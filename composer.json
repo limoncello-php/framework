@@ -1,0 +1,22 @@
+{
+    "name": "limoncello-php/framework",
+    "description": "PHP micro-framework framework (PSR-7)",
+    "keywords": ["framework", "micro", "PSR-7", "PSR7"],
+    "homepage": "https://github.com/limoncello-php/framework",
+    "support": {
+        "issues": "https://github.com/limoncello-php/framework/issues"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "neomerx",
+            "email": "info@neomerx.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "limoncello-php/core": "^0.2.0",
+        "limoncello-php/app-cache": "^0.1.0",
+        "limoncello-php/container-light": "^0.1.0"
+    }
+}
