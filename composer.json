@@ -15,8 +15,8 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "limoncello-php/core": "^0.2.0",
-        "limoncello-php/app-cache": "^0.1.0",
+        "limoncello-php/core": "^0.3.0",
+        "limoncello-php/app-cache": "^0.1.1",
         "limoncello-php/container-light": "^0.1.0",
         "limoncello-php/crypt": "^0.1.0",
         "limoncello-php/validation": "^0.1.9"
