@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/framework",
-    "description": "PHP micro-framework framework (PSR-7)",
-    "keywords": ["framework", "micro", "PSR-7", "PSR7"],
+    "description": "PHP framework framework (PSR-7)",
+    "keywords": ["framework", "PSR-7", "PSR7"],
     "homepage": "https://github.com/limoncello-php/framework",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"
@@ -20,5 +20,9 @@
         "limoncello-php/container-light": "^0.1.1",
         "limoncello-php/crypt": "^0.1.0",
         "limoncello-php/validation": "^0.2.0"
+    },
+    "scripts": {
+        "test": ["@test-OAuthServer"],
+        "test-OAuthServer": ["@composer update --working-dir=components/OAuthServer/ --optimize-autoloader --quiet", "composer --working-dir=components/OAuthServer/ test"]
     }
 }

@@ -1,0 +1,43 @@
+{
+    "name": "limoncello-php/oauth-server",
+    "description": "Framework agnostic OAuth 2.0 Server library (PSR-7)",
+    "keywords": ["PSR-7", "PSR7", "OAuth", "OAuth 2", "OAuth 2.0"],
+    "homepage": "https://github.com/limoncello-php/framework/components/OAuthServer",
+    "support": {
+        "issues": "https://github.com/limoncello-php/framework/issues"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "neomerx",
+            "email": "info@neomerx.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "psr/http-message": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7",
+        "squizlabs/php_codesniffer": "^2.7",
+        "phpmd/phpmd": "^2.6",
+        "zendframework/zend-diactoros": "^1.3",
+        "mockery/mockery": "^0.9.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Limoncello\\OAuthServer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Limoncello\\Tests\\OAuthServer\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": ["@test-unit", "@test-cs", "@test-md"],
+        "test-unit": "./vendor/bin/phpunit --coverage-text",
+        "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
+        "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming"
+    }
+}
