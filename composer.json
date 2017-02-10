@@ -22,7 +22,17 @@
         "limoncello-php/validation": "^0.2.0"
     },
     "scripts": {
-        "test": ["@test-OAuthServer"],
-        "test-OAuthServer": ["@composer update --working-dir=components/OAuthServer/ --optimize-autoloader --quiet", "composer --working-dir=components/OAuthServer/ test"]
+        "test": [
+            "@test-Contracts",
+            "@test-OAuthServer"
+        ],
+        "test-Contracts": [
+            "@composer update --working-dir=components/Contracts/ --optimize-autoloader --quiet",
+            "composer --working-dir=components/Contracts/ test"
+        ],
+        "test-OAuthServer": [
+            "@composer update --working-dir=components/OAuthServer/ --optimize-autoloader --quiet",
+            "composer --working-dir=components/OAuthServer/ test"
+        ]
     }
 }

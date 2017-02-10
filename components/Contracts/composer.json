@@ -1,0 +1,34 @@
+{
+    "name": "limoncello-php/contracts",
+    "description": "Limoncello PHP Framework Contracts (interfaces) required for components integration.",
+    "keywords": ["Limoncello Framework", "Limoncello", "Framework", "PHP", "Contracts", "Interfaces"],
+    "homepage": "https://github.com/limoncello-php/framework/components/Contracts",
+    "support": {
+        "issues": "https://github.com/limoncello-php/framework/issues"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "neomerx",
+            "email": "info@neomerx.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "container-interop/container-interop": "^1.1"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^2.7",
+        "phpmd/phpmd": "^2.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Limoncello\\Contracts\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": ["@test-cs", "@test-md"],
+        "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src",
+        "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming"
+    }
+}
