@@ -15,7 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
+
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Contracts\Integration\ClientIntegrationInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Psr\Http\Message\ResponseInterface;
@@ -75,7 +76,6 @@ trait ClientGrantTrait
     protected function clientIssueToken(array $parameters, ClientInterface $client): ResponseInterface
     {
         if ($client->isClientGrantEnabled() === false) {
-            // TODO we limit here possible Exception params. Think of a) add b) use helper factory
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
@@ -83,7 +83,6 @@ trait ClientGrantTrait
         list ($isScopeValid, $scopeList, $isScopeModified) =
             $this->clientGetIntegration()->clientValidateScope($client, $scope);
         if ($isScopeValid === false) {
-            // TODO we limit here possible Exception params. Think of a) add b) use helper factory
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_SCOPE);
         }
 

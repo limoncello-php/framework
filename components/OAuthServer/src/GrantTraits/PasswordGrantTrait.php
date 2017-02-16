@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Contracts\Integration\PasswordIntegrationInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Psr\Http\Message\ResponseInterface;
@@ -105,7 +105,6 @@ trait PasswordGrantTrait
         }
 
         if ($client !== null && $client->isPasswordGrantEnabled() === false) {
-            // TODO we limit here possible Exception params. Think of a) add b) use helper factory
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
@@ -113,14 +112,12 @@ trait PasswordGrantTrait
         list ($isScopeValid, $scopeList, $isScopeModified) =
             $this->passGetIntegration()->passValidateScope($client, $scope);
         if ($isScopeValid === false) {
-            // TODO we limit here possible Exception params. Think of a) add b) use helper factory
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_SCOPE);
         }
 
         if (($userName = $this->passGetUserName($parameters)) === null ||
             ($password = $this->passGetPassword($parameters)) === null
         ) {
-            // TODO we limit here possible Exception params. Think of a) add b) use helper factory
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_REQUEST);
         }
 

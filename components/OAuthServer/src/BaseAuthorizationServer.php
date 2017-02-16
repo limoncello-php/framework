@@ -17,9 +17,9 @@
  */
 
 use Limoncello\OAuthServer\Contracts\AuthorizationServerInterface;
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
-use Limoncello\OAuthServer\Contracts\Integration\CodeIntegrationInterface as AII;
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Contracts\Integration\ClientIntegrationInterface as CII;
+use Limoncello\OAuthServer\Contracts\Integration\CodeIntegrationInterface as AII;
 use Limoncello\OAuthServer\Contracts\Integration\ImplicitIntegrationInterface as III;
 use Limoncello\OAuthServer\Contracts\Integration\PasswordIntegrationInterface as PII;
 use Limoncello\OAuthServer\GrantTraits\ClientGrantTrait;

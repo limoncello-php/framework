@@ -186,23 +186,4 @@ class OAuthTokenBodyException extends OAuthServerException
     {
         return $this->httpHeaders;
     }
-
-    /**
-     * Get exception in array format as described in #5.2.
-     *
-     * @return array
-     *
-     * @link https://tools.ietf.org/html/rfc6749#section-5.2
-     */
-    public function toArray(): array
-    {
-        return $this->getErrorUri() === null ? [
-            'error'             => $this->getErrorCode(),
-            'error_description' => $this->getErrorDescription(),
-        ] : [
-            'error'             => $this->getErrorCode(),
-            'error_description' => $this->getErrorDescription(),
-            'error_uri'         => $this->getErrorUri(),
-        ];
-    }
 }

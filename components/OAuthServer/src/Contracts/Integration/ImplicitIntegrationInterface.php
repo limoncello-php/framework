@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**

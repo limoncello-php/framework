@@ -17,7 +17,7 @@
  */
 
 use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**

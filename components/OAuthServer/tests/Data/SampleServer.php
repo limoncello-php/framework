@@ -17,10 +17,10 @@
  */
 
 use Limoncello\OAuthServer\BaseAuthorizationServer;
-use Limoncello\OAuthServer\Contracts\GrantTypes;
 use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
+use Limoncello\OAuthServer\Contracts\ClientInterface;
+use Limoncello\OAuthServer\Contracts\GrantTypes;
 use Limoncello\OAuthServer\Contracts\ResponseTypes;
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Psr\Http\Message\ResponseInterface;
@@ -65,6 +65,9 @@ class SampleServer extends BaseAuthorizationServer
 
     /** Test data */
     const TEST_UNSUPPORTED_GRANT_TYPE_ERROR_URI = 'http://example.com/error123';
+
+    /** Test data */
+    const TEST_ACCESS_DENIED_ERROR_URI = 'http://example.com/error456';
 
     /** Test data */
     const TEST_CLIENT_ID = 'some_client_id';
@@ -136,10 +139,7 @@ class SampleServer extends BaseAuthorizationServer
                     }
                     break;
                 default:
-                    throw new OAuthTokenBodyException(
-                        OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE,
-                        self::TEST_UNSUPPORTED_GRANT_TYPE_ERROR_URI
-                    );
+                    throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE);
             }
         } catch (OAuthRedirectException $exception) {
             $response = $this->createRedirectErrorResponse($exception);
@@ -171,10 +171,7 @@ class SampleServer extends BaseAuthorizationServer
                     $response = $this->clientIssueToken($parameters, $authenticatedClient);
                     break;
                 default:
-                    throw new OAuthTokenBodyException(
-                        OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE,
-                        self::TEST_UNSUPPORTED_GRANT_TYPE_ERROR_URI
-                    );
+                    throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE);
             }
         } catch (OAuthTokenBodyException $exception) {
             $response = $this->createBodyErrorResponse($exception);
@@ -392,12 +389,10 @@ class SampleServer extends BaseAuthorizationServer
         AuthorizationCodeInterface $code
     ): ResponseInterface {
         // for authorization code format @link https://tools.ietf.org/html/rfc6749#section-4.1.2
-        $parameters = array_filter([
+        $parameters = $this->filterNulls([
             'code'  => $code->getCode(),
             'state' => $code->getState(),
-        ], function ($value) {
-            return $value !== null;
-        });
+        ]);
 
         $fragment = $this->encodeAsXWwwFormUrlencoded($parameters);
 
@@ -435,15 +430,13 @@ class SampleServer extends BaseAuthorizationServer
         // 'continue' button with an action linked to the redirection URI.
 
         $scope      = $scopeList === null ? null : implode(' ', $scopeList);
-        $parameters = array_filter([
+        $parameters = $this->filterNulls([
             'access_token' => $token,
             'token_type'   => $type,
             'expires_in'   => $expiresIn,
             'scope'        => $scope,
             'state'        => $state,
-        ], function ($value) {
-            return $value !== null;
-        });
+        ]);
 
         $fragment = $this->encodeAsXWwwFormUrlencoded($parameters);
 
@@ -470,15 +463,13 @@ class SampleServer extends BaseAuthorizationServer
     ): ResponseInterface {
         // for access token format @link https://tools.ietf.org/html/rfc6749#section-5.1
         $scope      = $scopeList === null ? null : implode(' ', $scopeList);
-        $parameters = array_filter([
+        $parameters = $this->filterNulls([
             'access_token'  => $token,
             'token_type'    => $type,
             'expires_in'    => $expiresIn,
             'refresh_token' => $refreshToken,
             'scope'         => $scope,
-        ], function ($value) {
-            return $value !== null;
-        });
+        ]);
 
         $response = new JsonResponse($parameters, 200, [
             'Cache-Control' => 'no-store',
@@ -495,14 +486,12 @@ class SampleServer extends BaseAuthorizationServer
      */
     private function createRedirectErrorResponse(OAuthRedirectException $exception): ResponseInterface
     {
-        $parameters = array_filter([
+        $parameters = $this->filterNulls([
             'error'             => $exception->getErrorCode(),
             'error_description' => $exception->getErrorDescription(),
             'error_uri'         => $exception->getErrorUri(),
             'state'             => $exception->getState(),
-        ], function ($value) {
-            return $value !== null;
-        });
+        ]);
         $fragment = $this->encodeAsXWwwFormUrlencoded($parameters);
         $uri      = (new Uri($exception->getRedirectUri()))->withFragment($fragment);
 
@@ -515,11 +504,19 @@ class SampleServer extends BaseAuthorizationServer
      * @param OAuthTokenBodyException $exception
      *
      * @return ResponseInterface
+     *
+     * @link https://tools.ietf.org/html/rfc6749#section-5.2
      */
     private function createBodyErrorResponse(OAuthTokenBodyException $exception): ResponseInterface
     {
+        $array = $this->filterNulls([
+            'error'             => $exception->getErrorCode(),
+            'error_description' => $exception->getErrorDescription(),
+            'error_uri'         => $this->getBodyErrorUri($exception),
+        ]);
+
         $response =
-            new JsonResponse($exception->toArray(), $exception->getHttpCode(), $exception->getHttpHeaders());
+            new JsonResponse($array, $exception->getHttpCode(), $exception->getHttpHeaders());
 
         return $response;
     }
@@ -550,5 +547,57 @@ class SampleServer extends BaseAuthorizationServer
         $this->repository = $repository;
 
         return $this;
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private function filterNulls(array $array): array
+    {
+        return array_filter($array, function ($value) {
+            return $value !== null;
+        });
+    }
+
+    /**
+     * @param OAuthTokenBodyException $exception
+     *
+     * @return null|string
+     */
+    protected function getBodyErrorUri(OAuthTokenBodyException $exception)
+    {
+        $uri = $exception->getErrorUri();
+
+        if ($uri === null) {
+            switch ($exception->getErrorCode()) {
+                case OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE:
+                    $uri = static::TEST_UNSUPPORTED_GRANT_TYPE_ERROR_URI;
+                    break;
+            }
+        }
+
+        return $uri;
+    }
+
+    /**
+     * @param OAuthRedirectException $exception
+     *
+     * @return null|string
+     */
+    protected function getRedirectErrorUri(OAuthRedirectException $exception)
+    {
+        $uri = $exception->getErrorUri();
+
+        if ($uri === null) {
+            switch ($exception->getErrorCode()) {
+                case OAuthRedirectException::ERROR_ACCESS_DENIED:
+                    $uri = static::TEST_ACCESS_DENIED_ERROR_URI;
+                    break;
+            }
+        }
+
+        return $uri;
     }
 }

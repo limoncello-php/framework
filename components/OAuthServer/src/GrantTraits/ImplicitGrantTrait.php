@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Contracts\Integration\ImplicitIntegrationInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenRedirectException;
 use Psr\Http\Message\ResponseInterface;
@@ -118,7 +118,6 @@ trait ImplicitGrantTrait
     ): ResponseInterface {
         $state = $this->implicitGetState($parameters);
         if ($maxStateLength !== null && strlen($state) > $maxStateLength) {
-            // TODO Think of using helper factory for exceptions in order to reduce param list / use all params
             throw new OAuthTokenRedirectException(
                 OAuthTokenRedirectException::ERROR_INVALID_REQUEST,
                 $redirectUri,
@@ -127,7 +126,6 @@ trait ImplicitGrantTrait
         }
 
         if ($client->isImplicitGrantEnabled() === false) {
-            // TODO Think of using helper factory for exceptions in order to reduce param list / use all params
             throw new OAuthTokenRedirectException(
                 OAuthTokenRedirectException::ERROR_UNAUTHORIZED_CLIENT,
                 $redirectUri,
@@ -139,7 +137,6 @@ trait ImplicitGrantTrait
         list ($isScopeValid, $scopeList, $isScopeModified) =
             $this->implicitGetIntegration()->implicitValidateScope($client, $scope);
         if ($isScopeValid === false) {
-            // TODO Think of using helper factory for exceptions in order to reduce param list / use all params
             throw new OAuthTokenRedirectException(
                 OAuthTokenRedirectException::ERROR_INVALID_SCOPE,
                 $redirectUri,

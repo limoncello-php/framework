@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthCodeRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\Tests\OAuthServer\Data\Client;
@@ -278,6 +278,26 @@ class CodeServerTest extends ServerTestCase
             SampleServer::TEST_AUTH_CODE,
             static::REDIRECT_URI_1,
             ['Authorization' => 'Basic ' . base64_encode("$identifier:$password")]
+        );
+        $response = $server->postCreateToken($request);
+
+        $expectedFragments = $this
+            ->getExpectedBodyTokenError(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
+        $this->validateBodyResponse($response, 400, $expectedFragments);
+    }
+
+    /**
+     * Test failed token issue due to client denied code auth.
+     */
+    public function testFailedTokenIssueDueToClientDeniedCodeAuth()
+    {
+        $client = $this->createClient()->disableCodeAuthorization();
+        $server = new SampleServer($this->createRepositoryMock($client));
+
+        $request  = $this->createTokenRequest(
+            static::CLIENT_ID,
+            SampleServer::TEST_AUTH_CODE,
+            static::REDIRECT_URI_1
         );
         $response = $server->postCreateToken($request);
 

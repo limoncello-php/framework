@@ -15,7 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
+
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Contracts\Integration\CodeIntegrationInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthCodeRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
@@ -124,10 +125,8 @@ trait CodeGrantTrait
         string $redirectUri = null,
         int $maxStateLength = null
     ): ResponseInterface {
-        // TODO invalid redirect uri for exceptions (can be null) should take from client if null
         $state = $this->codeGetState($parameters);
         if ($maxStateLength !== null && strlen($state) > $maxStateLength) {
-            // TODO Think of using helper factory for exceptions in order to reduce param list / use all params
             throw new OAuthCodeRedirectException(
                 OAuthCodeRedirectException::ERROR_INVALID_REQUEST,
                 $redirectUri,
@@ -136,7 +135,6 @@ trait CodeGrantTrait
         }
 
         if ($client->isCodeGrantEnabled() === false) {
-            // TODO Think of using helper factory for exceptions in order to reduce param list / use all params
             throw new OAuthCodeRedirectException(
                 OAuthCodeRedirectException::ERROR_UNAUTHORIZED_CLIENT,
                 $redirectUri,
@@ -148,7 +146,6 @@ trait CodeGrantTrait
         list ($isScopeValid, $scopeList, $isScopeModified) =
             $this->codeGetIntegration()->codeValidateScope($client, $scope);
         if ($isScopeValid === false) {
-            // TODO Think of using helper factory for exceptions in order to reduce param list / use all params
             throw new OAuthCodeRedirectException(
                 OAuthCodeRedirectException::ERROR_INVALID_SCOPE,
                 $redirectUri,
@@ -187,12 +184,10 @@ trait CodeGrantTrait
                 $client->isCodeGrantEnabled() === false ||
                 $client->isConfidential() === true
             ) {
-                // TODO we limit here possible Exception params. Think of a) add b) use helper factory
                 throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
             }
         } else {
             if ($clientId !== null && $clientId !== $authenticatedClient->getIdentifier()) {
-                // TODO we limit here possible Exception params. Think of a) add b) use helper factory
                 throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
             }
             $client = $authenticatedClient;
@@ -201,18 +196,15 @@ trait CodeGrantTrait
         if (($codeValue = $this->codeGetCode($parameters)) === null ||
             ($code = $this->codeGetIntegration()->codeReadAuthenticationCode($codeValue)) === null
         ) {
-            // TODO we limit here possible Exception params. Think of a) add b) use helper factory
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_GRANT);
         }
 
         if ($code->hasBeenUsedEarlier() === true) {
             $this->codeGetIntegration()->codeRevokeTokens($code);
-            // TODO we limit here possible Exception params. Think of a) add b) use helper factory
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_GRANT);
         }
 
         if ($code->getClientIdentifier() !== $client->getIdentifier()) {
-            // TODO we limit here possible Exception params. Think of a) add b) use helper factory
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
@@ -221,7 +213,6 @@ trait CodeGrantTrait
             if (($redirectUri = $this->codeGetRedirectUri($parameters)) === null ||
                 $redirectUri !== $code->getRedirectUri()
             ) {
-                // TODO we limit here possible Exception params. Think of a) add b) use helper factory
                 throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_GRANT);
             }
         }

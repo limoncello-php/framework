@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\OAuthServer\Contracts\Clients\ClientInterface;
+use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\Tests\OAuthServer\Data\Client;
 use Limoncello\Tests\OAuthServer\Data\RepositoryInterface;
