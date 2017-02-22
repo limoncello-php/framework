@@ -177,7 +177,7 @@ class Client implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getRedirectionUris(): array
+    public function getRedirectUriStrings(): array
     {
         return $this->redirectionUris;
     }
@@ -197,7 +197,7 @@ class Client implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getScopes(): array
+    public function getScopeStrings(): array
     {
         return $this->scopes;
     }

@@ -55,7 +55,7 @@ interface ClientInterface
      * @link https://tools.ietf.org/html/rfc6749#section-3.1.2.2
      * @link https://tools.ietf.org/html/rfc6749#section-3.1.2.3
      */
-    public function getRedirectionUris(): array;
+    public function getRedirectUriStrings(): array;
 
     /**
      * Get a list of scope (scope codes) associated with client. It could be interpreted as allowed scopes or as
@@ -65,7 +65,7 @@ interface ClientInterface
      *
      * @link https://tools.ietf.org/html/rfc6749#section-3.3
      */
-    public function getScopes(): array;
+    public function getScopeStrings(): array;
 
     /**
      * Get `true` if server should use client scope if no scope is given in authorization request. If `false` empty

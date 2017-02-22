@@ -129,7 +129,7 @@ class CodeServerTest extends ServerTestCase
     {
         // make sure client has more than 1 redirect URI so it cannot be determined which one to use automatically
         $client = $this->createClient();
-        $this->assertGreaterThan(1, count($client->getRedirectionUris()));
+        $this->assertGreaterThan(1, count($client->getRedirectUriStrings()));
 
         $server = new SampleServer($this->createRepositoryMock($client));
 

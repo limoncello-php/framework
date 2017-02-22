@@ -90,14 +90,14 @@ trait OAuthServerTrait
     protected function validateScope(ClientInterface $client, array $scopes = null): array
     {
         if (empty($scopes) === true) {
-            $clientScopes = $client->getScopes();
+            $clientScopes = $client->getScopeStrings();
             $isModified   = $clientScopes !== $scopes;
 
             return $client->isUseDefaultScopesOnEmptyRequest() === true ?
                 [true, $clientScopes, $isModified] : [false, $scopes, false];
         }
 
-        $extraScopes    = array_diff($scopes, $client->getScopes());
+        $extraScopes    = array_diff($scopes, $client->getScopeStrings());
         $hasExtraScopes = count($extraScopes) > 0;
         $isInvalidScope = $hasExtraScopes === true && $client->isScopeExcessAllowed() === false;
 
@@ -112,7 +112,7 @@ trait OAuthServerTrait
      */
     protected function isValidRedirectUri(ClientInterface $client, string $redirectUri = null)
     {
-        $uris = $client->getRedirectionUris();
+        $uris = $client->getRedirectUriStrings();
         if (empty($redirectUri) === true) {
             // if no redirect provided and it's optional we require client to have
             // exactly 1 redirect URI so we know where to redirect.
@@ -121,7 +121,7 @@ trait OAuthServerTrait
 
         // check client has provided redirect URI
         $isValid = false;
-        foreach ($client->getRedirectionUris() as $uri) {
+        foreach ($client->getRedirectUriStrings() as $uri) {
             if ($uri === $redirectUri) {
                 $isValid = true;
                 break;
@@ -142,7 +142,7 @@ trait OAuthServerTrait
         if ($receivedRedirectUri !== null) {
             assert(
                 call_user_func(function () use ($client, $receivedRedirectUri) {
-                    foreach ($client->getRedirectionUris() as $uri) {
+                    foreach ($client->getRedirectUriStrings() as $uri) {
                         if ($uri === $receivedRedirectUri) {
                             return true;
                         }
@@ -157,7 +157,7 @@ trait OAuthServerTrait
             return $receivedRedirectUri;
         }
 
-        $redirectionUris = $client->getRedirectionUris();
+        $redirectionUris = $client->getRedirectUriStrings();
 
         assert(
             count($redirectionUris) === 1,
