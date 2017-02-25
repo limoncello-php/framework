@@ -89,7 +89,8 @@ trait ClientGrantTrait
         $response = $this->clientGetIntegration()->clientCreateAccessTokenResponse(
             $client,
             $isScopeModified,
-            $scopeList
+            $scopeList,
+            $parameters
         );
 
         return $response;

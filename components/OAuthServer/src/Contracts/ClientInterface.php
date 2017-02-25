@@ -58,14 +58,14 @@ interface ClientInterface
     public function getRedirectUriStrings(): array;
 
     /**
-     * Get a list of scope (scope codes) associated with client. It could be interpreted as allowed scopes or as
+     * Get a list of scope (scope identifiers) associated with client. It could be interpreted as allowed scopes or as
      * default scopes for token if no scopes are given in authentication request.
      *
      * @return string[]
      *
      * @link https://tools.ietf.org/html/rfc6749#section-3.3
      */
-    public function getScopeStrings(): array;
+    public function getScopeIdentifiers(): array;
 
     /**
      * Get `true` if server should use client scope if no scope is given in authorization request. If `false` empty

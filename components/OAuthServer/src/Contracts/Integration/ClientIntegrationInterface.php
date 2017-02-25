@@ -41,6 +41,7 @@ interface ClientIntegrationInterface extends IntegrationInterface
      * @param ClientInterface $client
      * @param bool            $isScopeModified
      * @param array|null      $scope
+     * @param array           $extraParameters
      *
      * @return ResponseInterface
      *
@@ -49,6 +50,7 @@ interface ClientIntegrationInterface extends IntegrationInterface
     public function clientCreateAccessTokenResponse(
         ClientInterface $client,
         bool $isScopeModified,
-        array $scope = null
+        array $scope = null,
+        array $extraParameters = []
     ): ResponseInterface;
 }

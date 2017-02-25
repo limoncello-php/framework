@@ -36,12 +36,13 @@ interface CodeIntegrationInterface extends IntegrationInterface
      */
     public function codeValidateScope(ClientInterface $client, array $scopes = null): array;
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @param ClientInterface $client
      * @param string|null     $redirectUri
      * @param bool            $isScopeModified
      * @param string[]|null   $scopeList
      * @param string|null     $state
+     * @param array           $extraParameters
      *
      * @return ResponseInterface
      *
@@ -54,7 +55,8 @@ interface CodeIntegrationInterface extends IntegrationInterface
         string $redirectUri = null,
         bool $isScopeModified = false,
         array $scopeList = null,
-        string $state = null
+        string $state = null,
+        array $extraParameters = []
     ): ResponseInterface;
 
     /**
@@ -77,12 +79,16 @@ interface CodeIntegrationInterface extends IntegrationInterface
 
     /**
      * @param AuthorizationCodeInterface $code
+     * @param array                      $extraParameters
      *
      * @return ResponseInterface
      *
      * @link https://tools.ietf.org/html/rfc6749#section-4.1.4
      */
-    public function codeCreateAccessTokenResponse(AuthorizationCodeInterface $code): ResponseInterface;
+    public function codeCreateAccessTokenResponse(
+        AuthorizationCodeInterface $code,
+        array $extraParameters = []
+    ): ResponseInterface;
 
     /**
      * @param string $identifier

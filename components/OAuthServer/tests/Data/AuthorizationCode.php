@@ -49,11 +49,6 @@ class AuthorizationCode implements AuthorizationCodeInterface
     private $isScopeModified = false;
 
     /**
-     * @var string|null
-     */
-    private $state = null;
-
-    /**
      * @var bool
      */
     private $isUsedEarlier = false;
@@ -112,7 +107,7 @@ class AuthorizationCode implements AuthorizationCodeInterface
     /**
      * @inheritdoc
      */
-    public function getRedirectUri()
+    public function getRedirectUriString()
     {
         return $this->redirectUri;
     }
@@ -132,7 +127,7 @@ class AuthorizationCode implements AuthorizationCodeInterface
     /**
      * @inheritdoc
      */
-    public function getScope(): array
+    public function getScopeIdentifiers(): array
     {
         return $this->scope;
     }
@@ -173,26 +168,6 @@ class AuthorizationCode implements AuthorizationCodeInterface
     public function setScopeUnmodified(): AuthorizationCode
     {
         $this->isScopeModified = false;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getState()
-    {
-        return $this->state;
-    }
-
-    /**
-     * @param null|string $state
-     *
-     * @return AuthorizationCode
-     */
-    public function setState(string $state = null): AuthorizationCode
-    {
-        $this->state = $state;
 
         return $this;
     }

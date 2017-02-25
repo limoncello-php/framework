@@ -197,7 +197,7 @@ class Client implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getScopeStrings(): array
+    public function getScopeIdentifiers(): array
     {
         return $this->scopes;
     }

@@ -17,7 +17,6 @@
  */
 
 use Limoncello\OAuthServer\Contracts\ClientInterface;
-use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -36,7 +35,7 @@ interface PasswordIntegrationInterface extends IntegrationInterface
      */
     public function passValidateScope(ClientInterface $client = null, array $scopes = null): array;
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * Validate resource owner credentials and create access token response. On error (e.g invalid credentials)
      * it throws OAuth exception.
      *
@@ -45,10 +44,9 @@ interface PasswordIntegrationInterface extends IntegrationInterface
      * @param ClientInterface|null $client
      * @param bool                 $isScopeModified
      * @param array|null           $scope
+     * @param array                $extraParameters
      *
      * @return ResponseInterface
-     *
-     * @throws OAuthTokenBodyException
      *
      * @link https://tools.ietf.org/html/rfc6749#section-4.1.4
      *
@@ -59,7 +57,8 @@ interface PasswordIntegrationInterface extends IntegrationInterface
         $password,
         ClientInterface $client = null,
         bool $isScopeModified = false,
-        array $scope = null
+        array $scope = null,
+        array $extraParameters = []
     ): ResponseInterface;
 
     /**

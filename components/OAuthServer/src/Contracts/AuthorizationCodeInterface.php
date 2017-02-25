@@ -22,9 +22,9 @@
 interface AuthorizationCodeInterface
 {
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCode(): string;
+    public function getCode();
 
     /**
      * @return string
@@ -34,12 +34,12 @@ interface AuthorizationCodeInterface
     /**
      * @return string|null
      */
-    public function getRedirectUri();
+    public function getRedirectUriString();
 
     /**
      * @return string[]
      */
-    public function getScope(): array;
+    public function getScopeIdentifiers(): array;
 
     /**
      * If the scope was modified from original client request.
@@ -47,11 +47,6 @@ interface AuthorizationCodeInterface
      * @return bool
      */
     public function isScopeModified(): bool;
-
-    /**
-     * @return string|null
-     */
-    public function getState();
 
     /**
      * If the code has already been used earlier.

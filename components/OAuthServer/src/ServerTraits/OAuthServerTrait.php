@@ -90,14 +90,14 @@ trait OAuthServerTrait
     protected function validateScope(ClientInterface $client, array $scopes = null): array
     {
         if (empty($scopes) === true) {
-            $clientScopes = $client->getScopeStrings();
+            $clientScopes = $client->getScopeIdentifiers();
             $isModified   = $clientScopes !== $scopes;
 
             return $client->isUseDefaultScopesOnEmptyRequest() === true ?
                 [true, $clientScopes, $isModified] : [false, $scopes, false];
         }
 
-        $extraScopes    = array_diff($scopes, $client->getScopeStrings());
+        $extraScopes    = array_diff($scopes, $client->getScopeIdentifiers());
         $hasExtraScopes = count($extraScopes) > 0;
         $isInvalidScope = $hasExtraScopes === true && $client->isScopeExcessAllowed() === false;
 

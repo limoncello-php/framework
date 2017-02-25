@@ -126,7 +126,8 @@ trait PasswordGrantTrait
             $password,
             $client,
             $isScopeModified,
-            $scopeList
+            $scopeList,
+            $parameters
         );
 
         return $response;

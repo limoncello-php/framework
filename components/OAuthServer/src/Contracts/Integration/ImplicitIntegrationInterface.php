@@ -35,12 +35,13 @@ interface ImplicitIntegrationInterface extends IntegrationInterface
      */
     public function implicitValidateScope(ClientInterface $client, array $scopes = null): array;
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @param ClientInterface $client
      * @param string|null     $redirectUri
      * @param bool            $isScopeModified
      * @param string[]|null   $scopeList
      * @param string|null     $state
+     * @param array           $extraParameters
      *
      * @return ResponseInterface
      *
@@ -53,6 +54,7 @@ interface ImplicitIntegrationInterface extends IntegrationInterface
         string $redirectUri = null,
         bool $isScopeModified = false,
         array $scopeList = null,
-        string $state = null
+        string $state = null,
+        array $extraParameters = []
     ): ResponseInterface;
 }

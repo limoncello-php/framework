@@ -180,7 +180,7 @@ class SampleServer extends BaseAuthorizationServer
         return $response;
     }
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @inheritdoc
      */
     public function codeCreateAskResourceOwnerForApprovalResponse(
@@ -188,7 +188,8 @@ class SampleServer extends BaseAuthorizationServer
         string $redirectUri = null,
         bool $isScopeModified = false,
         array $scopeList = null,
-        string $state = null
+        string $state = null,
+        array $extraParameters = []
     ): ResponseInterface {
         // This method should return some kind of HTML response with a list of scopes asking resource owner for
         // approval. If the scope is approved the controller should create and save authentication code and
@@ -198,11 +199,10 @@ class SampleServer extends BaseAuthorizationServer
         //
         // For demonstration purposes and simplicity we skip 'approval' step and issue the code right away.
 
-        $code = (new AuthorizationCode(static::TEST_AUTH_CODE, $client->getIdentifier(), $redirectUri, $scopeList))
-            ->setState($state);
+        $code = (new AuthorizationCode(static::TEST_AUTH_CODE, $client->getIdentifier(), $redirectUri, $scopeList));
         $isScopeModified === true ? $code->setScopeModified() : $code->setScopeUnmodified();
 
-        $response = $this->createRedirectCodeResponse($client, $code);
+        $response = $this->createRedirectCodeResponse($client, $code, $state);
 
         return $response;
     }
@@ -228,13 +228,15 @@ class SampleServer extends BaseAuthorizationServer
     /**
      * @inheritdoc
      */
-    public function codeCreateAccessTokenResponse(AuthorizationCodeInterface $code): ResponseInterface
-    {
+    public function codeCreateAccessTokenResponse(
+        AuthorizationCodeInterface $code,
+        array $extraParameters = []
+    ): ResponseInterface {
         $token        = static::TEST_TOKEN;
         $type         = static::TEST_TOKEN_TYPE;
         $expiresIn    = static::TEST_TOKEN_EXPIRES_IN;
         $refreshToken = static::TEST_REFRESH_TOKEN;
-        $scopeList    = $code->isScopeModified() === true ? $code->getScope() : null;
+        $scopeList    = $code->isScopeModified() === true ? $code->getScopeIdentifiers() : null;
 
         // let's pretend we've saved the token parameters for the user
 
@@ -259,7 +261,7 @@ class SampleServer extends BaseAuthorizationServer
         // pretend we actually revoke all related tokens
     }
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @inheritdoc
      */
     public function implicitCreateAskResourceOwnerForApprovalResponse(
@@ -267,7 +269,8 @@ class SampleServer extends BaseAuthorizationServer
         string $redirectUri = null,
         bool $isScopeModified = false,
         array $scopeList = null,
-        string $state = null
+        string $state = null,
+        array $extraParameters = []
     ): ResponseInterface {
         // This method should return some kind of HTML response with a list of scopes asking resource owner for
         // approval. If the scope is approved the controller should create and save token and return it.
@@ -287,7 +290,7 @@ class SampleServer extends BaseAuthorizationServer
         return $response;
     }
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @inheritdoc
      */
     public function passValidateCredentialsAndCreateAccessTokenResponse(
@@ -295,7 +298,8 @@ class SampleServer extends BaseAuthorizationServer
         $password,
         ClientInterface $client = null,
         bool $isScopeModified = false,
-        array $scope = null
+        array $scope = null,
+        array $extraParameters = []
     ): ResponseInterface {
         // let's pretend we've made a query to our database and checked the credentials
         $areCredentialsValid = $userName === static::TEST_USER_NAME && $password === static::TEST_PASSWORD;
@@ -330,7 +334,8 @@ class SampleServer extends BaseAuthorizationServer
     public function clientCreateAccessTokenResponse(
         ClientInterface $client,
         bool $isScopeModified,
-        array $scope = null
+        array $scope = null,
+        array $extraParameters = []
     ): ResponseInterface {
         $token     = static::TEST_TOKEN;
         $type      = static::TEST_TOKEN_TYPE;
@@ -381,22 +386,24 @@ class SampleServer extends BaseAuthorizationServer
     /**
      * @param ClientInterface            $client
      * @param AuthorizationCodeInterface $code
+     * @param string|null                $state
      *
      * @return ResponseInterface
      */
     private function createRedirectCodeResponse(
         ClientInterface $client,
-        AuthorizationCodeInterface $code
+        AuthorizationCodeInterface $code,
+        string $state = null
     ): ResponseInterface {
         // for authorization code format @link https://tools.ietf.org/html/rfc6749#section-4.1.2
         $parameters = $this->filterNulls([
             'code'  => $code->getCode(),
-            'state' => $code->getState(),
+            'state' => $state,
         ]);
 
         $fragment = $this->encodeAsXWwwFormUrlencoded($parameters);
 
-        $redirectUri = $this->selectRedirectUri($client, $code->getRedirectUri());
+        $redirectUri = $this->selectRedirectUri($client, $code->getRedirectUriString());
         $response = new RedirectResponse((new Uri($redirectUri))->withFragment($fragment));
 
         return $response;

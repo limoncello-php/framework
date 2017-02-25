@@ -208,16 +208,16 @@ trait CodeGrantTrait
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
-        if ($code->getRedirectUri() !== null) {
+        if ($code->getRedirectUriString() !== null) {
             // REQUIRED, if the "redirect_uri" parameter was included in the authorization request
             if (($redirectUri = $this->codeGetRedirectUri($parameters)) === null ||
-                $redirectUri !== $code->getRedirectUri()
+                $redirectUri !== $code->getRedirectUriString()
             ) {
                 throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_GRANT);
             }
         }
 
-        $response = $this->codeGetIntegration()->codeCreateAccessTokenResponse($code);
+        $response = $this->codeGetIntegration()->codeCreateAccessTokenResponse($code, $parameters);
 
         return $response;
     }

@@ -149,7 +149,8 @@ trait ImplicitGrantTrait
             $redirectUri,
             $isScopeModified,
             $scopeList,
-            $state
+            $state,
+            $parameters
         );
 
         return $response;
