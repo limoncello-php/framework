@@ -18,10 +18,9 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\Type;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
 use Mockery;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,6 +32,8 @@ use Zend\Diactoros\Uri;
  */
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
+    use DatabaseSchemeMigrationTrait;
+
     /**
      * DBAL option.
      */
@@ -58,21 +59,6 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $this->assertNotSame(false, $connection->exec('PRAGMA foreign_keys = ON;'));
 
         return $connection;
-    }
-
-    /**
-     * @param Connection $connection
-     *
-     * @return void
-     */
-    protected function createDatabaseScheme(Connection $connection)
-    {
-        $this->createScopesTable($connection);
-        $this->createClientsTable($connection);
-        $this->createRedirectUrisTable($connection);
-        $this->createTokensTable($connection);
-        $this->createClientsScopesTable($connection);
-        $this->createTokensScopesTable($connection);
     }
 
     /**
@@ -185,188 +171,5 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
             $this->assertEquals([$value], $response->getHeader($header));
         }
         $this->assertEmpty((string)$response->getBody());
-    }
-
-    /**
-     * @param Connection $connection
-     *
-     * @return void
-     */
-    private function createScopesTable(Connection $connection)
-    {
-        $scheme  = $this->getDatabaseScheme();
-        $manager = $connection->getSchemaManager();
-
-        $table = new Table($scheme->getScopesTable());
-        $table->addColumn($scheme->getScopesIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->addColumn($scheme->getScopesDescriptionColumn(), Type::STRING)->setNotnull(false);
-        $table->addColumn($scheme->getScopesCreatedAtColumn(), Type::DATETIME)->setNotnull(true);
-        $table->addColumn($scheme->getScopesUpdatedAtColumn(), Type::DATETIME)->setNotnull(false);
-        $table->setPrimaryKey([$scheme->getScopesIdentityColumn()]);
-        $manager->dropAndCreateTable($table);
-    }
-
-    /**
-     * @param Connection $connection
-     *
-     * @return void
-     */
-    private function createClientsTable(Connection $connection)
-    {
-        $scheme  = $this->getDatabaseScheme();
-        $manager = $connection->getSchemaManager();
-
-        $table = new Table($scheme->getClientsTable());
-        $table->addColumn($scheme->getClientsIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->addColumn($scheme->getClientsNameColumn(), Type::STRING)->setNotnull(true);
-        $table->addColumn($scheme->getClientsDescriptionColumn(), Type::STRING)->setNotnull(false);
-        $table->addColumn($scheme->getClientsCredentialsColumn(), Type::STRING)->setNotnull(false);
-        $table->addColumn($scheme->getClientsIsConfidentialColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsScopeExcessAllowedColumn(), Type::BOOLEAN)->setDefault(false);
-        $table->addColumn($scheme->getClientsIsUseDefaultScopeColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsCodeGrantEnabledColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsImplicitGrantEnabledColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsPasswordGrantEnabledColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsClientGrantEnabledColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsCreatedAtColumn(), Type::DATETIME)->setNotnull(true);
-        $table->addColumn($scheme->getClientsUpdatedAtColumn(), Type::DATETIME)->setNotnull(false);
-        $table->setPrimaryKey([$scheme->getClientsIdentityColumn()]);
-        $manager->dropAndCreateTable($table);
-    }
-
-    /**
-     * @param Connection $connection
-     *
-     * @return void
-     */
-    private function createRedirectUrisTable(Connection $connection)
-    {
-        $scheme  = $this->getDatabaseScheme();
-        $manager = $connection->getSchemaManager();
-
-        $table = new Table($scheme->getRedirectUrisTable());
-        $table->addColumn($scheme->getRedirectUrisIdentityColumn(), Type::INTEGER)
-            ->setNotnull(true)->setAutoincrement(true);
-        $table->addColumn($scheme->getRedirectUrisClientIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->addColumn($scheme->getRedirectUrisValueColumn(), Type::STRING)->setNotnull(true);
-        $table->addColumn($scheme->getRedirectUrisCreatedAtColumn(), Type::DATETIME)->setNotnull(true);
-        $table->addColumn($scheme->getRedirectUrisUpdatedAtColumn(), Type::DATETIME)->setNotnull(false);
-        $table->setPrimaryKey([$scheme->getRedirectUrisIdentityColumn()]);
-
-        $table->addForeignKeyConstraint(
-            $scheme->getClientsTable(),
-            [$scheme->getRedirectUrisClientIdentityColumn()],
-            [$scheme->getClientsIdentityColumn()],
-            static::ON_DELETE_CASCADE
-        );
-
-        $manager->dropAndCreateTable($table);
-    }
-
-    /**
-     * @param Connection $connection
-     *
-     * @return void
-     */
-    private function createTokensTable(Connection $connection)
-    {
-        $scheme  = $this->getDatabaseScheme();
-        $manager = $connection->getSchemaManager();
-
-        $table = new Table($scheme->getTokensTable());
-        $table->addColumn($scheme->getTokensIdentityColumn(), Type::INTEGER)
-            ->setNotnull(true)->setAutoincrement(true);
-        $table->addColumn($scheme->getTokensIsEnabledColumn(), Type::BOOLEAN)->setNotnull(true)->setDefault(true);
-        $table->addColumn($scheme->getTokensIsScopeModified(), Type::BOOLEAN)->setNotnull(true)->setDefault(false);
-        $table->addColumn($scheme->getTokensClientIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->addColumn($scheme->getTokensUserIdentityColumn(), Type::INTEGER)->setNotnull(true);
-        $table->addColumn($scheme->getTokensRedirectUriColumn(), Type::STRING)->setNotnull(false);
-        $table->addColumn($scheme->getTokensCodeColumn(), Type::STRING)->setNotnull(false);
-        $table->addColumn($scheme->getTokensTypeColumn(), Type::STRING)->setNotnull(false);
-        $table->addColumn($scheme->getTokensValueColumn(), Type::STRING)->setNotnull(false);
-        $table->addColumn($scheme->getTokensRefreshColumn(), Type::STRING)->setNotnull(false);
-        $table->addColumn($scheme->getTokensCodeCreatedAtColumn(), Type::DATETIME)->setNotnull(false);
-        $table->addColumn($scheme->getTokensValueCreatedAtColumn(), Type::DATETIME)->setNotnull(false);
-        $table->addColumn($scheme->getTokensRefreshCreatedAtColumn(), Type::DATETIME)->setNotnull(false);
-        $table->setPrimaryKey([$scheme->getTokensIdentityColumn()]);
-
-        $table->addForeignKeyConstraint(
-            $scheme->getClientsTable(),
-            [$scheme->getTokensClientIdentityColumn()],
-            [$scheme->getClientsIdentityColumn()],
-            static::ON_DELETE_CASCADE
-        );
-
-        $manager->dropAndCreateTable($table);
-    }
-
-    /**
-     * @param Connection $connection
-     *
-     * @return void
-     */
-    private function createClientsScopesTable(Connection $connection)
-    {
-        $scheme  = $this->getDatabaseScheme();
-        $manager = $connection->getSchemaManager();
-
-        $table = new Table($scheme->getClientsScopesTable());
-        $table->addColumn($scheme->getClientsScopesClientIdentityColumn(), Type::INTEGER)->setNotnull(true);
-        $table->addColumn($scheme->getClientsScopesScopeIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->setPrimaryKey([
-            $scheme->getClientsScopesClientIdentityColumn(),
-            $scheme->getClientsScopesScopeIdentityColumn()
-        ]);
-
-        $table->addForeignKeyConstraint(
-            $scheme->getClientsTable(),
-            [$scheme->getClientsScopesClientIdentityColumn()],
-            [$scheme->getClientsIdentityColumn()],
-            static::ON_DELETE_CASCADE
-        );
-
-        $table->addForeignKeyConstraint(
-            $scheme->getScopesTable(),
-            [$scheme->getClientsScopesScopeIdentityColumn()],
-            [$scheme->getScopesIdentityColumn()],
-            static::ON_DELETE_CASCADE
-        );
-
-        $manager->dropAndCreateTable($table);
-    }
-
-    /**
-     * @param Connection $connection
-     *
-     * @return void
-     */
-    private function createTokensScopesTable(Connection $connection)
-    {
-        $scheme  = $this->getDatabaseScheme();
-        $manager = $connection->getSchemaManager();
-
-        $table = new Table($scheme->getTokensScopesTable());
-        $table->addColumn($scheme->getTokensScopesTokenIdentityColumn(), Type::INTEGER)->setNotnull(true);
-        $table->addColumn($scheme->getTokensScopesScopeIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->setPrimaryKey([
-            $scheme->getTokensScopesTokenIdentityColumn(),
-            $scheme->getTokensScopesScopeIdentityColumn()
-        ]);
-
-        $table->addForeignKeyConstraint(
-            $scheme->getTokensTable(),
-            [$scheme->getTokensScopesTokenIdentityColumn()],
-            [$scheme->getTokensIdentityColumn()],
-            static::ON_DELETE_CASCADE
-        );
-
-        $table->addForeignKeyConstraint(
-            $scheme->getScopesTable(),
-            [$scheme->getTokensScopesScopeIdentityColumn()],
-            [$scheme->getScopesIdentityColumn()],
-            static::ON_DELETE_CASCADE
-        );
-
-        $manager->dropAndCreateTable($table);
     }
 }

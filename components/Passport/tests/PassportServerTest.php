@@ -43,7 +43,7 @@ class PassportServerTest extends TestCase
      */
     public function testResourceOwnerPasswordToken()
     {
-        $this->createDatabaseScheme($connection = $this->createSqLiteConnection());
+        $this->createDatabaseScheme($connection = $this->createSqLiteConnection(), $this->getDatabaseScheme());
         $scheme     = $this->getDatabaseScheme();
         $scopeRepo  = new ScopeRepository($connection, $scheme);
         $clientRepo = new ClientRepository($connection, $scheme);
