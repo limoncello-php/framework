@@ -67,7 +67,7 @@ class ClientRepositoryTest extends TestCase
         $sameClient = $repo->read($client->getIdentifier());
         $this->assertEquals('client1', $sameClient->getIdentifier());
         $this->assertNull($sameClient->getDescription());
-        $this->assertEmpty($sameClient->getScopeStrings());
+        $this->assertEmpty($sameClient->getScopeIdentifiers());
         $this->assertEmpty($sameClient->getRedirectUriStrings());
         $this->assertTrue($sameClient->getCreatedAt() instanceof DateTimeImmutable);
         $this->assertTrue($sameClient->getUpdatedAt() instanceof DateTimeImmutable);
@@ -96,12 +96,12 @@ class ClientRepositoryTest extends TestCase
         });
 
         $this->assertNotNull($client = $clientRepo->read('client1'));
-        $this->assertCount(2, $client->getScopeStrings());
-        $this->assertEquals(['scope1', 'scope2'], $client->getScopeStrings());
+        $this->assertCount(2, $client->getScopeIdentifiers());
+        $this->assertEquals(['scope1', 'scope2'], $client->getScopeIdentifiers());
 
         $clientRepo->unbindScopes($client->getIdentifier());
         $this->assertNotNull($client = $clientRepo->read($client->getIdentifier()));
-        $this->assertCount(0, $client->getScopeStrings());
+        $this->assertCount(0, $client->getScopeIdentifiers());
     }
 
     /**

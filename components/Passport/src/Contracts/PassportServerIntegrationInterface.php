@@ -19,6 +19,7 @@
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @package Limoncello\Passport
@@ -57,17 +58,56 @@ interface PassportServerIntegrationInterface
     public function validateUserId(string $userName, string $password): int;
 
     /**
-     * @param int             $userId
-     * @param ClientInterface $client
+     * @param string          $clientIdentifier
+     * @param int             $userIdentifier
      * @param bool            $isScopeModified
      * @param string[]|null   $scope
      *
      * @return array [string $tokenValue, string $tokenType, int $tokenExpiresInSeconds, string|null $refreshValue]
      */
     public function generateTokenValues(
-        int $userId,
-        ClientInterface $client,
-        bool $isScopeModified,
+        string $clientIdentifier,
+        int $userIdentifier = null,
+        bool $isScopeModified = false,
         array $scope = null
     ): array;
+
+    /**
+     * @return int
+     */
+    public function getCodeExpirationPeriod(): int;
+
+    /**
+     * @return int
+     */
+    public function getTokenExpirationPeriod(): int;
+
+    /**
+     * @return ResponseInterface
+     */
+    public function createInvalidClientAndRedirectUriErrorResponse(): ResponseInterface;
+
+    /** @noinspection PhpTooManyParametersInspection
+     * @param ClientInterface $client
+     * @param string|null     $redirectUri
+     * @param bool            $isScopeModified
+     * @param string[]|null   $scopeList
+     * @param string|null     $state
+     * @param array           $extraParameters
+     *
+     * @return ResponseInterface
+     *
+     * @link https://tools.ietf.org/html/rfc6749#section-4.1.2
+     * @link https://tools.ietf.org/html/rfc6749#section-4.2.2
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
+    public function createAskResourceOwnerForApprovalResponse(
+        ClientInterface $client,
+        string $redirectUri = null,
+        bool $isScopeModified = false,
+        array $scopeList = null,
+        string $state = null,
+        array $extraParameters = []
+    ): ResponseInterface;
 }

@@ -49,9 +49,9 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      */
     public function assignValuesToCode(
         string $code,
-        int $expirationInSeconds,
         string $tokenValue,
         string $tokenType,
+        int $expirationInSeconds,
         string $refreshValue = null
     ) {
         $query = $this->getConnection()->createQueryBuilder();

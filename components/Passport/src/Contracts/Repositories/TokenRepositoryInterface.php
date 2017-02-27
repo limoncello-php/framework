@@ -43,18 +43,18 @@ interface TokenRepositoryInterface
 
     /**
      * @param string      $code
-     * @param int         $expirationInSeconds
      * @param string      $tokenValue
      * @param string      $tokenType
+     * @param int         $expirationInSeconds
      * @param string|null $refreshValue
      *
      * @return void
      */
     public function assignValuesToCode(
         string $code,
-        int $expirationInSeconds,
         string $tokenValue,
         string $tokenType,
+        int $expirationInSeconds,
         string $refreshValue = null
     );
 

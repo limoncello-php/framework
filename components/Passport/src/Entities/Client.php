@@ -95,7 +95,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @var string[]
      */
-    private $scopeStrings;
+    private $scopeIdentifiers;
 
     /**
      * @var bool
@@ -283,9 +283,9 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getScopeStrings(): array
+    public function getScopeIdentifiers(): array
     {
-        return $this->scopeStrings;
+        return $this->scopeIdentifiers;
     }
 
     /**
@@ -295,19 +295,19 @@ abstract class Client extends DatabaseItem implements ClientInterface
      */
     public function parseScopeList(string $uriList): Client
     {
-        return $this->setScopeStrings(
+        return $this->setScopeIdentifiers(
             empty($uriList) === true ? [] : explode($this->getListSeparator(), $uriList)
         );
     }
 
     /**
-     * @param string[] $scopeStrings
+     * @param string[] $scopeIdentifiers
      *
      * @return Client
      */
-    public function setScopeStrings(array $scopeStrings): Client
+    public function setScopeIdentifiers(array $scopeIdentifiers): Client
     {
-        $this->scopeStrings = $scopeStrings;
+        $this->scopeIdentifiers = $scopeIdentifiers;
 
         return $this;
     }

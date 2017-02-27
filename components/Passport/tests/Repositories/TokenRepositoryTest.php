@@ -78,16 +78,16 @@ class TokenRepositoryTest extends TestCase
         $this->assertEquals($userId, $token->getUserIdentifier());
         $this->assertNull($token->getValue());
         $this->assertNull($token->getRefreshValue());
-        $this->assertCount(2, $token->getTokenScopeStrings());
+        $this->assertCount(2, $token->getScopeIdentifiers());
         $this->assertTrue($token->getCodeCreatedAt() instanceof DateTimeImmutable);
         $this->assertNull($token->getValueCreatedAt());
         $this->assertNull($token->getRefreshCreatedAt());
 
         $tokenRepo->assignValuesToCode(
             $code,
-            10,
             $value = 'some-token-value',
             $type = 'bearer',
+            10,
             $refresh = 'some-refresh-value'
         );
 
@@ -102,7 +102,7 @@ class TokenRepositoryTest extends TestCase
 
         $tokenRepo->unbindScopes($sameToken->getIdentifier());
         $sameToken = $tokenRepo->read($token->getIdentifier());
-        $this->assertCount(0, $sameToken->getTokenScopeStrings());
+        $this->assertCount(0, $sameToken->getScopeIdentifiers());
 
         $tokenRepo->disable($tokenId);
         $this->assertNull($tokenRepo->readByCode($code, 10));

@@ -26,6 +26,7 @@ trait DbListSeparatorTrait
      */
     protected function getListSeparator(): string
     {
+        // TODO Actually by the spec space is used as a separator. It might be optimization to use space in db and here.
         return ',';
     }
 }

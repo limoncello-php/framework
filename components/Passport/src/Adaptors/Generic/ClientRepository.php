@@ -77,7 +77,7 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
      */
     private function addScopeAndRedirectUris(Client $client)
     {
-        $client->setScopeStrings($this->readScopeIdentifiers($client->getIdentifier()));
+        $client->setScopeIdentifiers($this->readScopeIdentifiers($client->getIdentifier()));
         $client->setRedirectUriStrings($this->readRedirectUriStrings($client->getIdentifier()));
     }
 }

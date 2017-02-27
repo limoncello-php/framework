@@ -47,7 +47,13 @@ abstract class Token implements TokenInterface
     const FIELD_TOKEN_SCOPE_LIST = 'token_scope_list';
 
     /** Field name */
+    const FIELD_IS_SCOPE_MODIFIED = 'is_scope_modified';
+
+    /** Field name */
     const FIELD_IS_ENABLED = 'is_enabled';
+
+    /** Field name */
+    const FIELD_REDIRECT_URI = 'redirect_uri';
 
     /** Field name */
     const FIELD_CODE = 'code';
@@ -89,6 +95,21 @@ abstract class Token implements TokenInterface
      * @var string[]
      */
     private $tokenScopeStrings;
+
+    /**
+     * @var bool
+     */
+    private $isScopeModified;
+
+    /**
+     * @var bool
+     */
+    private $isEnabled;
+
+    /**
+     * @var string|null
+     */
+    private $redirectUriString;
 
     /**
      * @var string|null
@@ -135,6 +156,7 @@ abstract class Token implements TokenInterface
                 ->setIdentifier((int)$this->{static::FIELD_ID})
                 ->setClientIdentifier($this->{static::FIELD_ID_CLIENT})
                 ->setUserIdentifier((int)$this->{static::FIELD_ID_USER})
+                ->setRedirectUriString($this->{static::FIELD_REDIRECT_URI})
                 ->setCode($this->{static::FIELD_CODE})
                 ->setType($this->{static::FIELD_TYPE})
                 ->setValue($this->{static::FIELD_VALUE})
@@ -142,7 +164,8 @@ abstract class Token implements TokenInterface
                 ->parseTokenScopeList(
                     $this->hasDynamicProperty(static::FIELD_TOKEN_SCOPE_LIST) === true ?
                         $this->{static::FIELD_TOKEN_SCOPE_LIST} : ''
-                );
+                )->parseIsScopeModified($this->{static::FIELD_IS_SCOPE_MODIFIED})
+                ->parseIsEnabled($this->{static::FIELD_IS_ENABLED});
         }
     }
 
@@ -189,7 +212,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getUserIdentifier(): int
+    public function getUserIdentifier()
     {
         return $this->userIdentifierField;
     }
@@ -209,7 +232,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getTokenScopeStrings(): array
+    public function getScopeIdentifiers(): array
     {
         return $this->tokenScopeStrings;
     }
@@ -234,6 +257,106 @@ abstract class Token implements TokenInterface
     public function setTokenScopeStrings(array $tokenScopeStrings): Token
     {
         $this->tokenScopeStrings = $tokenScopeStrings;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRedirectUriString()
+    {
+        return $this->redirectUriString;
+    }
+
+    /**
+     * @param string|null $uri
+     *
+     * @return Token
+     */
+    public function setRedirectUriString(string $uri = null): Token
+    {
+        $this->redirectUriString = $uri;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isScopeModified(): bool
+    {
+        return $this->isScopeModified;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return Token
+     */
+    protected function parseIsScopeModified(string $value): Token
+    {
+        $value === '1' ? $this->setScopeModified() : $this->setScopeUnmodified();
+
+        return $this;
+    }
+
+    /**
+     * @return Token
+     */
+    public function setScopeModified(): Token
+    {
+        $this->isScopeModified = true;
+
+        return $this;
+    }
+
+    /**
+     * @return Token
+     */
+    public function setScopeUnmodified(): Token
+    {
+        $this->isScopeModified = false;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isEnabled(): bool
+    {
+        return $this->isEnabled;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return Token
+     */
+    protected function parseIsEnabled(string $value): Token
+    {
+        $value === '1' ? $this->setEnabled() : $this->setDisabled();
+
+        return $this;
+    }
+
+    /**
+     * @return Token
+     */
+    public function setEnabled(): Token
+    {
+        $this->isEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * @return Token
+     */
+    public function setDisabled(): Token
+    {
+        $this->isEnabled = false;
 
         return $this;
     }
@@ -392,6 +515,14 @@ abstract class Token implements TokenInterface
         $this->refreshCreatedAtField = $refreshCreatedAt;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasBeenUsedEarlier(): bool
+    {
+        return $this->getValueCreatedAt() !== null;
     }
 
     /**

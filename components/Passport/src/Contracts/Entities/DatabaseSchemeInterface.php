@@ -199,12 +199,22 @@ interface DatabaseSchemeInterface
     /**
      * @return string
      */
+    public function getTokensIsScopeModified(): string;
+
+    /**
+     * @return string
+     */
     public function getTokensClientIdentityColumn(): string;
 
     /**
      * @return string
      */
     public function getTokensUserIdentityColumn(): string;
+
+    /**
+     * @return string
+     */
+    public function getTokensRedirectUriColumn(): string;
 
     /**
      * @return string

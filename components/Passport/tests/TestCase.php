@@ -277,8 +277,10 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $table->addColumn($scheme->getTokensIdentityColumn(), Type::INTEGER)
             ->setNotnull(true)->setAutoincrement(true);
         $table->addColumn($scheme->getTokensIsEnabledColumn(), Type::BOOLEAN)->setNotnull(true)->setDefault(true);
+        $table->addColumn($scheme->getTokensIsScopeModified(), Type::BOOLEAN)->setNotnull(true)->setDefault(false);
         $table->addColumn($scheme->getTokensClientIdentityColumn(), Type::STRING)->setNotnull(true);
         $table->addColumn($scheme->getTokensUserIdentityColumn(), Type::INTEGER)->setNotnull(true);
+        $table->addColumn($scheme->getTokensRedirectUriColumn(), Type::STRING)->setNotnull(false);
         $table->addColumn($scheme->getTokensCodeColumn(), Type::STRING)->setNotnull(false);
         $table->addColumn($scheme->getTokensTypeColumn(), Type::STRING)->setNotnull(false);
         $table->addColumn($scheme->getTokensValueColumn(), Type::STRING)->setNotnull(false);

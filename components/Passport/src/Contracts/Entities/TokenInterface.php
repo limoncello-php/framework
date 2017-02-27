@@ -17,11 +17,12 @@
  */
 
 use DateTime;
+use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
 
 /**
  * @package Limoncello\Passport
  */
-interface TokenInterface
+interface TokenInterface extends AuthorizationCodeInterface
 {
     /**
      * @return int
@@ -29,14 +30,9 @@ interface TokenInterface
     public function getIdentifier(): int;
 
     /**
-     * @return string
+     * @return int|null
      */
-    public function getClientIdentifier(): string;
-
-    /**
-     * @return int
-     */
-    public function getUserIdentifier(): int;
+    public function getUserIdentifier();
 
     /**
      * @return string|null
@@ -57,11 +53,6 @@ interface TokenInterface
      * @return string|null
      */
     public function getType();
-
-    /**
-     * @return string[]
-     */
-    public function getTokenScopeStrings(): array;
 
     /**
      * @return DateTime|null

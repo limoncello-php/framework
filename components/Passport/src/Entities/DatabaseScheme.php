@@ -274,6 +274,14 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /**
      * @inheritdoc
      */
+    public function getTokensIsScopeModified(): string
+    {
+        return Token::FIELD_IS_SCOPE_MODIFIED;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getTokensClientIdentityColumn(): string
     {
         return Token::FIELD_ID_CLIENT;
@@ -285,6 +293,14 @@ class DatabaseScheme implements DatabaseSchemeInterface
     public function getTokensUserIdentityColumn(): string
     {
         return Token::FIELD_ID_USER;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTokensRedirectUriColumn(): string
+    {
+        return Token::FIELD_REDIRECT_URI;
     }
 
     /**
