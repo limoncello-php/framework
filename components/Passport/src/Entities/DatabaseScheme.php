@@ -23,12 +23,30 @@ use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
  */
 class DatabaseScheme implements DatabaseSchemeInterface
 {
+    /** Table name */
+    const TABLE_CLIENTS = 'oauth_clients';
+
+    /** Table name */
+    const TABLE_CLIENTS_SCOPES = 'oauth_clients_scopes';
+
+    /** Table name */
+    const TABLE_REDIRECT_URIS = 'oauth_redirect_uris';
+
+    /** Table name */
+    const TABLE_SCOPES = 'oauth_scopes';
+
+    /** Table name */
+    const TABLE_TOKENS = 'oauth_tokens';
+
+    /** Table name */
+    const TABLE_TOKENS_SCOPES = 'oauth_tokens_scopes';
+
     /**
      * @inheritdoc
      */
     public function getClientsTable(): string
     {
-        return 'oauth_clients';
+        return self::TABLE_CLIENTS;
     }
 
     /**
@@ -140,7 +158,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getClientsScopesTable(): string
     {
-        return 'oauth_clients_scopes';
+        return self::TABLE_CLIENTS_SCOPES;
     }
 
     /**
@@ -164,7 +182,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getRedirectUrisTable(): string
     {
-        return 'oauth_redirect_uris';
+        return self::TABLE_REDIRECT_URIS;
     }
 
     /**
@@ -212,7 +230,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getScopesTable(): string
     {
-        return 'oauth_scopes';
+        return self::TABLE_SCOPES;
     }
 
     /**
@@ -252,7 +270,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getTokensTable(): string
     {
-        return 'oauth_tokens';
+        return self::TABLE_TOKENS;
     }
 
     /**
@@ -364,7 +382,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getTokensScopesTable(): string
     {
-        return 'oauth_tokens_scopes';
+        return self::TABLE_TOKENS_SCOPES;
     }
 
     /**
