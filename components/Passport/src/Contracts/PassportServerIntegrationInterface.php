@@ -55,7 +55,7 @@ interface PassportServerIntegrationInterface
      *
      * @return int|null
      */
-    public function validateUserId(string $userName, string $password): int;
+    public function validateUserId(string $userName, string $password);
 
     /**
      * @param string          $clientIdentifier

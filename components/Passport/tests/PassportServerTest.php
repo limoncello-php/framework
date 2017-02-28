@@ -80,7 +80,7 @@ class PassportServerTest extends TestCase
             /**
              * @inheritdoc
              */
-            public function validateUserId(string $userName, string $password): int
+            public function validateUserId(string $userName, string $password)
             {
                 return
                     $userName === PassportServerTest::TEST_USER_NAME &&
