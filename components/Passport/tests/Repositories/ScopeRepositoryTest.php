@@ -68,9 +68,12 @@ class ScopeRepositoryTest extends TestCase
      */
     private function createRepository(): ScopeRepositoryInterface
     {
-        $this->createDatabaseScheme($connection = $this->createSqLiteConnection(), $this->getDatabaseScheme());
+        $this->createDatabaseScheme(
+            $connection = $this->createSqLiteConnection(),
+            $scheme = $this->getDatabaseScheme()
+        );
 
-        $repo = new ScopeRepository($connection, $this->getDatabaseScheme());
+        $repo = new ScopeRepository($connection, $scheme);
 
         return $repo;
     }

@@ -154,8 +154,10 @@ class TokenRepositoryTest extends TestCase
      */
     private function createRepositories(): array
     {
-        $this->createDatabaseScheme($connection = $this->createSqLiteConnection(), $this->getDatabaseScheme());
-        $scheme = $this->getDatabaseScheme();
+        $this->createDatabaseScheme(
+            $connection = $this->createSqLiteConnection(),
+            $scheme = $this->getDatabaseScheme()
+        );
 
         $tokenRepo  = new TokenRepository($connection, $scheme);
         $scopeRepo  = new ScopeRepository($connection, $scheme);

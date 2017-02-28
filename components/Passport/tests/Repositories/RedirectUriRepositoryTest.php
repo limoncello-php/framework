@@ -80,8 +80,10 @@ class RedirectUriRepositoryTest extends TestCase
      */
     private function createRepositories(): array
     {
-        $this->createDatabaseScheme($connection = $this->createSqLiteConnection(), $this->getDatabaseScheme());
-        $scheme = $this->getDatabaseScheme();
+        $this->createDatabaseScheme(
+            $connection = $this->createSqLiteConnection(),
+            $scheme = $this->getDatabaseScheme()
+        );
 
         $clientRepository = new ClientRepository($connection, $scheme);
         $uriRepository    = new RedirectUriRepository($connection, $scheme);
