@@ -48,6 +48,24 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
+    protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
+    {
+        $manager = $connection->getSchemaManager();
+
+        $manager->dropTable($scheme->getTokensScopesTable());
+        $manager->dropTable($scheme->getClientsScopesTable());
+        $manager->dropTable($scheme->getTokensTable());
+        $manager->dropTable($scheme->getRedirectUrisTable());
+        $manager->dropTable($scheme->getClientsTable());
+        $manager->dropTable($scheme->getScopesTable());
+    }
+
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $scheme
+     *
+     * @return void
+     */
     protected function createScopesTable(Connection $connection, DatabaseSchemeInterface $scheme)
     {
         $manager = $connection->getSchemaManager();

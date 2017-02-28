@@ -105,12 +105,27 @@ class ClientRepositoryTest extends TestCase
     }
 
     /**
+     * Test remove database scheme.
+     */
+    public function testRemoveDatabaseScheme()
+    {
+        $this->createDatabaseScheme(
+            $connection = $this->createSqLiteConnection(),
+            $scheme = $this->getDatabaseScheme()
+        );
+
+        $this->removeDatabaseScheme($connection, $scheme);
+    }
+
+    /**
      * @return array
      */
     private function createRepositories(): array
     {
-        $this->createDatabaseScheme($connection = $this->createSqLiteConnection(), $this->getDatabaseScheme());
-        $scheme = $this->getDatabaseScheme();
+        $this->createDatabaseScheme(
+            $connection = $this->createSqLiteConnection(),
+            $scheme = $this->getDatabaseScheme()
+        );
 
         $clientRepo = new ClientRepository($connection, $scheme);
         $scopeRepo  = new ScopeRepository($connection, $scheme);
