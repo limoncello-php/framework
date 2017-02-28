@@ -42,6 +42,26 @@ class DatabaseScheme implements DatabaseSchemeInterface
     const TABLE_TOKENS_SCOPES = 'oauth_tokens_scopes';
 
     /**
+     * @var string|null
+     */
+    private $usersTableName;
+
+    /**
+     * @var string|null
+     */
+    private $usersIdColumn;
+
+    /**
+     * @param null|string $usersTableName
+     * @param null|string $usersIdColumn
+     */
+    public function __construct(string $usersTableName = null, string $usersIdColumn = null)
+    {
+        $this->usersTableName = $usersTableName;
+        $this->usersIdColumn  = $usersIdColumn;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getClientsTable(): string
@@ -399,5 +419,21 @@ class DatabaseScheme implements DatabaseSchemeInterface
     public function getTokensScopesScopeIdentityColumn(): string
     {
         return Scope::FIELD_ID;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUsersTable()
+    {
+        return $this->usersTableName;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUsersIdentityColumn()
+    {
+        return $this->usersIdColumn;
     }
 }

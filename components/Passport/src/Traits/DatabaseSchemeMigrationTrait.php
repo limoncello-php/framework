@@ -183,6 +183,17 @@ trait DatabaseSchemeMigrationTrait
             $this->getOnDeleteCascadeConstraint()
         );
 
+        $usersTable          = $scheme->getUsersTable();
+        $usersIdentityColumn = $scheme->getUsersIdentityColumn();
+        if ($usersTable !== null && $usersIdentityColumn !== null) {
+            $table->addForeignKeyConstraint(
+                $usersTable,
+                [$scheme->getTokensUserIdentityColumn()],
+                [$usersIdentityColumn],
+                $this->getOnDeleteCascadeConstraint()
+            );
+        }
+
         $manager->dropAndCreateTable($table);
     }
 

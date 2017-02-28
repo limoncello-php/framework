@@ -269,4 +269,18 @@ interface DatabaseSchemeInterface
      * @return string
      */
     public function getTokensScopesScopeIdentityColumn(): string;
+
+    /**************************************************************************
+     * Users table.
+     *************************************************************************/
+
+    /**
+     * @return string|null
+     */
+    public function getUsersTable();
+
+    /**
+     * @return string|null
+     */
+    public function getUsersIdentityColumn();
 }
