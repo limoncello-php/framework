@@ -197,7 +197,7 @@ trait DatabaseSchemeMigrationTrait
         $manager = $connection->getSchemaManager();
 
         $table = new Table($scheme->getClientsScopesTable());
-        $table->addColumn($scheme->getClientsScopesClientIdentityColumn(), Type::INTEGER)->setNotnull(true);
+        $table->addColumn($scheme->getClientsScopesClientIdentityColumn(), Type::STRING)->setNotnull(true);
         $table->addColumn($scheme->getClientsScopesScopeIdentityColumn(), Type::STRING)->setNotnull(true);
         $table->setPrimaryKey([
             $scheme->getClientsScopesClientIdentityColumn(),
