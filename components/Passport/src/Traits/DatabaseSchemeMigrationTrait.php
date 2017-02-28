@@ -132,7 +132,7 @@ trait DatabaseSchemeMigrationTrait
 
         $table = new Table($scheme->getRedirectUrisTable());
         $table->addColumn($scheme->getRedirectUrisIdentityColumn(), Type::INTEGER)
-            ->setNotnull(true)->setAutoincrement(true);
+            ->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
         $table->addColumn($scheme->getRedirectUrisClientIdentityColumn(), Type::STRING)->setNotnull(true);
         $table->addColumn($scheme->getRedirectUrisValueColumn(), Type::STRING)->setNotnull(true);
         $table->addColumn($scheme->getRedirectUrisCreatedAtColumn(), Type::DATETIME)->setNotnull(true);
@@ -161,11 +161,11 @@ trait DatabaseSchemeMigrationTrait
 
         $table = new Table($scheme->getTokensTable());
         $table->addColumn($scheme->getTokensIdentityColumn(), Type::INTEGER)
-            ->setNotnull(true)->setAutoincrement(true);
+            ->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
         $table->addColumn($scheme->getTokensIsEnabledColumn(), Type::BOOLEAN)->setNotnull(true)->setDefault(true);
         $table->addColumn($scheme->getTokensIsScopeModified(), Type::BOOLEAN)->setNotnull(true)->setDefault(false);
         $table->addColumn($scheme->getTokensClientIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->addColumn($scheme->getTokensUserIdentityColumn(), Type::INTEGER)->setNotnull(true);
+        $table->addColumn($scheme->getTokensUserIdentityColumn(), Type::INTEGER)->setNotnull(true)->setUnsigned(true);
         $table->addColumn($scheme->getTokensRedirectUriColumn(), Type::STRING)->setNotnull(false);
         $table->addColumn($scheme->getTokensCodeColumn(), Type::STRING)->setNotnull(false);
         $table->addColumn($scheme->getTokensTypeColumn(), Type::STRING)->setNotnull(false);
@@ -243,7 +243,8 @@ trait DatabaseSchemeMigrationTrait
         $manager = $connection->getSchemaManager();
 
         $table = new Table($scheme->getTokensScopesTable());
-        $table->addColumn($scheme->getTokensScopesTokenIdentityColumn(), Type::INTEGER)->setNotnull(true);
+        $table->addColumn($scheme->getTokensScopesTokenIdentityColumn(), Type::INTEGER)->setNotnull(true)
+            ->setUnsigned(true);
         $table->addColumn($scheme->getTokensScopesScopeIdentityColumn(), Type::STRING)->setNotnull(true);
         $table->setPrimaryKey([
             $scheme->getTokensScopesTokenIdentityColumn(),
