@@ -65,10 +65,10 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
-    public function readByValue(string $code, int $expirationInSeconds)
+    public function readByValue(string $tokenValue, int $expirationInSeconds)
     {
         /** @var Token $token */
-        $token = parent::readByValue($code, $expirationInSeconds);
+        $token = parent::readByValue($tokenValue, $expirationInSeconds);
         if ($token !== null) {
             $this->addScope($token);
         }
@@ -79,10 +79,10 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
-    public function readByRefresh(string $code, int $expirationInSeconds)
+    public function readByRefresh(string $refreshValue, int $expirationInSeconds)
     {
         /** @var Token $token */
-        $token = parent::readByRefresh($code, $expirationInSeconds);
+        $token = parent::readByRefresh($refreshValue, $expirationInSeconds);
         if ($token !== null) {
             $this->addScope($token);
         }
