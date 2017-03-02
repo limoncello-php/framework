@@ -406,6 +406,8 @@ class SampleServer extends BaseAuthorizationServer
      * It does not authenticate clients in all cases. It's allowed to provide only client identifier without
      * client credentials. In that case if client is not confidential and no credentials have been issued to the client
      * it would be OK.
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function determineClient(ServerRequestInterface $request, array $parameters)
     {
