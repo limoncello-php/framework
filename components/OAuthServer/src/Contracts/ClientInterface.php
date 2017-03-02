@@ -125,4 +125,13 @@ interface ClientInterface
      * @link https://tools.ietf.org/html/rfc6749#section-5.2
      */
     public function isClientGrantEnabled(): bool;
+
+    /**
+     * Get `true` if refresh token grant is allowed for the client and `false` otherwise.
+     *
+     * @return bool
+     *
+     * @link https://tools.ietf.org/html/rfc6749#section-6
+     */
+    public function isRefreshGrantEnabled();
 }

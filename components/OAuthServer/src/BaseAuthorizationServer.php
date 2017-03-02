@@ -22,10 +22,12 @@ use Limoncello\OAuthServer\Contracts\Integration\ClientIntegrationInterface as C
 use Limoncello\OAuthServer\Contracts\Integration\CodeIntegrationInterface as AII;
 use Limoncello\OAuthServer\Contracts\Integration\ImplicitIntegrationInterface as III;
 use Limoncello\OAuthServer\Contracts\Integration\PasswordIntegrationInterface as PII;
+use Limoncello\OAuthServer\Contracts\Integration\RefreshIntegrationInterface as RII;
 use Limoncello\OAuthServer\GrantTraits\ClientGrantTrait;
 use Limoncello\OAuthServer\GrantTraits\CodeGrantTrait;
 use Limoncello\OAuthServer\GrantTraits\ImplicitGrantTrait;
 use Limoncello\OAuthServer\GrantTraits\PasswordGrantTrait;
+use Limoncello\OAuthServer\GrantTraits\RefreshGrantTrait;
 use Limoncello\OAuthServer\ServerTraits\OAuthServerTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,10 +35,10 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * @package Limoncello\OAuthServer
  */
-abstract class BaseAuthorizationServer implements AuthorizationServerInterface, AII, III, PII, CII
+abstract class BaseAuthorizationServer implements AuthorizationServerInterface, AII, III, PII, CII, RII
 {
     use OAuthServerTrait,
-        CodeGrantTrait, ImplicitGrantTrait, PasswordGrantTrait, ClientGrantTrait;
+        CodeGrantTrait, ImplicitGrantTrait, PasswordGrantTrait, ClientGrantTrait, RefreshGrantTrait;
 
     /**
      * Implements Authorization Endpoint.
@@ -64,6 +66,7 @@ abstract class BaseAuthorizationServer implements AuthorizationServerInterface, 
         $this->implicitSetIntegration($this);
         $this->passSetIntegration($this);
         $this->clientSetIntegration($this);
+        $this->refreshSetIntegration($this);
     }
 
     /**

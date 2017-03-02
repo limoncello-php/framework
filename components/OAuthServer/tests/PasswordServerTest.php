@@ -159,6 +159,37 @@ class PasswordServerTest extends ServerTestCase
     }
 
     /**
+     * Test public client with credentials assigned.
+     */
+    public function testPublicClientHasCredentials()
+    {
+        $identifier = 'whatever_id';
+        $password   = 'secret';
+        $client     = (new Client($identifier))
+            ->setCredentials(password_hash($password, PASSWORD_DEFAULT))
+            ->enablePasswordGrant()
+            ->setCredentials('whatever');
+
+        /** @var Mock $repository */
+        $repository = Mockery::mock(RepositoryInterface::class);
+        $repository->shouldReceive('readDefaultClient')->once()->withNoArgs()->andReturn($client);
+
+        /** @var RepositoryInterface $repository */
+
+        $server = new SampleServer($repository);
+
+        $request  = $this->createTokenRequest(
+            static::GRANT_TYPE_PASSWORD,
+            SampleServer::TEST_USER_NAME,
+            SampleServer::TEST_PASSWORD
+        );
+        $response = $server->postCreateToken($request);
+
+        $errorCode = OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT;
+        $this->validateBodyResponse($response, 400, $this->getExpectedBodyTokenError($errorCode));
+    }
+
+    /**
      * @return RepositoryInterface
      */
     private function createDefaultClientRepositoryMock()

@@ -59,40 +59,47 @@ trait ClientGrantTrait
      */
     protected function clientGetScope(array $parameters)
     {
-        $scope    = null;
-        $hasScope =
-            array_key_exists('scope', $parameters) === true &&
-            is_string($scope = $parameters['scope']) === true;
-
-        return $hasScope === true ? explode(' ', $scope) : null;
+        return ($scope = $this->clientReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
     }
 
     /**
      * @param string[]        $parameters
-     * @param ClientInterface $client
+     * @param ClientInterface $determinedClient
      *
      * @return ResponseInterface
      */
-    protected function clientIssueToken(array $parameters, ClientInterface $client): ResponseInterface
+    protected function clientIssueToken(array $parameters, ClientInterface $determinedClient): ResponseInterface
     {
-        if ($client->isClientGrantEnabled() === false) {
+        if ($determinedClient->isClientGrantEnabled() === false) {
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
         $scope = $this->clientGetScope($parameters);
         list ($isScopeValid, $scopeList, $isScopeModified) =
-            $this->clientGetIntegration()->clientValidateScope($client, $scope);
+            $this->clientGetIntegration()->clientValidateScope($determinedClient, $scope);
         if ($isScopeValid === false) {
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_SCOPE);
         }
 
         $response = $this->clientGetIntegration()->clientCreateAccessTokenResponse(
-            $client,
+            $determinedClient,
             $isScopeModified,
             $scopeList,
             $parameters
         );
 
         return $response;
+    }
+
+    /**
+     * @param array  $parameters
+     * @param string $name
+     *
+     * @return null|string
+     */
+    private function clientReadStringValue(array $parameters, string $name)
+    {
+        return array_key_exists($name, $parameters) === true && is_string($value = $parameters[$name]) === true ?
+            $value : null;
     }
 }

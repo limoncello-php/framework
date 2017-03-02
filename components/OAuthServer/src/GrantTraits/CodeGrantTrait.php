@@ -59,8 +59,7 @@ trait CodeGrantTrait
      */
     protected function codeGetClientId(array $parameters)
     {
-        return array_key_exists('client_id', $parameters) === true ?
-            $parameters['client_id'] : null;
+        return $this->codeReadStringValue($parameters, 'client_id');
     }
 
     /**
@@ -70,8 +69,7 @@ trait CodeGrantTrait
      */
     protected function codeGetRedirectUri(array $parameters)
     {
-        return array_key_exists('redirect_uri', $parameters) === true ?
-            $parameters['redirect_uri'] : null;
+        return $this->codeReadStringValue($parameters, 'redirect_uri');
     }
 
     /**
@@ -81,12 +79,7 @@ trait CodeGrantTrait
      */
     protected function codeGetScope(array $parameters)
     {
-        $scope    = null;
-        $hasScope =
-            array_key_exists('scope', $parameters) === true &&
-            is_string($scope = $parameters['scope']) === true;
-
-        return $hasScope === true ? explode(' ', $scope) : null;
+        return ($scope = $this->codeReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
     }
 
     /**
@@ -96,8 +89,7 @@ trait CodeGrantTrait
      */
     protected function codeGetState(array $parameters)
     {
-        return array_key_exists('state', $parameters) === true ?
-            $parameters['state'] : null;
+        return $this->codeReadStringValue($parameters, 'state');
     }
 
     /**
@@ -107,8 +99,7 @@ trait CodeGrantTrait
      */
     protected function codeGetCode(array $parameters)
     {
-        return array_key_exists('code', $parameters) === true ?
-            $parameters['code'] : null;
+        return $this->codeReadStringValue($parameters, 'code');
     }
 
     /**
@@ -166,7 +157,7 @@ trait CodeGrantTrait
 
     /**
      * @param string[]             $parameters
-     * @param ClientInterface|null $authenticatedClient
+     * @param ClientInterface|null $determinedClient
      *
      * @return ResponseInterface
      *
@@ -174,23 +165,11 @@ trait CodeGrantTrait
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function codeIssueToken(array $parameters, ClientInterface $authenticatedClient = null): ResponseInterface
+    protected function codeIssueToken(array $parameters, ClientInterface $determinedClient = null): ResponseInterface
     {
-        $clientId = $this->codeGetClientId($parameters);
-        if ($authenticatedClient === null) {
-            // then client_id is required @link https://tools.ietf.org/html/rfc6749#section-4.1.3
-            if ($clientId === null ||
-                ($client = $this->codeGetIntegration()->codeReadClient($clientId)) === null ||
-                $client->isCodeGrantEnabled() === false ||
-                $client->isConfidential() === true
-            ) {
-                throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
-            }
-        } else {
-            if ($clientId !== null && $clientId !== $authenticatedClient->getIdentifier()) {
-                throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
-            }
-            $client = $authenticatedClient;
+        // client_id is required @link https://tools.ietf.org/html/rfc6749#section-4.1.3
+        if ($determinedClient === null || $determinedClient->isCodeGrantEnabled() === false) {
+            throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
         if (($codeValue = $this->codeGetCode($parameters)) === null ||
@@ -204,7 +183,7 @@ trait CodeGrantTrait
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_GRANT);
         }
 
-        if ($code->getClientIdentifier() !== $client->getIdentifier()) {
+        if ($code->getClientIdentifier() !== $determinedClient->getIdentifier()) {
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
@@ -220,5 +199,17 @@ trait CodeGrantTrait
         $response = $this->codeGetIntegration()->codeCreateAccessTokenResponse($code, $parameters);
 
         return $response;
+    }
+
+    /**
+     * @param array  $parameters
+     * @param string $name
+     *
+     * @return null|string
+     */
+    private function codeReadStringValue(array $parameters, string $name)
+    {
+        return array_key_exists($name, $parameters) === true && is_string($value = $parameters[$name]) === true ?
+            $value : null;
     }
 }

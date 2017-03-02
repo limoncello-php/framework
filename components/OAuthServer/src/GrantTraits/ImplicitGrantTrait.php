@@ -61,8 +61,7 @@ trait ImplicitGrantTrait
      */
     protected function implicitGetClientId(array $parameters)
     {
-        return array_key_exists('client_id', $parameters) === true ?
-            $parameters['client_id'] : null;
+        return $this->implicitReadStringValue($parameters, 'client_id');
     }
 
     /**
@@ -72,8 +71,7 @@ trait ImplicitGrantTrait
      */
     protected function implicitGetRedirectUri(array $parameters)
     {
-        return array_key_exists('redirect_uri', $parameters) === true ?
-            $parameters['redirect_uri'] : null;
+        return $this->implicitReadStringValue($parameters, 'redirect_uri');
     }
 
     /**
@@ -83,12 +81,7 @@ trait ImplicitGrantTrait
      */
     protected function implicitGetScope(array $parameters)
     {
-        $scope    = null;
-        $hasScope =
-            array_key_exists('scope', $parameters) === true &&
-            is_string($scope = $parameters['scope']) === true;
-
-        return $hasScope === true ? explode(' ', $scope) : null;
+        return ($scope = $this->implicitReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
     }
 
     /**
@@ -98,8 +91,7 @@ trait ImplicitGrantTrait
      */
     protected function implicitGetState(array $parameters)
     {
-        return array_key_exists('state', $parameters) === true ?
-            $parameters['state'] : null;
+        return $this->implicitReadStringValue($parameters, 'state');
     }
 
     /**
@@ -154,5 +146,17 @@ trait ImplicitGrantTrait
         );
 
         return $response;
+    }
+
+    /**
+     * @param array  $parameters
+     * @param string $name
+     *
+     * @return null|string
+     */
+    private function implicitReadStringValue(array $parameters, string $name)
+    {
+        return array_key_exists($name, $parameters) === true && is_string($value = $parameters[$name]) === true ?
+            $value : null;
     }
 }

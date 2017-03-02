@@ -271,7 +271,7 @@ class CodeServerTest extends ServerTestCase
 
         $this->assertEquals($identifier, $client->getIdentifier());
 
-        $server = new SampleServer($this->createRepositoryMock($client));
+        $server = new SampleServer($this->createNoMethodsRepositoryMock());
 
         $request  = $this->createTokenRequest(
             static::CLIENT_ID . '_xxx', // <-- invalid client id here
@@ -282,7 +282,7 @@ class CodeServerTest extends ServerTestCase
         $response = $server->postCreateToken($request);
 
         $expectedFragments = $this
-            ->getExpectedBodyTokenError(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
+            ->getExpectedBodyTokenError(OAuthTokenBodyException::ERROR_INVALID_REQUEST);
         $this->validateBodyResponse($response, 400, $expectedFragments);
     }
 
@@ -402,6 +402,17 @@ class CodeServerTest extends ServerTestCase
         /** @var Mock $mock */
         $mock = Mockery::mock(RepositoryInterface::class);
         $mock->shouldReceive('readClient')->once()->with($client->getIdentifier())->andReturn($client);
+
+        return $mock;
+    }
+
+    /**
+     * @return RepositoryInterface
+     */
+    private function createNoMethodsRepositoryMock(): RepositoryInterface
+    {
+        /** @var Mock $mock */
+        $mock = Mockery::mock(RepositoryInterface::class);
 
         return $mock;
     }

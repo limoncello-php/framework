@@ -88,6 +88,7 @@ abstract class ServerTestCase extends TestCase
      * @param string $type
      * @param int    $expiresIn
      * @param string $refreshToken
+     * @param string $scope
      *
      * @return array
      */
@@ -95,13 +96,15 @@ abstract class ServerTestCase extends TestCase
         string $token = SampleServer::TEST_TOKEN,
         string $type = 'bearer',
         int $expiresIn = 3600,
-        string $refreshToken = SampleServer::TEST_REFRESH_TOKEN
+        string $refreshToken = SampleServer::TEST_REFRESH_TOKEN,
+        string $scope = null
     ): array {
         return array_filter([
             'access_token'  => $token,
             'token_type'    => $type,
             'expires_in'    => $expiresIn,
             'refresh_token' => $refreshToken,
+            'scope'         => $scope,
         ], function ($value) {
             return $value !== null;
         });

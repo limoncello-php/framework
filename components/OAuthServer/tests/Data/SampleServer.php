@@ -58,6 +58,15 @@ class SampleServer extends BaseAuthorizationServer
     const TEST_REFRESH_TOKEN = 'e57941dbe1246fe97a4ffc16e85b5df9';
 
     /** Test data */
+    const TEST_TOKEN_NEW = '4142011b2689166ce7760644a0b5f8d0_new';
+
+    /** Test data */
+    const TEST_REFRESH_TOKEN_NEW = 'e57941dbe1246fe97a4ffc16e85b5df9_new';
+
+    /** Test data */
+    const TEST_SCOPES = ['scope1', 'scope2'];
+
+    /** Test data */
     const TEST_TOKEN_TYPE = 'bearer';
 
     /** Test data */
@@ -154,21 +163,27 @@ class SampleServer extends BaseAuthorizationServer
     public function postCreateToken(ServerRequestInterface $request): ResponseInterface
     {
         try {
-            $parameters          = $request->getParsedBody();
-            $authenticatedClient = $this->authenticateClient($request);
+            $parameters       = $request->getParsedBody();
+            $determinedClient = $this->determineClient($request, $parameters);
 
             switch ($this->getGrantType($parameters)) {
                 case GrantTypes::AUTHORIZATION_CODE:
-                    $response = $this->codeIssueToken($parameters, $authenticatedClient);
+                    $response = $this->codeIssueToken($parameters, $determinedClient);
                     break;
                 case GrantTypes::RESOURCE_OWNER_PASSWORD_CREDENTIALS:
-                    $response = $this->passIssueToken($parameters, $authenticatedClient);
+                    $response = $this->passIssueToken($parameters, $determinedClient);
                     break;
                 case GrantTypes::CLIENT_CREDENTIALS:
-                    if ($authenticatedClient === null) {
+                    if ($determinedClient === null) {
                         throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
                     }
-                    $response = $this->clientIssueToken($parameters, $authenticatedClient);
+                    $response = $this->clientIssueToken($parameters, $determinedClient);
+                    break;
+                case GrantTypes::REFRESH_TOKEN:
+                    if ($determinedClient === null) {
+                        throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
+                    }
+                    $response = $this->refreshIssueToken($parameters, $determinedClient);
                     break;
                 default:
                     throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE);
@@ -349,34 +364,124 @@ class SampleServer extends BaseAuthorizationServer
     }
 
     /**
+     * @inheritdoc
+     */
+    public function refreshCreateAccessTokenResponse(
+        ClientInterface $client,
+        string $refreshValue,
+        bool $isScopeModified,
+        array $scope = null,
+        array $extraParameters = []
+    ): ResponseInterface {
+        $token     = static::TEST_TOKEN_NEW;
+        $type      = static::TEST_TOKEN_TYPE;
+        $expiresIn = static::TEST_TOKEN_EXPIRES_IN;
+        $refresh   = static::TEST_REFRESH_TOKEN_NEW;
+
+        // let's pretend we've updated and saved token parameters and send a new set to client
+
+        $response = $this->createBodyTokenResponse($token, $type, $expiresIn, $refresh, $scope);
+
+        return $response;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readScopeByRefreshValue(string $refreshValue)
+    {
+        // let's pretend we actually read token scopes by refresh value
+
+        return $refreshValue === static::TEST_REFRESH_TOKEN ? static::TEST_SCOPES : null;
+    }
+
+    /**
      * @param ServerRequestInterface $request
+     * @param array                  $parameters
      *
      * @return ClientInterface|null
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * It does not authenticate clients in all cases. It's allowed to provide only client identifier without
+     * client credentials. In that case if client is not confidential and no credentials have been issued to the client
+     * it would be OK.
      */
-    private function authenticateClient(ServerRequestInterface $request)
+    private function determineClient(ServerRequestInterface $request, array $parameters)
     {
         // As an example let's implement `Basic` client authorization
 
-        $client = null;
+        // A client may use Basic authentication.
+        //
+        // Or
+        //
+        // A client MAY use the "client_id" request parameter to identify itself
+        // when sending requests to the token endpoint.
+        // @link https://tools.ietf.org/html/rfc6749#section-3.2.1
+
+        // try to parse `Authorization` header for client ID and credentials
+        $clientId          = null;
+        $clientCredentials = null;
+        $errorHeaders      = ['WWW-Authenticate' => 'Basic realm="OAuth"'];
         if (empty($headerArray = $request->getHeader('Authorization')) === false) {
+            $errorCode = OAuthTokenBodyException::ERROR_INVALID_CLIENT;
             if (empty($authHeader = $headerArray[0]) === true ||
                 ($tokenPos = strpos($authHeader, 'Basic ')) === false ||
                 $tokenPos !== 0 ||
                 ($authValue = substr($authHeader, 6)) === '' ||
                 $authValue === false ||
                 ($decodedValue = base64_decode($authValue, true)) === false ||
-                count($nameAndPassword = explode(':', $decodedValue, 2)) !== 2 ||
-                ($client = $this->getRepository()->readClient($nameAndPassword[0])) === null ||
-                password_verify($nameAndPassword[1], $client->getCredentials()) === false
+                ($idAndCredentials = explode(':', $decodedValue, 2)) === false
             ) {
-                throw new OAuthTokenBodyException(
-                    OAuthTokenBodyException::ERROR_INVALID_CLIENT,
-                    null, // error URI
-                    401,
-                    ['WWW-Authenticate' => 'Basic realm="OAuth"']
-                );
+                throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+            }
+            $headerPartsCount = count($idAndCredentials);
+            switch ($headerPartsCount) {
+                case 1:
+                    $clientId = $idAndCredentials[0];
+                    break;
+                case 2:
+                    $clientId          = $idAndCredentials[0];
+                    $clientCredentials = $idAndCredentials[1];
+                    break;
+                default:
+                    throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+            }
+        }
+
+        // check if client ID was specified in parameters it should match
+        if (array_key_exists('client_id', $parameters) === true &&
+            is_string($value = $parameters['client_id']) === true
+        ) {
+            if ($clientId !== null && $clientId !== $value) {
+                $errorCode = OAuthTokenBodyException::ERROR_INVALID_REQUEST;
+                throw new OAuthTokenBodyException($errorCode, null, 400, $errorHeaders);
+            }
+
+            $clientId = $value;
+            unset($value);
+        }
+
+        // when we are here we know if any client ID and credentials were given
+
+        $client = null;
+        if ($clientId !== null) {
+            $errorCode = OAuthTokenBodyException::ERROR_INVALID_CLIENT;
+            if (($client = $this->getRepository()->readClient($clientId)) === null) {
+                throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+            }
+
+            // check credentials
+            if ($clientCredentials !== null) {
+                // we got the password
+                if (password_verify($clientCredentials, $client->getCredentials()) === false) {
+                    throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+                }
+            } else {
+                // no password provided
+                if ($client->isConfidential() === true || $client->hasCredentials() === true) {
+                    throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+                }
             }
         }
 

@@ -61,8 +61,7 @@ trait PasswordGrantTrait
      */
     protected function passGetUserName(array $parameters)
     {
-        return array_key_exists('username', $parameters) === true ?
-            $parameters['username'] : null;
+        return $this->passReadStringValue($parameters, 'username');
     }
 
     /**
@@ -72,8 +71,7 @@ trait PasswordGrantTrait
      */
     protected function passGetPassword(array $parameters)
     {
-        return array_key_exists('password', $parameters) === true ?
-            $parameters['password'] : null;
+        return $this->passReadStringValue($parameters, 'password');
     }
 
     /**
@@ -83,34 +81,32 @@ trait PasswordGrantTrait
      */
     protected function passGetScope(array $parameters)
     {
-        $scope    = null;
-        $hasScope =
-            array_key_exists('scope', $parameters) === true &&
-            is_string($scope = $parameters['scope']) === true;
-
-        return $hasScope === true ? explode(' ', $scope) : null;
+        return ($scope = $this->passReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
     }
 
     /**
      * @param string[]             $parameters
-     * @param ClientInterface|null $client
+     * @param ClientInterface|null $determinedClient
      *
      * @return ResponseInterface
      */
-    protected function passIssueToken(array $parameters, ClientInterface $client = null): ResponseInterface
+    protected function passIssueToken(array $parameters, ClientInterface $determinedClient = null): ResponseInterface
     {
         // if client is not given we interpret it as a 'default' client should be used
-        if ($client === null) {
-            $client = $this->passGetIntegration()->passReadDefaultClient();
+        if ($determinedClient === null) {
+            $determinedClient = $this->passGetIntegration()->passReadDefaultClient();
+            if ($determinedClient->hasCredentials() === true) {
+                throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
+            }
         }
 
-        if ($client !== null && $client->isPasswordGrantEnabled() === false) {
+        if ($determinedClient !== null && $determinedClient->isPasswordGrantEnabled() === false) {
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
         $scope = $this->passGetScope($parameters);
         list ($isScopeValid, $scopeList, $isScopeModified) =
-            $this->passGetIntegration()->passValidateScope($client, $scope);
+            $this->passGetIntegration()->passValidateScope($determinedClient, $scope);
         if ($isScopeValid === false) {
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_SCOPE);
         }
@@ -124,12 +120,24 @@ trait PasswordGrantTrait
         $response = $this->passGetIntegration()->passValidateCredentialsAndCreateAccessTokenResponse(
             $userName,
             $password,
-            $client,
+            $determinedClient,
             $isScopeModified,
             $scopeList,
             $parameters
         );
 
         return $response;
+    }
+
+    /**
+     * @param array  $parameters
+     * @param string $name
+     *
+     * @return null|string
+     */
+    private function passReadStringValue(array $parameters, string $name)
+    {
+        return array_key_exists($name, $parameters) === true && is_string($value = $parameters[$name]) === true ?
+            $value : null;
     }
 }

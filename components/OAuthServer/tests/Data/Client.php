@@ -81,6 +81,11 @@ class Client implements ClientInterface
     private $isClientGrantEnabled = false;
 
     /**
+     * @var bool
+     */
+    private $isRefreshGrantEnabled = false;
+
+    /**
      * @param string $identifier
      */
     public function __construct(string $identifier)
@@ -378,6 +383,34 @@ class Client implements ClientInterface
     public function disableClientGrant(): Client
     {
         $this->isClientGrantEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRefreshGrantEnabled(): bool
+    {
+        return $this->isRefreshGrantEnabled;
+    }
+
+    /**
+     * @return Client
+     */
+    public function enableRefreshGrant(): Client
+    {
+        $this->isRefreshGrantEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * @return Client
+     */
+    public function disableRefreshGrant(): Client
+    {
+        $this->isRefreshGrantEnabled = false;
 
         return $this;
     }

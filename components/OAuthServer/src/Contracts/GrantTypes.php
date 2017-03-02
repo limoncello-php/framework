@@ -44,4 +44,11 @@ interface GrantTypes
      * @link https://tools.ietf.org/html/rfc6749#section-4.4.2
      */
     const CLIENT_CREDENTIALS = 'client_credentials';
+
+    /**
+     * Refresh token.
+     *
+     * @link https://tools.ietf.org/html/rfc6749#section-6
+     */
+    const REFRESH_TOKEN = 'refresh_token';
 }
