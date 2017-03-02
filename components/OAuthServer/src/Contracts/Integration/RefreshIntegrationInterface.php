@@ -17,6 +17,7 @@
  */
 
 use Limoncello\OAuthServer\Contracts\ClientInterface;
+use Limoncello\OAuthServer\Contracts\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -48,13 +49,13 @@ interface RefreshIntegrationInterface extends IntegrationInterface
     ): ResponseInterface;
 
     /**
-     * Return scope associated with token by refresh token value. If no token is found returns `null`.
+     * Read token by its value. If no token is found returns `null`.
      *
      * @param string $refreshValue
      *
-     * @return string[]|null
+     * @return TokenInterface|null
      *
      * @link https://tools.ietf.org/html/rfc6749#section-6
      */
-    public function readScopeByRefreshValue(string $refreshValue);
+    public function readTokenByRefreshValue(string $refreshValue);
 }

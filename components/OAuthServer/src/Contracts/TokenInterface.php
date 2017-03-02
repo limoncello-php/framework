@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\OAuthServer\Data;
+<?php namespace Limoncello\OAuthServer\Contracts;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,26 +17,32 @@
  */
 
 /**
- * @package Limoncello\Tests\OAuthServer
+ * @package Limoncello\OAuthServer
  */
-interface RepositoryInterface
+interface TokenInterface
 {
     /**
-     * @return Client
+     * @return string
      */
-    public function readDefaultClient();
+    public function getClientIdentifier(): string;
 
     /**
-     * @param string $identifier
-     *
-     * @return Client|null
+     * @return string|int|null
      */
-    public function readClient(string $identifier);
+    public function getUserIdentifier();
 
     /**
-     * @param string $refreshValue
-     *
-     * @return Token
+     * @return string[]
      */
-    public function readTokenByRefreshValue(string $refreshValue);
+    public function getScopeIdentifiers(): array;
+
+    /**
+     * @return string|null
+     */
+    public function getTokenValue();
+
+    /**
+     * @return string|null
+     */
+    public function getRefreshValue();
 }

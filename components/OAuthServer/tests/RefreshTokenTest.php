@@ -17,10 +17,12 @@
  */
 
 use Limoncello\OAuthServer\Contracts\ClientInterface;
+use Limoncello\OAuthServer\Contracts\TokenInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\Tests\OAuthServer\Data\Client;
 use Limoncello\Tests\OAuthServer\Data\RepositoryInterface;
 use Limoncello\Tests\OAuthServer\Data\SampleServer;
+use Limoncello\Tests\OAuthServer\Data\Token;
 use Mockery;
 use Mockery\Mock;
 use Psr\Http\Message\ServerRequestInterface;
@@ -47,12 +49,11 @@ class RefreshTokenTest extends ServerTestCase
     public function testSuccessfulTokenIssueWithoutScopeChange()
     {
         $client = $this->createDefaultClient();
-        $server = new SampleServer($this->createClientRepositoryMock($client));
-
-        $refreshValue = SampleServer::TEST_REFRESH_TOKEN;
+        $token  = $this->createToken($client);
+        $server = new SampleServer($this->createClientRepositoryMock($client, $token));
 
         $scope    = null;
-        $request  = $this->createTokenRequest($refreshValue, $scope, $client->getIdentifier());
+        $request  = $this->createTokenRequest($token->getRefreshValue(), $scope, $client->getIdentifier());
         $response = $server->postCreateToken($request);
 
         $this->validateBodyResponse($response, 200, $this->getExpectedBodyToken());
@@ -64,12 +65,11 @@ class RefreshTokenTest extends ServerTestCase
     public function testSuccessfulTokenIssueWithScopeChange()
     {
         $client = $this->createDefaultClient();
-        $server = new SampleServer($this->createClientRepositoryMock($client));
-
-        $refreshValue = SampleServer::TEST_REFRESH_TOKEN;
+        $token  = $this->createToken($client);
+        $server = new SampleServer($this->createClientRepositoryMock($client, $token));
 
         $scope    = SampleServer::TEST_SCOPES[0];
-        $request  = $this->createTokenRequest($refreshValue, $scope, $client->getIdentifier());
+        $request  = $this->createTokenRequest($token->getRefreshValue(), $scope, $client->getIdentifier());
         $response = $server->postCreateToken($request);
 
         $this->validateBodyResponse($response, 200, $this->getExpectedScopeBodyToken($scope));
@@ -81,13 +81,12 @@ class RefreshTokenTest extends ServerTestCase
     public function testFailedTokenIssueWithScopeChange()
     {
         $client = $this->createDefaultClient();
-        $server = new SampleServer($this->createClientRepositoryMock($client));
+        $token  = $this->createToken($client);
+        $server = new SampleServer($this->createClientRepositoryMock($client, $token));
 
-        $refreshValue = SampleServer::TEST_REFRESH_TOKEN;
+        $scope = SampleServer::TEST_SCOPES[0] . ' xxx'; // <-- additional invalid scope
 
-        $scope    = SampleServer::TEST_SCOPES[0] . ' xxx'; // <-- additional invalid scope
-
-        $request  = $this->createTokenRequest($refreshValue, $scope, $client->getIdentifier());
+        $request  = $this->createTokenRequest($token->getRefreshValue(), $scope, $client->getIdentifier());
         $response = $server->postCreateToken($request);
 
         $errorCode = OAuthTokenBodyException::ERROR_INVALID_SCOPE;
@@ -136,13 +135,12 @@ class RefreshTokenTest extends ServerTestCase
     public function testInvalidRefreshToken()
     {
         $client = $this->createDefaultClient();
-        $server = new SampleServer($this->createClientRepositoryMock($client));
+        $server = new SampleServer($this->createClientRepositoryMockNoTokenFound($client));
 
+        $scope        = null;
         $refreshValue = SampleServer::TEST_REFRESH_TOKEN . '_xxx'; // <-- token made invalid here
-
-        $scope    = null;
-        $request  = $this->createTokenRequest($refreshValue, $scope, $client->getIdentifier());
-        $response = $server->postCreateToken($request);
+        $request      = $this->createTokenRequest($refreshValue, $scope, $client->getIdentifier());
+        $response     = $server->postCreateToken($request);
 
         $errorCode = OAuthTokenBodyException::ERROR_INVALID_GRANT;
         $this->validateBodyResponse($response, 400, $this->getExpectedBodyTokenError($errorCode));
@@ -159,15 +157,35 @@ class RefreshTokenTest extends ServerTestCase
     }
 
     /**
-     * @param ClientInterface $client
+     * @param ClientInterface     $client
+     * @param TokenInterface|null $token
      *
      * @return RepositoryInterface
      */
-    private function createClientRepositoryMock(ClientInterface $client)
+    private function createClientRepositoryMock(ClientInterface $client, TokenInterface $token = null)
     {
         /** @var Mock $mock */
         $mock = Mockery::mock(RepositoryInterface::class);
         $mock->shouldReceive('readClient')->zeroOrMoreTimes()->with($client->getIdentifier())->andReturn($client);
+
+        if ($token !== null) {
+            $mock->shouldReceive('readTokenByRefreshValue')->once()->with($token->getRefreshValue())->andReturn($token);
+        }
+
+        return $mock;
+    }
+
+    /**
+     * @param ClientInterface $client
+     *
+     * @return RepositoryInterface
+     */
+    private function createClientRepositoryMockNoTokenFound(ClientInterface $client)
+    {
+        /** @var Mock $mock */
+        $mock = Mockery::mock(RepositoryInterface::class);
+        $mock->shouldReceive('readClient')->zeroOrMoreTimes()->with($client->getIdentifier())->andReturn($client);
+        $mock->shouldReceive('readTokenByRefreshValue')->once()->withAnyArgs()->andReturnNull();
 
         return $mock;
     }
@@ -223,5 +241,24 @@ class RefreshTokenTest extends ServerTestCase
             SampleServer::TEST_REFRESH_TOKEN_NEW,
             $scope
         );
+    }
+
+    /**
+     * @param ClientInterface $client
+     * @param null            $userIdentifier
+     * @param array           $scopeIdentifiers
+     * @param string          $tokenValue
+     * @param string          $refreshValue
+     *
+     * @return TokenInterface
+     */
+    private function createToken(
+        ClientInterface $client,
+        $userIdentifier = null,
+        array $scopeIdentifiers = SampleServer::TEST_SCOPES,
+        string $tokenValue = SampleServer::TEST_TOKEN,
+        string $refreshValue = SampleServer::TEST_REFRESH_TOKEN
+    ): TokenInterface {
+        return new Token($client->getIdentifier(), $userIdentifier, $scopeIdentifiers, $tokenValue, $refreshValue);
     }
 }

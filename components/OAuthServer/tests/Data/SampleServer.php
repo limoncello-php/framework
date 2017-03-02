@@ -388,11 +388,9 @@ class SampleServer extends BaseAuthorizationServer
     /**
      * @inheritdoc
      */
-    public function readScopeByRefreshValue(string $refreshValue)
+    public function readTokenByRefreshValue(string $refreshValue)
     {
-        // let's pretend we actually read token scopes by refresh value
-
-        return $refreshValue === static::TEST_REFRESH_TOKEN ? static::TEST_SCOPES : null;
+        return $this->getRepository()->readTokenByRefreshValue($refreshValue);
     }
 
     /**

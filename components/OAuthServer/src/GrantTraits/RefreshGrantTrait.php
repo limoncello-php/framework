@@ -87,20 +87,19 @@ trait RefreshGrantTrait
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_REQUEST);
         }
 
-        if (($currentScope = $this->refreshGetIntegration()->readScopeByRefreshValue($refreshValue)) === null) {
+        if (($token = $this->refreshGetIntegration()->readTokenByRefreshValue($refreshValue)) === null) {
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_GRANT);
         }
 
+        $isScopeModified = false;
+        $scopeList       = null;
         if (($requestedScope = $this->refreshGetScope($parameters)) !== null) {
             // check requested scope is within the current one
-            if (empty(array_diff($requestedScope, $currentScope)) === false) {
+            if (empty(array_diff($requestedScope, $token->getScopeIdentifiers())) === false) {
                 throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_SCOPE);
             }
             $isScopeModified = true;
             $scopeList       = $requestedScope;
-        } else {
-            $isScopeModified = false;
-            $scopeList       = null;
         }
 
         $response = $this->refreshGetIntegration()->refreshCreateAccessTokenResponse(
