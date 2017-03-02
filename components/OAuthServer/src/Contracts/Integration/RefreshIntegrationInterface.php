@@ -31,7 +31,7 @@ interface RefreshIntegrationInterface extends IntegrationInterface
      * Create access token response.
      *
      * @param ClientInterface $client
-     * @param string          $refreshValue
+     * @param TokenInterface  $token
      * @param bool            $isScopeModified
      * @param array|null      $scope
      * @param array           $extraParameters
@@ -42,7 +42,7 @@ interface RefreshIntegrationInterface extends IntegrationInterface
      */
     public function refreshCreateAccessTokenResponse(
         ClientInterface $client,
-        string $refreshValue,
+        TokenInterface $token,
         bool $isScopeModified,
         array $scope = null,
         array $extraParameters = []

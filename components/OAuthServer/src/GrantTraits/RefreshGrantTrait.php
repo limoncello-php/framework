@@ -104,7 +104,7 @@ trait RefreshGrantTrait
 
         $response = $this->refreshGetIntegration()->refreshCreateAccessTokenResponse(
             $determinedClient,
-            $refreshValue,
+            $token,
             $isScopeModified,
             $scopeList,
             $parameters

@@ -21,6 +21,7 @@ use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Contracts\GrantTypes;
 use Limoncello\OAuthServer\Contracts\ResponseTypes;
+use Limoncello\OAuthServer\Contracts\TokenInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Psr\Http\Message\ResponseInterface;
@@ -368,7 +369,7 @@ class SampleServer extends BaseAuthorizationServer
      */
     public function refreshCreateAccessTokenResponse(
         ClientInterface $client,
-        string $refreshValue,
+        TokenInterface  $token,
         bool $isScopeModified,
         array $scope = null,
         array $extraParameters = []
