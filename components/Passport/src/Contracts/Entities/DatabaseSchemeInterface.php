@@ -88,6 +88,11 @@ interface DatabaseSchemeInterface
     /**
      * @return string
      */
+    public function getClientsIsRefreshGrantEnabledColumn(): string;
+
+    /**
+     * @return string
+     */
     public function getClientsCreatedAtColumn(): string;
 
     /**

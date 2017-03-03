@@ -60,21 +60,27 @@ class PassportServer extends BaseAuthorizationServer
     public function postCreateToken(ServerRequestInterface $request): ResponseInterface
     {
         try {
-            $parameters          = $request->getParsedBody();
-            $authenticatedClient = $this->authenticateClient($request, $this->getIntegration());
+            $parameters       = $request->getParsedBody();
+            $determinedClient = $this->determineClient($this->getIntegration(), $request, $parameters);
 
             switch ($this->getGrantType($parameters)) {
                 case GrantTypes::AUTHORIZATION_CODE:
-                    $response = $this->codeIssueToken($parameters, $authenticatedClient);
+                    $response = $this->codeIssueToken($parameters, $determinedClient);
                     break;
                 case GrantTypes::RESOURCE_OWNER_PASSWORD_CREDENTIALS:
-                    $response = $this->passIssueToken($parameters, $authenticatedClient);
+                    $response = $this->passIssueToken($parameters, $determinedClient);
                     break;
                 case GrantTypes::CLIENT_CREDENTIALS:
-                    if ($authenticatedClient === null) {
+                    if ($determinedClient === null) {
                         throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
                     }
-                    $response = $this->clientIssueToken($parameters, $authenticatedClient);
+                    $response = $this->clientIssueToken($parameters, $determinedClient);
+                    break;
+                case GrantTypes::REFRESH_TOKEN:
+                    if ($determinedClient === null) {
+                        throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
+                    }
+                    $response = $this->refreshIssueToken($parameters, $determinedClient);
                     break;
                 default:
                     throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE);
@@ -277,16 +283,16 @@ class PassportServer extends BaseAuthorizationServer
         }
         assert(is_int($userId) === true);
 
+        $clientId = $client->getIdentifier();
         list($tokenValue, $tokenType, $tokenExpiresIn, $refreshValue) =
-            $this->getIntegration()->generateTokenValues($client->getIdentifier(), $userId, $isScopeModified, $scope);
+            $this->getIntegration()->generateTokenValues($clientId, $userId, $isScopeModified, $scope);
 
         assert(is_string($tokenValue) === true && empty($tokenValue) === false);
         assert(is_string($tokenType) === true && empty($tokenType) === false);
         assert(is_int($tokenExpiresIn) === true && $tokenExpiresIn > 0);
         assert($refreshValue === null || (is_string($refreshValue) === true && empty($refreshValue) === false));
 
-        $this->getIntegration()->getTokenRepository()
-            ->createToken($client->getIdentifier(), $userId, $tokenValue, $tokenType, $refreshValue);
+        $this->createToken($clientId, $tokenValue, $tokenType, $refreshValue, $userId, $isScopeModified, $scope);
 
         $response = $this->createBodyTokenResponse(
             $tokenValue,
@@ -326,23 +332,83 @@ class PassportServer extends BaseAuthorizationServer
         array $extraParameters = []
     ): ResponseInterface {
         $userId = null;
+        $clientId = $client->getIdentifier();
         list($tokenValue, $tokenType, $tokenExpiresIn) =
-            $this->getIntegration()->generateTokenValues($client->getIdentifier(), $userId, $isScopeModified, $scope);
+            $this->getIntegration()->generateTokenValues($clientId, $userId, $isScopeModified, $scope);
         $refreshValue = null;
 
         assert(is_string($tokenValue) === true && empty($tokenValue) === false);
         assert(is_string($tokenType) === true && empty($tokenType) === false);
         assert(is_int($tokenExpiresIn) === true && $tokenExpiresIn > 0);
 
-        // TODO userId is null though it's not possible input value
-        $this->getIntegration()->getTokenRepository()
-            ->createToken($client->getIdentifier(), $userId, $tokenValue, $tokenType, $refreshValue);
+        $this->createToken($clientId, $tokenValue, $tokenType, $refreshValue, $userId, $isScopeModified, $scope);
 
         $response = $this->createBodyTokenResponse(
             $tokenValue,
             $tokenType,
             $tokenExpiresIn,
             $refreshValue,
+            $isScopeModified,
+            $scope
+        );
+
+        return $response;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return TokenInterface|null
+     */
+    public function readTokenByRefreshValue(string $refreshValue)
+    {
+        return $this->getIntegration()->getTokenRepository()->readByRefresh(
+            $refreshValue,
+            $this->getIntegration()->getTokenExpirationPeriod()
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function refreshCreateAccessTokenResponse(
+        ClientInterface $client,
+        \Limoncello\OAuthServer\Contracts\TokenInterface $token,
+        bool $isScopeModified,
+        array $scope = null,
+        array $extraParameters = []
+    ): ResponseInterface {
+        /** @var TokenInterface $token */
+        assert($token instanceof TokenInterface);
+
+        list($newTokenValue, $tokenType, $tokenExpiresIn, $newRefreshValue) = $this->getIntegration()
+            ->generateTokenValues($client->getIdentifier(), $token->getUserIdentifier(), $isScopeModified, $scope);
+
+        if ($this->getIntegration()->isRenewRefreshValue() === false) {
+            $newRefreshValue = null;
+        }
+
+        assert(is_string($newTokenValue) === true && empty($newTokenValue) === false);
+        assert(is_string($tokenType) === true && empty($tokenType) === false);
+        assert(is_int($tokenExpiresIn) === true && $tokenExpiresIn > 0);
+
+        $tokenId   = $token->getIdentifier();
+        $tokenRepo = $this->getIntegration()->getTokenRepository();
+        if ($isScopeModified === false) {
+            $tokenRepo->updateValues($tokenId, $newTokenValue, $newRefreshValue);
+        } else {
+            assert(is_array($scope));
+            $tokenRepo->inTransaction(function () use ($tokenRepo, $tokenId, $newTokenValue, $newRefreshValue, $scope) {
+                $tokenRepo->updateValues($tokenId, $newTokenValue, $newRefreshValue);
+                $tokenRepo->unbindScopes($tokenId);
+                $tokenRepo->bindScopeIdentifiers($tokenId, $scope);
+            });
+        }
+        $response = $this->createBodyTokenResponse(
+            $newTokenValue,
+            $tokenType,
+            $tokenExpiresIn,
+            $newRefreshValue,
             $isScopeModified,
             $scope
         );
@@ -467,6 +533,45 @@ class PassportServer extends BaseAuthorizationServer
     {
         return array_filter($array, function ($value) {
             return $value !== null;
+        });
+    }
+
+    /**
+     * @param string      $clientId
+     * @param string      $tokenValue
+     * @param string      $tokenType
+     * @param string|null $refreshValue
+     * @param int|null    $userId
+     * @param bool        $isScopeModified
+     * @param array|null  $scope
+     *
+     * @return void
+     */
+    private function createToken(
+        string $clientId,
+        string $tokenValue,
+        string $tokenType,
+        string $refreshValue = null,
+        int $userId = null,
+        bool $isScopeModified = false,
+        array $scope = null
+    ) {
+        $tokenRepo = $this->getIntegration()->getTokenRepository();
+        $tokenRepo->inTransaction(function () use (
+            $tokenRepo,
+            $clientId,
+            $userId,
+            $tokenValue,
+            $tokenType,
+            $refreshValue,
+            $isScopeModified,
+            $scope
+        ) {
+            // TODO userId is null though it's not possible input value
+            $tokenId = $tokenRepo->createToken($clientId, $userId, $tokenValue, $tokenType, $refreshValue);
+            if ($isScopeModified === true && is_array($scope) === true && empty($scope) === false) {
+                $tokenRepo->bindScopeIdentifiers($tokenId, $scope);
+            }
         });
     }
 }

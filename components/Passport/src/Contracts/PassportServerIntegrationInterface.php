@@ -110,4 +110,11 @@ interface PassportServerIntegrationInterface
         string $state = null,
         array $extraParameters = []
     ): ResponseInterface;
+
+    /**
+     * If token refresh value should be re-newed on token value re-new.
+     *
+     * @return bool
+     */
+    public function isRenewRefreshValue(): bool;
 }

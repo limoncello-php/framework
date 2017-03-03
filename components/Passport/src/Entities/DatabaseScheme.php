@@ -160,6 +160,14 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /**
      * @inheritdoc
      */
+    public function getClientsIsRefreshGrantEnabledColumn(): string
+    {
+        return Client::FIELD_IS_REFRESH_GRANT_ENABLED;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getClientsCreatedAtColumn(): string
     {
         return Client::FIELD_CREATED_AT;

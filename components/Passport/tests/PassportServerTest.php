@@ -22,6 +22,7 @@ use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\Scope;
 use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
+use Limoncello\Passport\Adaptors\Generic\TokenRepository;
 use Limoncello\Passport\Integration\BasePassportServerIntegration;
 use Limoncello\Passport\PassportServer;
 use Psr\Http\Message\ServerRequestInterface;
@@ -37,13 +38,150 @@ class PassportServerTest extends TestCase
     const TEST_USER_ID           = 5;
     const TEST_ERROR_URI         = 'http://example.app/auth_request_error';
     const TEST_APPROVAL_URI      = 'http://example.app/resource_owner_approval';
+    const TEST_SCOPE_1           = 'scope1';
+    const TEST_SCOPE_2           = 'scope2';
 
     /**
      * Test issuing resource owner password token.
      */
     public function testResourceOwnerPasswordToken()
     {
-        $this->createDatabaseScheme($connection = $this->createSqLiteConnection(), $this->getDatabaseScheme());
+        $server   = $this->createPassportServer($connection = $this->createSqLiteConnection());
+        $response = $server->postCreateToken(
+            $this->createPasswordTokenRequest(static::TEST_USER_NAME, static::TEST_USER_PASSWORD)
+        );
+        $this->assertNotNull($response);
+        $token = json_decode((string)$response->getBody());
+        $this->checkItLooksLikeValidToken($token);
+        $this->assertTrue(property_exists($token, 'refresh_token'));
+        $this->assertTrue(property_exists($token, 'scope'));
+        $this->assertNotEmpty($token->scope);
+        $this->assertNotEmpty($token->refresh_token);
+
+        // check scopes were saved
+        $tokenRepo  = new TokenRepository($connection, $this->getDatabaseScheme());
+        $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
+        $this->assertNotEmpty($savedToken->getScopeIdentifiers());
+    }
+
+    /**
+     * Test refresh token.
+     */
+    public function testRefreshToken()
+    {
+        $server = $this->createPassportServer($this->createSqLiteConnection());
+
+        // create initial token
+        $response = $server->postCreateToken(
+            $this->createPasswordTokenRequest(static::TEST_USER_NAME, static::TEST_USER_PASSWORD)
+        );
+        $this->assertNotNull($response);
+        $token = json_decode((string)$response->getBody());
+        $this->checkItLooksLikeValidToken($token);
+        $this->assertTrue(property_exists($token, 'scope'));
+        $this->assertNotEmpty($token->scope);
+        $this->assertNotEmpty($refreshToken = $token->refresh_token);
+
+        // refresh the token
+        $response = $server->postCreateToken(
+            $this->createRefreshTokenRequest($refreshToken, null, PassportServerTest::TEST_DEFAULT_CLIENT_ID)
+        );
+        $this->assertNotNull($response);
+        $newToken = json_decode((string)$response->getBody());
+        $this->checkItLooksLikeValidToken($newToken);
+
+        $this->assertNotEquals($token->access_token, $newToken->access_token);
+    }
+
+    /**
+     * Test refresh token.
+     */
+    public function testRefreshTokenWithNewScope()
+    {
+        $server = $this->createPassportServer($this->createSqLiteConnection());
+
+        // create initial token
+        $response = $server->postCreateToken(
+            $this->createPasswordTokenRequest(static::TEST_USER_NAME, static::TEST_USER_PASSWORD)
+        );
+        $this->assertNotNull($response);
+        $token = json_decode((string)$response->getBody());
+        $this->checkItLooksLikeValidToken($token);
+        $this->assertTrue(property_exists($token, 'scope'));
+        $this->assertNotEmpty($token->scope);
+        $this->assertNotEmpty($refreshToken = $token->refresh_token);
+
+        // refresh the token
+        $response = $server->postCreateToken($this->createRefreshTokenRequest(
+            $refreshToken,
+            static::TEST_SCOPE_1,
+            PassportServerTest::TEST_DEFAULT_CLIENT_ID
+        ));
+        $this->assertNotNull($response);
+        $newToken = json_decode((string)$response->getBody());
+        $this->checkItLooksLikeValidToken($newToken);
+        $this->assertTrue(property_exists($newToken, 'scope'));
+        $this->assertNotEmpty($newToken->scope);
+
+        $this->assertNotEquals($token->access_token, $newToken->access_token);
+    }
+
+    /**
+     * @param string|null $username
+     * @param string|null $password
+     * @param string|null $scope
+     * @param array       $headers
+     *
+     * @return ServerRequestInterface
+     */
+    private function createPasswordTokenRequest(
+        string $username = null,
+        string $password = null,
+        string $scope = null,
+        array $headers = []
+    ) {
+        $request = $this->createServerRequest([
+            'grant_type' => 'password',
+            'username'   => $username,
+            'password'   => $password,
+            'scope'      => $scope,
+        ], null, $headers);
+
+        return $request;
+    }
+
+    /**
+     * @param string|null $refreshToken
+     * @param string|null $scope
+     * @param string|null $clientId
+     * @param array       $headers
+     *
+     * @return ServerRequestInterface
+     */
+    private function createRefreshTokenRequest(
+        string $refreshToken = null,
+        string $scope = null,
+        string $clientId = null,
+        array $headers = []
+    ) {
+        $request = $this->createServerRequest([
+            'grant_type'    => 'refresh_token',
+            'refresh_token' => $refreshToken,
+            'scope'         => $scope,
+            'client_id'     => $clientId,
+        ], null, $headers);
+
+        return $request;
+    }
+
+    /**
+     * @param Connection $connection
+     *
+     * @return AuthorizationServerInterface
+     */
+    private function createPassportServer(Connection $connection): AuthorizationServerInterface
+    {
+        $this->createDatabaseScheme($connection, $this->getDatabaseScheme());
         $scheme     = $this->getDatabaseScheme();
         $scopeRepo  = new ScopeRepository($connection, $scheme);
         $clientRepo = new ClientRepository($connection, $scheme);
@@ -54,15 +192,17 @@ class PassportServerTest extends TestCase
                     ->setIdentifier(PassportServerTest::TEST_DEFAULT_CLIENT_ID)
                     ->setName('client name')
                     ->enablePasswordGrant()
+                    ->enableRefreshGrant()
                     ->useDefaultScopesOnEmptyRequest()
             );
-            $scopeRepo->create($scope1 = (new Scope())->setIdentifier('scope1'));
-            $scopeRepo->create($scope2 = (new Scope())->setIdentifier('scope2'));
+            $scopeRepo->create($scope1 = (new Scope())->setIdentifier(static::TEST_SCOPE_1));
+            $scopeRepo->create($scope2 = (new Scope())->setIdentifier(static::TEST_SCOPE_2));
 
             $clientRepo->bindScopes($client->getIdentifier(), [$scope1, $scope2]);
         });
 
-        $integration = new class ($connection) extends BasePassportServerIntegration {
+        $integration = new class ($connection) extends BasePassportServerIntegration
+        {
 
             /**
              * @param Connection $connection
@@ -90,46 +230,22 @@ class PassportServerTest extends TestCase
         };
 
         /** @var AuthorizationServerInterface $server */
-        $server   = new PassportServer($integration);
-        $response = $server->postCreateToken(
-            $this->createPasswordTokenRequest(static::TEST_USER_NAME, static::TEST_USER_PASSWORD)
-        );
-        $this->assertNotNull($response);
-        $token = json_decode((string)$response->getBody());
+        $server = new PassportServer($integration);
+
+        return $server;
+    }
+
+    /**
+     * @param $token
+     */
+    private function checkItLooksLikeValidToken($token)
+    {
         $this->assertTrue(property_exists($token, 'access_token'));
         $this->assertTrue(property_exists($token, 'token_type'));
         $this->assertTrue(property_exists($token, 'expires_in'));
-        $this->assertTrue(property_exists($token, 'refresh_token'));
-        $this->assertTrue(property_exists($token, 'scope'));
 
         $this->assertNotEmpty($token->access_token);
         $this->assertEquals('bearer', $token->token_type);
         $this->assertTrue(is_int($token->expires_in));
-        $this->assertNotEmpty($token->refresh_token);
-        $this->assertNotEmpty($token->scope);
-    }
-
-    /**
-     * @param string|null $username
-     * @param string|null $password
-     * @param string|null $scope
-     * @param array       $headers
-     *
-     * @return ServerRequestInterface
-     */
-    private function createPasswordTokenRequest(
-        string $username = null,
-        string $password = null,
-        string $scope = null,
-        array $headers = []
-    ) {
-        $request = $this->createServerRequest([
-            'grant_type' => 'password',
-            'username'   => $username,
-            'password'   => $password,
-            'scope'      => $scope,
-        ], null, $headers);
-
-        return $request;
     }
 }

@@ -22,7 +22,7 @@ use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
 /**
  * @package Limoncello\Passport
  */
-interface TokenInterface extends AuthorizationCodeInterface
+interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthServer\Contracts\TokenInterface
 {
     /**
      * @return int
@@ -30,24 +30,9 @@ interface TokenInterface extends AuthorizationCodeInterface
     public function getIdentifier(): int;
 
     /**
-     * @return int|null
-     */
-    public function getUserIdentifier();
-
-    /**
-     * @return string|null
-     */
-    public function getCode();
-
-    /**
      * @return DateTime|null
      */
     public function getCodeCreatedAt();
-
-    /**
-     * @return string|null
-     */
-    public function getValue();
 
     /**
      * @return string|null
@@ -58,11 +43,6 @@ interface TokenInterface extends AuthorizationCodeInterface
      * @return DateTime|null
      */
     public function getValueCreatedAt();
-
-    /**
-     * @return string|null
-     */
-    public function getRefreshValue();
 
     /**
      * @return DateTime|null

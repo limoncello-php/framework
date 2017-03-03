@@ -67,6 +67,9 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /** Field name */
     const FIELD_IS_CLIENT_GRANT_ENABLED = 'is_client_grant_enabled';
 
+    /** Field name */
+    const FIELD_IS_REFRESH_GRANT_ENABLED = 'is_refresh_grant_enabled';
+
     /**
      * @var string
      */
@@ -133,6 +136,11 @@ abstract class Client extends DatabaseItem implements ClientInterface
     private $isClientGrantEnabledField = false;
 
     /**
+     * @var bool
+     */
+    private $isRefreshGrantEnabledField = false;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -150,6 +158,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
                 ->parseIsImplicitAuthEnabled($this->{static::FIELD_IS_IMPLICIT_GRANT_ENABLED})
                 ->parseIsPasswordGrantEnabled($this->{static::FIELD_IS_PASSWORD_GRANT_ENABLED})
                 ->parseIsClientGrantEnabled($this->{static::FIELD_IS_CLIENT_GRANT_ENABLED})
+                ->parseIsRefreshGrantEnabled($this->{static::FIELD_IS_REFRESH_GRANT_ENABLED})
                 ->parseScopeList(
                     $this->hasDynamicProperty(static::FIELD_SCOPE_LIST) === true ?
                         $this->{static::FIELD_SCOPE_LIST} : ''
@@ -517,6 +526,34 @@ abstract class Client extends DatabaseItem implements ClientInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function isRefreshGrantEnabled(): bool
+    {
+        return $this->isRefreshGrantEnabledField;
+    }
+
+    /**
+     * @return Client
+     */
+    public function enableRefreshGrant(): Client
+    {
+        $this->isRefreshGrantEnabledField = true;
+
+        return $this;
+    }
+
+    /**
+     * @return Client
+     */
+    public function disableRefreshGrant(): Client
+    {
+        $this->isRefreshGrantEnabledField = false;
+
+        return $this;
+    }
+
+    /**
      * @param string $value
      *
      * @return Client
@@ -596,6 +633,18 @@ abstract class Client extends DatabaseItem implements ClientInterface
     protected function parseIsClientGrantEnabled(string $value): Client
     {
         $value === '1' ? $this->enableClientGrant() : $this->disableClientGrant();
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return Client
+     */
+    protected function parseIsRefreshGrantEnabled(string $value): Client
+    {
+        $value === '1' ? $this->enableRefreshGrant() : $this->disableRefreshGrant();
 
         return $this;
     }

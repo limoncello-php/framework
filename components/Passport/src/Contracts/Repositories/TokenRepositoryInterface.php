@@ -137,6 +137,15 @@ interface TokenRepositoryInterface
     public function readScopeIdentifiers(int $identifier): array;
 
     /**
+     * @param int         $identifier
+     * @param string      $newTokenValue
+     * @param string|null $newRefreshValue
+     *
+     * @return void
+     */
+    public function updateValues(int $identifier, string $newTokenValue, string $newRefreshValue = null);
+
+    /**
      * @param int $identifier
      *
      * @return void

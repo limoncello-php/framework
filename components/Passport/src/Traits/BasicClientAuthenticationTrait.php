@@ -27,38 +27,95 @@ use Psr\Http\Message\ServerRequestInterface;
 trait BasicClientAuthenticationTrait
 {
     /**
-     * @param ServerRequestInterface             $request
      * @param PassportServerIntegrationInterface $integration
+     * @param ServerRequestInterface             $request
+     * @param array                              $parameters
      * @param string                             $realm
      *
      * @return ClientInterface|null
      *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function authenticateClient(
-        ServerRequestInterface $request,
+    protected function determineClient(
         PassportServerIntegrationInterface $integration,
+        ServerRequestInterface $request,
+        array $parameters,
         $realm = 'OAuth'
     ) {
-        $client = null;
-        if (empty($headerArray = $request->getHeader('Authorization')) === false) {
+        // A client may use Basic authentication.
+        //
+        // Or
+        //
+        // A client MAY use the "client_id" request parameter to identify itself
+        // when sending requests to the token endpoint.
+        // @link https://tools.ietf.org/html/rfc6749#section-3.2.1
+
+        $authorizationHeader = $request->getHeader('Authorization');
+
+        // try to parse `Authorization` header for client ID and credentials
+        $clientId          = null;
+        $clientCredentials = null;
+        $errorHeaders      = ['WWW-Authenticate' => 'Basic realm="' . $realm . '"'];
+        if (empty($headerArray = $authorizationHeader) === false) {
+            $errorCode = OAuthTokenBodyException::ERROR_INVALID_CLIENT;
             if (empty($authHeader = $headerArray[0]) === true ||
                 ($tokenPos = strpos($authHeader, 'Basic ')) === false ||
                 $tokenPos !== 0 ||
                 ($authValue = substr($authHeader, 6)) === '' ||
                 $authValue === false ||
                 ($decodedValue = base64_decode($authValue, true)) === false ||
-                count($nameAndPassword = explode(':', $decodedValue, 2)) !== 2 ||
-                ($client = $integration->getClientRepository()->read($nameAndPassword[0])) === null ||
-                ($credentials = $client->getCredentials()) === null ||
-                $integration->verifyPassword($nameAndPassword[1], $credentials) === false
+                ($idAndCredentials = explode(':', $decodedValue, 2)) === false
             ) {
-                throw new OAuthTokenBodyException(
-                    OAuthTokenBodyException::ERROR_INVALID_CLIENT,
-                    null, // error URI
-                    401,
-                    ['WWW-Authenticate' => 'Basic realm="' . $realm . '"']
-                );
+                throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+            }
+            $headerPartsCount = count($idAndCredentials);
+            switch ($headerPartsCount) {
+                case 1:
+                    $clientId = $idAndCredentials[0];
+                    break;
+                case 2:
+                    $clientId          = $idAndCredentials[0];
+                    $clientCredentials = $idAndCredentials[1];
+                    break;
+                default:
+                    throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+            }
+        }
+
+        // check if client ID was specified in parameters it should match
+        if (array_key_exists('client_id', $parameters) === true &&
+            is_string($value = $parameters['client_id']) === true
+        ) {
+            if ($clientId !== null && $clientId !== $value) {
+                $errorCode = OAuthTokenBodyException::ERROR_INVALID_REQUEST;
+                throw new OAuthTokenBodyException($errorCode, null, 400, $errorHeaders);
+            }
+
+            $clientId = $value;
+            unset($value);
+        }
+
+        // when we are here we know if any client ID and credentials were given
+
+        $client = null;
+        if ($clientId !== null) {
+            $errorCode = OAuthTokenBodyException::ERROR_INVALID_CLIENT;
+            if (($client = $integration->getClientRepository()->read($clientId)) === null) {
+                throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+            }
+
+            // check credentials
+            if ($clientCredentials !== null) {
+                // we got the password
+                if (password_verify($clientCredentials, $client->getCredentials()) === false) {
+                    throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+                }
+            } else {
+                // no password provided
+                if ($client->isConfidential() === true || $client->hasCredentials() === true) {
+                    throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
+                }
             }
         }
 

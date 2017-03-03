@@ -52,6 +52,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
             $scheme->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
             $scheme->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
             $scheme->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
+            $scheme->getClientsIsRefreshGrantEnabledColumn()  => $client->isRefreshGrantEnabled(),
             $scheme->getClientsCreatedAtColumn()              => new DateTimeImmutable(),
         ]);
     }

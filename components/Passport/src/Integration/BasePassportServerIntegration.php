@@ -80,6 +80,10 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
      * @var int
      */
     private $tokenExpiration;
+    /**
+     * @var bool
+     */
+    private $isRenewRefreshValue;
 
     /**
      * @param Connection $connection
@@ -88,6 +92,7 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
      * @param string     $errorUriString
      * @param int        $codeExpiration
      * @param int        $tokenExpiration
+     * @param bool       $isRenewRefreshValue
      */
     public function __construct(
         Connection $connection,
@@ -95,14 +100,16 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         string $approvalUriString,
         string $errorUriString,
         int $codeExpiration = 600,
-        int $tokenExpiration = 3600
+        int $tokenExpiration = 3600,
+        bool $isRenewRefreshValue = false
     ) {
-        $this->defaultClientId   = $defaultClientId;
-        $this->connection        = $connection;
-        $this->approvalUriString = $approvalUriString;
-        $this->errorUriString    = $errorUriString;
-        $this->codeExpiration    = $codeExpiration;
-        $this->tokenExpiration   = $tokenExpiration;
+        $this->defaultClientId     = $defaultClientId;
+        $this->connection          = $connection;
+        $this->approvalUriString   = $approvalUriString;
+        $this->errorUriString      = $errorUriString;
+        $this->codeExpiration      = $codeExpiration;
+        $this->tokenExpiration     = $tokenExpiration;
+        $this->isRenewRefreshValue = $isRenewRefreshValue;
     }
 
     /**
@@ -177,6 +184,14 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     public function getTokenExpirationPeriod(): int
     {
         return $this->tokenExpiration;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRenewRefreshValue(): bool
+    {
+        return $this->isRenewRefreshValue;
     }
 
     /**

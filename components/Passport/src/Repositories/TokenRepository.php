@@ -225,6 +225,30 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
+    public function updateValues(int $identifier, string $newTokenValue, string $newRefreshValue = null)
+    {
+        $query = $this->getConnection()->createQueryBuilder();
+
+        $scheme = $this->getDatabaseScheme();
+        $dbNow  = $this->createTypedParameter($query, new DateTimeImmutable());
+        $query
+            ->update($this->getTableName())
+            ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $identifier))
+            ->set($scheme->getTokensValueColumn(), $this->createTypedParameter($query, $newTokenValue))
+            ->set($scheme->getTokensValueCreatedAtColumn(), $dbNow);
+        if ($newRefreshValue !== null) {
+            $query
+                ->set($scheme->getTokensRefreshColumn(), $this->createTypedParameter($query, $newRefreshValue))
+                ->set($scheme->getTokensRefreshCreatedAtColumn(), $dbNow);
+        }
+
+        $numberOfUpdated = $query->execute();
+        assert(is_int($numberOfUpdated) === true);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function delete(int $identifier)
     {
         $this->deleteResource($identifier);

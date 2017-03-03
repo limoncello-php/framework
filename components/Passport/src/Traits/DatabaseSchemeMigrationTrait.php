@@ -110,10 +110,11 @@ trait DatabaseSchemeMigrationTrait
         $table->addColumn($scheme->getClientsIsConfidentialColumn(), Type::BOOLEAN)->setDefault(true);
         $table->addColumn($scheme->getClientsIsScopeExcessAllowedColumn(), Type::BOOLEAN)->setDefault(false);
         $table->addColumn($scheme->getClientsIsUseDefaultScopeColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsCodeGrantEnabledColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsImplicitGrantEnabledColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsPasswordGrantEnabledColumn(), Type::BOOLEAN)->setDefault(true);
-        $table->addColumn($scheme->getClientsIsClientGrantEnabledColumn(), Type::BOOLEAN)->setDefault(true);
+        $table->addColumn($scheme->getClientsIsCodeGrantEnabledColumn(), Type::BOOLEAN)->setDefault(false);
+        $table->addColumn($scheme->getClientsIsImplicitGrantEnabledColumn(), Type::BOOLEAN)->setDefault(false);
+        $table->addColumn($scheme->getClientsIsPasswordGrantEnabledColumn(), Type::BOOLEAN)->setDefault(false);
+        $table->addColumn($scheme->getClientsIsClientGrantEnabledColumn(), Type::BOOLEAN)->setDefault(false);
+        $table->addColumn($scheme->getClientsIsRefreshGrantEnabledColumn(), Type::BOOLEAN)->setDefault(false);
         $table->addColumn($scheme->getClientsCreatedAtColumn(), Type::DATETIME)->setNotnull(true);
         $table->addColumn($scheme->getClientsUpdatedAtColumn(), Type::DATETIME)->setNotnull(false);
         $table->setPrimaryKey([$scheme->getClientsIdentityColumn()]);
