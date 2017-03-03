@@ -39,7 +39,7 @@ interface TokenInterface
     /**
      * @return string|null
      */
-    public function getTokenValue();
+    public function getValue();
 
     /**
      * @return string|null
