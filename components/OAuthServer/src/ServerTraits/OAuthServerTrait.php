@@ -108,65 +108,27 @@ trait OAuthServerTrait
      * @param ClientInterface $client
      * @param string|null     $redirectUri
      *
-     * @return bool
+     * @return string|null
      */
-    protected function isValidRedirectUri(ClientInterface $client, string $redirectUri = null)
+    protected function selectValidRedirectUri(ClientInterface $client, string $redirectUri = null)
     {
-        $uris = $client->getRedirectUriStrings();
+        $validUri = null;
+        $uris     = $client->getRedirectUriStrings();
         if (empty($redirectUri) === true) {
             // if no redirect provided and it's optional we require client to have
             // exactly 1 redirect URI so we know where to redirect.
-            return ($this->isInputUriOptional() === true && count($uris) === 1);
+            if (($this->isInputUriOptional() === true && count($uris) === 1)) {
+                $validUri = $uris[0];
+            }
+
+            return $validUri;
         }
 
         // check client has provided redirect URI
-        $isValid = false;
-        foreach ($client->getRedirectUriStrings() as $uri) {
-            if ($uri === $redirectUri) {
-                $isValid = true;
-                break;
-            }
+        if (in_array($redirectUri, $client->getRedirectUriStrings()) === true) {
+            $validUri = $redirectUri;
         }
 
-        return $isValid;
-    }
-
-    /**
-     * @param ClientInterface $client
-     * @param string|null     $receivedRedirectUri
-     *
-     * @return string
-     */
-    protected function selectRedirectUri(ClientInterface $client, string $receivedRedirectUri = null): string
-    {
-        if ($receivedRedirectUri !== null) {
-            assert(
-                call_user_func(function () use ($client, $receivedRedirectUri) {
-                    foreach ($client->getRedirectUriStrings() as $uri) {
-                        if ($uri === $receivedRedirectUri) {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }) === true,
-                'Authentication server logic should not allow processing received redirect URI which does not belong ' .
-                'to client.'
-            );
-
-            return $receivedRedirectUri;
-        }
-
-        $redirectionUris = $client->getRedirectUriStrings();
-
-        assert(
-            count($redirectionUris) === 1,
-            'Authentication server logic should not allow processing clients with more than one redirect URI ' .
-            'if no redirect URI from client received.'
-        );
-
-        $result = $redirectionUris[0];
-
-        return $result;
+        return $validUri;
     }
 }

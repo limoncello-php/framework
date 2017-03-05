@@ -113,40 +113,32 @@ class SampleServer extends BaseAuthorizationServer
             $responseType = $this->getResponseType($parameters);
             switch ($responseType) {
                 case ResponseTypes::AUTHORIZATION_CODE:
-                    $redirectUri  = $this->codeGetRedirectUri($parameters);
-                    // check client identifier and redirect URI
-                    $isInvalid =
-                        ($clientId = $this->codeGetClientId($parameters)) === null ||
-                        ($client = $this->getRepository()->readClient($clientId)) === null ||
-                        $this->isValidRedirectUri($client, $redirectUri) === false;
-                    if ($isInvalid === true) {
-                        $response = $this->createInvalidClientAndRedirectUriErrorResponse();
-                    } else {
-                        $response = $this->codeAskResourceOwnerForApproval(
+                    list($client, $redirectUri) = $this->getValidClientAndRedirectUri(
+                        $this->codeGetClientId($parameters),
+                        $this->codeGetRedirectUri($parameters)
+                    );
+                    $response = $client === null || $redirectUri === null ?
+                        $this->createInvalidClientAndRedirectUriErrorResponse() :
+                        $this->codeAskResourceOwnerForApproval(
                             $parameters,
                             $client,
                             $redirectUri,
                             $this->getMaxStateLength()
                         );
-                    }
                     break;
                 case ResponseTypes::IMPLICIT:
-                    $redirectUri  = $this->implicitGetRedirectUri($parameters);
-                    // check client identifier and redirect URI
-                    $isInvalid =
-                        ($clientId = $this->implicitGetClientId($parameters)) === null ||
-                        ($client = $this->getRepository()->readClient($clientId)) === null ||
-                        $this->isValidRedirectUri($client, $redirectUri) === false;
-                    if ($isInvalid === true) {
-                        $response = $this->createInvalidClientAndRedirectUriErrorResponse();
-                    } else {
-                        $response = $this->implicitAskResourceOwnerForApproval(
+                    list($client, $redirectUri) = $this->getValidClientAndRedirectUri(
+                        $this->implicitGetClientId($parameters),
+                        $this->implicitGetRedirectUri($parameters)
+                    );
+                    $response = $client === null || $redirectUri === null ?
+                        $this->createInvalidClientAndRedirectUriErrorResponse() :
+                        $this->implicitAskResourceOwnerForApproval(
                             $parameters,
                             $client,
                             $redirectUri,
                             $this->getMaxStateLength()
                         );
-                    }
                     break;
                 default:
                     throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE);
@@ -294,7 +286,7 @@ class SampleServer extends BaseAuthorizationServer
         //
         // For demonstration purposes and simplicity we skip 'approval' step and issue the token right away.
 
-        $redirectUri = $this->selectRedirectUri($client, $redirectUri);
+        $redirectUri = $this->selectValidRedirectUri($client, $redirectUri);
 
         $token     = static::TEST_TOKEN;
         $type      = static::TEST_TOKEN_TYPE;
@@ -490,6 +482,24 @@ class SampleServer extends BaseAuthorizationServer
     }
 
     /**
+     * @param string|null $clientId
+     * @param string|null $redirectFromQuery
+     *
+     * @return array [client|null, uri|null]
+     */
+    private function getValidClientAndRedirectUri(string $clientId = null, string $redirectFromQuery = null)
+    {
+        $client           = null;
+        $validRedirectUri = null;
+
+        if ($clientId !== null && ($client = $this->getRepository()->readClient($clientId)) !== null) {
+            $validRedirectUri = $this->selectValidRedirectUri($client, $redirectFromQuery);
+        }
+
+        return [$client, $validRedirectUri];
+    }
+
+    /**
      * @param ClientInterface            $client
      * @param AuthorizationCodeInterface $code
      * @param string|null                $state
@@ -509,7 +519,7 @@ class SampleServer extends BaseAuthorizationServer
 
         $fragment = $this->encodeAsXWwwFormUrlencoded($parameters);
 
-        $redirectUri = $this->selectRedirectUri($client, $code->getRedirectUriString());
+        $redirectUri = $this->selectValidRedirectUri($client, $code->getRedirectUriString());
         $response = new RedirectResponse((new Uri($redirectUri))->withFragment($fragment));
 
         return $response;
