@@ -136,7 +136,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
         return $this->readHasManyRelationshipColumn(
             $identifier,
             $scheme->getRedirectUrisTable(),
-            $scheme->getRedirectUrisIdentityColumn(),
+            $scheme->getRedirectUrisValueColumn(),
             $scheme->getRedirectUrisClientIdentityColumn()
         );
     }

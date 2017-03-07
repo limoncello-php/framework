@@ -17,6 +17,7 @@
  */
 
 use Limoncello\OAuthServer\Contracts\ClientInterface;
+use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -57,20 +58,21 @@ interface PassportServerIntegrationInterface
      */
     public function validateUserId(string $userName, string $password);
 
+    // TODO move to trait? That's implementation choice rather than app specific
     /**
-     * @param string          $clientIdentifier
-     * @param int             $userIdentifier
-     * @param bool            $isScopeModified
-     * @param string[]|null   $scope
+     * @param TokenInterface $token
+     *
+     * @return string
+     */
+    public function generateCodeValue(TokenInterface $token): string;
+
+    // TODO move to trait? That's implementation choice rather than app specific
+    /**
+     * @param TokenInterface $token
      *
      * @return array [string $tokenValue, string $tokenType, int $tokenExpiresInSeconds, string|null $refreshValue]
      */
-    public function generateTokenValues(
-        string $clientIdentifier,
-        int $userIdentifier = null,
-        bool $isScopeModified = false,
-        array $scope = null
-    ): array;
+    public function generateTokenValues(TokenInterface $token): array;
 
     /**
      * @return int

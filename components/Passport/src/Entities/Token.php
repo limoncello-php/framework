@@ -94,42 +94,42 @@ abstract class Token implements TokenInterface
     /**
      * @var string[]
      */
-    private $tokenScopeStrings;
+    private $tokenScopeStrings = [];
 
     /**
      * @var bool
      */
-    private $isScopeModified;
+    private $isScopeModified = false;
 
     /**
      * @var bool
      */
-    private $isEnabled;
+    private $isEnabled = false;
 
     /**
      * @var string|null
      */
-    private $redirectUriString;
+    private $redirectUriString = null;
 
     /**
      * @var string|null
      */
-    private $codeField;
+    private $codeField = null;
 
     /**
      * @var string|null
      */
-    private $valueField;
+    private $valueField = null;
 
     /**
      * @var string|null
      */
-    private $typeField;
+    private $typeField = null;
 
     /**
      * @var string|null
      */
-    private $refreshValueField;
+    private $refreshValueField = null;
 
     /**
      * @var DateTimeImmutable|null
@@ -456,9 +456,9 @@ abstract class Token implements TokenInterface
     /**
      * @param DateTimeImmutable $codeCreatedAt
      *
-     * @return Scope
+     * @return Token
      */
-    public function setCodeCreatedAt(DateTimeImmutable $codeCreatedAt): Scope
+    public function setCodeCreatedAt(DateTimeImmutable $codeCreatedAt): Token
     {
         $this->codeCreatedAtField = $codeCreatedAt;
 
@@ -482,9 +482,9 @@ abstract class Token implements TokenInterface
     /**
      * @param DateTimeImmutable $valueCreatedAt
      *
-     * @return Scope
+     * @return Token
      */
-    public function setValueCreatedAt(DateTimeImmutable $valueCreatedAt): Scope
+    public function setValueCreatedAt(DateTimeImmutable $valueCreatedAt): Token
     {
         $this->valueCreatedAtField = $valueCreatedAt;
 
@@ -508,9 +508,9 @@ abstract class Token implements TokenInterface
     /**
      * @param DateTimeImmutable $refreshCreatedAt
      *
-     * @return Scope
+     * @return Token
      */
-    public function setRefreshCreatedAt(DateTimeImmutable $refreshCreatedAt): Scope
+    public function setRefreshCreatedAt(DateTimeImmutable $refreshCreatedAt): Token
     {
         $this->refreshCreatedAtField = $refreshCreatedAt;
 

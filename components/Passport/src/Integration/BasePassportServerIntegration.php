@@ -21,6 +21,7 @@ use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\TokenRepository;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
@@ -155,19 +156,31 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     /**
      * @inheritdoc
      */
-    public function generateTokenValues(
-        string $clientIdentifier,
-        int $userIdentifier = null,
-        bool $isScopeModified = false,
-        array $scope = null
-    ): array {
-        // [string $tokenValue, string $tokenType, int $tokenExpiresInSeconds, string|null $refreshValue]
-        return [
-            bin2hex(random_bytes(16)) . uniqid(),
-            'bearer',
-            $this->getTokenExpirationPeriod(),
-            bin2hex(random_bytes(16)) . uniqid()
-        ];
+    public function generateCodeValue(TokenInterface $token): string
+    {
+        $codeValue = bin2hex(random_bytes(16)) . uniqid();
+
+        assert(is_string($codeValue) === true && empty($codeValue) === false);
+
+        return $codeValue;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function generateTokenValues(TokenInterface $token): array
+    {
+        $tokenValue     = bin2hex(random_bytes(16)) . uniqid();
+        $tokenType      = 'bearer';
+        $tokenExpiresIn = $this->getTokenExpirationPeriod();
+        $refreshValue   = bin2hex(random_bytes(16)) . uniqid();
+
+        assert(is_string($tokenValue) === true && empty($tokenValue) === false);
+        assert(is_string($tokenType) === true && empty($tokenType) === false);
+        assert(is_int($tokenExpiresIn) === true && $tokenExpiresIn > 0);
+        assert($refreshValue === null || (is_string($refreshValue) === true && empty($refreshValue) === false));
+
+        return [$tokenValue, $tokenType, $tokenExpiresIn, $refreshValue];
     }
 
     /**
@@ -216,19 +229,27 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         array $extraParameters = []
     ): ResponseInterface {
         /** @var Client $client */
-        $fragment = http_build_query([
+        assert($client instanceof Client);
+
+        $filtered = array_filter([
 
             // TODO move strings to constants and add require approval URI have no fragment
+
 
             'client_id'         => $client->getIdentifier(),
             'client_name'       => $client->getName(),
             'redirect_uri'      => $redirectUri,
             'is_scope_modified' => $isScopeModified,
-            'scope'             => implode(' ', $scopeList),
+            'scope'             => $scopeList === null ? null : implode(' ', $scopeList),
             'state'             => $state,
 
-        ], '', '&', PHP_QUERY_RFC3986);
-        $uri = (new Uri($this->getApprovalUriString()))->withFragment($fragment);
+        ], function ($value) {
+            return $value !== null;
+        });
+
+        /** @var Client $client */
+        $fragment = http_build_query($filtered, '', '&', PHP_QUERY_RFC3986);
+        $uri      = (new Uri($this->getApprovalUriString()))->withFragment($fragment);
 
         return new RedirectResponse($uri);
     }

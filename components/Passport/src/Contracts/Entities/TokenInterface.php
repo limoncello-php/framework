@@ -24,6 +24,8 @@ use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
  */
 interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthServer\Contracts\TokenInterface
 {
+    // TODO setXXX methods are also needed otherwise it's needed to cast to Token everywhere
+
     /**
      * @return int
      */

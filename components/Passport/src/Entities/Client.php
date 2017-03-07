@@ -424,7 +424,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @return Client
      */
-    public function enableCodeAuthorization(): Client
+    public function enableCodeGrant(): Client
     {
         $this->isCodeAuthEnabledField = true;
 
@@ -434,7 +434,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @return Client
      */
-    public function disableCodeAuthorization(): Client
+    public function disableCodeGrant(): Client
     {
         $this->isCodeAuthEnabledField = false;
 
@@ -596,7 +596,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
      */
     protected function parseIsCodeAuthEnabled(string $value): Client
     {
-        $value === '1' ? $this->enableCodeAuthorization() : $this->disableCodeAuthorization();
+        $value === '1' ? $this->enableCodeGrant() : $this->disableCodeGrant();
 
         return $this;
     }

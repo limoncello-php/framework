@@ -19,6 +19,7 @@
 use DateTimeImmutable;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
+use Limoncello\Passport\Adaptors\Generic\Token;
 use Limoncello\Passport\Adaptors\Generic\TokenRepository;
 use Limoncello\Passport\Adaptors\Generic\Scope;
 use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
@@ -43,39 +44,38 @@ class TokenRepositoryTest extends TestCase
         /** @var ClientRepositoryInterface $clientRepo */
         list($tokenRepo, $scopeRepo, $clientRepo) = $this->createRepositories();
 
-        $tokenId  = null;
-        $userId   = 1;
-        $clientId = 'abc';
-        $code     = 'some-secret-code';
+        $newCode = (new Token())
+            ->setUserIdentifier(1)
+            ->setClientIdentifier('abc')
+            ->setCode('some-secret-code');
         $tokenRepo->inTransaction(function () use (
-            &$tokenId,
             $tokenRepo,
             $scopeRepo,
             $clientRepo,
-            $clientId,
-            $userId,
-            $code
+            &$newCode
         ) {
-            $clientRepo->create($client = (new Client())->setIdentifier($clientId)->setName('client name'));
+            $clientRepo->create(
+                $client = (new Client())->setIdentifier($newCode->getClientIdentifier())->setName('client name')
+            );
 
-            $tokenId = $tokenRepo->createCode($client->getIdentifier(), $userId, $code);
+            $newCode = $tokenRepo->createCode($newCode);
 
             $scopeRepo->create($scope1 = (new Scope())->setIdentifier('scope1'));
             $scopeRepo->create($scope2 = (new Scope())->setIdentifier('scope2'));
 
-            $tokenRepo->bindScopes($tokenId, [$scope1, $scope2]);
+            $tokenRepo->bindScopes($newCode->getIdentifier(), [$scope1, $scope2]);
         });
-        $this->assertNotNull($tokenId);
+        $this->assertNotNull($newCode);
 
-        $this->assertNotNull($tokenRepo->read($tokenId));
-        $this->assertNotNull($token = $tokenRepo->readByCode($code, 10));
-        $this->assertEquals($code, $token->getCode());
-        $this->assertNull($tokenRepo->readByCode($code, 0));
-        $this->assertNull($tokenRepo->readByRefresh($code, 10));
+        $this->assertNotNull($tokenRepo->read($newCode->getIdentifier()));
+        $this->assertNotNull($token = $tokenRepo->readByCode($newCode->getCode(), 10));
+        $this->assertEquals($newCode->getCode(), $token->getCode());
+        $this->assertNull($tokenRepo->readByCode($newCode->getCode(), 0));
+        $this->assertNull($tokenRepo->readByRefresh($newCode->getCode(), 10));
         $this->assertTrue($token instanceof TokenInterface);
-        $this->assertEquals($tokenId, $token->getIdentifier());
-        $this->assertEquals($clientId, $token->getClientIdentifier());
-        $this->assertEquals($userId, $token->getUserIdentifier());
+        $this->assertEquals($newCode->getIdentifier(), $token->getIdentifier());
+        $this->assertEquals($newCode->getClientIdentifier(), $token->getClientIdentifier());
+        $this->assertEquals($newCode->getUserIdentifier(), $token->getUserIdentifier());
         $this->assertNull($token->getValue());
         $this->assertNull($token->getRefreshValue());
         $this->assertCount(2, $token->getScopeIdentifiers());
@@ -83,19 +83,18 @@ class TokenRepositoryTest extends TestCase
         $this->assertNull($token->getValueCreatedAt());
         $this->assertNull($token->getRefreshCreatedAt());
 
-        $tokenRepo->assignValuesToCode(
-            $code,
-            $value = 'some-token-value',
-            $type = 'bearer',
-            10,
-            $refresh = 'some-refresh-value'
-        );
+        $newToken = (new Token())
+            ->setCode($newCode->getCode())
+            ->setValue('some-token-value')
+            ->setType('bearer')
+            ->setRefreshValue('some-refresh-value');
+        $tokenRepo->assignValuesToCode($newToken, 10);
 
         $sameToken = $tokenRepo->read($token->getIdentifier());
-        $this->assertEquals($tokenId, $sameToken->getIdentifier());
-        $this->assertEquals($value, $sameToken->getValue());
-        $this->assertEquals($type, $sameToken->getType());
-        $this->assertEquals($refresh, $sameToken->getRefreshValue());
+        $this->assertEquals($newCode->getIdentifier(), $sameToken->getIdentifier());
+        $this->assertEquals($newToken->getValue(), $sameToken->getValue());
+        $this->assertEquals($newToken->getType(), $sameToken->getType());
+        $this->assertEquals($newToken->getRefreshValue(), $sameToken->getRefreshValue());
         $this->assertTrue($sameToken->getCodeCreatedAt() instanceof DateTimeImmutable);
         $this->assertTrue($sameToken->getValueCreatedAt() instanceof DateTimeImmutable);
         $this->assertTrue($sameToken->getRefreshCreatedAt() instanceof DateTimeImmutable);
@@ -104,12 +103,12 @@ class TokenRepositoryTest extends TestCase
         $sameToken = $tokenRepo->read($token->getIdentifier());
         $this->assertCount(0, $sameToken->getScopeIdentifiers());
 
-        $tokenRepo->disable($tokenId);
-        $this->assertNull($tokenRepo->readByCode($code, 10));
+        $tokenRepo->disable($newCode->getIdentifier());
+        $this->assertNull($tokenRepo->readByCode($newCode->getCode(), 10));
 
-        $tokenRepo->delete($tokenId);
+        $tokenRepo->delete($newCode->getIdentifier());
 
-        $this->assertEmpty($tokenRepo->read($tokenId));
+        $this->assertEmpty($tokenRepo->read($newCode->getIdentifier()));
     }
 
     /**
@@ -122,10 +121,14 @@ class TokenRepositoryTest extends TestCase
         list($tokenRepo, , $clientRepo) = $this->createRepositories();
 
         $clientRepo->create($client = (new Client())->setIdentifier('client1')->setName('client name'));
-        $userId  = 1;
-        $tokenId =
-            $tokenRepo->createToken($client->getIdentifier(), $userId, 'some-token', 'bearer', 'refresh-token');
-        $this->assertGreaterThan(0, $tokenId);
+        $unsavedToken = (new Token())
+            ->setClientIdentifier($client->getIdentifier())
+            ->setUserIdentifier(1)
+            ->setValue('some-token')
+            ->setType('bearer')
+            ->setRefreshValue('refresh-token');
+        $this->assertNotNull($newToken = $tokenRepo->createToken($unsavedToken));
+        $this->assertGreaterThan(0, $tokenId = $newToken->getIdentifier());
 
         $this->assertEquals($tokenId, $tokenRepo->readByValue('some-token', 10)->getIdentifier());
         $this->assertEquals($tokenId, $tokenRepo->readByRefresh('refresh-token', 10)->getIdentifier());
@@ -141,10 +144,13 @@ class TokenRepositoryTest extends TestCase
         list($tokenRepo, , $clientRepo) = $this->createRepositories();
 
         $clientRepo->create($client = (new Client())->setIdentifier('client1')->setName('client name'));
-        $userId  = 1;
-        $tokenId =
-            $tokenRepo->createToken($client->getIdentifier(), $userId, 'some-token', 'bearer');
-        $this->assertGreaterThan(0, $tokenId);
+        $unsavedToken = (new Token())
+            ->setClientIdentifier($client->getIdentifier())
+            ->setUserIdentifier(1)
+            ->setValue('some-token')
+            ->setType('bearer');
+        $this->assertNotNull($newToken = $tokenRepo->createToken($unsavedToken));
+        $this->assertGreaterThan(0, $tokenId = $newToken->getIdentifier());
 
         $this->assertEquals($tokenId, $tokenRepo->readByValue('some-token', 10)->getIdentifier());
     }

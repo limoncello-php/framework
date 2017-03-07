@@ -33,47 +33,26 @@ interface TokenRepositoryInterface
     public function inTransaction(Closure $closure);
 
     /**
-     * @param string $clientIdentifier
-     * @param int    $userIdentifier
-     * @param string $code
+     * @param TokenInterface $code
      *
-     * @return int
+     * @return TokenInterface
      */
-    public function createCode(string $clientIdentifier, int $userIdentifier, string $code): int;
+    public function createCode(TokenInterface $code): TokenInterface;
 
     /**
-     * @param string      $code
-     * @param string      $tokenValue
-     * @param string      $tokenType
-     * @param int         $expirationInSeconds
-     * @param string|null $refreshValue
+     * @param TokenInterface $token
+     * @param int            $expirationInSeconds
      *
      * @return void
      */
-    public function assignValuesToCode(
-        string $code,
-        string $tokenValue,
-        string $tokenType,
-        int $expirationInSeconds,
-        string $refreshValue = null
-    );
+    public function assignValuesToCode(TokenInterface $token, int $expirationInSeconds);
 
     /**
-     * @param string      $clientIdentifier
-     * @param int         $userIdentifier
-     * @param string      $tokenValue
-     * @param string      $tokenType
-     * @param string|null $refreshValue
+     * @param TokenInterface $token
      *
-     * @return int
+     * @return TokenInterface
      */
-    public function createToken(
-        string $clientIdentifier,
-        int $userIdentifier,
-        string $tokenValue,
-        string $tokenType,
-        string $refreshValue = null
-    ): int;
+    public function createToken(TokenInterface $token): TokenInterface;
 
     /**
      * @param int              $identifier
@@ -137,13 +116,11 @@ interface TokenRepositoryInterface
     public function readScopeIdentifiers(int $identifier): array;
 
     /**
-     * @param int         $identifier
-     * @param string      $newTokenValue
-     * @param string|null $newRefreshValue
+     * @param TokenInterface $token
      *
      * @return void
      */
-    public function updateValues(int $identifier, string $newTokenValue, string $newRefreshValue = null);
+    public function updateValues(TokenInterface $token);
 
     /**
      * @param int $identifier

@@ -17,29 +17,35 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\OAuthServer\Contracts\AuthorizationServerInterface;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
+use Limoncello\Passport\Adaptors\Generic\RedirectUri;
+use Limoncello\Passport\Adaptors\Generic\RedirectUriRepository;
 use Limoncello\Passport\Adaptors\Generic\Scope;
 use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
+use Limoncello\Passport\Adaptors\Generic\Token;
 use Limoncello\Passport\Adaptors\Generic\TokenRepository;
+use Limoncello\Passport\Contracts\PassportServerInterface;
 use Limoncello\Passport\Integration\BasePassportServerIntegration;
 use Limoncello\Passport\PassportServer;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Uri;
 
 /**
  * @package Limoncello\Tests\Passport
  */
 class PassportServerTest extends TestCase
 {
-    const TEST_DEFAULT_CLIENT_ID = 'MainClient';
-    const TEST_USER_NAME         = 'john';
-    const TEST_USER_PASSWORD     = 'secret';
-    const TEST_USER_ID           = 5;
-    const TEST_ERROR_URI         = 'http://example.app/auth_request_error';
-    const TEST_APPROVAL_URI      = 'http://example.app/resource_owner_approval';
-    const TEST_SCOPE_1           = 'scope1';
-    const TEST_SCOPE_2           = 'scope2';
+    const TEST_DEFAULT_CLIENT_ID   = 'MainClient';
+    const TEST_DEFAULT_CLIENT_PASS = 'secret';
+    const TEST_USER_NAME           = 'john';
+    const TEST_USER_PASSWORD       = 'secret';
+    const TEST_USER_ID             = 5;
+    const TEST_ERROR_URI           = 'http://example.app/auth_request_error';
+    const TEST_APPROVAL_URI        = 'http://example.app/resource_owner_approval';
+    const TEST_CLIENT_REDIRECT_URI = 'http://client.server/redirect_uri';
+    const TEST_SCOPE_1             = 'scope1';
+    const TEST_SCOPE_2             = 'scope2';
 
     /**
      * Test issuing resource owner password token.
@@ -127,6 +133,107 @@ class PassportServerTest extends TestCase
     }
 
     /**
+     * Test implicit grant.
+     */
+    public function testImplicitGrant()
+    {
+        $server = $this->createPassportServer($this->createSqLiteConnection());
+
+        // Step 1 - Ask resource owner for an approval.
+        $response = $server->getCreateAuthorization($this->createImplicitRequest());
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+
+        // Step 2 - Get a token.
+        // Resource owner agreed to auth some scopes for the client and browser sends approval to server.
+        $token = (new Token())
+            ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI)
+            ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
+            ->setTokenScopeStrings([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
+            ->setUserIdentifier(static::TEST_USER_ID)
+            ->setScopeModified()
+        ;
+        $response = $server->createTokenResponse($token);
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_CLIENT_REDIRECT_URI, $location);
+    }
+
+    /**
+     * Test code grant.
+     */
+    public function testCodeGrant()
+    {
+        $server = $this->createPassportServer($this->createSqLiteConnection());
+
+        // Step 1 - ask resource owner for approval
+        $response = $server->getCreateAuthorization($this->createCodeRequest());
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+
+        // Step 2 - Get a code.
+        // Resource owner agreed to auth some scopes for the client and browser sends approval to server.
+        $token    = (new Token())
+            ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI)
+            ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
+            ->setTokenScopeStrings([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
+            ->setUserIdentifier(static::TEST_USER_ID)
+            ->setScopeModified()
+        ;
+        $state    = 'some state 123';
+        $response = $server->createCodeResponse($token, $state);
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_CLIENT_REDIRECT_URI, $location);
+        parse_str((new Uri($location))->getQuery(), $parameters);
+        $this->assertArrayHasKey('code', $parameters);
+        $this->assertArrayHasKey('state', $parameters);
+        $this->assertEquals($state, $parameters['state']);
+
+        $code = $parameters['code'];
+
+        // Step 3 - Exchange the code for token.
+        $response = $server->postCreateToken($this->createTokenRequest($code));
+        $this->assertNotNull($response);
+        $token = json_decode((string)$response->getBody());
+        $this->checkItLooksLikeValidToken($token);
+        $this->assertNotEmpty($refreshToken = $token->refresh_token);
+    }
+
+    /**
+     * Test client grant.
+     */
+    public function testClientGrant()
+    {
+        $server = $this->createPassportServer($connection = $this->createSqLiteConnection());
+
+        // add client authentication so we can actually get any tokens
+        $clientRepo    = new ClientRepository($connection, $this->getDatabaseScheme());
+        $defaultClient = $clientRepo->read(static::TEST_DEFAULT_CLIENT_ID);
+        $defaultClient->enableClientGrant()->setCredentials(
+            password_hash(static::TEST_DEFAULT_CLIENT_PASS, PASSWORD_DEFAULT)
+        );
+        $clientRepo->update($defaultClient);
+
+        $response = $server->postCreateToken($this->createClientTokenRequest());
+        $this->assertNotNull($response);
+        $token = json_decode((string)$response->getBody());
+        $this->checkItLooksLikeValidToken($token);
+        $this->assertFalse(property_exists($token, 'refresh_token'));
+        $this->assertTrue(property_exists($token, 'scope'));
+        $this->assertNotEmpty($token->scope);
+
+        // check scopes were saved
+        $tokenRepo  = new TokenRepository($connection, $this->getDatabaseScheme());
+        $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
+        $this->assertNotEmpty($savedToken->getScopeIdentifiers());
+    }
+
+    /**
      * @param string|null $username
      * @param string|null $password
      * @param string|null $scope
@@ -146,6 +253,107 @@ class PassportServerTest extends TestCase
             'password'   => $password,
             'scope'      => $scope,
         ], null, $headers);
+
+        return $request;
+    }
+
+    /**
+     * @param string      $clientId
+     * @param string|null $redirectUri
+     * @param string|null $scope
+     * @param string|null $state
+     * @param array       $headers
+     *
+     * @return ServerRequestInterface
+     */
+    private function createImplicitRequest(
+        string $clientId = self::TEST_DEFAULT_CLIENT_ID,
+        string $redirectUri = null,
+        string $scope = null,
+        string $state = null,
+        array $headers = []
+    ) {
+        $request = $this->createServerRequest(null, [
+            'response_type' => 'token',
+            'client_id'     => $clientId,
+            'redirect_uri'  => $redirectUri,
+            'scope'         => $scope,
+            'state'         => $state,
+        ], $headers);
+
+        return $request;
+    }
+
+    /**
+     * @param string      $clientId
+     * @param string|null $redirectUri
+     * @param string|null $scope
+     * @param string|null $state
+     * @param array       $headers
+     *
+     * @return ServerRequestInterface
+     */
+    private function createCodeRequest(
+        string $clientId = self::TEST_DEFAULT_CLIENT_ID,
+        string $redirectUri = null,
+        string $scope = null,
+        string $state = null,
+        array $headers = []
+    ) {
+        $request = $this->createServerRequest(null, [
+            'response_type' => 'code',
+            'client_id'     => $clientId,
+            'redirect_uri'  => $redirectUri,
+            'scope'         => $scope,
+            'state'         => $state,
+        ], $headers);
+
+        return $request;
+    }
+
+    /**
+     * @param string $code
+     * @param string $clientId
+     * @param string $redirectUri
+     * @param array  $headers
+     *
+     * @return ServerRequestInterface
+     */
+    private function createTokenRequest(
+        string $code,
+        string $clientId = self::TEST_DEFAULT_CLIENT_ID,
+        string $redirectUri = self::TEST_CLIENT_REDIRECT_URI,
+        array $headers = []
+    ) {
+        $request = $this->createServerRequest([
+            'grant_type'   => 'authorization_code',
+            'code'         => $code,
+            'redirect_uri' => $redirectUri,
+            'client_id'    => $clientId,
+        ], null, $headers);
+
+        return $request;
+    }
+
+    /**
+     * @param string|null $scope
+     * @param array       $headers
+     *
+     * @return ServerRequestInterface
+     */
+    private function createClientTokenRequest(
+        string $scope = null,
+        array $headers = []
+    ) {
+        $clientAuthHeader = [
+            'Authorization' => 'Basic ' .
+                base64_encode(static::TEST_DEFAULT_CLIENT_ID . ':' . static::TEST_DEFAULT_CLIENT_PASS),
+        ];
+
+        $request = $this->createServerRequest([
+            'grant_type' => 'client_credentials',
+            'scope'      => $scope,
+        ], null, $headers + $clientAuthHeader);
 
         return $request;
     }
@@ -177,28 +385,37 @@ class PassportServerTest extends TestCase
     /**
      * @param Connection $connection
      *
-     * @return AuthorizationServerInterface
+     * @return PassportServerInterface
      */
-    private function createPassportServer(Connection $connection): AuthorizationServerInterface
+    private function createPassportServer(Connection $connection): PassportServerInterface
     {
         $this->createDatabaseScheme($connection, $this->getDatabaseScheme());
-        $scheme     = $this->getDatabaseScheme();
-        $scopeRepo  = new ScopeRepository($connection, $scheme);
-        $clientRepo = new ClientRepository($connection, $scheme);
+        $scheme          = $this->getDatabaseScheme();
+        $scopeRepo       = new ScopeRepository($connection, $scheme);
+        $clientRepo      = new ClientRepository($connection, $scheme);
+        $redirectUriRepo = new RedirectUriRepository($connection, $scheme);
 
-        $clientRepo->inTransaction(function () use ($scopeRepo, $clientRepo) {
+        $clientRepo->inTransaction(function () use ($scopeRepo, $clientRepo, $redirectUriRepo) {
             $clientRepo->create(
                 $client = (new Client())
                     ->setIdentifier(PassportServerTest::TEST_DEFAULT_CLIENT_ID)
                     ->setName('client name')
+                    ->enableCodeGrant()
+                    ->enableImplicitGrant()
                     ->enablePasswordGrant()
                     ->enableRefreshGrant()
                     ->useDefaultScopesOnEmptyRequest()
             );
+
             $scopeRepo->create($scope1 = (new Scope())->setIdentifier(static::TEST_SCOPE_1));
             $scopeRepo->create($scope2 = (new Scope())->setIdentifier(static::TEST_SCOPE_2));
-
             $clientRepo->bindScopes($client->getIdentifier(), [$scope1, $scope2]);
+
+            $redirectUriRepo->create(
+                $uri1 = (new RedirectUri())
+                    ->setClientIdentifier($client->getIdentifier())
+                    ->setValue(static::TEST_CLIENT_REDIRECT_URI)
+            );
         });
 
         $integration = new class ($connection) extends BasePassportServerIntegration
@@ -229,7 +446,7 @@ class PassportServerTest extends TestCase
             }
         };
 
-        /** @var AuthorizationServerInterface $server */
+        /** @var PassportServerInterface $server */
         $server = new PassportServer($integration);
 
         return $server;
