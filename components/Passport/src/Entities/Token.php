@@ -17,6 +17,7 @@
  */
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 
 /**
@@ -24,11 +25,6 @@ use Limoncello\Passport\Contracts\Entities\TokenInterface;
  */
 abstract class Token implements TokenInterface
 {
-    /**
-     * @return string
-     */
-    abstract protected function getListSeparator(): string;
-
     /**
      * @return string
      */
@@ -94,7 +90,12 @@ abstract class Token implements TokenInterface
     /**
      * @var string[]
      */
-    private $tokenScopeStrings = [];
+    private $scopeIdentifiers = [];
+
+    /**
+     * @var string|null
+     */
+    private $scopeList = null;
 
     /**
      * @var bool
@@ -132,17 +133,17 @@ abstract class Token implements TokenInterface
     private $refreshValueField = null;
 
     /**
-     * @var DateTimeImmutable|null
+     * @var DateTimeInterface|null
      */
     private $codeCreatedAtField = null;
 
     /**
-     * @var DateTimeImmutable|null
+     * @var DateTimeInterface|null
      */
     private $valueCreatedAtField = null;
 
     /**
-     * @var DateTimeImmutable|null
+     * @var DateTimeInterface|null
      */
     private $refreshCreatedAtField = null;
 
@@ -160,11 +161,9 @@ abstract class Token implements TokenInterface
                 ->setCode($this->{static::FIELD_CODE})
                 ->setType($this->{static::FIELD_TYPE})
                 ->setValue($this->{static::FIELD_VALUE})
-                ->setRefreshValue($this->{static::FIELD_REFRESH})
-                ->parseTokenScopeList(
-                    $this->hasDynamicProperty(static::FIELD_TOKEN_SCOPE_LIST) === true ?
-                        $this->{static::FIELD_TOKEN_SCOPE_LIST} : ''
-                )->parseIsScopeModified($this->{static::FIELD_IS_SCOPE_MODIFIED})
+                ->setRefreshValue($this->{static::FIELD_REFRESH});
+            $this
+                ->parseIsScopeModified($this->{static::FIELD_IS_SCOPE_MODIFIED})
                 ->parseIsEnabled($this->{static::FIELD_IS_ENABLED});
         }
     }
@@ -178,11 +177,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param int $identifier
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setIdentifier(int $identifier): Token
+    public function setIdentifier(int $identifier): TokenInterface
     {
         $this->identifierField = $identifier;
 
@@ -198,11 +195,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param string $identifier
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setClientIdentifier(string $identifier): Token
+    public function setClientIdentifier(string $identifier): TokenInterface
     {
         $this->clientIdentifierField = $identifier;
 
@@ -218,11 +213,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param int $identifier
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setUserIdentifier(int $identifier): Token
+    public function setUserIdentifier(int $identifier): TokenInterface
     {
         $this->userIdentifierField = $identifier;
 
@@ -234,31 +227,31 @@ abstract class Token implements TokenInterface
      */
     public function getScopeIdentifiers(): array
     {
-        return $this->tokenScopeStrings;
+        return $this->scopeIdentifiers;
     }
 
     /**
-     * @param string $uriList
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function parseTokenScopeList(string $uriList): Token
+    public function setScopeIdentifiers(array $identifiers): TokenInterface
     {
-        return $this->setTokenScopeStrings(
-            empty($uriList) === true ? [] : explode($this->getListSeparator(), $uriList)
-        );
-    }
+        $this->scopeIdentifiers = $identifiers;
 
-    /**
-     * @param string[] $tokenScopeStrings
-     *
-     * @return Token
-     */
-    public function setTokenScopeStrings(array $tokenScopeStrings): Token
-    {
-        $this->tokenScopeStrings = $tokenScopeStrings;
+        $this->scopeList = null;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getScopeList(): string
+    {
+        if ($this->scopeList === null) {
+            $this->scopeList = implode(' ', $this->getScopeIdentifiers());
+        }
+
+        return $this->scopeList;
     }
 
     /**
@@ -270,11 +263,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param string|null $uri
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setRedirectUriString(string $uri = null): Token
+    public function setRedirectUriString(string $uri = null): TokenInterface
     {
         $this->redirectUriString = $uri;
 
@@ -290,21 +281,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param string $value
-     *
-     * @return Token
+     * @inheritdoc
      */
-    protected function parseIsScopeModified(string $value): Token
-    {
-        $value === '1' ? $this->setScopeModified() : $this->setScopeUnmodified();
-
-        return $this;
-    }
-
-    /**
-     * @return Token
-     */
-    public function setScopeModified(): Token
+    public function setScopeModified(): TokenInterface
     {
         $this->isScopeModified = true;
 
@@ -312,9 +291,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @return Token
+     * @inheritdoc
      */
-    public function setScopeUnmodified(): Token
+    public function setScopeUnmodified(): TokenInterface
     {
         $this->isScopeModified = false;
 
@@ -330,21 +309,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param string $value
-     *
-     * @return Token
+     * @inheritdoc
      */
-    protected function parseIsEnabled(string $value): Token
-    {
-        $value === '1' ? $this->setEnabled() : $this->setDisabled();
-
-        return $this;
-    }
-
-    /**
-     * @return Token
-     */
-    public function setEnabled(): Token
+    public function setEnabled(): TokenInterface
     {
         $this->isEnabled = true;
 
@@ -352,9 +319,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @return Token
+     * @inheritdoc
      */
-    public function setDisabled(): Token
+    public function setDisabled(): TokenInterface
     {
         $this->isEnabled = false;
 
@@ -370,11 +337,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param string|null $code
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setCode(string $code = null): Token
+    public function setCode(string $code = null): TokenInterface
     {
         $this->codeField = $code;
 
@@ -390,11 +355,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param string|null $value
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setValue(string $value = null): Token
+    public function setValue(string $value = null): TokenInterface
     {
         $this->valueField = $value;
 
@@ -410,11 +373,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param string|null $type
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setType(string $type = null): Token
+    public function setType(string $type = null): TokenInterface
     {
         $this->typeField = $type;
 
@@ -430,11 +391,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param string|null $refreshValue
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setRefreshValue(string $refreshValue = null): Token
+    public function setRefreshValue(string $refreshValue = null): TokenInterface
     {
         $this->refreshValueField = $refreshValue;
 
@@ -454,11 +413,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param DateTimeImmutable $codeCreatedAt
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setCodeCreatedAt(DateTimeImmutable $codeCreatedAt): Token
+    public function setCodeCreatedAt(DateTimeInterface $codeCreatedAt): TokenInterface
     {
         $this->codeCreatedAtField = $codeCreatedAt;
 
@@ -480,11 +437,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param DateTimeImmutable $valueCreatedAt
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setValueCreatedAt(DateTimeImmutable $valueCreatedAt): Token
+    public function setValueCreatedAt(DateTimeInterface $valueCreatedAt): TokenInterface
     {
         $this->valueCreatedAtField = $valueCreatedAt;
 
@@ -506,11 +461,9 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * @param DateTimeImmutable $refreshCreatedAt
-     *
-     * @return Token
+     * @inheritdoc
      */
-    public function setRefreshCreatedAt(DateTimeImmutable $refreshCreatedAt): Token
+    public function setRefreshCreatedAt(DateTimeInterface $refreshCreatedAt): TokenInterface
     {
         $this->refreshCreatedAtField = $refreshCreatedAt;
 
@@ -526,11 +479,35 @@ abstract class Token implements TokenInterface
     }
 
     /**
+     * @param string $value
+     *
+     * @return Token
+     */
+    protected function parseIsScopeModified(string $value): Token
+    {
+        $value === '1' ? $this->setScopeModified() : $this->setScopeUnmodified();
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return Token
+     */
+    protected function parseIsEnabled(string $value): Token
+    {
+        $value === '1' ? $this->setEnabled() : $this->setDisabled();
+
+        return $this;
+    }
+
+    /**
      * @param string $createdAt
      *
-     * @return DateTimeImmutable
+     * @return DateTimeInterface
      */
-    protected function parseDateTime(string $createdAt): DateTimeImmutable
+    protected function parseDateTime(string $createdAt): DateTimeInterface
     {
         return DateTimeImmutable::createFromFormat($this->getDbDateFormat(), $createdAt);
     }

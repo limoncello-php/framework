@@ -18,6 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\TokenInterface;
 
 /**
  * @package Limoncello\Passport
@@ -38,7 +39,6 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      */
     public function read(int $identifier)
     {
-        /** @var Token|null $token */
         $token = parent::read($identifier);
 
         if ($token !== null) {
@@ -53,7 +53,6 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      */
     public function readByCode(string $code, int $expirationInSeconds)
     {
-        /** @var Token $token */
         $token = parent::readByCode($code, $expirationInSeconds);
         if ($token !== null) {
             $this->addScope($token);
@@ -67,7 +66,6 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      */
     public function readByValue(string $tokenValue, int $expirationInSeconds)
     {
-        /** @var Token $token */
         $token = parent::readByValue($tokenValue, $expirationInSeconds);
         if ($token !== null) {
             $this->addScope($token);
@@ -81,7 +79,6 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      */
     public function readByRefresh(string $refreshValue, int $expirationInSeconds)
     {
-        /** @var Token $token */
         $token = parent::readByRefresh($refreshValue, $expirationInSeconds);
         if ($token !== null) {
             $this->addScope($token);
@@ -99,12 +96,12 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     }
 
     /**
-     * @param Token $token
+     * @param TokenInterface $token
      *
      * @return void
      */
-    private function addScope(Token $token)
+    private function addScope(TokenInterface $token)
     {
-        $token->setTokenScopeStrings($this->readScopeIdentifiers($token->getIdentifier()));
+        $token->setScopeIdentifiers($this->readScopeIdentifiers($token->getIdentifier()));
     }
 }

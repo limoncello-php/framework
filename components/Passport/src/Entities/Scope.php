@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use DateTimeInterface;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 
 /**
@@ -60,11 +61,9 @@ abstract class Scope extends DatabaseItem implements ScopeInterface
     }
 
     /**
-     * @param string $identifier
-     *
-     * @return Scope
+     * @inheritdoc
      */
-    public function setIdentifier(string $identifier): Scope
+    public function setIdentifier(string $identifier): ScopeInterface
     {
         $this->identifierField = $identifier;
 
@@ -80,14 +79,28 @@ abstract class Scope extends DatabaseItem implements ScopeInterface
     }
 
     /**
-     * @param string|null $description
-     *
-     * @return Scope
+     * @inheritdoc
      */
-    public function setDescription(string $description = null): Scope
+    public function setDescription(string $description = null): ScopeInterface
     {
         $this->descriptionField = $description;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCreatedAt(DateTimeInterface $createdAt): ScopeInterface
+    {
+        return $this->setCreatedAtImpl($createdAt);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setUpdatedAt(DateTimeInterface $createdAt): ScopeInterface
+    {
+        return $this->setUpdatedAtImpl($createdAt);
     }
 }

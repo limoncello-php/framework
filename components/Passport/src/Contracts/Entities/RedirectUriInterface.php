@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use DateTime;
+use DateTimeInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -30,9 +30,23 @@ interface RedirectUriInterface
     public function getIdentifier(): int;
 
     /**
+     * @param int $identifier
+     *
+     * @return RedirectUriInterface
+     */
+    public function setIdentifier(int $identifier): RedirectUriInterface;
+
+    /**
      * @return string
      */
     public function getClientIdentifier(): string;
+
+    /**
+     * @param string $identifier
+     *
+     * @return RedirectUriInterface
+     */
+    public function setClientIdentifier(string $identifier): RedirectUriInterface;
 
     /**
      * @return UriInterface
@@ -45,12 +59,33 @@ interface RedirectUriInterface
     public function getValue(): string;
 
     /**
-     * @return DateTime|null
+     * @param string $uri
+     *
+     * @return RedirectUriInterface
+     */
+    public function setValue(string $uri): RedirectUriInterface;
+
+    /**
+     * @return RedirectUriInterface|null
      */
     public function getCreatedAt();
 
     /**
-     * @return DateTime|null
+     * @param DateTimeInterface $createdAt
+     *
+     * @return RedirectUriInterface
+     */
+    public function setCreatedAt(DateTimeInterface $createdAt): RedirectUriInterface;
+
+    /**
+     * @return RedirectUriInterface|null
      */
     public function getUpdatedAt();
+
+    /**
+     * @param DateTimeInterface $createdAt
+     *
+     * @return RedirectUriInterface
+     */
+    public function setUpdatedAt(DateTimeInterface $createdAt): RedirectUriInterface;
 }

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\Generic;
+<?php namespace Limoncello\Passport\Exceptions;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,17 +16,11 @@
  * limitations under the License.
  */
 
+use LogicException;
+
 /**
  * @package Limoncello\Passport
  */
-trait DbListSeparatorTrait
+abstract class PassportException extends LogicException
 {
-    /**
-     * @return string
-     */
-    protected function getListSeparator(): string
-    {
-        // TODO Actually by the spec space is used as a separator. It might be optimization to use space in db and here.
-        return ',';
-    }
 }

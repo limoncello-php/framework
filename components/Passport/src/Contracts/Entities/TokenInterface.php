@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use DateTime;
+use DateTimeInterface;
 use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
 
 /**
@@ -24,17 +24,43 @@ use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
  */
 interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthServer\Contracts\TokenInterface
 {
-    // TODO setXXX methods are also needed otherwise it's needed to cast to Token everywhere
-
     /**
      * @return int
      */
     public function getIdentifier(): int;
 
     /**
-     * @return DateTime|null
+     * @param int $identifier
+     *
+     * @return TokenInterface
      */
-    public function getCodeCreatedAt();
+    public function setIdentifier(int $identifier): TokenInterface;
+
+    /**
+     * @param string $identifier
+     *
+     * @return TokenInterface
+     */
+    public function setClientIdentifier(string $identifier): TokenInterface;
+
+    /**
+     * @param int $identifier
+     *
+     * @return TokenInterface
+     */
+    public function setUserIdentifier(int $identifier): TokenInterface;
+
+    /**
+     * @param string[] $identifiers
+     *
+     * @return TokenInterface
+     */
+    public function setScopeIdentifiers(array $identifiers): TokenInterface;
+
+    /**
+     * @return string
+     */
+    public function getScopeList(): string;
 
     /**
      * @return string|null
@@ -42,12 +68,98 @@ interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthSe
     public function getType();
 
     /**
-     * @return DateTime|null
+     * @param string|null $uri
+     *
+     * @return TokenInterface
+     */
+    public function setRedirectUriString(string $uri = null): TokenInterface;
+
+    /**
+     * @return TokenInterface
+     */
+    public function setScopeModified(): TokenInterface;
+
+    /**
+     * @return TokenInterface
+     */
+    public function setScopeUnmodified(): TokenInterface;
+
+    /**
+     * @return bool
+     */
+    public function isEnabled(): bool;
+
+    /**
+     * @return TokenInterface
+     */
+    public function setEnabled(): TokenInterface;
+
+    /**
+     * @return TokenInterface
+     */
+    public function setDisabled(): TokenInterface;
+
+    /**
+     * @param string|null $code
+     *
+     * @return TokenInterface
+     */
+    public function setCode(string $code = null): TokenInterface;
+
+    /**
+     * @param string|null $value
+     *
+     * @return TokenInterface
+     */
+    public function setValue(string $value = null): TokenInterface;
+
+    /**
+     * @param string|null $type
+     *
+     * @return TokenInterface
+     */
+    public function setType(string $type = null): TokenInterface;
+
+    /**
+     * @param string|null $refreshValue
+     *
+     * @return TokenInterface
+     */
+    public function setRefreshValue(string $refreshValue = null): TokenInterface;
+
+    /**
+     * @return DateTimeInterface|null
+     */
+    public function getCodeCreatedAt();
+
+    /**
+     * @param DateTimeInterface $codeCreatedAt
+     *
+     * @return TokenInterface
+     */
+    public function setCodeCreatedAt(DateTimeInterface $codeCreatedAt): TokenInterface;
+
+    /**
+     * @return DateTimeInterface|null
      */
     public function getValueCreatedAt();
 
     /**
-     * @return DateTime|null
+     * @param DateTimeInterface $valueCreatedAt
+     *
+     * @return TokenInterface
+     */
+    public function setValueCreatedAt(DateTimeInterface $valueCreatedAt): TokenInterface;
+
+    /**
+     * @return DateTimeInterface|null
      */
     public function getRefreshCreatedAt();
+
+    /**
+     * @param DateTimeInterface $refreshCreatedAt
+     *
+     * @return TokenInterface
+     */
+    public function setRefreshCreatedAt(DateTimeInterface $refreshCreatedAt): TokenInterface;
 }

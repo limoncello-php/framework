@@ -49,15 +49,19 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
     /**
      * @inheritdoc
      */
-    public function create(RedirectUriInterface $redirectUri): int
+    public function create(RedirectUriInterface $redirectUri): RedirectUriInterface
     {
-        // TODO add check for URI format and absence of URI fragment (see the spec)
-        $scheme = $this->getDatabaseScheme();
-        return $this->createResource([
+        $now        = new DateTimeImmutable();
+        $scheme     = $this->getDatabaseScheme();
+        $identifier = $this->createResource([
             $scheme->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
             $scheme->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
-            $scheme->getRedirectUrisCreatedAtColumn()      => new DateTimeImmutable(),
+            $scheme->getRedirectUrisCreatedAtColumn()      => $now,
         ]);
+
+        $redirectUri->setIdentifier($identifier)->setCreatedAt($now);
+
+        return $redirectUri;
     }
 
     /**
@@ -73,13 +77,14 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
      */
     public function update(RedirectUriInterface $redirectUri)
     {
-        // TODO add check for URI format and absence of URI fragment (see the spec)
+        $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();
         $this->updateResource($redirectUri->getIdentifier(), [
             $scheme->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
             $scheme->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
-            $scheme->getRedirectUrisUpdatedAtColumn()      => new DateTimeImmutable(),
+            $scheme->getRedirectUrisUpdatedAtColumn()      => $now,
         ]);
+        $redirectUri->setUpdatedAt($now);
     }
 
     /**

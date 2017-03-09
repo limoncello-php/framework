@@ -17,6 +17,7 @@
  */
 
 use DateTimeImmutable;
+use DateTimeInterface;
 
 /**
  * @package Limoncello\Passport
@@ -35,12 +36,12 @@ abstract class DatabaseItem
     const FIELD_UPDATED_AT = 'updated_at';
 
     /**
-     * @var DateTimeImmutable|null
+     * @var DateTimeInterface|null
      */
     private $createdAtField;
 
     /**
-     * @var DateTimeImmutable|null
+     * @var DateTimeInterface|null
      */
     private $updatedAtField;
 
@@ -57,18 +58,6 @@ abstract class DatabaseItem
     }
 
     /**
-     * @param DateTimeImmutable $createdAt
-     *
-     * @return DatabaseItem
-     */
-    public function setCreatedAt(DateTimeImmutable $createdAt): DatabaseItem
-    {
-        $this->createdAtField = $createdAt;
-
-        return $this;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getUpdatedAt()
@@ -81,11 +70,23 @@ abstract class DatabaseItem
     }
 
     /**
-     * @param DateTimeImmutable $updatedAt
+     * @param DateTimeInterface $createdAt
      *
      * @return DatabaseItem
      */
-    public function setUpdatedAt(DateTimeImmutable $updatedAt): DatabaseItem
+    protected function setCreatedAtImpl(DateTimeInterface $createdAt): DatabaseItem
+    {
+        $this->createdAtField = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @param DateTimeInterface $updatedAt
+     *
+     * @return DatabaseItem
+     */
+    protected function setUpdatedAtImpl(DateTimeInterface $updatedAt): DatabaseItem
     {
         $this->updatedAtField = $updatedAt;
 
@@ -95,9 +96,9 @@ abstract class DatabaseItem
     /**
      * @param string $createdAt
      *
-     * @return DateTimeImmutable
+     * @return DateTimeInterface
      */
-    protected function parseDateTime(string $createdAt): DateTimeImmutable
+    protected function parseDateTime(string $createdAt): DateTimeInterface
     {
         return DateTimeImmutable::createFromFormat($this->getDbDateFormat(), $createdAt);
     }

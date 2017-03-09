@@ -39,9 +39,9 @@ interface ScopeRepositoryInterface
     /**
      * @param ScopeInterface $scope
      *
-     * @return void
+     * @return ScopeInterface
      */
-    public function create(ScopeInterface $scope);
+    public function create(ScopeInterface $scope): ScopeInterface;
 
     /**
      * @param string $identifier

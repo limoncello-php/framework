@@ -18,13 +18,9 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
-use Limoncello\Passport\Adaptors\Generic\ClientRepository;
-use Limoncello\Passport\Adaptors\Generic\TokenRepository;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
-use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
-use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Entities\Client;
 use Limoncello\Passport\Entities\DatabaseScheme;
 use Psr\Http\Message\ResponseInterface;
@@ -36,21 +32,16 @@ use Zend\Diactoros\Uri;
  */
 abstract class BasePassportServerIntegration implements PassportServerIntegrationInterface
 {
+    const SCOPE_APPROVAL_FORM_CLIENT_ID = 'client_id';
+    const SCOPE_APPROVAL_FORM_CLIENT_NAME = 'client_name';
+    const SCOPE_APPROVAL_FORM_REDIRECT_URI = 'redirect_uri';
+    const SCOPE_APPROVAL_FORM_IS_SCOPE_MODIFIED = 'is_scope_modified';
+    const SCOPE_APPROVAL_FORM_SCOPE = 'scope';
+    const SCOPE_APPROVAL_FORM_STATE = 'state';
     /**
      * @var string
      */
     private $defaultClientId;
-
-    /**
-     * @var ClientRepositoryInterface|null
-     */
-    private $clientRepo;
-
-    /**
-     * @var TokenRepositoryInterface|null
-     */
-    private $tokenRepo;
-
 
     /**
      * @var Connection
@@ -119,30 +110,6 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     public function getDefaultClientIdentifier(): string
     {
         return $this->defaultClientId;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getClientRepository(): ClientRepositoryInterface
-    {
-        if ($this->clientRepo === null) {
-            $this->clientRepo = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
-        }
-
-        return $this->clientRepo;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTokenRepository(): TokenRepositoryInterface
-    {
-        if ($this->tokenRepo === null) {
-            $this->tokenRepo = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
-        }
-
-        return $this->tokenRepo;
     }
 
     /**
@@ -231,18 +198,15 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         /** @var Client $client */
         assert($client instanceof Client);
 
-        $filtered = array_filter([
-
-            // TODO move strings to constants and add require approval URI have no fragment
-
-
-            'client_id'         => $client->getIdentifier(),
-            'client_name'       => $client->getName(),
-            'redirect_uri'      => $redirectUri,
-            'is_scope_modified' => $isScopeModified,
-            'scope'             => $scopeList === null ? null : implode(' ', $scopeList),
-            'state'             => $state,
-
+        // TODO think if we can receive objects instead of individual properties
+        $scopeList = $isScopeModified === false || empty($scopeList) === true ? null : implode(' ', $scopeList);
+        $filtered  = array_filter([
+            self::SCOPE_APPROVAL_FORM_CLIENT_ID         => $client->getIdentifier(),
+            self::SCOPE_APPROVAL_FORM_CLIENT_NAME       => $client->getName(),
+            self::SCOPE_APPROVAL_FORM_REDIRECT_URI      => $redirectUri,
+            self::SCOPE_APPROVAL_FORM_IS_SCOPE_MODIFIED => $isScopeModified,
+            self::SCOPE_APPROVAL_FORM_SCOPE             => $scopeList,
+            self::SCOPE_APPROVAL_FORM_STATE             => $state,
         ], function ($value) {
             return $value !== null;
         });

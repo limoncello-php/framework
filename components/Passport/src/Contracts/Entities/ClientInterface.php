@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use DateTime;
+use DateTimeInterface;
 
 /**
  * @package Limoncello\Passport
@@ -24,9 +24,23 @@ use DateTime;
 interface ClientInterface extends \Limoncello\OAuthServer\Contracts\ClientInterface
 {
     /**
-     * @return string
+     * @param string $identifier
+     *
+     * @return ClientInterface
      */
-    public function getName(): string;
+    public function setIdentifier(string $identifier): ClientInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getName();
+
+    /**
+     * @param string $name
+     *
+     * @return ClientInterface
+     */
+    public function setName(string $name): ClientInterface;
 
     /**
      * @return string|null
@@ -34,9 +48,37 @@ interface ClientInterface extends \Limoncello\OAuthServer\Contracts\ClientInterf
     public function getDescription();
 
     /**
+     * @param string|null $description
+     *
+     * @return ClientInterface
+     */
+    public function setDescription(string $description = null): ClientInterface;
+
+    /**
      * @return string|null
      */
     public function getCredentials();
+
+    /**
+     * @param string $credentials
+     *
+     * @return ClientInterface
+     */
+    public function setCredentials(string $credentials = null): ClientInterface;
+
+    /**
+     * @param string[] $redirectUriStrings
+     *
+     * @return ClientInterface
+     */
+    public function setRedirectUriStrings(array $redirectUriStrings): ClientInterface;
+
+    /**
+     * @param string[] $scopeIdentifiers
+     *
+     * @return ClientInterface
+     */
+    public function setScopeIdentifiers(array $scopeIdentifiers): ClientInterface;
 
     /**
      * @return bool
@@ -44,12 +86,106 @@ interface ClientInterface extends \Limoncello\OAuthServer\Contracts\ClientInterf
     public function isPublic(): bool;
 
     /**
-     * @return DateTime|null
+     * @return ClientInterface
+     */
+    public function setPublic(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function setConfidential(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function useDefaultScopesOnEmptyRequest(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function doNotUseDefaultScopesOnEmptyRequest(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function enableScopeExcess(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function disableScopeExcess(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function enableCodeGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function disableCodeGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function enableImplicitGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function disableImplicitGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function enablePasswordGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function disablePasswordGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function enableClientGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function disableClientGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function enableRefreshGrant(): ClientInterface;
+
+    /**
+     * @return ClientInterface
+     */
+    public function disableRefreshGrant(): ClientInterface;
+
+    /**
+     * @return DateTimeInterface|null
      */
     public function getCreatedAt();
 
     /**
-     * @return DateTime|null
+     * @param DateTimeInterface $createdAt
+     *
+     * @return ClientInterface
+     */
+    public function setCreatedAt(DateTimeInterface $createdAt): ClientInterface;
+
+    /**
+     * @return RedirectUriInterface|null
      */
     public function getUpdatedAt();
+
+    /**
+     * @param DateTimeInterface $createdAt
+     *
+     * @return ClientInterface
+     */
+    public function setUpdatedAt(DateTimeInterface $createdAt): ClientInterface;
 }

@@ -58,7 +58,6 @@ interface PassportServerIntegrationInterface
      */
     public function validateUserId(string $userName, string $password);
 
-    // TODO move to trait? That's implementation choice rather than app specific
     /**
      * @param TokenInterface $token
      *
@@ -66,7 +65,6 @@ interface PassportServerIntegrationInterface
      */
     public function generateCodeValue(TokenInterface $token): string;
 
-    // TODO move to trait? That's implementation choice rather than app specific
     /**
      * @param TokenInterface $token
      *
@@ -119,4 +117,9 @@ interface PassportServerIntegrationInterface
      * @return bool
      */
     public function isRenewRefreshValue(): bool;
+
+    /**
+     * @return TokenInterface
+     */
+    public function createTokenInstance(): TokenInterface;
 }

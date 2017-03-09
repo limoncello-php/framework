@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\Generic;
+<?php namespace Limoncello\Passport\Exceptions;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -19,7 +19,6 @@
 /**
  * @package Limoncello\Passport
  */
-class Token extends \Limoncello\Passport\Entities\Token
+class InvalidArgumentException extends PassportException
 {
-    use DbDateFormatTrait;
 }

@@ -21,7 +21,6 @@ use DateTimeImmutable;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
-use Limoncello\Passport\Entities\Token;
 use PDO;
 
 /**
@@ -34,22 +33,18 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      */
     public function createCode(TokenInterface $code): TokenInterface
     {
-        /** @var Token $code */
-        assert($code instanceof Token);
-
         $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();
         $values = [
             $scheme->getTokensClientIdentityColumn() => $code->getClientIdentifier(),
             $scheme->getTokensUserIdentityColumn()   => $code->getUserIdentifier(),
             $scheme->getTokensCodeColumn()           => $code->getCode(),
+            $scheme->getTokensIsScopeModified()      => $code->isScopeModified(),
             $scheme->getTokensCodeCreatedAtColumn()  => $now,
         ];
 
         $tokenIdentifier = null;
-        if (is_array($scopeIdentifiers = $code->getScopeIdentifiers()) === true &&
-            empty($scopeIdentifiers) === false
-        ) {
+        if (empty($scopeIdentifiers = $code->getScopeIdentifiers()) === false) {
             $this->inTransaction(function () use ($values, $scopeIdentifiers, &$tokenIdentifier) {
                 $tokenIdentifier = $this->createResource($values);
                 $this->bindScopeIdentifiers($tokenIdentifier, $scopeIdentifiers);
@@ -101,9 +96,6 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      */
     public function createToken(TokenInterface $token): TokenInterface
     {
-        /** @var Token $token */
-        assert($token instanceof Token);
-
         $now        = new DateTimeImmutable();
         $scheme     = $this->getDatabaseScheme();
         $hasRefresh = $token->getRefreshValue() !== null;
@@ -112,21 +104,21 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
             $scheme->getTokensUserIdentityColumn()     => $token->getUserIdentifier(),
             $scheme->getTokensValueColumn()            => $token->getValue(),
             $scheme->getTokensTypeColumn()             => $token->getType(),
+            $scheme->getTokensIsScopeModified()        => $token->isScopeModified(),
             $scheme->getTokensValueCreatedAtColumn()   => $now,
         ] : [
             $scheme->getTokensClientIdentityColumn()   => $token->getClientIdentifier(),
             $scheme->getTokensUserIdentityColumn()     => $token->getUserIdentifier(),
             $scheme->getTokensValueColumn()            => $token->getValue(),
             $scheme->getTokensTypeColumn()             => $token->getType(),
+            $scheme->getTokensIsScopeModified()        => $token->isScopeModified(),
             $scheme->getTokensValueCreatedAtColumn()   => $now,
             $scheme->getTokensRefreshColumn()          => $token->getRefreshValue(),
             $scheme->getTokensRefreshCreatedAtColumn() => $now,
         ];
 
         $tokenIdentifier = null;
-        if (is_array($scopeIdentifiers = $token->getScopeIdentifiers()) === true &&
-            empty($scopeIdentifiers) === false
-        ) {
+        if (empty($scopeIdentifiers = $token->getScopeIdentifiers()) === false) {
             $this->inTransaction(function () use ($values, $scopeIdentifiers, &$tokenIdentifier) {
                 $tokenIdentifier = $this->createResource($values);
                 $this->bindScopeIdentifiers($tokenIdentifier, $scopeIdentifiers);
@@ -257,9 +249,6 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      */
     public function updateValues(TokenInterface $token)
     {
-        /** @var Token $token */
-        assert($token instanceof Token);
-
         $query = $this->getConnection()->createQueryBuilder();
 
         $scheme = $this->getDatabaseScheme();

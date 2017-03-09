@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use DateTimeImmutable;
+use DateTimeInterface;
 
 /**
  * @package Limoncello\Passport
@@ -27,6 +27,12 @@ interface ScopeInterface
      * @return string
      */
     public function getIdentifier(): string;
+    /**
+     * @param string $identifier
+     *
+     * @return ScopeInterface
+     */
+    public function setIdentifier(string $identifier): ScopeInterface;
 
     /**
      * @return string|null
@@ -34,12 +40,33 @@ interface ScopeInterface
     public function getDescription();
 
     /**
-     * @return DateTimeImmutable|null
+     * @param string|null $description
+     *
+     * @return ScopeInterface
+     */
+    public function setDescription(string $description = null): ScopeInterface;
+
+    /**
+     * @return DateTimeInterface|null
      */
     public function getCreatedAt();
 
     /**
-     * @return DateTimeImmutable|null
+     * @param DateTimeInterface $createdAt
+     *
+     * @return ScopeInterface
+     */
+    public function setCreatedAt(DateTimeInterface $createdAt): ScopeInterface;
+
+    /**
+     * @return RedirectUriInterface|null
      */
     public function getUpdatedAt();
+
+    /**
+     * @param DateTimeInterface $createdAt
+     *
+     * @return ScopeInterface
+     */
+    public function setUpdatedAt(DateTimeInterface $createdAt): ScopeInterface;
 }

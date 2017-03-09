@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Passport\Adaptors\Generic\BasePassportServerIntegration;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\RedirectUri;
@@ -26,7 +27,6 @@ use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
 use Limoncello\Passport\Adaptors\Generic\Token;
 use Limoncello\Passport\Adaptors\Generic\TokenRepository;
 use Limoncello\Passport\Contracts\PassportServerInterface;
-use Limoncello\Passport\Integration\BasePassportServerIntegration;
 use Limoncello\Passport\PassportServer;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Uri;
@@ -151,7 +151,7 @@ class PassportServerTest extends TestCase
         $token = (new Token())
             ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI)
             ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
-            ->setTokenScopeStrings([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
+            ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
             ->setUserIdentifier(static::TEST_USER_ID)
             ->setScopeModified()
         ;
@@ -180,7 +180,7 @@ class PassportServerTest extends TestCase
         $token    = (new Token())
             ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI)
             ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
-            ->setTokenScopeStrings([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
+            ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
             ->setUserIdentifier(static::TEST_USER_ID)
             ->setScopeModified()
         ;
@@ -396,8 +396,8 @@ class PassportServerTest extends TestCase
         $redirectUriRepo = new RedirectUriRepository($connection, $scheme);
 
         $clientRepo->inTransaction(function () use ($scopeRepo, $clientRepo, $redirectUriRepo) {
-            $clientRepo->create(
-                $client = (new Client())
+            $client = $clientRepo->create(
+                (new Client())
                     ->setIdentifier(PassportServerTest::TEST_DEFAULT_CLIENT_ID)
                     ->setName('client name')
                     ->enableCodeGrant()

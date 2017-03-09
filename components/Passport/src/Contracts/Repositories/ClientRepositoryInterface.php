@@ -40,9 +40,9 @@ interface ClientRepositoryInterface
     /**
      * @param ClientInterface $client
      *
-     * @return void
+     * @return ClientInterface
      */
-    public function create(ClientInterface $client);
+    public function create(ClientInterface $client): ClientInterface;
 
     /**
      * @param string           $identifier

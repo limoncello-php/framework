@@ -36,14 +36,19 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
     /**
      * @inheritdoc
      */
-    public function create(ScopeInterface $scope)
+    public function create(ScopeInterface $scope): ScopeInterface
     {
+        $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();
         $this->createResource([
             $scheme->getScopesIdentityColumn()    => $scope->getIdentifier(),
             $scheme->getScopesDescriptionColumn() => $scope->getDescription(),
-            $scheme->getScopesCreatedAtColumn()   => new DateTimeImmutable(),
+            $scheme->getScopesCreatedAtColumn()   => $now,
         ]);
+
+        $scope->setCreatedAt($now);
+
+        return $scope;
     }
 
     /**
@@ -59,11 +64,13 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
      */
     public function update(ScopeInterface $scope)
     {
+        $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();
         $this->updateResource($scope->getIdentifier(), [
             $scheme->getScopesDescriptionColumn() => $scope->getDescription(),
-            $scheme->getScopesUpdatedAtColumn()   => new DateTimeImmutable(),
+            $scheme->getScopesUpdatedAtColumn()   => $now,
         ]);
+        $scope->setUpdatedAt($now);
     }
 
     /**

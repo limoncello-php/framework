@@ -41,9 +41,9 @@ interface RedirectUriRepositoryInterface
     /**
      * @param RedirectUriInterface $redirectUri
      *
-     * @return int
+     * @return RedirectUriInterface
      */
-    public function create(RedirectUriInterface $redirectUri): int;
+    public function create(RedirectUriInterface $redirectUri): RedirectUriInterface;
 
     /**
      * @param int $identifier

@@ -51,7 +51,7 @@ class RedirectUriRepositoryTest extends TestCase
             (new RedirectUri())
                 ->setClientIdentifier($clientId)
                 ->setValue('https://example.foo/boo')
-        );
+        )->getIdentifier();
 
         $this->assertNotEmpty($uris = $uriRepo->indexClientUris($clientId));
         $this->assertCount(1, $uris);

@@ -21,5 +21,5 @@
  */
 class Client extends \Limoncello\Passport\Entities\Client
 {
-    use DbDateFormatTrait, DbListSeparatorTrait;
+    use DbDateFormatTrait;
 }

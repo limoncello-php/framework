@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
+use DateTimeInterface;
 use Limoncello\Passport\Contracts\Entities\RedirectUriInterface;
+use Limoncello\Passport\Exceptions\InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
 use Zend\Diactoros\Uri;
 
@@ -76,11 +78,9 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     }
 
     /**
-     * @param int $identifier
-     *
-     * @return RedirectUri
+     * @inheritdoc
      */
-    public function setIdentifier(int $identifier): RedirectUri
+    public function setIdentifier(int $identifier): RedirectUriInterface
     {
         $this->identifierField = $identifier;
 
@@ -96,11 +96,9 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     }
 
     /**
-     * @param string $identifier
-     *
-     * @return RedirectUri
+     * @inheritdoc
      */
-    public function setClientIdentifier(string $identifier): RedirectUri
+    public function setClientIdentifier(string $identifier): RedirectUriInterface
     {
         $this->clientIdentifierField = $identifier;
 
@@ -116,21 +114,28 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     }
 
     /**
-     * @param string $uri
-     *
-     * @return RedirectUri
+     * @inheritdoc
      */
-    public function setValue(string $uri): RedirectUri
+    public function setValue(string $uri): RedirectUriInterface
     {
-        // TODO add fragment validation by spec
+        // @link https://tools.ietf.org/html/rfc6749#section-3.1.2
+        //
+        // The redirection endpoint URI MUST be an absolute URI.
+        // The endpoint URI MUST NOT include a fragment component.
+
+        $uriObject = new Uri($uri);
+        if (empty($uriObject->getHost()) === true || empty($uriObject->getFragment()) === false) {
+            throw new InvalidArgumentException('redirect URI');
+        }
 
         $this->valueField = $uri;
+        $this->uriObject  = $uriObject;
 
         return $this;
     }
 
     /**
-     * @return UriInterface
+     * @inheritdoc
      */
     public function getUri(): UriInterface
     {
@@ -139,5 +144,21 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
         }
 
         return $this->uriObject;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCreatedAt(DateTimeInterface $createdAt): RedirectUriInterface
+    {
+        return $this->setCreatedAtImpl($createdAt);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setUpdatedAt(DateTimeInterface $createdAt): RedirectUriInterface
+    {
+        return $this->setUpdatedAtImpl($createdAt);
     }
 }

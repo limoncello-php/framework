@@ -159,6 +159,52 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         return $response;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function createCodeResponse(TokenInterface $code, string $state = null): ResponseInterface
+    {
+        $client = $this->getIntegration()->getClientRepository()->read($code->getClientIdentifier());
+        if ($code->getRedirectUriString() === null ||
+            in_array($code->getRedirectUriString(), $client->getRedirectUriStrings()) === false
+        ) {
+            return $this->getIntegration()->createInvalidClientAndRedirectUriErrorResponse();
+        }
+
+        $code->setCode($this->getIntegration()->generateCodeValue($code));
+
+        $tokenRepo   = $this->getIntegration()->getTokenRepository();
+        $createdCode = $tokenRepo->createCode($code);
+
+        $response = $this->createRedirectCodeResponse($createdCode, $state);
+
+        return $response;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createTokenResponse(TokenInterface $token, string $state = null): ResponseInterface
+    {
+        $client = $this->getIntegration()->getClientRepository()->read($token->getClientIdentifier());
+        if ($token->getRedirectUriString() === null ||
+            in_array($token->getRedirectUriString(), $client->getRedirectUriStrings()) === false
+        ) {
+            return $this->getIntegration()->createInvalidClientAndRedirectUriErrorResponse();
+        }
+
+        list($tokenValue, $tokenType, $tokenExpiresIn) = $this->getIntegration()->generateTokenValues($token);
+
+        // refresh value must be null by the spec
+        $refreshValue = null;
+        $token->setValue($tokenValue)->setType($tokenType)->setRefreshValue($refreshValue);
+        $savedToken = $this->getIntegration()->getTokenRepository()->createToken($token);
+
+        $response = $this->createRedirectTokenResponse($savedToken, $tokenExpiresIn, $state);
+
+        return $response;
+    }
+
     /** @noinspection PhpTooManyParametersInspection
      * @inheritdoc
      *
@@ -271,13 +317,13 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         }
         assert(is_int($userIdentifier) === true);
 
-        // TODO would be nice to have created token as input so it's not here to decide which token class to use
-        $unsavedToken = (new \Limoncello\Passport\Adaptors\Generic\Token())
+        $unsavedToken = $this->getIntegration()->createTokenInstance();
+        $unsavedToken
             ->setClientIdentifier($client->getIdentifier())
+            ->setScopeIdentifiers($scope)
             ->setUserIdentifier($userIdentifier);
-        if ($isScopeModified === true && empty($scope) === false) {
-            $unsavedToken->setScopeModified()->setTokenScopeStrings($scope);
-        }
+        $isScopeModified === true ? $unsavedToken->setScopeModified() : $unsavedToken->setScopeUnmodified();
+
 
         $tokenExpiresIn = $this->setUpTokenValues($unsavedToken);
         $savedToken     = $this->getIntegration()->getTokenRepository()->createToken($unsavedToken);
@@ -314,12 +360,12 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
     ): ResponseInterface {
         assert($client !== null);
 
-        // TODO would be nice to have created token as input so it's not here to decide which token class to use
-        $unsavedToken = (new \Limoncello\Passport\Adaptors\Generic\Token())
-            ->setClientIdentifier($client->getIdentifier());
-        if ($isScopeModified === true && empty($scope) === false) {
-            $unsavedToken->setScopeModified()->setTokenScopeStrings($scope);
-        }
+        $unsavedToken = $this->getIntegration()->createTokenInstance();
+        $unsavedToken
+            ->setClientIdentifier($client->getIdentifier())
+            ->setScopeIdentifiers($scope);
+        $isScopeModified === true ? $unsavedToken->setScopeModified() : $unsavedToken->setScopeUnmodified();
+
 
         $tokenExpiresIn = $this->setUpTokenValue($unsavedToken);
         $savedToken     = $this->getIntegration()->getTokenRepository()->createToken($unsavedToken);
@@ -369,7 +415,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
                 $tokenRepo->unbindScopes($updatedToken->getIdentifier());
                 $tokenRepo->bindScopeIdentifiers($updatedToken->getIdentifier(), $scope);
             });
-            $updatedToken->setScopeModified()->setTokenScopeStrings($scope);
+            $updatedToken->setScopeModified()->setScopeIdentifiers($scope);
         }
         $response = $this->createBodyTokenResponse($updatedToken, $tokenExpiresIn);
 
@@ -404,8 +450,8 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      */
     protected function createBodyTokenResponse(TokenInterface $token, int $tokenExpiresIn): ResponseInterface
     {
-        $scopeList  = empty($token->getScopeIdentifiers()) === true || $token->isScopeModified() === false ?
-            null : implode(' ', $token->getScopeIdentifiers());
+        $scopeList  = $token->isScopeModified() === false || empty($token->getScopeIdentifiers()) === true ?
+            null : $token->getScopeList();
 
         // for access token format @link https://tools.ietf.org/html/rfc6749#section-5.1
         $parameters = $this->filterNulls([
@@ -432,8 +478,6 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      */
     protected function createRedirectCodeResponse(TokenInterface $code, string $state = null): ResponseInterface
     {
-        // TODO have to check that isScopeModified flag was saved with the code and if it is used (and have to)
-
         // for access token format @link https://tools.ietf.org/html/rfc6749#section-4.1.3
         $parameters = $this->filterNulls([
             'code'  => $code->getCode(),
@@ -460,8 +504,8 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         int $tokenExpiresIn,
         string $state = null
     ): ResponseInterface {
-        $scopeList  = $token->getScopeIdentifiers() === null || $token->isScopeModified() === false ?
-            null : implode(' ', $token->getScopeIdentifiers());
+        $scopeList  = $token->isScopeModified() === false || empty($token->getScopeIdentifiers()) === true ?
+            null : $token->getScopeList();
 
         // for access token format @link https://tools.ietf.org/html/rfc6749#section-5.1
         $parameters = $this->filterNulls([
@@ -526,9 +570,6 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      */
     protected function setUpTokenValue(TokenInterface $token): int
     {
-        /** @var Token $token */
-        assert($token instanceof Token);
-
         list($tokenValue, $tokenType, $tokenExpiresIn) =
             $this->getIntegration()->generateTokenValues($token);
         $token->setValue($tokenValue)->setType($tokenType);
@@ -543,9 +584,6 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      */
     protected function setUpTokenValues(TokenInterface $token): int
     {
-        /** @var Token $token */
-        assert($token instanceof Token);
-
         list($tokenValue, $tokenType, $tokenExpiresIn, $refreshValue) =
             $this->getIntegration()->generateTokenValues($token);
         $token->setValue($tokenValue)->setType($tokenType)->setRefreshValue($refreshValue);

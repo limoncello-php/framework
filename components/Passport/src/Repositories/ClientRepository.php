@@ -37,10 +37,11 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     /**
      * @inheritdoc
      */
-    public function create(ClientInterface $client)
+    public function create(ClientInterface $client): ClientInterface
     {
+        $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();
-        $this->createResource([
+        $values = [
             $scheme->getClientsIdentityColumn()               => $client->getIdentifier(),
             $scheme->getClientsNameColumn()                   => $client->getName(),
             $scheme->getClientsDescriptionColumn()            => $client->getDescription(),
@@ -53,8 +54,21 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
             $scheme->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
             $scheme->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
             $scheme->getClientsIsRefreshGrantEnabledColumn()  => $client->isRefreshGrantEnabled(),
-            $scheme->getClientsCreatedAtColumn()              => new DateTimeImmutable(),
-        ]);
+            $scheme->getClientsCreatedAtColumn()              => $now,
+        ];
+
+        $identifier = $client->getIdentifier();
+        if (empty($scopeIdentifiers = $client->getScopeIdentifiers()) === true) {
+            $this->createResource($values);
+        } else {
+            $this->inTransaction(function () use ($identifier, $values, $scopeIdentifiers) {
+                $this->createResource($values);
+                $this->bindScopeIdentifiers($identifier, $scopeIdentifiers);
+            });
+        }
+        $client->setCreatedAt($now);
+
+        return $client;
     }
 
     /**
@@ -146,6 +160,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
      */
     public function update(ClientInterface $client)
     {
+        $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();
         $this->updateResource($client->getIdentifier(), [
             $scheme->getClientsNameColumn()                   => $client->getName(),
@@ -158,8 +173,9 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
             $scheme->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
             $scheme->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
             $scheme->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
-            $scheme->getClientsUpdatedAtColumn()              => new DateTimeImmutable(),
+            $scheme->getClientsUpdatedAtColumn()              => $now,
         ]);
+        $client->setUpdatedAt($now);
     }
 
     /**
