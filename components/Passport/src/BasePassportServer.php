@@ -219,6 +219,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         array $extraParameters = []
     ): ResponseInterface {
         return $this->getIntegration()->createAskResourceOwnerForApprovalResponse(
+            ResponseTypes::AUTHORIZATION_CODE,
             $client,
             $redirectUri,
             $isScopeModified,
@@ -290,6 +291,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         array $extraParameters = []
     ): ResponseInterface {
         return $this->getIntegration()->createAskResourceOwnerForApprovalResponse(
+            ResponseTypes::IMPLICIT,
             $client,
             $redirectUri,
             $isScopeModified,

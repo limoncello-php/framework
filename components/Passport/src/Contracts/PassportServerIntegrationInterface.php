@@ -88,6 +88,7 @@ interface PassportServerIntegrationInterface
     public function createInvalidClientAndRedirectUriErrorResponse(): ResponseInterface;
 
     /** @noinspection PhpTooManyParametersInspection
+     * @param string          $type
      * @param ClientInterface $client
      * @param string|null     $redirectUri
      * @param bool            $isScopeModified
@@ -103,6 +104,7 @@ interface PassportServerIntegrationInterface
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function createAskResourceOwnerForApprovalResponse(
+        string $type,
         ClientInterface $client,
         string $redirectUri = null,
         bool $isScopeModified = false,

@@ -32,12 +32,27 @@ use Zend\Diactoros\Uri;
  */
 abstract class BasePassportServerIntegration implements PassportServerIntegrationInterface
 {
-    const SCOPE_APPROVAL_FORM_CLIENT_ID = 'client_id';
-    const SCOPE_APPROVAL_FORM_CLIENT_NAME = 'client_name';
-    const SCOPE_APPROVAL_FORM_REDIRECT_URI = 'redirect_uri';
-    const SCOPE_APPROVAL_FORM_IS_SCOPE_MODIFIED = 'is_scope_modified';
-    const SCOPE_APPROVAL_FORM_SCOPE = 'scope';
-    const SCOPE_APPROVAL_FORM_STATE = 'state';
+    /** Approval parameter */
+    const SCOPE_APPROVAL_TYPE = 'type';
+
+    /** Approval parameter */
+    const SCOPE_APPROVAL_CLIENT_ID = 'client_id';
+
+    /** Approval parameter */
+    const SCOPE_APPROVAL_CLIENT_NAME = 'client_name';
+
+    /** Approval parameter */
+    const SCOPE_APPROVAL_REDIRECT_URI = 'redirect_uri';
+
+    /** Approval parameter */
+    const SCOPE_APPROVAL_IS_SCOPE_MODIFIED = 'is_scope_modified';
+
+    /** Approval parameter */
+    const SCOPE_APPROVAL_SCOPE = 'scope';
+
+    /** Approval parameter */
+    const SCOPE_APPROVAL_STATE = 'state';
+
     /**
      * @var string
      */
@@ -188,6 +203,7 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function createAskResourceOwnerForApprovalResponse(
+        string $type,
         ClientInterface $client,
         string $redirectUri = null,
         bool $isScopeModified = false,
@@ -201,12 +217,13 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         // TODO think if we can receive objects instead of individual properties
         $scopeList = $isScopeModified === false || empty($scopeList) === true ? null : implode(' ', $scopeList);
         $filtered  = array_filter([
-            self::SCOPE_APPROVAL_FORM_CLIENT_ID         => $client->getIdentifier(),
-            self::SCOPE_APPROVAL_FORM_CLIENT_NAME       => $client->getName(),
-            self::SCOPE_APPROVAL_FORM_REDIRECT_URI      => $redirectUri,
-            self::SCOPE_APPROVAL_FORM_IS_SCOPE_MODIFIED => $isScopeModified,
-            self::SCOPE_APPROVAL_FORM_SCOPE             => $scopeList,
-            self::SCOPE_APPROVAL_FORM_STATE             => $state,
+            self::SCOPE_APPROVAL_TYPE              => $type,
+            self::SCOPE_APPROVAL_CLIENT_ID         => $client->getIdentifier(),
+            self::SCOPE_APPROVAL_CLIENT_NAME       => $client->getName(),
+            self::SCOPE_APPROVAL_REDIRECT_URI      => $redirectUri,
+            self::SCOPE_APPROVAL_IS_SCOPE_MODIFIED => $isScopeModified,
+            self::SCOPE_APPROVAL_SCOPE             => $scopeList,
+            self::SCOPE_APPROVAL_STATE             => $state,
         ], function ($value) {
             return $value !== null;
         });
