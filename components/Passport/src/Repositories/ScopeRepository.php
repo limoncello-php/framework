@@ -84,7 +84,7 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
     /**
      * @inheritdoc
      */
-    protected function getTableName(): string
+    protected function getTableNameForWriting(): string
     {
         return $this->getDatabaseScheme()->getScopesTable();
     }

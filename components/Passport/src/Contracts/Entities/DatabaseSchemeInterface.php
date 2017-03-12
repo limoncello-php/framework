@@ -22,8 +22,23 @@
 interface DatabaseSchemeInterface
 {
     /**************************************************************************
-     * OAuth Clients table.
+     * OAuth Clients table and view.
      *************************************************************************/
+
+
+    /**
+     * @return string
+     */
+    public function getClientsViewScopesColumn(): string;
+
+    /**
+     * @return string
+     */
+    public function getClientsViewRedirectUrisColumn(): string;
+    /**
+     * @return string
+     */
+    public function getClientsView(): string;
 
     /**
      * @return string
@@ -183,8 +198,18 @@ interface DatabaseSchemeInterface
     public function getScopesUpdatedAtColumn(): string;
 
     /**************************************************************************
-     * OAuth Tokens table.
+     * OAuth Tokens table and view.
      *************************************************************************/
+
+    /**
+     * @return string
+     */
+    public function getTokensView(): string;
+
+    /**
+     * @return string
+     */
+    public function getTokensViewScopesColumn(): string;
 
     /**
      * @return string
@@ -278,6 +303,11 @@ interface DatabaseSchemeInterface
     /**************************************************************************
      * Users table.
      *************************************************************************/
+
+    /**
+     * @return string|null
+     */
+    public function getUsersView();
 
     /**
      * @return string|null

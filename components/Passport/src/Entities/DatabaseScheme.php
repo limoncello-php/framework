@@ -26,6 +26,9 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /** Table name */
     const TABLE_CLIENTS = 'oauth_clients';
 
+    /** View name */
+    const VIEW_CLIENTS = 'vw_oauth_clients';
+
     /** Table name */
     const TABLE_CLIENTS_SCOPES = 'oauth_clients_scopes';
 
@@ -38,8 +41,14 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /** Table name */
     const TABLE_TOKENS = 'oauth_tokens';
 
+    /** View name */
+    const VIEW_TOKENS = 'vw_oauth_tokens';
+
     /** Table name */
     const TABLE_TOKENS_SCOPES = 'oauth_tokens_scopes';
+
+    /** View name */
+    const VIEW_USERS = 'vw_oauth_users';
 
     /**
      * @var string|null
@@ -66,7 +75,31 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getClientsTable(): string
     {
-        return self::TABLE_CLIENTS;
+        return static::TABLE_CLIENTS;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getClientsView(): string
+    {
+        return static::VIEW_CLIENTS;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getClientsViewScopesColumn(): string
+    {
+        return Client::FIELD_SCOPES;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getClientsViewRedirectUrisColumn(): string
+    {
+        return Client::FIELD_REDIRECT_URIS;
     }
 
     /**
@@ -186,7 +219,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getClientsScopesTable(): string
     {
-        return self::TABLE_CLIENTS_SCOPES;
+        return static::TABLE_CLIENTS_SCOPES;
     }
 
     /**
@@ -210,7 +243,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getRedirectUrisTable(): string
     {
-        return self::TABLE_REDIRECT_URIS;
+        return static::TABLE_REDIRECT_URIS;
     }
 
     /**
@@ -258,7 +291,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getScopesTable(): string
     {
-        return self::TABLE_SCOPES;
+        return static::TABLE_SCOPES;
     }
 
     /**
@@ -298,7 +331,23 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getTokensTable(): string
     {
-        return self::TABLE_TOKENS;
+        return static::TABLE_TOKENS;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTokensView(): string
+    {
+        return static::VIEW_TOKENS;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTokensViewScopesColumn(): string
+    {
+        return Token::FIELD_SCOPES;
     }
 
     /**
@@ -410,7 +459,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
      */
     public function getTokensScopesTable(): string
     {
-        return self::TABLE_TOKENS_SCOPES;
+        return static::TABLE_TOKENS_SCOPES;
     }
 
     /**
@@ -427,6 +476,14 @@ class DatabaseScheme implements DatabaseSchemeInterface
     public function getTokensScopesScopeIdentityColumn(): string
     {
         return Scope::FIELD_ID;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUsersView()
+    {
+        return static::VIEW_USERS;
     }
 
     /**

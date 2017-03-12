@@ -1,0 +1,65 @@
+# Usefull links
+# =============
+# https://hub.docker.com/_/php/
+# https://docs.docker.com/compose/overview/
+# https://docs.docker.com/compose/compose-file/
+#
+# Usefull commands
+# ================
+#
+# Start containers
+# $ docker-compose up -d
+#
+# View running containers
+# $ docker-compose ps
+#
+# Connect into command line of running container
+# $ docker-compose run <container_name> bash
+# where <name> could be db_passport, etc.
+# Tip: `Ctrl+p` + `Ctrl+q` + `Enter` (to exit container bash)
+#
+# Stop containers
+# $ docker-compose down
+#
+# Remove images
+# $ docker rmi db_passport
+#
+# Run non-default docker-compose file
+# $ docker-compose -f <file_name.yml> up -d
+# $ docker-compose -f <file_name.yml> down
+# $ docker-compose -f <file_name.yml> stop
+
+db:
+  image: percona
+  container_name: db_passport
+  ports:
+    - "3306:3306"
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_USER: passport
+    MYSQL_PASSWORD: secret
+    MYSQL_DATABASE: passport
+#
+#cli_7_1_php:
+#  build: ./docker/7_1_cli
+#  container_name: cli_7_1_php_passport
+#  volumes:
+#    - .:/app
+#  working_dir: /app
+#  tty: true
+#
+#cli_7_0_php:
+#  build: ./docker/7_0_cli
+#  container_name: cli_7_0_php_passport
+#  volumes:
+#    - .:/app
+#  working_dir: /app
+#  tty: true
+#
+#cli_hhvm:
+#  image: hhvm/hhvm
+#  container_name: cli_hhvm_passport
+#  volumes:
+#    - .:/app
+#  working_dir: /app
+#  tty: true

@@ -40,4 +40,12 @@ class RedirectUriRepository extends \Limoncello\Passport\Repositories\RedirectUr
     {
         return RedirectUri::class;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTableNameForReading(): string
+    {
+        return $this->getTableNameForWriting();
+    }
 }

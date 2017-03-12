@@ -36,7 +36,7 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
         $clientIdColumn = $this->getDatabaseScheme()->getRedirectUrisClientIdentityColumn();
         $statement      = $query
             ->select(['*'])
-            ->from($this->getTableName())
+            ->from($this->getTableNameForWriting())
             ->where($clientIdColumn . '=' . $this->createTypedParameter($query, $clientIdentifier))
             ->execute();
 
@@ -98,7 +98,7 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
     /**
      * @inheritdoc
      */
-    protected function getTableName(): string
+    protected function getTableNameForWriting(): string
     {
         return $this->getDatabaseScheme()->getRedirectUrisTable();
     }

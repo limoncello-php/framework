@@ -70,7 +70,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         $earliestExpired = $now->sub(new DateInterval("PT{$expirationInSeconds}S"));
         $scheme          = $this->getDatabaseScheme();
         $query
-            ->update($this->getTableName())
+            ->update($this->getTableNameForWriting())
             ->where($scheme->getTokensCodeColumn() . '=' . $this->createTypedParameter($query, $token->getCode()))
             ->andWhere(
                 $scheme->getTokensCodeCreatedAtColumn() . '>' . $this->createTypedParameter($query, $earliestExpired)
@@ -255,7 +255,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         $now    = new DateTimeImmutable();
         $dbNow  = $this->createTypedParameter($query, $now);
         $query
-            ->update($this->getTableName())
+            ->update($this->getTableNameForWriting())
             ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $token->getIdentifier()))
             ->set($scheme->getTokensValueColumn(), $this->createTypedParameter($query, $token->getValue()))
             ->set($scheme->getTokensValueCreatedAtColumn(), $dbNow);
@@ -292,7 +292,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
         $scheme = $this->getDatabaseScheme();
         $query
-            ->update($this->getTableName())
+            ->update($this->getTableNameForWriting())
             ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $identifier))
             ->set($scheme->getTokensIsEnabledColumn(), $this->createTypedParameter($query, false));
 
@@ -303,7 +303,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    protected function getTableName(): string
+    protected function getTableNameForWriting(): string
     {
         return $this->getDatabaseScheme()->getTokensTable();
     }
@@ -339,7 +339,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         $isEnabledColumn = $this->getDatabaseScheme()->getTokensIsEnabledColumn();
         $statement = $query
             ->select($columns)
-            ->from($this->getTableName())
+            ->from($this->getTableNameForReading())
             ->where($column . '=' . $this->createTypedParameter($query, $identifier))
             ->andWhere($createdAtColumn . '>' . $this->createTypedParameter($query, $earliestExpired))
             ->andWhere($query->expr()->eq($isEnabledColumn, '1'))

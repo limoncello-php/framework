@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\Generic;
+<?php namespace Limoncello\Passport\Adaptors\MySql;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -22,7 +22,7 @@ use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 /**
  * @package Limoncello\Passport
  */
-class ScopeRepository extends \Limoncello\Passport\Repositories\ScopeRepository
+class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepository
 {
     /**
      * @param Connection              $connection
@@ -38,7 +38,7 @@ class ScopeRepository extends \Limoncello\Passport\Repositories\ScopeRepository
      */
     protected function getClassName(): string
     {
-        return Scope::class;
+        return Client::class;
     }
 
     /**
@@ -46,6 +46,6 @@ class ScopeRepository extends \Limoncello\Passport\Repositories\ScopeRepository
      */
     protected function getTableNameForReading(): string
     {
-        return $this->getTableNameForWriting();
+        return $this->getDatabaseScheme()->getClientsView();
     }
 }

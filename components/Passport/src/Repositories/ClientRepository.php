@@ -189,7 +189,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     /**
      * @inheritdoc
      */
-    protected function getTableName(): string
+    protected function getTableNameForWriting(): string
     {
         return $this->getDatabaseScheme()->getClientsTable();
     }

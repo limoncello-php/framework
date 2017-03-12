@@ -28,6 +28,7 @@ use Limoncello\Passport\Adaptors\Generic\Token;
 use Limoncello\Passport\Adaptors\Generic\TokenRepository;
 use Limoncello\Passport\Contracts\PassportServerInterface;
 use Limoncello\Passport\PassportServer;
+use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Uri;
 
@@ -36,6 +37,18 @@ use Zend\Diactoros\Uri;
  */
 class PassportServerTest extends TestCase
 {
+    use DatabaseSchemeMigrationTrait;
+
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->initSqliteDatabase();
+    }
+
     const TEST_DEFAULT_CLIENT_ID   = 'MainClient';
     const TEST_DEFAULT_CLIENT_PASS = 'secret';
     const TEST_USER_NAME           = 'john';
@@ -52,7 +65,7 @@ class PassportServerTest extends TestCase
      */
     public function testResourceOwnerPasswordToken()
     {
-        $server   = $this->createPassportServer($connection = $this->createSqLiteConnection());
+        $server   = $this->createPassportServer();
         $response = $server->postCreateToken(
             $this->createPasswordTokenRequest(static::TEST_USER_NAME, static::TEST_USER_PASSWORD)
         );
@@ -65,7 +78,7 @@ class PassportServerTest extends TestCase
         $this->assertNotEmpty($token->refresh_token);
 
         // check scopes were saved
-        $tokenRepo  = new TokenRepository($connection, $this->getDatabaseScheme());
+        $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
         $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
         $this->assertNotEmpty($savedToken->getScopeIdentifiers());
     }
@@ -75,7 +88,7 @@ class PassportServerTest extends TestCase
      */
     public function testRefreshToken()
     {
-        $server = $this->createPassportServer($this->createSqLiteConnection());
+        $server = $this->createPassportServer();
 
         // create initial token
         $response = $server->postCreateToken(
@@ -104,7 +117,7 @@ class PassportServerTest extends TestCase
      */
     public function testRefreshTokenWithNewScope()
     {
-        $server = $this->createPassportServer($this->createSqLiteConnection());
+        $server = $this->createPassportServer();
 
         // create initial token
         $response = $server->postCreateToken(
@@ -137,7 +150,7 @@ class PassportServerTest extends TestCase
      */
     public function testImplicitGrant()
     {
-        $server = $this->createPassportServer($this->createSqLiteConnection());
+        $server = $this->createPassportServer();
 
         // Step 1 - Ask resource owner for an approval.
         $response = $server->getCreateAuthorization($this->createImplicitRequest());
@@ -166,7 +179,7 @@ class PassportServerTest extends TestCase
      */
     public function testCodeGrant()
     {
-        $server = $this->createPassportServer($this->createSqLiteConnection());
+        $server = $this->createPassportServer();
 
         // Step 1 - ask resource owner for approval
         $response = $server->getCreateAuthorization($this->createCodeRequest());
@@ -209,10 +222,10 @@ class PassportServerTest extends TestCase
      */
     public function testClientGrant()
     {
-        $server = $this->createPassportServer($connection = $this->createSqLiteConnection());
+        $server = $this->createPassportServer();
 
         // add client authentication so we can actually get any tokens
-        $clientRepo    = new ClientRepository($connection, $this->getDatabaseScheme());
+        $clientRepo    = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
         $defaultClient = $clientRepo->read(static::TEST_DEFAULT_CLIENT_ID);
         $defaultClient->enableClientGrant()->setCredentials(
             password_hash(static::TEST_DEFAULT_CLIENT_PASS, PASSWORD_DEFAULT)
@@ -228,7 +241,7 @@ class PassportServerTest extends TestCase
         $this->assertNotEmpty($token->scope);
 
         // check scopes were saved
-        $tokenRepo  = new TokenRepository($connection, $this->getDatabaseScheme());
+        $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
         $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
         $this->assertNotEmpty($savedToken->getScopeIdentifiers());
     }
@@ -383,13 +396,11 @@ class PassportServerTest extends TestCase
     }
 
     /**
-     * @param Connection $connection
-     *
      * @return PassportServerInterface
      */
-    private function createPassportServer(Connection $connection): PassportServerInterface
+    private function createPassportServer(): PassportServerInterface
     {
-        $this->createDatabaseScheme($connection, $this->getDatabaseScheme());
+        $connection      = $this->getConnection();
         $scheme          = $this->getDatabaseScheme();
         $scopeRepo       = new ScopeRepository($connection, $scheme);
         $clientRepo      = new ClientRepository($connection, $scheme);

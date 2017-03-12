@@ -21,6 +21,7 @@ use Limoncello\Passport\Adaptors\Generic\Scope;
 use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
+use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
 use Limoncello\Tests\Passport\TestCase;
 
 /**
@@ -28,6 +29,18 @@ use Limoncello\Tests\Passport\TestCase;
  */
 class ScopeRepositoryTest extends TestCase
 {
+    use DatabaseSchemeMigrationTrait;
+
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->initSqliteDatabase();
+    }
+
     /**
      * Test basic CRUD.
      */
@@ -68,12 +81,7 @@ class ScopeRepositoryTest extends TestCase
      */
     private function createRepository(): ScopeRepositoryInterface
     {
-        $this->createDatabaseScheme(
-            $connection = $this->createSqLiteConnection(),
-            $scheme = $this->getDatabaseScheme()
-        );
-
-        $repo = new ScopeRepository($connection, $scheme);
+        $repo = new ScopeRepository($this->getConnection(), $this->getDatabaseScheme());
 
         return $repo;
     }

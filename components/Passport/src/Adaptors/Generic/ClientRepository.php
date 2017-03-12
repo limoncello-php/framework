@@ -80,4 +80,12 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
         $client->setScopeIdentifiers($this->readScopeIdentifiers($client->getIdentifier()));
         $client->setRedirectUriStrings($this->readRedirectUriStrings($client->getIdentifier()));
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTableNameForReading(): string
+    {
+        return $this->getTableNameForWriting();
+    }
 }

@@ -24,6 +24,7 @@ use Limoncello\Passport\Adaptors\Generic\RedirectUriRepository;
 use Limoncello\Passport\Contracts\Entities\RedirectUriInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
+use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
 use Limoncello\Tests\Passport\TestCase;
 
 /**
@@ -31,6 +32,18 @@ use Limoncello\Tests\Passport\TestCase;
  */
 class RedirectUriRepositoryTest extends TestCase
 {
+    use DatabaseSchemeMigrationTrait;
+
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->initSqliteDatabase();
+    }
+
     /**
      * Test basic CRUD.
      */
@@ -80,13 +93,8 @@ class RedirectUriRepositoryTest extends TestCase
      */
     private function createRepositories(): array
     {
-        $this->createDatabaseScheme(
-            $connection = $this->createSqLiteConnection(),
-            $scheme = $this->getDatabaseScheme()
-        );
-
-        $clientRepository = new ClientRepository($connection, $scheme);
-        $uriRepository    = new RedirectUriRepository($connection, $scheme);
+        $clientRepository = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
+        $uriRepository    = new RedirectUriRepository($this->getConnection(), $this->getDatabaseScheme());
 
         return [$clientRepository, $uriRepository];
     }

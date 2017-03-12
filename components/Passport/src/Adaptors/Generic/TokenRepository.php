@@ -96,6 +96,14 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function getTableNameForReading(): string
+    {
+        return $this->getTableNameForWriting();
+    }
+
+    /**
      * @param TokenInterface $token
      *
      * @return void

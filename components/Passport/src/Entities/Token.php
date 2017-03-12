@@ -40,7 +40,7 @@ abstract class Token implements TokenInterface
     const FIELD_ID_USER = 'id_user';
 
     /** Field name */
-    const FIELD_TOKEN_SCOPE_LIST = 'token_scope_list';
+    const FIELD_SCOPES = 'scopes';
 
     /** Field name */
     const FIELD_IS_SCOPE_MODIFIED = 'is_scope_modified';
@@ -517,7 +517,7 @@ abstract class Token implements TokenInterface
      *
      * @return bool
      */
-    private function hasDynamicProperty(string $name): bool
+    protected function hasDynamicProperty(string $name): bool
     {
         return property_exists($this, $name);
     }

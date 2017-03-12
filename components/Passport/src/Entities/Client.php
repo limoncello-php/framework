@@ -37,10 +37,10 @@ abstract class Client extends DatabaseItem implements ClientInterface
     const FIELD_CREDENTIALS = 'credentials';
 
     /** Field name */
-    const FIELD_REDIRECT_URI_LIST = 'redirect_uri_list';
+    const FIELD_REDIRECT_URIS = 'redirect_uris';
 
     /** Field name */
-    const FIELD_SCOPE_LIST = 'scope_list';
+    const FIELD_SCOPES = 'scopes';
 
     /** Field name */
     const FIELD_IS_CONFIDENTIAL = 'is_confidential';

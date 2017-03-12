@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\Generic;
+<?php namespace Limoncello\Passport\Adaptors\MySql;
 
 /**
  * Copyright 2015-2017 info@neomerx.com

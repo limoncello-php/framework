@@ -32,7 +32,12 @@ abstract class BaseRepository
     /**
      * @return string
      */
-    abstract protected function getTableName(): string;
+    abstract protected function getTableNameForReading(): string;
+
+    /**
+     * @return string
+     */
+    abstract protected function getTableNameForWriting(): string;
 
     /**
      * @return string
@@ -101,7 +106,7 @@ abstract class BaseRepository
 
         $statement = $query
             ->select($columns)
-            ->from($this->getTableName())
+            ->from($this->getTableNameForReading())
             ->execute();
 
         $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
@@ -119,7 +124,7 @@ abstract class BaseRepository
     {
         $query = $this->getConnection()->createQueryBuilder();
 
-        $query->insert($this->getTableName());
+        $query->insert($this->getTableNameForWriting());
         foreach ($values as $key => $value) {
             $query->setValue($key, $this->createTypedParameter($query, $value));
         }
@@ -156,7 +161,7 @@ abstract class BaseRepository
 
         $statement = $query
             ->select($columns)
-            ->from($this->getTableName())
+            ->from($this->getTableNameForReading())
             ->where($column . '=' . $this->createTypedParameter($query, $identifier))
             ->execute();
 
@@ -177,7 +182,7 @@ abstract class BaseRepository
         $query = $this->getConnection()->createQueryBuilder();
 
         $query
-            ->update($this->getTableName())
+            ->update($this->getTableNameForWriting())
             ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $identifier));
         foreach ($values as $key => $value) {
             $query->set($key, $this->createTypedParameter($query, $value));
@@ -199,7 +204,7 @@ abstract class BaseRepository
         $query = $this->getConnection()->createQueryBuilder();
 
         $query
-            ->delete($this->getTableName())
+            ->delete($this->getTableNameForWriting())
             ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $identifier));
 
         $numberOfDeleted = $query->execute();

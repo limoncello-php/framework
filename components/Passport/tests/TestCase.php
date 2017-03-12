@@ -18,9 +18,11 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Type;
+use Dotenv\Dotenv;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
-use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
 use Mockery;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -32,7 +34,21 @@ use Zend\Diactoros\Uri;
  */
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
-    use DatabaseSchemeMigrationTrait;
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $scheme
+     *
+     * @return void
+     */
+    abstract protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme);
+
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $scheme
+     *
+     * @return void
+     */
+    abstract protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme);
 
     /**
      * DBAL option.
@@ -40,23 +56,91 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     const ON_DELETE_CASCADE = ['onDelete' => 'CASCADE'];
 
     /**
+     * @var Connection
+     */
+    private $connection = null;
+
+    /**
+     * @var DatabaseSchemeInterface|null
+     */
+    private $databaseScheme = null;
+
+    /**
      * @inheritdoc
      */
     protected function tearDown()
     {
         parent::tearDown();
+        if ($this->getConnection() !== null && $this->getDatabaseScheme() !== null) {
+            $this->removeDatabaseScheme($this->connection, $this->databaseScheme);
+            $this->connection->rollBack();
+            $this->connection->close();
+            $this->connection     = null;
+            $this->databaseScheme = null;
+        }
 
         Mockery::close();
     }
 
     /**
+     * Init MySQL database.
+     */
+    protected function initMySqlDatabase()
+    {
+        $this->databaseScheme = new DatabaseScheme('users', 'id_user');
+
+        $this->connection = $this->createMySqlDatabaseConnection();
+        $this->connection->beginTransaction();
+
+        // create users table
+        $table = new Table('users');
+        $table->addColumn('id_user', Type::INTEGER)->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
+        $table->addColumn('name', Type::STRING)->setNotnull(true);
+        $table->setPrimaryKey(['id_user']);
+        $this->connection->getSchemaManager()->dropAndCreateTable($table);
+
+        $this->createDatabaseScheme($this->connection, $this->databaseScheme);
+    }
+
+    /**
+     * Init SQLite database.
+     */
+    protected function initSqliteDatabase()
+    {
+        $this->databaseScheme = new DatabaseScheme();
+
+        $this->connection = $this->createSqliteDatabaseConnection();
+        $this->connection->beginTransaction();
+
+        $this->createDatabaseScheme($this->connection, $this->databaseScheme);
+    }
+
+    /**
      * @return Connection
      */
-    protected function createSqLiteConnection(): Connection
+    private function createSqliteDatabaseConnection(): Connection
     {
-        //$env = (new \Dotenv\Dotenv(__DIR__))->load();
         $connection = DriverManager::getConnection(['url' => 'sqlite:///', 'memory' => true]);
         $this->assertNotSame(false, $connection->exec('PRAGMA foreign_keys = ON;'));
+
+        return $connection;
+    }
+
+    /**
+     * @return Connection
+     */
+    private function createMySqlDatabaseConnection(): Connection
+    {
+        (new Dotenv(__DIR__ . DIRECTORY_SEPARATOR . '..'))->load();
+        $connection = DriverManager::getConnection([
+            'driver'       => getenv('DB_MY_SQL_DRIVER'),
+            'host'         => getenv('DB_MY_SQL_HOST'),
+            'port'         => getenv('DB_MY_SQL_PORT'),
+            'dbname'       => getenv('DB_MY_SQL_DATABASE'),
+            'user'         => getenv('DB_MY_SQL_USER_NAME'),
+            'password'     => getenv('DB_MY_SQL_PASSWORD'),
+            'charset'      => getenv('DB_MY_SQL_CHARSET'),
+        ]);
 
         return $connection;
     }
@@ -66,7 +150,15 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function getDatabaseScheme(): DatabaseSchemeInterface
     {
-        return new DatabaseScheme();
+        return $this->databaseScheme;
+    }
+
+    /**
+     * @return Connection
+     */
+    protected function getConnection(): Connection
+    {
+        return $this->connection;
     }
 
     /**

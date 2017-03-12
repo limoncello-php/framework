@@ -24,6 +24,7 @@ use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
 use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
+use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
 use Limoncello\Tests\Passport\TestCase;
 
 /**
@@ -31,6 +32,18 @@ use Limoncello\Tests\Passport\TestCase;
  */
 class ClientRepositoryTest extends TestCase
 {
+    use DatabaseSchemeMigrationTrait;
+
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->initSqliteDatabase();
+    }
+
     /**
      * Test basic CRUD.
      */
@@ -105,30 +118,12 @@ class ClientRepositoryTest extends TestCase
     }
 
     /**
-     * Test remove database scheme.
-     */
-    public function testRemoveDatabaseScheme()
-    {
-        $this->createDatabaseScheme(
-            $connection = $this->createSqLiteConnection(),
-            $scheme = $this->getDatabaseScheme()
-        );
-
-        $this->removeDatabaseScheme($connection, $scheme);
-    }
-
-    /**
      * @return array
      */
     private function createRepositories(): array
     {
-        $this->createDatabaseScheme(
-            $connection = $this->createSqLiteConnection(),
-            $scheme = $this->getDatabaseScheme()
-        );
-
-        $clientRepo = new ClientRepository($connection, $scheme);
-        $scopeRepo  = new ScopeRepository($connection, $scheme);
+        $clientRepo = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
+        $scopeRepo  = new ScopeRepository($this->getConnection(), $this->getDatabaseScheme());
 
         return [$clientRepo, $scopeRepo];
     }
