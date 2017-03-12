@@ -23,6 +23,7 @@ use Doctrine\DBAL\Types\Type;
 use Dotenv\Dotenv;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Tests\Passport\Data\User;
 use Mockery;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -87,19 +88,23 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function initMySqlDatabase()
     {
-        $this->databaseScheme = new DatabaseScheme('users', 'id_user');
+        $this->databaseScheme = new DatabaseScheme(User::TABLE_NAME, User::FIELD_ID);
 
         $this->connection = $this->createMySqlDatabaseConnection();
         $this->connection->beginTransaction();
 
         // create users table
-        $table = new Table('users');
-        $table->addColumn('id_user', Type::INTEGER)->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
-        $table->addColumn('name', Type::STRING)->setNotnull(true);
-        $table->setPrimaryKey(['id_user']);
+        $table = new Table(User::TABLE_NAME);
+        $table->addColumn(User::FIELD_ID, Type::INTEGER)->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
+        $table->addColumn(User::FIELD_NAME, Type::STRING)->setNotnull(true);
+        $table->setPrimaryKey([User::FIELD_ID]);
         $this->connection->getSchemaManager()->dropAndCreateTable($table);
 
         $this->createDatabaseScheme($this->connection, $this->databaseScheme);
+
+        $this->connection->insert(User::TABLE_NAME, [
+            User::FIELD_NAME => 'John Dow',
+        ]);
     }
 
     /**

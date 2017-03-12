@@ -31,6 +31,7 @@ use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
+use Limoncello\Tests\Passport\Data\User;
 use Limoncello\Tests\Passport\TestCase;
 
 /**
@@ -156,12 +157,25 @@ class MySqlTest extends TestCase
         $token     =$tokenRepo->createToken(
             (new Token())
                 ->setClientIdentifier($client->getIdentifier())
+                ->setValue('secret-token')
+                ->setUserIdentifier(1) // we know we have created one user
                 ->setScopeIdentifiers([$scope1->getIdentifier(), $scope2->getIdentifier()])
         );
 
         $sameToken = $tokenRepo->read($token->getIdentifier());
         $this->assertCount(2, $sameToken->getScopeIdentifiers());
         $this->assertTrue($sameToken->getValueCreatedAt() instanceof DateTimeInterface);
+    }
+
+    public function testReadUserByToken()
+    {
+        $this->testTokenReading();
+
+        /** @var TokenRepository $tokenRepo */
+        $tokenRepo = $this->createTokenRepository();
+        list($user, $scopes) = $tokenRepo->readUserByToken('secret-token', 10, User::class);
+        $this->assertTrue($user instanceof User);
+        $this->assertNotEmpty($scopes);
     }
 
     /**

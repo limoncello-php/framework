@@ -18,6 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use PDO;
 
 /**
  * @package Limoncello\Passport
@@ -31,6 +32,45 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     public function __construct(Connection $connection, DatabaseSchemeInterface $databaseScheme)
     {
         $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+    }
+
+    /**
+     * @param string $token
+     * @param int    $expirationInSeconds
+     * @param string $userClass
+     *
+     * @return array
+     */
+    public function readUserByToken(string $token, int $expirationInSeconds, string $userClass): array
+    {
+        $query = $this->getConnection()->createQueryBuilder();
+
+        $scheme          = $this->getDatabaseScheme();
+        $createdAtColumn = $scheme->getTokensValueCreatedAtColumn();
+        $tokenValue      = $scheme->getTokensValueColumn();
+        $statement       = $this->addExpirationCondition(
+            $query->select(['*'])
+                ->from($scheme->getUsersView())
+                ->where($tokenValue . '=' . $this->createTypedParameter($query, $token)),
+            $expirationInSeconds,
+            $createdAtColumn
+        )->execute();
+
+        $statement->setFetchMode(PDO::FETCH_CLASS, $userClass);
+        $userOrFalse = $statement->fetch();
+        if ($userOrFalse === false) {
+            $user   = null;
+            $scopes = null;
+        } else {
+            $scopesColumn = $scheme->getClientsViewScopesColumn();
+            $scopes       = $userOrFalse->{$scopesColumn};
+            unset($userOrFalse->{$scopesColumn});
+            unset($userOrFalse->{$tokenValue});
+            unset($userOrFalse->{$createdAtColumn});
+            $user = $userOrFalse;
+        }
+
+        return [$user, $scopes];
     }
 
     /**

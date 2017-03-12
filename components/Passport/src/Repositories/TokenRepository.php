@@ -18,6 +18,7 @@
 
 use DateInterval;
 use DateTimeImmutable;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
@@ -332,22 +333,39 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         string $createdAtColumn,
         array $columns = ['*']
     ) {
-        $earliestExpired = (new DateTimeImmutable())->sub(new DateInterval("PT{$expirationInSeconds}S"));
-
         $query = $this->getConnection()->createQueryBuilder();
 
         $isEnabledColumn = $this->getDatabaseScheme()->getTokensIsEnabledColumn();
-        $statement = $query
-            ->select($columns)
-            ->from($this->getTableNameForReading())
-            ->where($column . '=' . $this->createTypedParameter($query, $identifier))
-            ->andWhere($createdAtColumn . '>' . $this->createTypedParameter($query, $earliestExpired))
-            ->andWhere($query->expr()->eq($isEnabledColumn, '1'))
-            ->execute();
+        $statement = $this->addExpirationCondition(
+            $query->select($columns)
+                ->from($this->getTableNameForReading())
+                ->where($column . '=' . $this->createTypedParameter($query, $identifier))
+                ->andWhere($query->expr()->eq($isEnabledColumn, '1')),
+            $expirationInSeconds,
+            $createdAtColumn
+        )->execute();
 
         $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
         $result = $statement->fetch();
 
         return $result === false ? null : $result;
+    }
+
+    /**
+     * @param QueryBuilder $query
+     * @param int          $expirationInSeconds
+     * @param string       $createdAtColumn
+     *
+     * @return QueryBuilder
+     */
+    protected function addExpirationCondition(
+        QueryBuilder $query,
+        int $expirationInSeconds,
+        string $createdAtColumn
+    ): QueryBuilder {
+        $earliestExpired = (new DateTimeImmutable())->sub(new DateInterval("PT{$expirationInSeconds}S"));
+        $query->andWhere($createdAtColumn . '>' . $this->createTypedParameter($query, $earliestExpired));
+
+        return $query;
     }
 }
