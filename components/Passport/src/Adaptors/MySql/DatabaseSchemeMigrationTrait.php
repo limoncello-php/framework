@@ -169,6 +169,7 @@ EOT;
             $view          = $scheme->getUsersView();
             $tokensValue   = $scheme->getTokensValueColumn();
             $tokensValueAt = $scheme->getTokensValueCreatedAtColumn();
+            $tokensScopes  = $scheme->getTokensViewScopesColumn();
             $tokensView    = $scheme->getTokensView();
             $tokensUserId  = $scheme->getTokensUserIdentityColumn();
             $usersUserId   = $scheme->getUsersIdentityColumn();
@@ -176,7 +177,7 @@ EOT;
             $sql = <<< EOT
 CREATE OR REPLACE VIEW {$view} AS
     SELECT
-        t.$tokensValue, t.$tokensValueAt, u.*
+        t.$tokensValue, t.$tokensValueAt, t.$tokensScopes, u.*
     FROM {$tokensView} AS t
       LEFT JOIN {$users} AS u ON t.{$tokensUserId} = u.{$usersUserId};
 EOT;
