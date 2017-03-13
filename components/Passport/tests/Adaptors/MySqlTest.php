@@ -17,6 +17,7 @@
  */
 
 use DateTimeInterface;
+use Doctrine\DBAL\Types\Type;
 use Limoncello\Passport\Adaptors\MySql\Client;
 use Limoncello\Passport\Adaptors\MySql\ClientRepository;
 use Limoncello\Passport\Adaptors\MySql\DatabaseSchemeMigrationTrait;
@@ -167,7 +168,10 @@ class MySqlTest extends TestCase
         $this->assertTrue($sameToken->getValueCreatedAt() instanceof DateTimeInterface);
     }
 
-    public function testReadUserByToken()
+    /**
+     * Test user with not typed attributes.
+     */
+    public function testReadUnTypedUserByToken()
     {
         $this->testTokenReading();
 
@@ -176,6 +180,25 @@ class MySqlTest extends TestCase
         list($user, $scopes) = $tokenRepo->readUserByToken('secret-token', 10, User::class);
         $this->assertTrue($user instanceof User);
         $this->assertNotEmpty($scopes);
+    }
+
+    /**
+     * Test user with not typed attributes.
+     */
+    public function testReadTypedUserByToken()
+    {
+        $this->testTokenReading();
+
+        /** @var TokenRepository $tokenRepo */
+        $tokenRepo = $this->createTokenRepository();
+        $types = [
+            User::FIELD_ID   => Type::getType(Type::INTEGER),
+            User::FIELD_NAME => Type::getType(Type::STRING),
+        ];
+        list($user, $scopes) = $tokenRepo->readUserByToken('secret-token', 10, User::class, $types);
+        $this->assertTrue($user instanceof User);
+        $this->assertNotEmpty($scopes);
+        $this->assertTrue(is_int($user->{User::FIELD_ID}));
     }
 
     /**

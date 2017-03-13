@@ -25,7 +25,6 @@ interface DatabaseSchemeInterface
      * OAuth Clients table and view.
      *************************************************************************/
 
-
     /**
      * @return string
      */

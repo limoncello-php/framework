@@ -17,6 +17,9 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\Type;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use PDO;
 
@@ -35,42 +38,124 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     }
 
     /**
-     * @param string $token
-     * @param int    $expirationInSeconds
-     * @param string $userClass
+     * @param string      $token
+     * @param int         $expirationInSeconds
+     * @param string      $userClass
+     * @param Type[]|null $attributeTypes
      *
      * @return array
      */
-    public function readUserByToken(string $token, int $expirationInSeconds, string $userClass): array
-    {
+    public function readUserByToken(
+        string $token,
+        int $expirationInSeconds,
+        string $userClass,
+        array $attributeTypes = null
+    ): array {
         $query = $this->getConnection()->createQueryBuilder();
 
-        $scheme          = $this->getDatabaseScheme();
-        $createdAtColumn = $scheme->getTokensValueCreatedAtColumn();
-        $tokenValue      = $scheme->getTokensValueColumn();
-        $statement       = $this->addExpirationCondition(
+        $scheme            = $this->getDatabaseScheme();
+        $createdAtColumn   = $scheme->getTokensValueCreatedAtColumn();
+        $tokensValueColumn = $scheme->getTokensValueColumn();
+        $scopesColumn      = $scheme->getClientsViewScopesColumn();
+        $statement         = $this->addExpirationCondition(
             $query->select(['*'])
                 ->from($scheme->getUsersView())
-                ->where($tokenValue . '=' . $this->createTypedParameter($query, $token)),
+                ->where($tokensValueColumn . '=' . $this->createTypedParameter($query, $token)),
             $expirationInSeconds,
             $createdAtColumn
         )->execute();
 
-        $statement->setFetchMode(PDO::FETCH_CLASS, $userClass);
-        $userOrFalse = $statement->fetch();
-        if ($userOrFalse === false) {
-            $user   = null;
-            $scopes = null;
+        if ($attributeTypes === null) {
+            $result = $this->fetchUnTyped($statement, $userClass, $scopesColumn, $tokensValueColumn, $createdAtColumn);
         } else {
-            $scopesColumn = $scheme->getClientsViewScopesColumn();
-            $scopes       = $userOrFalse->{$scopesColumn};
-            unset($userOrFalse->{$scopesColumn});
-            unset($userOrFalse->{$tokenValue});
-            unset($userOrFalse->{$createdAtColumn});
-            $user = $userOrFalse;
+            $result = $this->fetchTyped(
+                $statement,
+                $this->getConnection()->getDatabasePlatform(),
+                $userClass,
+                $scopesColumn,
+                $tokensValueColumn,
+                $createdAtColumn,
+                $attributeTypes
+            );
         }
 
-        return [$user, $scopes];
+        return $result;
+    }
+
+    /** @noinspection PhpTooManyParametersInspection
+     * @param Statement        $statement
+     * @param AbstractPlatform $platform
+     * @param string           $modelClass
+     * @param string           $scopesColumn
+     * @param string           $tokenValueColumn
+     * @param string           $createdAtColumn
+     * @param Type[]           $attributeTypes
+     *
+     * @return array
+     */
+    private function fetchTyped(
+        Statement $statement,
+        AbstractPlatform $platform,
+        string $modelClass,
+        string $scopesColumn,
+        string $tokenValueColumn,
+        string $createdAtColumn,
+        array $attributeTypes
+    ): array {
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $attributesOrFalse = $statement->fetch();
+        if ($attributesOrFalse === false) {
+            $model   = null;
+            $scopes = null;
+        } else {
+            $scopes = $attributesOrFalse[$scopesColumn];
+            unset($attributesOrFalse[$scopesColumn]);
+            unset($attributesOrFalse[$tokenValueColumn]);
+            unset($attributesOrFalse[$createdAtColumn]);
+            $model = new $modelClass();
+            foreach ($attributesOrFalse as $name => $value) {
+                if (array_key_exists($name, $attributeTypes) === true) {
+                    /** @var Type $type */
+                    $type  = $attributeTypes[$name];
+                    $value = $type->convertToPHPValue($value, $platform);
+                }
+                $model->{$name} = $value;
+            }
+        }
+
+        return [$model, $scopes];
+    }
+
+    /**
+     * @param Statement $statement
+     * @param string    $modelClass
+     * @param string    $scopesColumn
+     * @param string    $tokenValueColumn
+     * @param string    $createdAtColumn
+     *
+     * @return array
+     */
+    private function fetchUnTyped(
+        Statement $statement,
+        string $modelClass,
+        string $scopesColumn,
+        string $tokenValueColumn,
+        string $createdAtColumn
+    ): array {
+        $statement->setFetchMode(PDO::FETCH_CLASS, $modelClass);
+        $modelOrFalse = $statement->fetch();
+        if ($modelOrFalse === false) {
+            $model   = null;
+            $scopes = null;
+        } else {
+            $scopes = $modelOrFalse->{$scopesColumn};
+            unset($modelOrFalse->{$scopesColumn});
+            unset($modelOrFalse->{$tokenValueColumn});
+            unset($modelOrFalse->{$createdAtColumn});
+            $model = $modelOrFalse;
+        }
+
+        return [$model, $scopes];
     }
 
     /**
