@@ -25,9 +25,9 @@ use Psr\Http\Message\UriInterface;
 interface RedirectUriInterface
 {
     /**
-     * @return int
+     * @return int|null
      */
-    public function getIdentifier(): int;
+    public function getIdentifier();
 
     /**
      * @param int $identifier
@@ -37,9 +37,9 @@ interface RedirectUriInterface
     public function setIdentifier(int $identifier): RedirectUriInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getClientIdentifier(): string;
+    public function getClientIdentifier();
 
     /**
      * @param string $identifier
@@ -54,9 +54,9 @@ interface RedirectUriInterface
     public function getUri(): UriInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getValue(): string;
+    public function getValue();
 
     /**
      * @param string $uri

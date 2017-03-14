@@ -130,14 +130,6 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     /**
      * @inheritdoc
      */
-    public function verifyPassword(string $password, string $hash): bool
-    {
-        return password_verify($password, $hash);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function generateCodeValue(TokenInterface $token): string
     {
         $codeValue = bin2hex(random_bytes(16)) . uniqid();
@@ -233,6 +225,17 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         $uri      = (new Uri($this->getApprovalUriString()))->withFragment($fragment);
 
         return new RedirectResponse($uri);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function verifyClientCredentials(ClientInterface $client, string $credentials): bool
+    {
+        /** @var \Limoncello\Passport\Contracts\Entities\ClientInterface $client */
+        assert($client instanceof \Limoncello\Passport\Contracts\Entities\ClientInterface);
+
+        return password_verify($credentials, $client->getCredentials());
     }
 
     /**

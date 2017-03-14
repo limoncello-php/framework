@@ -37,17 +37,17 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     const FIELD_VALUE = 'uri';
 
     /**
-     * @var int
+     * @var int|null
      */
     private $identifierField;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $clientIdentifierField;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $valueField;
 
@@ -72,7 +72,7 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     /**
      * @inheritdoc
      */
-    public function getIdentifier(): int
+    public function getIdentifier()
     {
         return $this->identifierField;
     }
@@ -90,7 +90,7 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     /**
      * @inheritdoc
      */
-    public function getClientIdentifier(): string
+    public function getClientIdentifier()
     {
         return $this->clientIdentifierField;
     }
@@ -108,7 +108,7 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     /**
      * @inheritdoc
      */
-    public function getValue(): string
+    public function getValue()
     {
         return $this->valueField;
     }
@@ -139,10 +139,6 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
      */
     public function getUri(): UriInterface
     {
-        if ($this->uriObject === null) {
-            $this->uriObject = new Uri($this->getValue());
-        }
-
         return $this->uriObject;
     }
 

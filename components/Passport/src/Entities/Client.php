@@ -69,7 +69,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @var string
      */
-    private $identifierField;
+    private $identifierField = '';
 
     /**
      * @var string|null
@@ -183,7 +183,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->nameField;
     }

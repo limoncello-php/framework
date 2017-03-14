@@ -25,8 +25,11 @@ use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
 use Limoncello\Tests\Passport\Data\User;
 use Mockery;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Uri;
 
@@ -35,6 +38,16 @@ use Zend\Diactoros\Uri;
  */
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var resource
+     */
+    private $logStream;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     /**
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $scheme
@@ -66,6 +79,14 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     private $databaseScheme = null;
 
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->logStream = fopen('php://memory', 'rw');
+        $this->logger    = new Logger('passport', [new StreamHandler($this->getLogStream())]);
+    }
+
     /**
      * @inheritdoc
      */
@@ -81,6 +102,10 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         }
 
         Mockery::close();
+
+        fclose($this->getLogStream());
+        $this->logStream = null;
+        $this->logger    = null;
     }
 
     /**
@@ -164,6 +189,33 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     protected function getConnection(): Connection
     {
         return $this->connection;
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @return resource
+     */
+    protected function getLogStream()
+    {
+        return $this->logStream;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLogs()
+    {
+        rewind($this->getLogStream());
+        $logs = stream_get_contents($this->getLogStream());
+
+        return $logs;
     }
 
     /**

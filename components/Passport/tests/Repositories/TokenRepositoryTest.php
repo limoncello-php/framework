@@ -89,6 +89,7 @@ class TokenRepositoryTest extends TestCase
         $this->assertEquals($newCode->getIdentifier(), $token->getIdentifier());
         $this->assertEquals($newCode->getClientIdentifier(), $token->getClientIdentifier());
         $this->assertEquals($newCode->getUserIdentifier(), $token->getUserIdentifier());
+        $this->assertTrue($newCode->getCodeCreatedAt() instanceof DateTimeImmutable);
         $this->assertNull($token->getValue());
         $this->assertNull($token->getRefreshValue());
         $this->assertCount(2, $token->getScopeIdentifiers());
@@ -145,6 +146,58 @@ class TokenRepositoryTest extends TestCase
 
         $this->assertEquals($tokenId, $tokenRepo->readByValue('some-token', 10)->getIdentifier());
         $this->assertEquals($tokenId, $tokenRepo->readByRefresh('refresh-token', 10)->getIdentifier());
+    }
+
+    /**
+     * Test disable token.
+     */
+    public function testDisableToken()
+    {
+        /** @var TokenRepositoryInterface $tokenRepo */
+        /** @var ClientRepositoryInterface $clientRepo */
+        list($tokenRepo, , $clientRepo) = $this->createRepositories();
+
+        $clientRepo->create($client = (new Client())->setIdentifier('client1')->setName('client name'));
+        $unsavedToken = (new Token())
+            ->setClientIdentifier($client->getIdentifier())
+            ->setUserIdentifier(1)
+            ->setValue('some-token')
+            ->setType('bearer')
+            ->setRefreshValue('refresh-token');
+        $this->assertNotNull($newToken = $tokenRepo->createToken($unsavedToken));
+        $this->assertGreaterThan(0, $tokenId = $newToken->getIdentifier());
+
+        // re-read
+        $this->assertTrue($tokenRepo->read($tokenId)->isEnabled());
+
+        $tokenRepo->disable($tokenId);
+
+        // re-read
+        $this->assertFalse($tokenRepo->read($tokenId)->isEnabled());
+    }
+
+    /**
+     * Test create disabled token.
+     */
+    public function testCreateDisabledToken()
+    {
+        /** @var TokenRepositoryInterface $tokenRepo */
+        /** @var ClientRepositoryInterface $clientRepo */
+        list($tokenRepo, , $clientRepo) = $this->createRepositories();
+
+        $clientRepo->create($client = (new Client())->setIdentifier('client1')->setName('client name'));
+        $unsavedToken = (new Token())
+            ->setClientIdentifier($client->getIdentifier())
+            ->setUserIdentifier(1)
+            ->setValue('some-token')
+            ->setType('bearer')
+            ->setRefreshValue('refresh-token')
+            ->setDisabled();
+        $this->assertNotNull($newToken = $tokenRepo->createToken($unsavedToken));
+        $this->assertGreaterThan(0, $tokenId = $newToken->getIdentifier());
+
+        // re-read
+        $this->assertFalse($tokenRepo->read($tokenId)->isEnabled());
     }
 
     /**

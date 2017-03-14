@@ -75,11 +75,10 @@ trait BasicClientAuthenticationTrait
                     $clientId = $idAndCredentials[0];
                     break;
                 case 2:
+                default:
                     $clientId          = $idAndCredentials[0];
                     $clientCredentials = $idAndCredentials[1];
                     break;
-                default:
-                    throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
             }
         }
 
@@ -108,7 +107,7 @@ trait BasicClientAuthenticationTrait
             // check credentials
             if ($clientCredentials !== null) {
                 // we got the password
-                if (password_verify($clientCredentials, $client->getCredentials()) === false) {
+                if ($integration->verifyClientCredentials($client, $clientCredentials) === false) {
                     throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
                 }
             } else {

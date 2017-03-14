@@ -24,6 +24,7 @@ use Limoncello\Passport\Adaptors\Generic\RedirectUriRepository;
 use Limoncello\Passport\Contracts\Entities\RedirectUriInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
+use Limoncello\Passport\Exceptions\InvalidArgumentException;
 use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
 use Limoncello\Tests\Passport\TestCase;
 
@@ -86,6 +87,21 @@ class RedirectUriRepositoryTest extends TestCase
         $uriRepo->delete($sameRedirectUri->getIdentifier());
 
         $this->assertEmpty($uriRepo->indexClientUris($clientId));
+    }
+
+    /**
+     * Test entities get/set methods.
+     */
+    public function testEntities()
+    {
+        $uri = (new RedirectUri())->setValue('http://host.foo/path?param=value');
+        $this->assertNotNull($uri->getUri());
+
+        try {
+            $uri->setValue('/no/host/value');
+        } catch (InvalidArgumentException $exception) {
+        }
+        $this->assertTrue(isset($exception));
     }
 
     /**

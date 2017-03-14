@@ -54,7 +54,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
             $tokenIdentifier = $this->createResource($values);
         }
 
-        $code->setIdentifier($tokenIdentifier)->setValueCreatedAt($now);
+        $code->setIdentifier($tokenIdentifier)->setCodeCreatedAt($now);
 
         return $code;
     }
@@ -106,6 +106,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
             $scheme->getTokensValueColumn()            => $token->getValue(),
             $scheme->getTokensTypeColumn()             => $token->getType(),
             $scheme->getTokensIsScopeModified()        => $token->isScopeModified(),
+            $scheme->getTokensIsEnabledColumn()        => $token->isEnabled(),
             $scheme->getTokensValueCreatedAtColumn()   => $now,
         ] : [
             $scheme->getTokensClientIdentityColumn()   => $token->getClientIdentifier(),
@@ -113,6 +114,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
             $scheme->getTokensValueColumn()            => $token->getValue(),
             $scheme->getTokensTypeColumn()             => $token->getType(),
             $scheme->getTokensIsScopeModified()        => $token->isScopeModified(),
+            $scheme->getTokensIsEnabledColumn()        => $token->isEnabled(),
             $scheme->getTokensValueCreatedAtColumn()   => $now,
             $scheme->getTokensRefreshColumn()          => $token->getRefreshValue(),
             $scheme->getTokensRefreshCreatedAtColumn() => $now,

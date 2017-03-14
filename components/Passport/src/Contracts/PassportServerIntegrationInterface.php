@@ -43,14 +43,6 @@ interface PassportServerIntegrationInterface
     public function getTokenRepository(): TokenRepositoryInterface;
 
     /**
-     * @param string $password
-     * @param string $hash
-     *
-     * @return bool
-     */
-    public function verifyPassword(string $password, string $hash): bool;
-
-    /**
      * @param string $userName
      * @param string $password
      *
@@ -124,4 +116,12 @@ interface PassportServerIntegrationInterface
      * @return TokenInterface
      */
     public function createTokenInstance(): TokenInterface;
+
+    /**
+     * @param ClientInterface $client
+     * @param string          $credentials
+     *
+     * @return bool
+     */
+    public function verifyClientCredentials(ClientInterface $client, string $credentials): bool;
 }

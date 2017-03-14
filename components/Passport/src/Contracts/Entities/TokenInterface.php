@@ -25,9 +25,9 @@ use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
 interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthServer\Contracts\TokenInterface
 {
     /**
-     * @return int
+     * @return int|null
      */
-    public function getIdentifier(): int;
+    public function getIdentifier();
 
     /**
      * @param int $identifier
@@ -44,11 +44,11 @@ interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthSe
     public function setClientIdentifier(string $identifier): TokenInterface;
 
     /**
-     * @param int $identifier
+     * @param int|string $identifier
      *
      * @return TokenInterface
      */
-    public function setUserIdentifier(int $identifier): TokenInterface;
+    public function setUserIdentifier($identifier): TokenInterface;
 
     /**
      * @param string[] $identifiers

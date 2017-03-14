@@ -118,6 +118,16 @@ class ClientRepositoryTest extends TestCase
     }
 
     /**
+     * Test entities get/set methods.
+     */
+    public function testEntities()
+    {
+        $client = (new Client())->setConfidential()->enableScopeExcess();
+        $this->assertFalse($client->isPublic());
+        $this->assertTrue($client->isScopeExcessAllowed());
+    }
+
+    /**
      * @return array
      */
     private function createRepositories(): array

@@ -31,7 +31,7 @@ abstract class Scope extends DatabaseItem implements ScopeInterface
     const FIELD_DESCRIPTION = 'description';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $identifierField;
 
@@ -55,7 +55,7 @@ abstract class Scope extends DatabaseItem implements ScopeInterface
     /**
      * @inheritdoc
      */
-    public function getIdentifier(): string
+    public function getIdentifier()
     {
         return $this->identifierField;
     }

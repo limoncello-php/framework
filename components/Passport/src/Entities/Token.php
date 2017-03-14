@@ -73,17 +73,17 @@ abstract class Token implements TokenInterface
     const FIELD_REFRESH_CREATED_AT = 'refresh_created_at';
 
     /**
-     * @var int
+     * @var int|null
      */
     private $identifierField;
 
     /**
      * @var string
      */
-    private $clientIdentifierField;
+    private $clientIdentifierField = '';
 
     /**
-     * @var int
+     * @var int|null
      */
     private $userIdentifierField;
 
@@ -105,7 +105,7 @@ abstract class Token implements TokenInterface
     /**
      * @var bool
      */
-    private $isEnabled = false;
+    private $isEnabled = true;
 
     /**
      * @var string|null
@@ -171,7 +171,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getIdentifier(): int
+    public function getIdentifier()
     {
         return $this->identifierField;
     }
@@ -215,8 +215,10 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function setUserIdentifier(int $identifier): TokenInterface
+    public function setUserIdentifier($identifier): TokenInterface
     {
+        assert(is_int($identifier) === true || is_string($identifier) === true);
+
         $this->userIdentifierField = $identifier;
 
         return $this;

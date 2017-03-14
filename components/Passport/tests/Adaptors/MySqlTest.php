@@ -202,6 +202,38 @@ class MySqlTest extends TestCase
     }
 
     /**
+     * Test user with not typed attributes.
+     */
+    public function testReadNonExistingUnTypedUserByToken()
+    {
+        $this->testTokenReading();
+
+        /** @var TokenRepository $tokenRepo */
+        $tokenRepo = $this->createTokenRepository();
+        list($user, $scopes) = $tokenRepo->readUserByToken('non-existing-token', 10, User::class);
+        $this->assertNull($user);
+        $this->assertNull($scopes);
+    }
+
+    /**
+     * Test user with not typed attributes.
+     */
+    public function testReadNonExistingTypedUserByToken()
+    {
+        $this->testTokenReading();
+
+        /** @var TokenRepository $tokenRepo */
+        $tokenRepo = $this->createTokenRepository();
+        $types = [
+            User::FIELD_ID   => Type::getType(Type::INTEGER),
+            User::FIELD_NAME => Type::getType(Type::STRING),
+        ];
+        list($user, $scopes) = $tokenRepo->readUserByToken('non-existing-token', 10, User::class, $types);
+        $this->assertNull($user);
+        $this->assertNull($scopes);
+    }
+
+    /**
      * @return ClientRepositoryInterface
      */
     private function createClientRepository(): ClientRepositoryInterface

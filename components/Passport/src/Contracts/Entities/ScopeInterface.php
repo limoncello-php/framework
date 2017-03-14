@@ -24,9 +24,10 @@ use DateTimeInterface;
 interface ScopeInterface
 {
     /**
-     * @return string
+     * @return string|null
      */
-    public function getIdentifier(): string;
+    public function getIdentifier();
+
     /**
      * @param string $identifier
      *

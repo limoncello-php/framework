@@ -81,6 +81,8 @@ class PassportServerTest extends TestCase
         $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
         $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
         $this->assertNotEmpty($savedToken->getScopeIdentifiers());
+
+        $this->assertNotEmpty($this->getLogs());
     }
 
     /**
@@ -110,6 +112,8 @@ class PassportServerTest extends TestCase
         $this->checkItLooksLikeValidToken($newToken);
 
         $this->assertNotEquals($token->access_token, $newToken->access_token);
+
+        $this->assertNotEmpty($this->getLogs());
     }
 
     /**
@@ -143,6 +147,8 @@ class PassportServerTest extends TestCase
         $this->assertNotEmpty($newToken->scope);
 
         $this->assertNotEquals($token->access_token, $newToken->access_token);
+
+        $this->assertNotEmpty($foo = $this->getLogs());
     }
 
     /**
@@ -166,12 +172,13 @@ class PassportServerTest extends TestCase
             ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
             ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
             ->setUserIdentifier(static::TEST_USER_ID)
-            ->setScopeModified()
-        ;
+            ->setScopeModified();
         $response = $server->createTokenResponse($token);
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
         $this->assertStringStartsWith(static::TEST_CLIENT_REDIRECT_URI, $location);
+
+        $this->assertNotEmpty($this->getLogs());
     }
 
     /**
@@ -215,6 +222,8 @@ class PassportServerTest extends TestCase
         $token = json_decode((string)$response->getBody());
         $this->checkItLooksLikeValidToken($token);
         $this->assertNotEmpty($refreshToken = $token->refresh_token);
+
+        $this->assertNotEmpty($this->getLogs());
     }
 
     /**
@@ -244,6 +253,8 @@ class PassportServerTest extends TestCase
         $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
         $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
         $this->assertNotEmpty($savedToken->getScopeIdentifiers());
+
+        $this->assertNotEmpty($this->getLogs());
     }
 
     /**
@@ -457,8 +468,8 @@ class PassportServerTest extends TestCase
             }
         };
 
-        /** @var PassportServerInterface $server */
         $server = new PassportServer($integration);
+        $server->setLogger($this->getLogger());
 
         return $server;
     }
