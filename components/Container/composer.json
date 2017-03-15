@@ -2,7 +2,7 @@
     "name": "limoncello-php/container",
     "description": "Lightweight container (container interoperability)",
     "keywords": ["container", "interoperability", "container interoperability", "PSR"],
-    "homepage": "https://github.com/limoncello-php/framework/components/container",
+    "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Container",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"
     },
