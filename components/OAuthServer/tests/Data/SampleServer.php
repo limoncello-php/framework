@@ -530,7 +530,7 @@ class SampleServer extends BaseAuthorizationServer
      * @param string        $token
      * @param string        $type
      * @param int           $expiresIn
-     * @param string[]|null $scopeList
+     * @param string[]|null $scopeIdentifiers
      * @param string|null   $state
      *
      * @return ResponseInterface
@@ -540,7 +540,7 @@ class SampleServer extends BaseAuthorizationServer
         string $token,
         string $type,
         int $expiresIn,
-        array $scopeList = null,
+        array $scopeIdentifiers = null,
         string $state = null
     ): ResponseInterface {
         // for access token format @link https://tools.ietf.org/html/rfc6749#section-4.2.2
@@ -552,7 +552,7 @@ class SampleServer extends BaseAuthorizationServer
         // the client than a 3xx redirection response -- for example, returning an HTML page that includes a
         // 'continue' button with an action linked to the redirection URI.
 
-        $scope      = $scopeList === null ? null : implode(' ', $scopeList);
+        $scope      = $scopeIdentifiers === null ? null : implode(' ', $scopeIdentifiers);
         $parameters = $this->filterNulls([
             'access_token' => $token,
             'token_type'   => $type,
