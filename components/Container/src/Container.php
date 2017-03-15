@@ -1,4 +1,4 @@
-<?php namespace Limoncello\ContainerLight;
+<?php namespace Limoncello\Container;
 
 /**
  * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
@@ -17,7 +17,7 @@
  */
 
 use InvalidArgumentException;
-use Limoncello\ContainerLight\Exceptions\NotFoundException;
+use Limoncello\Container\Exceptions\NotFoundException;
 use Limoncello\Contracts\Container\ContainerInterface;
 
 /**

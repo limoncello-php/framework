@@ -1,4 +1,4 @@
-<?php namespace Limoncello\ContainerLight\Exceptions;
+<?php namespace Limoncello\Container\Exceptions;
 
 /**
  * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)

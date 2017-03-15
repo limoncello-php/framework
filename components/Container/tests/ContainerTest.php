@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\ContainerLight;
+<?php namespace Limoncello\Tests\Container;
 
 /**
  * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\ContainerLight\Container;
+use Limoncello\Container\Container;
 
 /**
  * @package Limoncello\Tests\ContainerLight
@@ -39,7 +39,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Limoncello\ContainerLight\Exceptions\NotFoundException
+     * @expectedException \Limoncello\Container\Exceptions\NotFoundException
      */
     public function testNotFound()
     {

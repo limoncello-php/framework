@@ -1,8 +1,8 @@
 {
-    "name": "limoncello-php/container-light",
+    "name": "limoncello-php/container",
     "description": "Lightweight container (container interoperability)",
     "keywords": ["container", "interoperability", "container interoperability", "PSR"],
-    "homepage": "https://github.com/limoncello-php/container-light",
+    "homepage": "https://github.com/limoncello-php/framework/components/container",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"
     },
@@ -26,12 +26,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Limoncello\\ContainerLight\\": "src/"
+            "Limoncello\\Container\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Limoncello\\Tests\\ContainerLight\\": "tests/"
+            "Limoncello\\Tests\\Container\\": "tests/"
         }
     },
     "scripts": {
