@@ -24,6 +24,7 @@ use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Entities\Client;
 use Limoncello\Passport\Entities\DatabaseScheme;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
 
@@ -220,11 +221,7 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
             return $value !== null;
         });
 
-        /** @var Client $client */
-        $fragment = http_build_query($filtered, '', '&', PHP_QUERY_RFC3986);
-        $uri      = (new Uri($this->getApprovalUriString()))->withFragment($fragment);
-
-        return new RedirectResponse($uri);
+        return new RedirectResponse($this->createRedirectUri($this->getApprovalUriString(), $filtered));
     }
 
     /**
@@ -236,6 +233,20 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         assert($client instanceof \Limoncello\Passport\Contracts\Entities\ClientInterface);
 
         return password_verify($credentials, $client->getCredentials());
+    }
+
+    /**
+     * @param string $uri
+     * @param array  $data
+     *
+     * @return UriInterface
+     */
+    protected function createRedirectUri(string $uri, array $data): UriInterface
+    {
+        $query  = http_build_query($data, '', '&', PHP_QUERY_RFC3986);
+        $result = (new Uri($uri))->withQuery($query);
+
+        return $result;
     }
 
     /**
