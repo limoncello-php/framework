@@ -1,0 +1,44 @@
+{
+    "name": "limoncello-php/app-cache",
+    "description": "Limoncello application cache support",
+    "keywords": ["limoncello", "framework", "cache"],
+    "homepage": "https://github.com/limoncello-php/framework/tree/master/components/AppCache",
+    "support": {
+        "issues": "https://github.com/limoncello-php/framework/issues"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "neomerx",
+            "email": "info@neomerx.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "require-dev": {
+        "composer/composer": "^1.0.0",
+        "squizlabs/php_codesniffer": "^2.5",
+        "phpmd/phpmd": "^2.4",
+        "scrutinizer/ocular": "^1.3",
+        "phpunit/phpunit": "^4.0 || ^5.0",
+        "mockery/mockery": "^0.9.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Limoncello\\AppCache\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Limoncello\\Tests\\AppCache\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": ["@test-unit", "@test-cs", "@test-md"],
+        "test-unit": "./vendor/bin/phpunit --coverage-text",
+        "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
+        "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
+        "test-unit-light": "./vendor/bin/phpunit"
+    }
+}
