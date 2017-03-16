@@ -39,5 +39,10 @@
         "test-unit": "./vendor/bin/phpunit --coverage-text",
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.5.x-dev"
+        }
     }
 }
