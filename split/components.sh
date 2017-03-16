@@ -9,4 +9,5 @@ COMPONENTS=(
     'components/Crypt/:git@github.com:limoncello-php-dist/crypt.git'
     'components/OAuthServer/:git@github.com:limoncello-php-dist/oauth-server.git'
     'components/Passport/:git@github.com:limoncello-php-dist/passport.git'
+    'components/Validation/:git@github.com:limoncello-php-dist/validation.git'
 )
