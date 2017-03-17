@@ -21,7 +21,7 @@ use Limoncello\Container\Exceptions\NotFoundException;
 use Limoncello\Contracts\Container\ContainerInterface;
 
 /**
- * @package Limoncello\ContainerLight
+ * @package Limoncello\Container
  */
 class Container extends \Pimple\Container implements ContainerInterface
 {

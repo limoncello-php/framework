@@ -19,7 +19,7 @@
 use Limoncello\Container\Container;
 
 /**
- * @package Limoncello\Tests\ContainerLight
+ * @package Limoncello\Tests\Container
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
