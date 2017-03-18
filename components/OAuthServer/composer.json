@@ -35,14 +35,19 @@
         }
     },
     "scripts": {
-        "test": ["@test-unit", "@test-cs", "@test-md"],
-        "test-unit": "./vendor/bin/phpunit --coverage-text",
+        "test": ["@test-unit-with-coverage", "@test-cs", "@test-md"],
+        "test-unit": "./vendor/bin/phpunit",
+        "test-unit-with-coverage": "phpdbg -qrr ./vendor/bin/phpunit --coverage-text",
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
-        "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming"
+        "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
+        "test-unit-php-7-1": "docker-compose run --rm cli_7_1_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-0": "docker-compose run --rm cli_7_0_php php ./vendor/bin/phpunit",
+        "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php    ./vendor/bin/phpunit"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.5.x-dev"
+            "dev-master": "0.5.x-dev",
+            "dev-develop": "0.6.x-dev"
         }
     }
 }

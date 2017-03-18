@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/framework",
     "description": "PHP framework framework (PSR-7)",
-    "keywords": ["framework", "PSR-7", "PSR7"],
+    "keywords": ["framework", "PSR-7", "PSR7", "limoncello"],
     "homepage": "https://github.com/limoncello-php/framework",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"
@@ -14,25 +14,86 @@
         }
     ],
     "require": {
-        "php": ">=5.6.0",
-        "limoncello-php/core": "^0.4.0",
-        "limoncello-php/app-cache": "^0.1.2",
-        "limoncello-php/container-light": "^0.1.1",
-        "limoncello-php/crypt": "^0.1.0",
-        "limoncello-php/validation": "^0.2.0"
+        "php": ">=7.0.0",
+        "limoncello-php/app-cache": "^0.5.0",
+        "limoncello-php/auth": "^0.5.0",
+        "limoncello-php/container": "^0.5.0",
+        "limoncello-php/contracts": "^0.5.0",
+        "limoncello-php/core": "^0.5.0",
+        "limoncello-php/crypt": "^0.5.0",
+        "limoncello-php/flute": "^0.5.0",
+        "limoncello-php/l10n": "^0.5.0",
+        "limoncello-php/oauth-server": "^0.5.0",
+        "limoncello-php/passport": "^0.5.0",
+        "limoncello-php/templates": "^0.5.0",
+        "limoncello-php/validation": "^0.5.0"
     },
     "scripts": {
-        "test": [
-            "@test-Contracts",
-            "@test-OAuthServer"
+        "test": "@test-unit",
+        "test-unit": [
+            "@test-unit-component-AppCache",
+            "@test-unit-component-Auth",
+            "@test-unit-component-Container",
+            "@test-unit-component-Core",
+            "@test-unit-component-Crypt",
+            "@test-unit-component-Flute",
+            "@test-unit-component-L10n",
+            "@test-unit-component-OAuthServer",
+            "@test-unit-component-Passport",
+            "@test-unit-component-Templates",
+            "@test-unit-component-Validation"
         ],
-        "test-Contracts": [
-            "@composer update --working-dir=components/Contracts/ --optimize-autoloader --quiet",
-            "composer --working-dir=components/Contracts/ test"
+        "test-unit-with-coverage": [
+            "@test-unit-with-coverage-component-AppCache",
+            "@test-unit-with-coverage-component-Auth",
+            "@test-unit-with-coverage-component-Container",
+            "@test-unit-with-coverage-component-Core",
+            "@test-unit-with-coverage-component-Crypt",
+            "@test-unit-with-coverage-component-Flute",
+            "@test-unit-with-coverage-component-L10n",
+            "@test-unit-with-coverage-component-OAuthServer",
+            "@test-unit-with-coverage-component-Passport",
+            "@test-unit-with-coverage-component-Templates",
+            "@test-unit-with-coverage-component-Validation"
         ],
-        "test-OAuthServer": [
-            "@composer update --working-dir=components/OAuthServer/ --optimize-autoloader --quiet",
-            "composer --working-dir=components/OAuthServer/ test"
-        ]
+        "update-component-AppCache":    "@composer update --working-dir=./components/AppCache/ --optimize-autoloader --quiet",
+        "update-component-Auth":        "@composer update --working-dir=./components/Auth/ --optimize-autoloader --quiet",
+        "update-component-Container":   "@composer update --working-dir=./components/Container/ --optimize-autoloader --quiet",
+        "update-component-Core":        "@composer update --working-dir=./components/Core/ --optimize-autoloader --quiet",
+        "update-component-Crypt":       "@composer update --working-dir=./components/Crypt/ --optimize-autoloader --quiet",
+        "update-component-Flute":       "@composer update --working-dir=./components/Flute/ --optimize-autoloader --quiet",
+        "update-component-L10n":        "@composer update --working-dir=./components/L10n/ --optimize-autoloader --quiet",
+        "update-component-OAuthServer": "@composer update --working-dir=./components/OAuthServer/ --optimize-autoloader --quiet",
+        "update-component-Passport":    "@composer update --working-dir=./components/Passport/ --optimize-autoloader --quiet",
+        "update-component-Templates":   "@composer update --working-dir=./components/Templates/ --optimize-autoloader --quiet",
+        "update-component-Validation":  "@composer update --working-dir=./components/Validation/ --optimize-autoloader --quiet",
+        "test-unit-component-AppCache":    ["@update-component-AppCache", "@composer --working-dir=./components/AppCache/ test-unit"],
+        "test-unit-component-Auth":        ["@update-component-Auth", "@composer --working-dir=./components/Auth/ test-unit"],
+        "test-unit-component-Container":   ["@update-component-Container", "@composer --working-dir=./components/Container/ test-unit"],
+        "test-unit-component-Core":        ["@update-component-Core", "@composer --working-dir=./components/Core/ test-unit"],
+        "test-unit-component-Crypt":       ["@update-component-Crypt", "@composer --working-dir=./components/Crypt/ test-unit"],
+        "test-unit-component-Flute":       ["@update-component-Flute", "@composer --working-dir=./components/Flute/ test-unit"],
+        "test-unit-component-L10n":        ["@update-component-L10n", "@composer --working-dir=./components/L10n/ test-unit"],
+        "test-unit-component-OAuthServer": ["@update-component-OAuthServer", "@composer --working-dir=./components/OAuthServer/ test-unit"],
+        "test-unit-component-Passport":    ["@update-component-Passport", "@composer --working-dir=./components/Passport/ test-unit"],
+        "test-unit-component-Templates":   ["@update-component-Templates", "@composer --working-dir=./components/Templates/ test-unit"],
+        "test-unit-component-Validation":  ["@update-component-Validation", "@composer --working-dir=./components/Validation/ test-unit"],
+        "test-unit-with-coverage-component-AppCache":    ["@update-component-AppCache", "@composer --working-dir=./components/AppCache/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Auth":        ["@update-component-Auth", "@composer --working-dir=./components/Auth/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Container":   ["@update-component-Container", "@composer --working-dir=./components/Container/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Core":        ["@update-component-Core", "@composer --working-dir=./components/Core/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Crypt":       ["@update-component-Crypt", "@composer --working-dir=./components/Crypt/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Flute":       ["@update-component-Flute", "@composer --working-dir=./components/Flute/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-L10n":        ["@update-component-L10n", "@composer --working-dir=./components/L10n/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-OAuthServer": ["@update-component-OAuthServer", "@composer --working-dir=./components/OAuthServer/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Passport":    ["@update-component-Passport", "@composer --working-dir=./components/Passport/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Templates":   ["@update-component-Templates", "@composer --working-dir=./components/Templates/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Validation":  ["@update-component-Validation", "@composer --working-dir=./components/Validation/ test-unit-with-coverage"]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.5.x-dev",
+            "dev-develop": "0.6.x-dev"
+        }
     }
 }

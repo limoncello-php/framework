@@ -5,24 +5,16 @@
 # https://docs.docker.com/compose/compose-file/
 
 cli_7_1_php:
-  build: ./docker/7_1_cli
-  container_name: cli_7_1_php_limoncello_flute
+  build: ./../../docker/7_1_cli
+  container_name: cli_7_1_php_limoncello
   volumes:
     - .:/app
   working_dir: /app
   tty: true
 
 cli_7_0_php:
-  build: ./docker/7_0_cli
-  container_name: cli_7_0_php_limoncello_flute
-  volumes:
-    - .:/app
-  working_dir: /app
-  tty: true
-
-cli_5_6_php:
-  build: ./docker/5_6_cli
-  container_name: cli_5_6_php_limoncello_flute
+  build: ./../../docker/7_0_cli
+  container_name: cli_7_0_php_limoncello
   volumes:
     - .:/app
   working_dir: /app
@@ -30,7 +22,7 @@ cli_5_6_php:
 
 cli_hhvm:
   image: hhvm/hhvm
-  container_name: cli_hhvm_limoncello_flute
+  container_name: cli_hhvm_limoncello
   volumes:
     - .:/app
   working_dir: /app
