@@ -89,11 +89,4 @@ interface CodeIntegrationInterface extends IntegrationInterface
         AuthorizationCodeInterface $code,
         array $extraParameters = []
     ): ResponseInterface;
-
-    /**
-     * @param string $identifier
-     *
-     * @return ClientInterface|null
-     */
-    public function codeReadClient(string $identifier);
 }

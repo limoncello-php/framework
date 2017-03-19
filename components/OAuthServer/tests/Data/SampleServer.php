@@ -256,14 +256,6 @@ class SampleServer extends BaseAuthorizationServer
     /**
      * @inheritdoc
      */
-    public function codeReadClient(string $identifier)
-    {
-        return $this->getRepository()->readClient($identifier);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function codeRevokeTokens(AuthorizationCodeInterface $code)
     {
         // pretend we actually revoke all related tokens
