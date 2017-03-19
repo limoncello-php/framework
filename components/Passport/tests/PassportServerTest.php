@@ -17,6 +17,9 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\OAuthServer\Contracts\GrantTypes;
+use Limoncello\OAuthServer\Exceptions\OAuthRedirectException;
+use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\Passport\Adaptors\Generic\BasePassportServerIntegration;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
@@ -81,6 +84,24 @@ class PassportServerTest extends TestCase
         $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
         $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
         $this->assertNotEmpty($savedToken->getScopeIdentifiers());
+
+        $this->assertNotEmpty($this->getLogs());
+    }
+
+    /**
+     * Test issuing resource owner password token.
+     */
+    public function testResourceOwnerPasswordTokenInvalidCredentials()
+    {
+        $server   = $this->createPassportServer();
+        $response = $server->postCreateToken($this->createPasswordTokenRequest(
+            static::TEST_USER_NAME,
+            static::TEST_USER_PASSWORD . 'XXX' // <- invalid passwod
+        ));
+        $this->assertEquals(400, $response->getStatusCode());
+        $error = json_decode((string)$response->getBody());
+        $this->assertTrue(property_exists($error, 'error'));
+        $this->assertEquals(OAuthTokenBodyException::ERROR_INVALID_GRANT, $error->error);
 
         $this->assertNotEmpty($this->getLogs());
     }
@@ -152,6 +173,25 @@ class PassportServerTest extends TestCase
     }
 
     /**
+     * Test client grant with invalid client.
+     */
+    public function testRefreshTokenInvalidClient()
+    {
+        $noClientIdRequest = $this->createServerRequest([
+            'grant_type' => GrantTypes::REFRESH_TOKEN
+
+            // note no client_id
+        ]);
+        $response = $this->createPassportServer()->postCreateToken($noClientIdRequest);
+        $this->assertEquals(400, $response->getStatusCode());
+        $error = json_decode((string)$response->getBody());
+        $this->assertTrue(property_exists($error, 'error'));
+        $this->assertEquals(OAuthTokenBodyException::ERROR_INVALID_CLIENT, $error->error);
+
+        $this->assertNotEmpty($this->getLogs());
+    }
+
+    /**
      * Test implicit grant.
      */
     public function testImplicitGrant()
@@ -182,6 +222,79 @@ class PassportServerTest extends TestCase
     }
 
     /**
+     * Test implicit grant.
+     */
+    public function testImplicitGrantForClientWithMultipleRedirectUris()
+    {
+        $server = $this->createPassportServer();
+
+        // step 0 - add one more redirect URI to client so the server will not know which one to use (no default)
+        $connection      = $this->getConnection();
+        $scheme          = $this->getDatabaseScheme();
+        $redirectUriRepo = new RedirectUriRepository($connection, $scheme);
+        $redirectUriRepo->create(
+            $uri1 = (new RedirectUri())
+                ->setClientIdentifier(PassportServerTest::TEST_DEFAULT_CLIENT_ID)
+                ->setValue(static::TEST_CLIENT_REDIRECT_URI . 'XXX') // <- not very creative URI :smile:
+        );
+
+        // Step 1 - Ask resource owner for an approval.
+        $response = $server->getCreateAuthorization($this->createImplicitRequest());
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+
+        $this->assertNotEmpty($this->getLogs());
+    }
+
+    /**
+     * Test implicit grant with invalid redirect URI.
+     */
+    public function testImplicitGrantInvalidRedirectUri()
+    {
+        $server = $this->createPassportServer();
+
+        // Step 1 - Ask resource owner for an approval.
+        $response = $server->getCreateAuthorization($this->createImplicitRequest());
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+
+        // Step 2 - Get a token.
+        // Resource owner agreed to auth some scopes for the client and browser sends approval to server.
+        $token = (new Token())
+            ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI . 'XXX') // <- invalid redirect URI
+            ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
+            ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
+            ->setUserIdentifier(static::TEST_USER_ID)
+            ->setScopeModified();
+        $response = $server->createTokenResponse($token);
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+
+        $this->assertNotEmpty($this->getLogs());
+    }
+
+    /**
+     * Test implicit grant with invalid client.
+     */
+    public function testImplicitGrantInvalidClient()
+    {
+        $server = $this->createPassportServer();
+
+        $invalidClientId = 'XXX';
+        // Step 1 - Ask resource owner for an approval.
+        $response = $server->getCreateAuthorization($this->createImplicitRequest($invalidClientId));
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+    }
+
+    /**
      * Test code grant.
      */
     public function testCodeGrant()
@@ -202,8 +315,7 @@ class PassportServerTest extends TestCase
             ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
             ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
             ->setUserIdentifier(static::TEST_USER_ID)
-            ->setScopeModified()
-        ;
+            ->setScopeModified();
         $state    = 'some state 123';
         $response = $server->createCodeResponse($token, $state);
         $this->assertTrue($response->hasHeader('Location'));
@@ -224,7 +336,63 @@ class PassportServerTest extends TestCase
         $this->assertNotEmpty($refreshToken = $token->refresh_token);
 
         $this->assertNotEmpty($this->getLogs());
+
+        // Step 3a - Try to use the code second time
+        $response = $server->postCreateToken($this->createTokenRequest($code));
+        $error = json_decode((string)$response->getBody());
+        $this->assertTrue(property_exists($error, 'error'));
+        $this->assertEquals(OAuthTokenBodyException::ERROR_INVALID_GRANT, $error->error);
+
+        $this->assertNotEmpty($this->getLogs());
     }
+
+    /**
+     * Test code grant with invalid redirect URI.
+     */
+    public function testCodeGrantInvalidRedirectUri()
+    {
+        $server = $this->createPassportServer();
+
+        // Step 1 - ask resource owner for approval
+        $response = $server->getCreateAuthorization($this->createCodeRequest());
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+
+        // Step 2 - Get a code.
+        // Resource owner agreed to auth some scopes for the client and browser sends approval to server.
+        $token    = (new Token())
+            ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI . 'XXX') // <- invalid redirect URI
+            ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
+            ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
+            ->setUserIdentifier(static::TEST_USER_ID)
+            ->setScopeModified()
+        ;
+        $state    = 'some state 123';
+        $response = $server->createCodeResponse($token, $state);
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+
+        $this->assertNotEmpty($this->getLogs());
+    }
+
+    /**
+     * Test code grant with invalid client.
+     */
+    public function testCodeGrantInvalidClient()
+    {
+        $server = $this->createPassportServer();
+
+        $invalidClientId = 'XXX';
+        // Step 1 - ask resource owner for approval
+        $response = $server->getCreateAuthorization($this->createCodeRequest($invalidClientId));
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+   }
 
     /**
      * Test client grant.
@@ -253,6 +421,66 @@ class PassportServerTest extends TestCase
         $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
         $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
         $this->assertNotEmpty($savedToken->getScopeIdentifiers());
+
+        $this->assertNotEmpty($this->getLogs());
+    }
+
+    /**
+     * Test client grant with invalid client.
+     */
+    public function testClientGrantInvalidClient()
+    {
+        $noClientIdRequest = $this->createServerRequest([
+            'grant_type' => GrantTypes::CLIENT_CREDENTIALS
+
+            // note no client_id
+        ]);
+        $response = $this->createPassportServer()->postCreateToken($noClientIdRequest);
+        $this->assertEquals(400, $response->getStatusCode());
+        $error = json_decode((string)$response->getBody());
+        $this->assertTrue(property_exists($error, 'error'));
+        $this->assertEquals(OAuthTokenBodyException::ERROR_INVALID_CLIENT, $error->error);
+
+        $this->assertNotEmpty($this->getLogs());
+    }
+
+    /**
+     * Test invalid grant.
+     */
+    public function testInvalidResponseType()
+    {
+        $server = $this->createPassportServer();
+
+        $request = $this->createServerRequest(null, [
+            'response_type' => 'UNKNOWN_RESPONSE_TYPE',
+            'client_id'     => self::TEST_DEFAULT_CLIENT_ID,
+        ]);
+
+        // Step 1 - Ask resource owner for an approval.
+        $response = $server->getCreateAuthorization($request);
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $locationUri = new Uri($location);
+        parse_str($locationUri->getFragment(), $fragments);
+        $this->assertArrayHasKey('error', $fragments);
+        $this->assertEquals(OAuthRedirectException::ERROR_UNSUPPORTED_RESPONSE_TYPE, $fragments['error']);
+    }
+
+    /**
+     * Test client grant with invalid client.
+     */
+    public function testInvalidGrantType()
+    {
+        $noClientIdRequest = $this->createServerRequest([
+            'grant_type' => 'UNKNOWN_GRANT_TYPE',
+            'client_id'  => self::TEST_DEFAULT_CLIENT_ID,
+        ]);
+        $response = $this->createPassportServer()->postCreateToken($noClientIdRequest);
+        $this->assertEquals(400, $response->getStatusCode());
+        $error = json_decode((string)$response->getBody());
+        $this->assertTrue(property_exists($error, 'error'));
+        $this->assertEquals(OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE, $error->error);
 
         $this->assertNotEmpty($this->getLogs());
     }
@@ -361,17 +589,20 @@ class PassportServerTest extends TestCase
 
     /**
      * @param string|null $scope
+     * @param string      $clientId
+     * @param string      $clientPass
      * @param array       $headers
      *
      * @return ServerRequestInterface
      */
     private function createClientTokenRequest(
         string $scope = null,
+        string $clientId = self::TEST_DEFAULT_CLIENT_ID,
+        string $clientPass = self::TEST_DEFAULT_CLIENT_PASS,
         array $headers = []
     ) {
         $clientAuthHeader = [
-            'Authorization' => 'Basic ' .
-                base64_encode(static::TEST_DEFAULT_CLIENT_ID . ':' . static::TEST_DEFAULT_CLIENT_PASS),
+            'Authorization' => 'Basic ' . base64_encode($clientId . ':' . $clientPass),
         ];
 
         $request = $this->createServerRequest([

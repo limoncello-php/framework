@@ -21,6 +21,7 @@ use Limoncello\OAuthServer\Contracts\AuthorizationCodeInterface;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Contracts\GrantTypes;
 use Limoncello\OAuthServer\Contracts\ResponseTypes;
+use Limoncello\OAuthServer\Exceptions\OAuthCodeRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
@@ -83,42 +84,32 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
     protected function createAuthorization(array $parameters): ResponseInterface
     {
         try {
-            $client      = null;
-            $redirectUri = null;
+            list($client, $redirectUri) = $this->getValidClientAndRedirectUri(
+                $this->codeGetClientId($parameters),
+                $this->codeGetRedirectUri($parameters)
+            );
+            if ($client === null || $redirectUri === null) {
+                return $this->getIntegration()->createInvalidClientAndRedirectUriErrorResponse();
+            }
+
+            $maxStateLength = $this->getMaxStateLength();
             switch ($responseType = $this->getResponseType($parameters)) {
                 case ResponseTypes::AUTHORIZATION_CODE:
                     $this->logDebug('Handling code authorization.');
-                    list($client, $redirectUri) = $this->getValidClientAndRedirectUri(
-                        $this->codeGetClientId($parameters),
-                        $this->codeGetRedirectUri($parameters)
-                    );
-                    $response = $client === null || $redirectUri === null ?
-                        $this->getIntegration()->createInvalidClientAndRedirectUriErrorResponse() :
-                        $this->codeAskResourceOwnerForApproval(
-                            $parameters,
-                            $client,
-                            $redirectUri,
-                            $this->getMaxStateLength()
-                        );
+                    $response = $this
+                        ->codeAskResourceOwnerForApproval($parameters, $client, $redirectUri, $maxStateLength);
                     break;
                 case ResponseTypes::IMPLICIT:
                     $this->logDebug('Handling implicit authorization.');
-                    list($client, $redirectUri) = $this->getValidClientAndRedirectUri(
-                        $this->implicitGetClientId($parameters),
-                        $this->implicitGetRedirectUri($parameters)
-                    );
-                    $response = $client === null || $redirectUri === null ?
-                        $this->getIntegration()->createInvalidClientAndRedirectUriErrorResponse() :
-                        $this->implicitAskResourceOwnerForApproval(
-                            $parameters,
-                            $client,
-                            $redirectUri,
-                            $this->getMaxStateLength()
-                        );
+                    $response = $this
+                        ->implicitAskResourceOwnerForApproval($parameters, $client, $redirectUri, $maxStateLength);
                     break;
                 default:
-                    $this->logDebug('Unknown authorization.', ['response_type' => $responseType]);
-                    throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE);
+                    // @link https://tools.ietf.org/html/rfc6749#section-3.1.1 ->
+                    // @link https://tools.ietf.org/html/rfc6749#section-4.1.2.1
+                    $this->logDebug('Unsupported response type in request.', ['response_type' => $responseType]);
+                    $errorCode = OAuthCodeRedirectException::ERROR_UNSUPPORTED_RESPONSE_TYPE;
+                    throw new OAuthCodeRedirectException($errorCode, $redirectUri);
             }
         } catch (OAuthRedirectException $exception) {
             $response = $this->createRedirectErrorResponse($exception);
@@ -284,21 +275,13 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      */
     public function codeRevokeTokens(AuthorizationCodeInterface $code)
     {
-        $token = $this->codeReadAuthenticationCode($code);
+        assert($code instanceof TokenInterface);
 
-        if ($token !== null) {
-            $identifier = $token->getIdentifier();
-            $this->logDebug('Revoking token.', ['token_id' => $identifier]);
-            $this->getIntegration()->getTokenRepository()->disable($identifier);
-        }
-    }
+        /** @var TokenInterface $code */
 
-    /**
-     * @inheritdoc
-     */
-    public function codeReadClient(string $identifier)
-    {
-        return $this->getIntegration()->getClientRepository()->read($identifier);
+        $identifier = $code->getIdentifier();
+        $this->logDebug('Revoking token.', ['token_id' => $identifier]);
+        $this->getIntegration()->getTokenRepository()->disable($identifier);
     }
 
     /** @noinspection PhpTooManyParametersInspection
@@ -471,7 +454,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
             $validRedirectUri = $this->selectValidRedirectUri($client, $redirectFromQuery);
             if ($validRedirectUri === null) {
                 $this->logDebug(
-                    'Valid redirect URI is not found for client.',
+                    'Choosing valid redirect URI for client failed.',
                     ['client_id' => $clientId, 'redirect_uri_from_query' => $redirectFromQuery]
                 );
             }

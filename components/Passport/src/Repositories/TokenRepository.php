@@ -88,8 +88,6 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
         $numberOfUpdated = $query->execute();
         assert(is_int($numberOfUpdated) === true);
-
-        // TODO add error check if no actual changes made
     }
 
     /**
