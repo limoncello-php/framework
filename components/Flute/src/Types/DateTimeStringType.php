@@ -17,6 +17,7 @@
  */
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
@@ -43,7 +44,7 @@ class DateTimeStringType extends DateTimeBaseType
     {
         /** @var string|null|DateTime $value */
 
-        return $value instanceof DateTime ? $value->format($platform->getDateTimeFormatString()) : $value;
+        return $value instanceof DateTimeInterface ? $value->format($platform->getDateTimeFormatString()) : $value;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection

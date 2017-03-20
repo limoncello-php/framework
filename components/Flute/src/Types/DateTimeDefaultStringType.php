@@ -17,6 +17,7 @@
  */
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 
@@ -75,7 +76,7 @@ class DateTimeDefaultStringType extends DateTimeBaseType
      */
     private function convertDateTimeString($value, $fromFormat, $toFormat)
     {
-        $dateTime = $value instanceof DateTime ? $value : DateTime::createFromFormat($fromFormat, $value);
+        $dateTime = $value instanceof DateTimeInterface ? $value : DateTime::createFromFormat($fromFormat, $value);
 
         if ($dateTime === false) {
             throw ConversionException::conversionFailedFormat($value, $this->getName(), $fromFormat);

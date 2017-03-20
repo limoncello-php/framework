@@ -63,6 +63,8 @@ class DateTimeTypesTest extends TestCase
         $type     = Type::getType(DateTimeDefaultNativeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
 
+        $this->assertNotEmpty($type->getSQLDeclaration([], $platform));
+
         $dbDate = '2001-02-03 04:05:06';
 
         $dateTime = DateTime::createFromFormat(DateTime::ISO8601, '2001-02-03T04:05:06+00:00');
@@ -81,6 +83,9 @@ class DateTimeTypesTest extends TestCase
         // extra coverage for `null` inputs
         $this->assertNull($type->convertToPHPValue(null, $platform));
         $this->assertNull($type->convertToDatabaseValue(null, $platform));
+
+        $this->assertNull($type->convertToDatabaseValue(null, $platform));
+        $this->assertNull($type->convertToPHPValue(null, $platform));
     }
 
     /**
@@ -91,6 +96,8 @@ class DateTimeTypesTest extends TestCase
         $type     = Type::getType(DateTimeDefaultStringType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
 
+        $this->assertNotEmpty($type->getSQLDeclaration([], $platform));
+
         $jsonDate = '2001-02-03T04:05:06+0000';
         $dbDate   = '2001-02-03 04:05:06';
 
@@ -99,6 +106,9 @@ class DateTimeTypesTest extends TestCase
 
         $phpValue = $type->convertToPHPValue($dbDate, $platform);
         $this->assertEquals($jsonDate, $phpValue);
+
+        $this->assertNull($type->convertToDatabaseValue(null, $platform));
+        $this->assertNull($type->convertToPHPValue(null, $platform));
     }
 
     /**
@@ -108,6 +118,8 @@ class DateTimeTypesTest extends TestCase
     {
         $type     = Type::getType(DateTimeJsonApiNativeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
+
+        $this->assertNotEmpty($type->getSQLDeclaration([], $platform));
 
         $jsonDate = '2001-02-03T04:05:06+0000';
         $dbDate   = '2001-02-03 04:05:06';
@@ -119,6 +131,9 @@ class DateTimeTypesTest extends TestCase
         $phpValue = $type->convertToPHPValue($jsonDate, $platform);
         $this->assertEquals($dateTime, $phpValue);
         $this->assertEquals($phpValue, $type->convertToPHPValue($phpValue, $platform));
+
+        $this->assertNull($type->convertToDatabaseValue(null, $platform));
+        $this->assertNull($type->convertToPHPValue(null, $platform));
     }
 
     /**
@@ -129,6 +144,8 @@ class DateTimeTypesTest extends TestCase
         $type     = Type::getType(DateTimeJsonApiStringType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
 
+        $this->assertNotEmpty($type->getSQLDeclaration([], $platform));
+
         $jsonDate = '2001-02-03T04:05:06+0000';
         $dbDate   = '2001-02-03 04:05:06';
 
@@ -137,6 +154,9 @@ class DateTimeTypesTest extends TestCase
 
         $phpValue = $type->convertToPHPValue($jsonDate, $platform);
         $this->assertEquals($jsonDate, $phpValue);
+
+        $this->assertNull($type->convertToDatabaseValue(null, $platform));
+        $this->assertNull($type->convertToPHPValue(null, $platform));
     }
 
     /**
@@ -149,7 +169,12 @@ class DateTimeTypesTest extends TestCase
         $type     = Type::getType(DateTimeDefaultNativeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
 
+        $this->assertNotEmpty($type->getSQLDeclaration([], $platform));
+
         $type->convertToPHPValue('2001-02-03 04:05:06.XXX', $platform);
+
+        $this->assertNull($type->convertToDatabaseValue(null, $platform));
+        $this->assertNull($type->convertToPHPValue(null, $platform));
     }
 
     /**
@@ -159,6 +184,8 @@ class DateTimeTypesTest extends TestCase
     {
         $type     = Type::getType(DateJsonApiStringType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
+
+        $this->assertNotEmpty($type->getSQLDeclaration([], $platform));
 
         $jsonDate = '2001-02-03T04:05:06+0000';
         $dbDate   = '2001-02-03';
@@ -171,6 +198,9 @@ class DateTimeTypesTest extends TestCase
 
         $phpValue = $type->convertToPHPValue($jsonDate, $platform);
         $this->assertEquals($jsonDate, $phpValue);
+
+        $this->assertNull($type->convertToDatabaseValue(null, $platform));
+        $this->assertNull($type->convertToPHPValue(null, $platform));
     }
 
     /**
@@ -183,6 +213,50 @@ class DateTimeTypesTest extends TestCase
         $type     = Type::getType(DateJsonApiStringType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
 
+        $this->assertNotEmpty($type->getSQLDeclaration([], $platform));
+
         $type->convertToDatabaseValue('2001-02-03 04:05:06.XXX', $platform);
+
+        $this->assertNull($type->convertToDatabaseValue(null, $platform));
+        $this->assertNull($type->convertToPHPValue(null, $platform));
+    }
+
+    /**
+     * Test date conversions for invalid value.
+     *
+     * @expectedException \Doctrine\DBAL\Types\ConversionException
+     */
+    public function testDefaultStringConversionsInvalidValue()
+    {
+        Type::getType(DateTimeDefaultStringType::NAME)->convertToDatabaseValue(
+            '2001-02-03 04:05:06', // invalid format
+            $this->createConnection()->getDatabasePlatform()
+        );
+    }
+
+    /**
+     * Test date conversions for invalid value.
+     *
+     * @expectedException \Doctrine\DBAL\Types\ConversionException
+     */
+    public function testJsonApiNativeConversionsInvalidValue()
+    {
+        Type::getType(DateTimeJsonApiNativeType::NAME)->convertToPHPValue(
+            '2001-02-03 04:05:06', // invalid format
+            $this->createConnection()->getDatabasePlatform()
+        );
+    }
+
+    /**
+     * Test date conversions for invalid value.
+     *
+     * @expectedException \Doctrine\DBAL\Types\ConversionException
+     */
+    public function testJsonApiStringConversionsInvalidValue()
+    {
+        Type::getType(DateTimeJsonApiStringType::NAME)->convertToDatabaseValue(
+            '2001-02-03 04:05:06', // invalid format
+            $this->createConnection()->getDatabasePlatform()
+        );
     }
 }

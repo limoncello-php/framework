@@ -24,9 +24,9 @@ interface ApplicationInterface
     /**
      * @param SapiInterface $sapi
      *
-     * @return $this
+     * @return ApplicationInterface
      */
-    public function setSapi(SapiInterface $sapi);
+    public function setSapi(SapiInterface $sapi): ApplicationInterface;
 
     /**
      * @return void

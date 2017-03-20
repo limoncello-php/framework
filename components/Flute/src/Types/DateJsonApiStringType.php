@@ -17,6 +17,7 @@
  */
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 
@@ -51,7 +52,8 @@ class DateJsonApiStringType extends DateBaseType
             return null;
         }
 
-        $dateTime = $value instanceof DateTime ? $value : DateTime::createFromFormat(static::JSON_API_FORMAT, $value);
+        $dateTime = $value instanceof DateTimeInterface ?
+            $value : DateTime::createFromFormat(static::JSON_API_FORMAT, $value);
 
         if ($dateTime === false) {
             throw ConversionException::conversionFailedFormat($value, $this->getName(), static::JSON_API_FORMAT);

@@ -203,6 +203,8 @@ class Router implements RouterInterface
      * @param array  $placeholders
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function replacePlaceholders($path, array $placeholders)
     {
@@ -219,11 +221,8 @@ class Router implements RouterInterface
                     $inPlaceholderName = true;
                     break;
                 case '}':
-                    if (array_key_exists($curPlaceholder, $placeholders) === true) {
-                        $result .= $placeholders[$curPlaceholder];
-                    } else {
-                        $result .= '{' . $curPlaceholder . '}';
-                    }
+                    $result .= array_key_exists($curPlaceholder, $placeholders) === true ?
+                        $placeholders[$curPlaceholder] : '{' . $curPlaceholder . '}';
                     $inPlaceholder     = false;
                     $curPlaceholder    = null;
                     $inPlaceholderName = false;

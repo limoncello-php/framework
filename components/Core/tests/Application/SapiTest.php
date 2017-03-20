@@ -32,10 +32,11 @@ class SapiTest extends TestCase
      */
     public function testHomeIndex()
     {
+        /** @var Mockery\Mock $emitter */
         $emitter  = Mockery::mock(EmitterInterface::class);
+        /** @var Mockery\Mock $response */
         $response = Mockery::mock(ResponseInterface::class);
 
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
         $emitter->shouldReceive('emit')->once()->with($response)->andReturnUndefined();
 
         /** @var EmitterInterface $emitter */
@@ -43,5 +44,15 @@ class SapiTest extends TestCase
 
         $sapi = new Sapi($emitter);
         $sapi->handleResponse($response);
+
+        $this->assertNotNull($sapi->getCookies());
+        $this->assertNotNull($sapi->getUri());
+        $this->assertNotNull($sapi->getFiles());
+        $this->assertNotNull($sapi->getHeaders());
+        $this->assertNotNull($sapi->getMethod());
+        $this->assertNotNull($sapi->getParsedBody());
+        $this->assertNotNull($sapi->getQueryParams());
+        $this->assertNotNull($sapi->getRequestBody());
+        $this->assertNotNull($sapi->getServer());
     }
 }

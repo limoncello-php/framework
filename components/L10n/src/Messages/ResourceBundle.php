@@ -119,14 +119,13 @@ class ResourceBundle implements ResourceBundleInterface
     {
         // check all keys and values are non-empty strings
         assert(call_user_func(function () use ($properties) {
+            $result = true;
             foreach ($properties as $key => $value) {
-                if (is_string($key) === false || empty($key) === true ||
-                        is_string($value) === false || empty($value) === true
-                    ) {
-                    return false;
-                }
+                $result = $result === true &&
+                    is_string($key) === true && empty($key) === false &&
+                    is_string($value) === true && empty($value) === false;
             }
-            return true;
+            return $result;
         }) === true);
 
         $this->properties = $properties;

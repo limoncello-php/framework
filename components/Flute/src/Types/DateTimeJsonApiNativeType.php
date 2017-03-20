@@ -17,6 +17,7 @@
  */
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 
@@ -57,7 +58,7 @@ class DateTimeJsonApiNativeType extends DateTimeBaseType
     {
         /** @var string|null|DateTime $value */
 
-        if ($value === null || $value instanceof DateTime) {
+        if ($value === null || $value instanceof DateTimeInterface) {
             return $value;
         }
 

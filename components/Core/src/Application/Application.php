@@ -78,7 +78,7 @@ abstract class Application implements ApplicationInterface
     /**
      * @inheritdoc
      */
-    public function setSapi(SapiInterface $sapi)
+    public function setSapi(SapiInterface $sapi): ApplicationInterface
     {
         $this->sapi = $sapi;
 
@@ -87,6 +87,8 @@ abstract class Application implements ApplicationInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function run()
     {
@@ -118,21 +120,14 @@ abstract class Application implements ApplicationInterface
         }
 
         $globalMiddleware = $this->getGlobalMiddleware();
-        $handler = $this->createMiddlewareChain($handler, $userContainer, $globalMiddleware, $routeMiddleware);
+        $hasMiddleware    = empty($globalMiddleware) === false || empty($routeMiddleware) === false;
 
-        if ($requestFactory === null) {
-            // if developer removed request factory and we don't have any middleware it's OK to skip Request creation
-            if (empty($globalMiddleware) === true &&
-                empty($routeMiddleware) === true &&
-                $matchCode === RouterInterface::MATCH_FOUND
-            ) {
-                $request = null;
-            } else {
-                $request = $this->createRequest($this->sapi, $userContainer, self::getDefaultRequestFactory());
-            }
-        } else {
-            $request = $this->createRequest($this->sapi, $userContainer, $requestFactory);
-        }
+        $handler = $hasMiddleware === true ?
+            $this->createMiddlewareChain($handler, $userContainer, $globalMiddleware, $routeMiddleware) : $handler;
+
+        $request = $requestFactory === null && $hasMiddleware === false && $matchCode === RouterInterface::MATCH_FOUND ?
+            null :
+            $this->createRequest($this->sapi, $userContainer, $requestFactory ?? self::getDefaultRequestFactory());
 
         // send `Request` down all middleware (global then route's then terminal handler in `Controller` and back) and
         // then send `Response` to SAPI
@@ -142,7 +137,7 @@ abstract class Application implements ApplicationInterface
     /**
      * @return callable
      */
-    public static function getDefaultRequestFactory()
+    public static function getDefaultRequestFactory(): callable
     {
         return [static::class, static::FACTORY_METHOD];
     }
@@ -152,7 +147,7 @@ abstract class Application implements ApplicationInterface
      *
      * @return ServerRequestInterface
      */
-    public static function defaultRequestFactory(SapiInterface $sapi)
+    public static function defaultRequestFactory(SapiInterface $sapi): ServerRequestInterface
     {
         return new ServerRequest(
             $sapi->getServer(),
@@ -173,10 +168,11 @@ abstract class Application implements ApplicationInterface
      *
      * @return ResponseInterface
      */
-    protected function handleRequest(Closure $handler, RequestInterface $request = null)
+    protected function handleRequest(Closure $handler, RequestInterface $request = null): ResponseInterface
     {
-        /** @var ResponseInterface $response */
         $response = call_user_func($handler, $request);
+
+        assert($response instanceof ResponseInterface);
 
         return $response;
     }
@@ -187,7 +183,7 @@ abstract class Application implements ApplicationInterface
      *
      * @return ResponseInterface
      */
-    protected function createEmptyResponse($status = 204, array $headers = [])
+    protected function createEmptyResponse($status = 204, array $headers = []): ResponseInterface
     {
         $response = new EmptyResponse($status, $headers);
 
@@ -197,7 +193,7 @@ abstract class Application implements ApplicationInterface
     /**
      * @return RouterInterface
      */
-    protected function getRouter()
+    protected function getRouter(): RouterInterface
     {
         if ($this->router === null) {
             $this->router = $this->createRouter();
@@ -210,7 +206,7 @@ abstract class Application implements ApplicationInterface
     /**
      * @return array
      */
-    protected function getRouterConfig()
+    protected function getRouterConfig(): array
     {
         return RouterConfig::DEFAULTS;
     }
@@ -241,7 +237,7 @@ abstract class Application implements ApplicationInterface
         ContainerInterface $userContainer,
         array $globalMiddleware,
         array $routeMiddleware = null
-    ) {
+    ): Closure {
         $handler = $this->createMiddlewareChainImpl($handler, $userContainer, $routeMiddleware);
         $handler = $this->createMiddlewareChainImpl($handler, $userContainer, $globalMiddleware);
 
@@ -261,14 +257,14 @@ abstract class Application implements ApplicationInterface
         array $handlerParams,
         ContainerInterface $container,
         ServerRequestInterface $request = null
-    ) {
+    ): ResponseInterface {
         return call_user_func($handler, $handlerParams, $container, $request);
     }
 
     /**
      * @return RouterInterface
      */
-    private function createRouter()
+    private function createRouter(): RouterInterface
     {
         $config = $this->getRouterConfig();
 
@@ -290,7 +286,7 @@ abstract class Application implements ApplicationInterface
         SapiInterface $sapi,
         ContainerInterface $userContainer,
         callable $requestFactory
-    ) {
+    ): ServerRequestInterface {
         $request = call_user_func($requestFactory, $sapi, $userContainer);
 
         return $request;
@@ -307,7 +303,7 @@ abstract class Application implements ApplicationInterface
         callable $handler,
         array $handlerParams,
         ContainerInterface $container
-    ) {
+    ): Closure {
         return function (ServerRequestInterface $request = null) use ($handler, $handlerParams, $container) {
             return $this->callControllerHandler($handler, $handlerParams, $container, $request);
         };
@@ -318,7 +314,7 @@ abstract class Application implements ApplicationInterface
      *
      * @return Closure
      */
-    private function createMethodNotAllowedTerminalHandler(array $allowedMethods)
+    private function createMethodNotAllowedTerminalHandler(array $allowedMethods): Closure
     {
         // 405 Method Not Allowed
         return function () use ($allowedMethods) {
@@ -329,7 +325,7 @@ abstract class Application implements ApplicationInterface
     /**
      * @return Closure
      */
-    private function createNotFoundTerminalHandler()
+    private function createNotFoundTerminalHandler(): Closure
     {
         // 404 Not Found
         return function () {
@@ -348,7 +344,7 @@ abstract class Application implements ApplicationInterface
         Closure $handler,
         ContainerInterface $userContainer,
         array $middleware = null
-    ) {
+    ): Closure {
         $start = count($middleware) - 1;
         for ($index = $start; $index >= 0; $index--) {
             $handler = $this->createMiddlewareChainLink($handler, $middleware[$index], $userContainer);
@@ -364,8 +360,11 @@ abstract class Application implements ApplicationInterface
      *
      * @return Closure
      */
-    private function createMiddlewareChainLink(Closure $next, callable $middleware, ContainerInterface $userContainer)
-    {
+    private function createMiddlewareChainLink(
+        Closure $next,
+        callable $middleware,
+        ContainerInterface $userContainer
+    ): Closure {
         return function (ServerRequestInterface $request) use ($next, $middleware, $userContainer) {
             return call_user_func($middleware, $request, $next, $userContainer);
         };
