@@ -50,6 +50,9 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /** View name */
     const VIEW_USERS = 'vw_oauth_users';
 
+    /** Field name */
+    const CLIENTS_SCOPES_FIELD_ID = 'clients_scopes_id';
+
     /**
      * @var string|null
      */
@@ -220,6 +223,14 @@ class DatabaseScheme implements DatabaseSchemeInterface
     public function getClientsScopesTable(): string
     {
         return static::TABLE_CLIENTS_SCOPES;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getClientsScopesIdentityColumn(): string
+    {
+        return static::CLIENTS_SCOPES_FIELD_ID;
     }
 
     /**

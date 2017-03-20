@@ -209,9 +209,12 @@ trait DatabaseSchemeMigrationTrait
         $manager = $connection->getSchemaManager();
 
         $table = new Table($scheme->getClientsScopesTable());
+        $table->addColumn($scheme->getClientsScopesIdentityColumn(), Type::INTEGER)
+            ->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
         $table->addColumn($scheme->getClientsScopesClientIdentityColumn(), Type::STRING)->setNotnull(true);
         $table->addColumn($scheme->getClientsScopesScopeIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->setPrimaryKey([
+        $table->setPrimaryKey([$scheme->getClientsScopesIdentityColumn()]);
+        $table->addUniqueIndex([
             $scheme->getClientsScopesClientIdentityColumn(),
             $scheme->getClientsScopesScopeIdentityColumn()
         ]);

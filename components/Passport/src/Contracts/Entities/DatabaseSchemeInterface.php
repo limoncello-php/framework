@@ -121,6 +121,11 @@ interface DatabaseSchemeInterface
     /**
      * @return string
      */
+    public function getClientsScopesIdentityColumn(): string;
+
+    /**
+     * @return string
+     */
     public function getClientsScopesTable(): string;
 
     /**
