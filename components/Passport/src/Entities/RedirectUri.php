@@ -34,7 +34,7 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     const FIELD_ID_CLIENT = Client::FIELD_ID;
 
     /** Field name */
-    const FIELD_VALUE = 'uri';
+    const FIELD_VALUE = 'value';
 
     /**
      * @var int|null
