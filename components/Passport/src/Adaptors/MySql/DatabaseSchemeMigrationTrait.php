@@ -27,8 +27,8 @@ use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait as BaseDatabaseSchem
 trait DatabaseSchemeMigrationTrait
 {
     use BaseDatabaseSchemeMigrationTrait {
-        BaseDatabaseSchemeMigrationTrait::createDatabaseScheme as baseCreateDatabaseScheme;
-        BaseDatabaseSchemeMigrationTrait::removeDatabaseScheme as baseRemoveDatabaseScheme;
+        BaseDatabaseSchemeMigrationTrait::createDatabaseScheme as createDatabaseTables;
+        BaseDatabaseSchemeMigrationTrait::removeDatabaseScheme as removeDatabaseTables;
     }
 
     /**
@@ -39,7 +39,30 @@ trait DatabaseSchemeMigrationTrait
      */
     protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
     {
-        $this->baseCreateDatabaseScheme($connection, $scheme);
+        $this->createDatabaseTables($connection, $scheme);
+        $this->createDatabaseViews($connection, $scheme);
+    }
+
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $scheme
+     *
+     * @return void
+     */
+    protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
+    {
+        $this->removeDatabaseTables($connection, $scheme);
+        $this->removeDatabaseViews($connection, $scheme);
+    }
+
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $scheme
+     *
+     * @return void
+     */
+    protected function createDatabaseViews(Connection $connection, DatabaseSchemeInterface $scheme)
+    {
         $this->createClientsView($connection, $scheme);
         $this->createTokensView($connection, $scheme);
         $this->createUsersView($connection, $scheme);
@@ -51,9 +74,8 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function removeDatabaseViews(Connection $connection, DatabaseSchemeInterface $scheme)
     {
-        $this->baseRemoveDatabaseScheme($connection, $scheme);
         $this->removeClientsView($connection, $scheme);
         $this->removeTokensView($connection, $scheme);
         $this->removeUsersView($connection, $scheme);
