@@ -25,12 +25,22 @@ use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 class ScopeRepository extends \Limoncello\Passport\Repositories\ScopeRepository
 {
     /**
+     * @var string
+     */
+    private $modelClass;
+
+    /**
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $databaseScheme
+     * @param string                  $modelClass
      */
-    public function __construct(Connection $connection, DatabaseSchemeInterface $databaseScheme)
-    {
+    public function __construct(
+        Connection $connection,
+        DatabaseSchemeInterface $databaseScheme,
+        string $modelClass = Scope::class
+    ) {
         $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+        $this->modelClass = $modelClass;
     }
 
     /**
@@ -38,7 +48,7 @@ class ScopeRepository extends \Limoncello\Passport\Repositories\ScopeRepository
      */
     protected function getClassName(): string
     {
-        return Scope::class;
+        return $this->modelClass;
     }
 
     /**

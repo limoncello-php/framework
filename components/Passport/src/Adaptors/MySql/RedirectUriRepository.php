@@ -25,12 +25,22 @@ use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 class RedirectUriRepository extends \Limoncello\Passport\Repositories\RedirectUriRepository
 {
     /**
+     * @var string
+     */
+    private $modelClass;
+
+    /**
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $databaseScheme
+     * @param string                  $modelClass
      */
-    public function __construct(Connection $connection, DatabaseSchemeInterface $databaseScheme)
-    {
+    public function __construct(
+        Connection $connection,
+        DatabaseSchemeInterface $databaseScheme,
+        string $modelClass = RedirectUri::class
+    ) {
         $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+        $this->modelClass = $modelClass;
     }
 
     /**
@@ -38,7 +48,7 @@ class RedirectUriRepository extends \Limoncello\Passport\Repositories\RedirectUr
      */
     protected function getClassName(): string
     {
-        return RedirectUri::class;
+        return $this->modelClass;
     }
 
     /**

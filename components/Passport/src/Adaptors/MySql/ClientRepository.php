@@ -25,12 +25,22 @@ use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepository
 {
     /**
+     * @var string
+     */
+    private $modelClass;
+
+    /**
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $databaseScheme
+     * @param string                  $modelClass
      */
-    public function __construct(Connection $connection, DatabaseSchemeInterface $databaseScheme)
-    {
+    public function __construct(
+        Connection $connection,
+        DatabaseSchemeInterface $databaseScheme,
+        string $modelClass = Client::class
+    ) {
         $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+        $this->modelClass = $modelClass;
     }
 
     /**
@@ -38,7 +48,7 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
      */
     protected function getClassName(): string
     {
-        return Client::class;
+        return $this->modelClass;
     }
 
     /**

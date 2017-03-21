@@ -26,12 +26,22 @@ use Limoncello\Passport\Contracts\Entities\TokenInterface;
 class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
 {
     /**
+     * @var string
+     */
+    private $modelClass;
+
+    /**
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $databaseScheme
+     * @param string                  $modelClass
      */
-    public function __construct(Connection $connection, DatabaseSchemeInterface $databaseScheme)
-    {
+    public function __construct(
+        Connection $connection,
+        DatabaseSchemeInterface $databaseScheme,
+        string $modelClass = Token::class
+    ) {
         $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+        $this->modelClass = $modelClass;
     }
 
     /**
@@ -87,12 +97,13 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
         return $token;
     }
 
+
     /**
      * @inheritdoc
      */
     protected function getClassName(): string
     {
-        return Token::class;
+        return $this->modelClass;
     }
 
     /**
