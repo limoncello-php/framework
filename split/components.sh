@@ -7,6 +7,7 @@ COMPONENTS=(
     'components/Contracts/:git@github.com:limoncello-php-dist/contracts.git'
     'components/Core/:git@github.com:limoncello-php-dist/core.git'
     'components/Crypt/:git@github.com:limoncello-php-dist/crypt.git'
+    'components/Events/:git@github.com:limoncello-php-dist/events.git'
     'components/Flute/:git@github.com:limoncello-php-dist/flute.git'
     'components/L10n/:git@github.com:limoncello-php-dist/l10n.git'
     'components/OAuthServer/:git@github.com:limoncello-php-dist/oauth-server.git'
