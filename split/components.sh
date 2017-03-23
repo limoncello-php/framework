@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+BRANCHES='master develop'
+
 COMPONENTS=(
     'components/AppCache/:git@github.com:limoncello-php-dist/app-cache.git'
     'components/Auth/:git@github.com:limoncello-php-dist/auth.git'

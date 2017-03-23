@@ -8,7 +8,7 @@ git subsplit init git@github.com:limoncello-php/framework.git
 
 for component in "${COMPONENTS[@]}"
 do
-  git subsplit publish --heads="master" "${component}"
+  git subsplit publish --heads="${BRANCHES}" "${component}"
 done
 
 rm -rf .subsplit/
