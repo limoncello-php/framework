@@ -17,11 +17,10 @@
  */
 
 use ArrayAccess;
-use Interop\Container\ContainerInterface as BaseContainerInterface;
 
 /**
  * @package Limoncello\Contracts
  */
-interface ContainerInterface extends ArrayAccess, BaseContainerInterface
+interface ContainerInterface extends ArrayAccess, \Psr\Container\ContainerInterface
 {
 }
