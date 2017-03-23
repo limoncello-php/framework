@@ -79,6 +79,11 @@ class Sapi implements SapiInterface
     private $messageBody;
 
     /**
+     * @var string
+     */
+    private $protocolVersion;
+
+    /**
      * Sapi constructor.
      *
      * @param EmitterInterface                $sapiEmitter
@@ -88,6 +93,7 @@ class Sapi implements SapiInterface
      * @param array|null                      $cookies
      * @param array|null                      $files
      * @param string|resource|StreamInterface $messageBody
+     * @param string                          $protocolVersion
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.Superglobals)
@@ -99,7 +105,8 @@ class Sapi implements SapiInterface
         array $parsedBody = null,
         array $cookies = null,
         array $files = null,
-        $messageBody = 'php://input'
+        $messageBody = 'php://input',
+        string $protocolVersion = '1.1'
     ) {
         $this->sapiEmitter = $sapiEmitter;
 
@@ -109,21 +116,22 @@ class Sapi implements SapiInterface
         };
 
         // Code below based on ServerRequestFactory::fromGlobals
-        $this->server      = ServerRequestFactory::normalizeServer($get($server, $_SERVER));
-        $this->files       = ServerRequestFactory::normalizeFiles($get($files, $_FILES));
-        $this->headers     = ServerRequestFactory::marshalHeaders($this->server);
-        $this->uri         = ServerRequestFactory::marshalUriFromServer($this->server, $this->headers);
-        $this->method      = ServerRequestFactory::get('REQUEST_METHOD', $this->server, 'GET');
-        $this->cookies     = $get($cookies, $_COOKIE);
-        $this->queryParams = $get($queryParams, $_GET);
-        $this->parsedBody  = $get($parsedBody, $_POST);
-        $this->messageBody = $messageBody;
+        $this->server          = ServerRequestFactory::normalizeServer($get($server, $_SERVER));
+        $this->files           = ServerRequestFactory::normalizeFiles($get($files, $_FILES));
+        $this->headers         = ServerRequestFactory::marshalHeaders($this->server);
+        $this->uri             = ServerRequestFactory::marshalUriFromServer($this->server, $this->headers);
+        $this->method          = ServerRequestFactory::get('REQUEST_METHOD', $this->server, 'GET');
+        $this->cookies         = $get($cookies, $_COOKIE);
+        $this->queryParams     = $get($queryParams, $_GET);
+        $this->parsedBody      = $get($parsedBody, $_POST);
+        $this->messageBody     = $messageBody;
+        $this->protocolVersion = $protocolVersion;
     }
 
     /**
      * @inheritdoc
      */
-    public function getServer()
+    public function getServer(): array
     {
         return $this->server;
     }
@@ -131,7 +139,7 @@ class Sapi implements SapiInterface
     /**
      * @inheritdoc
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         return $this->files;
     }
@@ -139,7 +147,7 @@ class Sapi implements SapiInterface
     /**
      * @inheritdoc
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -147,7 +155,7 @@ class Sapi implements SapiInterface
     /**
      * @inheritdoc
      */
-    public function getUri()
+    public function getUri(): UriInterface
     {
         return $this->uri;
     }
@@ -155,7 +163,7 @@ class Sapi implements SapiInterface
     /**
      * @inheritdoc
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -163,7 +171,7 @@ class Sapi implements SapiInterface
     /**
      * @inheritdoc
      */
-    public function getCookies()
+    public function getCookies(): array
     {
         return $this->cookies;
     }
@@ -171,7 +179,7 @@ class Sapi implements SapiInterface
     /**
      * @inheritdoc
      */
-    public function getQueryParams()
+    public function getQueryParams(): array
     {
         return $this->queryParams;
     }
@@ -190,6 +198,14 @@ class Sapi implements SapiInterface
     public function getRequestBody()
     {
         return $this->messageBody;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getProtocolVersion(): string
+    {
+        return $this->protocolVersion;
     }
 
     /**

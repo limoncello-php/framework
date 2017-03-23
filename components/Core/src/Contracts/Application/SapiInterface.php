@@ -28,7 +28,7 @@ interface SapiInterface
     /**
      * @return array
      */
-    public function getServer();
+    public function getServer(): array;
 
     /**
      * @return string|resource|StreamInterface
@@ -43,32 +43,37 @@ interface SapiInterface
     /**
      * @return array
      */
-    public function getQueryParams();
+    public function getQueryParams(): array;
 
     /**
      * @return array
      */
-    public function getCookies();
+    public function getCookies(): array;
 
     /**
      * @return array
      */
-    public function getFiles();
+    public function getFiles(): array;
 
     /**
      * @return array
      */
-    public function getHeaders();
+    public function getHeaders(): array;
 
     /**
      * @return UriInterface
      */
-    public function getUri();
+    public function getUri(): UriInterface;
 
     /**
      * @return string
      */
-    public function getMethod();
+    public function getMethod(): string;
+
+    /**
+     * @return string
+     */
+    public function getProtocolVersion(): string;
 
     /**
      * @param ResponseInterface $response

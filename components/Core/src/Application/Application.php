@@ -115,6 +115,7 @@ abstract class Application implements ApplicationInterface
                 $handler = $this->createMethodNotAllowedTerminalHandler($allowedMethods);
                 break;
             default:
+                assert($matchCode === RouterInterface::MATCH_NOT_FOUND);
                 $handler = $this->createNotFoundTerminalHandler();
                 break;
         }
@@ -127,7 +128,7 @@ abstract class Application implements ApplicationInterface
 
         $request = $requestFactory === null && $hasMiddleware === false && $matchCode === RouterInterface::MATCH_FOUND ?
             null :
-            $this->createRequest($this->sapi, $userContainer, $requestFactory ?? self::getDefaultRequestFactory());
+            $this->createRequest($this->sapi, $userContainer, $requestFactory ?? static::getDefaultRequestFactory());
 
         // send `Request` down all middleware (global then route's then terminal handler in `Controller` and back) and
         // then send `Response` to SAPI
@@ -158,7 +159,8 @@ abstract class Application implements ApplicationInterface
             $sapi->getHeaders(),
             $sapi->getCookies(),
             $sapi->getQueryParams(),
-            $sapi->getParsedBody()
+            $sapi->getParsedBody(),
+            $sapi->getProtocolVersion()
         );
     }
 
