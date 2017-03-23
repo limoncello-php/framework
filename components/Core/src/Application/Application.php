@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Application;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
  */
 
 use Closure;
-use Interop\Container\ContainerInterface;
+use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
+use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Core\Contracts\Application\ApplicationInterface;
+use Limoncello\Core\Contracts\Application\CoreSettings;
 use Limoncello\Core\Contracts\Application\SapiInterface;
-use Limoncello\Core\Contracts\Routing\RouterConfigInterface;
 use Limoncello\Core\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Routing\Router;
-use Limoncello\Core\Routing\RouterConfig;
 use LogicException;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -53,27 +54,24 @@ abstract class Application implements ApplicationInterface
     private $router;
 
     /**
-     * @return ContainerInterface
+     * @return SettingsInterface
      */
-    abstract protected function createContainer();
+    abstract protected function createSettings(): SettingsInterface;
 
     /**
-     * @return array
+     * @return LimoncelloContainerInterface
      */
-    abstract protected function getRoutesData();
+    abstract protected function createContainer(): LimoncelloContainerInterface;
 
     /**
-     * @return callable[]
-     */
-    abstract protected function getGlobalMiddleware();
-
-    /**
-     * @param SapiInterface      $sapi
-     * @param ContainerInterface $container
+     * Exception handler should not use container before actual error occurs.
+     *
+     * @param SapiInterface         $sapi
+     * @param PsrContainerInterface $container
      *
      * @return void
      */
-    abstract protected function setUpExceptionHandler(SapiInterface $sapi, ContainerInterface $container);
+    abstract protected function setUpExceptionHandler(SapiInterface $sapi, PsrContainerInterface $container);
 
     /**
      * @inheritdoc
@@ -96,20 +94,40 @@ abstract class Application implements ApplicationInterface
             throw new LogicException('SAPI not set.');
         }
 
-        $userContainer = $this->createContainer();
+        $container = $this->createContainer();
 
-        $this->setUpExceptionHandler($this->sapi, $userContainer);
+        $this->setUpExceptionHandler($this->sapi, $container);
 
-        list($matchCode, $allowedMethods, $handlerParams, $handler, $routeMiddleware, $configurators, $requestFactory) =
-            $this->getRouter()->match($this->sapi->getMethod(), $this->sapi->getUri()->getPath());
+        $settingsProvider = $this->createSettings();
+        $container->offsetSet(SettingsInterface::class, $settingsProvider);
 
-        if (empty($configurators) === false) {
-            $this->configureUserContainer($userContainer, $configurators);
+        $coreSettings = $settingsProvider->get(CoreSettings::class);
+
+        // match route from `Request` to handler, route container configurators/middleware, etc
+        assert(array_key_exists(CoreSettings::KEY_ROUTER_PARAMS, $coreSettings));
+        assert(array_key_exists(CoreSettings::KEY_ROUTES_DATA, $coreSettings));
+        $routerParams = $coreSettings[CoreSettings::KEY_ROUTER_PARAMS];
+        $routesData   = $coreSettings[CoreSettings::KEY_ROUTES_DATA];
+        list($matchCode, $allowedMethods, $handlerParams, $handler,
+            $routeMiddleware, $routeConfigurators, $requestFactory) = $this->getRouter($routerParams, $routesData)
+                ->match($this->sapi->getMethod(), $this->sapi->getUri()->getPath());
+
+        // configure container
+        assert(array_key_exists(CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $coreSettings));
+        $globalConfigurators = $coreSettings[CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
+        if (empty($globalConfigurators) === false) {
+            $this->configureContainer($container, $globalConfigurators);
+        }
+        if (empty($routeConfigurators) === false) {
+            $this->configureContainer($container, $routeConfigurators);
         }
 
+        // build pipeline for handling `Request`: global middleware -> route middleware -> handler (e.g. controller)
+
+        // select terminal handler
         switch ($matchCode) {
             case RouterInterface::MATCH_FOUND:
-                $handler = $this->createOrdinaryTerminalHandler($handler, $handlerParams, $userContainer);
+                $handler = $this->createTerminalHandler($handler, $handlerParams, $container);
                 break;
             case RouterInterface::MATCH_METHOD_NOT_ALLOWED:
                 $handler = $this->createMethodNotAllowedTerminalHandler($allowedMethods);
@@ -120,18 +138,19 @@ abstract class Application implements ApplicationInterface
                 break;
         }
 
-        $globalMiddleware = $this->getGlobalMiddleware();
+        assert(array_key_exists(CoreSettings::KEY_GLOBAL_MIDDLEWARE, $coreSettings));
+        $globalMiddleware = $coreSettings[CoreSettings::KEY_GLOBAL_MIDDLEWARE];
         $hasMiddleware    = empty($globalMiddleware) === false || empty($routeMiddleware) === false;
 
         $handler = $hasMiddleware === true ?
-            $this->createMiddlewareChain($handler, $userContainer, $globalMiddleware, $routeMiddleware) : $handler;
+            $this->addMiddlewareChain($handler, $container, $globalMiddleware, $routeMiddleware) : $handler;
 
         $request = $requestFactory === null && $hasMiddleware === false && $matchCode === RouterInterface::MATCH_FOUND ?
             null :
-            $this->createRequest($this->sapi, $userContainer, $requestFactory ?? static::getDefaultRequestFactory());
+            $this->createRequest($this->sapi, $container, $requestFactory ?? static::getDefaultRequestFactory());
 
-        // send `Request` down all middleware (global then route's then terminal handler in `Controller` and back) and
-        // then send `Response` to SAPI
+        // Execute the pipeline by sending `Request` down all middleware (global then route's then
+        // terminal handler in `Controller` and back) and then send `Response` to SAPI
         $this->sapi->handleResponse($this->handleRequest($handler, $request));
     }
 
@@ -193,33 +212,35 @@ abstract class Application implements ApplicationInterface
     }
 
     /**
+     * @param array $routerParams
+     * @param array $routesData
+     *
      * @return RouterInterface
      */
-    protected function getRouter(): RouterInterface
+    protected function getRouter(array $routerParams, array $routesData): RouterInterface
     {
         if ($this->router === null) {
-            $this->router = $this->createRouter();
-            $this->router->loadCachedRoutes($this->getRoutesData());
+            assert(array_key_exists(CoreSettings::KEY_ROUTER_PARAMS__GENERATOR, $routerParams));
+            assert(array_key_exists(CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER, $routerParams));
+            $generatorClass  = $routerParams[CoreSettings::KEY_ROUTER_PARAMS__GENERATOR];
+            $dispatcherClass = $routerParams[CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER];
+
+            $router = new Router($generatorClass, $dispatcherClass);
+            $router->loadCachedRoutes($routesData);
+
+            $this->router = $router;
         }
 
         return $this->router;
     }
 
     /**
-     * @return array
-     */
-    protected function getRouterConfig(): array
-    {
-        return RouterConfig::DEFAULTS;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     * @param callable[]         $configurators
+     * @param LimoncelloContainerInterface $container
+     * @param callable[]                   $configurators
      *
      * @return void
      */
-    protected function configureUserContainer(ContainerInterface $container, array $configurators)
+    protected function configureContainer(LimoncelloContainerInterface $container, array $configurators)
     {
         foreach ($configurators as $configurator) {
             call_user_func($configurator, $container);
@@ -227,21 +248,21 @@ abstract class Application implements ApplicationInterface
     }
 
     /**
-     * @param Closure            $handler
-     * @param ContainerInterface $userContainer
-     * @param array|null         $globalMiddleware
-     * @param array|null         $routeMiddleware
+     * @param Closure               $handler
+     * @param PsrContainerInterface $container
+     * @param array|null            $globalMiddleware
+     * @param array|null            $routeMiddleware
      *
      * @return Closure
      */
-    protected function createMiddlewareChain(
+    protected function addMiddlewareChain(
         Closure $handler,
-        ContainerInterface $userContainer,
+        PsrContainerInterface $container,
         array $globalMiddleware,
         array $routeMiddleware = null
     ): Closure {
-        $handler = $this->createMiddlewareChainImpl($handler, $userContainer, $routeMiddleware);
-        $handler = $this->createMiddlewareChainImpl($handler, $userContainer, $globalMiddleware);
+        $handler = $this->createMiddlewareChainImpl($handler, $container, $routeMiddleware);
+        $handler = $this->createMiddlewareChainImpl($handler, $container, $globalMiddleware);
 
         return $handler;
     }
@@ -249,65 +270,53 @@ abstract class Application implements ApplicationInterface
     /**
      * @param callable                    $handler
      * @param array                       $handlerParams
-     * @param ContainerInterface          $container
+     * @param PsrContainerInterface       $container
      * @param ServerRequestInterface|null $request
      *
      * @return ResponseInterface
      */
-    protected function callControllerHandler(
+    protected function callHandler(
         callable $handler,
         array $handlerParams,
-        ContainerInterface $container,
+        PsrContainerInterface $container,
         ServerRequestInterface $request = null
     ): ResponseInterface {
-        return call_user_func($handler, $handlerParams, $container, $request);
+        $response = call_user_func($handler, $handlerParams, $container, $request);
+
+        return $response;
     }
 
     /**
-     * @return RouterInterface
-     */
-    private function createRouter(): RouterInterface
-    {
-        $config = $this->getRouterConfig();
-
-        $generatorClass  = $config[RouterConfigInterface::KEY_GENERATOR];
-        $dispatcherClass = $config[RouterConfigInterface::KEY_DISPATCHER];
-        $router          = new Router($generatorClass, $dispatcherClass);
-
-        return $router;
-    }
-
-    /**
-     * @param SapiInterface      $sapi
-     * @param ContainerInterface $userContainer
-     * @param callable           $requestFactory
+     * @param SapiInterface         $sapi
+     * @param PsrContainerInterface $container
+     * @param callable              $requestFactory
      *
      * @return ServerRequestInterface
      */
     private function createRequest(
         SapiInterface $sapi,
-        ContainerInterface $userContainer,
+        PsrContainerInterface $container,
         callable $requestFactory
     ): ServerRequestInterface {
-        $request = call_user_func($requestFactory, $sapi, $userContainer);
+        $request = call_user_func($requestFactory, $sapi, $container);
 
         return $request;
     }
 
     /**
-     * @param callable           $handler
-     * @param array              $handlerParams
-     * @param ContainerInterface $container
+     * @param callable              $handler
+     * @param array                 $handlerParams
+     * @param PsrContainerInterface $container
      *
      * @return Closure
      */
-    private function createOrdinaryTerminalHandler(
+    private function createTerminalHandler(
         callable $handler,
         array $handlerParams,
-        ContainerInterface $container
+        PsrContainerInterface $container
     ): Closure {
         return function (ServerRequestInterface $request = null) use ($handler, $handlerParams, $container) {
-            return $this->callControllerHandler($handler, $handlerParams, $container, $request);
+            return $this->callHandler($handler, $handlerParams, $container, $request);
         };
     }
 
@@ -336,39 +345,39 @@ abstract class Application implements ApplicationInterface
     }
 
     /**
-     * @param Closure            $handler
-     * @param ContainerInterface $userContainer
-     * @param array|null         $middleware
+     * @param Closure               $handler
+     * @param PsrContainerInterface $container
+     * @param array|null            $middleware
      *
      * @return Closure
      */
     private function createMiddlewareChainImpl(
         Closure $handler,
-        ContainerInterface $userContainer,
+        PsrContainerInterface $container,
         array $middleware = null
     ): Closure {
         $start = count($middleware) - 1;
         for ($index = $start; $index >= 0; $index--) {
-            $handler = $this->createMiddlewareChainLink($handler, $middleware[$index], $userContainer);
+            $handler = $this->createMiddlewareChainLink($handler, $middleware[$index], $container);
         }
 
         return $handler;
     }
 
     /**
-     * @param Closure            $next
-     * @param callable           $middleware
-     * @param ContainerInterface $userContainer
+     * @param Closure               $next
+     * @param callable              $middleware
+     * @param PsrContainerInterface $container
      *
      * @return Closure
      */
     private function createMiddlewareChainLink(
         Closure $next,
         callable $middleware,
-        ContainerInterface $userContainer
+        PsrContainerInterface $container
     ): Closure {
-        return function (ServerRequestInterface $request) use ($next, $middleware, $userContainer) {
-            return call_user_func($middleware, $request, $next, $userContainer);
+        return function (ServerRequestInterface $request) use ($next, $middleware, $container) {
+            return call_user_func($middleware, $request, $next, $container);
         };
     }
 }

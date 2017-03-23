@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Contracts\Routing;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,12 +54,12 @@ interface GroupInterface
     /**
      * @return callable[]
      */
-    public function getMiddleware();
+    public function getMiddleware(): array;
 
     /**
      * @return callable[]
      */
-    public function getContainerConfigurators();
+    public function getContainerConfigurators(): array;
 
     /**
      * @return callable|null
@@ -69,7 +69,7 @@ interface GroupInterface
     /**
      * @return Iterator
      */
-    public function getRoutes();
+    public function getRoutes(): Iterator;
 
     /**
      * @param string  $prefix
@@ -84,16 +84,16 @@ interface GroupInterface
      * @param Closure        $closure
      * @param GroupInterface $group
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function addGroup(Closure $closure, GroupInterface $group);
+    public function addGroup(Closure $closure, GroupInterface $group): GroupInterface;
 
     /**
      * @param RouteInterface $route
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function addRoute(RouteInterface $route);
+    public function addRoute(RouteInterface $route): GroupInterface;
 
     /**
      * @param string   $method
@@ -101,57 +101,57 @@ interface GroupInterface
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function method($method, $uriPath, callable $handler, array $parameters = []);
+    public function method($method, $uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function get($uriPath, callable $handler, array $parameters = []);
+    public function get($uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function post($uriPath, callable $handler, array $parameters = []);
+    public function post($uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function put($uriPath, callable $handler, array $parameters = []);
+    public function put($uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function patch($uriPath, callable $handler, array $parameters = []);
+    public function patch($uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function delete($uriPath, callable $handler, array $parameters = []);
+    public function delete($uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @return bool
      */
-    public function hasTrailSlash();
+    public function hasTrailSlash(): bool;
 }

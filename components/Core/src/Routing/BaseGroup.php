@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Routing;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Closure;
+use Iterator;
 use Limoncello\Core\Contracts\Routing\GroupInterface;
 use Limoncello\Core\Contracts\Routing\RouteInterface;
 use Limoncello\Core\Routing\Traits\CallableTrait;
@@ -145,7 +146,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function getMiddleware()
+    public function getMiddleware(): array
     {
         $result = array_merge($this->getParentMiddleware(), $this->middleware);
 
@@ -155,7 +156,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function getContainerConfigurators()
+    public function getContainerConfigurators(): array
     {
         $result = array_merge($this->getParentConfigurators(), $this->configurators);
 
@@ -180,7 +181,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function getRoutes()
+    public function getRoutes(): Iterator
     {
         foreach ($this->items as $routeOrGroup) {
             if ($routeOrGroup instanceof RouteInterface) {
@@ -218,7 +219,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function addGroup(Closure $closure, GroupInterface $group)
+    public function addGroup(Closure $closure, GroupInterface $group): GroupInterface
     {
         $closure($group);
 
@@ -230,7 +231,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function addRoute(RouteInterface $route)
+    public function addRoute(RouteInterface $route): GroupInterface
     {
         $this->items[] = $route;
 
@@ -240,7 +241,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function method($method, $uriPath, callable $handler, array $parameters = [])
+    public function method($method, $uriPath, callable $handler, array $parameters = []): GroupInterface
     {
         list($middleware, $configurators, $requestFactory, $useGroupFactory, $name) =
             $this->normalizeRouteParameters($parameters);
@@ -261,7 +262,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function get($uriPath, callable $handler, array $parameters = [])
+    public function get($uriPath, callable $handler, array $parameters = []): GroupInterface
     {
         return $this->method('GET', $uriPath, $handler, $parameters);
     }
@@ -269,7 +270,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function post($uriPath, callable $handler, array $parameters = [])
+    public function post($uriPath, callable $handler, array $parameters = []): GroupInterface
     {
         return $this->method('POST', $uriPath, $handler, $parameters);
     }
@@ -277,7 +278,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function put($uriPath, callable $handler, array $parameters = [])
+    public function put($uriPath, callable $handler, array $parameters = []): GroupInterface
     {
         return $this->method('PUT', $uriPath, $handler, $parameters);
     }
@@ -285,7 +286,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function patch($uriPath, callable $handler, array $parameters = [])
+    public function patch($uriPath, callable $handler, array $parameters = []): GroupInterface
     {
         return $this->method('PATCH', $uriPath, $handler, $parameters);
     }
@@ -293,7 +294,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function delete($uriPath, callable $handler, array $parameters = [])
+    public function delete($uriPath, callable $handler, array $parameters = []): GroupInterface
     {
         return $this->method('DELETE', $uriPath, $handler, $parameters);
     }
@@ -301,7 +302,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function hasTrailSlash()
+    public function hasTrailSlash(): bool
     {
         return $this->trailSlashes;
     }

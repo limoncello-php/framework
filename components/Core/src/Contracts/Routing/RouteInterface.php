@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Contracts\Routing;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,17 +39,17 @@ interface RouteInterface
     /**
      * @return GroupInterface
      */
-    public function getGroup();
+    public function getGroup(): GroupInterface;
 
     /**
      * @return string
      */
-    public function getMethod();
+    public function getMethod(): string;
 
     /**
      * @return string
      */
-    public function getUriPath();
+    public function getUriPath(): string;
 
     /**
      * @return null|string
@@ -59,20 +59,20 @@ interface RouteInterface
     /**
      * @return callable[]
      */
-    public function getMiddleware();
+    public function getMiddleware(): array;
 
     /**
      * @return callable
      */
-    public function getHandler();
+    public function getHandler(): callable;
 
     /**
      * @return callable[]
      */
-    public function getContainerConfigurators();
+    public function getContainerConfigurators(): array;
 
     /**
-     * @return callable
+     * @return callable|null
      */
     public function getRequestFactory();
 }

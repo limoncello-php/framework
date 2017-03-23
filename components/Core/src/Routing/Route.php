@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Routing;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getGroup()
+    public function getGroup(): GroupInterface
     {
         return $this->group;
     }
@@ -112,7 +112,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -120,7 +120,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getUriPath()
+    public function getUriPath(): string
     {
         $uriPath = $this->concatUri($this->getGroup()->getUriPrefix(), $this->uriPath);
 
@@ -130,7 +130,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getMiddleware()
+    public function getMiddleware(): array
     {
         return array_merge($this->getGroup()->getMiddleware(), $this->middleware);
     }
@@ -138,7 +138,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getHandler()
+    public function getHandler(): callable
     {
         return $this->handler;
     }
@@ -146,7 +146,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getContainerConfigurators()
+    public function getContainerConfigurators(): array
     {
         return array_merge($this->getGroup()->getContainerConfigurators(), $this->configurators);
     }
@@ -166,7 +166,7 @@ class Route implements RouteInterface
     /**
      * @return bool
      */
-    public function isUseGroupRequestFactory()
+    public function isUseGroupRequestFactory(): bool
     {
         return $this->isGroupRequestFactory;
     }
@@ -174,9 +174,9 @@ class Route implements RouteInterface
     /**
      * @param bool $isGroupFactory
      *
-     * @return $this
+     * @return Route
      */
-    public function setUseGroupRequestFactory($isGroupFactory)
+    public function setUseGroupRequestFactory($isGroupFactory): Route
     {
         $this->isGroupRequestFactory = $isGroupFactory;
 

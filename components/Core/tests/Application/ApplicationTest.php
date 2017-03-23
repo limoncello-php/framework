@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Core\Application;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@
 
 use Closure;
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
-use Interop\Container\ContainerInterface;
+use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
+use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Core\Application\Application;
 use Limoncello\Core\Application\Sapi;
+use Limoncello\Core\Contracts\Application\CoreSettings;
 use Limoncello\Core\Contracts\Application\SapiInterface;
 use Limoncello\Core\Contracts\Routing\GroupInterface;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
@@ -28,6 +30,8 @@ use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;
 use Limoncello\Tests\Core\TestCase;
 use Mockery;
+use Mockery\Mock;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
@@ -46,7 +50,12 @@ class ApplicationTest extends TestCase
     /**
      * @var bool
      */
-    private static $isConfiguratorCalled;
+    private static $isRouteConfiguratorCalled;
+
+    /**
+     * @var bool
+     */
+    private static $isGlobalConfiguratorCalled;
 
     /**
      * @var bool
@@ -75,11 +84,12 @@ class ApplicationTest extends TestCase
     {
         parent::setUp();
 
-        self::$isConfiguratorCalled      = false;
-        self::$isGlobalMiddleware1Called = false;
-        self::$isGlobalMiddleware2Called = false;
-        self::$isRouteMiddlewareCalled   = false;
-        self::$isRequestFactoryCalled    = false;
+        self::$isGlobalConfiguratorCalled = false;
+        self::$isRouteConfiguratorCalled  = false;
+        self::$isGlobalMiddleware1Called  = false;
+        self::$isGlobalMiddleware2Called  = false;
+        self::$isRouteMiddlewareCalled    = false;
+        self::$isRequestFactoryCalled     = false;
     }
 
     /**
@@ -97,7 +107,8 @@ class ApplicationTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('home index', $this->getText($response->getBody()));
 
-        $this->assertFalse(self::$isConfiguratorCalled);
+        $this->assertTrue(self::$isGlobalConfiguratorCalled);
+        $this->assertFalse(self::$isRouteConfiguratorCalled);
         $this->assertTrue(self::$isGlobalMiddleware1Called);
         $this->assertFalse(self::$isRouteMiddlewareCalled);
         $this->assertFalse(self::$isRequestFactoryCalled);
@@ -118,7 +129,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('post create', $this->getText($response->getBody()));
 
-        $this->assertTrue(self::$isConfiguratorCalled);
+        $this->assertTrue(self::$isRouteConfiguratorCalled);
         $this->assertTrue(self::$isGlobalMiddleware1Called);
         $this->assertTrue(self::$isRouteMiddlewareCalled);
         $this->assertTrue(self::$isRequestFactoryCalled);
@@ -139,7 +150,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals(0, $response->getBody()->getSize());
 
-        $this->assertFalse(self::$isConfiguratorCalled);
+        $this->assertFalse(self::$isRouteConfiguratorCalled);
         $this->assertTrue(self::$isGlobalMiddleware1Called);
         $this->assertFalse(self::$isRouteMiddlewareCalled);
         $this->assertFalse(self::$isRequestFactoryCalled);
@@ -161,7 +172,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals(0, $response->getBody()->getSize());
         $this->assertEquals(['GET'], $response->getHeader('Accept'));
 
-        $this->assertFalse(self::$isConfiguratorCalled);
+        $this->assertFalse(self::$isRouteConfiguratorCalled);
         $this->assertTrue(self::$isGlobalMiddleware1Called);
         $this->assertFalse(self::$isRouteMiddlewareCalled);
         $this->assertFalse(self::$isRequestFactoryCalled);
@@ -196,7 +207,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('home index', $this->getText($response->getBody()));
 
-        $this->assertTrue(self::$isConfiguratorCalled);
+        $this->assertTrue(self::$isRouteConfiguratorCalled);
         $this->assertFalse(self::$isGlobalMiddleware1Called);
         $this->assertFalse(self::$isRouteMiddlewareCalled);
         $this->assertFalse(self::$isRequestFactoryCalled);
@@ -216,7 +227,21 @@ class ApplicationTest extends TestCase
         array $routesData,
         array $globalMiddleware = [[self::class, 'globalMiddlewareItem1'], [self::class, 'globalMiddlewareItem2']]
     ) {
-        $container = Mockery::mock(ContainerInterface::class);
+        /** @var Mock $settings */
+        $settings = Mockery::mock(SettingsInterface::class);
+        $settings->shouldReceive('get')->once()->with(CoreSettings::class)->andReturn([
+            CoreSettings::KEY_ROUTER_PARAMS                  => [
+                CoreSettings::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
+                CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER => GroupCountBasedDispatcher::class,
+            ],
+            CoreSettings::KEY_ROUTES_DATA                    => $routesData,
+            CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS => [[self::class, 'createGlobalConfigurator']],
+            CoreSettings::KEY_GLOBAL_MIDDLEWARE              => $globalMiddleware,
+        ]);
+
+        /** @var Mock $container */
+        $container = Mockery::mock(LimoncelloContainerInterface::class);
+        $container->shouldReceive('offsetSet')->once()->with(SettingsInterface::class, $settings)->andReturnUndefined();
 
         $server['REQUEST_URI']    = $uri;
         $server['REQUEST_METHOD'] = $method;
@@ -232,9 +257,8 @@ class ApplicationTest extends TestCase
 
         $app = Mockery::mock(Application::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $app->shouldReceive('getRoutesData')->zeroOrMoreTimes()->withNoArgs()->andReturn($routesData);
+        $app->shouldReceive('createSettings')->once()->withAnyArgs()->andReturn($settings);
         $app->shouldReceive('createContainer')->zeroOrMoreTimes()->withNoArgs()->andReturn($container);
-        $app->shouldReceive('getGlobalMiddleware')->zeroOrMoreTimes()->withNoArgs()->andReturn($globalMiddleware);
         $app->shouldReceive('setUpExceptionHandler')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
 
         /** @var Application $app */
@@ -296,14 +320,14 @@ class ApplicationTest extends TestCase
     /**
      * @param ServerRequestInterface $request
      * @param Closure                $next
-     * @param ContainerInterface     $container
+     * @param PsrContainerInterface  $container
      *
      * @return ResponseInterface
      */
     public static function globalMiddlewareItem1(
         ServerRequestInterface $request,
         Closure $next,
-        ContainerInterface $container
+        PsrContainerInterface $container
     ) {
         self::assertFalse(self::$isGlobalMiddleware1Called);
         self::assertFalse(self::$isGlobalMiddleware2Called);
@@ -335,14 +359,14 @@ class ApplicationTest extends TestCase
     /**
      * @param ServerRequestInterface $request
      * @param Closure                $next
-     * @param ContainerInterface     $container
+     * @param PsrContainerInterface  $container
      *
      * @return ResponseInterface
      */
     public static function createPostMiddleware(
         ServerRequestInterface $request,
         Closure $next,
-        ContainerInterface $container
+        PsrContainerInterface $container
     ) {
 
         $container ?: null;
@@ -356,28 +380,43 @@ class ApplicationTest extends TestCase
     /**
      * Container configurator.
      *
-     * @param ContainerInterface $container
+     * @param LimoncelloContainerInterface $container
      *
      * @return void
      */
-    public static function createPostConfigurator(ContainerInterface $container)
+    public static function createGlobalConfigurator(LimoncelloContainerInterface $container)
     {
         // dummy for tests
         $container ?: null;
 
-        self::$isConfiguratorCalled = true;
+        self::$isGlobalConfiguratorCalled = true;
+    }
+
+    /**
+     * Container configurator.
+     *
+     * @param LimoncelloContainerInterface $container
+     *
+     * @return void
+     */
+    public static function createPostConfigurator(LimoncelloContainerInterface $container)
+    {
+        // dummy for tests
+        $container ?: null;
+
+        self::$isRouteConfiguratorCalled = true;
     }
 
     /**
      * @param array                       $params
-     * @param ContainerInterface          $container
+     * @param PsrContainerInterface       $container
      * @param ServerRequestInterface|null $request
      *
      * @return ResponseInterface
      */
     public static function homeIndex(
         array $params,
-        ContainerInterface $container,
+        PsrContainerInterface $container,
         ServerRequestInterface $request = null
     ) {
         // dummy for tests
@@ -398,14 +437,14 @@ class ApplicationTest extends TestCase
 
     /**
      * @param array                       $params
-     * @param ContainerInterface          $container
+     * @param PsrContainerInterface       $container
      * @param ServerRequestInterface|null $request
      *
      * @return ResponseInterface
      */
     public static function homeIndexNoRequest(
         array $params,
-        ContainerInterface $container,
+        PsrContainerInterface $container,
         ServerRequestInterface $request = null
     ) {
         // we didn't specified any middleware and request factory was set to null thus request should be null

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Routing;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,9 @@ class Router implements RouterInterface
      */
     public function __construct($generatorClass, $dispatcherClass)
     {
+        assert(class_exists($generatorClass) === true);
+        assert(class_exists($dispatcherClass) === true);
+
         $this->generatorClass  = $generatorClass;
         $this->dispatcherClass = $dispatcherClass;
     }
@@ -63,7 +66,7 @@ class Router implements RouterInterface
     /**
      * @inheritdoc
      */
-    public function getCachedRoutes(GroupInterface $group)
+    public function getCachedRoutes(GroupInterface $group): array
     {
         $collector = $this->createRouteCollector();
 
@@ -107,7 +110,7 @@ class Router implements RouterInterface
     /**
      * @inheritdoc
      */
-    public function match($method, $uriPath)
+    public function match($method, $uriPath): array
     {
         $this->checkRoutesLoaded();
 
@@ -157,7 +160,7 @@ class Router implements RouterInterface
         $routeName,
         array $placeholders = [],
         array $queryParams = []
-    ) {
+    ): string {
         $prefix = $this->getServerUriPrefix($request);
         $path   = $this->getUriPath($routeName);
         $path   = $this->replacePlaceholders($path, $placeholders);

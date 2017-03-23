@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Contracts\Routing;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ interface RouterInterface
      *
      * @return array
      */
-    public function getCachedRoutes(GroupInterface $group);
+    public function getCachedRoutes(GroupInterface $group): array;
 
     /**
      * @param array $cachedRoutes
@@ -55,7 +55,7 @@ interface RouterInterface
      * @return array Array contains matching result code, allowed methods list, handler parameters list, handler,
      *               middleware list, container configurators list, custom request factory.
      */
-    public function match($method, $uriPath);
+    public function match($method, $uriPath): array;
 
     /**
      * Get URI path for named route.
@@ -74,12 +74,12 @@ interface RouterInterface
      * @param array                  $placeholders
      * @param array                  $queryParams
      *
-     * @return mixed
+     * @return string
      */
     public function get(
         ServerRequestInterface $request,
         $routeName,
         array $placeholders = [],
         array $queryParams = []
-    );
+    ): string;
 }
