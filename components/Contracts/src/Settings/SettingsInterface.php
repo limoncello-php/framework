@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Core\Contracts\Config;
+<?php namespace Limoncello\Contracts\Settings;
 
 /**
  * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
@@ -19,17 +19,12 @@
 /**
  * @package Limoncello\Core
  */
-interface ConfigInterface
+interface SettingsInterface
 {
     /**
-     * @return string[]
-     */
-    public function getConfigInterfaces();
-
-    /**
-     * @param string $interfaceClass
+     * @param string $className
      *
      * @return array
      */
-    public function getConfig($interfaceClass);
+    public function get(string $className): array;
 }
