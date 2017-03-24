@@ -17,14 +17,16 @@
  */
 
 /**
- * Provides individual settings for a component.
+ * Provides settings for a component by its class name.
  *
  * @package Limoncello\Core
  */
-interface SettingsInterface
+interface SettingsProviderInterface
 {
     /**
+     * @param string $className
+     *
      * @return array
      */
-    public static function get(): array;
+    public function get(string $className): array;
 }
