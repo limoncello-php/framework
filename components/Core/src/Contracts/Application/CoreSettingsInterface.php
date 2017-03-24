@@ -40,19 +40,4 @@ interface CoreSettingsInterface extends SettingsInterface
 
     /** Settings key for routing data */
     const KEY_GLOBAL_MIDDLEWARE = self::KEY_GLOBAL_CONTAINER_CONFIGURATORS + 1;
-
-    /**
-     * @return array
-     */
-    public static function getRoutesData(): array;
-
-    /**
-     * @return array
-     */
-    public static function getGlobalContainerConfigurators(): array;
-
-    /**
-     * @return array
-     */
-    public static function getGlobalMiddleware(): array;
 }

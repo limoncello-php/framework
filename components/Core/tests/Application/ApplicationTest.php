@@ -228,38 +228,17 @@ class ApplicationTest extends TestCase
         array $routesData,
         array $globalMiddleware = [[self::class, 'globalMiddlewareItem1'], [self::class, 'globalMiddlewareItem2']]
     ) {
-        $coreSettings = new class extends CoreSettings {
-            public static $routesData;
-            public static $globalConfigurators;
-            public static $globalMiddleware;
-
-            /** @inheritdoc */
-            public static function getRoutesData(): array
-            {
-                return static::$routesData;
-            }
-
-            /** @inheritdoc */
-            public static function getGlobalContainerConfigurators(): array
-            {
-                return static::$globalConfigurators;
-            }
-
-            /** @inheritdoc */
-            public static function getGlobalMiddleware(): array
-            {
-                return static::$globalMiddleware;
-            }
-        };
-        $coreSettings::$routesData          = $routesData;
-        $coreSettings::$globalConfigurators = [[self::class, 'createGlobalConfigurator']];
-        $coreSettings::$globalMiddleware    = $globalMiddleware;
-
-        /** @var CoreSettings $coreSettings */
+        $coreSettings = (new CoreSettings())
+            ->setRouterParameters([
+                CoreSettings::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
+                CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER => GroupCountBasedDispatcher::class,
+            ])->setRoutesData($routesData)
+            ->setGlobalConfigurators([[self::class, 'createGlobalConfigurator']])
+            ->setGlobalMiddleware($globalMiddleware);
 
         /** @var Mock $settings */
         $settings = Mockery::mock(SettingsProviderInterface::class);
-        $settings->shouldReceive('get')->once()->with(CoreSettingsInterface::class)->andReturn($coreSettings::get());
+        $settings->shouldReceive('get')->once()->with(CoreSettingsInterface::class)->andReturn($coreSettings->get());
 
         /** @var Mock $container */
         $container = Mockery::mock(LimoncelloContainerInterface::class);
