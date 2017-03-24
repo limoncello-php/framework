@@ -26,5 +26,5 @@ interface SettingsInterface
     /**
      * @return array
      */
-    public static function get(): array;
+    public function get(): array;
 }
