@@ -18,7 +18,7 @@
 
 use Closure;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Contracts\Application\ApplicationInterface;
 use Limoncello\Core\Contracts\Application\CoreSettings;
 use Limoncello\Core\Contracts\Application\SapiInterface;
@@ -54,9 +54,9 @@ abstract class Application implements ApplicationInterface
     private $router;
 
     /**
-     * @return SettingsInterface
+     * @return SettingsProviderInterface
      */
-    abstract protected function createSettings(): SettingsInterface;
+    abstract protected function createSettingsProvider(): SettingsProviderInterface;
 
     /**
      * @return LimoncelloContainerInterface
@@ -98,8 +98,8 @@ abstract class Application implements ApplicationInterface
 
         $this->setUpExceptionHandler($this->sapi, $container);
 
-        $settingsProvider = $this->createSettings();
-        $container->offsetSet(SettingsInterface::class, $settingsProvider);
+        $settingsProvider = $this->createSettingsProvider();
+        $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
 
         $coreSettings = $settingsProvider->get(CoreSettings::class);
 
@@ -115,12 +115,7 @@ abstract class Application implements ApplicationInterface
         // configure container
         assert(array_key_exists(CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $coreSettings));
         $globalConfigurators = $coreSettings[CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
-        if (empty($globalConfigurators) === false) {
-            $this->configureContainer($container, $globalConfigurators);
-        }
-        if (empty($routeConfigurators) === false) {
-            $this->configureContainer($container, $routeConfigurators);
-        }
+        $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
 
         // build pipeline for handling `Request`: global middleware -> route middleware -> handler (e.g. controller)
 
@@ -236,14 +231,25 @@ abstract class Application implements ApplicationInterface
 
     /**
      * @param LimoncelloContainerInterface $container
-     * @param callable[]                   $configurators
+     * @param callable[]|null              $globalConfigurators
+     * @param callable[]|null              $routeConfigurators
      *
      * @return void
      */
-    protected function configureContainer(LimoncelloContainerInterface $container, array $configurators)
-    {
-        foreach ($configurators as $configurator) {
-            call_user_func($configurator, $container);
+    protected function configureContainer(
+        LimoncelloContainerInterface $container,
+        array $globalConfigurators = null,
+        array $routeConfigurators = null
+    ) {
+        if (empty($globalConfigurators) === false) {
+            foreach ($globalConfigurators as $configurator) {
+                $configurator($container);
+            }
+        }
+        if (empty($routeConfigurators) === false) {
+            foreach ($routeConfigurators as $configurator) {
+                $configurator($container);
+            }
         }
     }
 

@@ -19,7 +19,7 @@
 use Closure;
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Application;
 use Limoncello\Core\Application\Sapi;
 use Limoncello\Core\Contracts\Application\CoreSettings;
@@ -228,7 +228,7 @@ class ApplicationTest extends TestCase
         array $globalMiddleware = [[self::class, 'globalMiddlewareItem1'], [self::class, 'globalMiddlewareItem2']]
     ) {
         /** @var Mock $settings */
-        $settings = Mockery::mock(SettingsInterface::class);
+        $settings = Mockery::mock(SettingsProviderInterface::class);
         $settings->shouldReceive('get')->once()->with(CoreSettings::class)->andReturn([
             CoreSettings::KEY_ROUTER_PARAMS                  => [
                 CoreSettings::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
@@ -241,7 +241,8 @@ class ApplicationTest extends TestCase
 
         /** @var Mock $container */
         $container = Mockery::mock(LimoncelloContainerInterface::class);
-        $container->shouldReceive('offsetSet')->once()->with(SettingsInterface::class, $settings)->andReturnUndefined();
+        $container->shouldReceive('offsetSet')->once()
+            ->with(SettingsProviderInterface::class, $settings)->andReturnUndefined();
 
         $server['REQUEST_URI']    = $uri;
         $server['REQUEST_METHOD'] = $method;
@@ -257,7 +258,7 @@ class ApplicationTest extends TestCase
 
         $app = Mockery::mock(Application::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $app->shouldReceive('createSettings')->once()->withAnyArgs()->andReturn($settings);
+        $app->shouldReceive('createSettingsProvider')->once()->withAnyArgs()->andReturn($settings);
         $app->shouldReceive('createContainer')->zeroOrMoreTimes()->withNoArgs()->andReturn($container);
         $app->shouldReceive('setUpExceptionHandler')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
 
