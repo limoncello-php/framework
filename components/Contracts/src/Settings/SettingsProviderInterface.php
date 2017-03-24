@@ -26,6 +26,13 @@ interface SettingsProviderInterface
     /**
      * @param string $className
      *
+     * @return bool
+     */
+    public function has(string $className): bool;
+
+    /**
+     * @param string $className
+     *
      * @return array
      */
     public function get(string $className): array;
