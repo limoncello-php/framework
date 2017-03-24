@@ -20,7 +20,7 @@ use Closure;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Contracts\Application\ApplicationInterface;
-use Limoncello\Core\Contracts\Application\CoreSettings;
+use Limoncello\Core\Contracts\Application\CoreSettingsInterface;
 use Limoncello\Core\Contracts\Application\SapiInterface;
 use Limoncello\Core\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Routing\Router;
@@ -101,20 +101,20 @@ abstract class Application implements ApplicationInterface
         $settingsProvider = $this->createSettingsProvider();
         $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
 
-        $coreSettings = $settingsProvider->get(CoreSettings::class);
+        $coreSettings = $settingsProvider->get(CoreSettingsInterface::class);
 
         // match route from `Request` to handler, route container configurators/middleware, etc
-        assert(array_key_exists(CoreSettings::KEY_ROUTER_PARAMS, $coreSettings));
-        assert(array_key_exists(CoreSettings::KEY_ROUTES_DATA, $coreSettings));
-        $routerParams = $coreSettings[CoreSettings::KEY_ROUTER_PARAMS];
-        $routesData   = $coreSettings[CoreSettings::KEY_ROUTES_DATA];
+        assert(array_key_exists(CoreSettingsInterface::KEY_ROUTER_PARAMS, $coreSettings));
+        assert(array_key_exists(CoreSettingsInterface::KEY_ROUTES_DATA, $coreSettings));
+        $routerParams = $coreSettings[CoreSettingsInterface::KEY_ROUTER_PARAMS];
+        $routesData   = $coreSettings[CoreSettingsInterface::KEY_ROUTES_DATA];
         list($matchCode, $allowedMethods, $handlerParams, $handler,
             $routeMiddleware, $routeConfigurators, $requestFactory) = $this->getRouter($routerParams, $routesData)
                 ->match($this->sapi->getMethod(), $this->sapi->getUri()->getPath());
 
         // configure container
-        assert(array_key_exists(CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $coreSettings));
-        $globalConfigurators = $coreSettings[CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
+        assert(array_key_exists(CoreSettingsInterface::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $coreSettings));
+        $globalConfigurators = $coreSettings[CoreSettingsInterface::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
         $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
 
         // build pipeline for handling `Request`: global middleware -> route middleware -> handler (e.g. controller)
@@ -133,8 +133,8 @@ abstract class Application implements ApplicationInterface
                 break;
         }
 
-        assert(array_key_exists(CoreSettings::KEY_GLOBAL_MIDDLEWARE, $coreSettings));
-        $globalMiddleware = $coreSettings[CoreSettings::KEY_GLOBAL_MIDDLEWARE];
+        assert(array_key_exists(CoreSettingsInterface::KEY_GLOBAL_MIDDLEWARE, $coreSettings));
+        $globalMiddleware = $coreSettings[CoreSettingsInterface::KEY_GLOBAL_MIDDLEWARE];
         $hasMiddleware    = empty($globalMiddleware) === false || empty($routeMiddleware) === false;
 
         $handler = $hasMiddleware === true ?
@@ -215,10 +215,10 @@ abstract class Application implements ApplicationInterface
     protected function getRouter(array $routerParams, array $routesData): RouterInterface
     {
         if ($this->router === null) {
-            assert(array_key_exists(CoreSettings::KEY_ROUTER_PARAMS__GENERATOR, $routerParams));
-            assert(array_key_exists(CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER, $routerParams));
-            $generatorClass  = $routerParams[CoreSettings::KEY_ROUTER_PARAMS__GENERATOR];
-            $dispatcherClass = $routerParams[CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER];
+            assert(array_key_exists(CoreSettingsInterface::KEY_ROUTER_PARAMS__GENERATOR, $routerParams));
+            assert(array_key_exists(CoreSettingsInterface::KEY_ROUTER_PARAMS__DISPATCHER, $routerParams));
+            $generatorClass  = $routerParams[CoreSettingsInterface::KEY_ROUTER_PARAMS__GENERATOR];
+            $dispatcherClass = $routerParams[CoreSettingsInterface::KEY_ROUTER_PARAMS__DISPATCHER];
 
             $router = new Router($generatorClass, $dispatcherClass);
             $router->loadCachedRoutes($routesData);

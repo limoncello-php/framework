@@ -21,8 +21,9 @@ use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Application;
+use Limoncello\Core\Application\CoreSettings;
 use Limoncello\Core\Application\Sapi;
-use Limoncello\Core\Contracts\Application\CoreSettings;
+use Limoncello\Core\Contracts\Application\CoreSettingsInterface;
 use Limoncello\Core\Contracts\Application\SapiInterface;
 use Limoncello\Core\Contracts\Routing\GroupInterface;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
@@ -227,17 +228,38 @@ class ApplicationTest extends TestCase
         array $routesData,
         array $globalMiddleware = [[self::class, 'globalMiddlewareItem1'], [self::class, 'globalMiddlewareItem2']]
     ) {
+        $coreSettings = new class extends CoreSettings {
+            public static $routesData;
+            public static $globalConfigurators;
+            public static $globalMiddleware;
+
+            /** @inheritdoc */
+            public static function getRoutesData(): array
+            {
+                return static::$routesData;
+            }
+
+            /** @inheritdoc */
+            public static function getGlobalContainerConfigurators(): array
+            {
+                return static::$globalConfigurators;
+            }
+
+            /** @inheritdoc */
+            public static function getGlobalMiddleware(): array
+            {
+                return static::$globalMiddleware;
+            }
+        };
+        $coreSettings::$routesData          = $routesData;
+        $coreSettings::$globalConfigurators = [[self::class, 'createGlobalConfigurator']];
+        $coreSettings::$globalMiddleware    = $globalMiddleware;
+
+        /** @var CoreSettings $coreSettings */
+
         /** @var Mock $settings */
         $settings = Mockery::mock(SettingsProviderInterface::class);
-        $settings->shouldReceive('get')->once()->with(CoreSettings::class)->andReturn([
-            CoreSettings::KEY_ROUTER_PARAMS                  => [
-                CoreSettings::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
-                CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER => GroupCountBasedDispatcher::class,
-            ],
-            CoreSettings::KEY_ROUTES_DATA                    => $routesData,
-            CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS => [[self::class, 'createGlobalConfigurator']],
-            CoreSettings::KEY_GLOBAL_MIDDLEWARE              => $globalMiddleware,
-        ]);
+        $settings->shouldReceive('get')->once()->with(CoreSettingsInterface::class)->andReturn($coreSettings::get());
 
         /** @var Mock $container */
         $container = Mockery::mock(LimoncelloContainerInterface::class);
