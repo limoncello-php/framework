@@ -40,4 +40,7 @@ interface CoreSettingsInterface extends SettingsInterface
 
     /** Settings key for routing data */
     const KEY_GLOBAL_MIDDLEWARE = self::KEY_GLOBAL_CONTAINER_CONFIGURATORS + 1;
+
+    /** Special key which could be used by developers to safely add their own keys */
+    const KEY_LAST = self::KEY_GLOBAL_MIDDLEWARE + 1;
 }
