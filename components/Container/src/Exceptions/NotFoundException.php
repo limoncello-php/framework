@@ -16,6 +16,12 @@
  * limitations under the License.
  */
 
-class NotFoundException extends \InvalidArgumentException implements \Interop\Container\Exception\NotFoundException
+use InvalidArgumentException;
+use Psr\Container\NotFoundExceptionInterface;
+
+/**
+ * @package Limoncello\Container
+ */
+class NotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {
 }
