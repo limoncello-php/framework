@@ -19,6 +19,7 @@
         "limoncello-php/core": "dev-develop",
         "limoncello-php/container": "dev-develop",
         "limoncello-php/crypt": "dev-develop",
+        "limoncello-php/templates": "dev-develop",
 
         "limoncello-php/contracts": "dev-develop"
     },
