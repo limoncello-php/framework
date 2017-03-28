@@ -21,7 +21,7 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use PDO;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Providers\Pdo\PdoSettings as C;
+use Limoncello\Application\Providers\PDO\PdoSettings as C;
 
 /**
  * @package Limoncello\Application

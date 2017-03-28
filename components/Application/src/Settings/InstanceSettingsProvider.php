@@ -57,6 +57,8 @@ class InstanceSettingsProvider implements SettingsProviderInterface
      */
     public function has(string $className): bool
     {
+        $this->checkInstancesAreProcessed();
+
         $result = array_key_exists($className, $this->getSettingsMap());
 
         return $result;
