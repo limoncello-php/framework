@@ -15,7 +15,9 @@
     ],
     "require": {
         "php": ">=7.0.0",
+        "filp/whoops": "^2.1",
         "limoncello-php/core": "dev-develop",
+        "limoncello-php/container": "dev-develop",
 
         "limoncello-php/contracts": "dev-develop"
     },
