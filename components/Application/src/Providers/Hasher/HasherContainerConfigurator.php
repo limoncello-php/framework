@@ -33,9 +33,7 @@ class HasherContainerConfigurator implements ContainerConfiguratorInterface
     const METHOD = [self::class, self::METHOD_NAME];
 
     /**
-     * @param LimoncelloContainerInterface $container
-     *
-     * @return void
+     * @inheritdoc
      */
     public static function configure(LimoncelloContainerInterface $container)
     {

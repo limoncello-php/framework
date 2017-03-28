@@ -25,9 +25,7 @@ use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 class HasherProvider implements ProvidesSettingsInterface, ProvidesContainerConfiguratorsInterface
 {
     /**
-     * Get container configurators.
-     *
-     * @return callable[]
+     * @inheritdoc
      */
     public static function getContainerConfigurators(): array
     {
