@@ -22,6 +22,8 @@ use Limoncello\Application\CoreSettings\CoreSettings;
 use Limoncello\Application\ExceptionHandlers\DefaultHandler;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
+use Limoncello\Application\Traits\SelectClassImplementsTrait;
+use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Sapi;
 use Limoncello\Core\Contracts\Application\ExceptionHandlerInterface;
@@ -37,6 +39,8 @@ use Limoncello\Container\Container;
  */
 class Application extends \Limoncello\Core\Application\Application
 {
+    use SelectClassImplementsTrait;
+
     /**
      * @var string
      */
@@ -76,6 +80,15 @@ class Application extends \Limoncello\Core\Application\Application
         $routesPath      = $appSettings[ApplicationSettings::KEY_ROUTES_PATH];
         $containersPath  = $appSettings[ApplicationSettings::KEY_CONTAINER_CONFIGURATORS_PATH];
         $providerClasses = $appSettings[ApplicationSettings::KEY_PROVIDER_CLASSES];
+
+        // providers might have additional setting providers that also should be registered
+        foreach ($this->selectProviders($providerClasses, ProvidesSettingsInterface::class) as $providerClass) {
+            /** @var ProvidesSettingsInterface $providerClass */
+            foreach ($providerClass::getSettings() as $setting) {
+                $provider->register($setting);
+            }
+        }
+
         $coreSettings    = new CoreSettings($routesPath, $containersPath, $providerClasses);
 
         $provider->register($coreSettings);

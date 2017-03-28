@@ -22,6 +22,7 @@ use Limoncello\Application\Contracts\ContainerConfiguratorInterface;
 use Limoncello\Application\Contracts\MiddlewareInterface;
 use Limoncello\Application\Contracts\RoutesConfiguratorInterface;
 use Limoncello\Application\Traits\SelectClassesTrait;
+use Limoncello\Application\Traits\SelectClassImplementsTrait;
 use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface;
@@ -36,7 +37,7 @@ use ReflectionMethod;
  */
 class CoreSettings implements CoreSettingsInterface
 {
-    use SelectClassesTrait;
+    use SelectClassesTrait, SelectClassImplementsTrait;
 
     /**
      * @var string
@@ -118,7 +119,8 @@ class CoreSettings implements CoreSettingsInterface
             $selectClass::configureRoutes($routes);
         }
 
-        foreach ($this->selectProviders(ProvidesRouteConfiguratorsInterface::class) as $providerClass) {
+        $interfaceName = ProvidesRouteConfiguratorsInterface::class;
+        foreach ($this->selectProviders($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesRouteConfiguratorsInterface $providerClass */
             foreach ($providerClass::getRouteConfigurators() as $configurator) {
                 // TODO check route configurator is valid
@@ -145,7 +147,8 @@ class CoreSettings implements CoreSettingsInterface
             $configurators[] = $configurator;
         }
 
-        foreach ($this->selectProviders(ProvidesContainerConfiguratorsInterface::class) as $providerClass) {
+        $interfaceName = ProvidesContainerConfiguratorsInterface::class;
+        foreach ($this->selectProviders($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesContainerConfiguratorsInterface $providerClass */
             foreach ($providerClass::getContainerConfigurators() as $configurator) {
                 assert($this->isValidContainerConfigurator($configurator) === true);
@@ -154,20 +157,6 @@ class CoreSettings implements CoreSettingsInterface
         }
 
         return $configurators;
-    }
-
-    /**
-     * @param string $interfaceName
-     *
-     * @return Generator
-     */
-    protected function selectProviders(string $interfaceName): Generator
-    {
-        foreach ($this->getProviderClasses() as $providerClass) {
-            if (array_key_exists($interfaceName, class_implements($providerClass)) === true) {
-                yield $providerClass;
-            }
-        }
     }
 
     /**
