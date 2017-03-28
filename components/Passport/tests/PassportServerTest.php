@@ -347,6 +347,31 @@ class PassportServerTest extends TestCase
     }
 
     /**
+     * Test code grant.
+     */
+    public function testCodeGrantShouldReturnScopeEvenIfNotModified()
+    {
+        $server = $this->createPassportServer();
+
+        // Step 1 - ask resource owner for approval
+        $response = $server->getCreateAuthorization($this->createCodeRequest(
+            self::TEST_DEFAULT_CLIENT_ID,
+            null,
+            static::TEST_SCOPE_1 . ' ' . static::TEST_SCOPE_2
+        ));
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('Location'));
+        $location = $response->getHeader('location')[0];
+        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+        parse_str((new Uri($location))->getQuery(), $parameters);
+        $this->assertArrayHasKey('is_scope_modified', $parameters);
+        $this->assertEquals('0', $parameters['is_scope_modified']);
+        $this->assertArrayHasKey('scope', $parameters);
+
+        $this->assertNotEmpty($this->getLogs());
+    }
+
+    /**
      * Test code grant with invalid redirect URI.
      */
     public function testCodeGrantInvalidRedirectUri()

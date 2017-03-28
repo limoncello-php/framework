@@ -208,7 +208,7 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         assert($client instanceof Client);
 
         // TODO think if we can receive objects instead of individual properties
-        $scopeList = $isScopeModified === false || empty($scopeList) === true ? null : implode(' ', $scopeList);
+        $scopeList = empty($scopeList) === true ? null : implode(' ', $scopeList);
         $filtered  = array_filter([
             self::SCOPE_APPROVAL_TYPE              => $type,
             self::SCOPE_APPROVAL_CLIENT_ID         => $client->getIdentifier(),
