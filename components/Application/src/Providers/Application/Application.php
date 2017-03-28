@@ -89,7 +89,7 @@ class Application extends \Limoncello\Core\Application\Application
             }
         }
 
-        $coreSettings    = new CoreSettings($routesPath, $containersPath, $providerClasses);
+        $coreSettings = new CoreSettings($routesPath, $containersPath, $providerClasses);
 
         $provider->register($coreSettings);
 
