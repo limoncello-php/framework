@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Monolog;
+<?php namespace Limoncello\Application\Packages\Cors;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
+use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as CCI;
+use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as MI;
+use Limoncello\Contracts\Provider\ProvidesSettingsInterface as SI;
 
 /**
  * @package Limoncello\Application
  */
-class MonologFileProvider implements ProvidesContainerConfiguratorsInterface
+class CorsProvider implements SI, CCI, MI
 {
     /**
      * @inheritdoc
@@ -29,7 +31,27 @@ class MonologFileProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            MonologFileContainerConfigurator::HANDLER,
+            CorsContainerConfigurator::HANDLER,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getSettings(): array
+    {
+        return [
+            new CorsSettings(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getMiddleware(): array
+    {
+        return [
+            CorsMiddleware::HANDLER,
         ];
     }
 }

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\PDO;
+<?php namespace Limoncello\Application\Packages\PDO;
 
 /**
  * Copyright 2015-2017 info@neomerx.com

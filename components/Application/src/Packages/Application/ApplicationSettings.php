@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Cors;
+<?php namespace Limoncello\Application\Packages\Application;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,23 +17,30 @@
  */
 
 use Limoncello\Contracts\Settings\SettingsInterface;
-use Neomerx\Cors\Strategies\Settings;
 
 /**
  * @package Limoncello\Application
  */
-class CorsSettings extends Settings implements SettingsInterface
+abstract class ApplicationSettings implements SettingsInterface
 {
     /** Settings key */
-    const KEY_LAST = self::KEY_IS_CHECK_HOST + 10;
+    const KEY_APP_NAME = 0;
 
-    /**
-     * @inheritdoc
-     */
-    public function get(): array
-    {
-        $defaults = (new Settings())->getDefaultSettings();
+    /** Settings key */
+    const KEY_IS_DEBUG = self::KEY_APP_NAME + 1;
 
-        return $defaults;
-    }
+    /** Settings key */
+    const KEY_ROUTES_PATH = self::KEY_IS_DEBUG + 1;
+
+    /** Settings key */
+    const KEY_CONTAINER_CONFIGURATORS_PATH = self::KEY_ROUTES_PATH + 1;
+
+    /** Settings key */
+    const KEY_PROVIDER_CLASSES = self::KEY_CONTAINER_CONFIGURATORS_PATH + 1;
+
+    /** Settings key */
+    const KEY_EXCEPTION_DUMPER = self::KEY_PROVIDER_CLASSES + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_EXCEPTION_DUMPER + 1;
 }

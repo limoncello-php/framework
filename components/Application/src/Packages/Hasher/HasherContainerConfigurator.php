@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Cors;
+<?php namespace Limoncello\Application\Packages\Hasher;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,20 +17,17 @@
  */
 
 use Limoncello\Application\Contracts\ContainerConfiguratorInterface;
-use Limoncello\Application\Providers\Application\ApplicationSettings as A;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Neomerx\Cors\Analyzer;
-use Neomerx\Cors\Contracts\AnalyzerInterface;
-use Neomerx\Cors\Strategies\Settings;
+use Limoncello\Crypt\Contracts\HasherInterface;
+use Limoncello\Crypt\Hasher;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Providers\Cors\CorsSettings as C;
-use Psr\Log\LoggerInterface;
+use Limoncello\Application\Packages\Hasher\HasherSettings as C;
 
 /**
  * @package Limoncello\Application
  */
-class CorsContainerConfigurator implements ContainerConfiguratorInterface
+class HasherContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
     const HANDLER = [self::class, self::METHOD_NAME];
@@ -40,18 +37,11 @@ class CorsContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configure(LimoncelloContainerInterface $container)
     {
-        $container[AnalyzerInterface::class] = function (PsrContainerInterface $container) {
-            $settingsProvider = $container->get(SettingsProviderInterface::class);
-            $appSettings      = $settingsProvider->get(A::class);
-            $corsSettings     = $settingsProvider->get(C::class);
-            $analyzer         = Analyzer::instance(new Settings($corsSettings));
+        $container[HasherInterface::class] = function (PsrContainerInterface $container) {
+            $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
+            $hasher   = new Hasher($settings[C::KEY_ALGORITHM], $settings[C::KEY_COST]);
 
-            if ($appSettings[A::KEY_IS_DEBUG] === true) {
-                $logger = $container->get(LoggerInterface::class);
-                $analyzer->setLogger($logger);
-            }
-
-            return $analyzer;
+            return $hasher;
         };
     }
 }

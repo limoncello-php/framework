@@ -18,7 +18,7 @@
 
 use ErrorException;
 use Exception;
-use Limoncello\Application\Providers\Application\ApplicationSettings as A;
+use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Contracts\Application\ExceptionHandlerInterface;
 use Limoncello\Core\Contracts\Application\SapiInterface;

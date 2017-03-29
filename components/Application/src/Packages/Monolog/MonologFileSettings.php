@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Application;
+<?php namespace Limoncello\Application\Packages\Monolog;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -21,26 +21,17 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 /**
  * @package Limoncello\Application
  */
-abstract class ApplicationSettings implements SettingsInterface
+abstract class MonologFileSettings implements SettingsInterface
 {
     /** Settings key */
-    const KEY_APP_NAME = 0;
+    const KEY_IS_ENABLED = 0;
 
     /** Settings key */
-    const KEY_IS_DEBUG = self::KEY_APP_NAME + 1;
+    const KEY_LOG_PATH = self::KEY_IS_ENABLED + 1;
 
     /** Settings key */
-    const KEY_ROUTES_PATH = self::KEY_IS_DEBUG + 1;
+    const KEY_LOG_LEVEL = self::KEY_LOG_PATH + 1;
 
     /** Settings key */
-    const KEY_CONTAINER_CONFIGURATORS_PATH = self::KEY_ROUTES_PATH + 1;
-
-    /** Settings key */
-    const KEY_PROVIDER_CLASSES = self::KEY_CONTAINER_CONFIGURATORS_PATH + 1;
-
-    /** Settings key */
-    const KEY_EXCEPTION_DUMPER = self::KEY_PROVIDER_CLASSES + 1;
-
-    /** Settings key */
-    const KEY_LAST = self::KEY_EXCEPTION_DUMPER + 1;
+    const KEY_LAST = self::KEY_LOG_LEVEL + 1;
 }

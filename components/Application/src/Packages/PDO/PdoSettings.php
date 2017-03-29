@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Monolog;
+<?php namespace Limoncello\Application\Packages\PDO;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -21,17 +21,20 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 /**
  * @package Limoncello\Application
  */
-abstract class MonologFileSettings implements SettingsInterface
+abstract class PdoSettings implements SettingsInterface
 {
     /** Settings key */
-    const KEY_IS_ENABLED = 0;
+    const KEY_USER_NAME = 0;
 
     /** Settings key */
-    const KEY_LOG_PATH = self::KEY_IS_ENABLED + 1;
+    const KEY_PASSWORD = self::KEY_USER_NAME + 1;
 
     /** Settings key */
-    const KEY_LOG_LEVEL = self::KEY_LOG_PATH + 1;
+    const KEY_CONNECTION_STRING = self::KEY_PASSWORD + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_LOG_LEVEL + 1;
+    const KEY_OPTIONS = self::KEY_CONNECTION_STRING + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_OPTIONS + 1;
 }

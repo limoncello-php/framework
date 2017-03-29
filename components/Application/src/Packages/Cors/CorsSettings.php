@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Templates;
+<?php namespace Limoncello\Application\Packages\Cors;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,18 +17,23 @@
  */
 
 use Limoncello\Contracts\Settings\SettingsInterface;
+use Neomerx\Cors\Strategies\Settings;
 
 /**
  * @package Limoncello\Application
  */
-abstract class TemplatesSettings implements SettingsInterface
+class CorsSettings extends Settings implements SettingsInterface
 {
     /** Settings key */
-    const KEY_TEMPLATES_FOLDER = 0;
+    const KEY_LAST = self::KEY_IS_CHECK_HOST + 10;
 
-    /** Settings key */
-    const KEY_CACHE_FOLDER = self::KEY_TEMPLATES_FOLDER + 1;
+    /**
+     * @inheritdoc
+     */
+    public function get(): array
+    {
+        $defaults = (new Settings())->getDefaultSettings();
 
-    /** Settings key */
-    const KEY_LAST = self::KEY_CACHE_FOLDER + 1;
+        return $defaults;
+    }
 }

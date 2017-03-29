@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\PDO;
+<?php namespace Limoncello\Application\Packages\Hasher;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,25 +16,31 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
+use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-abstract class PdoSettings implements SettingsInterface
+class HasherProvider implements ProvidesSettingsInterface, ProvidesContainerConfiguratorsInterface
 {
-    /** Settings key */
-    const KEY_USER_NAME = 0;
+    /**
+     * @inheritdoc
+     */
+    public static function getContainerConfigurators(): array
+    {
+        return [
+            HasherContainerConfigurator::HANDLER,
+        ];
+    }
 
-    /** Settings key */
-    const KEY_PASSWORD = self::KEY_USER_NAME + 1;
-
-    /** Settings key */
-    const KEY_CONNECTION_STRING = self::KEY_PASSWORD + 1;
-
-    /** Settings key */
-    const KEY_OPTIONS = self::KEY_CONNECTION_STRING + 1;
-
-    /** Settings key */
-    const KEY_LAST = self::KEY_OPTIONS + 1;
+    /**
+     * @inheritdoc
+     */
+    public static function getSettings(): array
+    {
+        return [
+            new HasherSettings(),
+        ];
+    }
 }

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Hasher;
+<?php namespace Limoncello\Application\Packages\Templates;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -19,15 +19,15 @@
 use Limoncello\Application\Contracts\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Crypt\Contracts\HasherInterface;
-use Limoncello\Crypt\Hasher;
+use Limoncello\Templates\Contracts\TemplatesInterface;
+use Limoncello\Templates\TwigTemplates;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Providers\Hasher\HasherSettings as C;
+use Limoncello\Application\Packages\Templates\TemplatesSettings as C;
 
 /**
  * @package Limoncello\Application
  */
-class HasherContainerConfigurator implements ContainerConfiguratorInterface
+class TemplatesContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
     const HANDLER = [self::class, self::METHOD_NAME];
@@ -37,11 +37,11 @@ class HasherContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configure(LimoncelloContainerInterface $container)
     {
-        $container[HasherInterface::class] = function (PsrContainerInterface $container) {
-            $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
-            $hasher   = new Hasher($settings[C::KEY_ALGORITHM], $settings[C::KEY_COST]);
+        $container[TemplatesInterface::class] = function (PsrContainerInterface $container) {
+            $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
+            $templates = new TwigTemplates($settings[C::KEY_TEMPLATES_FOLDER], $settings[C::KEY_CACHE_FOLDER]);
 
-            return $hasher;
+            return $templates;
         };
     }
 }

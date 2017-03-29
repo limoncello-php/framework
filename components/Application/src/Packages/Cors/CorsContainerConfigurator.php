@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Templates;
+<?php namespace Limoncello\Application\Packages\Cors;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,17 +17,20 @@
  */
 
 use Limoncello\Application\Contracts\ContainerConfiguratorInterface;
+use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Templates\Contracts\TemplatesInterface;
-use Limoncello\Templates\TwigTemplates;
+use Neomerx\Cors\Analyzer;
+use Neomerx\Cors\Contracts\AnalyzerInterface;
+use Neomerx\Cors\Strategies\Settings;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Providers\Templates\TemplatesSettings as C;
+use Limoncello\Application\Packages\Cors\CorsSettings as C;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package Limoncello\Application
  */
-class TemplatesContainerConfigurator implements ContainerConfiguratorInterface
+class CorsContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
     const HANDLER = [self::class, self::METHOD_NAME];
@@ -37,11 +40,18 @@ class TemplatesContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configure(LimoncelloContainerInterface $container)
     {
-        $container[TemplatesInterface::class] = function (PsrContainerInterface $container) {
-            $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
-            $templates = new TwigTemplates($settings[C::KEY_TEMPLATES_FOLDER], $settings[C::KEY_CACHE_FOLDER]);
+        $container[AnalyzerInterface::class] = function (PsrContainerInterface $container) {
+            $settingsProvider = $container->get(SettingsProviderInterface::class);
+            $appSettings      = $settingsProvider->get(A::class);
+            $corsSettings     = $settingsProvider->get(C::class);
+            $analyzer         = Analyzer::instance(new Settings($corsSettings));
 
-            return $templates;
+            if ($appSettings[A::KEY_IS_DEBUG] === true) {
+                $logger = $container->get(LoggerInterface::class);
+                $analyzer->setLogger($logger);
+            }
+
+            return $analyzer;
         };
     }
 }

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\PDO;
+<?php namespace Limoncello\Application\Packages\PDO;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -21,7 +21,7 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use PDO;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Providers\PDO\PdoSettings as C;
+use Limoncello\Application\Packages\PDO\PdoSettings as C;
 
 /**
  * @package Limoncello\Application

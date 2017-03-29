@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Traits;
+<?php namespace Limoncello\Application\Packages\Hasher;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,23 +16,32 @@
  * limitations under the License.
  */
 
-use Generator;
+use Limoncello\Contracts\Settings\SettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-trait SelectClassImplementsTrait
+class HasherSettings implements SettingsInterface
 {
+    /** Settings key */
+    const KEY_ALGORITHM = 0;
+
+    /** Settings key */
+    const KEY_COST = self::KEY_ALGORITHM + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_COST + 1;
+
     /**
-     * @param string[] $providerClasses
-     * @param string   $interfaceName
-     *
-     * @return Generator
+     * @inheritdoc
      */
-    protected function selectProviders(array $providerClasses, string $interfaceName): Generator
+    public function get(): array
     {
-        foreach ($providerClasses as $providerClass) {
-            array_key_exists($interfaceName, class_implements($providerClass)) === false ?: yield $providerClass;
-        }
+        return [
+            /** @see http://php.net/manual/en/password.constants.php */
+            static::KEY_ALGORITHM => PASSWORD_DEFAULT,
+            /** @see http://php.net/manual/en/function.password-hash.php */
+            static::KEY_COST      => 10,
+        ];
     }
 }

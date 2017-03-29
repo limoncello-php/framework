@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Providers\Cors;
+<?php namespace Limoncello\Application\Packages\Cors;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
