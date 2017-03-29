@@ -30,7 +30,7 @@ use Limoncello\Application\Providers\Templates\TemplatesSettings as C;
 class TemplatesContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
-    const METHOD = [self::class, self::METHOD_NAME];
+    const HANDLER = [self::class, self::METHOD_NAME];
 
     /**
      * @inheritdoc

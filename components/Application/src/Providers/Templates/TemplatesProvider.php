@@ -29,7 +29,7 @@ class TemplatesProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            TemplatesContainerConfigurator::METHOD,
+            TemplatesContainerConfigurator::HANDLER,
         ];
     }
 }

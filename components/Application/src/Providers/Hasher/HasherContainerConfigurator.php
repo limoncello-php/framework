@@ -30,7 +30,7 @@ use Limoncello\Application\Providers\Hasher\HasherSettings as C;
 class HasherContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
-    const METHOD = [self::class, self::METHOD_NAME];
+    const HANDLER = [self::class, self::METHOD_NAME];
 
     /**
      * @inheritdoc

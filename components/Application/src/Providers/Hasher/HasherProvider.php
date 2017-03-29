@@ -30,7 +30,7 @@ class HasherProvider implements ProvidesSettingsInterface, ProvidesContainerConf
     public static function getContainerConfigurators(): array
     {
         return [
-            HasherContainerConfigurator::METHOD,
+            HasherContainerConfigurator::HANDLER,
         ];
     }
 
