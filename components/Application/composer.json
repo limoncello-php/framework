@@ -16,6 +16,7 @@
     "require": {
         "php": ">=7.0.0",
         "filp/whoops": "^2.1",
+        "neomerx/cors-psr7": "^1.0.0",
         "limoncello-php/core": "dev-develop",
         "limoncello-php/container": "dev-develop",
         "limoncello-php/crypt": "dev-develop",
