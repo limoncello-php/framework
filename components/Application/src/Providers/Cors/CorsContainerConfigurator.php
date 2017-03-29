@@ -24,7 +24,7 @@ use Neomerx\Cors\Analyzer;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
 use Neomerx\Cors\Strategies\Settings;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Providers\Hasher\HasherSettings as C;
+use Limoncello\Application\Providers\Cors\CorsSettings as C;
 use Psr\Log\LoggerInterface;
 
 /**
