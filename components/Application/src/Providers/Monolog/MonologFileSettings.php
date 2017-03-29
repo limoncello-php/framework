@@ -31,4 +31,7 @@ abstract class MonologFileSettings implements SettingsInterface
 
     /** Settings key */
     const KEY_LOG_LEVEL = self::KEY_LOG_PATH + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_LOG_LEVEL + 1;
 }

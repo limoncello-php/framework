@@ -24,6 +24,9 @@ use Neomerx\Cors\Strategies\Settings;
  */
 class CorsSettings extends Settings implements SettingsInterface
 {
+    /** Settings key */
+    const KEY_LAST = self::KEY_IS_CHECK_HOST + 10;
+
     /**
      * @inheritdoc
      */

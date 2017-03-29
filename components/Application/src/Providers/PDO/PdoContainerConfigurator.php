@@ -39,10 +39,10 @@ class PdoContainerConfigurator implements ContainerConfiguratorInterface
         $container[PDO::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
             $database = new PDO(
-                $settings[C::PDO_CONNECTION_STRING],
-                $settings[C::USER_NAME],
-                $settings[C::PASSWORD],
-                $settings[C::PDO_OPTIONS]
+                $settings[C::KEY_CONNECTION_STRING],
+                $settings[C::KEY_USER_NAME],
+                $settings[C::KEY_PASSWORD],
+                $settings[C::KEY_OPTIONS]
             );
 
             return $database;

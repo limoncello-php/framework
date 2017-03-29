@@ -39,7 +39,7 @@ class TemplatesContainerConfigurator implements ContainerConfiguratorInterface
     {
         $container[TemplatesInterface::class] = function (PsrContainerInterface $container) {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
-            $templates = new TwigTemplates($settings[C::TEMPLATES_FOLDER], $settings[C::CACHE_FOLDER]);
+            $templates = new TwigTemplates($settings[C::KEY_TEMPLATES_FOLDER], $settings[C::KEY_CACHE_FOLDER]);
 
             return $templates;
         };

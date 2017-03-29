@@ -40,4 +40,7 @@ abstract class ApplicationSettings implements SettingsInterface
 
     /** Settings key */
     const KEY_EXCEPTION_DUMPER = self::KEY_PROVIDER_CLASSES + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_EXCEPTION_DUMPER + 1;
 }

@@ -24,14 +24,17 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 abstract class PdoSettings implements SettingsInterface
 {
     /** Settings key */
-    const USER_NAME = 0;
+    const KEY_USER_NAME = 0;
 
     /** Settings key */
-    const PASSWORD = self::USER_NAME + 1;
+    const KEY_PASSWORD = self::KEY_USER_NAME + 1;
 
     /** Settings key */
-    const PDO_CONNECTION_STRING = self::PASSWORD + 1;
+    const KEY_CONNECTION_STRING = self::KEY_PASSWORD + 1;
 
     /** Settings key */
-    const PDO_OPTIONS = self::PDO_CONNECTION_STRING + 1;
+    const KEY_OPTIONS = self::KEY_CONNECTION_STRING + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_OPTIONS + 1;
 }

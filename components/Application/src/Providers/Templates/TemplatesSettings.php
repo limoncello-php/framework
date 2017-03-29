@@ -24,8 +24,11 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 abstract class TemplatesSettings implements SettingsInterface
 {
     /** Settings key */
-    const TEMPLATES_FOLDER = 0;
+    const KEY_TEMPLATES_FOLDER = 0;
 
     /** Settings key */
-    const CACHE_FOLDER = self::TEMPLATES_FOLDER + 1;
+    const KEY_CACHE_FOLDER = self::KEY_TEMPLATES_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_CACHE_FOLDER + 1;
 }
