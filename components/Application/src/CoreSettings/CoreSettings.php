@@ -25,8 +25,11 @@ use Limoncello\Application\Traits\SelectClassesTrait;
 use Limoncello\Application\Traits\SelectClassImplementsTrait;
 use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
+use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface;
 use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface;
 use Limoncello\Core\Contracts\Application\CoreSettingsInterface;
+use Limoncello\Core\Contracts\Routing\GroupInterface;
+use Limoncello\Core\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;
@@ -74,9 +77,14 @@ class CoreSettings implements CoreSettingsInterface
     public function get(): array
     {
         list ($generatorClass, $dispatcherClass) = $this->getGeneratorAndDispatcherClasses();
-        // TODO check returned generator and dispatcher (correctness and compatibility)
+        assert($this->isValidRouterGeneratorAndDispatcher($generatorClass, $dispatcherClass) === true);
 
-        list ($routesData, $globalMiddleware) = $this->handleRouteConfigurators($generatorClass, $dispatcherClass);
+        $routesData = $this
+            ->createRouter($generatorClass, $dispatcherClass)
+            ->getCachedRoutes($this->addRoutes($this->createGroup()));
+
+        $globalConfigurators = iterator_to_array($this->getGlobalContainerConfigurators(), false);
+        $globalMiddleware    = iterator_to_array($this->getGlobalMiddleWareHandlers(), false);
 
         return [
             static::KEY_ROUTER_PARAMS                  => [
@@ -84,7 +92,7 @@ class CoreSettings implements CoreSettingsInterface
                 static::KEY_ROUTER_PARAMS__DISPATCHER => $dispatcherClass,
             ],
             static::KEY_ROUTES_DATA                    => $routesData,
-            static::KEY_GLOBAL_CONTAINER_CONFIGURATORS => $this->getGlobalContainerConfigurators(),
+            static::KEY_GLOBAL_CONTAINER_CONFIGURATORS => $globalConfigurators,
             static::KEY_GLOBAL_MIDDLEWARE              => $globalMiddleware,
         ];
     }
@@ -98,53 +106,15 @@ class CoreSettings implements CoreSettingsInterface
     }
 
     /**
-     * @param string $generatorClass
-     * @param string $dispatcherClass
-     *
-     * @return array
+     * @return Generator
      */
-    protected function handleRouteConfigurators(string $generatorClass, string $dispatcherClass): array
+    protected function getGlobalContainerConfigurators(): Generator
     {
-        // TODO think of more flexible way of creating top level route group
-        $routes = new Group();
-
-        $middleware = [];
-        foreach ($this->selectClasses($this->getRoutesPath(), RoutesConfiguratorInterface::class) as $selectClass) {
-            /** @var RoutesConfiguratorInterface $selectClass */
-            foreach ($selectClass::getMiddleware() as $middlewareClass) {
-                // TODO check is valid middleware
-                $middleware[] = [$middlewareClass, MiddlewareInterface::METHOD_NAME];
-            }
-
-            $selectClass::configureRoutes($routes);
-        }
-
-        $interfaceName = ProvidesRouteConfiguratorsInterface::class;
-        foreach ($this->selectProviders($this->getProviderClasses(), $interfaceName) as $providerClass) {
-            /** @var ProvidesRouteConfiguratorsInterface $providerClass */
-            foreach ($providerClass::getRouteConfigurators() as $configurator) {
-                // TODO check route configurator is valid
-                $configurator($routes);
-            }
-        }
-
-        // TODO think of more flexible way of creating routes data
-        $routeData = (new Router($generatorClass, $dispatcherClass))->getCachedRoutes($routes);
-
-        return [$routeData, $middleware];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getGlobalContainerConfigurators(): array
-    {
-        $path          = $this->getConfiguratorsPaths();
-        $configurators = [];
-        foreach ($this->selectClasses($path, ContainerConfiguratorInterface::class) as $selectClass) {
+        $interfaceName = ContainerConfiguratorInterface::class;
+        foreach ($this->selectClasses($this->getConfiguratorsPaths(), $interfaceName) as $selectClass) {
             $configurator = [$selectClass, ContainerConfiguratorInterface::METHOD_NAME];
             assert($this->isValidContainerConfigurator($configurator) === true);
-            $configurators[] = $configurator;
+            yield $configurator;
         }
 
         $interfaceName = ProvidesContainerConfiguratorsInterface::class;
@@ -152,11 +122,78 @@ class CoreSettings implements CoreSettingsInterface
             /** @var ProvidesContainerConfiguratorsInterface $providerClass */
             foreach ($providerClass::getContainerConfigurators() as $configurator) {
                 assert($this->isValidContainerConfigurator($configurator) === true);
-                $configurators[] = $configurator;
+                yield $configurator;
+            }
+        }
+    }
+
+    /**
+     * @param GroupInterface $group
+     *
+     * @return GroupInterface
+     */
+    protected function addRoutes(GroupInterface $group): GroupInterface
+    {
+        foreach ($this->selectClasses($this->getRoutesPath(), RoutesConfiguratorInterface::class) as $selectClass) {
+            /** @var RoutesConfiguratorInterface $selectClass */
+            $selectClass::configureRoutes($group);
+        }
+
+        $interfaceName = ProvidesRouteConfiguratorsInterface::class;
+        foreach ($this->selectProviders($this->getProviderClasses(), $interfaceName) as $providerClass) {
+            /** @var ProvidesRouteConfiguratorsInterface $providerClass */
+            foreach ($providerClass::getRouteConfigurators() as $configurator) {
+                assert($this->isValidRouteConfigurator($configurator) === true);
+                $configurator($group);
             }
         }
 
-        return $configurators;
+        return $group;
+    }
+
+    /**
+     * @return Generator
+     */
+    protected function getGlobalMiddleWareHandlers(): Generator
+    {
+        // select global middleware from routes
+        foreach ($this->selectClasses($this->getRoutesPath(), RoutesConfiguratorInterface::class) as $selectClass) {
+            /** @var RoutesConfiguratorInterface $selectClass */
+            foreach ($selectClass::getMiddleware() as $middlewareClass) {
+                $handler = [$middlewareClass, MiddlewareInterface::METHOD_NAME];
+                assert($this->isValidMiddlewareHandler($handler) === true);
+                yield $handler;
+            }
+        }
+
+        // select global middleware from providers
+        $interfaceName = ProvidesMiddlewareInterface::class;
+        foreach ($this->selectProviders($this->getProviderClasses(), $interfaceName) as $providerClass) {
+            /** @var ProvidesMiddlewareInterface $providerClass */
+            foreach ($providerClass::getMiddleware() as $handler) {
+                assert($this->isValidMiddlewareHandler($handler) === true);
+                yield $handler;
+            }
+        }
+    }
+
+    /**
+     * @return GroupInterface
+     */
+    protected function createGroup(): GroupInterface
+    {
+        return new Group();
+    }
+
+    /**
+     * @param string $generatorClass
+     * @param string $dispatcherClass
+     *
+     * @return RouterInterface
+     */
+    protected function createRouter(string $generatorClass, string $dispatcherClass): RouterInterface
+    {
+        return new Router($generatorClass, $dispatcherClass);
     }
 
     /**
@@ -184,6 +221,20 @@ class CoreSettings implements CoreSettingsInterface
     }
 
     /**
+     * @param string $generatorClass
+     * @param string $dispatcherClass
+     *
+     * @return bool
+     */
+    private function isValidRouterGeneratorAndDispatcher(string $generatorClass, string $dispatcherClass): bool
+    {
+        assert($generatorClass && $dispatcherClass);
+
+        // TODO add validation for router generator and dispatcher classes
+        return true;
+    }
+
+    /**
      * @param $mightBeConfigurator
      *
      * @return bool
@@ -191,6 +242,32 @@ class CoreSettings implements CoreSettingsInterface
     private function isValidContainerConfigurator($mightBeConfigurator): bool
     {
         return $this->isStaticCallableWithParameters($mightBeConfigurator, [ContainerInterface::class]);
+    }
+
+    /**
+     * @param $mightBeHandler
+     *
+     * @return bool
+     */
+    private function isValidMiddlewareHandler($mightBeHandler): bool
+    {
+        //return $this->isStaticCallableWithParameters($mightBeHandler, [ContainerInterface::class]);
+
+        // TODO add validation for middleware handler
+        return is_callable($mightBeHandler);
+    }
+
+    /**
+     * @param $mightBeConfigurator
+     *
+     * @return bool
+     */
+    private function isValidRouteConfigurator($mightBeConfigurator): bool
+    {
+        //return $this->isStaticCallableWithParameters($mightBeConfigurator, [ContainerInterface::class]);
+
+        // TODO add validation for routes configurator
+        return is_callable($mightBeConfigurator);
     }
 
     /**

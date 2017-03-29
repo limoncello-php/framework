@@ -73,15 +73,12 @@ class Application extends \Limoncello\Core\Application\Application
      */
     public function createFileSettingsProvider(): FileSettingsProvider
     {
+        // Load all settings from path specified
         $provider = (new FileSettingsProvider())->load($this->getSettingsPath());
 
-        $appSettings = $provider->get(ApplicationSettings::class);
-
-        $routesPath      = $appSettings[ApplicationSettings::KEY_ROUTES_PATH];
-        $containersPath  = $appSettings[ApplicationSettings::KEY_CONTAINER_CONFIGURATORS_PATH];
+        // Application settings have a list of providers which might have additional settings to load
+        $appSettings     = $provider->get(ApplicationSettings::class);
         $providerClasses = $appSettings[ApplicationSettings::KEY_PROVIDER_CLASSES];
-
-        // providers might have additional setting providers that also should be registered
         foreach ($this->selectProviders($providerClasses, ProvidesSettingsInterface::class) as $providerClass) {
             /** @var ProvidesSettingsInterface $providerClass */
             foreach ($providerClass::getSettings() as $setting) {
@@ -89,7 +86,10 @@ class Application extends \Limoncello\Core\Application\Application
             }
         }
 
-        $coreSettings = new CoreSettings($routesPath, $containersPath, $providerClasses);
+        // App settings (paths, lists) --> core settings (container configurators, routes, middleware and etc).
+        $routesPath     = $appSettings[ApplicationSettings::KEY_ROUTES_PATH];
+        $containersPath = $appSettings[ApplicationSettings::KEY_CONTAINER_CONFIGURATORS_PATH];
+        $coreSettings   = new CoreSettings($routesPath, $containersPath, $providerClasses);
 
         $provider->register($coreSettings);
 
