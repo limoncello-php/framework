@@ -26,6 +26,7 @@ use Limoncello\Application\Traits\SelectClassImplementsTrait;
 use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Sapi;
+use Limoncello\Core\Contracts\Application\CoreSettingsInterface;
 use Limoncello\Core\Contracts\Application\ExceptionHandlerInterface;
 use Limoncello\Core\Contracts\Application\SapiInterface;
 use Throwable;
@@ -69,9 +70,61 @@ class Application extends \Limoncello\Core\Application\Application
     }
 
     /**
+     * Get container from application. If `method` and `path` are specified the container will be configured
+     * not only with global container configurators but with route's one as well.
+     *
+     * @param string|null $method
+     * @param string|null $path
+     *
+     * @return LimoncelloContainerInterface
+     */
+    public function createConfiguredContainer(string $method = null, string $path = null): LimoncelloContainerInterface
+    {
+        $container = $this->createContainer();
+
+        $settingsProvider = $this->createSettingsProvider();
+        $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
+
+        $coreSettings = $settingsProvider->get(CoreSettingsInterface::class);
+
+        $routeConfigurators = [];
+        if (empty($method) === false && empty($path) === false) {
+            assert(array_key_exists(CoreSettingsInterface::KEY_ROUTER_PARAMS, $coreSettings));
+            assert(array_key_exists(CoreSettingsInterface::KEY_ROUTES_DATA, $coreSettings));
+            list(, , , , , $routeConfigurators) = $this->getRouter(
+                $coreSettings[CoreSettingsInterface::KEY_ROUTER_PARAMS],
+                $coreSettings[CoreSettingsInterface::KEY_ROUTES_DATA]
+            )->match($method, $path);
+        }
+
+        // configure container
+        assert(array_key_exists(CoreSettingsInterface::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $coreSettings));
+        $globalConfigurators = $coreSettings[CoreSettingsInterface::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
+        $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
+
+        return $container;
+    }
+
+    /**
+     * @return SettingsProviderInterface
+     */
+    protected function createSettingsProvider(): SettingsProviderInterface
+    {
+        $provider = new CacheSettingsProvider();
+        if (is_callable($method = $this->getSettingCacheMethod()) === true) {
+            $data = call_user_func($method);
+            $provider->unserialize($data);
+        } else {
+            $provider->setInstanceSettings($this->createFileSettingsProvider());
+        }
+
+        return $provider;
+    }
+
+    /**
      * @return FileSettingsProvider
      */
-    public function createFileSettingsProvider(): FileSettingsProvider
+    protected function createFileSettingsProvider(): FileSettingsProvider
     {
         // Load all settings from path specified
         $provider = (new FileSettingsProvider())->load($this->getSettingsPath());
@@ -92,21 +145,6 @@ class Application extends \Limoncello\Core\Application\Application
         $coreSettings   = new CoreSettings($routesPath, $containersPath, $providerClasses);
 
         $provider->register($coreSettings);
-
-        return $provider;
-    }
-
-    /**
-     * @return SettingsProviderInterface
-     */
-    protected function createSettingsProvider(): SettingsProviderInterface
-    {
-        if (is_callable($method = $this->getSettingCacheMethod()) === true) {
-            $data     = call_user_func($method);
-            $provider = (new CacheSettingsProvider())->setData($data);
-        } else {
-            $provider = $this->createFileSettingsProvider();
-        }
 
         return $provider;
     }

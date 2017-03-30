@@ -18,12 +18,13 @@
 
 use Limoncello\Application\Exceptions\AmbiguousSettingsException;
 use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
+use Limoncello\Contracts\Serializable\ArraySerializableInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 
 /**
  * @package Limoncello\Application
  */
-class CacheSettingsProvider implements SettingsProviderInterface
+class CacheSettingsProvider implements SettingsProviderInterface, ArraySerializableInterface
 {
     /** Internal data index */
     const KEY_SETTINGS_MAP = 0;
@@ -87,25 +88,25 @@ class CacheSettingsProvider implements SettingsProviderInterface
     }
 
     /**
+     * @deprecated Use `serialize` method instead.
+     *
      * @return array
      */
     public function getData(): array
     {
-        return [
-            static::KEY_SETTINGS_MAP  => $this->settingsMap,
-            static::KEY_SETTINGS_DATA => $this->settingsData,
-            static::KEY_AMBIGUOUS_MAP => $this->ambiguousMap,
-        ];
+        return $this->serialize();
     }
 
     /**
+     * @deprecated Use `unserialize` method instead.
+     *
      * @param array $data
      *
      * @return CacheSettingsProvider
      */
     public function setData(array $data): CacheSettingsProvider
     {
-        list ($this->settingsMap, $this->settingsData, $this->ambiguousMap) = $data;
+        $this->unserialize($data);
 
         return $this;
     }
@@ -117,10 +118,32 @@ class CacheSettingsProvider implements SettingsProviderInterface
      */
     public function setInstanceSettings(InstanceSettingsProvider $provider): CacheSettingsProvider
     {
-        return $this->setData([
+        $this->unserialize([
             static::KEY_SETTINGS_MAP  => $provider->getSettingsMap(),
             static::KEY_SETTINGS_DATA => $provider->getSettingsData(),
             static::KEY_AMBIGUOUS_MAP => $provider->getAmbiguousMap(),
         ]);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function serialize(): array
+    {
+        return [
+            static::KEY_SETTINGS_MAP  => $this->settingsMap,
+            static::KEY_SETTINGS_DATA => $this->settingsData,
+            static::KEY_AMBIGUOUS_MAP => $this->ambiguousMap,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function unserialize(array $serialized)
+    {
+        list ($this->settingsMap, $this->settingsData, $this->ambiguousMap) = $serialized;
     }
 }
