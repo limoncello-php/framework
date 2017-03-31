@@ -29,8 +29,8 @@ class CoreSettings implements CoreSettingsInterface
      * @var array
      */
     private $routerParameters = [
-        CoreSettings::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
-        CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER => GroupCountBasedDispatcher::class,
+        self::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
+        self::KEY_ROUTER_PARAMS__DISPATCHER => GroupCountBasedDispatcher::class,
     ];
 
     /**
@@ -54,10 +54,10 @@ class CoreSettings implements CoreSettingsInterface
     public function get(): array
     {
         return [
-            CoreSettings::KEY_ROUTER_PARAMS                  => $this->getRouterParameters(),
-            CoreSettings::KEY_ROUTES_DATA                    => $this->getRoutesData(),
-            CoreSettings::KEY_GLOBAL_CONTAINER_CONFIGURATORS => $this->getGlobalConfigurators(),
-            CoreSettings::KEY_GLOBAL_MIDDLEWARE              => $this->getGlobalMiddleware(),
+            self::KEY_ROUTER_PARAMS                  => $this->getRouterParameters(),
+            self::KEY_ROUTES_DATA                    => $this->getRoutesData(),
+            self::KEY_GLOBAL_CONTAINER_CONFIGURATORS => $this->getGlobalConfigurators(),
+            self::KEY_GLOBAL_MIDDLEWARE              => $this->getGlobalMiddleware(),
         ];
     }
 
@@ -67,6 +67,48 @@ class CoreSettings implements CoreSettingsInterface
     public function getRouterParameters(): array
     {
         return $this->routerParameters;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public static function getRouterParametersFromData(array $data): array
+    {
+        assert(array_key_exists(self::KEY_ROUTER_PARAMS, $data));
+        $result = $data[self::KEY_ROUTER_PARAMS];
+        assert(empty($result) === false);
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return string
+     */
+    public static function getGeneratorFromParametersData(array $data): string
+    {
+        assert(array_key_exists(self::KEY_ROUTER_PARAMS__GENERATOR, $data));
+        $result = $data[self::KEY_ROUTER_PARAMS__GENERATOR];
+        assert(empty($result) === false);
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return string
+     */
+    public static function getDispatcherFromParametersData(array $data): string
+    {
+        assert(array_key_exists(self::KEY_ROUTER_PARAMS__DISPATCHER, $data));
+        $result = $data[self::KEY_ROUTER_PARAMS__DISPATCHER];
+        assert(empty($result) === false);
+
+        return $result;
     }
 
     /**
@@ -90,6 +132,19 @@ class CoreSettings implements CoreSettingsInterface
     }
 
     /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public static function getRoutesDataFromData(array $data): array
+    {
+        assert(array_key_exists(self::KEY_ROUTES_DATA, $data));
+        $result = $data[self::KEY_ROUTES_DATA];
+
+        return $result;
+    }
+
+    /**
      * @param array $routesData
      *
      * @return CoreSettings
@@ -110,6 +165,19 @@ class CoreSettings implements CoreSettingsInterface
     }
 
     /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public static function getGlobalConfiguratorsFromData(array $data): array
+    {
+        assert(array_key_exists(self::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $data));
+        $result = $data[self::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
+
+        return $result;
+    }
+
+    /**
      * @param array $globalConfigurators
      *
      * @return CoreSettings
@@ -127,6 +195,19 @@ class CoreSettings implements CoreSettingsInterface
     public function getGlobalMiddleware(): array
     {
         return $this->globalMiddleware;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public static function getGlobalMiddlewareFromData(array $data): array
+    {
+        assert(array_key_exists(self::KEY_GLOBAL_MIDDLEWARE, $data));
+        $result = $data[self::KEY_GLOBAL_MIDDLEWARE];
+
+        return $result;
     }
 
     /**

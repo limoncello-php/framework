@@ -94,7 +94,7 @@ abstract class Application implements ApplicationInterface
             throw new LogicException('SAPI not set.');
         }
 
-        $container = $this->createContainer();
+        $container = $this->createContainerInstance();
 
         $this->setUpExceptionHandler($this->sapi, $container);
 
@@ -104,17 +104,12 @@ abstract class Application implements ApplicationInterface
         $coreSettings = $settingsProvider->get(CoreSettingsInterface::class);
 
         // match route from `Request` to handler, route container configurators/middleware, etc
-        assert(array_key_exists(CoreSettingsInterface::KEY_ROUTER_PARAMS, $coreSettings));
-        assert(array_key_exists(CoreSettingsInterface::KEY_ROUTES_DATA, $coreSettings));
-        $routerParams = $coreSettings[CoreSettingsInterface::KEY_ROUTER_PARAMS];
-        $routesData   = $coreSettings[CoreSettingsInterface::KEY_ROUTES_DATA];
         list($matchCode, $allowedMethods, $handlerParams, $handler,
-            $routeMiddleware, $routeConfigurators, $requestFactory) = $this->getRouter($routerParams, $routesData)
+            $routeMiddleware, $routeConfigurators, $requestFactory) = $this->getRouter($coreSettings)
                 ->match($this->sapi->getMethod(), $this->sapi->getUri()->getPath());
 
         // configure container
-        assert(array_key_exists(CoreSettingsInterface::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $coreSettings));
-        $globalConfigurators = $coreSettings[CoreSettingsInterface::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
+        $globalConfigurators = CoreSettings::getGlobalConfiguratorsFromData($coreSettings);
         $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
 
         // build pipeline for handling `Request`: global middleware -> route middleware -> handler (e.g. controller)
@@ -133,8 +128,7 @@ abstract class Application implements ApplicationInterface
                 break;
         }
 
-        assert(array_key_exists(CoreSettingsInterface::KEY_GLOBAL_MIDDLEWARE, $coreSettings));
-        $globalMiddleware = $coreSettings[CoreSettingsInterface::KEY_GLOBAL_MIDDLEWARE];
+        $globalMiddleware = CoreSettings::getGlobalMiddlewareFromData($coreSettings);
         $hasMiddleware    = empty($globalMiddleware) === false || empty($routeMiddleware) === false;
 
         $handler = $hasMiddleware === true ?
@@ -207,18 +201,18 @@ abstract class Application implements ApplicationInterface
     }
 
     /**
-     * @param array $routerParams
-     * @param array $routesData
+     * @param array $coreSettings
      *
      * @return RouterInterface
      */
-    protected function getRouter(array $routerParams, array $routesData): RouterInterface
+    protected function getRouter(array $coreSettings): RouterInterface
     {
+        $routerParams = CoreSettings::getRouterParametersFromData($coreSettings);
+        $routesData   = CoreSettings::getRoutesDataFromData($coreSettings);
+
         if ($this->router === null) {
-            assert(array_key_exists(CoreSettingsInterface::KEY_ROUTER_PARAMS__GENERATOR, $routerParams));
-            assert(array_key_exists(CoreSettingsInterface::KEY_ROUTER_PARAMS__DISPATCHER, $routerParams));
-            $generatorClass  = $routerParams[CoreSettingsInterface::KEY_ROUTER_PARAMS__GENERATOR];
-            $dispatcherClass = $routerParams[CoreSettingsInterface::KEY_ROUTER_PARAMS__DISPATCHER];
+            $generatorClass  = CoreSettings::getGeneratorFromParametersData($routerParams);
+            $dispatcherClass = CoreSettings::getDispatcherFromParametersData($routerParams);
 
             $router = new Router($generatorClass, $dispatcherClass);
             $router->loadCachedRoutes($routesData);

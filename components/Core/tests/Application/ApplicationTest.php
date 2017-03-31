@@ -260,7 +260,7 @@ class ApplicationTest extends TestCase
         $app = Mockery::mock(Application::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
         $app->shouldReceive('createSettingsProvider')->once()->withAnyArgs()->andReturn($settings);
-        $app->shouldReceive('createContainer')->zeroOrMoreTimes()->withNoArgs()->andReturn($container);
+        $app->shouldReceive('createContainerInstance')->zeroOrMoreTimes()->withNoArgs()->andReturn($container);
         $app->shouldReceive('setUpExceptionHandler')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
 
         /** @var Application $app */
