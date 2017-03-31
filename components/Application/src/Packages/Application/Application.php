@@ -23,12 +23,12 @@ use Limoncello\Application\ExceptionHandlers\DefaultHandler;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
 use Limoncello\Application\Traits\SelectClassImplementsTrait;
+use Limoncello\Contracts\Application\SapiInterface;
 use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Sapi;
-use Limoncello\Core\Contracts\Application\CoreSettingsInterface;
-use Limoncello\Core\Contracts\Application\ExceptionHandlerInterface;
-use Limoncello\Core\Contracts\Application\SapiInterface;
+use Limoncello\Core\Contracts\ExceptionHandlers\ExceptionHandlerInterface;
+use Limoncello\Core\Contracts\Settings\CoreSettingsInterface;
 use Throwable;
 use Zend\Diactoros\Response\SapiEmitter;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
@@ -78,9 +78,9 @@ class Application extends \Limoncello\Core\Application\Application
      *
      * @return LimoncelloContainerInterface
      */
-    public function createConfiguredContainer(string $method = null, string $path = null): LimoncelloContainerInterface
+    public function createContainer(string $method = null, string $path = null): LimoncelloContainerInterface
     {
-        $container = $this->createContainer();
+        $container = $this->createContainerInstance();
 
         $settingsProvider = $this->createSettingsProvider();
         $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
@@ -89,17 +89,11 @@ class Application extends \Limoncello\Core\Application\Application
 
         $routeConfigurators = [];
         if (empty($method) === false && empty($path) === false) {
-            assert(array_key_exists(CoreSettingsInterface::KEY_ROUTER_PARAMS, $coreSettings));
-            assert(array_key_exists(CoreSettingsInterface::KEY_ROUTES_DATA, $coreSettings));
-            list(, , , , , $routeConfigurators) = $this->getRouter(
-                $coreSettings[CoreSettingsInterface::KEY_ROUTER_PARAMS],
-                $coreSettings[CoreSettingsInterface::KEY_ROUTES_DATA]
-            )->match($method, $path);
+            list(, , , , , $routeConfigurators) = $this->getRouter($coreSettings)->match($method, $path);
         }
 
         // configure container
-        assert(array_key_exists(CoreSettingsInterface::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $coreSettings));
-        $globalConfigurators = $coreSettings[CoreSettingsInterface::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
+        $globalConfigurators = CoreSettings::getGlobalConfiguratorsFromData($coreSettings);
         $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
 
         return $container;
@@ -152,7 +146,7 @@ class Application extends \Limoncello\Core\Application\Application
     /**
      * @return LimoncelloContainerInterface
      */
-    protected function createContainer(): LimoncelloContainerInterface
+    protected function createContainerInstance(): LimoncelloContainerInterface
     {
         return new Container();
     }

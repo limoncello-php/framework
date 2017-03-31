@@ -16,18 +16,15 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-abstract class ApplicationSettings implements SettingsInterface
+abstract class ApplicationSettings implements ApplicationSettingsInterface
 {
     /** Settings key */
-    const KEY_APP_NAME = 0;
-
-    /** Settings key */
-    const KEY_IS_DEBUG = self::KEY_APP_NAME + 1;
+    const KEY_IS_DEBUG = self::KEY_PROVIDER_CLASSES + 1;
 
     /** Settings key */
     const KEY_ROUTES_PATH = self::KEY_IS_DEBUG + 1;
@@ -36,10 +33,7 @@ abstract class ApplicationSettings implements SettingsInterface
     const KEY_CONTAINER_CONFIGURATORS_PATH = self::KEY_ROUTES_PATH + 1;
 
     /** Settings key */
-    const KEY_PROVIDER_CLASSES = self::KEY_CONTAINER_CONFIGURATORS_PATH + 1;
-
-    /** Settings key */
-    const KEY_EXCEPTION_DUMPER = self::KEY_PROVIDER_CLASSES + 1;
+    const KEY_EXCEPTION_DUMPER = self::KEY_CONTAINER_CONFIGURATORS_PATH + 1;
 
     /** Settings key */
     const KEY_LAST = self::KEY_EXCEPTION_DUMPER + 1;

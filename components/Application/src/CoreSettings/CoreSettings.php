@@ -27,7 +27,7 @@ use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface;
 use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface;
-use Limoncello\Core\Contracts\Application\CoreSettingsInterface;
+use Limoncello\Core\Application\BaseCoreSettings;
 use Limoncello\Core\Contracts\Routing\GroupInterface;
 use Limoncello\Core\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
@@ -38,7 +38,7 @@ use ReflectionMethod;
 /**
  * @package Limoncello\Application
  */
-class CoreSettings implements CoreSettingsInterface
+class CoreSettings extends BaseCoreSettings
 {
     use SelectClassesTrait, SelectClassImplementsTrait;
 

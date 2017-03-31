@@ -19,9 +19,9 @@
 use ErrorException;
 use Exception;
 use Limoncello\Application\Packages\Application\ApplicationSettings as A;
+use Limoncello\Contracts\Application\SapiInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Core\Contracts\Application\ExceptionHandlerInterface;
-use Limoncello\Core\Contracts\Application\SapiInterface;
+use Limoncello\Core\Contracts\ExceptionHandlers\ExceptionHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
