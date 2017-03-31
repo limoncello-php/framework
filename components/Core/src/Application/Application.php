@@ -109,7 +109,7 @@ abstract class Application implements ApplicationInterface
                 ->match($this->sapi->getMethod(), $this->sapi->getUri()->getPath());
 
         // configure container
-        $globalConfigurators = CoreSettings::getGlobalConfiguratorsFromData($coreSettings);
+        $globalConfigurators = BaseCoreSettings::getGlobalConfiguratorsFromData($coreSettings);
         $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
 
         // build pipeline for handling `Request`: global middleware -> route middleware -> handler (e.g. controller)
@@ -128,7 +128,7 @@ abstract class Application implements ApplicationInterface
                 break;
         }
 
-        $globalMiddleware = CoreSettings::getGlobalMiddlewareFromData($coreSettings);
+        $globalMiddleware = BaseCoreSettings::getGlobalMiddlewareFromData($coreSettings);
         $hasMiddleware    = empty($globalMiddleware) === false || empty($routeMiddleware) === false;
 
         $handler = $hasMiddleware === true ?
@@ -207,12 +207,12 @@ abstract class Application implements ApplicationInterface
      */
     protected function getRouter(array $coreSettings): RouterInterface
     {
-        $routerParams = CoreSettings::getRouterParametersFromData($coreSettings);
-        $routesData   = CoreSettings::getRoutesDataFromData($coreSettings);
+        $routerParams = BaseCoreSettings::getRouterParametersFromData($coreSettings);
+        $routesData   = BaseCoreSettings::getRoutesDataFromData($coreSettings);
 
         if ($this->router === null) {
-            $generatorClass  = CoreSettings::getGeneratorFromParametersData($routerParams);
-            $dispatcherClass = CoreSettings::getDispatcherFromParametersData($routerParams);
+            $generatorClass  = BaseCoreSettings::getGeneratorFromParametersData($routerParams);
+            $dispatcherClass = BaseCoreSettings::getDispatcherFromParametersData($routerParams);
 
             $router = new Router($generatorClass, $dispatcherClass);
             $router->loadCachedRoutes($routesData);

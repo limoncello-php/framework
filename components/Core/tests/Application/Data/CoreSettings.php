@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Core\Application;
+<?php namespace Limoncello\Tests\Core\Application\Data;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,13 +17,13 @@
  */
 
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
-use Limoncello\Core\Contracts\Settings\CoreSettingsInterface;
+use Limoncello\Core\Application\BaseCoreSettings;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 
 /**
  * @package Limoncello\Core
  */
-class CoreSettings implements CoreSettingsInterface
+class CoreSettings extends BaseCoreSettings
 {
     /**
      * @var array
@@ -70,48 +70,6 @@ class CoreSettings implements CoreSettingsInterface
     }
 
     /**
-     * @param array $data
-     *
-     * @return array
-     */
-    public static function getRouterParametersFromData(array $data): array
-    {
-        assert(array_key_exists(self::KEY_ROUTER_PARAMS, $data));
-        $result = $data[self::KEY_ROUTER_PARAMS];
-        assert(empty($result) === false);
-
-        return $result;
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return string
-     */
-    public static function getGeneratorFromParametersData(array $data): string
-    {
-        assert(array_key_exists(self::KEY_ROUTER_PARAMS__GENERATOR, $data));
-        $result = $data[self::KEY_ROUTER_PARAMS__GENERATOR];
-        assert(empty($result) === false);
-
-        return $result;
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return string
-     */
-    public static function getDispatcherFromParametersData(array $data): string
-    {
-        assert(array_key_exists(self::KEY_ROUTER_PARAMS__DISPATCHER, $data));
-        $result = $data[self::KEY_ROUTER_PARAMS__DISPATCHER];
-        assert(empty($result) === false);
-
-        return $result;
-    }
-
-    /**
      * @param array $routerParameters
      *
      * @return CoreSettings
@@ -129,19 +87,6 @@ class CoreSettings implements CoreSettingsInterface
     public function getRoutesData(): array
     {
         return $this->routesData;
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
-    public static function getRoutesDataFromData(array $data): array
-    {
-        assert(array_key_exists(self::KEY_ROUTES_DATA, $data));
-        $result = $data[self::KEY_ROUTES_DATA];
-
-        return $result;
     }
 
     /**
@@ -165,19 +110,6 @@ class CoreSettings implements CoreSettingsInterface
     }
 
     /**
-     * @param array $data
-     *
-     * @return array
-     */
-    public static function getGlobalConfiguratorsFromData(array $data): array
-    {
-        assert(array_key_exists(self::KEY_GLOBAL_CONTAINER_CONFIGURATORS, $data));
-        $result = $data[self::KEY_GLOBAL_CONTAINER_CONFIGURATORS];
-
-        return $result;
-    }
-
-    /**
      * @param array $globalConfigurators
      *
      * @return CoreSettings
@@ -195,19 +127,6 @@ class CoreSettings implements CoreSettingsInterface
     public function getGlobalMiddleware(): array
     {
         return $this->globalMiddleware;
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
-    public static function getGlobalMiddlewareFromData(array $data): array
-    {
-        assert(array_key_exists(self::KEY_GLOBAL_MIDDLEWARE, $data));
-        $result = $data[self::KEY_GLOBAL_MIDDLEWARE];
-
-        return $result;
     }
 
     /**
