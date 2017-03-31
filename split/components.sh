@@ -6,6 +6,7 @@ COMPONENTS=(
     'components/AppCache/:git@github.com:limoncello-php-dist/app-cache.git'
     'components/Application/:git@github.com:limoncello-php-dist/application.git'
     'components/Auth/:git@github.com:limoncello-php-dist/auth.git'
+    'components/Commands/:git@github.com:limoncello-php-dist/commands.git'
     'components/Container/:git@github.com:limoncello-php-dist/container.git'
     'components/Contracts/:git@github.com:limoncello-php-dist/contracts.git'
     'components/Core/:git@github.com:limoncello-php-dist/core.git'
