@@ -21,10 +21,9 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
-use Limoncello\Application\Packages\Application\ApplicationSettings;
-use Limoncello\Application\Traits\SelectClassImplementsTrait;
 use Limoncello\Commands\Exceptions\ApplicationClassNotFoundException;
-use Limoncello\Commands\Exceptions\ContainerMethodNotFoundException;
+use Limoncello\Contracts\Application\ApplicationInterface;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\Provider\ProvidesCommandsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
@@ -34,8 +33,6 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
  */
 class ComposerPlugin implements PluginInterface, Capable
 {
-    use SelectClassImplementsTrait;
-
     /** Expected key at `composer.json` -> "extra" */
     const COMPOSER_JSON__EXTRA__APPLICATION = 'application';
 
@@ -44,9 +41,6 @@ class ComposerPlugin implements PluginInterface, Capable
 
     /** Default application class name if not replaced via "extra" -> "application" -> "class" */
     const DEFAULT_APPLICATION_CLASS_NAME = '\\App\\Application';
-
-    /** Method to be used to get application settings */
-    const DEFAULT_APPLICATION_CREATE_CONTAINER_METHOD = 'createConfiguredContainer';
 
     /**
      * @var Composer
@@ -124,12 +118,14 @@ class ComposerPlugin implements PluginInterface, Capable
         $provider = $container->get(SettingsProviderInterface::class);
 
         // Application settings have a list of providers which might have additional settings to load
-        $appSettings     = $provider->get(ApplicationSettings::class);
-        $providerClasses = $appSettings[ApplicationSettings::KEY_PROVIDER_CLASSES];
-        foreach ($this->selectProviders($providerClasses, ProvidesCommandsInterface::class) as $providerClass) {
-            /** @var ProvidesCommandsInterface $providerClass */
-            foreach ($providerClass::getCommands() as $command) {
-                new LimoncelloCommand($command);
+        $appSettings     = $provider->get(ApplicationSettingsInterface::class);
+        $providerClasses = $appSettings[ApplicationSettingsInterface::KEY_PROVIDER_CLASSES];
+        foreach ($providerClasses as $providerClass) {
+            if (array_key_exists(ProvidesCommandsInterface::class, class_implements($providerClass)) === true) {
+                /** @var ProvidesCommandsInterface $providerClass */
+                foreach ($providerClass::getCommands() as $command) {
+                    new LimoncelloCommand($command);
+                }
             }
         }
     }
@@ -143,17 +139,15 @@ class ComposerPlugin implements PluginInterface, Capable
         $appClass =
             $extra[static::COMPOSER_JSON__EXTRA__APPLICATION][static::COMPOSER_JSON__EXTRA__APPLICATION__CLASS] ??
                 static::DEFAULT_APPLICATION_CLASS_NAME;
-        if (class_exists($appClass) === false) {
+        if (class_exists($appClass) === false ||
+            (($application = new $appClass()) instanceof ApplicationInterface) === false
+        ) {
             throw new ApplicationClassNotFoundException($appClass);
         }
 
-        $application = new $appClass();
-        if (method_exists($application, $methodName = static::DEFAULT_APPLICATION_CREATE_CONTAINER_METHOD) === false) {
-            throw new ContainerMethodNotFoundException($methodName);
-        }
+        /** @var ApplicationInterface $application */
 
-        $container = $application->{$methodName};
-        assert($container instanceof ContainerInterface);
+        $container = $application->createContainer();
 
         return $container;
     }
