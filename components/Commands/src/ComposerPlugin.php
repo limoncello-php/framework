@@ -21,7 +21,6 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
-use Limoncello\Commands\Exceptions\ApplicationClassNotFoundException;
 use Limoncello\Contracts\Application\ApplicationInterface;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Container\ContainerInterface;
@@ -110,44 +109,46 @@ class ComposerPlugin implements PluginInterface, Capable
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function loadCommands()
     {
-        $container = $this->getAppContainer();
+        if (($container = $this->getAppContainer()) !== null) {
+            /** @var SettingsProviderInterface $settingsProvider */
+            $provider = $container->get(SettingsProviderInterface::class);
 
-        /** @var SettingsProviderInterface $settingsProvider */
-        $provider = $container->get(SettingsProviderInterface::class);
-
-        // Application settings have a list of providers which might have additional settings to load
-        $appSettings     = $provider->get(ApplicationSettingsInterface::class);
-        $providerClasses = $appSettings[ApplicationSettingsInterface::KEY_PROVIDER_CLASSES];
-        foreach ($providerClasses as $providerClass) {
-            if (array_key_exists(ProvidesCommandsInterface::class, class_implements($providerClass)) === true) {
-                /** @var ProvidesCommandsInterface $providerClass */
-                foreach ($providerClass::getCommands() as $command) {
-                    new LimoncelloCommand($command);
+            // Application settings have a list of providers which might have additional settings to load
+            $appSettings     = $provider->get(ApplicationSettingsInterface::class);
+            $providerClasses = $appSettings[ApplicationSettingsInterface::KEY_PROVIDER_CLASSES];
+            foreach ($providerClasses as $providerClass) {
+                if (array_key_exists(ProvidesCommandsInterface::class, class_implements($providerClass)) === true) {
+                    /** @var ProvidesCommandsInterface $providerClass */
+                    foreach ($providerClass::getCommands() as $command) {
+                        new LimoncelloCommand($command);
+                    }
                 }
             }
         }
     }
 
     /**
-     * @return ContainerInterface
+     * @return ContainerInterface|null
      */
-    protected function getAppContainer(): ContainerInterface
+    protected function getAppContainer()
     {
+        $container = null;
+
         $extra    = $this->getComposer()->getPackage()->getExtra();
         $appClass =
             $extra[static::COMPOSER_JSON__EXTRA__APPLICATION][static::COMPOSER_JSON__EXTRA__APPLICATION__CLASS] ??
                 static::DEFAULT_APPLICATION_CLASS_NAME;
-        if (class_exists($appClass) === false ||
-            (($application = new $appClass()) instanceof ApplicationInterface) === false
+        if (class_exists($appClass) === true &&
+            (($application = new $appClass()) instanceof ApplicationInterface) === true
         ) {
-            throw new ApplicationClassNotFoundException($appClass);
+            /** @var ApplicationInterface $application */
+            $container = $application->createContainer();
         }
-
-        /** @var ApplicationInterface $application */
-
-        $container = $application->createContainer();
 
         return $container;
     }
