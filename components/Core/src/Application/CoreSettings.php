@@ -17,7 +17,7 @@
  */
 
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
-use Limoncello\Core\Contracts\Application\CoreSettingsInterface;
+use Limoncello\Core\Contracts\Settings\CoreSettingsInterface;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 
 /**

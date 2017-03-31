@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Core\Contracts\Application;
+<?php namespace Limoncello\Core\Contracts\ExceptionHandlers;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,6 +17,7 @@
  */
 
 use Exception;
+use Limoncello\Contracts\Application\SapiInterface;
 use Psr\Container\ContainerInterface;
 use Throwable;
 

@@ -17,12 +17,12 @@
  */
 
 use Closure;
+use Limoncello\Contracts\Application\ApplicationInterface;
+use Limoncello\Contracts\Application\SapiInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Core\Contracts\Application\ApplicationInterface;
-use Limoncello\Core\Contracts\Application\CoreSettingsInterface;
-use Limoncello\Core\Contracts\Application\SapiInterface;
 use Limoncello\Core\Contracts\Routing\RouterInterface;
+use Limoncello\Core\Contracts\Settings\CoreSettingsInterface;
 use Limoncello\Core\Routing\Router;
 use LogicException;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -61,7 +61,7 @@ abstract class Application implements ApplicationInterface
     /**
      * @return LimoncelloContainerInterface
      */
-    abstract protected function createContainer(): LimoncelloContainerInterface;
+    abstract protected function createContainerInstance(): LimoncelloContainerInterface;
 
     /**
      * Exception handler should not use container before actual error occurs.
