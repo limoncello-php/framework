@@ -80,15 +80,6 @@ interface CommandInterface
     /** Data option key */
     const OPTION_MODE__IS_ARRAY = 8;
 
-    /** Data handler key */
-    const HANDLER_INITIALIZE = 0;
-
-    /** Data handler key */
-    const HANDLER_INTERACT = self::HANDLER_INITIALIZE + 1;
-
-    /** Command execution method name */
-    const EXECUTE_METHOD = 'execute';
-
     /**
      * @return string[]
      */
@@ -111,9 +102,4 @@ interface CommandInterface
      * @return void
      */
     public function execute(ContainerInterface $container, IoInterface $inOut);
-
-    /**
-     * @return callable[]
-     */
-    public function getOptionalHandlers(): array;
 }
