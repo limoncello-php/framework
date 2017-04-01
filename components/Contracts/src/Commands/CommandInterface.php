@@ -98,8 +98,9 @@ interface CommandInterface
     /**
      * @param ContainerInterface $container
      * @param IoInterface        $inOut
+     * @param ContextInterface   $context
      *
      * @return void
      */
-    public function execute(ContainerInterface $container, IoInterface $inOut);
+    public function execute(ContainerInterface $container, IoInterface $inOut, ContextInterface $context);
 }
