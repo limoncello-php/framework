@@ -24,7 +24,7 @@ use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 abstract class ApplicationSettings implements ApplicationSettingsInterface
 {
     /** Settings key */
-    const KEY_IS_DEBUG = self::KEY_PROVIDER_CLASSES + 1;
+    const KEY_IS_DEBUG = self::KEY_CACHE_CALLABLE + 1;
 
     /** Settings key */
     const KEY_ROUTES_PATH = self::KEY_IS_DEBUG + 1;
