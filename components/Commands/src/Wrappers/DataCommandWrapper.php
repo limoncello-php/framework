@@ -18,6 +18,8 @@
 
 use Generator;
 use Limoncello\Contracts\Commands\CommandInterface;
+use Limoncello\Contracts\Commands\IoInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Commands
@@ -84,40 +86,14 @@ class DataCommandWrapper
     }
 
     /**
-     * @return callable
+     * @param ContainerInterface $container
+     * @param IoInterface        $inOut
+     *
+     * @return void
      */
-    public function getExecuteHandler(): callable
+    public function execute(ContainerInterface $container, IoInterface $inOut)
     {
-        /** @var callable $handler */
-        $handler = [get_class($this->getCommand()), CommandInterface::EXECUTE_METHOD];
-
-        assert($this->isValidHandler($handler) === true);
-
-        return $handler;
-    }
-
-    /**
-     * @return callable|null
-     */
-    public function getInitializeHandler()
-    {
-        $handler = $this->getCommand()->getOptionalHandlers()[CommandInterface::HANDLER_INITIALIZE] ?? null;
-
-        assert($handler === null || $this->isValidHandler($handler) === true);
-
-        return $handler;
-    }
-
-    /**
-     * @return callable|null
-     */
-    public function getInteractHandler()
-    {
-        $handler = $this->getCommand()->getOptionalHandlers()[CommandInterface::HANDLER_INTERACT] ?? null;
-
-        assert($handler === null || $this->isValidHandler($handler) === true);
-
-        return $handler;
+        $this->getCommand()->execute($container, $inOut);
     }
 
     /**
@@ -126,16 +102,5 @@ class DataCommandWrapper
     protected function getCommand()
     {
         return $this->command;
-    }
-
-    /**
-     * @param mixed $handler
-     *
-     * @return bool
-     */
-    private function isValidHandler($handler): bool
-    {
-        // TODO add deeper check for `static` and method argument count and types
-        return is_callable($handler) === true && (is_array($handler) === true || is_string($handler) === true);
     }
 }

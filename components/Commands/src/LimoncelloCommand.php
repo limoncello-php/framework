@@ -17,13 +17,15 @@
  */
 
 use Composer\Command\BaseCommand;
+use Limoncello\Commands\Exceptions\ConfigurationException;
 use Limoncello\Commands\Wrappers\ConsoleIoWrapper;
 use Limoncello\Commands\Wrappers\DataArgumentWrapper;
 use Limoncello\Commands\Wrappers\DataCommandWrapper;
 use Limoncello\Commands\Wrappers\DataOptionWrapper;
+use Limoncello\Contracts\Application\ApplicationInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
-use Psr\Container\ContainerInterface;
+use Limoncello\Contracts\Container\ContainerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -32,10 +34,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class LimoncelloCommand extends BaseCommand
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    /** Expected key at `composer.json` -> "extra" */
+    const COMPOSER_JSON__EXTRA__APPLICATION = 'application';
+
+    /** Expected key at `composer.json` -> "extra" -> "application" */
+    const COMPOSER_JSON__EXTRA__APPLICATION__CLASS = 'class';
+
+    /** Default application class name if not replaced via "extra" -> "application" -> "class" */
+    const DEFAULT_APPLICATION_CLASS_NAME = '\\App\\Application';
 
     /**
      * @var DataCommandWrapper
@@ -80,58 +86,47 @@ class LimoncelloCommand extends BaseCommand
         }
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function initialize(InputInterface $input, OutputInterface $output)
-    {
-        parent::initialize($input, $output);
-
-        $handler = $this->getWrapper()->getInitializeHandler();
-        if ($handler !== null) {
-            call_user_func(
-                $handler,
-                $this->getContainer(),
-                $this->wrapIo($input, $output)
-            );
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function interact(InputInterface $input, OutputInterface $output)
-    {
-        parent::interact($input, $output);
-
-        $handler = $this->getWrapper()->getInteractHandler();
-        if ($handler !== null) {
-            call_user_func(
-                $handler,
-                $this->getContainer(),
-                $this->wrapIo($input, $output)
-            );
-        }
-    }
-
     /** @noinspection PhpMissingParentCallCommonInspection
      * @inheritdoc
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        call_user_func(
-            $this->getWrapper()->getExecuteHandler(),
-            $this->getContainer(),
-            $this->wrapIo($input, $output)
-        );
+        $this->getWrapper()->execute($this->getAppContainer(), $this->wrapIo($input, $output));
     }
 
     /**
      * @return ContainerInterface
      */
-    private function getContainer()
+    private function getAppContainer(): ContainerInterface
     {
-        return $this->container;
+        // use application auto loader otherwise no app classes will be visible for us
+        $autoLoaderPath = $this->getComposer()->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'autoload.php';
+        if (file_exists($autoLoaderPath) === true) {
+            /** @noinspection PhpIncludeInspection */
+            require_once $autoLoaderPath;
+        }
+
+        $application = null;
+        $appClass    = $this->getValueFromApplicationExtra(
+            static::COMPOSER_JSON__EXTRA__APPLICATION__CLASS,
+            static::DEFAULT_APPLICATION_CLASS_NAME
+        );
+        if (class_exists($appClass) === false ||
+            (($application = new $appClass()) instanceof ApplicationInterface) === false
+        ) {
+            $settingsPath =
+                'extra->' .
+                static::COMPOSER_JSON__EXTRA__APPLICATION . '->' .
+                static::COMPOSER_JSON__EXTRA__APPLICATION__CLASS;
+            throw new ConfigurationException(
+                "Invalid application class specified '$appClass'. Check your settings at composer.json $settingsPath."
+            );
+        }
+
+        /** @var ApplicationInterface $application */
+        $container = $application->createContainer();
+
+        return $container;
     }
 
     /**
@@ -151,5 +146,19 @@ class LimoncelloCommand extends BaseCommand
     private function getWrapper(): DataCommandWrapper
     {
         return $this->wrapper;
+    }
+
+    /**
+     * @param string $key
+     * @param null   $default
+     *
+     * @return null|mixed
+     */
+    private function getValueFromApplicationExtra(string $key, $default = null)
+    {
+        $extra = $this->getComposer()->getPackage()->getExtra();
+        $value = $extra[static::COMPOSER_JSON__EXTRA__APPLICATION][$key] ?? $default;
+
+        return $value;
     }
 }

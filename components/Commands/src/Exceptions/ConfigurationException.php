@@ -19,6 +19,6 @@
 /**
  * @package Limoncello\Commands
  */
-class ApplicationClassNotFoundException extends CommandsException
+class ConfigurationException extends CommandsException
 {
 }

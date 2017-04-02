@@ -21,26 +21,13 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
-use Limoncello\Contracts\Application\ApplicationInterface;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface;
-use Limoncello\Contracts\Container\ContainerInterface;
-use Limoncello\Contracts\Provider\ProvidesCommandsInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Commands\Commands\CacheCreate;
 
 /**
  * @package Limoncello\Commands
  */
 class ComposerPlugin implements PluginInterface, Capable
 {
-    /** Expected key at `composer.json` -> "extra" */
-    const COMPOSER_JSON__EXTRA__APPLICATION = 'application';
-
-    /** Expected key at `composer.json` -> "extra" -> "application" */
-    const COMPOSER_JSON__EXTRA__APPLICATION__CLASS = 'class';
-
-    /** Default application class name if not replaced via "extra" -> "application" -> "class" */
-    const DEFAULT_APPLICATION_CLASS_NAME = '\\App\\Application';
-
     /**
      * @var Composer
      */
@@ -60,6 +47,21 @@ class ComposerPlugin implements PluginInterface, Capable
     }
 
     /**
+     * @return void
+     */
+    protected function loadCommands()
+    {
+        // Due to https://github.com/composer/composer/issues/6315 we cannot load command from
+        // application settings (application itself and providers).
+        // So ATM fixed list of command is possible.
+        $commands = [
+            new LimoncelloCommand(new CacheCreate()),
+        ];
+
+        ComposerCommandProvider::setCommands($commands);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getCapabilities()
@@ -67,26 +69,6 @@ class ComposerPlugin implements PluginInterface, Capable
         return [
             CommandProvider::class => ComposerCommandProvider::class,
         ];
-    }
-
-    /**
-     * @return IOInterface
-     */
-    protected function getIoInterface(): IOInterface
-    {
-        return $this->ioInterface;
-    }
-
-    /**
-     * @param IOInterface $ioInterface
-     *
-     * @return ComposerPlugin
-     */
-    protected function setIoInterface(IOInterface $ioInterface): ComposerPlugin
-    {
-        $this->ioInterface = $ioInterface;
-
-        return $this;
     }
 
     /**
@@ -110,46 +92,22 @@ class ComposerPlugin implements PluginInterface, Capable
     }
 
     /**
-     * @return void
+     * @return IOInterface
      */
-    protected function loadCommands()
+    protected function getIoInterface(): IOInterface
     {
-        if (($container = $this->getAppContainer()) !== null) {
-            /** @var SettingsProviderInterface $settingsProvider */
-            $provider = $container->get(SettingsProviderInterface::class);
-
-            // Application settings have a list of providers which might have additional settings to load
-            $appSettings     = $provider->get(ApplicationSettingsInterface::class);
-            $providerClasses = $appSettings[ApplicationSettingsInterface::KEY_PROVIDER_CLASSES];
-            foreach ($providerClasses as $providerClass) {
-                if (array_key_exists(ProvidesCommandsInterface::class, class_implements($providerClass)) === true) {
-                    /** @var ProvidesCommandsInterface $providerClass */
-                    foreach ($providerClass::getCommands() as $command) {
-                        new LimoncelloCommand($command);
-                    }
-                }
-            }
-        }
+        return $this->ioInterface;
     }
 
     /**
-     * @return ContainerInterface|null
+     * @param IOInterface $ioInterface
+     *
+     * @return ComposerPlugin
      */
-    protected function getAppContainer()
+    protected function setIoInterface(IOInterface $ioInterface): ComposerPlugin
     {
-        $container = null;
+        $this->ioInterface = $ioInterface;
 
-        $extra    = $this->getComposer()->getPackage()->getExtra();
-        $appClass =
-            $extra[static::COMPOSER_JSON__EXTRA__APPLICATION][static::COMPOSER_JSON__EXTRA__APPLICATION__CLASS] ??
-                static::DEFAULT_APPLICATION_CLASS_NAME;
-        if (class_exists($appClass) === true &&
-            (($application = new $appClass()) instanceof ApplicationInterface) === true
-        ) {
-            /** @var ApplicationInterface $application */
-            $container = $application->createContainer();
-        }
-
-        return $container;
+        return $this;
     }
 }
