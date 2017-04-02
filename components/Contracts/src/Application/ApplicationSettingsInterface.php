@@ -28,4 +28,10 @@ interface ApplicationSettingsInterface extends SettingsInterface
 
     /** Settings key */
     const KEY_PROVIDER_CLASSES = self::KEY_APP_NAME + 1;
+
+    /** Settings key */
+    const KEY_CACHE_FOLDER = self::KEY_PROVIDER_CLASSES + 1;
+
+    /** Settings key */
+    const KEY_CACHE_CALLABLE = self::KEY_CACHE_FOLDER + 1;
 }
