@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
+use Limoncello\Commands\Exceptions\ConfigurationException;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\IoInterface;
+use Limoncello\Templates\Commands\TemplatesClean;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -63,9 +65,15 @@ class CacheClean extends CacheBase
         $cacheCallable = $appSettings[ApplicationSettingsInterface::KEY_CACHE_CALLABLE];
         list (, $class) = $this->parseCacheCallable($cacheCallable);
 
+        if ($class === null) {
+            throw new ConfigurationException();
+        }
+
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
 
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @unlink($path);
+
+        (new TemplatesClean())->execute($container, $inOut);
     }
 }

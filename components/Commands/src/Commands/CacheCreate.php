@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
+use Limoncello\Commands\Exceptions\ConfigurationException;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Serializable\ArraySerializableInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Templates\Commands\TemplatesCreate;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -64,6 +66,9 @@ class CacheCreate extends CacheBase
         $cacheDir      = $appSettings[ApplicationSettingsInterface::KEY_CACHE_FOLDER];
         $cacheCallable = $appSettings[ApplicationSettingsInterface::KEY_CACHE_CALLABLE];
         list ($namespace, $class, $method) = $this->parseCacheCallable($cacheCallable);
+        if ($class === null || $namespace === null || $method === null) {
+            throw new ConfigurationException();
+        }
 
         $settingsProvider = $container->get(SettingsProviderInterface::class);
         assert($settingsProvider instanceof ArraySerializableInterface);
@@ -72,6 +77,8 @@ class CacheCreate extends CacheBase
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
         file_put_contents($path, $content);
+
+        (new TemplatesCreate())->execute($container, $inOut);
     }
 
     /**

@@ -21,6 +21,7 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
+use Limoncello\Commands\Commands\CacheClean;
 use Limoncello\Commands\Commands\CacheCreate;
 
 /**
@@ -56,6 +57,7 @@ class ComposerPlugin implements PluginInterface, Capable
         // So ATM fixed list of command is possible.
         $commands = [
             new LimoncelloCommand(new CacheCreate()),
+            new LimoncelloCommand(new CacheClean()),
         ];
 
         ComposerCommandProvider::setCommands($commands);
