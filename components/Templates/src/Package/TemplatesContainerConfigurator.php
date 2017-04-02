@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Packages\Templates;
+<?php namespace Limoncello\Templates\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -22,7 +22,7 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Templates\Contracts\TemplatesInterface;
 use Limoncello\Templates\TwigTemplates;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Packages\Templates\TemplatesSettings as C;
+use Limoncello\Templates\Package\TemplatesSettings as C;
 
 /**
  * @package Limoncello\Application

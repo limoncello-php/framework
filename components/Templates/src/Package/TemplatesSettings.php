@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Packages\Templates;
+<?php namespace Limoncello\Templates\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
+use GlobIterator;
 use Limoncello\Contracts\Settings\SettingsInterface;
+use SplFileInfo;
 
 /**
  * @package Limoncello\Application
@@ -31,4 +33,25 @@ abstract class TemplatesSettings implements SettingsInterface
 
     /** Settings key */
     const KEY_LAST = self::KEY_CACHE_FOLDER + 1;
+
+    /**
+     * @param string $templatesFolder
+     *
+     * @return string[]
+     */
+    public static function getTemplateNames(string $templatesFolder): array
+    {
+        assert(is_dir($templatesFolder) === true);
+
+        return iterator_to_array(call_user_func(function () use ($templatesFolder) {
+            $globIterator = new GlobIterator(
+                $templatesFolder . DIRECTORY_SEPARATOR . '*.html.twig',
+                GlobIterator::SKIP_DOTS | GlobIterator::CURRENT_AS_FILEINFO
+            );
+            foreach ($globIterator as $fileInfo) {
+                /** @var SplFileInfo $fileInfo */
+                yield $fileInfo->getFilename();
+            }
+        }));
+    }
 }

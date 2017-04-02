@@ -16,10 +16,15 @@
     "require": {
         "php": ">=7.0.0",
         "twig/twig": "^2.3",
-        "limoncello-php/app-cache": "^0.5.0"
+        "limoncello-php/contracts": "dev-develop",
+        "limoncello-php/application": "dev-develop",
+        "limoncello-php/app-cache": "dev-develop",
+
+        "limoncello-php/container": "dev-develop",
+        "limoncello-php/crypt": "dev-develop",
+        "limoncello-php/core": "dev-develop"
     },
     "require-dev": {
-        "composer/composer": "^1.0.0",
         "squizlabs/php_codesniffer": "^2.5",
         "phpmd/phpmd": "^2.4",
         "scrutinizer/ocular": "^1.3",

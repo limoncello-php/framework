@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Packages\Templates;
+<?php namespace Limoncello\Templates\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
