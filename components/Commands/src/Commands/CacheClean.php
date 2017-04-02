@@ -18,14 +18,12 @@
 
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\IoInterface;
-use Limoncello\Contracts\Serializable\ArraySerializableInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Commands
  */
-class CacheCreate extends CacheBase
+class CacheClean extends CacheBase
 {
     /**
      * @inheritdoc
@@ -33,9 +31,9 @@ class CacheCreate extends CacheBase
     public function getCommandData(): array
     {
         return [
-            self::COMMAND_NAME        => 'limoncello:cache',
-            self::COMMAND_DESCRIPTION => 'Creates application caches.',
-            self::COMMAND_HELP        => 'This command creates caches for routes, settings, templates and etc.',
+            self::COMMAND_NAME        => 'limoncello:cache:clean',
+            self::COMMAND_DESCRIPTION => 'Cleans application caches.',
+            self::COMMAND_HELP        => 'This command cleans caches for routes, settings, templates and etc.',
         ];
     }
 
@@ -63,51 +61,11 @@ class CacheCreate extends CacheBase
         $appSettings   = $this->getApplicationSettings($container);
         $cacheDir      = $appSettings[ApplicationSettingsInterface::KEY_CACHE_FOLDER];
         $cacheCallable = $appSettings[ApplicationSettingsInterface::KEY_CACHE_CALLABLE];
-        list ($namespace, $class, $method) = $this->parseCacheCallable($cacheCallable);
-
-        $settingsProvider = $container->get(SettingsProviderInterface::class);
-        assert($settingsProvider instanceof ArraySerializableInterface);
-        $settingsData = $settingsProvider->serialize();
-        $content      = $this->composeContent($settingsData, $namespace, $class, $method);
+        list (, $class) = $this->parseCacheCallable($cacheCallable);
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
-        file_put_contents($path, $content);
-    }
 
-    /**
-     * @param mixed  $value
-     * @param string $className
-     * @param string $methodName
-     * @param string $namespace
-     *
-     * @return string
-     */
-    protected function composeContent(
-        $value,
-        string $namespace,
-        string $className,
-        string $methodName
-    ) {
-        $now     = date(DATE_RFC2822);
-        $data    = var_export($value, true);
-        $content = <<<EOT
-<?php namespace $namespace;
-
-// THIS FILE IS AUTO GENERATED. DO NOT EDIT IT MANUALLY.
-// Generated at: $now
-
-class $className
-{
-    const DATA = $data;
-
-    public static function $methodName()
-    {
-        return static::DATA;
-    }
-}
-
-EOT;
-
-        return $content;
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        @unlink($path);
     }
 }
