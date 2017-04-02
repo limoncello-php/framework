@@ -36,11 +36,5 @@ abstract class ApplicationSettings implements ApplicationSettingsInterface
     const KEY_EXCEPTION_DUMPER = self::KEY_CONTAINER_CONFIGURATORS_PATH + 1;
 
     /** Settings key */
-    const KEY_CACHE_PATH = self::KEY_EXCEPTION_DUMPER + 1;
-
-    /** Settings key */
-    const KEY_CACHE_CALLABLE = self::KEY_CACHE_PATH + 1;
-
-    /** Settings key */
-    const KEY_LAST = self::KEY_CACHE_CALLABLE + 1;
+    const KEY_LAST = self::KEY_EXCEPTION_DUMPER + 1;
 }
