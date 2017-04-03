@@ -112,7 +112,7 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase
     /**
      * Test folder scan.
      */
-    public function testScanFolder()
+    public function testScanFolder1()
     {
         $foundCurrentFile = false;
         foreach ($this->fileSystem->scanFolder(__DIR__) as $fileOrFolder) {
@@ -123,6 +123,22 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertTrue($foundCurrentFile);
+    }
+
+    /**
+     * Test folder scan.
+     */
+    public function testScanFolderShouldSeeFolders()
+    {
+        $foundCurrentFolder = false;
+        foreach ($this->fileSystem->scanFolder(__DIR__ . DIRECTORY_SEPARATOR . '..') as $fileOrFolder) {
+            if (__DIR__ === realpath($fileOrFolder)) {
+                $foundCurrentFolder = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($foundCurrentFolder);
     }
 
     /**

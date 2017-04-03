@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use GlobIterator;
+use DirectoryIterator;
 use Limoncello\Application\Contracts\FileSystemInterface;
 use Limoncello\Application\Exceptions\FileSystemException;
 
@@ -69,8 +69,16 @@ class FileSystem implements FileSystemInterface
     {
         is_dir($folderPath) === true ?: $this->throwEx(new FileSystemException());
 
-        $flags  = GlobIterator::SKIP_DOTS | GlobIterator::KEY_AS_FILENAME | GlobIterator::CURRENT_AS_PATHNAME;
-        $result = iterator_to_array(new GlobIterator($folderPath . DIRECTORY_SEPARATOR . '*.*', $flags));
+        $iterator = call_user_func(function () use ($folderPath) {
+            foreach (new DirectoryIterator($folderPath) as $directoryIterator) {
+                /** @var DirectoryIterator $directoryIterator */
+                if ($directoryIterator->isDot() === false) {
+                    yield $directoryIterator->getFilename() => $directoryIterator->getRealPath();
+                }
+            }
+        });
+
+        $result = iterator_to_array($iterator);
 
         return $result;
     }
