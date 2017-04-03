@@ -114,8 +114,7 @@ class FileSystem implements FileSystemInterface
      */
     public function deleteFolderRecursive(string $folderPath)
     {
-        foreach ($this->scanFolder($folderPath) as $fileOrFolder) {
-            $path = $folderPath . DIRECTORY_SEPARATOR . $fileOrFolder;
+        foreach ($this->scanFolder($folderPath) as $path) {
             $this->isFolder($path) === true ? $this->deleteFolderRecursive($path) : $this->delete($path);
         }
 

@@ -165,12 +165,12 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase
     {
         $rootPath        = 'root';
         $rootItems       = [
-            'folder1',
-            'file1',
+            'root/folder1',
+            'root/file1',
         ];
         $folder1Items    = [
-            'subFolder1',
-            'file11',
+            'root/folder1/subFolder1',
+            'root/folder1/file11',
         ];
         $subFolder1Items = [];
 
@@ -201,12 +201,12 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase
     {
         $rootPath        = 'root';
         $rootItems       = [
-            'folder1',
-            'file1',
+            'root/folder1',
+            'root/file1',
         ];
         $folder1Items    = [
-            'subFolder1',
-            'file11',
+            'root/folder1/subFolder1',
+            'root/folder1/file11',
         ];
         $subFolder1Items = [];
 
@@ -233,12 +233,12 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase
     {
         $rootPath        = 'root';
         $rootItems       = [
-            'folder1',
-            'file1',
+            'root/folder1',
+            'root/file1',
         ];
         $folder1Items    = [
-            'subFolder1',
-            'file11',
+            'root/folder1/subFolder1',
+            'root/folder1/file11',
         ];
         $subFolder1Items = [];
 
