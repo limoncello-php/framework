@@ -3,7 +3,6 @@
 BRANCHES='master develop'
 
 COMPONENTS=(
-    'components/AppCache/:git@github.com:limoncello-php-dist/app-cache.git'
     'components/Application/:git@github.com:limoncello-php-dist/application.git'
     'components/Auth/:git@github.com:limoncello-php-dist/auth.git'
     'components/Commands/:git@github.com:limoncello-php-dist/commands.git'

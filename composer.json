@@ -15,24 +15,22 @@
     ],
     "require": {
         "php": ">=7.0.0",
-        "limoncello-php/app-cache": "^0.5.0",
-        "limoncello-php/auth": "^0.5.0",
-        "limoncello-php/container": "^0.5.0",
-        "limoncello-php/contracts": "^0.5.0",
-        "limoncello-php/core": "^0.5.0",
-        "limoncello-php/crypt": "^0.5.0",
-        "limoncello-php/events": "^0.5.0",
-        "limoncello-php/flute": "^0.5.0",
-        "limoncello-php/l10n": "^0.5.0",
-        "limoncello-php/oauth-server": "^0.5.0",
-        "limoncello-php/passport": "^0.5.0",
-        "limoncello-php/templates": "^0.5.0",
-        "limoncello-php/validation": "^0.5.0"
+        "limoncello-php/auth": "^0.6.0",
+        "limoncello-php/container": "^0.6.0",
+        "limoncello-php/contracts": "^0.6.0",
+        "limoncello-php/core": "^0.6.0",
+        "limoncello-php/crypt": "^0.6.0",
+        "limoncello-php/events": "^0.6.0",
+        "limoncello-php/flute": "^0.6.0",
+        "limoncello-php/l10n": "^0.6.0",
+        "limoncello-php/oauth-server": "^0.6.0",
+        "limoncello-php/passport": "^0.6.0",
+        "limoncello-php/templates": "^0.6.0",
+        "limoncello-php/validation": "^0.6.0"
     },
     "scripts": {
         "test": "@test-unit",
         "test-unit": [
-            "@test-unit-component-AppCache",
             "@test-unit-component-Auth",
             "@test-unit-component-Container",
             "@test-unit-component-Core",
@@ -46,7 +44,6 @@
             "@test-unit-component-Validation"
         ],
         "test-unit-with-coverage": [
-            "@test-unit-with-coverage-component-AppCache",
             "@test-unit-with-coverage-component-Auth",
             "@test-unit-with-coverage-component-Container",
             "@test-unit-with-coverage-component-Core",
@@ -59,7 +56,6 @@
             "@test-unit-with-coverage-component-Templates",
             "@test-unit-with-coverage-component-Validation"
         ],
-        "update-component-AppCache":    "@composer update --working-dir=./components/AppCache/ --optimize-autoloader --quiet",
         "update-component-Auth":        "@composer update --working-dir=./components/Auth/ --optimize-autoloader --quiet",
         "update-component-Container":   "@composer update --working-dir=./components/Container/ --optimize-autoloader --quiet",
         "update-component-Core":        "@composer update --working-dir=./components/Core/ --optimize-autoloader --quiet",
@@ -71,7 +67,6 @@
         "update-component-Passport":    "@composer update --working-dir=./components/Passport/ --optimize-autoloader --quiet",
         "update-component-Templates":   "@composer update --working-dir=./components/Templates/ --optimize-autoloader --quiet",
         "update-component-Validation":  "@composer update --working-dir=./components/Validation/ --optimize-autoloader --quiet",
-        "test-unit-component-AppCache":    ["@update-component-AppCache", "@composer --working-dir=./components/AppCache/ test-unit"],
         "test-unit-component-Auth":        ["@update-component-Auth", "@composer --working-dir=./components/Auth/ test-unit"],
         "test-unit-component-Container":   ["@update-component-Container", "@composer --working-dir=./components/Container/ test-unit"],
         "test-unit-component-Core":        ["@update-component-Core", "@composer --working-dir=./components/Core/ test-unit"],
@@ -83,7 +78,6 @@
         "test-unit-component-Passport":    ["@update-component-Passport", "@composer --working-dir=./components/Passport/ test-unit"],
         "test-unit-component-Templates":   ["@update-component-Templates", "@composer --working-dir=./components/Templates/ test-unit"],
         "test-unit-component-Validation":  ["@update-component-Validation", "@composer --working-dir=./components/Validation/ test-unit"],
-        "test-unit-with-coverage-component-AppCache":    ["@update-component-AppCache", "@composer --working-dir=./components/AppCache/ test-unit-with-coverage"],
         "test-unit-with-coverage-component-Auth":        ["@update-component-Auth", "@composer --working-dir=./components/Auth/ test-unit-with-coverage"],
         "test-unit-with-coverage-component-Container":   ["@update-component-Container", "@composer --working-dir=./components/Container/ test-unit-with-coverage"],
         "test-unit-with-coverage-component-Core":        ["@update-component-Core", "@composer --working-dir=./components/Core/ test-unit-with-coverage"],
