@@ -58,7 +58,7 @@ class FileSystem implements FileSystemInterface
      */
     public function delete(string $filePath)
     {
-        $isDeleted = file_exists($filePath) === true && unlink($filePath) === true;
+        $isDeleted = file_exists($filePath) === false || unlink($filePath) === true;
         $isDeleted === true ?: $this->throwEx(new FileSystemException());
     }
 

@@ -104,6 +104,9 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->fileSystem->exists($tmpFileName));
         $this->fileSystem->delete($tmpFileName);
         $this->assertFalse($this->fileSystem->exists($tmpFileName));
+
+        // delete of non-existing file do not fail
+        $this->fileSystem->delete($tmpFileName);
     }
 
     /**
