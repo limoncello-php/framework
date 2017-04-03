@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Contracts\FileSystemInterface;
+use Limoncello\Application\FileSystem\FileSystem;
 use Limoncello\Application\Traits\ParseCallableTrait;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
@@ -41,5 +43,13 @@ abstract class ApplicationSettingsBase implements CommandInterface
         $appSettings      = $settingsProvider->get(ApplicationSettingsInterface::class);
 
         return $appSettings;
+    }
+
+    /**
+     * @return FileSystemInterface
+     */
+    protected function createFileSystem(): FileSystemInterface
+    {
+        return new FileSystem();
     }
 }

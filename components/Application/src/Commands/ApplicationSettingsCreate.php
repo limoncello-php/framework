@@ -76,7 +76,7 @@ class ApplicationSettingsCreate extends ApplicationSettingsBase
         $content      = $this->composeContent($settingsData, $namespace, $class, $method);
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
-        file_put_contents($path, $content);
+        $this->createFileSystem()->write($path, $content);
     }
 
     /**

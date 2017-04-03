@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Contracts\FileSystemInterface;
 use Limoncello\Application\Exceptions\ConfigurationException;
-use Limoncello\Application\FileSystem\FileSystem;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Psr\Container\ContainerInterface;
@@ -74,13 +72,5 @@ class ApplicationSettingsClean extends ApplicationSettingsBase
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
 
         $this->createFileSystem()->delete($path);
-    }
-
-    /**
-     * @return FileSystemInterface
-     */
-    protected function createFileSystem(): FileSystemInterface
-    {
-        return new FileSystem();
     }
 }
