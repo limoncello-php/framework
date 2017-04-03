@@ -18,7 +18,6 @@
         "twig/twig": "^2.3",
         "limoncello-php/contracts": "dev-develop",
         "limoncello-php/application": "dev-develop",
-        "limoncello-php/app-cache": "dev-develop",
 
         "limoncello-php/container": "dev-develop",
         "limoncello-php/crypt": "dev-develop",

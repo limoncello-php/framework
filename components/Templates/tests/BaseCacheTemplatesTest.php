@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-use Composer\Script\Event;
-use Limoncello\AppCache\Contracts\FileSystemInterface;
-use Limoncello\Templates\Scripts\BaseCacheTemplates;
+use Limoncello\Application\Contracts\FileSystemInterface;
 use Mockery;
 use Mockery\Mock;
 use Twig_Environment;
+
+// TODO update tests to test commands + rename test class
 
 /**
  * @package Limoncello\Tests\AppCache
