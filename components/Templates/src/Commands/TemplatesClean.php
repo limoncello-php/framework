@@ -65,8 +65,7 @@ class TemplatesClean extends TemplatesBase
 
         $fileSystem = $this->createFileSystem();
         foreach ($fileSystem->scanFolder($cacheFolder) as $fileOrFolder) {
-            $fileSystem->isFolder($fileOrFolder) === true ?
-                $fileSystem->deleteFolderRecursive($fileOrFolder) : $fileSystem->delete($fileOrFolder);
+            $fileSystem->isFolder($fileOrFolder) === false ?: $fileSystem->deleteFolderRecursive($fileOrFolder);
         }
     }
 
