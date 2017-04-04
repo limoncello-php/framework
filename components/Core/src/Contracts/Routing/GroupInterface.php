@@ -47,9 +47,9 @@ interface GroupInterface
     public function getName();
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getUriPrefix();
+    public function getUriPrefix(): string;
 
     /**
      * @return callable[]
@@ -76,9 +76,9 @@ interface GroupInterface
      * @param Closure $closure
      * @param array   $parameters
      *
-     * @return $this
+     * @return GroupInterface
      */
-    public function group($prefix, Closure $closure, array $parameters = []);
+    public function group($prefix, Closure $closure, array $parameters = []): GroupInterface;
 
     /**
      * @param Closure        $closure
@@ -103,7 +103,7 @@ interface GroupInterface
      *
      * @return GroupInterface
      */
-    public function method($method, $uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function method(string $method, string $uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
@@ -112,7 +112,7 @@ interface GroupInterface
      *
      * @return GroupInterface
      */
-    public function get($uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function get(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
@@ -121,7 +121,7 @@ interface GroupInterface
      *
      * @return GroupInterface
      */
-    public function post($uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function post(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
@@ -130,7 +130,7 @@ interface GroupInterface
      *
      * @return GroupInterface
      */
-    public function put($uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function put(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
@@ -139,7 +139,7 @@ interface GroupInterface
      *
      * @return GroupInterface
      */
-    public function patch($uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function patch(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @param string   $uriPath
@@ -148,7 +148,7 @@ interface GroupInterface
      *
      * @return GroupInterface
      */
-    public function delete($uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function delete(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
 
     /**
      * @return bool

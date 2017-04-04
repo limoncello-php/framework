@@ -52,9 +52,9 @@ class NestedGroup extends BaseGroup
     }
 
     /**
-     * @return NestedGroup
+     * @return BaseGroup
      */
-    protected function createGroup()
+    protected function createGroup(): BaseGroup
     {
         $group = (new static($this))->setHasTrailSlash($this->hasTrailSlash());
 

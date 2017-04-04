@@ -28,7 +28,7 @@ trait CallableTrait
      *
      * @return bool
      */
-    protected function isCallableToCache($value)
+    protected function isCallableToCache($value): bool
     {
         $result = is_callable($value) && (
                 // string `Class::method`
@@ -47,7 +47,7 @@ trait CallableTrait
      *
      * @return bool
      */
-    protected function isCallableToCacheArray(array $values)
+    protected function isCallableToCacheArray(array $values): bool
     {
         foreach ($values as $value) {
             if ($this->isCallableToCache($value) === false) {
@@ -61,7 +61,7 @@ trait CallableTrait
     /**
      * @return string
      */
-    protected function getCallableToCacheMessage()
+    protected function getCallableToCacheMessage(): string
     {
         return 'Value either not callable or cannot be cached. ' .
             'Use callable in form of \'ClassName::methodName\' or [ClassName::class, \'methodName\'].';

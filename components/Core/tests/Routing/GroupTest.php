@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\SapiInterface;
 use Limoncello\Core\Application\Application;
-use Limoncello\Core\Contracts\Application\SapiInterface;
 use Limoncello\Core\Contracts\Routing\GroupInterface as GI;
 use Limoncello\Core\Contracts\Routing\GroupInterface;
 use Limoncello\Core\Contracts\Routing\RouteInterface;

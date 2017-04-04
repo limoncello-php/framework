@@ -22,7 +22,7 @@ use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use FastRoute\DataGenerator\GroupPosBased as GroupPosBasedGenerator;
 use FastRoute\DataGenerator\MarkBased as MarkBasedGenerator;
 use FastRoute\RouteParser;
-use Limoncello\Core\Contracts\Application\SapiInterface;
+use Limoncello\Contracts\Application\SapiInterface;
 use Limoncello\Core\Contracts\Routing\GroupInterface;
 use Limoncello\Core\Contracts\Routing\RouteInterface;
 use Limoncello\Core\Contracts\Routing\RouterInterface;

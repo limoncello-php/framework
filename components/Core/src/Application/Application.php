@@ -86,6 +86,7 @@ abstract class Application implements ApplicationInterface
     /**
      * @inheritdoc
      *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function run()
@@ -204,6 +205,8 @@ abstract class Application implements ApplicationInterface
      * @param array $coreSettings
      *
      * @return RouterInterface
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     protected function getRouter(array $coreSettings): RouterInterface
     {

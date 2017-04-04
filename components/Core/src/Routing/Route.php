@@ -67,7 +67,7 @@ class Route implements RouteInterface
      * @param string         $method
      * @param string         $uriPath
      */
-    public function __construct(GroupInterface $group, $method, $uriPath)
+    public function __construct(GroupInterface $group, string $method, string $uriPath)
     {
         $this->group   = $group;
         $this->method  = $method;
@@ -77,9 +77,9 @@ class Route implements RouteInterface
     /**
      * @param callable $handler
      *
-     * @return $this
+     * @return Route
      */
-    public function setHandler(callable $handler)
+    public function setHandler(callable $handler): Route
     {
         if ($this->isCallableToCache($handler) === false) {
             throw new LogicException($this->getCallableToCacheMessage());
@@ -92,9 +92,9 @@ class Route implements RouteInterface
     /**
      * @param string|null $name
      *
-     * @return $this
+     * @return Route
      */
-    public function setName($name)
+    public function setName(string $name = null): Route
     {
         $this->name = $name;
 
@@ -176,7 +176,7 @@ class Route implements RouteInterface
      *
      * @return Route
      */
-    public function setUseGroupRequestFactory($isGroupFactory): Route
+    public function setUseGroupRequestFactory(bool $isGroupFactory): Route
     {
         $this->isGroupRequestFactory = $isGroupFactory;
 
