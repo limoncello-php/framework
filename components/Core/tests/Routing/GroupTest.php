@@ -17,10 +17,9 @@
  */
 
 use Limoncello\Contracts\Application\SapiInterface;
+use Limoncello\Contracts\Routing\GroupInterface as GI;
+use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Core\Application\Application;
-use Limoncello\Core\Contracts\Routing\GroupInterface as GI;
-use Limoncello\Core\Contracts\Routing\GroupInterface;
-use Limoncello\Core\Contracts\Routing\RouteInterface;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Traits\CallableTrait;
 use Limoncello\Tests\Core\TestCase;
@@ -38,7 +37,7 @@ class GroupTest extends TestCase
     public function testBasicGroups()
     {
         $topGroup = (new Group([
-            GroupInterface::PARAM_NAME_PREFIX => 'all::',
+            GI::PARAM_NAME_PREFIX => 'all::',
         ]));
 
         $topGroup
@@ -50,7 +49,7 @@ class GroupTest extends TestCase
                     ->delete('{id}', [self::class, 'postsDelete'])
                     ->group('edit', function (GI $group) {
                         $group->get('', [self::class, 'postEdit'], [RouteInterface::PARAM_NAME => 'editPost']);
-                    }, [GroupInterface::PARAM_NAME_PREFIX => 'edit::']);
+                    }, [GI::PARAM_NAME_PREFIX => 'edit::']);
             })
             ->post('', [self::class, 'createNews']);
 

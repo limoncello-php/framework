@@ -18,10 +18,10 @@
 
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
-use Limoncello\Core\Contracts\Routing\DispatcherInterface;
-use Limoncello\Core\Contracts\Routing\GroupInterface;
-use Limoncello\Core\Contracts\Routing\RouteInterface;
-use Limoncello\Core\Contracts\Routing\RouterInterface;
+use Limoncello\Contracts\Routing\DispatcherInterface;
+use Limoncello\Contracts\Routing\GroupInterface;
+use Limoncello\Contracts\Routing\RouteInterface;
+use Limoncello\Contracts\Routing\RouterInterface;
 use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -110,16 +110,16 @@ class Router implements RouterInterface
     /**
      * @inheritdoc
      */
-    public function match($method, $uriPath): array
+    public function match(string $method, string $uriPath): array
     {
         $this->checkRoutesLoaded();
 
-        $result = $this->dispatcher->dispatch($method, $uriPath);
+        $result = $this->dispatcher->dispatchRequest($method, $uriPath);
 
         // Array contains matching result code, allowed methods list, handler parameters list, handler,
         // middleware list, container configurators list, custom request factory.
         switch ($result[0]) {
-            case DispatcherInterface::FOUND:
+            case DispatcherInterface::ROUTE_FOUND:
                 $routeIndex    = $result[1];
                 $handlerParams = $result[2];
 
@@ -128,7 +128,7 @@ class Router implements RouterInterface
 
                 return array_merge([self::MATCH_FOUND, null, $handlerParams], $routeInfo);
 
-            case DispatcherInterface::METHOD_NOT_ALLOWED:
+            case DispatcherInterface::ROUTE_METHOD_NOT_ALLOWED:
                 $allowedMethods = $result[1];
 
                 return [self::MATCH_METHOD_NOT_ALLOWED, $allowedMethods, null, null, null, null, null];

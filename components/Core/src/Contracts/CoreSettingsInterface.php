@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Core\Contracts\Settings;
+<?php namespace Limoncello\Core\Contracts;
 
 /**
  * Copyright 2015-2017 info@neomerx.com

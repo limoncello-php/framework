@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Core\Contracts\Settings\CoreSettingsInterface;
+use Limoncello\Core\Contracts\CoreSettingsInterface;
 
 /**
  * @package Limoncello\Core

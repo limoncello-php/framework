@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Core\Contracts\Routing\GroupInterface;
+use Limoncello\Contracts\Routing\GroupInterface;
 
 /**
  * @package Limoncello\Core

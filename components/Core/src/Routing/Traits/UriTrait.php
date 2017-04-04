@@ -27,7 +27,7 @@ trait UriTrait
      *
      * @return string
      */
-    protected function normalizeUri(string $uri, bool $trailingSlash)
+    protected function normalizeUri(string $uri, bool $trailingSlash): string
     {
         // add starting '/' and cut ending '/' if necessary
         $uri = strlen($uri) > 0 && $uri[0] === '/' ? $uri : '/' . $uri;

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Core\Routing\Dispatcher;
+<?php namespace Limoncello\Core\Routing\Traits;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -15,32 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+use FastRoute\Dispatcher;
 use Limoncello\Contracts\Routing\DispatcherInterface;
-use Limoncello\Core\Routing\Traits\DispatcherTrait;
 
 /**
  * @package Limoncello\Core
+ *
+ * @method dispatch(string $method, string $uri): array
  */
-class GroupCountBased extends \FastRoute\Dispatcher\GroupCountBased implements DispatcherInterface
+trait DispatcherTrait
 {
-    use DispatcherTrait;
-
-    /** @noinspection PhpMissingParentConstructorInspection
-     * Constructor.
+    /**
+     * Validate implementation code match with FasRoute ones.
+     *
+     * @return bool
      */
-    public function __construct()
+    protected function areCodeValid()
     {
-        assert($this->areCodeValid() === true);
-
-        // Suppress parent constructor. Use `setData` instead.
+        return
+            Dispatcher::NOT_FOUND === DispatcherInterface::ROUTE_NOT_FOUND &&
+            Dispatcher::FOUND === DispatcherInterface::ROUTE_FOUND &&
+            Dispatcher::METHOD_NOT_ALLOWED === DispatcherInterface::ROUTE_METHOD_NOT_ALLOWED;
     }
 
     /**
      * @inheritdoc
      */
-    public function setData(array $data)
+    public function dispatchRequest(string $method, string $uri): array
     {
-        list($this->staticRouteMap, $this->variableRouteData) = $data;
+        return $this->dispatch($method, $uri);
     }
 }

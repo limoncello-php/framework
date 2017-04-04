@@ -16,18 +16,23 @@
  * limitations under the License.
  */
 
-use Limoncello\Core\Contracts\Routing\DispatcherInterface;
+use Limoncello\Contracts\Routing\DispatcherInterface;
+use Limoncello\Core\Routing\Traits\DispatcherTrait;
 
 /**
  * @package Limoncello\Core
  */
 class MarkBased extends \FastRoute\Dispatcher\MarkBased implements DispatcherInterface
 {
+    use DispatcherTrait;
+
     /** @noinspection PhpMissingParentConstructorInspection
      * Constructor.
      */
     public function __construct()
     {
+        assert($this->areCodeValid() === true);
+
         // Suppress parent constructor. Use `setData` instead.
     }
 

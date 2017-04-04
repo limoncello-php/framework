@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Core\Contracts\Routing\GroupInterface;
-use Limoncello\Core\Contracts\Routing\RouteInterface;
+use Limoncello\Contracts\Routing\GroupInterface;
+use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Core\Routing\Traits\CallableTrait;
 use Limoncello\Core\Routing\Traits\HasConfiguratorsTrait;
 use Limoncello\Core\Routing\Traits\HasMiddlewareTrait;
