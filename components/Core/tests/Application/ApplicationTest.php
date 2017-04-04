@@ -18,8 +18,8 @@
 
 use Closure;
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
-use Limoncello\Contracts\Application\SapiInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
+use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Application;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Application\SapiInterface;
+use Limoncello\Contracts\Core\SapiInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;

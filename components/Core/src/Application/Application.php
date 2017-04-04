@@ -17,9 +17,9 @@
  */
 
 use Closure;
-use Limoncello\Contracts\Application\ApplicationInterface;
-use Limoncello\Contracts\Application\SapiInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
+use Limoncello\Contracts\Core\ApplicationInterface;
+use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Contracts\CoreSettingsInterface;
