@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Contracts;
+<?php namespace Limoncello\Crypt\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,31 +16,20 @@
  * limitations under the License.
  */
 
-use Closure;
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 
 /**
  * @package Limoncello\Application
  */
-interface MiddlewareInterface
+class AsymmetricPublicEncryptPrivateDecryptProvider implements ProvidesContainerConfiguratorsInterface
 {
     /**
-     * Configurator's method name.
+     * @inheritdoc
      */
-    const METHOD_NAME = 'handle';
-
-    /**
-     * @param ServerRequestInterface $request
-     * @param Closure                $next
-     * @param ContainerInterface     $container
-     *
-     * @return ResponseInterface
-     */
-    public static function handle(
-        ServerRequestInterface $request,
-        Closure $next,
-        ContainerInterface $container
-    ): ResponseInterface;
+    public static function getContainerConfigurators(): array
+    {
+        return [
+            AsymmetricPublicEncryptPrivateDecryptContainerConfigurator::HANDLER,
+        ];
+    }
 }

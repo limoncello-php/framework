@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Crypt\Contracts;
+<?php namespace Limoncello\Crypt\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,14 +16,20 @@
  * limitations under the License.
  */
 
-/**
- * @package Limoncello\Crypt
- */
-interface CryptConfigInterface
-{
-    /** Config key */
-    const HASH_ALGORITHM = 0;
+use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 
-    /** Config key */
-    const HASH_COST = self::HASH_ALGORITHM + 1;
+/**
+ * @package Limoncello\Application
+ */
+class SymmetricCryptProvider implements ProvidesContainerConfiguratorsInterface
+{
+    /**
+     * @inheritdoc
+     */
+    public static function getContainerConfigurators(): array
+    {
+        return [
+            SymmetricCryptContainerConfigurator::HANDLER,
+        ];
+    }
 }

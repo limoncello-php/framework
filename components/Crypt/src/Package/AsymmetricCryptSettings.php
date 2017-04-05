@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Contracts;
+<?php namespace Limoncello\Crypt\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,22 +16,19 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Container\ContainerInterface;
+use Limoncello\Contracts\Settings\SettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-interface ContainerConfiguratorInterface
+abstract class AsymmetricCryptSettings implements SettingsInterface
 {
-    /**
-     * Configurator's method name.
-     */
-    const METHOD_NAME = 'configure';
+    /** Settings key */
+    const KEY_PUBLIC_PATH_OR_KEY_VALUE = 0;
 
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return void
-     */
-    public static function configure(ContainerInterface $container);
+    /** Settings key */
+    const KEY_PRIVATE_PATH_OR_KEY_VALUE = self::KEY_PUBLIC_PATH_OR_KEY_VALUE + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_PRIVATE_PATH_OR_KEY_VALUE + 1;
 }

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Crypt;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class Hasher implements HasherInterface
     private $algorithm;
 
     /**
-     * @var null|array
+     * @var array
      */
     private $options;
 
@@ -37,8 +37,10 @@ class Hasher implements HasherInterface
      * @param int $algorithm
      * @param int $cost
      */
-    public function __construct($algorithm = PASSWORD_DEFAULT, $cost = 10)
+    public function __construct(int $algorithm = PASSWORD_DEFAULT, int $cost = 10)
     {
+        assert($cost > 0);
+
         $this->algorithm = $algorithm;
         $this->options   = [
             'cost' => $cost,
@@ -48,7 +50,7 @@ class Hasher implements HasherInterface
     /**
      * @inheritdoc
      */
-    public function hash($password)
+    public function hash(string $password): string
     {
         $hash = password_hash($password, $this->algorithm, $this->options);
 
@@ -58,7 +60,7 @@ class Hasher implements HasherInterface
     /**
      * @inheritdoc
      */
-    public function verify($password, $hash)
+    public function verify(string $password, string $hash): bool
     {
         $result = password_verify($password, $hash);
 

@@ -1,7 +1,7 @@
-<?php namespace Limoncello\Crypt;
+<?php namespace Limoncello\Crypt\Exceptions;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
  * limitations under the License.
  */
 
-use RuntimeException;
-
 /**
  * @package Limoncello\Crypt
  */
-class CryptException extends RuntimeException
+class CryptConfigurationException extends CryptException
 {
 }

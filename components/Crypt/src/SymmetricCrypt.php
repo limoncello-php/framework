@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Crypt;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 use Limoncello\Crypt\Contracts\DecryptInterface;
 use Limoncello\Crypt\Contracts\EncryptInterface;
+use Limoncello\Crypt\Exceptions\CryptException;
 
 /**
  * @package Limoncello\Crypt
@@ -39,18 +40,18 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
      *
      * @var int
      */
-    private $options;
+    private $options = 0;
 
     /**
      * @var string
      */
-    private $initializationVector = null;
+    private $initializationVector = '';
 
     /**
      * @param string $method
      * @param string $password
      */
-    public function __construct($method, $password)
+    public function __construct(string $method, string $password)
     {
         $this->setMethod($method)->setPassword($password)->asRaw();
     }
@@ -58,21 +59,24 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @inheritdoc
      */
-    public function decrypt($data)
+    public function decrypt(string $data): string
     {
-        assert(is_string($data) === true);
-
         $this->clearErrors();
+
+        $vector = $this->getIV();
+        if (empty($vector) === true) {
+            $ivLength = $this->openSslIvLength($this->getMethod());
+            $vector   = $this->readIV($data, $ivLength);
+            $data     = $this->extractData($data, $ivLength);
+        }
 
         $decrypted = $this->openSslDecrypt(
             $data,
             $this->getMethod(),
             $this->getPassword(),
             $this->getOptions(),
-            $this->getInitializationVector()
+            $vector
         );
-
-        $decrypted !== false ?: $this->throwException(new CryptException($this->getErrorMessage()));
 
         return $decrypted;
     }
@@ -80,29 +84,44 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @inheritdoc
      */
-    public function encrypt($data)
+    public function encrypt(string $data): string
     {
-        assert(is_string($data) === true);
-
         $this->clearErrors();
+
+        $isAddIvToOutput = false;
+        $vector          = $this->getIV();
+        if (empty($vector) === true) {
+            $vector          = $this->generateIV();
+            $isAddIvToOutput = true;
+        }
 
         $encrypted = $this->openSslEncrypt(
             $data,
             $this->getMethod(),
             $this->getPassword(),
             $this->getOptions(),
-            $this->getInitializationVector()
+            $vector
         );
 
-        $encrypted !== false ?: $this->throwException(new CryptException($this->getErrorMessage()));
+        // Add initialization vector (IV) if it was generated otherwise it won't be possible to encrypt the message.
+        //
+        // Also @see http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
+        //
+        // Appendix C: Generation of Initialization Vectors
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ...
+        // The IV need not be secret, so the IV, or information sufficient to determine the IV, may be
+        // transmitted with the ciphertext.
+        // ...
+        $result = $isAddIvToOutput === false ? $encrypted : $vector . $encrypted;
 
-        return $encrypted;
+        return $result;
     }
 
     /**
      * @return string
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -110,7 +129,7 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -118,11 +137,14 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param string $method
      *
-     * @return $this
+     * @return SymmetricCrypt
      */
-    public function setMethod($method)
+    public function setMethod(string $method): SymmetricCrypt
     {
-        assert(is_string($method) === true && in_array($method, openssl_get_cipher_methods(true)) === true);
+        assert(
+            ($availableMethods = openssl_get_cipher_methods(true)) !== false &&
+            in_array($method, $availableMethods) === true
+        );
 
         $this->method = $method;
 
@@ -132,11 +154,11 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param string $password
      *
-     * @return $this
+     * @return SymmetricCrypt
      */
-    public function setPassword($password)
+    public function setPassword(string $password): SymmetricCrypt
     {
-        assert(is_string($password) === true && empty($password) === false);
+        assert(empty($password) === false);
 
         $this->password = $password;
 
@@ -144,14 +166,12 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     }
 
     /**
-     * @param null|string $value
+     * @param string $value
      *
-     * @return $this
+     * @return SymmetricCrypt
      */
-    public function resetInitializationVector($value = null)
+    public function setIV(string $value): SymmetricCrypt
     {
-        assert(is_string($value) === true || $value === null);
-
         $this->initializationVector = $value;
 
         return $this;
@@ -160,51 +180,39 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @return string
      */
-    public function getInitializationVector()
+    public function getIV(): string
     {
-        if ($this->initializationVector === null) {
-            $this->initializationVector = $this->generateInitializationVector();
-        }
-
         return $this->initializationVector;
     }
 
     /**
-     * @return $this
+     * @return SymmetricCrypt
      */
-    public function asRaw()
-    {
-        return $this->setOption(OPENSSL_RAW_DATA);
-    }
-
-    /**
-     * @return $this
-     */
-    public function asBase64()
-    {
-        return $this->clearOption(OPENSSL_RAW_DATA);
-    }
-
-    /**
-     * @return $this
-     */
-    public function withZeroPadding()
+    public function withZeroPadding(): SymmetricCrypt
     {
         return $this->setOption(OPENSSL_ZERO_PADDING);
     }
 
     /**
-     * @return $this
+     * @return SymmetricCrypt
      */
-    public function withoutZeroPadding()
+    public function withoutZeroPadding(): SymmetricCrypt
     {
         return $this->clearOption(OPENSSL_ZERO_PADDING);
     }
 
     /**
+     * @return SymmetricCrypt
+     */
+    protected function asRaw(): SymmetricCrypt
+    {
+        return $this->setOption(OPENSSL_RAW_DATA);
+    }
+
+    /**
      * @return int
      */
-    protected function getOptions()
+    protected function getOptions(): int
     {
         return $this->options;
     }
@@ -212,12 +220,10 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param int $options
      *
-     * @return $this
+     * @return SymmetricCrypt
      */
-    protected function setOptions($options)
+    protected function setOptions(int $options): SymmetricCrypt
     {
-        assert(is_int($options) === true);
-
         $this->options = $options;
 
         return $this;
@@ -226,9 +232,12 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @return string
      */
-    protected function generateInitializationVector()
+    protected function generateIV(): string
     {
-        $vector = openssl_random_pseudo_bytes(openssl_cipher_iv_length($this->getMethod()));
+        $ivLength = $this->openSslIvLength($this->getMethod());
+        $ivLength !== false ?: $this->throwException(new CryptException($this->getErrorMessage()));
+
+        $vector = openssl_random_pseudo_bytes($ivLength);
 
         return $vector;
     }
@@ -236,12 +245,10 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param int $option
      *
-     * @return $this
+     * @return SymmetricCrypt
      */
-    protected function setOption($option)
+    protected function setOption(int $option): SymmetricCrypt
     {
-        assert(is_int($option) === true);
-
         $this->setOptions($this->getOptions() | $option);
 
         return $this;
@@ -250,31 +257,122 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param int $option
      *
-     * @return $this
+     * @return SymmetricCrypt
      */
-    protected function clearOption($option)
+    protected function clearOption(int $option): SymmetricCrypt
     {
-        assert(is_int($option) === true);
-
         $this->setOptions($this->getOptions() & ~$option);
 
         return $this;
     }
 
     /**
-     * We need this wrapper for testing purposes so we can mock system call to Open SSL.
+     * @param string $data
+     * @param int    $ivLength
      *
+     * @return string
+     */
+    protected function readIV(string $data, int $ivLength): string
+    {
+        $vector = substr($data, 0, $ivLength);
+        $isOk   = $vector !== false && strlen($vector) === $ivLength;
+
+        $isOk === true ?: $this->throwException(new CryptException($this->getReadVectorErrorMessage()));
+
+        return $vector;
+    }
+
+    /**
+     * @param string $data
+     * @param int    $ivLength
+     *
+     * @return string
+     */
+    protected function extractData(string $data, int $ivLength): string
+    {
+        $result = substr($data, $ivLength);
+
+        $isOk = $result !== false && empty($result) === false;
+        $isOk === true ?: $this->throwException(new CryptException($this->getExtractDataErrorMessage()));
+
+        return $result;
+    }
+
+    /**
      * @param string $data
      * @param string $method
      * @param string $password
      * @param int    $options
      * @param string $initializationVector
      *
-     * @return string|false
+     * @return string
      */
-    protected function openSslDecrypt($data, $method, $password, $options, $initializationVector)
+    protected function openSslEncrypt(
+        string $data,
+        string $method,
+        string $password,
+        int $options,
+        string $initializationVector
+    ): string {
+        $encrypted = $this->openSslEncryptImpl($data, $method, $password, $options, $initializationVector);
+
+        $message = $this->getErrorMessage();
+        $encrypted !== false ?: $this->throwException(new CryptException($message));
+
+        return $encrypted;
+    }
+
+    /**
+     * @param string $data
+     * @param string $method
+     * @param string $password
+     * @param int    $options
+     * @param string $initializationVector
+     *
+     * @return string
+     */
+    protected function openSslDecrypt(
+        string $data,
+        string $method,
+        string $password,
+        int $options,
+        string $initializationVector
+    ): string {
+        $decrypted = $this->openSslDecryptImpl($data, $method, $password, $options, $initializationVector);
+
+        $decrypted !== false ?: $this->throwException(new CryptException($this->getErrorMessage()));
+
+        return $decrypted;
+    }
+
+    /**
+     * @param string $method
+     *
+     * @return int
+     */
+    protected function openSslIvLength(string $method): int
     {
-        return openssl_decrypt($data, $method, $password, $options, $initializationVector);
+        $ivLength = $this->openSslIvLengthImpl($method);
+
+        $ivLength !== false ?: $this->throwException(new CryptException($this->getErrorMessage()));
+
+        return $ivLength;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getReadVectorErrorMessage(): string
+    {
+        return 'Reading Initialization Vector (IV) failed';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getExtractDataErrorMessage(): string
+    {
+        return 'Extracting ciphertext from input data failed';
     }
 
     /**
@@ -288,8 +386,46 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
      *
      * @return string|false
      */
-    protected function openSslEncrypt($data, $method, $password, $options, $initializationVector)
-    {
+    protected function openSslEncryptImpl(
+        string $data,
+        string $method,
+        string $password,
+        int $options,
+        string $initializationVector
+    ) {
         return openssl_encrypt($data, $method, $password, $options, $initializationVector);
+    }
+
+    /**
+     * We need this wrapper for testing purposes so we can mock system call to Open SSL.
+     *
+     * @param string $data
+     * @param string $method
+     * @param string $password
+     * @param int    $options
+     * @param string $initializationVector
+     *
+     * @return string|false
+     */
+    protected function openSslDecryptImpl(
+        string $data,
+        string $method,
+        string $password,
+        int $options,
+        string $initializationVector
+    ) {
+        return openssl_decrypt($data, $method, $password, $options, $initializationVector);
+    }
+
+    /**
+     * We need this wrapper for testing purposes so we can mock system call to Open SSL.
+     *
+     * @param string $method
+     *
+     * @return int|false
+     */
+    protected function openSslIvLengthImpl(string $method)
+    {
+        return openssl_cipher_iv_length($method);
     }
 }

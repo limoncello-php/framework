@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Crypt\Contracts;
+<?php namespace Limoncello\Crypt\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,23 +16,31 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
+use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
+
 /**
- * @package Limoncello\Crypt
+ * @package Limoncello\Application
  */
-interface HasherInterface
+class HasherProvider implements ProvidesSettingsInterface, ProvidesContainerConfiguratorsInterface
 {
     /**
-     * @param string $password
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function hash(string $password): string;
+    public static function getContainerConfigurators(): array
+    {
+        return [
+            HasherContainerConfigurator::HANDLER,
+        ];
+    }
 
     /**
-     * @param string $password
-     * @param string $hash
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function verify(string $password, string $hash): bool;
+    public static function getSettings(): array
+    {
+        return [
+            new HasherSettings(),
+        ];
+    }
 }

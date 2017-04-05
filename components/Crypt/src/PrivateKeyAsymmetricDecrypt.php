@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Crypt;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Crypt\Contracts\DecryptInterface;
+use Limoncello\Crypt\Exceptions\CryptException;
 
 /**
  * @package Limoncello\Crypt
@@ -26,7 +27,7 @@ class PrivateKeyAsymmetricDecrypt extends BasePrivateKeyAsymmetricCrypt implemen
     /**
      * @inheritdoc
      */
-    public function decrypt($data)
+    public function decrypt(string $data): string
     {
         $result           = null;
         $decryptChunkSize = $this->getDecryptChunkSize();
