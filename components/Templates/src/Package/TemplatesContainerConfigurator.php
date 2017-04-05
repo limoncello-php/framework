@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Contracts\ContainerConfiguratorInterface;
+use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Templates\Contracts\TemplatesInterface;

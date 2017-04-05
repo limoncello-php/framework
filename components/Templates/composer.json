@@ -16,12 +16,7 @@
     "require": {
         "php": ">=7.0.0",
         "twig/twig": "^2.3",
-        "limoncello-php/contracts": "dev-develop",
-        "limoncello-php/application": "dev-develop",
-
-        "limoncello-php/container": "dev-develop",
-        "limoncello-php/crypt": "dev-develop",
-        "limoncello-php/core": "dev-develop"
+        "limoncello-php/contracts": "dev-develop"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.5",

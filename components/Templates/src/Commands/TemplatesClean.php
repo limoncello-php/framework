@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Contracts\FileSystemInterface;
-use Limoncello\Application\FileSystem\FileSystem;
 use Limoncello\Contracts\Commands\IoInterface;
+use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Templates\Package\TemplatesSettings;
 use Psr\Container\ContainerInterface;
 
@@ -63,19 +62,10 @@ class TemplatesClean extends TemplatesBase
         $settings    = $this->getTemplatesSettings($container);
         $cacheFolder = $settings[TemplatesSettings::KEY_CACHE_FOLDER];
 
-        $fileSystem = $this->createFileSystem();
+        /** @var FileSystemInterface $fileSystem */
+        $fileSystem = $container->get(FileSystemInterface::class);
         foreach ($fileSystem->scanFolder($cacheFolder) as $fileOrFolder) {
             $fileSystem->isFolder($fileOrFolder) === false ?: $fileSystem->deleteFolderRecursive($fileOrFolder);
         }
-    }
-
-    /**
-     * @return FileSystemInterface
-     */
-    protected function createFileSystem(): FileSystemInterface
-    {
-        $fileSystem = new FileSystem();
-
-        return $fileSystem;
     }
 }

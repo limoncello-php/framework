@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Templates;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,18 @@ use Twig_Loader_Filesystem;
 /**
  * @package Limoncello\Templates
  */
-class TwigTemplates extends Twig_Environment implements TemplatesInterface
+class TwigTemplates implements TemplatesInterface
 {
+    /**
+     * @var Twig_Environment
+     */
+    private $twig;
+
     /**
      * @param string      $templatesFolder
      * @param null|string $cacheFolder
      */
-    public function __construct($templatesFolder, $cacheFolder = null)
+    public function __construct(string $templatesFolder, string $cacheFolder = null)
     {
         // For Twig options see http://twig.sensiolabs.org/doc/api.html
         $options = [
@@ -37,6 +42,22 @@ class TwigTemplates extends Twig_Environment implements TemplatesInterface
             'auto_reload' => false,
         ];
 
-        parent::__construct(new Twig_Loader_Filesystem($templatesFolder), $options);
+        $this->twig = new Twig_Environment(new Twig_Loader_Filesystem($templatesFolder), $options);
+    }
+
+    /**
+     * @return Twig_Environment
+     */
+    public function getTwig(): Twig_Environment
+    {
+        return $this->twig;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function render(string $name, array $context = []): string
+    {
+        return $this->getTwig()->render($name, $context);
     }
 }

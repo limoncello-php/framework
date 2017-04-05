@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Traits\ParseCallableTrait;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Templates\Package\TemplatesSettings;
@@ -27,8 +26,6 @@ use Psr\Container\ContainerInterface;
  */
 abstract class TemplatesBase implements CommandInterface
 {
-    use ParseCallableTrait;
-
     /**
      * @param ContainerInterface $container
      *
