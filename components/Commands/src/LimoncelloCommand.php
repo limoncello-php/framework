@@ -22,10 +22,10 @@ use Limoncello\Commands\Wrappers\ConsoleIoWrapper;
 use Limoncello\Commands\Wrappers\DataArgumentWrapper;
 use Limoncello\Commands\Wrappers\DataCommandWrapper;
 use Limoncello\Commands\Wrappers\DataOptionWrapper;
-use Limoncello\Contracts\Application\ApplicationInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Container\ContainerInterface;
+use Limoncello\Contracts\Core\ApplicationInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

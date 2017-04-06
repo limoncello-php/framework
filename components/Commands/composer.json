@@ -22,8 +22,7 @@
 
         "limoncello-php/contracts": "dev-develop",
         "limoncello-php/core": "dev-develop",
-        "limoncello-php/container": "dev-develop",
-        "limoncello-php/crypt": "dev-develop"
+        "limoncello-php/container": "dev-develop"
     },
     "require-dev": {
         "composer/composer": "^1.0.0",
