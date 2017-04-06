@@ -77,6 +77,15 @@ class ApplicationSettingsCreate extends ApplicationSettingsBase
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
         $this->createFileSystem($container)->write($path, $content);
+
+        // TODO check if it has any performance impact
+        // Add file to PHP cache if available
+        if (function_exists('opcache_get_configuration') === true &&
+            (opcache_get_configuration()['directives']['opcache.enable'] ?? false) === true &&
+            function_exists('opcache_compile_file') === true
+        ) {
+            opcache_compile_file($path);
+        }
     }
 
     /**

@@ -22,6 +22,7 @@ use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -47,18 +48,33 @@ class MonologFileContainerConfigurator implements ContainerConfiguratorInterface
             $settingsProvider = $container->get(SettingsProviderInterface::class);
             $appSettings      = $settingsProvider->get(A::class);
             $monologSettings  = $settingsProvider->get(C::class);
-            $monolog          = new Logger($appSettings[A::KEY_APP_NAME]);
-            if ($monologSettings[C::KEY_IS_ENABLED] === true) {
-                $handler = new StreamHandler($monologSettings[C::KEY_LOG_PATH], $monologSettings[C::KEY_LOG_LEVEL]);
-                $handler->setFormatter(new LineFormatter(null, null, true, true));
-                $handler->pushProcessor(new WebProcessor());
-                $handler->pushProcessor(new UidProcessor());
-            } else {
-                $handler = new NullHandler();
-            }
+
+            $monolog = new Logger($appSettings[A::KEY_APP_NAME]);
+            $handler = $monologSettings[C::KEY_IS_ENABLED] === true ?
+                static::createHandler($monologSettings) : new NullHandler();
+
             $monolog->pushHandler($handler);
 
             return $monolog;
         };
+    }
+
+    /**
+     * @param array $settings
+     *
+     * @return HandlerInterface
+     */
+    protected static function createHandler(array $settings): HandlerInterface
+    {
+        assert(array_key_exists(C::KEY_LOG_PATH, $settings) === true);
+
+        $logPath  = $settings[C::KEY_LOG_PATH];
+        $logLevel = $settings[C::KEY_LOG_LEVEL] ?? Logger::ERROR;
+        $handler  = new StreamHandler($logPath, $logLevel);
+        $handler->setFormatter(new LineFormatter(null, null, true, true));
+        $handler->pushProcessor(new WebProcessor());
+        $handler->pushProcessor(new UidProcessor());
+
+        return $handler;
     }
 }

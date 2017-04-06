@@ -72,5 +72,14 @@ class ApplicationSettingsClean extends ApplicationSettingsBase
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
 
         $this->createFileSystem($container)->delete($path);
+
+        // TODO check if it has any performance impact
+        // Remove file from PHP cache if available
+        if (function_exists('opcache_get_configuration') === true &&
+            (opcache_get_configuration()['directives']['opcache.enable'] ?? false) === true &&
+            function_exists('opcache_compile_file') === true
+        ) {
+            opcache_invalidate($path, true);
+        }
     }
 }

@@ -25,6 +25,8 @@ use ReflectionClass;
  */
 trait SelectClassesTrait
 {
+    // TODO this trait and other similar reflection traits are/could be used on more than places. Move it to lib.
+
     /**
      * Reads file(s) by specified path mask and select only those which implement given class or interface.
      *
