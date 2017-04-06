@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Application\Data\CoreSettings\Routes;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Contracts\RoutesConfiguratorInterface;
-use Limoncello\Core\Contracts\Routing\GroupInterface;
+use Limoncello\Contracts\Application\RoutesConfiguratorInterface;
+use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Tests\Application\Data\CoreSettings\Middleware\ApplicationMiddleware;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;

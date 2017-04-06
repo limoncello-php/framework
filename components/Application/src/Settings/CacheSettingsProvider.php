@@ -88,30 +88,6 @@ class CacheSettingsProvider implements SettingsProviderInterface, ArraySerializa
     }
 
     /**
-     * @deprecated Use `serialize` method instead.
-     *
-     * @return array
-     */
-    public function getData(): array
-    {
-        return $this->serialize();
-    }
-
-    /**
-     * @deprecated Use `unserialize` method instead.
-     *
-     * @param array $data
-     *
-     * @return CacheSettingsProvider
-     */
-    public function setData(array $data): CacheSettingsProvider
-    {
-        $this->unserialize($data);
-
-        return $this;
-    }
-
-    /**
      * @param InstanceSettingsProvider $provider
      *
      * @return CacheSettingsProvider

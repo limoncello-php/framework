@@ -19,9 +19,9 @@
 use ErrorException;
 use Exception;
 use Limoncello\Application\Packages\Application\ApplicationSettings as A;
-use Limoncello\Contracts\Application\SapiInterface;
+use Limoncello\Contracts\Core\SapiInterface;
+use Limoncello\Contracts\Exceptions\ExceptionHandlerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Core\Contracts\ExceptionHandlers\ExceptionHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -61,13 +61,13 @@ class DefaultHandler implements ExceptionHandlerInterface
     }
 
     /**
-     * @param Exception|Throwable $exception
+     * @param Throwable           $exception
      * @param SapiInterface       $sapi
      * @param ContainerInterface  $container
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function handle($exception, SapiInterface $sapi, ContainerInterface $container)
+    private function handle(Throwable $exception, SapiInterface $sapi, ContainerInterface $container)
     {
         $message  = 'Internal Server Error';
 
@@ -121,13 +121,13 @@ class DefaultHandler implements ExceptionHandlerInterface
     }
 
     /**
-     * @param Exception          $exception
+     * @param Throwable          $exception
      * @param ContainerInterface $container
      * @param string             $message
      *
      * @return void
      */
-    private function logException(Exception $exception, ContainerInterface $container, $message)
+    private function logException(Throwable $exception, ContainerInterface $container, string $message)
     {
         if ($container->has(LoggerInterface::class) === true) {
             /** @var LoggerInterface $logger */

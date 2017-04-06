@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Packages\Hasher;
+<?php namespace Limoncello\Application\Packages\FileSystem;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,12 +17,11 @@
  */
 
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
-use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-class HasherProvider implements ProvidesSettingsInterface, ProvidesContainerConfiguratorsInterface
+class FileSystemProvider implements ProvidesContainerConfiguratorsInterface
 {
     /**
      * @inheritdoc
@@ -30,17 +29,7 @@ class HasherProvider implements ProvidesSettingsInterface, ProvidesContainerConf
     public static function getContainerConfigurators(): array
     {
         return [
-            HasherContainerConfigurator::HANDLER,
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getSettings(): array
-    {
-        return [
-            new HasherSettings(),
+            FileSystemContainerConfigurator::HANDLER,
         ];
     }
 }

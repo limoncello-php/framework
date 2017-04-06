@@ -76,7 +76,7 @@ class ApplicationSettingsCreate extends ApplicationSettingsBase
         $content      = $this->composeContent($settingsData, $namespace, $class, $method);
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
-        $this->createFileSystem()->write($path, $content);
+        $this->createFileSystem($container)->write($path, $content);
     }
 
     /**
@@ -92,7 +92,7 @@ class ApplicationSettingsCreate extends ApplicationSettingsBase
         string $namespace,
         string $className,
         string $methodName
-    ) {
+    ): string {
         $now     = date(DATE_RFC2822);
         $data    = var_export($value, true);
         $content = <<<EOT

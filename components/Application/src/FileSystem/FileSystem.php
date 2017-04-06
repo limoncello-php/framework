@@ -17,8 +17,8 @@
  */
 
 use DirectoryIterator;
-use Limoncello\Application\Contracts\FileSystemInterface;
 use Limoncello\Application\Exceptions\FileSystemException;
+use Limoncello\Contracts\FileSystem\FileSystemInterface;
 
 /**
  * @package Limoncello\Application

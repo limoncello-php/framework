@@ -115,7 +115,7 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     /**
      * @return array
      */
-    public function getSettingsData()
+    public function getSettingsData(): array
     {
         $this->checkInstancesAreProcessed();
 
@@ -125,7 +125,7 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     /**
      * @return array
      */
-    public function getAmbiguousMap()
+    public function getAmbiguousMap(): array
     {
         $this->checkInstancesAreProcessed();
 

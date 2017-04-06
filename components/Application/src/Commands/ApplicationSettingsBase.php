@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Contracts\FileSystemInterface;
-use Limoncello\Application\FileSystem\FileSystem;
 use Limoncello\Application\Traits\ParseCallableTrait;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
+use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 
@@ -46,10 +45,14 @@ abstract class ApplicationSettingsBase implements CommandInterface
     }
 
     /**
+     * @param ContainerInterface $container
+     *
      * @return FileSystemInterface
      */
-    protected function createFileSystem(): FileSystemInterface
+    protected function createFileSystem(ContainerInterface $container): FileSystemInterface
     {
-        return new FileSystem();
+        // TODO These commands want to have it from container. Need a feature for command to configure container (?).
+
+        return $container->get(FileSystemInterface::class);
     }
 }

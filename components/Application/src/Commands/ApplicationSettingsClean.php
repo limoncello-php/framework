@@ -71,6 +71,6 @@ class ApplicationSettingsClean extends ApplicationSettingsBase
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
 
-        $this->createFileSystem()->delete($path);
+        $this->createFileSystem($container)->delete($path);
     }
 }

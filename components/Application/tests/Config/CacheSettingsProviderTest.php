@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Application\Config;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class CacheSettingsProviderTest extends TestCase
     public function testLoadFromFolder()
     {
         $provider = $this->createProvider();
-        $provider->setData($provider->getData());
+        $provider->unserialize($provider->serialize());
 
         $valuesA = (new SampleSettingsAA())->get();
 

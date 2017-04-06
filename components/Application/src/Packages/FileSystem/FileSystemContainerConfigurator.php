@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Packages\Hasher;
+<?php namespace Limoncello\Application\Packages\FileSystem;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,18 +16,15 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Contracts\ContainerConfiguratorInterface;
+use Limoncello\Application\FileSystem\FileSystem;
+use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Crypt\Contracts\HasherInterface;
-use Limoncello\Crypt\Hasher;
-use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Packages\Hasher\HasherSettings as C;
+use Limoncello\Contracts\FileSystem\FileSystemInterface;
 
 /**
  * @package Limoncello\Application
  */
-class HasherContainerConfigurator implements ContainerConfiguratorInterface
+class FileSystemContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
     const HANDLER = [self::class, self::METHOD_NAME];
@@ -37,11 +34,8 @@ class HasherContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configure(LimoncelloContainerInterface $container)
     {
-        $container[HasherInterface::class] = function (PsrContainerInterface $container) {
-            $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
-            $hasher   = new Hasher($settings[C::KEY_ALGORITHM], $settings[C::KEY_COST]);
-
-            return $hasher;
+        $container[FileSystemInterface::class] = function () {
+            return new FileSystem();
         };
     }
 }

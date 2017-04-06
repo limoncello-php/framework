@@ -18,11 +18,10 @@
         "filp/whoops": "^2.1",
         "neomerx/cors-psr7": "^1.0.0",
         "monolog/monolog": "^1.22",
-        "limoncello-php/container": "dev-develop",
-        "limoncello-php/core": "dev-develop",
-        "limoncello-php/crypt": "dev-develop",
+        "limoncello-php/contracts": "dev-develop",
 
-        "limoncello-php/contracts": "dev-develop"
+        "limoncello-php/container": "dev-develop",
+        "limoncello-php/core": "dev-develop"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.8",
