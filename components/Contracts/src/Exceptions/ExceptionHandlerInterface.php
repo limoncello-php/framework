@@ -17,7 +17,7 @@
  */
 
 use Exception;
-use Limoncello\Contracts\Application\SapiInterface;
+use Limoncello\Contracts\Core\SapiInterface;
 use Psr\Container\ContainerInterface;
 use Throwable;
 
