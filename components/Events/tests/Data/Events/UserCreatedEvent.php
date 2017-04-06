@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Events\Exceptions;
+<?php namespace Limoncello\Tests\Events\Data\Events;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,12 +16,9 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface;
-use RuntimeException;
-
 /**
- * @package Limoncello\Events
+ * @package Limoncello\Tests\Events
  */
-abstract class EventException extends RuntimeException implements LimoncelloExceptionInterface
+class UserCreatedEvent extends BaseUserEvent implements CreatedEvent
 {
 }

@@ -17,6 +17,14 @@
  */
 
 use Limoncello\Events\SimpleEventEmitter;
+use Limoncello\Tests\Events\Data\Events\OrderCreatedEvent;
+use Limoncello\Tests\Events\Data\Events\OrderUpdatedEvent;
+use Limoncello\Tests\Events\Data\Events\UserCreatedEvent;
+use Limoncello\Tests\Events\Data\Events\UserUpdatedEvent;
+use Limoncello\Tests\Events\Data\EventSettings;
+use Limoncello\Tests\Events\Data\Subscribers\GenericSubscribers;
+use Limoncello\Tests\Events\Data\Subscribers\OrderSubscribers;
+use Limoncello\Tests\Events\Data\Subscribers\UserSubscribers;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -175,6 +183,76 @@ class SimpleEventEmitterTest extends TestCase
     }
 
     /**
+     * Test event dispatch.
+     */
+    public function testEventDispatch()
+    {
+        $cacheData = (new EventSettings())->get();
+
+        // it has 4 sections for each non-abstract event we have described
+        $this->assertCount(4, $cacheData);
+
+        // now do some actual event testing
+        $events = (new SimpleEventEmitter())->setStaticSubscribers($cacheData);
+
+        // 1
+        $this->resetSubscribers();
+        $events->dispatch(new OrderCreatedEvent());
+        $this->assertTrue(GenericSubscribers::isOnCreated());
+        $this->assertFalse(GenericSubscribers::isOnUpdated());
+        $this->assertTrue(OrderSubscribers::isOnOrder());
+        $this->assertTrue(OrderSubscribers::isOnBaseOrder());
+        $this->assertTrue(OrderSubscribers::isOnOrderCreated());
+        $this->assertFalse(OrderSubscribers::isOnOrderUpdated());
+        $this->assertFalse(UserSubscribers::isOnUser());
+        $this->assertFalse(UserSubscribers::isOnBaseUser());
+        $this->assertFalse(UserSubscribers::isOnUserCreated());
+        $this->assertFalse(UserSubscribers::isOnUserUpdated());
+
+        // 2
+        $this->resetSubscribers();
+        $events->dispatch(new OrderUpdatedEvent());
+        $this->assertFalse(GenericSubscribers::isOnCreated());
+        $this->assertTrue(GenericSubscribers::isOnUpdated());
+        $this->assertTrue(OrderSubscribers::isOnOrder());
+        $this->assertTrue(OrderSubscribers::isOnBaseOrder());
+        $this->assertFalse(OrderSubscribers::isOnOrderCreated());
+        $this->assertTrue(OrderSubscribers::isOnOrderUpdated());
+        $this->assertFalse(UserSubscribers::isOnUser());
+        $this->assertFalse(UserSubscribers::isOnBaseUser());
+        $this->assertFalse(UserSubscribers::isOnUserCreated());
+        $this->assertFalse(UserSubscribers::isOnUserUpdated());
+
+        // 3
+        $this->resetSubscribers();
+        $events->dispatch(new UserCreatedEvent());
+        $this->assertTrue(GenericSubscribers::isOnCreated());
+        $this->assertFalse(GenericSubscribers::isOnUpdated());
+        $this->assertFalse(OrderSubscribers::isOnOrder());
+        $this->assertFalse(OrderSubscribers::isOnBaseOrder());
+        $this->assertFalse(OrderSubscribers::isOnOrderCreated());
+        $this->assertFalse(OrderSubscribers::isOnOrderUpdated());
+        $this->assertTrue(UserSubscribers::isOnUser());
+        $this->assertTrue(UserSubscribers::isOnBaseUser());
+        $this->assertTrue(UserSubscribers::isOnUserCreated());
+        $this->assertFalse(UserSubscribers::isOnUserUpdated());
+
+        // 4
+        $this->resetSubscribers();
+        $events->dispatch(new UserUpdatedEvent());
+        $this->assertFalse(GenericSubscribers::isOnCreated());
+        $this->assertTrue(GenericSubscribers::isOnUpdated());
+        $this->assertFalse(OrderSubscribers::isOnOrder());
+        $this->assertFalse(OrderSubscribers::isOnBaseOrder());
+        $this->assertFalse(OrderSubscribers::isOnOrderCreated());
+        $this->assertFalse(OrderSubscribers::isOnOrderUpdated());
+        $this->assertTrue(UserSubscribers::isOnUser());
+        $this->assertTrue(UserSubscribers::isOnBaseUser());
+        $this->assertFalse(UserSubscribers::isOnUserCreated());
+        $this->assertTrue(UserSubscribers::isOnUserUpdated());
+    }
+
+    /**
      * Reset flags.
      */
     private function resetCalledFlags()
@@ -195,5 +273,15 @@ class SimpleEventEmitterTest extends TestCase
         $result = $method->invoke(new SimpleEventEmitter(), $subscribers);
 
         return $result;
+    }
+
+    /**
+     * @return void
+     */
+    private function resetSubscribers()
+    {
+        GenericSubscribers::reset();
+        OrderSubscribers::reset();
+        UserSubscribers::reset();
     }
 }

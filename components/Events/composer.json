@@ -14,7 +14,8 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0"
+        "php": ">=7.0.0",
+        "limoncello-php/contracts": "dev-develop"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.5",
@@ -26,6 +27,11 @@
     "autoload": {
         "psr-4": {
             "Limoncello\\Events\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Limoncello\\Tests\\Events\\": "tests/"
         }
     },
     "scripts": {

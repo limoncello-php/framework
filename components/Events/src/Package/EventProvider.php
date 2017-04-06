@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Events\Exceptions;
+<?php namespace Limoncello\Events\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,12 +16,20 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface;
-use RuntimeException;
+use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 
 /**
- * @package Limoncello\Events
+ * @package Limoncello\Application
  */
-abstract class EventException extends RuntimeException implements LimoncelloExceptionInterface
+class EventProvider implements ProvidesContainerConfiguratorsInterface
 {
+    /**
+     * @inheritdoc
+     */
+    public static function getContainerConfigurators(): array
+    {
+        return [
+            EventsContainerConfigurator::HANDLER,
+        ];
+    }
 }

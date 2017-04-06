@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Events\Exceptions;
+<?php namespace Limoncello\Tests\Events\Data;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,12 +16,24 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface;
-use RuntimeException;
-
 /**
- * @package Limoncello\Events
+ * @package Limoncello\Tests\Events
  */
-abstract class EventException extends RuntimeException implements LimoncelloExceptionInterface
+class EventSettings extends \Limoncello\Events\Package\EventSettings
 {
+    /**
+     * @return string
+     */
+    protected function getEventsFolder(): string
+    {
+        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'Events', '*.php']);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSubscribersFolder(): string
+    {
+        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'Subscribers', '*.php']);
+    }
 }
