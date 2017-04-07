@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Authorization\PolicyAdministration;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ class Rule implements RuleInterface
      * @param AdviceInterface[]     $advice
      */
     public function __construct(
-        $name = null,
+        string $name = null,
         TargetInterface $target = null,
         MethodInterface $condition = null,
         MethodInterface $effect = null,
@@ -88,12 +88,10 @@ class Rule implements RuleInterface
     /**
      * @param null|string $name
      *
-     * @return $this
+     * @return self
      */
-    public function setName($name)
+    public function setName(string $name = null): self
     {
-        assert(is_string($name) === true || $name === null);
-
         $this->name = $name;
 
         return $this;
@@ -110,9 +108,9 @@ class Rule implements RuleInterface
     /**
      * @param TargetInterface|null $target
      *
-     * @return $this
+     * @return self
      */
-    public function setTarget(TargetInterface $target = null)
+    public function setTarget(TargetInterface $target = null): self
     {
         $this->target = $target;
 
@@ -130,9 +128,9 @@ class Rule implements RuleInterface
     /**
      * @param MethodInterface|null $condition
      *
-     * @return $this
+     * @return self
      */
-    public function setCondition(MethodInterface $condition = null)
+    public function setCondition(MethodInterface $condition = null): self
     {
         $this->condition = $condition;
 
@@ -150,9 +148,9 @@ class Rule implements RuleInterface
     /**
      * @param MethodInterface $effect
      *
-     * @return $this
+     * @return self
      */
-    public function setEffect(MethodInterface $effect = null)
+    public function setEffect(MethodInterface $effect = null): self
     {
         $this->effect = $effect;
 
@@ -162,7 +160,7 @@ class Rule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function getObligations()
+    public function getObligations(): array
     {
         return $this->obligations;
     }
@@ -170,9 +168,9 @@ class Rule implements RuleInterface
     /**
      * @param ObligationInterface[] $obligations
      *
-     * @return $this
+     * @return self
      */
-    public function setObligations(array $obligations)
+    public function setObligations(array $obligations): self
     {
         // check every item is Obligation (debug mode only)
         assert(call_user_func(
@@ -192,7 +190,7 @@ class Rule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function getAdvice()
+    public function getAdvice(): array
     {
         return $this->advice;
     }
@@ -200,9 +198,9 @@ class Rule implements RuleInterface
     /**
      * @param AdviceInterface[] $advice
      *
-     * @return $this
+     * @return self
      */
-    public function setAdvice($advice)
+    public function setAdvice(array $advice): self
     {
         // check every item is Obligation (debug mode only)
         assert(call_user_func(

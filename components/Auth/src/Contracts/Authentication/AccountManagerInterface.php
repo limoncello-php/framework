@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Contracts\Authentication;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ interface AccountManagerInterface
     /**
      * @param AccountInterface $account
      *
-     * @return $this
+     * @return self
      */
-    public function setAccount(AccountInterface $account);
+    public function setAccount(AccountInterface $account): self;
 }

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Authorization\PolicyAdministration;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class Target implements TargetInterface
      * @param AnyOfInterface $anyOff
      * @param string|null    $name
      */
-    public function __construct(AnyOfInterface $anyOff, $name = null)
+    public function __construct(AnyOfInterface $anyOff, string $name = null)
     {
         $this->setAnyOff($anyOff)->setName($name);
     }
@@ -46,7 +46,7 @@ class Target implements TargetInterface
     /**
      * @inheritdoc
      */
-    public function getAnyOf()
+    public function getAnyOf(): AnyOfInterface
     {
         return $this->anyOff;
     }
@@ -64,10 +64,8 @@ class Target implements TargetInterface
      *
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name = null)
     {
-        assert(is_string($name) === true || $name === null);
-
         $this->name = $name;
 
         return $this;
@@ -76,9 +74,9 @@ class Target implements TargetInterface
     /**
      * @param AnyOfInterface $anyOff
      *
-     * @return $this
+     * @return self
      */
-    public function setAnyOff(AnyOfInterface $anyOff)
+    public function setAnyOff(AnyOfInterface $anyOff): self
     {
         $this->anyOff = $anyOff;
 

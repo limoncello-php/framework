@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Authorization\PolicyAdministration;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class Obligation extends Method implements ObligationInterface
      * @param int      $fulfillOn
      * @param callable $callable
      */
-    public function __construct($fulfillOn, callable $callable)
+    public function __construct(int $fulfillOn, callable $callable)
     {
         // Reminder on obligations and advice (from 7.18)
         //---------------------------------------------------------------------
@@ -52,7 +52,7 @@ class Obligation extends Method implements ObligationInterface
     /**
      * @inheritdoc
      */
-    public function getFulfillOn()
+    public function getFulfillOn(): int
     {
         return $this->fulfillOn;
     }

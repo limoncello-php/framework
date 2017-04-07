@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Authorization\PolicyEnforcement;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class PolicyEnforcementPoint implements PolicyEnforcementPointInterface, LoggerA
     /**
      * @inheritdoc
      */
-    public function authorize(RequestInterface $request)
+    public function authorize(RequestInterface $request): bool
     {
         $context = $this->getPip()->createContext($request);
 
@@ -86,15 +86,15 @@ class PolicyEnforcementPoint implements PolicyEnforcementPointInterface, LoggerA
     /**
      * @return bool
      */
-    public function isExecuteAdvice()
+    public function isExecuteAdvice(): bool
     {
         return $this->isExecuteAdvice;
     }
 
     /**
-     * @return $this
+     * @return self
      */
-    public function enableExecuteAdvice()
+    public function enableExecuteAdvice(): self
     {
         $this->isExecuteAdvice = true;
 
@@ -102,9 +102,9 @@ class PolicyEnforcementPoint implements PolicyEnforcementPointInterface, LoggerA
     }
 
     /**
-     * @return $this
+     * @return self
      */
-    public function disableExecuteAdvice()
+    public function disableExecuteAdvice(): self
     {
         $this->isExecuteAdvice = false;
 
@@ -114,7 +114,7 @@ class PolicyEnforcementPoint implements PolicyEnforcementPointInterface, LoggerA
     /**
      * @return PolicyInformationPointInterface
      */
-    protected function getPip()
+    protected function getPip(): PolicyInformationPointInterface
     {
         return $this->pip;
     }
@@ -122,7 +122,7 @@ class PolicyEnforcementPoint implements PolicyEnforcementPointInterface, LoggerA
     /**
      * @return PolicyDecisionPointInterface
      */
-    protected function getPdp()
+    protected function getPdp(): PolicyDecisionPointInterface
     {
         return $this->pdp;
     }
@@ -132,7 +132,7 @@ class PolicyEnforcementPoint implements PolicyEnforcementPointInterface, LoggerA
      *
      * @return bool
      */
-    protected function interpretEvaluation($evaluation)
+    protected function interpretEvaluation(int $evaluation): bool
     {
         return $evaluation === EvaluationEnum::PERMIT;
     }

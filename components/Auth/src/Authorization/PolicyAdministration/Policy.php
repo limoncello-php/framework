@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Authorization\PolicyAdministration;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class Policy implements PolicyInterface
     private $name;
 
     /**
-     * @var TargetInterface
+     * @var TargetInterface|null
      */
     private $target;
 
@@ -69,7 +69,7 @@ class Policy implements PolicyInterface
     public function __construct(
         array $rules,
         RuleCombiningAlgorithmInterface $combiningAlgorithm,
-        $name = null,
+        string $name = null,
         TargetInterface $target = null,
         array $obligations = [],
         array $advice = []
@@ -89,12 +89,10 @@ class Policy implements PolicyInterface
     /**
      * @param null|string $name
      *
-     * @return $this
+     * @return self
      */
-    public function setName($name)
+    public function setName(string $name = null): self
     {
-        assert(is_string($name) === true || $name === null);
-
         $this->name = $name;
 
         return $this;
@@ -111,9 +109,9 @@ class Policy implements PolicyInterface
     /**
      * @param TargetInterface|null $target
      *
-     * @return $this
+     * @return self
      */
-    public function setTarget(TargetInterface $target = null)
+    public function setTarget(TargetInterface $target = null): self
     {
         $this->target = $target;
 
@@ -123,7 +121,7 @@ class Policy implements PolicyInterface
     /**
      * @inheritdoc
      */
-    public function getRules()
+    public function getRules(): array
     {
         return $this->rules;
     }
@@ -131,9 +129,9 @@ class Policy implements PolicyInterface
     /**
      * @param RuleInterface[] $rules
      *
-     * @return $this
+     * @return self
      */
-    public function setRules(array $rules)
+    public function setRules(array $rules): self
     {
         assert(empty($rules) === false);
 
@@ -145,7 +143,7 @@ class Policy implements PolicyInterface
     /**
      * @inheritdoc
      */
-    public function getCombiningAlgorithm()
+    public function getCombiningAlgorithm(): RuleCombiningAlgorithmInterface
     {
         return $this->combiningAlgorithm;
     }
@@ -153,9 +151,9 @@ class Policy implements PolicyInterface
     /**
      * @param RuleCombiningAlgorithmInterface $combiningAlgorithm
      *
-     * @return $this
+     * @return self
      */
-    public function setCombiningAlgorithm(RuleCombiningAlgorithmInterface $combiningAlgorithm)
+    public function setCombiningAlgorithm(RuleCombiningAlgorithmInterface $combiningAlgorithm): self
     {
         $this->combiningAlgorithm = $combiningAlgorithm;
 
@@ -165,7 +163,7 @@ class Policy implements PolicyInterface
     /**
      * @inheritdoc
      */
-    public function getObligations()
+    public function getObligations(): array
     {
         return $this->obligations;
     }
@@ -173,9 +171,9 @@ class Policy implements PolicyInterface
     /**
      * @param ObligationInterface[] $obligations
      *
-     * @return $this
+     * @return self
      */
-    public function setObligations(array $obligations)
+    public function setObligations(array $obligations): self
     {
         $this->obligations = $obligations;
 
@@ -185,7 +183,7 @@ class Policy implements PolicyInterface
     /**
      * @inheritdoc
      */
-    public function getAdvice()
+    public function getAdvice(): array
     {
         return $this->advice;
     }
@@ -193,9 +191,9 @@ class Policy implements PolicyInterface
     /**
      * @param AdviceInterface[] $advice
      *
-     * @return $this
+     * @return self
      */
-    public function setAdvice($advice)
+    public function setAdvice(array $advice): self
     {
         $this->advice = $advice;
 

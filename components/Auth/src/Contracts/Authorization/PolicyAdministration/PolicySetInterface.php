@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Contracts\Authorization\PolicyAdministration;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,27 +27,27 @@ interface PolicySetInterface
     public function getName();
 
     /**
-     * @return TargetInterface
+     * @return TargetInterface|null
      */
     public function getTarget();
 
     /**
      * @return PolicyInterface[]|PolicySetInterface[]
      */
-    public function getPoliciesAndSets();
+    public function getPoliciesAndSets(): array;
 
     /**
      * @return PolicyCombiningAlgorithmInterface
      */
-    public function getCombiningAlgorithm();
+    public function getCombiningAlgorithm(): PolicyCombiningAlgorithmInterface;
 
     /**
      * @return MethodInterface[]
      */
-    public function getObligations();
+    public function getObligations(): array;
 
     /**
      * @return MethodInterface[]
      */
-    public function getAdvice();
+    public function getAdvice(): array;
 }

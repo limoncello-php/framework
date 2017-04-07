@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Authorization\PolicyInformation;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Auth\Contracts\Authorization\PolicyEnforcement\RequestInterface;
+use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\PolicyInformationPointInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -43,7 +44,7 @@ class PolicyInformationPoint implements PolicyInformationPointInterface
     /**
      * @inheritdoc
      */
-    public function createContext(RequestInterface $request)
+    public function createContext(RequestInterface $request): ContextInterface
     {
         return new Context($request, $this->contextDefinitions);
     }

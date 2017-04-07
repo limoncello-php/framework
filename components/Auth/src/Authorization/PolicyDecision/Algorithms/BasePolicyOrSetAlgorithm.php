@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Authorization\PolicyDecision\Algorithms;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function optimize(array $policiesAndSets)
+    public function optimize(array $policiesAndSets): array
     {
         assert(empty($policiesAndSets) === false);
 
