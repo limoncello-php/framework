@@ -21,7 +21,7 @@ use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
 use Limoncello\Tests\Application\TestCase;
 
 /**
- * @package Limoncello\Tests\Core
+ * @package Limoncello\Tests\Application
  */
 class CoreSettingsTest extends TestCase
 {

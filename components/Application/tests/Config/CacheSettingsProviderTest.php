@@ -24,7 +24,7 @@ use Limoncello\Tests\Application\Data\Config\SampleSettingsAA;
 use Limoncello\Tests\Application\TestCase;
 
 /**
- * @package Limoncello\Tests\Core
+ * @package Limoncello\Tests\Application
  */
 class CacheSettingsProviderTest extends TestCase
 {

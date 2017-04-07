@@ -20,7 +20,7 @@ use Limoncello\Application\Traits\SelectClassesTrait;
 use Limoncello\Tests\Application\TestCase;
 
 /**
- * @package Limoncello\Tests\Core
+ * @package Limoncello\Tests\Application
  */
 class SelectClassesTraitTest extends TestCase
 {

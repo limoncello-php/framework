@@ -35,7 +35,7 @@ use Limoncello\Tests\Application\TestCase;
 use ReflectionMethod;
 
 /**
- * @package Limoncello\Tests\Core
+ * @package Limoncello\Tests\Application
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
