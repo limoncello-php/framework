@@ -1,7 +1,7 @@
 <?php namespace Limoncello\l10n\Contracts\Messages;
 
-    /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+/**
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ interface BundleEncoderInterface
     /**
      * @param ResourceBundleInterface $bundle
      *
-     * @return $this
+     * @return self
      */
-    public function addBundle(ResourceBundleInterface $bundle);
+    public function addBundle(ResourceBundleInterface $bundle): self;
 
     /**
      * @param string $defaultLocale
      *
      * @return array
      */
-    public function getStorageData($defaultLocale);
+    public function getStorageData(string $defaultLocale): array;
 }
