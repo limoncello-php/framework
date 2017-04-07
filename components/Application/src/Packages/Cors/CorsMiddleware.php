@@ -47,18 +47,21 @@ class CorsMiddleware implements MiddlewareInterface
     ): ResponseInterface {
         /** @var AnalyzerInterface $analyzer */
         $analyzer = $container->get(AnalyzerInterface::class);
-        $cors     = $analyzer->analyze($request);
+        $analysis = $analyzer->analyze($request);
 
-        switch ($cors->getRequestType()) {
+        switch ($analysis->getRequestType()) {
             case AnalysisResultInterface::TYPE_REQUEST_OUT_OF_CORS_SCOPE:
                 // call next middleware handler
                 return $next($request);
 
             case AnalysisResultInterface::TYPE_ACTUAL_REQUEST:
                 // actual CORS request
+                $corsHeaders = $analysis->getResponseHeaders();
+
+                self::rememberCorsHeaders($container, $corsHeaders);
+
                 /** @var ResponseInterface $response */
-                $response    = $next($request);
-                $corsHeaders = $cors->getResponseHeaders();
+                $response = $next($request);
 
                 // add CORS headers to Response $response
                 foreach ($corsHeaders as $name => $value) {
@@ -68,18 +71,92 @@ class CorsMiddleware implements MiddlewareInterface
                 return $response;
 
             case AnalysisResultInterface::TYPE_PRE_FLIGHT_REQUEST:
-                $corsHeaders = $cors->getResponseHeaders();
+                $corsHeaders = $analysis->getResponseHeaders();
 
                 // return 200 HTTP with $corsHeaders
                 return new EmptyResponse(200, $corsHeaders);
 
             case AnalysisResultInterface::ERR_NO_HOST_HEADER:
+                return static::getErrorNoHostHeaderResponse($analysis);
+
             case AnalysisResultInterface::ERR_ORIGIN_NOT_ALLOWED:
+                return static::getErrorOriginNotAllowedResponse($analysis);
+
             case AnalysisResultInterface::ERR_METHOD_NOT_SUPPORTED:
+                return static::getErrorMethodNotSupportedResponse($analysis);
+
             case AnalysisResultInterface::ERR_HEADERS_NOT_SUPPORTED:
+                return static::getErrorHeadersNotSupportedResponse($analysis);
+
             default:
-                // return 4XX HTTP error
                 return new EmptyResponse(400);
+        }
+    }
+
+    /**
+     * @param AnalysisResultInterface $analysis
+     *
+     * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected static function getErrorNoHostHeaderResponse(
+        /** @noinspection PhpUnusedParameterInspection */ AnalysisResultInterface $analysis
+    ): ResponseInterface {
+        return new EmptyResponse(400);
+    }
+
+    /**
+     * @param AnalysisResultInterface $analysis
+     *
+     * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected static function getErrorOriginNotAllowedResponse(
+        /** @noinspection PhpUnusedParameterInspection */ AnalysisResultInterface $analysis
+    ): ResponseInterface {
+        return new EmptyResponse(400);
+    }
+
+    /**
+     * @param AnalysisResultInterface $analysis
+     *
+     * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected static function getErrorMethodNotSupportedResponse(
+        /** @noinspection PhpUnusedParameterInspection */ AnalysisResultInterface $analysis
+    ): ResponseInterface {
+        return new EmptyResponse(400);
+    }
+
+    /**
+     * @param AnalysisResultInterface $analysis
+     *
+     * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected static function getErrorHeadersNotSupportedResponse(
+        /** @noinspection PhpUnusedParameterInspection */ AnalysisResultInterface $analysis
+    ): ResponseInterface {
+        return new EmptyResponse(400);
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param array              $headers
+     *
+     * @return void
+     */
+    private static function rememberCorsHeaders(ContainerInterface $container, array $headers)
+    {
+        if ($container->has(CorsStorageInterface::class) === true) {
+            /** @var CorsStorageInterface $storage */
+            $storage = $container->get(CorsStorageInterface::class);
+            $storage->setHeaders($headers);
         }
     }
 }

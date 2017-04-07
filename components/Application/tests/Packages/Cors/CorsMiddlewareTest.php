@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Http\Cors;
+<?php namespace Limoncello\Tests\Application\Packages\Cors;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,20 +17,20 @@
  */
 
 use Closure;
+use Limoncello\Application\Packages\Cors\CorsMiddleware;
+use Limoncello\Application\Packages\Cors\CorsStorage;
+use Limoncello\Application\Packages\Cors\CorsStorageInterface;
 use Limoncello\Container\Container;
-use Limoncello\Flute\Contracts\Http\Cors\CorsStorageInterface;
-use Limoncello\Flute\Http\Cors\CorsMiddleware;
-use Limoncello\Flute\Http\Cors\CorsStorage;
-use Limoncello\Tests\Flute\TestCase;
 use Mockery;
 use Mockery\Mock;
 use Neomerx\Cors\Contracts\AnalysisResultInterface;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\EmptyResponse;
 
 /**
- * @package Limoncello\Tests\Flute
+ * @package Limoncello\Tests\Application
  */
 class CorsMiddlewareTest extends TestCase
 {

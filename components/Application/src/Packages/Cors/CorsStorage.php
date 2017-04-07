@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Http\Cors;
+<?php namespace Limoncello\Application\Packages\Cors;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,26 +16,31 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Http\Cors\CorsStorage;
-use Limoncello\Tests\Flute\TestCase;
-use Mockery;
-
 /**
- * @package Limoncello\Tests\Flute
+ * @package Limoncello\Application
  */
-class CorsStorageTest extends TestCase
+class CorsStorage implements CorsStorageInterface
 {
     /**
-     * Test methods.
+     * @var array
      */
-    public function testHasSetGet()
+    private $headers = [];
+
+    /**
+     * @inheritdoc
+     */
+    public function getHeaders(): array
     {
-        $storage = new CorsStorage();
+        return $this->headers;
+    }
 
-        $headers = ['key' => 'value'];
-        $this->assertNotEquals($headers, $storage->getHeaders());
+    /**
+     * @inheritdoc
+     */
+    public function setHeaders(array $headers): CorsStorageInterface
+    {
+        $this->headers = $headers;
 
-        $storage->setHeaders($headers);
-        $this->assertEquals($headers, $storage->getHeaders());
+        return $this;
     }
 }

@@ -53,5 +53,9 @@ class CorsContainerConfigurator implements ContainerConfiguratorInterface
 
             return $analyzer;
         };
+
+        $container[CorsStorageInterface::class] = function () {
+            return new CorsStorage();
+        };
     }
 }

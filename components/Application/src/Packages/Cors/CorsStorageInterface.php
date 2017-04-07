@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Http\Cors;
+<?php namespace Limoncello\Application\Packages\Cors;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,31 +16,20 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Http\Cors\CorsStorageInterface;
-
 /**
- * @package App
+ * @package Limoncello\Application
  */
-class CorsStorage implements CorsStorageInterface
+interface CorsStorageInterface
 {
     /**
-     * @var array
+     * @return array
      */
-    private $headers = [];
+    public function getHeaders(): array;
 
     /**
-     * @inheritdoc
+     * @param array $headers
+     *
+     * @return self
      */
-    public function getHeaders()
-    {
-        return $this->headers;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setHeaders(array $headers)
-    {
-        $this->headers = $headers;
-    }
+    public function setHeaders(array $headers): self;
 }
