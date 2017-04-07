@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\MessageCodes;
 
@@ -37,7 +38,7 @@ class Fail extends BaseRule
     /**
      * @param int $messageCode
      */
-    public function __construct($messageCode = MessageCodes::INVALID_VALUE)
+    public function __construct(int $messageCode = MessageCodes::INVALID_VALUE)
     {
         $this->messageCode = $messageCode;
     }
@@ -45,7 +46,7 @@ class Fail extends BaseRule
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         $this->errorAdded = true;
         yield $this->createError($this->getParameterName(), $input, $this->messageCode);
@@ -54,7 +55,7 @@ class Fail extends BaseRule
     /**
      * @inheritdoc
      */
-    public function isStateless()
+    public function isStateless(): bool
     {
         return parent::isStateless() && false;
     }

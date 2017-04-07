@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\MessageCodes;
 
 /**
@@ -43,7 +44,7 @@ class StringLength extends BaseRule
      * @param int|null $min
      * @param int|null $max
      */
-    public function __construct($min = null, $max = null)
+    public function __construct(int $min = null, int $max = null)
     {
         $this->min = $min;
         $this->max = $max;
@@ -54,7 +55,7 @@ class StringLength extends BaseRule
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         $length = strlen($input);
 

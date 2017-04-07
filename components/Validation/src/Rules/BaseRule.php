@@ -40,7 +40,7 @@ abstract class BaseRule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function isStateless()
+    public function isStateless(): bool
     {
         return true;
     }
@@ -79,7 +79,7 @@ abstract class BaseRule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function setParameterName($parameterName)
+    public function setParameterName(string $parameterName = null): RuleInterface
     {
         $this->parameterName = $parameterName;
 

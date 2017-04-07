@@ -29,7 +29,7 @@ trait Generics
     /**
      * @return RuleInterface
      */
-    protected static function success()
+    protected static function success(): RuleInterface
     {
         return new Success();
     }
@@ -39,7 +39,7 @@ trait Generics
      *
      * @return RuleInterface
      */
-    protected static function fail($messageCode = MessageCodes::INVALID_VALUE)
+    protected static function fail(int $messageCode = MessageCodes::INVALID_VALUE): RuleInterface
     {
         return new Fail($messageCode);
     }

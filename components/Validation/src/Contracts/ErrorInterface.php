@@ -34,7 +34,7 @@ interface ErrorInterface
     /**
      * @return int
      */
-    public function getMessageCode();
+    public function getMessageCode(): int;
 
     /**
      * @return array|null

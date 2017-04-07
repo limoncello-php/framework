@@ -77,7 +77,7 @@ class Translator implements TranslatorInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function translate(ErrorInterface $error)
+    public function translate(ErrorInterface $error): string
     {
         $pattern    = $this->getMessagePattern($error->getMessageCode());
         $paramName  = $this->getParameterName($error->getParameterName());

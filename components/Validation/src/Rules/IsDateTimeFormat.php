@@ -17,6 +17,7 @@
  */
 
 use DateTime;
+use Generator;
 use Limoncello\Validation\Contracts\MessageCodes;
 
 /**
@@ -35,7 +36,7 @@ class IsDateTimeFormat extends BaseRule
     /**
      * @param string $format
      */
-    public function __construct($format)
+    public function __construct(string $format)
     {
         $this->format = $format;
     }
@@ -45,7 +46,7 @@ class IsDateTimeFormat extends BaseRule
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         if (DateTime::createFromFormat($this->format, (string)$input) === false) {
             $context = [static::CONTEXT_FORMAT => $this->format];

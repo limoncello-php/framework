@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\CaptureAggregatorInterface;
 use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\RuleInterface;
@@ -79,7 +80,7 @@ abstract class BaseCapture implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         $this->hadErrors = false;
         foreach ($this->getRule()->validate($input) as $error) {
@@ -97,7 +98,7 @@ abstract class BaseCapture implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function isStateless()
+    public function isStateless(): bool
     {
         return $this->getRule()->isStateless();
     }
@@ -121,7 +122,7 @@ abstract class BaseCapture implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function setParameterName($parameterName)
+    public function setParameterName(string $parameterName = null): RuleInterface
     {
         $this->getRule()->setParameterName($parameterName);
 

@@ -33,7 +33,7 @@ trait Wrappers
      *
      * @return RuleInterface
      */
-    protected static function nullable(RuleInterface $rule)
+    protected static function nullable(RuleInterface $rule): RuleInterface
     {
         return static::orX($rule, static::isNull());
     }
@@ -43,7 +43,7 @@ trait Wrappers
      *
      * @return RuleInterface
      */
-    protected static function required(RuleInterface $rule)
+    protected static function required(RuleInterface $rule): RuleInterface
     {
         return static::andX(static::isRequired(), $rule);
     }

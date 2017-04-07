@@ -28,5 +28,5 @@ interface ValidatorInterface
      *
      * @return Generator
      */
-    public function validate($input);
+    public function validate($input): Generator;
 }

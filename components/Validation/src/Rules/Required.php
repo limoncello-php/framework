@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\MessageCodes;
 
@@ -32,7 +33,7 @@ class Required extends BaseRule
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         $this->hasBeenInvoked = true;
 
@@ -45,7 +46,7 @@ class Required extends BaseRule
     /**
      * @inheritdoc
      */
-    public function isStateless()
+    public function isStateless(): bool
     {
         return parent::isStateless() && false;
     }

@@ -27,10 +27,10 @@ interface CaptureAggregatorInterface
      *
      * @return void
      */
-    public function remember($key, $value);
+    public function remember(string $key, $value);
 
     /**
      * @return array
      */
-    public function getCaptures();
+    public function getCaptures(): array;
 }

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\RuleInterface;
 
@@ -65,7 +66,7 @@ class IfExpression extends BaseExpression
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         $conditionResult    = call_user_func($this->condition, $input);
         $this->selectedRule = $conditionResult === true ? $this->onTrue : $this->onFalse;
@@ -78,7 +79,7 @@ class IfExpression extends BaseExpression
     /**
      * @inheritdoc
      */
-    public function isStateless()
+    public function isStateless(): bool
     {
         return false;
     }

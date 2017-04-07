@@ -28,12 +28,12 @@ interface RuleInterface
      *
      * @return Generator
      */
-    public function validate($input);
+    public function validate($input): Generator;
 
     /**
      * @return bool
      */
-    public function isStateless();
+    public function isStateless(): bool;
 
     /**
      * @param RuleInterface $parent
@@ -52,7 +52,7 @@ interface RuleInterface
      *
      * @return self
      */
-    public function setParameterName($parameterName);
+    public function setParameterName(string $parameterName = null): self;
 
     /**
      * @param ErrorAggregatorInterface $aggregator

@@ -40,7 +40,7 @@ class ErrorAggregator implements ErrorAggregatorInterface
     /**
      * @inheritdoc
      */
-    public function get()
+    public function get(): array
     {
         return $this->errors;
     }

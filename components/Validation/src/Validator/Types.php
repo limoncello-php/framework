@@ -31,7 +31,7 @@ trait Types
     /**
      * @return RuleInterface
      */
-    protected static function isString()
+    protected static function isString(): RuleInterface
     {
         return new CallableRule('is_string', MessageCodes::IS_STRING);
     }
@@ -39,7 +39,7 @@ trait Types
     /**
      * @return RuleInterface
      */
-    protected static function isBool()
+    protected static function isBool(): RuleInterface
     {
         return new CallableRule('is_bool', MessageCodes::IS_BOOL);
     }
@@ -47,7 +47,7 @@ trait Types
     /**
      * @return RuleInterface
      */
-    protected static function isInt()
+    protected static function isInt(): RuleInterface
     {
         return new CallableRule('is_int', MessageCodes::IS_INT);
     }
@@ -55,7 +55,7 @@ trait Types
     /**
      * @return RuleInterface
      */
-    protected static function isFloat()
+    protected static function isFloat(): RuleInterface
     {
         return new CallableRule('is_float', MessageCodes::IS_FLOAT);
     }
@@ -63,7 +63,7 @@ trait Types
     /**
      * @return RuleInterface
      */
-    protected static function isNumeric()
+    protected static function isNumeric(): RuleInterface
     {
         return new CallableRule('is_numeric', MessageCodes::IS_NUMERIC);
     }
@@ -71,7 +71,7 @@ trait Types
     /**
      * @return RuleInterface
      */
-    protected static function isDateTime()
+    protected static function isDateTime(): RuleInterface
     {
         return new CallableRule(function ($value) {
             return $value instanceof DateTime;
@@ -83,7 +83,7 @@ trait Types
      *
      * @return RuleInterface
      */
-    protected static function isDateTimeFormat($format = DateTime::W3C)
+    protected static function isDateTimeFormat(string $format = DateTime::W3C): RuleInterface
     {
         return new IsDateTimeFormat($format);
     }
@@ -91,7 +91,7 @@ trait Types
     /**
      * @return RuleInterface
      */
-    protected static function isArray()
+    protected static function isArray(): RuleInterface
     {
         return new CallableRule('is_array', MessageCodes::IS_ARRAY);
     }
@@ -104,7 +104,7 @@ trait Types
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected static function inValues(array $values, $isStrict = true)
+    protected static function inValues(array $values, bool $isStrict = true): RuleInterface
     {
         return new InValues($values, $isStrict);
     }

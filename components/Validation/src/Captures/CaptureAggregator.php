@@ -31,7 +31,7 @@ class CaptureAggregator implements CaptureAggregatorInterface
     /**
      * @inheritdoc
      */
-    public function remember($key, $value)
+    public function remember(string $key, $value)
     {
         $this->remembered[$key] = $value;
     }
@@ -39,7 +39,7 @@ class CaptureAggregator implements CaptureAggregatorInterface
     /**
      * @inheritdoc
      */
-    public function getCaptures()
+    public function getCaptures(): array
     {
         return $this->remembered;
     }

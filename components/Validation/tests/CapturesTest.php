@@ -20,6 +20,7 @@ use Limoncello\Tests\Validation\Data\AppValidator as v;
 use Limoncello\Validation\Captures\CaptureAggregator;
 use Limoncello\Validation\Contracts\CaptureAggregatorInterface;
 use Limoncello\Validation\Contracts\MessageCodes;
+use Limoncello\Validation\Contracts\ValidatorInterface;
 use Limoncello\Validation\Errors\Error;
 use Limoncello\Validation\Validator;
 
@@ -244,12 +245,12 @@ EOT;
     }
 
     /**
-     * @param v     $validator
-     * @param mixed $input
+     * @param ValidatorInterface $validator
+     * @param mixed              $input
      *
      * @return Error[]
      */
-    private function readErrors(v $validator, $input)
+    private function readErrors(ValidatorInterface $validator, $input)
     {
         $errors = [];
         foreach ($validator->validate($input) as $error) {
