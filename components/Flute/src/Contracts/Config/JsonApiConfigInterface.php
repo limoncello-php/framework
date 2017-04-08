@@ -48,53 +48,53 @@ interface JsonApiConfigInterface
     /**
      * @return array
      */
-    public function getModelSchemaMap();
+    public function getModelSchemaMap(): array;
 
     /**
      * @param array $modelSchemaMap
      *
-     * @return $this
+     * @return self
      */
-    public function setModelSchemaMap(array $modelSchemaMap);
+    public function setModelSchemaMap(array $modelSchemaMap): self;
 
     /**
      * @return int
      */
-    public function getJsonEncodeOptions();
+    public function getJsonEncodeOptions(): int;
 
     /**
      * @param int $options
      *
-     * @return $this
+     * @return self
      */
-    public function setJsonEncodeOptions($options);
+    public function setJsonEncodeOptions(int $options): self;
 
     /**
      * @return int
      */
-    public function getJsonEncodeDepth();
+    public function getJsonEncodeDepth(): int;
 
     /**
      * @param int $depth
      *
-     * @return $this
+     * @return self
      */
-    public function setJsonEncodeDepth($depth);
+    public function setJsonEncodeDepth(int $depth): self;
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isShowVersion();
+    public function isShowVersion(): bool;
 
     /**
-     * @return $this
+     * @return self
      */
-    public function setShowVersion();
+    public function setShowVersion(): self;
 
     /**
-     * @return $this
+     * @return self
      */
-    public function setHideVersion();
+    public function setHideVersion(): self;
 
     /**
      * @return mixed
@@ -104,43 +104,43 @@ interface JsonApiConfigInterface
     /**
      * @param mixed $meta
      *
-     * @return $this
+     * @return self
      */
-    public function setMeta($meta);
+    public function setMeta($meta): self;
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUriPrefix();
 
     /**
      * @param string $prefix
      *
-     * @return $this
+     * @return self
      */
-    public function setUriPrefix($prefix);
+    public function setUriPrefix(string $prefix = null): self;
 
     /**
      * @return int
      */
-    public function getRelationshipPagingSize();
+    public function getRelationshipPagingSize(): int;
 
     /**
      * @param int $size
      *
-     * @return $this
+     * @return self
      */
-    public function setRelationshipPagingSize($size);
+    public function setRelationshipPagingSize(int $size): self;
 
     /**
      * @return array
      */
-    public function getConfig();
+    public function getConfig(): array;
 
     /**
      * @param array $data
      *
-     * @return JsonApiConfigInterface
+     * @return self
      */
-    public function setConfig(array $data);
+    public function setConfig(array $data): self;
 }

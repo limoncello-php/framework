@@ -28,7 +28,7 @@ class StringPKModelApi extends AppCrud
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnCreate($modelClass, array $attributes, $index = null)
+    protected function filterAttributesOnCreate(string $modelClass, array $attributes, string $index = null): array
     {
         $allowedChanges = parent::filterAttributesOnCreate($modelClass, $attributes, $index);
 

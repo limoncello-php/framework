@@ -19,7 +19,7 @@
 use Limoncello\Flute\Contracts\Models\TagStorageInterface;
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 class TagStorage implements TagStorageInterface
 {
@@ -28,29 +28,33 @@ class TagStorage implements TagStorageInterface
     /**
      * @inheritdoc
      */
-    public function register($item, $tag)
+    public function register($item, string $tag): TagStorageInterface
     {
         $uniqueId = spl_object_hash($item);
 
         $this->tags[$tag][$uniqueId] = $item;
+
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function registerArray($item, array $tags)
+    public function registerArray($item, array $tags): TagStorageInterface
     {
         $uniqueId = spl_object_hash($item);
 
         foreach ($tags as $tag) {
             $this->tags[$tag][$uniqueId] = $item;
         }
+
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function get($tag)
+    public function get(string $tag): array
     {
         $result = array_key_exists($tag, $this->tags) === true ? $this->tags[$tag] : [];
 

@@ -44,7 +44,7 @@ trait CreateResponsesTrait
         ContainerInterface $container,
         ServerRequestInterface $request,
         EncodingParametersInterface $parameters = null
-    ) {
+    ): ResponsesInterface {
         /** @var EncoderInterface $encoder */
         $encoder = $container->get(EncoderInterface::class);
         $encoder->forOriginalUri($request->getUri());

@@ -17,7 +17,7 @@
  */
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 interface PaginatedDataInterface
 {
@@ -29,26 +29,32 @@ interface PaginatedDataInterface
     /**
      * @return bool
      */
-    public function isCollection();
+    public function isCollection(): bool;
 
     /**
-     * @param bool $isCollection
-     *
-     * @return $this
+     * @return self
      */
-    public function setIsCollection($isCollection);
+    public function markAsCollection(): self;
+
+    /**
+     * @return self
+     */
+    public function markAsSingleItem(): self;
 
     /**
      * @return bool
      */
-    public function hasMoreItems();
+    public function hasMoreItems(): bool;
 
     /**
-     * @param bool $hasMoreItems
-     *
-     * @return $this
+     * @return self
      */
-    public function setHasMoreItems($hasMoreItems);
+    public function markHasMoreItems(): self;
+
+    /**
+     * @return self
+     */
+    public function markHasNoMoreItems(): self;
 
     /**
      * @return int|null
@@ -56,20 +62,21 @@ interface PaginatedDataInterface
     public function getOffset();
 
     /**
-     * @param int $offset
+     * @param int|null $offset
      *
-     * @return $this
+     * @return self
      */
-    public function setOffset($offset);
+    public function setOffset(int $offset = null): self;
 
     /**
      * @return int|null
      */
     public function getLimit();
+
     /**
-     * @param int $size
+     * @param int|null $size
      *
-     * @return $this
+     * @return self
      */
-    public function setLimit($size);
+    public function setLimit(int $size = null): self;
 }

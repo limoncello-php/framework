@@ -37,7 +37,7 @@ class IncludeParameter implements IncludeParameterInterface
      * @param string $originalPath
      * @param array  $path
      */
-    public function __construct($originalPath, array $path)
+    public function __construct(string $originalPath, array $path)
     {
         $this->originalPath = $originalPath;
         $this->path         = $path;
@@ -46,7 +46,7 @@ class IncludeParameter implements IncludeParameterInterface
     /**
      * @inheritdoc
      */
-    public function getOriginalPath()
+    public function getOriginalPath(): string
     {
         return $this->originalPath;
     }
@@ -54,7 +54,7 @@ class IncludeParameter implements IncludeParameterInterface
     /**
      * @inheritdoc
      */
-    public function getPath()
+    public function getPath(): array
     {
         return $this->path;
     }

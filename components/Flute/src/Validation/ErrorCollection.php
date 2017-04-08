@@ -56,7 +56,7 @@ class ErrorCollection extends \Neomerx\JsonApi\Exceptions\ErrorCollection
     public function __construct(
         T $jsonApiTranslator,
         ValidationTranslatorInterface $validationTranslator,
-        $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
+        int $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
         $this->jsonApiTranslator    = $jsonApiTranslator;
         $this->validationTranslator = $validationTranslator;
@@ -104,7 +104,7 @@ class ErrorCollection extends \Neomerx\JsonApi\Exceptions\ErrorCollection
     /**
      * @return T
      */
-    protected function getJsonApiTranslator()
+    protected function getJsonApiTranslator(): T
     {
         return $this->jsonApiTranslator;
     }
@@ -112,7 +112,7 @@ class ErrorCollection extends \Neomerx\JsonApi\Exceptions\ErrorCollection
     /**
      * @return ValidationTranslatorInterface
      */
-    protected function getValidationTranslator()
+    protected function getValidationTranslator(): ValidationTranslatorInterface
     {
         return $this->validationTranslator;
     }
@@ -120,7 +120,7 @@ class ErrorCollection extends \Neomerx\JsonApi\Exceptions\ErrorCollection
     /**
      * @return int
      */
-    protected function getErrorStatus()
+    protected function getErrorStatus(): int
     {
         return $this->errorStatus;
     }
@@ -128,7 +128,7 @@ class ErrorCollection extends \Neomerx\JsonApi\Exceptions\ErrorCollection
     /**
      * @return string
      */
-    private function getInvalidElementMessage()
+    private function getInvalidElementMessage(): string
     {
         if ($this->msgInvalidElement === null) {
             $this->msgInvalidElement = $this->getJsonApiTranslator()->get(T::MSG_ERR_INVALID_ELEMENT);

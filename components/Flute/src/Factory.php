@@ -20,11 +20,17 @@ use Doctrine\DBAL\Connection;
 use Limoncello\Flute\Adapters\Repository;
 use Limoncello\Flute\Api\ModelsData;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
+use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
+use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
+use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
+use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
 use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
+use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
+use Limoncello\Flute\Contracts\Models\TagStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Encoder\Encoder;
 use Limoncello\Flute\I18n\Translator;
@@ -68,7 +74,7 @@ class Factory implements FactoryInterface
      *
      * @return PaginatedDataInterface
      */
-    public function createPaginatedData($data)
+    public function createPaginatedData($data): PaginatedDataInterface
     {
         return new PaginatedData($data);
     }
@@ -76,7 +82,7 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createErrorCollection()
+    public function createErrorCollection(): ErrorCollection
     {
         return new ErrorCollection();
     }
@@ -84,7 +90,7 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createRelationshipStorage()
+    public function createRelationshipStorage(): RelationshipStorageInterface
     {
         return new RelationshipStorage($this);
     }
@@ -92,7 +98,7 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createModelStorage(ModelSchemesInterface $modelSchemes)
+    public function createModelStorage(ModelSchemesInterface $modelSchemes): ModelStorageInterface
     {
         return new ModelStorage($modelSchemes);
     }
@@ -100,7 +106,7 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createTagStorage()
+    public function createTagStorage(): TagStorageInterface
     {
         return new TagStorage();
     }
@@ -111,14 +117,14 @@ class Factory implements FactoryInterface
     public function createModelsData(
         PaginatedDataInterface $paginatedData,
         RelationshipStorageInterface $relationshipStorage = null
-    ) {
+    ): ModelsDataInterface {
         return new ModelsData($paginatedData, $relationshipStorage);
     }
 
     /**
      * @inheritdoc
      */
-    public function createTranslator()
+    public function createTranslator(): TranslatorInterface
     {
         return new Translator();
     }
@@ -131,14 +137,14 @@ class Factory implements FactoryInterface
         ModelSchemesInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
         T $translator
-    ) {
+    ): RepositoryInterface {
         return new Repository($connection, $modelSchemes, $filterOperations, $translator);
     }
 
     /**
      * @inheritdoc
      */
-    public function createJsonSchemes(array $schemes, ModelSchemesInterface $modelSchemes)
+    public function createJsonSchemes(array $schemes, ModelSchemesInterface $modelSchemes): JsonSchemesInterface
     {
         return new JsonSchemes($this->getJsonApiFactory(), $schemes, $modelSchemes);
     }
@@ -146,8 +152,10 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createEncoder(JsonSchemesInterface $schemes, EncoderOptions $encoderOptions = null)
-    {
+    public function createEncoder(
+        JsonSchemesInterface $schemes,
+        EncoderOptions $encoderOptions = null
+    ): EncoderInterface {
         return new Encoder($this->getJsonApiFactory(), $schemes, $encoderOptions);
     }
 }

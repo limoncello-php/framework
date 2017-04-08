@@ -38,8 +38,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     );
 
@@ -57,8 +57,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     );
 
@@ -76,8 +76,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     );
 
@@ -95,8 +95,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     );
 
@@ -114,8 +114,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     );
 
@@ -133,8 +133,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     );
 
@@ -152,8 +152,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     );
 
@@ -171,8 +171,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     );
 
@@ -190,8 +190,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         array $values
     );
 
@@ -209,8 +209,8 @@ interface FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         array $values
     );
 
@@ -222,7 +222,7 @@ interface FilterOperationsInterface
      *
      * @return void
      */
-    public function applyIsNull(QueryBuilder $builder, CompositeExpression $link, $table, $column);
+    public function applyIsNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column);
 
     /**
      * @param QueryBuilder        $builder
@@ -232,5 +232,5 @@ interface FilterOperationsInterface
      *
      * @return void
      */
-    public function applyIsNotNull(QueryBuilder $builder, CompositeExpression $link, $table, $column);
+    public function applyIsNotNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column);
 }

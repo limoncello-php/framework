@@ -71,7 +71,7 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnCreate($modelClass, array $attributes, $index = null)
+    protected function filterAttributesOnCreate(string $modelClass, array $attributes, string $index = null): array
     {
         $allowedChanges = parent::filterAttributesOnCreate($modelClass, $attributes, $index);
 
@@ -83,7 +83,7 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnUpdate($modelClass, array $attributes)
+    protected function filterAttributesOnUpdate(string $modelClass, array $attributes): array
     {
         $allowedChanges = parent::filterAttributesOnUpdate($modelClass, $attributes);
 
@@ -95,7 +95,7 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function builderSaveRelationshipOnCreate($relationshipName, QueryBuilder $builder)
+    protected function builderSaveRelationshipOnCreate($relationshipName, QueryBuilder $builder): QueryBuilder
     {
         $builder = parent::builderSaveRelationshipOnCreate($relationshipName, $builder);
 
@@ -107,7 +107,7 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function builderSaveRelationshipOnUpdate($relationshipName, QueryBuilder $builder)
+    protected function builderSaveRelationshipOnUpdate($relationshipName, QueryBuilder $builder): QueryBuilder
     {
         $builder = parent::builderSaveRelationshipOnUpdate($relationshipName, $builder);
 

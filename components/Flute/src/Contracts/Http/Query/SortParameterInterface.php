@@ -24,17 +24,17 @@ interface SortParameterInterface
     /**
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * @return string
      */
-    public function getOriginalName();
+    public function getOriginalName(): string;
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isRelationship();
+    public function isRelationship(): bool;
 
     /**
      * @return int|null
@@ -44,5 +44,5 @@ interface SortParameterInterface
     /**
      * @return bool
      */
-    public function isAscending();
+    public function isAscending(): bool;
 }

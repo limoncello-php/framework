@@ -20,7 +20,7 @@ use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 class ModelStorage implements ModelStorageInterface
 {
@@ -66,7 +66,7 @@ class ModelStorage implements ModelStorageInterface
     /**
      * @inheritdoc
      */
-    public function has($class, $index)
+    public function has(string $class, string $index): bool
     {
         $result = isset($this->models[$class][$index]);
 
@@ -76,7 +76,7 @@ class ModelStorage implements ModelStorageInterface
     /**
      * @inheritdoc
      */
-    public function get($class, $index)
+    public function get(string $class, string $index)
     {
         $result = $this->models[$class][$index];
 

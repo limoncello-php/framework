@@ -19,7 +19,6 @@
         "container-interop/container-interop": "^1.1",
         "doctrine/dbal": "^2.5.0",
         "neomerx/json-api": "^1.0.0",
-        "neomerx/cors-psr7": "^1.0.0",
         "limoncello-php/validation": "^0.5.0"
     },
     "require-dev": {

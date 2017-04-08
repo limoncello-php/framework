@@ -47,7 +47,11 @@ interface ControllerInterface
      *
      * @return ResponseInterface
      */
-    public static function index(array $routeParams, ContainerInterface $container, ServerRequestInterface $request);
+    public static function index(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface;
 
     /**
      * @param array                  $routeParams
@@ -56,7 +60,11 @@ interface ControllerInterface
      *
      * @return ResponseInterface
      */
-    public static function create(array $routeParams, ContainerInterface $container, ServerRequestInterface $request);
+    public static function create(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface;
 
     /**
      * @param array                  $routeParams
@@ -65,7 +73,11 @@ interface ControllerInterface
      *
      * @return ResponseInterface
      */
-    public static function read(array $routeParams, ContainerInterface $container, ServerRequestInterface $request);
+    public static function read(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface;
 
     /**
      * @param array                  $routeParams
@@ -74,7 +86,11 @@ interface ControllerInterface
      *
      * @return ResponseInterface
      */
-    public static function update(array $routeParams, ContainerInterface $container, ServerRequestInterface $request);
+    public static function update(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface;
 
     /**
      * @param array                  $routeParams
@@ -83,7 +99,11 @@ interface ControllerInterface
      *
      * @return ResponseInterface
      */
-    public static function delete(array $routeParams, ContainerInterface $container, ServerRequestInterface $request);
+    public static function delete(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface;
 
     /**
      * @param ContainerInterface     $container
@@ -94,7 +114,7 @@ interface ControllerInterface
     public static function parseInputOnCreate(
         ContainerInterface $container,
         ServerRequestInterface $request
-    );
+    ): array;
 
     /**
      * @param string|int             $index
@@ -107,5 +127,5 @@ interface ControllerInterface
         $index,
         ContainerInterface $container,
         ServerRequestInterface $request
-    );
+    ): array;
 }

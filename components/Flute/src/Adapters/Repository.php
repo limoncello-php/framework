@@ -100,7 +100,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function index($modelClass)
+    public function index(string $modelClass): QueryBuilder
     {
         $builder = $this->getConnection()->createQueryBuilder();
         $table   = $this->buildTableName($this->getTableName($modelClass));
@@ -112,7 +112,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function count($modelClass)
+    public function count(string $modelClass): QueryBuilder
     {
         $builder = $this->getConnection()->createQueryBuilder();
         $table   = $this->buildTableName($this->getTableName($modelClass));
@@ -126,7 +126,7 @@ class Repository implements RepositoryInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function create($modelClass, array $attributes)
+    public function create(string $modelClass, array $attributes): QueryBuilder
     {
         $connection = $this->getConnection();
         $dbPlatform = $connection->getDatabasePlatform();
@@ -151,7 +151,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function read($modelClass, $indexBind)
+    public function read(string $modelClass, string $indexBind): QueryBuilder
     {
         $builder = $this->getConnection()->createQueryBuilder();
         $table   = $this->getTableName($modelClass);
@@ -164,7 +164,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function readRelationship($modelClass, $indexBind, $relationshipName)
+    public function readRelationship(string $modelClass, string $indexBind, string $relationshipName): array
     {
         list($builder, $resultClass, $relationshipType, $table, $column) =
             $this->createRelationshipBuilder($modelClass, $relationshipName);
@@ -177,8 +177,12 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function hasInRelationship($modelClass, $parentIndexBind, $relationshipName, $childIndexBind)
-    {
+    public function hasInRelationship(
+        string $modelClass,
+        string $parentIndexBind,
+        string $relationshipName,
+        string $childIndexBind
+    ): array {
         list($builder, $resultClass, $relationshipType, $table, $column) =
             $this->createRelationshipBuilder($modelClass, $relationshipName);
 
@@ -196,7 +200,7 @@ class Repository implements RepositoryInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function update($modelClass, $index, array $attributes)
+    public function update(string $modelClass, $index, array $attributes): QueryBuilder
     {
         $connection = $this->getConnection();
         $dbPlatform = $connection->getDatabasePlatform();
@@ -224,7 +228,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function delete($modelClass, $indexBind)
+    public function delete(string $modelClass, string $indexBind): QueryBuilder
     {
         $builder = $this->getConnection()->createQueryBuilder();
 
@@ -238,8 +242,12 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function createToManyRelationship($modelClass, $indexBind, $name, $otherIndexBind)
-    {
+    public function createToManyRelationship(
+        string $modelClass,
+        string $indexBind,
+        string $name,
+        string $otherIndexBind
+    ): QueryBuilder {
         list ($intermediateTable, $foreignKey, $reverseForeignKey) =
             $this->getModelSchemes()->getBelongsToManyRelationship($modelClass, $name);
 
@@ -257,7 +265,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function cleanToManyRelationship($modelClass, $indexBind, $name)
+    public function cleanToManyRelationship(string $modelClass, string $indexBind, string $name): QueryBuilder
     {
         list ($intermediateTable, $foreignKey) =
             $this->getModelSchemes()->getBelongsToManyRelationship($modelClass, $name);
@@ -273,7 +281,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function applySorting(QueryBuilder $builder, $modelClass, array $sortParams)
+    public function applySorting(QueryBuilder $builder, string $modelClass, array $sortParams)
     {
         $table = $this->getTableName($modelClass);
         foreach ($sortParams as $sortParam) {
@@ -305,7 +313,7 @@ class Repository implements RepositoryInterface
     public function applyFilters(
         ErrorCollection $errors,
         QueryBuilder $builder,
-        $modelClass,
+        string $modelClass,
         FilterParameterCollection $filterParams
     ) {
         if ($filterParams->count() <= 0) {
@@ -473,7 +481,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function createRelationshipBuilder($modelClass, $relationshipName)
+    public function createRelationshipBuilder(string $modelClass, string $relationshipName): array
     {
         $builder          = null;
         $resultClass      = null;
@@ -503,7 +511,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function getConnection()
+    public function getConnection(): Connection
     {
         return $this->connection;
     }
@@ -511,7 +519,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function getColumns($modelClass)
+    public function getColumns(string $modelClass): array
     {
         $table   = $this->getModelSchemes()->getTable($modelClass);
         $columns = $this->getModelSchemes()->getAttributes($modelClass);
@@ -526,7 +534,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function buildTableName($table)
+    public function buildTableName(string $table): string
     {
         return "`$table`";
     }
@@ -534,7 +542,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function buildColumnName($table, $column, $modelClass = null)
+    public function buildColumnName(string $table, string $column, string $modelClass = null): string
     {
         return "`$table`.`$column`";
     }
@@ -542,7 +550,7 @@ class Repository implements RepositoryInterface
     /**
      * @return ModelSchemesInterface
      */
-    protected function getModelSchemes()
+    protected function getModelSchemes(): ModelSchemesInterface
     {
         return $this->modelSchemes;
     }
@@ -550,7 +558,7 @@ class Repository implements RepositoryInterface
     /**
      * @return T
      */
-    protected function getTranslator()
+    protected function getTranslator(): T
     {
         return $this->translator;
     }
@@ -558,7 +566,7 @@ class Repository implements RepositoryInterface
     /**
      * @return FilterOperationsInterface
      */
-    protected function getFilterOperations()
+    protected function getFilterOperations(): FilterOperationsInterface
     {
         return $this->filterOperations;
     }
@@ -568,7 +576,7 @@ class Repository implements RepositoryInterface
      *
      * @return string
      */
-    protected function getTableName($class)
+    protected function getTableName(string $class): string
     {
         $tableName = $this->getModelSchemes()->getTable($class);
 
@@ -580,7 +588,7 @@ class Repository implements RepositoryInterface
      *
      * @return string
      */
-    protected function getPrimaryKeyName($class)
+    protected function getPrimaryKeyName(string $class): string
     {
         $primaryKey = $this->getModelSchemes()->getPrimaryKey($class);
 
@@ -607,9 +615,9 @@ class Repository implements RepositoryInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         FilterParameterInterface $filterParam,
-        $table,
-        $field,
-        $operation,
+        string $table,
+        string $field,
+        string $operation,
         $params = null
     ) {
         switch ($operation) {
@@ -684,7 +692,7 @@ class Repository implements RepositoryInterface
      *
      * @return QueryBuilder
      */
-    protected function distinct(QueryBuilder $builder, $modelClass)
+    protected function distinct(QueryBuilder $builder, string $modelClass): QueryBuilder
     {
         // emulate SELECT DISTINCT (group by primary key)
         $primaryColumn     = $this->getModelSchemes()->getPrimaryKey($modelClass);
@@ -700,7 +708,7 @@ class Repository implements RepositoryInterface
      * @param string       $column
      * @param string       $bindName
      */
-    private function addWhereBind(QueryBuilder $builder, $table, $column, $bindName)
+    private function addWhereBind(QueryBuilder $builder, string $table, string $column, string $bindName)
     {
         $builder
             ->andWhere($this->buildColumnName($table, $column) . '=' . $bindName);
@@ -712,7 +720,7 @@ class Repository implements RepositoryInterface
      *
      * @return array
      */
-    private function createBelongsToBuilder($modelClass, $relationshipName)
+    private function createBelongsToBuilder(string $modelClass, string $relationshipName): array
     {
         $oneClass       = $this->getModelSchemes()->getReverseModelClass($modelClass, $relationshipName);
         $oneTable       = $this->getTableName($oneClass);
@@ -740,7 +748,7 @@ class Repository implements RepositoryInterface
      *
      * @return array
      */
-    private function createHasManyBuilder($modelClass, $relationshipName)
+    private function createHasManyBuilder(string $modelClass, string $relationshipName): array
     {
         list ($reverseClass, $reverseName) = $this->getModelSchemes()
             ->getReverseRelationship($modelClass, $relationshipName);
@@ -760,7 +768,7 @@ class Repository implements RepositoryInterface
      *
      * @return array
      */
-    private function createBelongsToManyBuilder($modelClass, $relationshipName)
+    private function createBelongsToManyBuilder(string $modelClass, string $relationshipName): array
     {
         list ($intermediateTable, $foreignKey, $reverseForeignKey) =
             $this->getModelSchemes()->getBelongsToManyRelationship($modelClass, $relationshipName);
@@ -784,7 +792,7 @@ class Repository implements RepositoryInterface
     /**
      * @return int
      */
-    private function getNewAliasId()
+    private function getNewAliasId(): int
     {
         return ++$this->aliasIdCounter;
     }

@@ -50,7 +50,7 @@ class PostSchema extends BaseSchema
     /**
      * @inheritdoc
      */
-    public static function getMappings()
+    public static function getMappings(): array
     {
         return [
             self::SCHEMA_ATTRIBUTES => [
@@ -71,7 +71,7 @@ class PostSchema extends BaseSchema
     /**
      * @inheritdoc
      */
-    protected function isShowRelatedLinkInRelationships()
+    protected function isShowRelatedLinkInRelationships(): bool
     {
         return !parent::isShowRelatedLinkInRelationships();
     }

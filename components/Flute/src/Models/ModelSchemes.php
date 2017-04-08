@@ -22,7 +22,7 @@ use Limoncello\Contracts\Model\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 class ModelSchemes implements ModelSchemesInterface
 {
@@ -79,7 +79,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getData()
+    public function getData(): array
     {
         $result = [
             $this->foreignKeys,
@@ -110,17 +110,22 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function registerClass($class, $tableName, $primaryKey, array $attributeTypes, array $attributeLengths)
-    {
-        if (is_string($class) === false || empty($class) === true) {
+    public function registerClass(
+        string $class,
+        string $tableName,
+        string $primaryKey,
+        array $attributeTypes,
+        array $attributeLengths
+    ): ModelSchemesInterface {
+        if (empty($class) === true) {
             throw new InvalidArgumentException('class');
         }
 
-        if (is_string($tableName) === false || empty($tableName) === true) {
+        if (empty($tableName) === true) {
             throw new InvalidArgumentException('tableName');
         }
 
-        if (is_string($primaryKey) === false || empty($primaryKey) === true) {
+        if (empty($primaryKey) === true) {
             throw new InvalidArgumentException('primaryKey');
         }
 
@@ -136,7 +141,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function hasClass($class)
+    public function hasClass(string $class): bool
     {
         $result = array_key_exists($class, $this->tableNames);
 
@@ -146,7 +151,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getTable($class)
+    public function getTable(string $class): string
     {
         $result = $this->tableNames[$class];
 
@@ -156,7 +161,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getPrimaryKey($class)
+    public function getPrimaryKey(string $class): string
     {
         $result = $this->primaryKeys[$class];
 
@@ -166,7 +171,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getAttributeTypes($class)
+    public function getAttributeTypes(string $class): array
     {
         $result = $this->attributeTypes[$class];
 
@@ -178,7 +183,7 @@ class ModelSchemes implements ModelSchemesInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getAttributeTypeInstances($class)
+    public function getAttributeTypeInstances(string $class): array
     {
         $types  = $this->getAttributeTypes($class);
         $result = [];
@@ -194,7 +199,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getAttributeType($class, $name)
+    public function getAttributeType(string $class, string $name): string
     {
         $result = $this->attributeTypes[$class][$name];
 
@@ -204,7 +209,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function hasAttributeType($class, $name)
+    public function hasAttributeType(string $class, string $name): bool
     {
         $result = isset($this->attributeTypes[$class][$name]);
 
@@ -214,7 +219,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getAttributeLengths($class)
+    public function getAttributeLengths(string $class): array
     {
         $result = $this->attributeLengths[$class];
 
@@ -224,7 +229,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function hasAttributeLength($class, $name)
+    public function hasAttributeLength(string $class, string $name): bool
     {
         $result = isset($this->attributeLengths[$class][$name]);
 
@@ -234,7 +239,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getAttributeLength($class, $name)
+    public function getAttributeLength(string $class, string $name): int
     {
         $result = $this->attributeLengths[$class][$name];
 
@@ -244,7 +249,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getAttributes($class)
+    public function getAttributes(string $class): array
     {
         $result = $this->attributes[$class];
 
@@ -254,7 +259,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function hasRelationship($class, $name)
+    public function hasRelationship(string $class, string $name): bool
     {
         $result = isset($this->relationshipTypes[$class][$name]);
 
@@ -264,7 +269,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getRelationshipType($class, $name)
+    public function getRelationshipType(string $class, string $name): int
     {
         $result = $this->relationshipTypes[$class][$name];
 
@@ -274,7 +279,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getReverseRelationship($class, $name)
+    public function getReverseRelationship(string $class, string $name): array
     {
         $result = $this->reversedRelationships[$class][$name];
 
@@ -284,7 +289,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getReversePrimaryKey($class, $name)
+    public function getReversePrimaryKey(string $class, string $name): array
     {
         $reverseClass = $this->getReverseModelClass($class, $name);
 
@@ -297,7 +302,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getReverseForeignKey($class, $name)
+    public function getReverseForeignKey(string $class, string $name): array
     {
         list ($reverseClass, $reverseName) = $this->getReverseRelationship($class, $name);
 
@@ -311,7 +316,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getReverseModelClass($class, $name)
+    public function getReverseModelClass(string $class, string $name): string
     {
         $reverseClass = $this->reversedClasses[$class][$name];
 
@@ -321,7 +326,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getForeignKey($class, $name)
+    public function getForeignKey(string $class, string $name): string
     {
         $result = $this->foreignKeys[$class][$name];
 
@@ -331,7 +336,7 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getBelongsToManyRelationship($class, $name)
+    public function getBelongsToManyRelationship(string $class, string $name): array
     {
         $result = $this->belongsToMany[$class][$name];
 
@@ -341,8 +346,13 @@ class ModelSchemes implements ModelSchemesInterface
     /**
      * @inheritdoc
      */
-    public function registerBelongsToOneRelationship($class, $name, $foreignKey, $reverseClass, $reverseName)
-    {
+    public function registerBelongsToOneRelationship(
+        string $class,
+        string $name,
+        string $foreignKey,
+        string $reverseClass,
+        string $reverseName
+    ): ModelSchemesInterface {
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO, $class, $name);
         $this->registerRelationshipType(RelationshipTypes::HAS_MANY, $reverseClass, $reverseName);
 
@@ -358,14 +368,14 @@ class ModelSchemes implements ModelSchemesInterface
      * @inheritdoc
      */
     public function registerBelongsToManyRelationship(
-        $class,
-        $name,
-        $table,
-        $foreignKey,
-        $reverseForeignKey,
-        $reverseClass,
-        $reverseName
-    ) {
+        string $class,
+        string $name,
+        string $table,
+        string $foreignKey,
+        string $reverseForeignKey,
+        string $reverseClass,
+        string $reverseName
+    ): ModelSchemesInterface {
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO_MANY, $class, $name);
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO_MANY, $reverseClass, $reverseName);
 
@@ -385,12 +395,12 @@ class ModelSchemes implements ModelSchemesInterface
      * @param int    $type
      * @param string $class
      * @param string $name
+     *
+     * @return void
      */
-    private function registerRelationshipType($type, $class, $name)
+    private function registerRelationshipType(int $type, string $class, string $name)
     {
-        assert(is_int($type) === true);
-        assert(is_string($class) === true && empty($class) === false);
-        assert(is_string($name) === true && empty($name) === false);
+        assert(empty($class) === false && empty($name) === false);
         assert(
             isset($this->relationshipTypes[$class][$name]) === false,
             "Relationship `$name` for class `$class` was already used."
@@ -404,13 +414,21 @@ class ModelSchemes implements ModelSchemesInterface
      * @param string $name
      * @param string $reverseClass
      * @param string $reverseName
+     *
+     * @return void
      */
-    private function registerReversedRelationship($class, $name, $reverseClass, $reverseName)
-    {
-        assert(is_string($class) === true && empty($class) === false);
-        assert(is_string($name) === true && empty($name) === false);
-        assert(is_string($reverseClass) === true && empty($reverseClass) === false);
-        assert(is_string($reverseName) === true && empty($reverseName) === false);
+    private function registerReversedRelationship(
+        string $class,
+        string $name,
+        string $reverseClass,
+        string $reverseName
+    ) {
+        assert(
+            empty($class) === false &&
+            empty($name) === false &&
+            empty($reverseClass) === false &&
+            empty($reverseName) === false
+        );
 
         // NOTE:
         // this function relies it would be called after

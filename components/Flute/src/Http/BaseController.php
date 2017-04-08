@@ -54,8 +54,11 @@ abstract class BaseController implements ControllerInterface
     /**
      * @inheritdoc
      */
-    public static function index(array $routeParams, ContainerInterface $container, ServerRequestInterface $request)
-    {
+    public static function index(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
         /** @var QueryParametersParserInterface $queryParser */
         $queryParser    = $container->get(QueryParametersParserInterface::class);
         $encodingParams = $queryParser->parse($request);
@@ -74,8 +77,11 @@ abstract class BaseController implements ControllerInterface
     /**
      * @inheritdoc
      */
-    public static function create(array $routeParams, ContainerInterface $container, ServerRequestInterface $request)
-    {
+    public static function create(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
         list ($index, $attributes, $toMany) = static::parseInputOnCreate($container, $request);
 
         $api   = self::createApi($container);
@@ -90,8 +96,11 @@ abstract class BaseController implements ControllerInterface
     /**
      * @inheritdoc
      */
-    public static function read(array $routeParams, ContainerInterface $container, ServerRequestInterface $request)
-    {
+    public static function read(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
         /** @var QueryParametersParserInterface $queryParser */
         $queryParser    = $container->get(QueryParametersParserInterface::class);
         $encodingParams = $queryParser->parse($request);
@@ -110,8 +119,11 @@ abstract class BaseController implements ControllerInterface
     /**
      * @inheritdoc
      */
-    public static function update(array $routeParams, ContainerInterface $container, ServerRequestInterface $request)
-    {
+    public static function update(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
         list ($attributes, $toMany) = static::parseInputOnUpdate($index, $container, $request);
         $api   = self::createApi($container);
@@ -122,8 +134,11 @@ abstract class BaseController implements ControllerInterface
     /**
      * @inheritdoc
      */
-    public static function delete(array $routeParams, ContainerInterface $container, ServerRequestInterface $request)
-    {
+    public static function delete(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
         return static::deleteImpl($index, $container, $request, self::createApi($container));
     }
@@ -137,11 +152,11 @@ abstract class BaseController implements ControllerInterface
      * @return ResponseInterface
      */
     protected static function readRelationship(
-        $index,
-        $relationshipName,
+        string $index,
+        string $relationshipName,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         /** @var PaginatedDataInterface $relData */
         /** @var EncodingParametersInterface $encodingParams */
         list ($relData, $encodingParams) = self::readRelationshipData($index, $relationshipName, $container, $request);
@@ -162,11 +177,11 @@ abstract class BaseController implements ControllerInterface
      * @return ResponseInterface
      */
     protected static function readRelationshipIdentifiers(
-        $index,
-        $relationshipName,
+        string $index,
+        string $relationshipName,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         /** @var PaginatedDataInterface $relData */
         /** @var EncodingParametersInterface $encodingParams */
         list ($relData, $encodingParams) = self::readRelationshipData($index, $relationshipName, $container, $request);
@@ -183,7 +198,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @return CrudInterface
      */
-    protected static function createApi(ContainerInterface $container)
+    protected static function createApi(ContainerInterface $container): CrudInterface
     {
         return static::createApiByClass($container, static::API_CLASS);
     }
@@ -198,8 +213,8 @@ abstract class BaseController implements ControllerInterface
     protected static function mapQueryParameters(
         ContainerInterface $container,
         EncodingParametersInterface $parameters,
-        $schemaClass
-    ) {
+        string $schemaClass
+    ): array {
         /** @var FactoryInterface $factory */
         $factory = $container->get(FactoryInterface::class);
         $errors  = $factory->createErrorCollection();
@@ -224,7 +239,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @return array
      */
-    protected static function parseJson(ContainerInterface $container, ServerRequestInterface $request)
+    protected static function parseJson(ContainerInterface $container, ServerRequestInterface $request): array
     {
         $body = (string)$request->getBody();
         if (empty($body) === true || ($json = json_decode($body, true)) === null) {
@@ -245,7 +260,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @return SchemaInterface
      */
-    protected static function getSchema(ContainerInterface $container)
+    protected static function getSchema(ContainerInterface $container): SchemaInterface
     {
         /** @var SchemaInterface $schemaClass */
         $schemaClass = static::SCHEMA_CLASS;
@@ -269,12 +284,12 @@ abstract class BaseController implements ControllerInterface
      */
     protected static function deleteInRelationship(
         $parentIndex,
-        $relationshipName,
+        string $relationshipName,
         $childIndex,
-        $childApiClass,
+        string $childApiClass,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         /** @var SchemaInterface $schemaClass */
         $schemaClass  = static::SCHEMA_CLASS;
         $modelRelName = $schemaClass::getMappings()[SchemaInterface::SCHEMA_RELATIONSHIPS][$relationshipName];
@@ -302,14 +317,14 @@ abstract class BaseController implements ControllerInterface
      */
     protected static function updateInRelationship(
         $parentIndex,
-        $relationshipName,
+        string $relationshipName,
         $childIndex,
         array $attributes,
         array $toMany,
-        $childApiClass,
+        string $childApiClass,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         /** @var SchemaInterface $schemaClass */
         $schemaClass  = static::SCHEMA_CLASS;
         $modelRelName = $schemaClass::getMappings()[SchemaInterface::SCHEMA_RELATIONSHIPS][$relationshipName];
@@ -332,11 +347,11 @@ abstract class BaseController implements ControllerInterface
      * @return array [PaginatedDataInterface, EncodingParametersInterface]
      */
     private static function readRelationshipData(
-        $index,
-        $relationshipName,
+        string $index,
+        string $relationshipName,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): array {
         /** @var QueryParametersParserInterface $queryParser */
         $queryParser    = $container->get(QueryParametersParserInterface::class);
         $encodingParams = $queryParser->parse($request);
@@ -372,7 +387,7 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request,
         CrudInterface $api
-    ) {
+    ): ResponseInterface {
         $updated   = $api->update($index, $attributes, $toMany);
         $responses = static::createResponses($container, $request);
 
@@ -399,7 +414,7 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request,
         CrudInterface $api
-    ) {
+    ): ResponseInterface {
         $api->delete($index);
         $response = static::createResponses($container, $request)->getCodeResponse(204);
 

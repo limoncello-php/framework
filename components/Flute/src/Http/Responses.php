@@ -74,7 +74,7 @@ class Responses extends JsonApiResponses
         EncoderInterface $encoder,
         ContainerInterface $schemes,
         EncodingParametersInterface $parameters = null,
-        $urlPrefix = null
+        string $urlPrefix = null
     ) {
         $this->extensions      = $extensions;
         $this->encoder         = $encoder;

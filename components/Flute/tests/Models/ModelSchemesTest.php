@@ -26,7 +26,7 @@ use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\User;
 
 /**
- * @package Limoncello\Tests\Models
+ * @package Limoncello\Tests\Flute
  */
 class ModelSchemesTest extends \PHPUnit_Framework_TestCase
 {
@@ -162,7 +162,7 @@ class ModelSchemesTest extends \PHPUnit_Framework_TestCase
     public function testCannotRegisterWithEmptyClass()
     {
         $this->schemes->registerClass(
-            null,
+            '',
             Comment::TABLE_NAME,
             Comment::FIELD_ID,
             [
@@ -182,7 +182,7 @@ class ModelSchemesTest extends \PHPUnit_Framework_TestCase
     {
         $this->schemes->registerClass(
             Comment::class,
-            null,
+            '',
             Comment::FIELD_ID,
             [
                 Comment::FIELD_ID         => Type::INTEGER,
@@ -202,7 +202,7 @@ class ModelSchemesTest extends \PHPUnit_Framework_TestCase
         $this->schemes->registerClass(
             Comment::class,
             Comment::TABLE_NAME,
-            null,
+            '',
             [
                 Comment::FIELD_ID         => Type::INTEGER,
                 Comment::FIELD_ID_USER    => Type::INTEGER,

@@ -19,7 +19,7 @@
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 class PaginatedData implements PaginatedDataInterface
 {
@@ -57,7 +57,7 @@ class PaginatedData implements PaginatedDataInterface
     /**
      * @inheritdoc
      */
-    public function isCollection()
+    public function isCollection(): bool
     {
         return $this->isCollection;
     }
@@ -65,9 +65,9 @@ class PaginatedData implements PaginatedDataInterface
     /**
      * @inheritdoc
      */
-    public function setIsCollection($isCollection)
+    public function markAsCollection(): PaginatedDataInterface
     {
-        $this->isCollection = $isCollection;
+        $this->isCollection = true;
 
         return $this;
     }
@@ -75,7 +75,17 @@ class PaginatedData implements PaginatedDataInterface
     /**
      * @inheritdoc
      */
-    public function hasMoreItems()
+    public function markAsSingleItem(): PaginatedDataInterface
+    {
+        $this->isCollection = false;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasMoreItems(): bool
     {
         return $this->hasMoreItems;
     }
@@ -83,9 +93,19 @@ class PaginatedData implements PaginatedDataInterface
     /**
      * @inheritdoc
      */
-    public function setHasMoreItems($hasMoreItems)
+    public function markHasMoreItems(): PaginatedDataInterface
     {
-        $this->hasMoreItems = $hasMoreItems;
+        $this->hasMoreItems = true;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function markHasNoMoreItems(): PaginatedDataInterface
+    {
+        $this->hasMoreItems = false;
 
         return $this;
     }
@@ -101,7 +121,7 @@ class PaginatedData implements PaginatedDataInterface
     /**
      * @inheritdoc
      */
-    public function setOffset($offset)
+    public function setOffset(int $offset = null): PaginatedDataInterface
     {
         $this->offset = $offset;
 
@@ -119,7 +139,7 @@ class PaginatedData implements PaginatedDataInterface
     /**
      * @inheritdoc
      */
-    public function setLimit($size)
+    public function setLimit(int $size = null): PaginatedDataInterface
     {
         $this->size = $size;
 

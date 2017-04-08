@@ -35,12 +35,12 @@ interface PaginationStrategyInterface
      *
      * @return array [$offset, $limit]
      */
-    public function getParameters($rootClass, $class, $path, $relationshipName);
+    public function getParameters(string $rootClass, string $class, string $path, string $relationshipName): array;
 
     /**
      * @param array|null $parameters
      *
      * @return array [$offset, $limit]
      */
-    public function parseParameters(array $parameters = null);
+    public function parseParameters(array $parameters = null): array;
 }

@@ -49,7 +49,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     private $meta = null;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $uriPrefix = null;
 
@@ -61,7 +61,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function getJsonEncodeOptions()
+    public function getJsonEncodeOptions(): int
     {
         return $this->options;
     }
@@ -69,7 +69,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setJsonEncodeOptions($options)
+    public function setJsonEncodeOptions(int $options): JsonApiConfigInterface
     {
         $this->options = $options;
 
@@ -79,7 +79,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function getJsonEncodeDepth()
+    public function getJsonEncodeDepth(): int
     {
         return $this->depth;
     }
@@ -87,7 +87,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setJsonEncodeDepth($depth)
+    public function setJsonEncodeDepth(int $depth): JsonApiConfigInterface
     {
         $this->depth = $depth;
 
@@ -97,7 +97,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function isShowVersion()
+    public function isShowVersion(): bool
     {
         return $this->isShowVersion;
     }
@@ -105,7 +105,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setShowVersion()
+    public function setShowVersion(): JsonApiConfigInterface
     {
         $this->isShowVersion = true;
 
@@ -115,7 +115,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setHideVersion()
+    public function setHideVersion(): JsonApiConfigInterface
     {
         $this->isShowVersion = false;
 
@@ -133,7 +133,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setMeta($meta)
+    public function setMeta($meta): JsonApiConfigInterface
     {
         $this->meta = $meta;
 
@@ -151,7 +151,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setUriPrefix($prefix)
+    public function setUriPrefix(string $prefix = null): JsonApiConfigInterface
     {
         $this->uriPrefix = $prefix;
 
@@ -161,7 +161,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function getRelationshipPagingSize()
+    public function getRelationshipPagingSize(): int
     {
         return $this->pagingSize;
     }
@@ -169,7 +169,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setRelationshipPagingSize($size)
+    public function setRelationshipPagingSize(int $size): JsonApiConfigInterface
     {
         $this->pagingSize = $size;
 
@@ -179,7 +179,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function getModelSchemaMap()
+    public function getModelSchemaMap(): array
     {
         return $this->modelSchemaMap;
     }
@@ -187,7 +187,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setModelSchemaMap(array $modelSchemaMap)
+    public function setModelSchemaMap(array $modelSchemaMap): JsonApiConfigInterface
     {
         $this->modelSchemaMap = $modelSchemaMap;
 
@@ -197,7 +197,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         return [
             self::KEY_MODEL_TO_SCHEMA_MAP => $this->modelSchemaMap,
@@ -216,7 +216,7 @@ class JsonApiConfig implements JsonApiConfigInterface
     /**
      * @inheritdoc
      */
-    public function setConfig(array $data)
+    public function setConfig(array $data): JsonApiConfigInterface
     {
         $this->setModelSchemaMap($data[self::KEY_MODEL_TO_SCHEMA_MAP]);
 

@@ -33,11 +33,11 @@ class JsonApiResponse extends Response
     use InjectContentTypeTrait;
 
     /**
-     * @param string $content
-     * @param int    $status
-     * @param array  $headers
+     * @param string|null $content
+     * @param int         $status
+     * @param array       $headers
      */
-    public function __construct($content, $status = 200, array $headers = [])
+    public function __construct(string $content = null, int $status = 200, array $headers = [])
     {
         $headers = $this->injectContentType(MediaTypeInterface::JSON_API_MEDIA_TYPE, $headers);
 
@@ -45,15 +45,18 @@ class JsonApiResponse extends Response
     }
 
     /**
-     * @param string $content
+     * @param string|null $content
      *
      * @return StreamInterface
      */
-    protected function createBody($content)
+    protected function createBody(string $content = null): StreamInterface
     {
         $body = new Stream('php://temp', 'wb+');
-        $body->write($content);
-        $body->rewind();
+
+        if ($content !== null) {
+            $body->write($content);
+            $body->rewind();
+        }
 
         return $body;
     }

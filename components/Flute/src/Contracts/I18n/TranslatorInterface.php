@@ -44,5 +44,5 @@ interface TranslatorInterface
      *
      * @return string
      */
-    public function get($messageId);
+    public function get(string $messageId): string;
 }

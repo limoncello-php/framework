@@ -50,7 +50,7 @@ interface ValidatorInterface
         array $attributeRules,
         array $toOneRules = [],
         array $toManyRules = []
-    );
+    ): array;
 
     /**
      * @param SchemaInterface $schema
@@ -69,5 +69,5 @@ interface ValidatorInterface
         array $attributeRules,
         array $toOneRules = [],
         array $toManyRules = []
-    );
+    ): array;
 }

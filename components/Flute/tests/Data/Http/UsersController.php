@@ -38,8 +38,10 @@ class UsersController extends BaseController
     /**
      * @inheritdoc
      */
-    public static function parseInputOnCreate(ContainerInterface $container, ServerRequestInterface $request)
-    {
+    public static function parseInputOnCreate(
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): array {
         $json   = static::parseJson($container, $request);
         $schema = static::getSchema($container);
 
@@ -67,8 +69,11 @@ class UsersController extends BaseController
     /**
      * @inheritdoc
      */
-    public static function parseInputOnUpdate($index, ContainerInterface $container, ServerRequestInterface $request)
-    {
+    public static function parseInputOnUpdate(
+        $index,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): array {
         $json   = static::parseJson($container, $request);
         $schema = static::getSchema($container);
 
@@ -104,7 +109,7 @@ class UsersController extends BaseController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         return static::readRelationship($routeParams[static::ROUTE_KEY_INDEX], Schema::REL_POSTS, $container, $request);
     }
 
@@ -119,7 +124,7 @@ class UsersController extends BaseController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
         return static::readRelationship($index, Schema::REL_COMMENTS, $container, $request);

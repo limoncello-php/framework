@@ -39,24 +39,24 @@ interface FactoryInterface
     /**
      * @return ErrorCollection
      */
-    public function createErrorCollection();
+    public function createErrorCollection(): ErrorCollection;
 
     /**
      * @return RelationshipStorageInterface
      */
-    public function createRelationshipStorage();
+    public function createRelationshipStorage(): RelationshipStorageInterface;
 
     /**
      * @param ModelSchemesInterface $modelSchemes
      *
      * @return ModelStorageInterface
      */
-    public function createModelStorage(ModelSchemesInterface $modelSchemes);
+    public function createModelStorage(ModelSchemesInterface $modelSchemes): ModelStorageInterface;
 
     /**
      * @return TagStorageInterface
      */
-    public function createTagStorage();
+    public function createTagStorage(): TagStorageInterface;
 
     /**
      * @param PaginatedDataInterface       $paginatedData
@@ -67,12 +67,12 @@ interface FactoryInterface
     public function createModelsData(
         PaginatedDataInterface $paginatedData,
         RelationshipStorageInterface $relationshipStorage = null
-    );
+    ): ModelsDataInterface;
 
     /**
      * @return TranslatorInterface
      */
-    public function createTranslator();
+    public function createTranslator(): TranslatorInterface;
 
     /**
      * @param Connection                $connection
@@ -87,7 +87,7 @@ interface FactoryInterface
         ModelSchemesInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
         TranslatorInterface $translator
-    );
+    ): RepositoryInterface;
 
     /**
      * @param array                 $schemes
@@ -95,7 +95,7 @@ interface FactoryInterface
      *
      * @return JsonSchemesInterface
      */
-    public function createJsonSchemes(array $schemes, ModelSchemesInterface $modelSchemes);
+    public function createJsonSchemes(array $schemes, ModelSchemesInterface $modelSchemes): JsonSchemesInterface;
 
     /**
      * @param JsonSchemesInterface $schemes
@@ -103,11 +103,15 @@ interface FactoryInterface
      *
      * @return EncoderInterface
      */
-    public function createEncoder(JsonSchemesInterface $schemes, EncoderOptions $encoderOptions = null);
+    public function createEncoder(
+        JsonSchemesInterface $schemes,
+        EncoderOptions $encoderOptions = null
+    ): EncoderInterface;
+
     /**
      * @param mixed $data
      *
      * @return PaginatedDataInterface
      */
-    public function createPaginatedData($data);
+    public function createPaginatedData($data): PaginatedDataInterface;
 }

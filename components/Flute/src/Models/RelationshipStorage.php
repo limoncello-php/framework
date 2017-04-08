@@ -20,7 +20,7 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 class RelationshipStorage implements RelationshipStorageInterface
 {
@@ -49,12 +49,12 @@ class RelationshipStorage implements RelationshipStorageInterface
     /**
      * @inheritdoc
      */
-    public function addToOneRelationship($model, $relationship, $one)
+    public function addToOneRelationship($model, string $relationship, $one): bool
     {
         $uniqueId = spl_object_hash($model);
         if (isset($this->relationships[$uniqueId][$relationship]) === false) {
             $this->relationships[$uniqueId][$relationship] = [
-                self::IDX_DATA => $this->factory->createPaginatedData($one),
+                self::IDX_DATA => $this->factory->createPaginatedData($one)->markAsSingleItem(),
                 self::IDX_TYPE => self::RELATIONSHIP_TYPE_TO_ONE,
             ];
 
@@ -67,15 +67,21 @@ class RelationshipStorage implements RelationshipStorageInterface
     /**
      * @inheritdoc
      */
-    public function addToManyRelationship($model, $relationship, array $many, $hasMore, $offset, $size)
-    {
+    public function addToManyRelationship(
+        $model,
+        string $relationship,
+        array $many,
+        bool $hasMore,
+        int $offset = null,
+        $size = null
+    ): bool {
         $uniqueId = spl_object_hash($model);
         if (isset($this->relationships[$uniqueId][$relationship]) === false) {
             $data = $this->factory->createPaginatedData($many)
-                ->setIsCollection(true)
-                ->setHasMoreItems($hasMore)
+                ->markAsCollection()
                 ->setOffset($offset)
                 ->setLimit($size);
+            $hasMore === true ? $data->markHasMoreItems() : $data->markHasNoMoreItems();
             $this->relationships[$uniqueId][$relationship] = [
                 self::IDX_DATA => $data,
                 self::IDX_TYPE => self::RELATIONSHIP_TYPE_TO_MANY,
@@ -90,7 +96,7 @@ class RelationshipStorage implements RelationshipStorageInterface
     /**
      * @inheritdoc
      */
-    public function hasRelationship($model, $relationship)
+    public function hasRelationship($model, string $relationship): bool
     {
         return $this->getRelationshipType($model, $relationship) !== self::RELATIONSHIP_TYPE_NONE;
     }
@@ -98,7 +104,7 @@ class RelationshipStorage implements RelationshipStorageInterface
     /**
      * @inheritdoc
      */
-    public function getRelationshipType($model, $relationship)
+    public function getRelationshipType($model, string $relationship): int
     {
         $result = self::RELATIONSHIP_TYPE_NONE;
 
@@ -113,7 +119,7 @@ class RelationshipStorage implements RelationshipStorageInterface
     /**
      * @inheritdoc
      */
-    public function getRelationship($model, $relationship)
+    public function getRelationship($model, string $relationship)
     {
         $uniqueId = spl_object_hash($model);
         $result = $this->relationships[$uniqueId][$relationship][self::IDX_DATA];

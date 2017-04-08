@@ -87,7 +87,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     /**
      * @return JsonSchemesInterface
      */
-    protected function getSchemesContainer()
+    protected function getSchemesContainer(): JsonSchemesInterface
     {
         return $this->schemesContainer;
     }
@@ -95,7 +95,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     /**
      * @return UriInterface
      */
-    protected function getOriginalUri()
+    protected function getOriginalUri(): UriInterface
     {
         return $this->originalUri;
     }
@@ -153,7 +153,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
      *
      * @return Closure
      */
-    private function createLinkClosure($pageSize)
+    private function createLinkClosure(int $pageSize): Closure
     {
         parse_str($this->getOriginalUri()->getQuery(), $queryParams);
 

@@ -22,7 +22,7 @@ use Limoncello\Flute\Models\ModelStorage;
 use Limoncello\Tests\Flute\Data\Models\Post;
 
 /**
- * @package Limoncello\Tests\Models
+ * @package Limoncello\Tests\Flute
  */
 class ModelStorageTest extends \PHPUnit_Framework_TestCase
 {

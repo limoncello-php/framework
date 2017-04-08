@@ -34,7 +34,7 @@ interface FilterParameterInterface
     /**
      * @return string
      */
-    public function getOriginalName();
+    public function getOriginalName(): string;
 
     /**
      * @return mixed
@@ -44,17 +44,17 @@ interface FilterParameterInterface
     /**
      * @return bool
      */
-    public function isForAttribute();
+    public function isForAttribute(): bool;
 
     /**
      * @return bool
      */
-    public function isForRelationship();
+    public function isForRelationship(): bool;
 
     /**
      * @return bool
      */
-    public function isForAttributeInRelationship();
+    public function isForAttributeInRelationship(): bool;
 
     /**
      * @return int|null

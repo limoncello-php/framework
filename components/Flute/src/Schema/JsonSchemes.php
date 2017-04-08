@@ -30,7 +30,7 @@ use Neomerx\JsonApi\Schema\Container;
 class JsonSchemes extends Container implements JsonSchemesInterface
 {
     /**
-     * @var RelationshipStorageInterface
+     * @var RelationshipStorageInterface|null
      */
     private $relationshipStorage;
 
@@ -61,16 +61,23 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     /**
      * @inheritdoc
      */
-    public function setRelationshipStorage(RelationshipStorageInterface $storage)
+    public function setRelationshipStorage(RelationshipStorageInterface $storage = null): JsonSchemesInterface
     {
         $this->relationshipStorage = $storage;
+
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function getRelationshipSchema($schemaClass, $relationshipName)
+    public function getRelationshipSchema(string $schemaClass, string $relationshipName): SchemaInterface
     {
+        assert(
+            class_exists($schemaClass) === true &&
+            in_array(SchemaInterface::class, class_implements($schemaClass)) === true
+        );
+
         /** @var SchemaInterface $schemaClass */
 
         $modelRelName = $schemaClass::getMappings()[SchemaInterface::SCHEMA_RELATIONSHIPS][$relationshipName];

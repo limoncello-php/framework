@@ -32,7 +32,7 @@ interface RepositoryInterface
      *
      * @return QueryBuilder
      */
-    public function index($modelClass);
+    public function index(string $modelClass): QueryBuilder;
 
     /**
      * @param string $modelClass
@@ -40,7 +40,7 @@ interface RepositoryInterface
      *
      * @return QueryBuilder
      */
-    public function create($modelClass, array $attributes);
+    public function create(string $modelClass, array $attributes): QueryBuilder;
 
     /**
      * @param string $modelClass
@@ -48,7 +48,7 @@ interface RepositoryInterface
      *
      * @return QueryBuilder
      */
-    public function read($modelClass, $indexBind);
+    public function read(string $modelClass, string $indexBind): QueryBuilder;
 
     /**
      * @param string $modelClass
@@ -57,7 +57,7 @@ interface RepositoryInterface
      *
      * @return array [$builder, $resultClass, $relationshipType]
      */
-    public function readRelationship($modelClass, $indexBind, $relationshipName);
+    public function readRelationship(string $modelClass, string $indexBind, string $relationshipName): array;
 
     /**
      * @param string $modelClass
@@ -67,7 +67,12 @@ interface RepositoryInterface
      *
      * @return array [$builder, $resultClass, $relationshipType]
      */
-    public function hasInRelationship($modelClass, $parentIndexBind, $relationshipName, $childIndexBind);
+    public function hasInRelationship(
+        string $modelClass,
+        string $parentIndexBind,
+        string $relationshipName,
+        string $childIndexBind
+    ): array;
 
     /**
      * @param string     $modelClass
@@ -76,7 +81,7 @@ interface RepositoryInterface
      *
      * @return QueryBuilder
      */
-    public function update($modelClass, $index, array $attributes);
+    public function update(string $modelClass, $index, array $attributes): QueryBuilder;
 
     /**
      * @param string $modelClass
@@ -84,7 +89,7 @@ interface RepositoryInterface
      *
      * @return QueryBuilder
      */
-    public function delete($modelClass, $indexBind);
+    public function delete(string $modelClass, string $indexBind): QueryBuilder;
 
     /**
      * @param string $modelClass
@@ -94,7 +99,12 @@ interface RepositoryInterface
      *
      * @return QueryBuilder
      */
-    public function createToManyRelationship($modelClass, $indexBind, $name, $otherIndexBind);
+    public function createToManyRelationship(
+        string $modelClass,
+        string $indexBind,
+        string $name,
+        string $otherIndexBind
+    ): QueryBuilder;
 
     /**
      * @param string $modelClass
@@ -103,7 +113,7 @@ interface RepositoryInterface
      *
      * @return QueryBuilder
      */
-    public function cleanToManyRelationship($modelClass, $indexBind, $name);
+    public function cleanToManyRelationship(string $modelClass, string $indexBind, string $name): QueryBuilder;
 
     /**
      * @param ErrorCollection           $errors
@@ -116,7 +126,7 @@ interface RepositoryInterface
     public function applyFilters(
         ErrorCollection $errors,
         QueryBuilder $builder,
-        $modelClass,
+        string $modelClass,
         FilterParameterCollection $filterParams
     );
 
@@ -127,7 +137,7 @@ interface RepositoryInterface
      *
      * @return void
      */
-    public function applySorting(QueryBuilder $builder, $modelClass, array $sortParams);
+    public function applySorting(QueryBuilder $builder, string $modelClass, array $sortParams);
 
     /**
      * @param string $modelClass
@@ -135,33 +145,33 @@ interface RepositoryInterface
      *
      * @return array [$builder, $resultClass, $relationshipType, $table, $column]
      */
-    public function createRelationshipBuilder($modelClass, $relationshipName);
+    public function createRelationshipBuilder(string $modelClass, string $relationshipName): array;
 
     /**
      * @param string $modelClass
      *
      * @return QueryBuilder
      */
-    public function count($modelClass);
+    public function count(string $modelClass): QueryBuilder;
 
     /**
      * @return Connection
      */
-    public function getConnection();
+    public function getConnection(): Connection;
 
     /**
      * @param string $modelClass
      *
      * @return array
      */
-    public function getColumns($modelClass);
+    public function getColumns(string $modelClass): array;
 
     /**
      * @param string $table
      *
      * @return string
      */
-    public function buildTableName($table);
+    public function buildTableName(string $table): string;
 
     /**
      * @param string      $table
@@ -170,5 +180,5 @@ interface RepositoryInterface
      *
      * @return string
      */
-    public function buildColumnName($table, $column, $modelClass = null);
+    public function buildColumnName(string $table, string $column, string $modelClass = null): string;
 }

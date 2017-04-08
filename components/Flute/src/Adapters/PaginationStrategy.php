@@ -37,7 +37,7 @@ class PaginationStrategy implements PaginationStrategyInterface
     /**
      * @param int $defaultPageLimit
      */
-    public function __construct($defaultPageLimit = self::DEFAULT_LIMIT_SIZE)
+    public function __construct(int $defaultPageLimit = self::DEFAULT_LIMIT_SIZE)
     {
         $this->defaultPageLimit = $defaultPageLimit;
     }
@@ -45,7 +45,7 @@ class PaginationStrategy implements PaginationStrategyInterface
     /**
      * @inheritdoc
      */
-    public function getParameters($rootClass, $class, $path, $relationshipName)
+    public function getParameters(string $rootClass, string $class, string $path, string $relationshipName): array
     {
         // input parameters are ignored (same paging params for all)
         // feel free to change it in child classes
@@ -59,7 +59,7 @@ class PaginationStrategy implements PaginationStrategyInterface
     /**
      * @inheritdoc
      */
-    public function parseParameters(array $parameters = null)
+    public function parseParameters(array $parameters = null): array
     {
         if ($parameters === null) {
             return [0, $this->defaultPageLimit + 1];
@@ -87,7 +87,7 @@ class PaginationStrategy implements PaginationStrategyInterface
      *
      * @return int
      */
-    private function getValue(array $parameters, $key, $default, $min, $max)
+    private function getValue(array $parameters, string $key, int $default, int $min, int $max): int
     {
         $result = $default;
         if (isset($parameters[$key]) === true) {

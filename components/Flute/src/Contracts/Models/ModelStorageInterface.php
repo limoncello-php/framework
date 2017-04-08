@@ -17,7 +17,7 @@
  */
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 interface ModelStorageInterface
 {
@@ -34,7 +34,7 @@ interface ModelStorageInterface
      *
      * @return bool
      */
-    public function has($class, $index);
+    public function has(string $class, string $index): bool;
 
     /**
      * @param string $class
@@ -42,5 +42,5 @@ interface ModelStorageInterface
      *
      * @return mixed
      */
-    public function get($class, $index);
+    public function get(string $class, string $index);
 }

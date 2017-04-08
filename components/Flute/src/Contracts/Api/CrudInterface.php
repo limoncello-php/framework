@@ -37,7 +37,7 @@ interface CrudInterface
         array $sortParams = null,
         array $includePaths = null,
         array $pagingParams = null
-    );
+    ): ModelsDataInterface;
 
     /**
      * @param FilterParameterCollection|null $filterParams
@@ -45,7 +45,7 @@ interface CrudInterface
      *
      * @return array
      */
-    public function indexResources(FilterParameterCollection $filterParams = null, array $sortParams = null);
+    public function indexResources(FilterParameterCollection $filterParams = null, array $sortParams = null): array;
 
     /**
      * @param int|string                     $index
@@ -54,7 +54,11 @@ interface CrudInterface
      *
      * @return ModelsDataInterface
      */
-    public function read($index, FilterParameterCollection $filterParams = null, array $includePaths = null);
+    public function read(
+        $index,
+        FilterParameterCollection $filterParams = null,
+        array $includePaths = null
+    ): ModelsDataInterface;
 
     /**
      * @param int|string                     $index
@@ -69,7 +73,7 @@ interface CrudInterface
      *
      * @return int
      */
-    public function delete($index);
+    public function delete($index): int;
 
     /**
      * @param null|string $index
@@ -78,7 +82,7 @@ interface CrudInterface
      *
      * @return string
      */
-    public function create($index, array $attributes, array $toMany = []);
+    public function create($index, array $attributes, array $toMany = []): string;
 
     /**
      * @param int|string $index
@@ -87,7 +91,7 @@ interface CrudInterface
      *
      * @return int
      */
-    public function update($index, array $attributes, array $toMany = []);
+    public function update($index, array $attributes, array $toMany = []): int;
 
     /**
      * @param int|string                     $index
@@ -100,11 +104,11 @@ interface CrudInterface
      */
     public function readRelationship(
         $index,
-        $relationshipName,
+        string $relationshipName,
         FilterParameterCollection $filterParams = null,
         array $sortParams = null,
         array $pagingParams = null
-    );
+    ): PaginatedDataInterface;
 
     /**
      * @param int|string $parentId
@@ -113,7 +117,7 @@ interface CrudInterface
      *
      * @return bool
      */
-    public function hasInRelationship($parentId, $name, $childId);
+    public function hasInRelationship($parentId, string $name, $childId): bool;
 
     /**
      * @param int|string $index

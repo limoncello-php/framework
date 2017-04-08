@@ -96,7 +96,7 @@ class QueryTransformer
         ModelSchemesInterface $modelSchemes,
         JsonSchemesInterface $jsonSchemes,
         T $translator,
-        $schemaClass
+        string $schemaClass
     ) {
         $this->modelSchemes = $modelSchemes;
         $this->jsonSchemes  = $jsonSchemes;
@@ -110,7 +110,7 @@ class QueryTransformer
      *
      * @return array
      */
-    public function mapParameters(ErrorCollection $errors, EncodingParametersInterface $parameters)
+    public function mapParameters(ErrorCollection $errors, EncodingParametersInterface $parameters): array
     {
         $filters  = $this->mapFilterParameters($errors, $parameters->getFilteringParameters());
         $sorts    = $this->mapSortParameters($errors, $parameters->getSortParameters());
@@ -222,7 +222,7 @@ class QueryTransformer
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function mapFilterField($jsonName, $value)
+    protected function mapFilterField(string $jsonName, $value)
     {
         $this->resetSchema();
 
@@ -299,7 +299,7 @@ class QueryTransformer
      *
      * @return IncludeParameterInterface|null
      */
-    protected function mapRelationshipsPath($path)
+    protected function mapRelationshipsPath(string $path)
     {
         $this->resetSchema();
 
@@ -326,7 +326,7 @@ class QueryTransformer
     /**
      * @return FilterParameterCollection
      */
-    protected function createFilterParameterCollection()
+    protected function createFilterParameterCollection(): FilterParameterCollection
     {
         return new FilterParameterCollection();
     }
@@ -338,8 +338,11 @@ class QueryTransformer
      *
      * @return FilterParameterInterface
      */
-    protected function createFilterAttributeParameter($originalName, $attributeName, $value)
-    {
+    protected function createFilterAttributeParameter(
+        string $originalName,
+        string $attributeName,
+        $value
+    ): FilterParameterInterface {
         return new FilterParameter($originalName, null, $attributeName, $value);
     }
 
@@ -351,8 +354,12 @@ class QueryTransformer
      *
      * @return FilterParameterInterface
      */
-    protected function createFilterRelationshipParameter($originalName, $relationshipName, $value, $relationshipType)
-    {
+    protected function createFilterRelationshipParameter(
+        string $originalName,
+        string $relationshipName,
+        $value,
+        int $relationshipType
+    ): FilterParameterInterface {
         return new FilterParameter($originalName, $relationshipName, null, $value, $relationshipType);
     }
 
@@ -366,12 +373,12 @@ class QueryTransformer
      * @return FilterParameterInterface
      */
     protected function createFilterAttributeInRelationshipParameter(
-        $originalName,
-        $relationshipName,
-        $attributeName,
+        string $originalName,
+        string $relationshipName,
+        string $attributeName,
         $value,
-        $relationshipType
-    ) {
+        int $relationshipType
+    ): FilterParameterInterface {
         return new FilterParameter($originalName, $relationshipName, $attributeName, $value, $relationshipType);
     }
 
@@ -381,8 +388,10 @@ class QueryTransformer
      *
      * @return SortParameterInterface
      */
-    protected function createSortAttributeParameter(JsonLibrarySortParameterInterface $sortParam, $name)
-    {
+    protected function createSortAttributeParameter(
+        JsonLibrarySortParameterInterface $sortParam,
+        string $name
+    ): SortParameterInterface {
         return new SortParameter($sortParam, $name, false, null);
     }
 
@@ -395,9 +404,9 @@ class QueryTransformer
      */
     protected function createSortRelationshipParameter(
         JsonLibrarySortParameterInterface $sortParam,
-        $name,
-        $relationshipType
-    ) {
+        string $name,
+        int $relationshipType
+    ): SortParameterInterface {
         return new SortParameter($sortParam, $name, true, $relationshipType);
     }
 
@@ -407,7 +416,7 @@ class QueryTransformer
      *
      * @return IncludeParameterInterface
      */
-    protected function createIncludeParameter($originalPath, array $path)
+    protected function createIncludeParameter(string $originalPath, array $path)
     {
         return new IncludeParameter($originalPath, $path);
     }
@@ -417,7 +426,7 @@ class QueryTransformer
      *
      * @return bool
      */
-    protected function isId($jsonName)
+    protected function isId(string $jsonName): bool
     {
         return $jsonName === DocumentInterface::KEYWORD_ID;
     }
@@ -427,7 +436,7 @@ class QueryTransformer
      *
      * @return bool
      */
-    protected function canMapAttribute($jsonName)
+    protected function canMapAttribute(string $jsonName): bool
     {
         $result = array_key_exists($jsonName, $this->getAttributeMappings()) === true;
 
@@ -439,7 +448,7 @@ class QueryTransformer
      *
      * @return bool
      */
-    protected function canMapRelationship($jsonName)
+    protected function canMapRelationship(string $jsonName): bool
     {
         $result = array_key_exists($jsonName, $this->getRelationshipMappings()) === true;
 
@@ -449,7 +458,7 @@ class QueryTransformer
     /**
      * @return array
      */
-    protected function getAttributeMappings()
+    protected function getAttributeMappings(): array
     {
         return $this->attrMappings;
     }
@@ -457,7 +466,7 @@ class QueryTransformer
     /**
      * @return array
      */
-    protected function getRelationshipMappings()
+    protected function getRelationshipMappings(): array
     {
         return $this->relMappings;
     }
@@ -465,7 +474,7 @@ class QueryTransformer
     /**
      * @return string
      */
-    protected function getCurrentModelClass()
+    protected function getCurrentModelClass(): string
     {
         return $this->currentModelClass;
     }
@@ -473,7 +482,7 @@ class QueryTransformer
     /**
      * @return string
      */
-    protected function getCurrentSchemaClass()
+    protected function getCurrentSchemaClass(): string
     {
         return $this->currentSchemaClass;
     }
@@ -481,7 +490,7 @@ class QueryTransformer
     /**
      * @return ModelSchemesInterface
      */
-    protected function getModelSchemes()
+    protected function getModelSchemes(): ModelSchemesInterface
     {
         return $this->modelSchemes;
     }
@@ -489,7 +498,7 @@ class QueryTransformer
     /**
      * @return JsonSchemesInterface
      */
-    protected function getJsonSchemes()
+    protected function getJsonSchemes(): JsonSchemesInterface
     {
         return $this->jsonSchemes;
     }
@@ -497,7 +506,7 @@ class QueryTransformer
     /**
      * @return string
      */
-    protected function getSchemaClass()
+    protected function getSchemaClass(): string
     {
         return $this->schemaClass;
     }
@@ -505,15 +514,17 @@ class QueryTransformer
     /**
      * @return T
      */
-    protected function getTranslator()
+    protected function getTranslator(): T
     {
         return $this->translator;
     }
 
     /**
-     * @inheritdoc
+     * @param string $currentSchemaClass
+     *
+     * @return void
      */
-    protected function setCurrentSchema($currentSchemaClass)
+    protected function setCurrentSchema(string $currentSchemaClass)
     {
         $this->currentSchemaClass = $currentSchemaClass;
 
@@ -547,7 +558,7 @@ class QueryTransformer
      *
      * @return void
      */
-    private function addQueryParamError(ErrorCollection $errors, $name)
+    private function addQueryParamError(ErrorCollection $errors, string $name)
     {
         $title = $this->getTranslator()->get(T::MSG_ERR_INVALID_ELEMENT);
         $errors->addQueryParameterError($name, $title, null, JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY);
@@ -558,7 +569,7 @@ class QueryTransformer
      *
      * @return SchemaInterface
      */
-    private function getRelationshipSchema($jsonName)
+    private function getRelationshipSchema(string $jsonName): SchemaInterface
     {
         return $this->getJsonSchemes()->getRelationshipSchema($this->getCurrentSchemaClass(), $jsonName);
     }

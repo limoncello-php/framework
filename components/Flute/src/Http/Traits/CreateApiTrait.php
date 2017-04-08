@@ -34,7 +34,7 @@ trait CreateApiTrait
      *
      * @return CrudInterface
      */
-    protected static function createApiByClass(ContainerInterface $container, $apiClass)
+    protected static function createApiByClass(ContainerInterface $container, string $apiClass): CrudInterface
     {
         $factory            = $container->get(FactoryInterface::class);
         $repository         = $container->get(RepositoryInterface::class);

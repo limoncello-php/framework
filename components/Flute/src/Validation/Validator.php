@@ -134,7 +134,7 @@ abstract class Validator implements ValidatorInterface
         array $attributeRules,
         array $toOneRules = [],
         array $toManyRules = []
-    ) {
+    ): array {
         /** @var ErrorCollection $errors */
         /** @var CaptureAggregatorInterface $idAggregator */
         /** @var CaptureAggregatorInterface $attrTo1Aggregator */
@@ -164,7 +164,7 @@ abstract class Validator implements ValidatorInterface
         array $attributeRules,
         array $toOneRules = [],
         array $toManyRules = []
-    ) {
+    ): array {
         $errors            = $this->createErrorCollection();
         $idAggregator      = $this->createIdCaptureAggregator();
         $attrTo1Aggregator = $this->createAttributesAndToOneCaptureAggregator();
@@ -183,7 +183,7 @@ abstract class Validator implements ValidatorInterface
     /**
      * @return ErrorCollection
      */
-    protected function createErrorCollection()
+    protected function createErrorCollection(): ErrorCollection
     {
         return new ErrorCollection(
             $this->getJsonApiTranslator(),
@@ -195,7 +195,7 @@ abstract class Validator implements ValidatorInterface
     /**
      * @return T
      */
-    protected function getJsonApiTranslator()
+    protected function getJsonApiTranslator(): T
     {
         return $this->jsonApiTranslator;
     }
@@ -203,7 +203,7 @@ abstract class Validator implements ValidatorInterface
     /**
      * @return ValidationTranslatorInterface
      */
-    protected function getValidationTranslator()
+    protected function getValidationTranslator(): ValidationTranslatorInterface
     {
         return $this->validationTranslator;
     }
@@ -211,7 +211,7 @@ abstract class Validator implements ValidatorInterface
     /**
      * @return JsonSchemesInterface
      */
-    protected function getJsonSchemes()
+    protected function getJsonSchemes(): JsonSchemesInterface
     {
         return $this->jsonSchemes;
     }
@@ -219,7 +219,7 @@ abstract class Validator implements ValidatorInterface
     /**
      * @return ModelSchemesInterface
      */
-    protected function getModelSchemes()
+    protected function getModelSchemes(): ModelSchemesInterface
     {
         return $this->modelSchemes;
     }
@@ -227,7 +227,7 @@ abstract class Validator implements ValidatorInterface
     /**
      * @return int
      */
-    protected function getErrorStatus()
+    protected function getErrorStatus(): int
     {
         return $this->errorStatus;
     }
@@ -235,7 +235,7 @@ abstract class Validator implements ValidatorInterface
     /**
      * @return RuleInterface
      */
-    protected function getUnlistedRelationshipRule()
+    protected function getUnlistedRelationshipRule(): RuleInterface
     {
         return $this->unlistedRelationshipRule;
     }
@@ -243,7 +243,7 @@ abstract class Validator implements ValidatorInterface
     /**
      * @return RuleInterface
      */
-    protected function getUnlistedAttributeRule()
+    protected function getUnlistedAttributeRule(): RuleInterface
     {
         return $this->unlistedAttributeRule;
     }
@@ -255,7 +255,7 @@ abstract class Validator implements ValidatorInterface
      *
      * @return void
      */
-    private function validateType(ErrorCollection $errors, array $jsonData, $expectedType)
+    private function validateType(ErrorCollection $errors, array $jsonData, string $expectedType)
     {
         $ignoreOthers = static::success();
         $rule         = static::arrayX([
@@ -344,7 +344,7 @@ abstract class Validator implements ValidatorInterface
         CaptureAggregatorInterface $toOneAggregator,
         array $toManyRules,
         CaptureAggregatorInterface $toManyAggregator
-    ) {
+    ): array {
         $modelClass           = $schema::MODEL;
         $relationshipCaptures = [];
         foreach ($toOneRules as $name => $rule) {
@@ -398,7 +398,7 @@ abstract class Validator implements ValidatorInterface
      *
      * @return RuleInterface
      */
-    private function createOptionalIdentity(RuleInterface $typeRule, RuleInterface $idRule)
+    private function createOptionalIdentity(RuleInterface $typeRule, RuleInterface $idRule): RuleInterface
     {
         return self::andX(self::isArray(), self::arrayX([
             DocumentInterface::KEYWORD_TYPE => $typeRule,
@@ -413,7 +413,7 @@ abstract class Validator implements ValidatorInterface
      *
      * @return RuleInterface
      */
-    private function createSingleData($name, RuleInterface $typeRule, RuleInterface $idRule)
+    private function createSingleData($name, RuleInterface $typeRule, RuleInterface $idRule): RuleInterface
     {
         $identityRule  = $this->createOptionalIdentity($typeRule, $idRule);
         $nullValueRule = static::andX($idRule, static::isNull());
@@ -430,7 +430,7 @@ abstract class Validator implements ValidatorInterface
      *
      * @return RuleInterface
      */
-    private function createMultiData($name, RuleInterface $typeRule, RuleInterface $idRule)
+    private function createMultiData(string $name, RuleInterface $typeRule, RuleInterface $idRule): RuleInterface
     {
         $identityRule = $this->createOptionalIdentity($typeRule, $idRule);
 
@@ -445,7 +445,7 @@ abstract class Validator implements ValidatorInterface
      *
      * @return Generator
      */
-    private function validateRule(RuleInterface $rule, $input)
+    private function validateRule(RuleInterface $rule, $input): Generator
     {
         return static::validateData($rule, $input, new ErrorAggregator());
     }

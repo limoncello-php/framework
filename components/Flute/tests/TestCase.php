@@ -50,7 +50,7 @@ use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 /**
  * @package Limoncello\Tests\Flute
  */
-class TestCase extends \PHPUnit_Framework_TestCase
+class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array $modelClasses

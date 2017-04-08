@@ -49,17 +49,17 @@ class FilterParameterCollection implements IteratorAggregate, ArrayAccess, Seria
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isWithOr()
+    public function isWithOr(): bool
     {
         return $this->isWithAnd() === false;
     }
 
     /**
-     * @return $this
+     * @return self
      */
-    public function withAnd()
+    public function withAnd(): self
     {
         $this->isJoinWithAND = true;
 
@@ -67,9 +67,9 @@ class FilterParameterCollection implements IteratorAggregate, ArrayAccess, Seria
     }
 
     /**
-     * @return $this
+     * @return self
      */
-    public function withOr()
+    public function withOr(): self
     {
         $this->isJoinWithAND = false;
 
@@ -145,7 +145,7 @@ class FilterParameterCollection implements IteratorAggregate, ArrayAccess, Seria
     /**
      * @return FilterParameterInterface[]
      */
-    public function getArrayCopy()
+    public function getArrayCopy(): array
     {
         return $this->items;
     }
@@ -153,9 +153,9 @@ class FilterParameterCollection implements IteratorAggregate, ArrayAccess, Seria
     /**
      * @param FilterParameterInterface $parameter
      *
-     * @return $this
+     * @return self
      */
-    public function add(FilterParameterInterface $parameter)
+    public function add(FilterParameterInterface $parameter): self
     {
         $this->items[] = $parameter;
 

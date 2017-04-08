@@ -61,7 +61,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     /**
      * @inheritdoc
      */
-    public static function getAttributeMapping($jsonName)
+    public static function getAttributeMapping(string $jsonName): string
     {
         return static::getMappings()[static::SCHEMA_ATTRIBUTES][$jsonName];
     }
@@ -69,7 +69,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     /**
      * @inheritdoc
      */
-    public static function getRelationshipMapping($jsonName)
+    public static function getRelationshipMapping(string $jsonName): string
     {
         return static::getMappings()[static::SCHEMA_RELATIONSHIPS][$jsonName];
     }
@@ -77,7 +77,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     /**
      * @inheritdoc
      */
-    public static function hasAttributeMapping($jsonName)
+    public static function hasAttributeMapping(string $jsonName): bool
     {
         return array_key_exists($jsonName, static::getMappings()[static::SCHEMA_ATTRIBUTES]);
     }
@@ -85,7 +85,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     /**
      * @inheritdoc
      */
-    public static function hasRelationshipMapping($jsonName)
+    public static function hasRelationshipMapping(string $jsonName): bool
     {
         return array_key_exists($jsonName, static::getMappings()[static::SCHEMA_RELATIONSHIPS]);
     }
@@ -161,7 +161,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     /**
      * @return JsonSchemesInterface
      */
-    protected function getJsonSchemes()
+    protected function getJsonSchemes(): JsonSchemesInterface
     {
         return $this->jsonSchemes;
     }
@@ -169,7 +169,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     /**
      * @return ModelSchemesInterface
      */
-    protected function getModelSchemes()
+    protected function getModelSchemes(): ModelSchemesInterface
     {
         return $this->modelSchemes;
     }
@@ -180,7 +180,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return array
      */
-    protected function getRelationshipDescription(PaginatedDataInterface $data, $uri)
+    protected function getRelationshipDescription(PaginatedDataInterface $data, string $uri): array
     {
         if ($data->hasMoreItems() === false) {
             return [static::DATA => $data->getData()];
@@ -218,8 +218,11 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return array
      */
-    protected function getRelationshipIdentityRepresentation($model, $jsonRelationship, $modelRelationship)
-    {
+    protected function getRelationshipIdentityRepresentation(
+        $model,
+        string $jsonRelationship,
+        string $modelRelationship
+    ): array {
         $identity = $this->getIdentity($model, $modelRelationship);
 
         return [
@@ -234,7 +237,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return array
      */
-    protected function getRelationshipLinkRepresentation($model, $jsonRelationship)
+    protected function getRelationshipLinkRepresentation($model, string $jsonRelationship): array
     {
         return [
             static::LINKS     => $this->getRelationshipLinks($model, $jsonRelationship),
@@ -248,7 +251,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return array
      */
-    protected function getRelationshipLinks($model, $jsonRelationship)
+    protected function getRelationshipLinks($model, string $jsonRelationship): array
     {
         $links = [];
         if ($this->showSelfInRelationship($jsonRelationship) === true) {
@@ -267,7 +270,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return mixed
      */
-    protected function getIdentity($model, $modelRelName)
+    protected function getIdentity($model, string $modelRelName)
     {
         $schema = $this->getModelSchemes();
 
@@ -292,7 +295,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return array Should be in ['jsonRelationship' => true] format.
      */
-    protected function getExcludesFromDefaultShowSelfLinkInRelationships()
+    protected function getExcludesFromDefaultShowSelfLinkInRelationships(): array
     {
         return [];
     }
@@ -302,7 +305,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return array Should be in ['jsonRelationship' => true] format.
      */
-    protected function getExcludesFromDefaultShowRelatedLinkInRelationships()
+    protected function getExcludesFromDefaultShowRelatedLinkInRelationships(): array
     {
         return [];
     }
@@ -312,7 +315,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return bool
      */
-    protected function isShowSelfLinkInRelationships()
+    protected function isShowSelfLinkInRelationships(): bool
     {
         return true;
     }
@@ -322,7 +325,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return bool
      */
-    protected function isShowRelatedLinkInRelationships()
+    protected function isShowRelatedLinkInRelationships(): bool
     {
         return true;
     }
@@ -333,7 +336,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return bool
      */
-    private function hasRelationship($model, $name)
+    private function hasRelationship($model, string $name): bool
     {
         $relationships   = $this->getJsonSchemes()->getRelationshipStorage();
         $hasRelationship = ($relationships !== null && $relationships->hasRelationship($model, $name) === true);
@@ -346,7 +349,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return bool
      */
-    private function showSelfInRelationship($jsonRelationship)
+    private function showSelfInRelationship(string $jsonRelationship): bool
     {
         $default = $this->isShowSelfLinkInRelationships();
         $result  = isset($this->getExcludesFromDefaultShowSelfLinkInRelationships()[$jsonRelationship]) === true ?
@@ -360,7 +363,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      *
      * @return bool
      */
-    private function showRelatedInRelationship($jsonRelationship)
+    private function showRelatedInRelationship(string $jsonRelationship): bool
     {
         $default = $this->isShowRelatedLinkInRelationships();
         $result  = isset($this->getExcludesFromDefaultShowRelatedLinkInRelationships()[$jsonRelationship]) === true ?

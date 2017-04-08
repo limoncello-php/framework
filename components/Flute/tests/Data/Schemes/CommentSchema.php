@@ -44,7 +44,7 @@ class CommentSchema extends BaseSchema
     /**
      * @inheritdoc
      */
-    public static function getMappings()
+    public static function getMappings(): array
     {
         return [
             self::SCHEMA_ATTRIBUTES => [
@@ -63,7 +63,7 @@ class CommentSchema extends BaseSchema
     /** @noinspection PhpMissingParentCallCommonInspection
      * @inheritdoc
      */
-    protected function getExcludesFromDefaultShowSelfLinkInRelationships()
+    protected function getExcludesFromDefaultShowSelfLinkInRelationships(): array
     {
         return [
             self::REL_USER => true,
@@ -74,7 +74,7 @@ class CommentSchema extends BaseSchema
     /** @noinspection PhpMissingParentCallCommonInspection
      * @inheritdoc
      */
-    protected function getExcludesFromDefaultShowRelatedLinkInRelationships()
+    protected function getExcludesFromDefaultShowRelatedLinkInRelationships(): array
     {
         return [
             self::REL_USER     => true,

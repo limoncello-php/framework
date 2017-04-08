@@ -23,7 +23,7 @@ use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\User;
 
 /**
- * @package Limoncello\Tests\Models
+ * @package Limoncello\Tests\Flute
  */
 class RelationshipStorageTest extends \PHPUnit_Framework_TestCase
 {

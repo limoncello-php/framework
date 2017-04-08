@@ -25,14 +25,16 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 interface JsonSchemesInterface extends ContainerInterface
 {
     /**
-     * @return RelationshipStorageInterface
+     * @return RelationshipStorageInterface|null
      */
     public function getRelationshipStorage();
 
     /**
-     * @param RelationshipStorageInterface $storage
+     * @param RelationshipStorageInterface|null $storage
+     *
+     * @return self
      */
-    public function setRelationshipStorage(RelationshipStorageInterface $storage);
+    public function setRelationshipStorage(RelationshipStorageInterface $storage = null): self;
 
     /**
      * @param string $schemaClass
@@ -40,7 +42,7 @@ interface JsonSchemesInterface extends ContainerInterface
      *
      * @return SchemaInterface
      */
-    public function getRelationshipSchema($schemaClass, $relationshipName);
+    public function getRelationshipSchema(string $schemaClass, string $relationshipName): SchemaInterface;
 
     /**
      * @param string $modelClass

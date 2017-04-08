@@ -18,14 +18,14 @@
 use Doctrine\DBAL\Types\Type;
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 interface ModelSchemesInterface
 {
     /**
      * @return array[]
      */
-    public function getData();
+    public function getData(): array;
 
     /**
      * @param array $data
@@ -41,44 +41,50 @@ interface ModelSchemesInterface
      * @param array  $attributeTypes
      * @param array  $attributeLengths
      *
-     * @return $this
+     * @return self
      */
-    public function registerClass($class, $tableName, $primaryKey, array $attributeTypes, array $attributeLengths);
+    public function registerClass(
+        string $class,
+        string $tableName,
+        string $primaryKey,
+        array $attributeTypes,
+        array $attributeLengths
+    ): self;
 
     /**
      * @param string $class
      *
      * @return bool
      */
-    public function hasClass($class);
+    public function hasClass(string $class): bool;
 
     /**
      * @param string $class
      *
      * @return string
      */
-    public function getTable($class);
+    public function getTable(string $class): string;
 
     /**
      * @param string $class
      *
      * @return string
      */
-    public function getPrimaryKey($class);
+    public function getPrimaryKey(string $class): string;
 
     /**
      * @param string $class
      *
      * @return array
      */
-    public function getAttributeTypes($class);
+    public function getAttributeTypes(string $class): array;
 
     /**
      * @param string $class
      *
      * @return Type[]
      */
-    public function getAttributeTypeInstances($class);
+    public function getAttributeTypeInstances(string $class): array;
 
     /**
      * @param string $class
@@ -86,7 +92,7 @@ interface ModelSchemesInterface
      *
      * @return bool
      */
-    public function hasAttributeType($class, $name);
+    public function hasAttributeType(string $class, string $name): bool;
 
     /**
      * @param string $class
@@ -94,21 +100,21 @@ interface ModelSchemesInterface
      *
      * @return string
      */
-    public function getAttributeType($class, $name);
+    public function getAttributeType(string $class, string $name): string;
 
     /**
      * @param string $class
      *
      * @return array
      */
-    public function getAttributeLengths($class);
+    public function getAttributeLengths(string $class): array;
 
     /**
      * @param string $class
      *
      * @return array
      */
-    public function getAttributes($class);
+    public function getAttributes(string $class): array;
 
     /**
      * @param string $class
@@ -116,7 +122,7 @@ interface ModelSchemesInterface
      *
      * @return bool
      */
-    public function hasAttributeLength($class, $name);
+    public function hasAttributeLength(string $class, string $name): bool;
 
     /**
      * @param string $class
@@ -124,7 +130,7 @@ interface ModelSchemesInterface
      *
      * @return int
      */
-    public function getAttributeLength($class, $name);
+    public function getAttributeLength(string $class, string $name): int;
 
     /**
      * @param string $class
@@ -132,7 +138,7 @@ interface ModelSchemesInterface
      *
      * @return bool
      */
-    public function hasRelationship($class, $name);
+    public function hasRelationship(string $class, string $name): bool;
 
     /**
      * @param string $class
@@ -140,7 +146,7 @@ interface ModelSchemesInterface
      *
      * @return int
      */
-    public function getRelationshipType($class, $name);
+    public function getRelationshipType(string $class, string $name): int;
 
     /**
      * @param string $class
@@ -148,7 +154,7 @@ interface ModelSchemesInterface
      *
      * @return array
      */
-    public function getReverseRelationship($class, $name);
+    public function getReverseRelationship(string $class, string $name): array;
 
     /**
      * @param string $class
@@ -156,7 +162,7 @@ interface ModelSchemesInterface
      *
      * @return array
      */
-    public function getReversePrimaryKey($class, $name);
+    public function getReversePrimaryKey(string $class, string $name): array;
 
     /**
      * @param string $class
@@ -164,7 +170,7 @@ interface ModelSchemesInterface
      *
      * @return array
      */
-    public function getReverseForeignKey($class, $name);
+    public function getReverseForeignKey(string $class, string $name): array;
 
     /**
      * @param string $class
@@ -172,7 +178,7 @@ interface ModelSchemesInterface
      *
      * @return string
      */
-    public function getReverseModelClass($class, $name);
+    public function getReverseModelClass(string $class, string $name): string;
 
     /**
      * @param string $class
@@ -180,7 +186,7 @@ interface ModelSchemesInterface
      *
      * @return string
      */
-    public function getForeignKey($class, $name);
+    public function getForeignKey(string $class, string $name): string;
 
     /**
      * @param string $class
@@ -188,7 +194,7 @@ interface ModelSchemesInterface
      *
      * @return array
      */
-    public function getBelongsToManyRelationship($class, $name);
+    public function getBelongsToManyRelationship(string $class, string $name): array;
 
     /**
      * @param string $class
@@ -197,9 +203,15 @@ interface ModelSchemesInterface
      * @param string $reverseClass
      * @param string $reverseName
      *
-     * @return $this
+     * @return self
      */
-    public function registerBelongsToOneRelationship($class, $name, $foreignKey, $reverseClass, $reverseName);
+    public function registerBelongsToOneRelationship(
+        string $class,
+        string $name,
+        string $foreignKey,
+        string $reverseClass,
+        string $reverseName
+    ): ModelSchemesInterface;
 
     /**
      * @param string $class
@@ -210,15 +222,15 @@ interface ModelSchemesInterface
      * @param string $reverseClass
      * @param string $reverseName
      *
-     * @return $this
+     * @return self
      */
     public function registerBelongsToManyRelationship(
-        $class,
-        $name,
-        $table,
-        $foreignKey,
-        $reverseForeignKey,
-        $reverseClass,
-        $reverseName
-    );
+        string $class,
+        string $name,
+        string $table,
+        string $foreignKey,
+        string $reverseForeignKey,
+        string $reverseClass,
+        string $reverseName
+    ): self;
 }
