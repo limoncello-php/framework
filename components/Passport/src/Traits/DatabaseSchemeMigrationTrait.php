@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
@@ -30,16 +31,26 @@ trait DatabaseSchemeMigrationTrait
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $scheme
      *
+     * @throws DBALException
+     *
      * @return void
      */
     protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
     {
-        $this->createScopesTable($connection, $scheme);
-        $this->createClientsTable($connection, $scheme);
-        $this->createRedirectUrisTable($connection, $scheme);
-        $this->createTokensTable($connection, $scheme);
-        $this->createClientsScopesTable($connection, $scheme);
-        $this->createTokensScopesTable($connection, $scheme);
+        try {
+            $this->createScopesTable($connection, $scheme);
+            $this->createClientsTable($connection, $scheme);
+            $this->createRedirectUrisTable($connection, $scheme);
+            $this->createTokensTable($connection, $scheme);
+            $this->createClientsScopesTable($connection, $scheme);
+            $this->createTokensScopesTable($connection, $scheme);
+        } catch (DBALException $exception) {
+            if ($connection->isConnected() === true) {
+                $this->removeDatabaseScheme($connection, $scheme);
+            }
+
+            throw $exception;
+        }
     }
 
     /**

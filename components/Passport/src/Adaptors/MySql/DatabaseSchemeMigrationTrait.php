@@ -35,12 +35,22 @@ trait DatabaseSchemeMigrationTrait
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $scheme
      *
+     * @throws DBALException
+     *
      * @return void
      */
     protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
     {
-        $this->createDatabaseTables($connection, $scheme);
-        $this->createDatabaseViews($connection, $scheme);
+        try {
+            $this->createDatabaseTables($connection, $scheme);
+            $this->createDatabaseViews($connection, $scheme);
+        } catch (DBALException $exception) {
+            if ($connection->isConnected() === true) {
+                $this->removeDatabaseScheme($connection, $scheme);
+            }
+
+            throw $exception;
+        }
     }
 
     /**

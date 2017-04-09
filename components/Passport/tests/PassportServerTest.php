@@ -392,7 +392,7 @@ class PassportServerTest extends TestCase
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
         $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
-   }
+    }
 
     /**
      * Test client grant.

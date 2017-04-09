@@ -79,6 +79,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     private $databaseScheme = null;
 
+    /**
+     * @inheritdoc
+     */
     protected function setUp()
     {
         parent::setUp();
@@ -94,9 +97,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     {
         parent::tearDown();
         if ($this->getConnection() !== null && $this->getDatabaseScheme() !== null) {
-            $this->removeDatabaseScheme($this->connection, $this->databaseScheme);
-            $this->connection->rollBack();
-            $this->connection->close();
+            $this->removeDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
+            $this->getConnection()->rollBack();
+            $this->getConnection()->close();
             $this->connection     = null;
             $this->databaseScheme = null;
         }
@@ -113,21 +116,21 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function initMySqlDatabase()
     {
-        $this->databaseScheme = new DatabaseScheme(User::TABLE_NAME, User::FIELD_ID);
+        $this->setDatabaseScheme(new DatabaseScheme(User::TABLE_NAME, User::FIELD_ID));
 
-        $this->connection = $this->createMySqlDatabaseConnection();
-        $this->connection->beginTransaction();
+        $this->setConnection($this->createMySqlDatabaseConnection());
+        $this->getConnection()->beginTransaction();
 
         // create users table
         $table = new Table(User::TABLE_NAME);
         $table->addColumn(User::FIELD_ID, Type::INTEGER)->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
         $table->addColumn(User::FIELD_NAME, Type::STRING)->setNotnull(true);
         $table->setPrimaryKey([User::FIELD_ID]);
-        $this->connection->getSchemaManager()->dropAndCreateTable($table);
+        $this->getConnection()->getSchemaManager()->dropAndCreateTable($table);
 
-        $this->createDatabaseScheme($this->connection, $this->databaseScheme);
+        $this->createDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
 
-        $this->connection->insert(User::TABLE_NAME, [
+        $this->getConnection()->insert(User::TABLE_NAME, [
             User::FIELD_NAME => 'John Dow',
         ]);
     }
@@ -137,18 +140,18 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function initSqliteDatabase()
     {
-        $this->databaseScheme = new DatabaseScheme();
+        $this->setDatabaseScheme(new DatabaseScheme());
 
-        $this->connection = $this->createSqliteDatabaseConnection();
-        $this->connection->beginTransaction();
+        $this->setConnection($this->createSqliteDatabaseConnection());
+        $this->getConnection()->beginTransaction();
 
-        $this->createDatabaseScheme($this->connection, $this->databaseScheme);
+        $this->createDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
     }
 
     /**
      * @return Connection
      */
-    private function createSqliteDatabaseConnection(): Connection
+    protected function createSqliteDatabaseConnection(): Connection
     {
         $connection = DriverManager::getConnection(['url' => 'sqlite:///', 'memory' => true]);
         $this->assertNotSame(false, $connection->exec('PRAGMA foreign_keys = ON;'));
@@ -159,17 +162,17 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return Connection
      */
-    private function createMySqlDatabaseConnection(): Connection
+    protected function createMySqlDatabaseConnection(): Connection
     {
         (new Dotenv(__DIR__ . DIRECTORY_SEPARATOR . '..'))->load();
         $connection = DriverManager::getConnection([
-            'driver'       => getenv('DB_MY_SQL_DRIVER'),
-            'host'         => getenv('DB_MY_SQL_HOST'),
-            'port'         => getenv('DB_MY_SQL_PORT'),
-            'dbname'       => getenv('DB_MY_SQL_DATABASE'),
-            'user'         => getenv('DB_MY_SQL_USER_NAME'),
-            'password'     => getenv('DB_MY_SQL_PASSWORD'),
-            'charset'      => getenv('DB_MY_SQL_CHARSET'),
+            'driver'   => getenv('DB_MY_SQL_DRIVER'),
+            'host'     => getenv('DB_MY_SQL_HOST'),
+            'port'     => getenv('DB_MY_SQL_PORT'),
+            'dbname'   => getenv('DB_MY_SQL_DATABASE'),
+            'user'     => getenv('DB_MY_SQL_USER_NAME'),
+            'password' => getenv('DB_MY_SQL_PASSWORD'),
+            'charset'  => getenv('DB_MY_SQL_CHARSET'),
         ]);
 
         return $connection;
@@ -184,11 +187,35 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param DatabaseSchemeInterface $scheme
+     *
+     * @return TestCase
+     */
+    protected function setDatabaseScheme(DatabaseSchemeInterface $scheme): self
+    {
+        $this->databaseScheme = $scheme;
+
+        return $this;
+    }
+
+    /**
      * @return Connection
      */
     protected function getConnection(): Connection
     {
         return $this->connection;
+    }
+
+    /**
+     * @param Connection $connection
+     *
+     * @return TestCase
+     */
+    protected function setConnection(Connection $connection): self
+    {
+        $this->connection = $connection;
+
+        return $this;
     }
 
     /**
