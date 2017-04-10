@@ -24,6 +24,11 @@ use Limoncello\Contracts\Routing\GroupInterface;
 interface RoutesConfiguratorInterface
 {
     /**
+     * Configurator's method name.
+     */
+    const METHOD_NAME = 'configureRoutes';
+
+    /**
      * @return string[]
      */
     public static function getMiddleware(): array;
