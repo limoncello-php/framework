@@ -34,4 +34,9 @@ interface SeedInterface
      * @return void
      */
     public function run();
+
+    /**
+     * @return void
+     */
+    public function reset();
 }
