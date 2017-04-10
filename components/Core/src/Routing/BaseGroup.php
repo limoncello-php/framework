@@ -200,7 +200,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function group($prefix, Closure $closure, array $parameters = []): GroupInterface
+    public function group(string $prefix, Closure $closure, array $parameters = []): GroupInterface
     {
         list($middleware, $configurators, $factoryWasGiven, $requestFactory, $name) =
             $this->normalizeGroupParameters($parameters);
