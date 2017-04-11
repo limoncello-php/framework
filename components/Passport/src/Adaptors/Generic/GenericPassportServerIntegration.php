@@ -19,11 +19,12 @@
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
+use Limoncello\Passport\Integration\BasePassportServerIntegration;
 
 /**
  * @package Limoncello\Passport
  */
-abstract class BasePassportServerIntegration extends \Limoncello\Passport\Integration\BasePassportServerIntegration
+abstract class GenericPassportServerIntegration extends BasePassportServerIntegration
 {
     /**
      * @var ClientRepositoryInterface|null

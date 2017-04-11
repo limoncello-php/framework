@@ -20,7 +20,7 @@ use Doctrine\DBAL\Connection;
 use Limoncello\OAuthServer\Contracts\GrantTypes;
 use Limoncello\OAuthServer\Exceptions\OAuthRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
-use Limoncello\Passport\Adaptors\Generic\BasePassportServerIntegration;
+use Limoncello\Passport\Adaptors\Generic\GenericPassportServerIntegration;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\RedirectUri;
@@ -671,7 +671,7 @@ class PassportServerTest extends TestCase
             );
         });
 
-        $integration = new class ($connection) extends BasePassportServerIntegration
+        $integration = new class ($connection) extends GenericPassportServerIntegration
         {
 
             /**

@@ -21,7 +21,9 @@
         "doctrine/dbal": "^2.5.0",
 
         "zendframework/zend-diactoros": "^1.3",
-        "limoncello-php/oauth-server": "^0.5.1"
+
+        "limoncello-php/contracts": "dev-develop",
+        "limoncello-php/oauth-server": "dev-develop"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7",
