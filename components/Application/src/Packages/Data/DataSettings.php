@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Data\Seeds;
+<?php namespace Limoncello\Application\Packages\Data;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,9 +16,22 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Settings\SettingsInterface;
+
 /**
- * @package Limoncello\Data
+ * @package Limoncello\Application
  */
-class SeedRunner
+abstract class DataSettings implements SettingsInterface
 {
+    /** Settings key */
+    const KEY_MIGRATIONS_PATH = 0;
+
+    /** Settings key */
+    const KEY_SEEDS_PATH = self::KEY_MIGRATIONS_PATH + 1;
+
+    /** Settings key */
+    const KEY_SEED_INIT = self::KEY_SEEDS_PATH + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_SEED_INIT + 1;
 }

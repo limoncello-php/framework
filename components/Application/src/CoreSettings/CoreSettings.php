@@ -118,7 +118,7 @@ class CoreSettings extends BaseCoreSettings
         }
 
         $interfaceName = ProvidesContainerConfiguratorsInterface::class;
-        foreach ($this->selectProviders($this->getProviderClasses(), $interfaceName) as $providerClass) {
+        foreach ($this->selectClassImplements($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesContainerConfiguratorsInterface $providerClass */
             foreach ($providerClass::getContainerConfigurators() as $configurator) {
                 assert($this->isValidContainerConfigurator($configurator) === true);
@@ -140,7 +140,7 @@ class CoreSettings extends BaseCoreSettings
         }
 
         $interfaceName = ProvidesRouteConfiguratorsInterface::class;
-        foreach ($this->selectProviders($this->getProviderClasses(), $interfaceName) as $providerClass) {
+        foreach ($this->selectClassImplements($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesRouteConfiguratorsInterface $providerClass */
             foreach ($providerClass::getRouteConfigurators() as $configurator) {
                 assert($this->isValidRouteConfigurator($configurator) === true);
@@ -168,7 +168,7 @@ class CoreSettings extends BaseCoreSettings
 
         // select global middleware from providers
         $interfaceName = ProvidesMiddlewareInterface::class;
-        foreach ($this->selectProviders($this->getProviderClasses(), $interfaceName) as $providerClass) {
+        foreach ($this->selectClassImplements($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesMiddlewareInterface $providerClass */
             foreach ($providerClass::getMiddleware() as $handler) {
                 assert($this->isValidMiddlewareHandler($handler) === true);

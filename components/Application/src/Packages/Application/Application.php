@@ -126,7 +126,7 @@ class Application extends \Limoncello\Core\Application\Application
         // Application settings have a list of providers which might have additional settings to load
         $appSettings     = $provider->get(ApplicationSettings::class);
         $providerClasses = $appSettings[ApplicationSettings::KEY_PROVIDER_CLASSES];
-        foreach ($this->selectProviders($providerClasses, ProvidesSettingsInterface::class) as $providerClass) {
+        foreach ($this->selectClassImplements($providerClasses, ProvidesSettingsInterface::class) as $providerClass) {
             /** @var ProvidesSettingsInterface $providerClass */
             foreach ($providerClass::getSettings() as $setting) {
                 $provider->register($setting);

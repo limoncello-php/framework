@@ -16,6 +16,7 @@
     "require": {
         "php": ">=7.0.0",
         "filp/whoops": "^2.1",
+        "doctrine/dbal": "^2.5.0",
         "neomerx/cors-psr7": "^1.0.0",
         "monolog/monolog": "^1.22",
         "limoncello-php/contracts": "dev-develop",

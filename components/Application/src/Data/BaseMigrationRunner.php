@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Data\Migrations;
+<?php namespace Limoncello\Application\Data;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -26,9 +26,9 @@ use Limoncello\Contracts\Data\MigrationInterface;
 use Psr\Container\ContainerInterface;
 
 /**
- * @package Limoncello\Data
+ * @package Limoncello\Application
  */
-class MigrationRunner
+abstract class BaseMigrationRunner
 {
     /** Migrations table name */
     const MIGRATIONS_TABLE = '_migrations';
@@ -40,23 +40,15 @@ class MigrationRunner
     const MIGRATIONS_COLUMN_CLASS = 'class';
 
     /** Migration column name */
-    const MIGRATIONS_COLUMN_CREATED_AT = 'created_at';
+    const MIGRATIONS_COLUMN_MIGRATED_AT = 'migrated_at';
 
     /** Seeds table name */
     const SEEDS_TABLE = '_seeds';
 
     /**
-     * @var string[]
+     * @return string[]
      */
-    private $migrationsList;
-
-    /**
-     * @param string[] $migrationList
-     */
-    public function __construct(array $migrationList)
-    {
-        $this->migrationsList = $migrationList;
-    }
+    abstract protected function getMigrationClasses(): array;
 
     /**
      * @param ContainerInterface $container
@@ -68,7 +60,7 @@ class MigrationRunner
         foreach ($this->getMigrations($container) as $class) {
             /** @var MigrationInterface $migration */
             $migration = new $class($container);
-            $migration->migrate();
+            $migration->init($container)->migrate();
         }
     }
 
@@ -95,14 +87,6 @@ class MigrationRunner
     }
 
     /**
-     * @return string[]
-     */
-    protected function getMigrationsList(): array
-    {
-        return $this->migrationsList;
-    }
-
-    /**
      * @param ContainerInterface $container
      *
      * @return Generator
@@ -119,7 +103,7 @@ class MigrationRunner
             $migrated = [];
         }
 
-        $notYetMigrated = array_diff($this->getMigrationsList(), $migrated);
+        $notYetMigrated = array_diff($this->getMigrationClasses(), $migrated);
 
         foreach ($notYetMigrated as $class) {
             yield $class;
@@ -170,7 +154,7 @@ class MigrationRunner
             ->addColumn(static::MIGRATIONS_COLUMN_CLASS, Type::STRING)
             ->setLength(255);
         $table
-            ->addColumn(static::MIGRATIONS_COLUMN_CREATED_AT, Type::DATETIME);
+            ->addColumn(static::MIGRATIONS_COLUMN_MIGRATED_AT, Type::DATETIME);
 
         $table->setPrimaryKey([static::MIGRATIONS_COLUMN_ID]);
         $table->addUniqueIndex([static::MIGRATIONS_COLUMN_CLASS]);
@@ -216,8 +200,8 @@ class MigrationRunner
         $format = $connection->getSchemaManager()->getDatabasePlatform()->getDateTimeFormatString();
         $now    = (new DateTimeImmutable())->format($format);
         $connection->insert(static::MIGRATIONS_TABLE, [
-            static::MIGRATIONS_COLUMN_CLASS      => $class,
-            static::MIGRATIONS_COLUMN_CREATED_AT => $now,
+            static::MIGRATIONS_COLUMN_CLASS       => $class,
+            static::MIGRATIONS_COLUMN_MIGRATED_AT => $now,
         ]);
     }
 

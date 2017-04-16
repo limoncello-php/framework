@@ -24,15 +24,15 @@ use Generator;
 trait SelectClassImplementsTrait
 {
     /**
-     * @param string[] $providerClasses
+     * @param string[] $classNames
      * @param string   $interfaceName
      *
      * @return Generator
      */
-    protected function selectProviders(array $providerClasses, string $interfaceName): Generator
+    protected function selectClassImplements(array $classNames, string $interfaceName): Generator
     {
-        foreach ($providerClasses as $providerClass) {
-            array_key_exists($interfaceName, class_implements($providerClass)) === false ?: yield $providerClass;
+        foreach ($classNames as $className) {
+            array_key_exists($interfaceName, class_implements($className)) === false ?: yield $className;
         }
     }
 }
