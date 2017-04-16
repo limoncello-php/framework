@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
@@ -36,19 +36,19 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     private $jsonSchemes;
 
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
     private $modelSchemes;
 
     /**
-     * @param FactoryInterface      $factory
-     * @param JsonSchemesInterface  $jsonSchemes
-     * @param ModelSchemesInterface $modelSchemes
+     * @param FactoryInterface         $factory
+     * @param JsonSchemesInterface     $jsonSchemes
+     * @param ModelSchemeInfoInterface $modelSchemes
      */
     public function __construct(
         FactoryInterface $factory,
         JsonSchemesInterface $jsonSchemes,
-        ModelSchemesInterface $modelSchemes
+        ModelSchemeInfoInterface $modelSchemes
     ) {
         $this->resourceType = static::TYPE;
 
@@ -167,9 +167,9 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemesInterface
+    protected function getModelSchemes(): ModelSchemeInfoInterface
     {
         return $this->modelSchemes;
     }

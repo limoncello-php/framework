@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Data\Models;
+<?php namespace Limoncello\Tests\Application\Data\Models;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -18,24 +18,23 @@
 
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Data\RelationshipTypes;
-use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 
 /**
- * @package Limoncello\Tests\Flute
+ * @package Limoncello\Tests\Application
  */
-class Board extends Model
+class Role extends Model
 {
     /** @inheritdoc */
-    const TABLE_NAME = 'boards';
+    const TABLE_NAME = 'roles';
 
     /** @inheritdoc */
-    const FIELD_ID = 'id_board';
+    const FIELD_ID = 'id_role';
 
     /** Relationship name */
-    const REL_POSTS = 'posts';
+    const REL_USERS = 'users';
 
     /** Field name */
-    const FIELD_TITLE = 'title';
+    const FIELD_NAME = 'name';
 
     /**
      * @inheritdoc
@@ -44,10 +43,9 @@ class Board extends Model
     {
         return [
             self::FIELD_ID         => Type::INTEGER,
-            self::FIELD_TITLE      => Type::STRING,
-            self::FIELD_CREATED_AT => SystemDateTimeType::NAME,
-            self::FIELD_UPDATED_AT => SystemDateTimeType::NAME,
-            self::FIELD_DELETED_AT => SystemDateTimeType::NAME,
+            self::FIELD_NAME       => Type::STRING,
+            self::FIELD_CREATED_AT => Type::DATETIME,
+            self::FIELD_UPDATED_AT => Type::DATETIME,
         ];
     }
 
@@ -57,7 +55,7 @@ class Board extends Model
     public static function getAttributeLengths()
     {
         return [
-            self::FIELD_TITLE => 255,
+            self::FIELD_NAME => 255,
         ];
     }
 
@@ -68,7 +66,7 @@ class Board extends Model
     {
         return [
             RelationshipTypes::HAS_MANY => [
-                self::REL_POSTS => [Post::class, Post::FIELD_ID_BOARD, Post::REL_BOARD],
+                self::REL_USERS => [User::class, User::FIELD_ID_ROLE, User::REL_ROLE],
             ],
         ];
     }

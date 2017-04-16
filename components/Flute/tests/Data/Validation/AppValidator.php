@@ -17,8 +17,8 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface as JsonApiTranslatorInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Validation\Validator;
 use Limoncello\Tests\Flute\Data\Models\Category;
@@ -44,14 +44,14 @@ class AppValidator extends Validator
      * @param JsonApiTranslatorInterface    $jsonApiTranslator
      * @param ValidationTranslatorInterface $validationTranslator
      * @param JsonSchemesInterface          $jsonSchemes
-     * @param ModelSchemesInterface         $modelSchemes
+     * @param ModelSchemeInfoInterface      $modelSchemes
      * @param Connection                    $connection
      */
     public function __construct(
         JsonApiTranslatorInterface $jsonApiTranslator,
         ValidationTranslatorInterface $validationTranslator,
         JsonSchemesInterface $jsonSchemes,
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         Connection $connection
     ) {
         $this->connection      = $connection;

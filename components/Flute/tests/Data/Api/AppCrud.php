@@ -17,13 +17,13 @@
  */
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Interop\Container\ContainerInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Api\Crud;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Tests\Flute\Data\Models\Model;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests
@@ -44,7 +44,7 @@ abstract class AppCrud extends Crud
     public function __construct(
         FactoryInterface $factory,
         RepositoryInterface $repository,
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         PaginationStrategyInterface $paginationStrategy,
         ContainerInterface $container = null
     ) {

@@ -18,6 +18,8 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Container\ContainerInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Config\JsonApiConfig;
@@ -28,7 +30,6 @@ use Limoncello\Flute\Contracts\Config\JsonApiConfigInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
@@ -1041,7 +1042,7 @@ EOT;
                 ],
             ]
         ];
-        $container   = $this->createContainer();
+        $container = $this->createContainer();
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
@@ -1069,16 +1070,16 @@ EOT;
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface
      */
-    private function createContainer()
+    private function createContainer(): ContainerInterface
     {
         $container = new Container();
 
         $container[FactoryInterface::class]               = $factory = new Factory();
         $container[QueryParametersParserInterface::class] = $factory
             ->getJsonApiFactory()->createQueryParametersParser();
-        $container[ModelSchemesInterface::class]       = $modelSchemes = $this->getModelSchemes();
+        $container[ModelSchemeInfoInterface::class]       = $modelSchemes = $this->getModelSchemes();
         /** @var RelationshipStorageInterface $storage */
         $storage                                       = null;
         $container[JsonSchemesInterface::class]        = $jsonSchemes = $this->getJsonSchemes($modelSchemes, $storage);

@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-use Interop\Container\ContainerInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\ControllerInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
@@ -30,6 +29,7 @@ use Limoncello\Flute\Http\Traits\CreateResponsesTrait;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -219,7 +219,7 @@ abstract class BaseController implements ControllerInterface
         $factory = $container->get(FactoryInterface::class);
         $errors  = $factory->createErrorCollection();
         $queryTransformer = new QueryTransformer(
-            $container->get(ModelSchemesInterface::class),
+            $container->get(ModelSchemeInfoInterface::class),
             $container->get(JsonSchemesInterface::class),
             $container->get(TranslatorInterface::class),
             $schemaClass

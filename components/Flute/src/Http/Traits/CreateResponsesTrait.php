@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Interop\Container\ContainerInterface;
 use Limoncello\Flute\Contracts\Config\JsonApiConfigInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
@@ -26,6 +25,7 @@ use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use Neomerx\JsonApi\Http\Headers\SupportedExtensions;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

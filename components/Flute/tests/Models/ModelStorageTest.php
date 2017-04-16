@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
-use Limoncello\Flute\Models\ModelSchemes;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Models\ModelStorage;
+use Limoncello\Tests\Flute\Data\Models\ModelSchemes;
 use Limoncello\Tests\Flute\Data\Models\Post;
 
 /**
@@ -50,7 +50,7 @@ class ModelStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
     private function createSchemaStorage()
     {

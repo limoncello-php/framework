@@ -17,7 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;

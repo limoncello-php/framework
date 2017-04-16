@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-use Interop\Container\ContainerInterface;
 use Limoncello\Tests\Flute\Data\Api\CategoriesApi as Api;
 use Limoncello\Tests\Flute\Data\Schemes\CategorySchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\AppValidator;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

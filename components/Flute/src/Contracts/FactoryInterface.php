@@ -17,12 +17,12 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -47,11 +47,11 @@ interface FactoryInterface
     public function createRelationshipStorage(): RelationshipStorageInterface;
 
     /**
-     * @param ModelSchemesInterface $modelSchemes
+     * @param ModelSchemeInfoInterface $modelSchemes
      *
      * @return ModelStorageInterface
      */
-    public function createModelStorage(ModelSchemesInterface $modelSchemes): ModelStorageInterface;
+    public function createModelStorage(ModelSchemeInfoInterface $modelSchemes): ModelStorageInterface;
 
     /**
      * @return TagStorageInterface
@@ -76,7 +76,7 @@ interface FactoryInterface
 
     /**
      * @param Connection                $connection
-     * @param ModelSchemesInterface     $modelSchemes
+     * @param ModelSchemeInfoInterface  $modelSchemes
      * @param FilterOperationsInterface $filterOperations
      * @param TranslatorInterface       $translator
      *
@@ -84,18 +84,18 @@ interface FactoryInterface
      */
     public function createRepository(
         Connection $connection,
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
         TranslatorInterface $translator
     ): RepositoryInterface;
 
     /**
-     * @param array                 $schemes
-     * @param ModelSchemesInterface $modelSchemes
+     * @param array                    $schemes
+     * @param ModelSchemeInfoInterface $modelSchemes
      *
      * @return JsonSchemesInterface
      */
-    public function createJsonSchemes(array $schemes, ModelSchemesInterface $modelSchemes): JsonSchemesInterface;
+    public function createJsonSchemes(array $schemes, ModelSchemeInfoInterface $modelSchemes): JsonSchemesInterface;
 
     /**
      * @param JsonSchemesInterface $schemes

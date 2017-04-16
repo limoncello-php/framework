@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\IncludeParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Http\Query\FilterParameter;
@@ -62,7 +62,7 @@ class QueryTransformer
     private $relMappings;
 
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
     private $modelSchemes;
 
@@ -87,13 +87,13 @@ class QueryTransformer
     private $schemaClass;
 
     /**
-     * @param ModelSchemesInterface $modelSchemes
-     * @param JsonSchemesInterface  $jsonSchemes
-     * @param T                     $translator
-     * @param string                $schemaClass
+     * @param ModelSchemeInfoInterface $modelSchemes
+     * @param JsonSchemesInterface     $jsonSchemes
+     * @param T                        $translator
+     * @param string                   $schemaClass
      */
     public function __construct(
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         JsonSchemesInterface $jsonSchemes,
         T $translator,
         string $schemaClass
@@ -488,9 +488,9 @@ class QueryTransformer
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemesInterface
+    protected function getModelSchemes(): ModelSchemeInfoInterface
     {
         return $this->modelSchemes;
     }

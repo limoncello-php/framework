@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Models;
+<?php namespace Limoncello\Tests\Flute\Data\Models;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -18,14 +18,33 @@
 
 use Doctrine\DBAL\Types\Type;
 use InvalidArgumentException;
-use Limoncello\Contracts\Model\RelationshipTypes;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 
 /**
- * @package Limoncello\Flute
+ * @package Limoncello\Models
  */
-class ModelSchemes implements ModelSchemesInterface
+class ModelSchemes implements ModelSchemeInfoInterface
 {
+    /**
+     * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function getAttributeTypeInstances($class)
+    {
+        $types  = $this->getAttributeTypes($class);
+        $result = [];
+
+        foreach ($types as $name => $type) {
+            $result[$name] = Type::getType($type);
+        }
+
+        return $result;
+    }
+
+    // Code below copy-pasted from Application component
+
     /**
      * @var array
      */
@@ -116,7 +135,7 @@ class ModelSchemes implements ModelSchemesInterface
         string $primaryKey,
         array $attributeTypes,
         array $attributeLengths
-    ): ModelSchemesInterface {
+    ): ModelSchemeInfoInterface {
         if (empty($class) === true) {
             throw new InvalidArgumentException('class');
         }
@@ -177,24 +196,6 @@ class ModelSchemes implements ModelSchemesInterface
 
         return $result;
     }
-
-    /**
-     * @inheritdoc
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function getAttributeTypeInstances(string $class): array
-    {
-        $types  = $this->getAttributeTypes($class);
-        $result = [];
-
-        foreach ($types as $name => $type) {
-            $result[$name] = Type::getType($type);
-        }
-
-        return $result;
-    }
-
 
     /**
      * @inheritdoc
@@ -352,7 +353,7 @@ class ModelSchemes implements ModelSchemesInterface
         string $foreignKey,
         string $reverseClass,
         string $reverseName
-    ): ModelSchemesInterface {
+    ): ModelSchemeInfoInterface {
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO, $class, $name);
         $this->registerRelationshipType(RelationshipTypes::HAS_MANY, $reverseClass, $reverseName);
 
@@ -364,7 +365,7 @@ class ModelSchemes implements ModelSchemesInterface
         return $this;
     }
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @inheritdoc
      */
     public function registerBelongsToManyRelationship(
@@ -375,7 +376,7 @@ class ModelSchemes implements ModelSchemesInterface
         string $reverseForeignKey,
         string $reverseClass,
         string $reverseName
-    ): ModelSchemesInterface {
+    ): ModelSchemeInfoInterface {
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO_MANY, $class, $name);
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO_MANY, $reverseClass, $reverseName);
 

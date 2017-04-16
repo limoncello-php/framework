@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Models;
+<?php namespace Limoncello\Tests\Application\Data;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,21 +17,21 @@
  */
 
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Model\RelationshipTypes;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
-use Limoncello\Flute\Models\ModelSchemes;
-use Limoncello\Tests\Flute\Data\Models\Comment;
-use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
-use Limoncello\Tests\Flute\Data\Models\Emotion;
-use Limoncello\Tests\Flute\Data\Models\User;
+use Limoncello\Application\Data\ModelSchemeInfo;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Tests\Application\Data\Models\Comment;
+use Limoncello\Tests\Application\Data\Models\CommentEmotion;
+use Limoncello\Tests\Application\Data\Models\Emotion;
+use Limoncello\Tests\Application\Data\Models\User;
 
 /**
- * @package Limoncello\Tests\Flute
+ * @package Limoncello\Tests\Application
  */
 class ModelSchemesTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
     private $schemes;
 
@@ -42,7 +42,7 @@ class ModelSchemesTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->schemes = new ModelSchemes();
+        $this->schemes = new ModelSchemeInfo();
 
         $this->setUpStorage();
 

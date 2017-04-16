@@ -20,13 +20,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
@@ -60,7 +60,7 @@ class Repository implements RepositoryInterface
     private $connection;
 
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
     private $modelSchemes;
 
@@ -81,13 +81,13 @@ class Repository implements RepositoryInterface
 
     /**
      * @param Connection                $connection
-     * @param ModelSchemesInterface     $modelSchemes
+     * @param ModelSchemeInfoInterface  $modelSchemes
      * @param FilterOperationsInterface $filterOperations
      * @param T                         $translator
      */
     public function __construct(
         Connection $connection,
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
         T $translator
     ) {
@@ -548,9 +548,9 @@ class Repository implements RepositoryInterface
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemesInterface
+    protected function getModelSchemes(): ModelSchemeInfoInterface
     {
         return $this->modelSchemes;
     }

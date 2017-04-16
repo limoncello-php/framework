@@ -19,18 +19,18 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Model\RelationshipTypes;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\Models\ModelSchemes;
 use Limoncello\Tests\Flute\Data\Migrations\Runner as MigrationRunner;
 use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\ModelInterface;
+use Limoncello\Tests\Flute\Data\Models\ModelSchemes;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\Role;
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
@@ -56,10 +56,12 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * @param array $modelClasses
      * @param bool  $requireReverseRelationships
      *
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    public static function createSchemes(array $modelClasses, $requireReverseRelationships = true)
-    {
+    public static function createSchemes(
+        array $modelClasses,
+        $requireReverseRelationships = true
+    ): ModelSchemeInfoInterface {
         $registered    = [];
         $modelSchemes  = new ModelSchemes();
         $registerModel = function ($modelClass) use ($modelSchemes, &$registered, $requireReverseRelationships) {
@@ -188,7 +190,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
     protected function getModelSchemes()
     {
@@ -207,13 +209,13 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param ModelSchemesInterface             $modelSchemes
+     * @param ModelSchemeInfoInterface          $modelSchemes
      * @param RelationshipStorageInterface|null $storage
      *
      * @return JsonSchemesInterface
      */
     protected function getJsonSchemes(
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         RelationshipStorageInterface $storage = null
     ) {
         $factory = new Factory();
@@ -233,7 +235,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             Board::class   => function (
                 FactoryInterface $factory,
                 JsonSchemesInterface $container,
-                ModelSchemesInterface $modelSchemes
+                ModelSchemeInfoInterface $modelSchemes
             ) {
                 return new BoardSchema($factory, $container, $modelSchemes);
             },

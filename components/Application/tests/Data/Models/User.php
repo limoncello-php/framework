@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Data\Models;
+<?php namespace Limoncello\Tests\Application\Data\Models;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -18,10 +18,9 @@
 
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Data\RelationshipTypes;
-use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 
 /**
- * @package Limoncello\Tests\Flute
+ * @package Limoncello\Tests\Application
  */
 class User extends Model
 {
@@ -86,9 +85,9 @@ class User extends Model
             self::FIELD_PASSWORD_HASH => Type::STRING,
             self::FIELD_LANGUAGE      => Type::STRING,
             self::FIELD_API_TOKEN     => Type::STRING,
-            self::FIELD_CREATED_AT    => SystemDateTimeType::NAME,
-            self::FIELD_UPDATED_AT    => SystemDateTimeType::NAME,
-            self::FIELD_DELETED_AT    => SystemDateTimeType::NAME,
+            self::FIELD_CREATED_AT    => Type::DATETIME,
+            self::FIELD_UPDATED_AT    => Type::DATETIME,
+            self::FIELD_DELETED_AT    => Type::DATETIME,
         ];
     }
 

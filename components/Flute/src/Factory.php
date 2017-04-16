@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Adapters\Repository;
 use Limoncello\Flute\Api\ModelsData;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
@@ -26,7 +27,6 @@ use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -98,7 +98,7 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createModelStorage(ModelSchemesInterface $modelSchemes): ModelStorageInterface
+    public function createModelStorage(ModelSchemeInfoInterface $modelSchemes): ModelStorageInterface
     {
         return new ModelStorage($modelSchemes);
     }
@@ -134,7 +134,7 @@ class Factory implements FactoryInterface
      */
     public function createRepository(
         Connection $connection,
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
         T $translator
     ): RepositoryInterface {
@@ -144,7 +144,7 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createJsonSchemes(array $schemes, ModelSchemesInterface $modelSchemes): JsonSchemesInterface
+    public function createJsonSchemes(array $schemes, ModelSchemeInfoInterface $modelSchemes): JsonSchemesInterface
     {
         return new JsonSchemes($this->getJsonApiFactory(), $schemes, $modelSchemes);
     }

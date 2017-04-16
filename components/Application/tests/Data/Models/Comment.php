@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Data\Models;
+<?php namespace Limoncello\Tests\Application\Data\Models;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -18,24 +18,38 @@
 
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Data\RelationshipTypes;
-use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 
 /**
- * @package Limoncello\Tests\Flute
+ * @package Limoncello\Tests\Application
  */
-class Emotion extends Model
+class Comment extends Model
 {
     /** @inheritdoc */
-    const TABLE_NAME = 'emotions';
+    const TABLE_NAME = 'comments';
 
     /** @inheritdoc */
-    const FIELD_ID = 'id_emotion';
-
-    /** Relationship name */
-    const REL_COMMENTS = 'comments';
+    const FIELD_ID = 'id_comment';
 
     /** Field name */
-    const FIELD_NAME = 'name';
+    const FIELD_ID_POST = 'id_post_fk';
+
+    /** Field name */
+    const FIELD_ID_USER = 'id_user_fk';
+
+    /** Relationship name */
+    const REL_POST = 'post';
+
+    /** Relationship name */
+    const REL_USER = 'user';
+
+    /** Relationship name */
+    const REL_EMOTIONS = 'emotions';
+
+    /** Field name */
+    const FIELD_TEXT = 'text';
+
+    /** Length constant */
+    const LENGTH_TEXT = 255;
 
     /**
      * @inheritdoc
@@ -44,9 +58,12 @@ class Emotion extends Model
     {
         return [
             self::FIELD_ID         => Type::INTEGER,
-            self::FIELD_NAME       => Type::STRING,
-            self::FIELD_CREATED_AT => SystemDateTimeType::NAME,
-            self::FIELD_UPDATED_AT => SystemDateTimeType::NAME,
+            self::FIELD_ID_POST    => Type::INTEGER,
+            self::FIELD_ID_USER    => Type::INTEGER,
+            self::FIELD_TEXT       => Type::STRING,
+            self::FIELD_CREATED_AT => Type::DATETIME,
+            self::FIELD_UPDATED_AT => Type::DATETIME,
+            self::FIELD_DELETED_AT => Type::DATETIME,
         ];
     }
 
@@ -56,7 +73,7 @@ class Emotion extends Model
     public static function getAttributeLengths()
     {
         return [
-            self::FIELD_NAME => 255,
+            self::FIELD_TEXT => self::LENGTH_TEXT,
         ];
     }
 
@@ -66,13 +83,17 @@ class Emotion extends Model
     public static function getRelationships()
     {
         return [
+            RelationshipTypes::BELONGS_TO => [
+                self::REL_POST => [Post::class, self::FIELD_ID_POST, Post::REL_COMMENTS],
+                self::REL_USER => [User::class, self::FIELD_ID_USER, User::REL_COMMENTS],
+            ],
             RelationshipTypes::BELONGS_TO_MANY => [
-                self::REL_COMMENTS => [
-                    Comment::class,
+                self::REL_EMOTIONS => [
+                    Emotion::class,
                     CommentEmotion::TABLE_NAME,
-                    CommentEmotion::FIELD_ID_EMOTION,
                     CommentEmotion::FIELD_ID_COMMENT,
-                    Comment::REL_EMOTIONS,
+                    CommentEmotion::FIELD_ID_EMOTION,
+                    Emotion::REL_COMMENTS,
                 ],
             ],
         ];

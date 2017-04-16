@@ -17,7 +17,7 @@
  */
 
 use Closure;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
@@ -35,16 +35,16 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     private $relationshipStorage;
 
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
     private $modelSchemes;
 
     /**
-     * @param SchemaFactoryInterface $factory
-     * @param array                  $schemas
-     * @param ModelSchemesInterface  $modelSchemes
+     * @param SchemaFactoryInterface   $factory
+     * @param array                    $schemas
+     * @param ModelSchemeInfoInterface $modelSchemes
      */
-    public function __construct(SchemaFactoryInterface $factory, array $schemas, ModelSchemesInterface $modelSchemes)
+    public function __construct(SchemaFactoryInterface $factory, array $schemas, ModelSchemeInfoInterface $modelSchemes)
     {
         parent::__construct($factory, $schemas);
         $this->modelSchemes = $modelSchemes;
@@ -98,9 +98,9 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    protected function getModelSchemes()
+    protected function getModelSchemes(): ModelSchemeInfoInterface
     {
         return $this->modelSchemes;
     }

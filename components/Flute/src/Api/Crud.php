@@ -23,14 +23,14 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 use Generator;
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\IncludeParameterInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -78,7 +78,7 @@ class Crud implements CrudInterface
     private $repository;
 
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
     private $modelSchemes;
 
@@ -91,14 +91,14 @@ class Crud implements CrudInterface
      * @param FactoryInterface            $factory
      * @param string                      $modelClass
      * @param RepositoryInterface         $repository
-     * @param ModelSchemesInterface       $modelSchemes
+     * @param ModelSchemeInfoInterface    $modelSchemes
      * @param PaginationStrategyInterface $paginationStrategy
      */
     public function __construct(
         FactoryInterface $factory,
         string $modelClass,
         RepositoryInterface $repository,
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         PaginationStrategyInterface $paginationStrategy
     ) {
         $this->factory            = $factory;
@@ -404,9 +404,9 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemesInterface
+    protected function getModelSchemes(): ModelSchemeInfoInterface
     {
         return $this->modelSchemes;
     }

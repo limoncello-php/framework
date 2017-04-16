@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-use Interop\Container\ContainerInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Flute
@@ -38,7 +38,7 @@ trait CreateApiTrait
     {
         $factory            = $container->get(FactoryInterface::class);
         $repository         = $container->get(RepositoryInterface::class);
-        $modelSchemes       = $container->get(ModelSchemesInterface::class);
+        $modelSchemes       = $container->get(ModelSchemeInfoInterface::class);
         $paginationStrategy = $container->get(PaginationStrategyInterface::class);
 
         $api = new $apiClass($factory, $repository, $modelSchemes, $paginationStrategy, $container);

@@ -17,8 +17,8 @@
  */
 
 use Generator;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Contracts\Validation\ValidatorInterface;
@@ -78,7 +78,7 @@ abstract class Validator implements ValidatorInterface
     private $jsonSchemes;
 
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
     private $modelSchemes;
 
@@ -101,7 +101,7 @@ abstract class Validator implements ValidatorInterface
      * @param T                             $jsonApiTranslator
      * @param ValidationTranslatorInterface $validationTranslator
      * @param JsonSchemesInterface          $jsonSchemes
-     * @param ModelSchemesInterface         $modelSchemes
+     * @param ModelSchemeInfoInterface      $modelSchemes
      * @param int                           $errorStatus
      * @param RuleInterface                 $unlistedAttrRule
      * @param RuleInterface                 $unlistedRelationRule
@@ -110,7 +110,7 @@ abstract class Validator implements ValidatorInterface
         T $jsonApiTranslator,
         ValidationTranslatorInterface $validationTranslator,
         JsonSchemesInterface $jsonSchemes,
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY,
         RuleInterface $unlistedAttrRule = null,
         RuleInterface $unlistedRelationRule = null
@@ -217,9 +217,9 @@ abstract class Validator implements ValidatorInterface
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemesInterface
+    protected function getModelSchemes(): ModelSchemeInfoInterface
     {
         return $this->modelSchemes;
     }
