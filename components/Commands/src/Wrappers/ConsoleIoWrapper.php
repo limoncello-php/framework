@@ -46,6 +46,78 @@ class ConsoleIoWrapper implements IoInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function hasArgument(string $name): bool
+    {
+        return $this->getInput()->hasArgument($name);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getArgument(string $name)
+    {
+        return $this->getInput()->getArgument($name);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getArguments(): array
+    {
+        return $this->getInput()->getArguments();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasOption(string $name): bool
+    {
+        return $this->getInput()->hasOption($name);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOption(string $name)
+    {
+        return $this->getInput()->getOption($name);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOptions(): array
+    {
+        return $this->getInput()->getOptions();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function writeInfo(string $message): IoInterface
+    {
+        $this->getOutput()->write("<info>$message</info>>");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function writeWarning(string $message): IoInterface
+    {
+        $this->getOutput()->write("<comment>$message</comment>>");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function writeError(string $message): IoInterface
+    {
+        $this->getOutput()->write("<error>$message</error>>");
+    }
+
+    /**
      * @return OutputInterface
      */
     protected function getOutput(): OutputInterface
