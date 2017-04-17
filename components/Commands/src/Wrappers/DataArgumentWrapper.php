@@ -72,7 +72,7 @@ class DataArgumentWrapper
      */
     public function isRequired(): bool
     {
-        return $this->getModeValue() & CommandInterface::ARGUMENT_MODE__REQUIRED > 0;
+        return ($this->getModeValue() & CommandInterface::ARGUMENT_MODE__REQUIRED) > 0;
     }
 
     /**
@@ -80,7 +80,7 @@ class DataArgumentWrapper
      */
     public function isOptional(): bool
     {
-        return $this->getModeValue() & CommandInterface::ARGUMENT_MODE__OPTIONAL > 0;
+        return ($this->getModeValue() & CommandInterface::ARGUMENT_MODE__OPTIONAL) > 0;
     }
 
     /**
@@ -88,7 +88,7 @@ class DataArgumentWrapper
      */
     public function isArray(): bool
     {
-        return $this->getModeValue() & CommandInterface::ARGUMENT_MODE__IS_ARRAY > 0;
+        return ($this->getModeValue() & CommandInterface::ARGUMENT_MODE__IS_ARRAY) > 0;
     }
 
     /**
