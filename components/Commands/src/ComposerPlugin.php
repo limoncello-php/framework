@@ -21,6 +21,7 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
+use Limoncello\Application\Commands\DataCommand;
 use Limoncello\Commands\Commands\CacheClean;
 use Limoncello\Commands\Commands\CacheCreate;
 
@@ -58,6 +59,7 @@ class ComposerPlugin implements PluginInterface, Capable
         $commands = [
             new LimoncelloCommand(new CacheCreate()),
             new LimoncelloCommand(new CacheClean()),
+            new LimoncelloCommand(new DataCommand()),
         ];
 
         ComposerCommandProvider::setCommands($commands);
