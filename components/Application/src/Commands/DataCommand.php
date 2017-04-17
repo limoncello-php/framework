@@ -86,7 +86,7 @@ class DataCommand implements CommandInterface
             [
                 static::OPTION_NAME        => static::OPT_PATH,
                 static::OPTION_DESCRIPTION => 'Path to a list of migrations or seeds. ' .
-                                              'If not given a path from settings will be used.',
+                    'If not given a path from settings will be used.',
                 static::OPTION_SHORTCUT    => 'i',
                 static::OPTION_MODE        => static::OPTION_MODE__REQUIRED,
             ],
@@ -102,22 +102,24 @@ class DataCommand implements CommandInterface
         $options   = $inOut->getOptions();
         $settings  = $this->getSettings($container);
 
-        switch ($arguments[static::ARG_ACTION]) {
+        $path   = $options[static::OPT_PATH] ?? false;
+        $action = $arguments[static::ARG_ACTION];
+        switch ($action) {
             case static::ACTION_MIGRATE:
-                $path = $options[static::OPT_PATH] ?? $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
+                $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
                 (new FileMigrationRunner($path))->migrate($container);
                 break;
             case static::ACTION_ROLLBACK:
-                $path = $options[static::OPT_PATH] ?? $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
+                $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
                 (new FileMigrationRunner($path))->rollback($container);
                 break;
             case static::ACTION_SEED:
-                $path     = $options[static::OPT_PATH] ?? $settings[DataSettings::KEY_SEEDS_PATH] ?? '';
+                $path     = $path !== false ? $path : $settings[DataSettings::KEY_SEEDS_PATH] ?? '';
                 $seedInit = $settings[DataSettings::KEY_SEED_INIT] ?? null;
                 (new FileSeedRunner($path, $seedInit))->run($container);
                 break;
             default:
-                $inOut->writeError('Unsupported action');
+                $inOut->writeError("Unsupported action `$action`." . PHP_EOL);
                 break;
         }
     }

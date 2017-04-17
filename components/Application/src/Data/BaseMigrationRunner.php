@@ -74,7 +74,7 @@ abstract class BaseMigrationRunner
         foreach ($this->getRollbacks($container) as $class) {
             /** @var MigrationInterface $migration */
             $migration = new $class($container);
-            $migration->rollback();
+            $migration->init($container)->rollback();
         }
 
         $manager = $this->getConnection($container)->getSchemaManager();

@@ -98,7 +98,9 @@ class ConsoleIoWrapper implements IoInterface
      */
     public function writeInfo(string $message): IoInterface
     {
-        $this->getOutput()->write("<info>$message</info>>");
+        $this->getOutput()->write("<info>$message</info>");
+
+        return $this;
     }
 
     /**
@@ -106,7 +108,9 @@ class ConsoleIoWrapper implements IoInterface
      */
     public function writeWarning(string $message): IoInterface
     {
-        $this->getOutput()->write("<comment>$message</comment>>");
+        $this->getOutput()->write("<comment>$message</comment>");
+
+        return $this;
     }
 
     /**
@@ -114,7 +118,9 @@ class ConsoleIoWrapper implements IoInterface
      */
     public function writeError(string $message): IoInterface
     {
-        $this->getOutput()->write("<error>$message</error>>");
+        $this->getOutput()->write("<error>$message</error>");
+
+        return $this;
     }
 
     /**
