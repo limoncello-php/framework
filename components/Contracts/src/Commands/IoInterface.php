@@ -21,4 +21,62 @@
  */
 interface IoInterface
 {
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasArgument(string $name): bool;
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getArgument(string $name);
+
+    /**
+     * @return array
+     */
+    public function getArguments(): array;
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasOption(string $name): bool;
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getOption(string $name);
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array;
+
+    /**
+     * @param string $message
+     *
+     * @return self
+     */
+    public function writeInfo(string $message): self;
+
+    /**
+     * @param string $message
+     *
+     * @return self
+     */
+    public function writeWarning(string $message): self;
+
+    /**
+     * @param string $message
+     *
+     * @return self
+     */
+    public function writeError(string $message): self;
 }
