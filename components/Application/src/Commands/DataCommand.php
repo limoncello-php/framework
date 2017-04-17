@@ -73,7 +73,6 @@ class DataCommand implements CommandInterface
                 static::ARGUMENT_NAME        => static::ARG_ACTION,
                 static::ARGUMENT_DESCRIPTION => "Action such as `$migrate`, `$seed` or `$rollback` data.",
                 static::ARGUMENT_MODE        => static::ARGUMENT_MODE__REQUIRED,
-                static::ARGUMENT_DEFAULT     => $migrate,
             ],
         ];
     }
@@ -99,30 +98,26 @@ class DataCommand implements CommandInterface
      */
     public function execute(ContainerInterface $container, IoInterface $inOut)
     {
-        // TODO: Implement execute() method.
-
-        $arguments = [
-            static::ARG_ACTION => static::ACTION_MIGRATE,
-        ];
+        $arguments = $inOut->getArguments();
+        $options   = $inOut->getOptions();
         $settings  = $this->getSettings($container);
 
         switch ($arguments[static::ARG_ACTION]) {
             case static::ACTION_MIGRATE:
-                $path = $arguments[static::OPT_PATH] ?? $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
+                $path = $options[static::OPT_PATH] ?? $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
                 (new FileMigrationRunner($path))->migrate($container);
                 break;
             case static::ACTION_ROLLBACK:
-                $path = $arguments[static::OPT_PATH] ?? $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
+                $path = $options[static::OPT_PATH] ?? $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
                 (new FileMigrationRunner($path))->rollback($container);
                 break;
             case static::ACTION_SEED:
-                $path     = $arguments[static::OPT_PATH] ?? $settings[DataSettings::KEY_SEEDS_PATH] ?? '';
+                $path     = $options[static::OPT_PATH] ?? $settings[DataSettings::KEY_SEEDS_PATH] ?? '';
                 $seedInit = $settings[DataSettings::KEY_SEED_INIT] ?? null;
                 (new FileSeedRunner($path, $seedInit))->run($container);
                 break;
             default:
-                // TODO output error message to IO interface
-                assert(false, 'Unsupported action');
+                $inOut->writeError('Unsupported action');
                 break;
         }
     }
