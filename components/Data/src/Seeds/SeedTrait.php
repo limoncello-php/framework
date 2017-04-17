@@ -137,7 +137,7 @@ trait SeedTrait
     {
         $connection = $this->getConnection();
         for ($i = 0; $i !== $records; $i++) {
-            $this->insertRow($tableName, $connection, $dataClosure());
+            $this->insertRow($tableName, $connection, $dataClosure($this->getContainer()));
         }
     }
 
