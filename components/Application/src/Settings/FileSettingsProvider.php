@@ -55,11 +55,10 @@ class FileSettingsProvider extends InstanceSettingsProvider
     {
         try {
             $reflection  = new ReflectionClass($className);
-            $constructor = $reflection->getConstructor();
-            if ($constructor !== null) {
-                if ($constructor->isPublic() === false) {
-                    throw new InvalidSettingsClassException($className);
-                }
+            if ($reflection->isInstantiable() === false) {
+                throw new InvalidSettingsClassException($className);
+            }
+            if (($constructor = $reflection->getConstructor()) !== null) {
                 foreach ($constructor->getParameters() as $parameter) {
                     if ($parameter->isOptional() === false && $parameter->isDefaultValueAvailable() === false) {
                         // there is no default constructor

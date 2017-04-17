@@ -74,24 +74,10 @@ abstract class BaseSeedRunner
     public function run(ContainerInterface $container)
     {
         foreach ($this->getSeeds($container) as $seederClass) {
-            $this->executeSeedInit($container);
+            $this->executeSeedInit($container, $seederClass);
             /** @var SeedInterface $seeder */
             $seeder = new $seederClass();
             $seeder->init($container)->run();
-        }
-    }
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return void
-     */
-    public function reset(ContainerInterface $container)
-    {
-        foreach ($this->getSeeds($container) as $seederClass) {
-            /** @var SeedInterface $seeder */
-            $seeder = new $seederClass();
-            $seeder->init($container)->reset();
         }
     }
 
@@ -132,13 +118,14 @@ abstract class BaseSeedRunner
 
     /**
      * @param ContainerInterface $container
+     * @param string             $seedClass
      *
      * @return void
      */
-    protected function executeSeedInit(ContainerInterface $container)
+    protected function executeSeedInit(ContainerInterface $container, string $seedClass)
     {
         if (($closure = $this->seedInit) !== null) {
-            call_user_func($closure, $container);
+            call_user_func($closure, $container, $seedClass);
         }
     }
 
