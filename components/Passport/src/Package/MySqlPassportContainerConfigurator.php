@@ -83,7 +83,7 @@ class MySqlPassportContainerConfigurator extends BasePassportContainerConfigurat
                 public function validateUserId(string $userName, string $password)
                 {
                     $validator    = $this->settings[C::KEY_USER_CREDENTIALS_VALIDATOR];
-                    $nullOrUserId = call_user_func($validator, $userName, $password);
+                    $nullOrUserId = call_user_func($validator, $this->container, $userName, $password);
 
                     return $nullOrUserId;
                 }
