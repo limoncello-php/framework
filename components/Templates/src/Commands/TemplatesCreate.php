@@ -20,7 +20,6 @@ use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Templates\Package\TemplatesSettings;
 use Limoncello\Templates\TwigTemplates;
 use Psr\Container\ContainerInterface;
-use Twig_Environment;
 
 /**
  * @package Limoncello\Commands
@@ -69,7 +68,7 @@ class TemplatesCreate extends TemplatesBase
         foreach ($templates as $templateName) {
             // it will write template to cache
             /** @noinspection PhpInternalEntityUsedInspection */
-            $templateEngine->loadTemplate($templateName);
+            $templateEngine->getTwig()->loadTemplate($templateName);
         }
     }
 
@@ -77,9 +76,9 @@ class TemplatesCreate extends TemplatesBase
      * @param string $templatesFolder
      * @param string $cacheFolder
      *
-     * @return Twig_Environment
+     * @return TwigTemplates
      */
-    protected function createCachingTemplateEngine(string $templatesFolder, string $cacheFolder): Twig_Environment
+    protected function createCachingTemplateEngine(string $templatesFolder, string $cacheFolder): TwigTemplates
     {
         $templates = new TwigTemplates($templatesFolder, $cacheFolder);
 
