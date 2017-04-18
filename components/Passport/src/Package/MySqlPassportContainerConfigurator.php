@@ -17,10 +17,10 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
+use Limoncello\Contracts\Application\ContainerConfiguratorInterface as CCI;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Passport\Adaptors\Generic\GenericPassportServerIntegration;
+use Limoncello\Passport\Adaptors\MySql\MySqlPassportServerIntegration;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Package\PassportSettings as C;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -28,7 +28,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 /**
  * @package Limoncello\Passport
  */
-class PassportContainerConfigurator extends BasePassportContainerConfigurator implements ContainerConfiguratorInterface
+class MySqlPassportContainerConfigurator extends BasePassportContainerConfigurator implements CCI
 {
     /** @var callable */
     const HANDLER = [self::class, self::METHOD_NAME];
@@ -43,7 +43,7 @@ class PassportContainerConfigurator extends BasePassportContainerConfigurator im
         $container[PassportServerIntegrationInterface::class] = function (PsrContainerInterface $container) {
             assert($container !== null);
 
-            return new class ($container) extends GenericPassportServerIntegration
+            return new class ($container) extends MySqlPassportServerIntegration
             {
                 /**
                  * @var PsrContainerInterface
