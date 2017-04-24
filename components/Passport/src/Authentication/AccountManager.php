@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Auth\Contracts\Authentication;
+<?php namespace Limoncello\Passport\Authentication;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,20 +16,34 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Authentication\AccountInterface;
+use Limoncello\Contracts\Authentication\AccountManagerInterface;
+
 /**
  * @package Limoncello\Auth
  */
-interface AccountManagerInterface
+class AccountManager implements AccountManagerInterface
 {
     /**
-     * @return AccountInterface|null
+     * @var null|AccountInterface
      */
-    public function getAccount();
+    private $account = null;
 
     /**
-     * @param AccountInterface $account
-     *
-     * @return self
+     * @inheritdoc
      */
-    public function setAccount(AccountInterface $account): self;
+    public function getAccount()
+    {
+        return $this->account;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAccount(AccountInterface $account): AccountManagerInterface
+    {
+        $this->account = $account;
+
+        return $this;
+    }
 }

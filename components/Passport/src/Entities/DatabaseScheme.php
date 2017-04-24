@@ -53,6 +53,9 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /** Field name */
     const CLIENTS_SCOPES_FIELD_ID = 'clients_scopes_id';
 
+    /** View name */
+    const VIEW_PASSPORT = 'vw_oauth_passport';
+
     /**
      * @var string|null
      */
@@ -511,5 +514,13 @@ class DatabaseScheme implements DatabaseSchemeInterface
     public function getUsersIdentityColumn()
     {
         return $this->usersIdColumn;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPassportView()
+    {
+        return static::VIEW_PASSPORT;
     }
 }

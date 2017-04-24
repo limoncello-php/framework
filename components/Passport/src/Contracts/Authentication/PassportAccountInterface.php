@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Auth\Contracts\Authentication;
+<?php namespace Limoncello\Passport\Contracts\Authentication;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,22 +16,17 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Authentication\AccountInterface;
+
 /**
- * @package Limoncello\Auth
+ * @package Limoncello\Passport
  */
-interface AccountInterface
+interface PassportAccountInterface extends AccountInterface
 {
     /**
-     * @param int|string $key
+     * @param array $properties
      *
-     * @return bool
+     * @return self
      */
-    public function hasProperty($key): bool;
-
-    /**
-     * @param int|string $key
-     *
-     * @return mixed
-     */
-    public function getProperty($key);
+    public function setPassportProperties(array $properties): self;
 }

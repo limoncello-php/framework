@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Passport\Authentication\AccountManager;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\PassportServerInterface;
@@ -37,6 +39,10 @@ abstract class BasePassportContainerConfigurator
      */
     protected static function configureContainer(LimoncelloContainerInterface $container)
     {
+        $container[AccountManagerInterface::class] = function () {
+            return new AccountManager();
+        };
+
         $container[DatabaseSchemeInterface::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
 

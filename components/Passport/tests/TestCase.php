@@ -38,6 +38,8 @@ use Zend\Diactoros\Uri;
  */
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
+    const USERS_COLUMN_NAME = 'name';
+
     /**
      * @var resource
      */
@@ -140,10 +142,24 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function initSqliteDatabase()
     {
-        $this->setDatabaseScheme(new DatabaseScheme());
+        $this->setDatabaseScheme($scheme = new DatabaseScheme(User::TABLE_NAME, User::FIELD_ID));
 
         $this->setConnection($this->createSqliteDatabaseConnection());
         $this->getConnection()->beginTransaction();
+
+        $manager = $this->getConnection()->getSchemaManager();
+
+        $table = new Table($scheme->getUsersTable());
+        $table->addColumn($scheme->getUsersIdentityColumn(), Type::INTEGER)->setNotnull(true);
+        $table->addColumn(self::USERS_COLUMN_NAME, Type::STRING)->setNotnull(false);
+        $table->setPrimaryKey([$scheme->getUsersIdentityColumn()]);
+
+        $manager->dropAndCreateTable($table);
+
+        $this->getConnection()->insert($scheme->getUsersTable(), [
+            $scheme->getUsersIdentityColumn()     => PassportServerTest::TEST_USER_ID,
+            PassportServerTest::USERS_COLUMN_NAME => PassportServerTest::TEST_USER_NAME,
+        ]);
 
         $this->createDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
     }

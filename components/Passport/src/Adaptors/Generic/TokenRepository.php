@@ -17,8 +17,10 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
+use PDO;
 
 /**
  * @package Limoncello\Passport
@@ -97,6 +99,25 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
         return $token;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function readPassport(string $tokenValue, int $expirationInSeconds)
+    {
+        $statement = $this->createPassportDataQuery($tokenValue, $expirationInSeconds)->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $data = $statement->fetch();
+        $result = null;
+        if ($data !== false) {
+            $scheme  = $this->getDatabaseScheme();
+            $tokenId = $data[$scheme->getTokensIdentityColumn()];
+            $scopes  =  $this->readScopeIdentifiers($tokenId);
+            $data[$scheme->getTokensViewScopesColumn()] = $scopes;
+            $result = $data;
+        }
+
+        return $result;
+    }
 
     /**
      * @inheritdoc
@@ -112,6 +133,38 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     protected function getTableNameForReading(): string
     {
         return $this->getTableNameForWriting();
+    }
+
+    /**
+     * @param string $tokenValue
+     * @param int    $expirationInSeconds
+     *
+     * @return QueryBuilder
+     */
+    private function createPassportDataQuery(
+        string $tokenValue,
+        int $expirationInSeconds
+    ): QueryBuilder {
+        $scheme = $this->getDatabaseScheme();
+        $query  = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
+            $tokenValue,
+            $scheme->getTokensValueColumn(),
+            $expirationInSeconds,
+            $scheme->getTokensValueCreatedAtColumn()
+        );
+
+        $tokensTable = $this->getTableNameForReading();
+        $usersTable  = $aliased = $scheme->getUsersTable();
+        $usersFk     = $scheme->getTokensUserIdentityColumn();
+        $usersPk     = $scheme->getUsersIdentityColumn();
+        $query->innerJoin(
+            $tokensTable,
+            $usersTable,
+            $aliased,
+            "`$tokensTable`.`$usersFk` = `$aliased`.`$usersPk`"
+        );
+
+        return $query;
     }
 
     /**

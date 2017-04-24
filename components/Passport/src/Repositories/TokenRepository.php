@@ -333,22 +333,48 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         string $createdAtColumn,
         array $columns = ['*']
     ) {
-        $query = $this->getConnection()->createQueryBuilder();
-
-        $isEnabledColumn = $this->getDatabaseScheme()->getTokensIsEnabledColumn();
-        $statement = $this->addExpirationCondition(
-            $query->select($columns)
-                ->from($this->getTableNameForReading())
-                ->where($column . '=' . $this->createTypedParameter($query, $identifier))
-                ->andWhere($query->expr()->eq($isEnabledColumn, '1')),
+        $query = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
+            $identifier,
+            $column,
             $expirationInSeconds,
-            $createdAtColumn
-        )->execute();
+            $createdAtColumn,
+            $columns
+        );
 
+        $statement = $query->execute();
         $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
         $result = $statement->fetch();
 
         return $result === false ? null : $result;
+    }
+
+    /**
+     * @param string $identifier
+     * @param string $column
+     * @param int    $expirationInSeconds
+     * @param string $createdAtColumn
+     * @param array  $columns
+     *
+     * @return QueryBuilder
+     */
+    protected function createEnabledTokenByColumnWithExpirationCheckQuery(
+        string $identifier,
+        string $column,
+        int $expirationInSeconds,
+        string $createdAtColumn,
+        array $columns = ['*']
+    ): QueryBuilder {
+        $query = $this->getConnection()->createQueryBuilder();
+        $query = $this->addExpirationCondition(
+            $query->select($columns)
+                ->from($this->getTableNameForReading())
+                ->where($column . '=' . $this->createTypedParameter($query, $identifier))
+                ->andWhere($query->expr()->eq($this->getDatabaseScheme()->getTokensIsEnabledColumn(), '1')),
+            $expirationInSeconds,
+            $createdAtColumn
+        );
+
+        return $query;
     }
 
     /**

@@ -62,6 +62,7 @@ class PassportServerTest extends TestCase
     const TEST_CLIENT_REDIRECT_URI = 'http://client.server/redirect_uri';
     const TEST_SCOPE_1             = 'scope1';
     const TEST_SCOPE_2             = 'scope2';
+    const USERS_COLUMN_NAME        = 'name';
 
     /**
      * Test issuing resource owner password token.

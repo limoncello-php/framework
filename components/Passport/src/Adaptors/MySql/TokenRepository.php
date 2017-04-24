@@ -48,6 +48,37 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     }
 
     /**
+     * @inheritdoc
+     */
+    public function readPassport(string $tokenValue, int $expirationInSeconds)
+    {
+        $scheme = $this->getDatabaseScheme();
+        $query  = $this->getConnection()->createQueryBuilder();
+        $query  = $this->addExpirationCondition(
+            $query->select(['*'])
+                ->from($scheme->getPassportView())
+                ->where($scheme->getTokensValueColumn() . '=' . $this->createTypedParameter($query, $tokenValue))
+                ->andWhere($query->expr()->eq($this->getDatabaseScheme()->getTokensIsEnabledColumn(), '1')),
+            $expirationInSeconds,
+            $scheme->getTokensValueCreatedAtColumn()
+        );
+
+        $statement = $query->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $data = $statement->fetch();
+
+        $result = null;
+        if ($data !== false) {
+            $scopesColumn        = $scheme->getTokensViewScopesColumn();
+            $scopeList           = $data[$scopesColumn];
+            $data[$scopesColumn] = explode(' ', $scopeList);
+            $result              = $data;
+        }
+
+        return $result;
+    }
+
+    /**
      * @param string      $token
      * @param int         $expirationInSeconds
      * @param string      $userClass

@@ -25,7 +25,7 @@ class User
     const TABLE_NAME = 'users';
 
     /** Field name */
-    const FIELD_ID = 'user_id';
+    const FIELD_ID = 'id_user';
 
     /** Field name */
     const FIELD_NAME = 'name';

@@ -43,8 +43,7 @@ class PassportController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    )
-    {
+    ): ResponseInterface {
         assert($routeParams !== null);
 
         /** @var PassportServerInterface $passportServer */
@@ -65,8 +64,7 @@ class PassportController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    )
-    {
+    ): ResponseInterface {
         assert($routeParams !== null);
 
         /** @var PassportServerInterface $passportServer */

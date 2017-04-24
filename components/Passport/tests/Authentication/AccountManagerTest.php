@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Auth\Authentication;
+<?php namespace Limoncello\Tests\Passport\Authentication;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-use Limoncello\Auth\Authentication\AccountManager;
-use Limoncello\Auth\Contracts\Authentication\AccountInterface;
-use Limoncello\Auth\Contracts\Authentication\AccountManagerInterface;
+use Limoncello\Passport\Authentication\AccountManager;
+use Limoncello\Contracts\Authentication\AccountInterface;
+use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Mockery;
 
 /**

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Auth\Authentication;
+<?php namespace Limoncello\Passport\Authentication;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,33 +16,43 @@
  * limitations under the License.
  */
 
-use Limoncello\Auth\Contracts\Authentication\AccountInterface;
-use Limoncello\Auth\Contracts\Authentication\AccountManagerInterface;
+use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
 
 /**
- * @package Limoncello\Auth
+ * @package Limoncello\Application
  */
-class AccountManager implements AccountManagerInterface
+class PassportAccount implements PassportAccountInterface
 {
-    /**
-     * @var null|AccountInterface
-     */
-    private $account = null;
+    private $properties = [];
 
     /**
      * @inheritdoc
      */
-    public function getAccount()
+    public function hasProperty($key): bool
     {
-        return $this->account;
+        assert(is_string($key) || is_int($key));
+
+        return array_key_exists($key, $this->properties);
     }
 
     /**
      * @inheritdoc
      */
-    public function setAccount(AccountInterface $account): AccountManagerInterface
+    public function getProperty($key)
     {
-        $this->account = $account;
+        assert($this->hasProperty($key));
+
+        $value = $this->properties[$key];
+
+        return $value;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPassportProperties(array $properties): self
+    {
+        $this->properties = $properties;
 
         return $this;
     }
