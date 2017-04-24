@@ -50,7 +50,7 @@ class PassportAccount implements PassportAccountInterface
     /**
      * @inheritdoc
      */
-    public function setPassportProperties(array $properties): self
+    public function setPassportProperties(array $properties): PassportAccountInterface
     {
         $this->properties = $properties;
 
