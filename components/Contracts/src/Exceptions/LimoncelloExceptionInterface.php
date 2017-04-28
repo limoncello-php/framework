@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
+use Throwable;
+
 /**
  * @package Limoncello\Contracts
  */
-interface LimoncelloExceptionInterface
+interface LimoncelloExceptionInterface extends Throwable
 {
 }
