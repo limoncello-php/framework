@@ -144,7 +144,7 @@ class PassportAccount implements PassportAccountInterface
      */
     public function hasScope(string $scope): bool
     {
-        return in_array($scope, $this->getScopes());
+        return $this->hasScopes() === true && in_array($scope, $this->getScopes()) === true;
     }
 
     /**
