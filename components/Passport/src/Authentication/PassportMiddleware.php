@@ -20,6 +20,7 @@ use Closure;
 use Limoncello\Contracts\Application\MiddlewareInterface;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Package\PassportSettings as C;
 use Psr\Container\ContainerInterface;
@@ -48,11 +49,7 @@ class PassportMiddleware implements MiddlewareInterface
     ): ResponseInterface {
         $header = $request->getHeader('Authorization');
 
-        /** @var AccountManagerInterface $accountManager */
-        $accountManager = $container->get(AccountManagerInterface::class);
-
-        $account = new PassportAccount();
-
+        $properties = [];
         // if value has Bearer token and it is a valid json with 2 required fields and they are strings
         if (empty($header) === false &&
             substr($value = $header[0], 0, 7) === 'Bearer ' &&
@@ -63,10 +60,14 @@ class PassportMiddleware implements MiddlewareInterface
             $tokenRepo    = $container->get(TokenRepositoryInterface::class);
             $expInSeconds = $settings[C::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS];
             $properties   = $tokenRepo->readPassport($tokenValue, $expInSeconds);
-            $account->setPassportProperties($properties);
         }
 
-        $accountManager->setAccount($account);
+        /** @var AccountManagerInterface $accountManager */
+        $accountManager = $container->get(AccountManagerInterface::class);
+        /** @var DatabaseSchemeInterface $scheme */
+        $scheme = $container->get(DatabaseSchemeInterface::class);
+
+        $accountManager->setAccount(new PassportAccount($scheme, $properties));
 
         // call next middleware handler
         return $next($request);

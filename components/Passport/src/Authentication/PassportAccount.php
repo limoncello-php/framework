@@ -17,13 +17,57 @@
  */
 
 use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 
 /**
  * @package Limoncello\Application
  */
 class PassportAccount implements PassportAccountInterface
 {
-    private $properties = [];
+    /**
+     * @var array
+     */
+    private $properties;
+
+    /**
+     * @var DatabaseSchemeInterface
+     */
+    private $scheme;
+
+    /**
+     * @var bool|string
+     */
+    private $userIdentityKey = false;
+
+    /**
+     * @var bool|string
+     */
+    private $clientIdentityKey = false;
+
+    /**
+     * @var bool|string
+     */
+    private $scopesKey = false;
+
+    /**
+     * @param DatabaseSchemeInterface $scheme
+     * @param array $properties
+     */
+    public function __construct(DatabaseSchemeInterface $scheme, array $properties = [])
+    {
+        $this->scheme = $scheme;
+        $this->setPassportProperties($properties);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPassportProperties(array $properties): PassportAccountInterface
+    {
+        $this->properties = $properties;
+
+        return $this;
+    }
 
     /**
      * @inheritdoc
@@ -50,10 +94,100 @@ class PassportAccount implements PassportAccountInterface
     /**
      * @inheritdoc
      */
-    public function setPassportProperties(array $properties): PassportAccountInterface
+    public function hasUserIdentity(): bool
     {
-        $this->properties = $properties;
+        return $this->hasProperty($this->getUserIdentityKey());
+    }
 
-        return $this;
+    /**
+     * @inheritdoc
+     */
+    public function getUserIdentity()
+    {
+        return $this->getProperty($this->getUserIdentityKey());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasClientIdentity(): bool
+    {
+        return $this->hasProperty($this->getClientIdentityKey());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getClientIdentity()
+    {
+        return $this->getProperty($this->getClientIdentityKey());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasScopes(): bool
+    {
+        return $this->hasProperty($this->getScopesKey());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getScopes(): array
+    {
+        return $this->getProperty($this->getScopesKey());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasScope(string $scope): bool
+    {
+        return in_array($scope, $this->getScopes());
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUserIdentityKey(): string
+    {
+        if ($this->userIdentityKey === false) {
+            $this->userIdentityKey = $this->getScheme()->getTokensUserIdentityColumn();
+        }
+
+        return $this->userIdentityKey;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getClientIdentityKey(): string
+    {
+        if ($this->clientIdentityKey === false) {
+            $this->clientIdentityKey = $this->getScheme()->getTokensClientIdentityColumn();
+        }
+
+        return $this->clientIdentityKey;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getScopesKey(): string
+    {
+        if ($this->scopesKey === false) {
+            $this->scopesKey = $this->getScheme()->getTokensViewScopesColumn();
+        }
+
+        return $this->scopesKey;
+    }
+
+    /**
+     * @return DatabaseSchemeInterface
+     */
+    protected function getScheme(): DatabaseSchemeInterface
+    {
+        return $this->scheme;
     }
 }

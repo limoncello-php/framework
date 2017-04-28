@@ -24,9 +24,39 @@ use Limoncello\Contracts\Authentication\AccountInterface;
 interface PassportAccountInterface extends AccountInterface
 {
     /**
-     * @param array $properties
-     *
-     * @return self
+     * @return bool
      */
-    public function setPassportProperties(array $properties): self;
+    public function hasUserIdentity(): bool;
+
+    /**
+     * @return string|int|null
+     */
+    public function getUserIdentity();
+
+    /**
+     * @return bool
+     */
+    public function hasClientIdentity(): bool;
+
+    /**
+     * @return string|int|null
+     */
+    public function getClientIdentity();
+
+    /**
+     * @param string $scope
+     *
+     * @return bool
+     */
+    public function hasScope(string $scope): bool;
+
+    /**
+     * @return bool
+     */
+    public function hasScopes(): bool;
+
+    /**
+     * @return array
+     */
+    public function getScopes(): array;
 }
