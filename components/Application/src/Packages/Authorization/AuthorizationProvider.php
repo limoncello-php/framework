@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Traits;
+<?php namespace Limoncello\Application\Packages\Authorization;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,25 +16,20 @@
  * limitations under the License.
  */
 
-use Generator;
+use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 
 /**
  * @package Limoncello\Application
  */
-trait SelectClassImplementsTrait
+class AuthorizationProvider implements ProvidesContainerConfiguratorsInterface
 {
     /**
-     * @param string[] $classNames
-     * @param string   $interfaceName
-     *
-     * @return Generator
+     * @inheritdoc
      */
-    protected function selectClassImplements(array $classNames, string $interfaceName): Generator
+    public static function getContainerConfigurators(): array
     {
-        foreach ($classNames as $className) {
-            if (array_key_exists($interfaceName, class_implements($className)) === true) {
-                yield $className;
-            }
-        }
+        return [
+            AuthorizationContainerConfigurator::HANDLER,
+        ];
     }
 }
