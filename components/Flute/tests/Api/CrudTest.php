@@ -42,11 +42,13 @@ use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\TestCase;
+use Mockery;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Encoder\Parameters\SortParameter as JsonLibrarySortParameter;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PDO;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -651,7 +653,7 @@ class CrudTest extends TestCase
     private function createCrud($class)
     {
         $this->connection = $this->initDb();
-        $factory          = new Factory();
+        $factory          = new Factory($this->createContainer());
         $translator       = $factory->createTranslator();
         $filterOperations = new FilterOperations($translator);
         $modelSchemes     = $this->getModelSchemes();
@@ -688,5 +690,16 @@ class CrudTest extends TestCase
         $result    = new SortParameter($sortParam, $name, $isRelationship, $relationshipType);
 
         return $result;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    private function createContainer(): ContainerInterface
+    {
+        /** @var ContainerInterface $container */
+        $container = Mockery::mock(ContainerInterface::class);
+
+        return $container;
     }
 }

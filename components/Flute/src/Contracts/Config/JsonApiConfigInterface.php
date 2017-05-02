@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-/**
+/** @deprecated
  * @package Limoncello\Flute
  */
 interface JsonApiConfigInterface

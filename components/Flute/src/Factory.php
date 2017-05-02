@@ -21,12 +21,12 @@ use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Adapters\Repository;
 use Limoncello\Flute\Api\ModelsData;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
+use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -43,6 +43,7 @@ use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as JsonApiFactoryInterf
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Factories\Factory as JsonApiFactory;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Flute
@@ -56,6 +57,18 @@ class Factory implements FactoryInterface
      * @var JsonApiFactoryInterface
      */
     private $jsonApiFactory = null;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @return JsonApiFactoryInterface
@@ -136,7 +149,7 @@ class Factory implements FactoryInterface
         Connection $connection,
         ModelSchemeInfoInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
-        T $translator
+        TranslatorInterface $translator
     ): RepositoryInterface {
         return new Repository($connection, $modelSchemes, $filterOperations, $translator);
     }
@@ -157,5 +170,28 @@ class Factory implements FactoryInterface
         EncoderOptions $encoderOptions = null
     ): EncoderInterface {
         return new Encoder($this->getJsonApiFactory(), $schemes, $encoderOptions);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createApi(string $class)
+    {
+        $factory            = $this->getContainer()->get(FactoryInterface::class);
+        $repository         = $this->getContainer()->get(RepositoryInterface::class);
+        $modelSchemes       = $this->getContainer()->get(ModelSchemeInfoInterface::class);
+        $paginationStrategy = $this->getContainer()->get(PaginationStrategyInterface::class);
+
+        $api = new $class($factory, $repository, $modelSchemes, $paginationStrategy, $this->getContainer());
+
+        return $api;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 }

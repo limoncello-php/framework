@@ -21,6 +21,8 @@ use Limoncello\Flute\Models\RelationshipStorage;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\User;
+use Mockery;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -32,7 +34,7 @@ class RelationshipStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testStorage()
     {
-        $storage = new RelationshipStorage(new Factory());
+        $storage = new RelationshipStorage(new Factory($this->createContainer()));
 
         $user     = new User();
         $post1    = new Post();
@@ -91,12 +93,23 @@ class RelationshipStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddRelationToNull()
     {
-        $storage = new RelationshipStorage(new Factory());
+        $storage = new RelationshipStorage(new Factory($this->createContainer()));
         $post1   = new Post();
 
         $this->assertFalse($storage->hasRelationship($post1, Post::REL_USER));
         $this->assertTrue($storage->addToOneRelationship($post1, Post::REL_USER, null));
         $this->assertEquals(null, $storage->getRelationship($post1, Post::REL_USER)->getData());
         $this->assertTrue($storage->hasRelationship($post1, Post::REL_USER));
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    private function createContainer(): ContainerInterface
+    {
+        /** @var ContainerInterface $container */
+        $container = Mockery::mock(ContainerInterface::class);
+
+        return $container;
     }
 }

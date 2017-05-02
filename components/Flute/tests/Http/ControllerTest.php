@@ -1076,7 +1076,7 @@ EOT;
     {
         $container = new Container();
 
-        $container[FactoryInterface::class]               = $factory = new Factory();
+        $container[FactoryInterface::class]               = $factory = new Factory($container);
         $container[QueryParametersParserInterface::class] = $factory
             ->getJsonApiFactory()->createQueryParametersParser();
         $container[ModelSchemeInfoInterface::class]       = $modelSchemes = $this->getModelSchemes();

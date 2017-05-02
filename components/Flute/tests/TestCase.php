@@ -46,6 +46,7 @@ use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Mockery;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -218,7 +219,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         ModelSchemeInfoInterface $modelSchemes,
         RelationshipStorageInterface $storage = null
     ) {
-        $factory = new Factory();
+        $factory = new Factory($this->createContainer());
         $schemes = $factory->createJsonSchemes($this->getSchemeMap(), $modelSchemes);
 
         $storage === null ?: $schemes->setRelationshipStorage($storage);
@@ -246,5 +247,16 @@ class TestCase extends \PHPUnit\Framework\TestCase
             User::class     => UserSchema::class,
             Category::class => CategorySchema::class,
         ];
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    private function createContainer(): ContainerInterface
+    {
+        /** @var ContainerInterface $container */
+        $container = Mockery::mock(ContainerInterface::class);
+
+        return $container;
     }
 }

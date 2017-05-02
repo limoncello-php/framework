@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
+use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
@@ -114,4 +115,11 @@ interface FactoryInterface
      * @return PaginatedDataInterface
      */
     public function createPaginatedData($data): PaginatedDataInterface;
+
+    /**
+     * @param string $class
+     *
+     * @return CrudInterface
+     */
+    public function createApi(string $class);
 }
