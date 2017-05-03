@@ -41,23 +41,17 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    public function __construct(
-        FactoryInterface $factory,
-        RepositoryInterface $repository,
-        ModelSchemeInfoInterface $modelSchemes,
-        PaginationStrategyInterface $paginationStrategy,
-        ContainerInterface $container = null
-    ) {
-        parent::__construct(
-            $factory,
-            static::MODEL_CLASS,
-            $repository,
-            $modelSchemes,
-            $paginationStrategy
-        );
+    public function __construct(ContainerInterface $container)
+    {
         $this->container = $container;
-        // we do not use container in test (invoke for test coverage)
-        $this->getContainer();
+
+        parent::__construct(
+            $this->getContainer()->get(FactoryInterface::class),
+            static::MODEL_CLASS,
+            $this->getContainer()->get(RepositoryInterface::class),
+            $this->getContainer()->get(ModelSchemeInfoInterface::class),
+            $this->getContainer()->get(PaginationStrategyInterface::class)
+        );
     }
 
     /**

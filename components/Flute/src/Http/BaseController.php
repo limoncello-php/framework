@@ -24,7 +24,6 @@ use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Http\Traits\CreateApiTrait;
 use Limoncello\Flute\Http\Traits\CreateResponsesTrait;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
@@ -40,7 +39,7 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 abstract class BaseController implements ControllerInterface
 {
-    use CreateApiTrait, CreateResponsesTrait;
+    use CreateResponsesTrait;
 
     /** API class name */
     const API_CLASS = null;
@@ -195,12 +194,17 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * @param ContainerInterface $container
+     * @param string|null        $class
      *
      * @return CrudInterface
      */
-    protected static function createApi(ContainerInterface $container): CrudInterface
+    protected static function createApi(ContainerInterface $container, string $class = null): CrudInterface
     {
-        return static::createApiByClass($container, static::API_CLASS);
+        /** @var FactoryInterface $factory */
+        $factory = $container->get(FactoryInterface::class);
+        $api     = $factory->createApi($class ?? static::API_CLASS);
+
+        return $api;
     }
 
     /**
@@ -298,7 +302,7 @@ abstract class BaseController implements ControllerInterface
             return static::createResponses($container, $request)->getCodeResponse(404);
         }
 
-        $childApi = self::createApiByClass($container, $childApiClass);
+        $childApi = self::createApi($container, $childApiClass);
 
         return static::deleteImpl($childIndex, $container, $request, $childApi);
     }
@@ -333,7 +337,7 @@ abstract class BaseController implements ControllerInterface
             return static::createResponses($container, $request)->getCodeResponse(404);
         }
 
-        $childApi = self::createApiByClass($container, $childApiClass);
+        $childApi = self::createApi($container, $childApiClass);
 
         return static::updateImpl($childIndex, $attributes, $toMany, $container, $request, $childApi);
     }

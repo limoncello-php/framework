@@ -117,9 +117,9 @@ interface FactoryInterface
     public function createPaginatedData($data): PaginatedDataInterface;
 
     /**
-     * @param string $class
+     * @param string $apiClass
      *
      * @return CrudInterface
      */
-    public function createApi(string $class);
+    public function createApi(string $apiClass);
 }

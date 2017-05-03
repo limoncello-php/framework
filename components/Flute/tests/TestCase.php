@@ -19,6 +19,7 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
+use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -210,18 +211,18 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param Factory                           $factory
      * @param ModelSchemeInfoInterface          $modelSchemes
      * @param RelationshipStorageInterface|null $storage
      *
      * @return JsonSchemesInterface
      */
     protected function getJsonSchemes(
+        Factory $factory,
         ModelSchemeInfoInterface $modelSchemes,
         RelationshipStorageInterface $storage = null
     ) {
-        $factory = new Factory($this->createContainer());
         $schemes = $factory->createJsonSchemes($this->getSchemeMap(), $modelSchemes);
-
         $storage === null ?: $schemes->setRelationshipStorage($storage);
 
         return $schemes;
@@ -250,12 +251,17 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param array $declarations
+     *
      * @return ContainerInterface
      */
-    private function createContainer(): ContainerInterface
+    protected function createContainer(array $declarations = []): ContainerInterface
     {
-        /** @var ContainerInterface $container */
-        $container = Mockery::mock(ContainerInterface::class);
+        $container = new Container();
+
+        foreach ($declarations as $key => $value) {
+            $container->offsetSet($key, $value);
+        }
 
         return $container;
     }

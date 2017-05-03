@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Factory;
 use Limoncello\Flute\I18n\Translator as JsonApiTranslator;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
@@ -37,7 +39,7 @@ class ValidatorTest extends TestCase
      */
     public function testCaptureValidData()
     {
-        $jsonSchemes = $this->getJsonSchemes($this->getModelSchemes());
+        $jsonSchemes = $this->createJsonSchemes();
         $validator   = $this->createValidator($jsonSchemes);
 
         $text  = 'Outside every fat man there was an even fatter man trying to close in';
@@ -92,7 +94,7 @@ EOT;
      */
     public function testCaptureNullInTo1Relationship()
     {
-        $jsonSchemes = $this->getJsonSchemes($this->getModelSchemes());
+        $jsonSchemes = $this->createJsonSchemes();
         $validator   = $this->createValidator($jsonSchemes);
 
         $text  = 'Outside every fat man there was an even fatter man trying to close in';
@@ -135,7 +137,7 @@ EOT;
      */
     public function testCaptureInvalidData1()
     {
-        $jsonSchemes = $this->getJsonSchemes($this->getModelSchemes());
+        $jsonSchemes = $this->createJsonSchemes();
         $validator   = $this->createValidator($jsonSchemes);
 
         $text  = 'Outside every fat man there was an even fatter man trying to close in';
@@ -221,7 +223,7 @@ EOT;
      */
     public function testCaptureInvalidData2()
     {
-        $jsonSchemes = $this->getJsonSchemes($this->getModelSchemes());
+        $jsonSchemes = $this->createJsonSchemes();
         $validator   = $this->createValidator($jsonSchemes);
 
         $input = json_decode('{}', true);
@@ -271,7 +273,7 @@ EOT;
      */
     public function testCaptureInvalidData3()
     {
-        $jsonSchemes = $this->getJsonSchemes($this->getModelSchemes());
+        $jsonSchemes = $this->createJsonSchemes();
         $validator   = $this->createValidator($jsonSchemes);
 
         $jsonInput = <<<EOT
@@ -337,7 +339,7 @@ EOT;
      */
     public function testCaptureInvalidData4()
     {
-        $jsonSchemes = $this->getJsonSchemes($this->getModelSchemes());
+        $jsonSchemes = $this->createJsonSchemes();
         $validator   = $this->createValidator($jsonSchemes);
 
         $jsonInput = <<<EOT
@@ -399,7 +401,7 @@ EOT;
      */
     public function testCaptureInvalidData5()
     {
-        $jsonSchemes = $this->getJsonSchemes($this->getModelSchemes());
+        $jsonSchemes = $this->createJsonSchemes();
         $validator   = $this->createValidator($jsonSchemes);
 
         $input = json_decode('{}', true);
@@ -459,5 +461,15 @@ EOT;
         );
 
         return $validator;
+    }
+
+    /**
+     * @return JsonSchemesInterface
+     */
+    private function createJsonSchemes(): JsonSchemesInterface
+    {
+        $jsonSchemes = $this->getJsonSchemes(new Factory($this->createContainer()), $this->getModelSchemes());
+
+        return $jsonSchemes;
     }
 }

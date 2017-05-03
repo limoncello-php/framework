@@ -17,11 +17,15 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Container\Container;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
+use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
+use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\FilterParameter;
@@ -42,13 +46,11 @@ use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\TestCase;
-use Mockery;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Encoder\Parameters\SortParameter as JsonLibrarySortParameter;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PDO;
-use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -652,20 +654,21 @@ class CrudTest extends TestCase
      */
     private function createCrud($class)
     {
-        $this->connection = $this->initDb();
-        $factory          = new Factory($this->createContainer());
-        $translator       = $factory->createTranslator();
-        $filterOperations = new FilterOperations($translator);
-        $modelSchemes     = $this->getModelSchemes();
-        $repository       = $factory->createRepository(
+        $container = new Container();
+
+        $container[Connection::class] = $this->connection = $this->initDb();
+        $container[FactoryInterface::class] = $factory = new Factory($container);
+        $translator = $factory->createTranslator();
+        $container[ModelSchemeInfoInterface::class] = $modelSchemes     = $this->getModelSchemes();
+        $container[RepositoryInterface::class] = $factory->createRepository(
             $this->connection,
             $modelSchemes,
-            $filterOperations,
+            new FilterOperations($translator),
             $translator
         );
 
-        $relPaging = new PaginationStrategy(self::DEFAULT_PAGE);
-        $crud      = new $class($factory, $repository, $modelSchemes, $relPaging);
+        $container[PaginationStrategyInterface::class] = new PaginationStrategy(self::DEFAULT_PAGE);
+        $crud      = new $class($container);
 
         return $crud;
     }
@@ -690,16 +693,5 @@ class CrudTest extends TestCase
         $result    = new SortParameter($sortParam, $name, $isRelationship, $relationshipType);
 
         return $result;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    private function createContainer(): ContainerInterface
-    {
-        /** @var ContainerInterface $container */
-        $container = Mockery::mock(ContainerInterface::class);
-
-        return $container;
     }
 }

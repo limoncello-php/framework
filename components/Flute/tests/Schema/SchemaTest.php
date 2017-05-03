@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Factory as FluteFactory;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\TestCase;
@@ -39,8 +40,9 @@ class SchemaTest extends TestCase
     {
         parent::setUp();
 
+        $factory      = new FluteFactory($this->createContainer());
         $modelSchemes = $this->getModelSchemes();
-        $this->schema = new PostSchema(new Factory(), $this->getJsonSchemes($modelSchemes), $modelSchemes);
+        $this->schema = new PostSchema(new Factory(), $this->getJsonSchemes($factory, $modelSchemes), $modelSchemes);
     }
 
     /**

@@ -21,7 +21,6 @@ use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Adapters\Repository;
 use Limoncello\Flute\Api\ModelsData;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
@@ -175,14 +174,9 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createApi(string $class)
+    public function createApi(string $apiClass)
     {
-        $factory            = $this->getContainer()->get(FactoryInterface::class);
-        $repository         = $this->getContainer()->get(RepositoryInterface::class);
-        $modelSchemes       = $this->getContainer()->get(ModelSchemeInfoInterface::class);
-        $paginationStrategy = $this->getContainer()->get(PaginationStrategyInterface::class);
-
-        $api = new $class($factory, $repository, $modelSchemes, $paginationStrategy, $this->getContainer());
+        $api = new $apiClass($this->getContainer());
 
         return $api;
     }

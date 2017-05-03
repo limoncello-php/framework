@@ -31,17 +31,21 @@ trait RoutesTrait
      * @param GroupInterface $group
      * @param string         $controllerClass
      *
-     * @return void
+     * @return GroupInterface
      */
-    protected function resource(GroupInterface $group, string $controllerClass)
+    protected static function resource(GroupInterface $group, string $controllerClass): GroupInterface
     {
         /** @var BaseController $controllerClass */
         assert(array_key_exists(BaseController::class, class_parents($controllerClass)) === true);
-        $schemaClass = $controllerClass::SCHEMA_CLASS;
+        $schemeClass = $controllerClass::SCHEMA_CLASS;
+        assert(
+            empty($schemeClass) === false,
+            "Scheme class is not specified for controller `$controllerClass`."
+        );
 
-        /** @var SchemaInterface $schemaClass */
-        assert(array_key_exists(SchemaInterface::class, class_implements($schemaClass)) === true);
-        $subUri = $type = $schemaClass::TYPE;
+        /** @var SchemaInterface $schemeClass */
+        assert(array_key_exists(SchemaInterface::class, class_implements($schemeClass)) === true);
+        $subUri = $type = $schemeClass::TYPE;
 
         $indexSlug = '/{' . BaseController::ROUTE_KEY_INDEX . '}';
         $params    = function ($method) use ($type) {
@@ -51,7 +55,7 @@ trait RoutesTrait
             return [$controllerClass, $method];
         };
 
-        $group
+        return $group
             ->get($subUri, $handler(CI::METHOD_INDEX), $params(CI::METHOD_INDEX))
             ->post($subUri, $handler(CI::METHOD_CREATE), $params(CI::METHOD_CREATE))
             ->get($subUri . $indexSlug, $handler(CI::METHOD_READ), $params(CI::METHOD_READ))
@@ -65,14 +69,14 @@ trait RoutesTrait
      * @param string         $controllerClass
      * @param string         $selfGetMethod
      *
-     * @return void
+     * @return GroupInterface
      */
-    protected function relationship(
+    protected static function relationship(
         GroupInterface $group,
         string $relationshipName,
         string $controllerClass,
         string $selfGetMethod
-    ) {
+    ): GroupInterface {
         /** @var BaseController $controllerClass */
         assert(array_key_exists(BaseController::class, class_parents($controllerClass)) === true);
         $schemaClass = $controllerClass::SCHEMA_CLASS;
@@ -85,12 +89,12 @@ trait RoutesTrait
         /** @var string $schemaClass */
 
         $resourceIdUri = $subUri . '/{' . BaseController::ROUTE_KEY_INDEX . '}/';
+        $selfUri       = $resourceIdUri . DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $relationshipName;
 
-        // `self`
-        $selfUri = $resourceIdUri . DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $relationshipName;
-        $group->get($selfUri, [$controllerClass, $selfGetMethod]);
-
-        // `related`
-        $group->get($resourceIdUri . $relationshipName, [$controllerClass, $selfGetMethod]);
+        return $group
+            // `self`
+            ->get($selfUri, [$controllerClass, $selfGetMethod])
+            // `related`
+            ->get($resourceIdUri . $relationshipName, [$controllerClass, $selfGetMethod]);
     }
 }

@@ -18,7 +18,6 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
@@ -58,6 +57,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Uri;
 
@@ -1070,9 +1070,11 @@ EOT;
     }
 
     /**
+     * @param array $declarations
+     *
      * @return ContainerInterface
      */
-    private function createContainer(): ContainerInterface
+    protected function createContainer(array $declarations = []): ContainerInterface
     {
         $container = new Container();
 
@@ -1082,7 +1084,8 @@ EOT;
         $container[ModelSchemeInfoInterface::class]       = $modelSchemes = $this->getModelSchemes();
         /** @var RelationshipStorageInterface $storage */
         $storage                                       = null;
-        $container[JsonSchemesInterface::class]        = $jsonSchemes = $this->getJsonSchemes($modelSchemes, $storage);
+        $container[JsonSchemesInterface::class]        = $jsonSchemes = $this
+            ->getJsonSchemes($factory, $modelSchemes, $storage);
         $container[Connection::class]                  = $connection = $this->initDb();
         $container[TranslatorInterface::class]         = $translator = $factory->createTranslator();
         $container[FilterOperationsInterface::class]   = $filterOperations = new FilterOperations($translator);
