@@ -48,7 +48,7 @@ abstract class BaseController implements ControllerInterface
     const SCHEMA_CLASS = null;
 
     /** URI key used in routing table */
-    const ROUTE_KEY_INDEX = null;
+    const ROUTE_KEY_INDEX = 'idx';
 
     /**
      * @inheritdoc

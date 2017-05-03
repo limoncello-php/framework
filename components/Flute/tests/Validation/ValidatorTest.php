@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Container\Container;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\I18n\Translator as JsonApiTranslator;
@@ -468,7 +469,7 @@ EOT;
      */
     private function createJsonSchemes(): JsonSchemesInterface
     {
-        $jsonSchemes = $this->getJsonSchemes(new Factory($this->createContainer()), $this->getModelSchemes());
+        $jsonSchemes = $this->getJsonSchemes(new Factory(new Container()), $this->getModelSchemes());
 
         return $jsonSchemes;
     }

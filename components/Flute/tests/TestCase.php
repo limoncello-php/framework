@@ -19,7 +19,6 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -47,7 +46,6 @@ use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Mockery;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
-use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -248,21 +246,5 @@ class TestCase extends \PHPUnit\Framework\TestCase
             User::class     => UserSchema::class,
             Category::class => CategorySchema::class,
         ];
-    }
-
-    /**
-     * @param array $declarations
-     *
-     * @return ContainerInterface
-     */
-    protected function createContainer(array $declarations = []): ContainerInterface
-    {
-        $container = new Container();
-
-        foreach ($declarations as $key => $value) {
-            $container->offsetSet($key, $value);
-        }
-
-        return $container;
     }
 }

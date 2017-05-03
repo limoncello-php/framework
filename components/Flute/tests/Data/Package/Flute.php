@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Data\Http;
+<?php namespace Limoncello\Tests\Flute\Data\Package;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,14 +16,31 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Package\FluteSettings;
+
 /**
  * @package Limoncello\Tests\Flute
  */
-abstract class BaseController extends \Limoncello\Flute\Http\BaseController
+class Flute extends FluteSettings
 {
-    /** URI key used in routing table */
-    const ROUTE_KEY_CHILD_INDEX = 'child_idx';
+    /**
+     * @var array
+     */
+    private $modelToSchemeMap;
 
-    /** API URI prefix */
-    const API_URI_PREFIX = '/api/v1';
+    /**
+     * @param array $modelToSchemeMap
+     */
+    public function __construct(array $modelToSchemeMap = [])
+    {
+        $this->modelToSchemeMap = $modelToSchemeMap;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getModelToSchemeMap(): array
+    {
+        return $this->modelToSchemeMap;
+    }
 }

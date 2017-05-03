@@ -19,19 +19,19 @@
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
-use Limoncello\Flute\Config\JsonApiConfig;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
-use Limoncello\Flute\Contracts\Config\JsonApiConfigInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
+use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Http\BoardsController;
 use Limoncello\Tests\Flute\Data\Http\CategoriesController;
@@ -40,6 +40,8 @@ use Limoncello\Tests\Flute\Data\Http\PostsController;
 use Limoncello\Tests\Flute\Data\Http\UsersController;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
+use Limoncello\Tests\Flute\Data\Package\Flute;
+use Limoncello\Tests\Flute\Data\Package\SettingsProvider;
 use Limoncello\Tests\Flute\Data\Schemes\BoardSchema;
 use Limoncello\Tests\Flute\Data\Schemes\CategorySchema;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
@@ -1070,11 +1072,9 @@ EOT;
     }
 
     /**
-     * @param array $declarations
-     *
      * @return ContainerInterface
      */
-    protected function createContainer(array $declarations = []): ContainerInterface
+    protected function createContainer(): ContainerInterface
     {
         $container = new Container();
 
@@ -1096,23 +1096,26 @@ EOT;
             $filterOperations,
             $translator
         );
-        $container[JsonApiConfigInterface::class]        = $config = $this->createJsonApiConfig();
+        $container[SettingsProviderInterface::class] = new SettingsProvider([
+            FluteSettings::class => (new Flute($this->getSchemeMap()))->get(),
+        ]);
+        $container[EncoderInterface::class] = function (ContainerInterface $container) use ($factory, $jsonSchemes) {
+            /** @var SettingsProviderInterface $provider */
+            $provider = $container->get(SettingsProviderInterface::class);
+            $settings = $provider->get(FluteSettings::class);
 
-        $container[EncoderInterface::class] = function () use ($config, $factory, $jsonSchemes) {
-            $encoderConfig = $config->getConfig()[JsonApiConfigInterface::KEY_JSON];
-
-            $urlPrefix = $encoderConfig[JsonApiConfigInterface::KEY_JSON_URL_PREFIX];
+            $urlPrefix = $settings[FluteSettings::KEY_URI_PREFIX];
             $encoder   = $factory->createEncoder($jsonSchemes, new EncoderOptions(
-                $encoderConfig[JsonApiConfigInterface::KEY_JSON_OPTIONS],
+                $settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS],
                 $urlPrefix,
-                $encoderConfig[JsonApiConfigInterface::KEY_JSON_DEPTH]
+                $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
             ));
-            if (isset($encoderConfig[JsonApiConfigInterface::KEY_JSON_VERSION_META]) === true) {
-                $meta = $encoderConfig[JsonApiConfigInterface::KEY_JSON_VERSION_META];
+            if (isset($settings[FluteSettings::KEY_META]) === true) {
+                $meta = $settings[FluteSettings::KEY_META];
                 $encoder->withMeta($meta);
             }
-            if (isset($encoderConfig[JsonApiConfigInterface::KEY_JSON_IS_SHOW_VERSION]) === true &&
-                $encoderConfig[JsonApiConfigInterface::KEY_JSON_IS_SHOW_VERSION] === true
+            if (isset($settings[FluteSettings::KEY_IS_SHOW_VERSION]) === true &&
+                $settings[FluteSettings::KEY_IS_SHOW_VERSION] === true
             ) {
                 $encoder->withJsonApiVersion();
             }
@@ -1127,20 +1130,5 @@ EOT;
             new AppValidator($translator, $validationTranslator, $jsonSchemes, $modelSchemes, $connection);
 
         return $container;
-    }
-
-    /**
-     * @return JsonApiConfigInterface
-     */
-    private function createJsonApiConfig()
-    {
-        $config = new JsonApiConfig();
-        $config
-            ->setModelSchemaMap($this->getSchemeMap())
-            ->setRelationshipPagingSize(20)
-            ->setJsonEncodeOptions($config->getJsonEncodeOptions() | JSON_PRETTY_PRINT)
-            ->setHideVersion();
-
-        return $config;
     }
 }
