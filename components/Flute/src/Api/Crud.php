@@ -485,12 +485,12 @@ class Crud implements CrudInterface
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
-        $platform = $builder->getConnection()->getDatabasePlatform();
-        $types    = $this->getModelSchemes()->getAttributeTypeInstances($class);
+        $platform  = $builder->getConnection()->getDatabasePlatform();
+        $typeNames = $this->getModelSchemes()->getAttributeTypes($class);
 
         $model = null;
         if (($attributes = $statement->fetch()) !== false) {
-            $model = $this->readRowFromAssoc($attributes, $types, $platform);
+            $model = $this->readRowFromAssoc($attributes, $typeNames, $platform);
         }
 
         return $model;
@@ -507,11 +507,11 @@ class Crud implements CrudInterface
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
         $platform = $builder->getConnection()->getDatabasePlatform();
-        $types    = $this->getModelSchemes()->getAttributeTypeInstances($class);
+        $typeNames = $this->getModelSchemes()->getAttributeTypes($class);
 
         $model = null;
         if (($attributes = $statement->fetch()) !== false) {
-            $model = $this->readInstanceFromAssoc($class, $attributes, $types, $platform);
+            $model = $this->readInstanceFromAssoc($class, $attributes, $typeNames, $platform);
         }
 
         return $model;
@@ -530,11 +530,11 @@ class Crud implements CrudInterface
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
         $platform = $builder->getConnection()->getDatabasePlatform();
-        $types    = $this->getModelSchemes()->getAttributeTypeInstances($class);
+        $typeNames = $this->getModelSchemes()->getAttributeTypes($class);
 
         $models = [];
         while (($attributes = $statement->fetch()) !== false) {
-            $models[] = $this->readInstanceFromAssoc($class, $attributes, $types, $platform);
+            $models[] = $this->readInstanceFromAssoc($class, $attributes, $typeNames, $platform);
         }
 
         return $this->normalizePagingParams($models, $limit, $offset);
@@ -892,18 +892,21 @@ class Crud implements CrudInterface
     /**
      * @param string           $class
      * @param array            $attributes
-     * @param Type[]           $types
+     * @param Type[]           $typeNames
      * @param AbstractPlatform $platform
      *
      * @return mixed|null
      */
-    private function readInstanceFromAssoc(string $class, array $attributes, array $types, AbstractPlatform $platform)
-    {
+    private function readInstanceFromAssoc(
+        string $class,
+        array $attributes,
+        array $typeNames,
+        AbstractPlatform $platform
+    ) {
         $instance = new $class();
         foreach ($attributes as $name => $value) {
-            if (array_key_exists($name, $types) === true) {
-                /** @var Type $type */
-                $type  = $types[$name];
+            if (array_key_exists($name, $typeNames) === true) {
+                $type  = Type::getType($typeNames[$name]);
                 $value = $type->convertToPHPValue($value, $platform);
             }
             $instance->{$name} = $value;
@@ -914,18 +917,17 @@ class Crud implements CrudInterface
 
     /**
      * @param array            $attributes
-     * @param Type[]           $types
+     * @param Type[]           $typeNames
      * @param AbstractPlatform $platform
      *
      * @return array
      */
-    private function readRowFromAssoc(array $attributes, array $types, AbstractPlatform $platform): array
+    private function readRowFromAssoc(array $attributes, array $typeNames, AbstractPlatform $platform): array
     {
         $row = [];
         foreach ($attributes as $name => $value) {
-            if (array_key_exists($name, $types) === true) {
-                /** @var Type $type */
-                $type  = $types[$name];
+            if (array_key_exists($name, $typeNames) === true) {
+                $type  = Type::getType($typeNames[$name]);
                 $value = $type->convertToPHPValue($value, $platform);
             }
             $row[$name] = $value;
