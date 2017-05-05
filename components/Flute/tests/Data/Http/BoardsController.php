@@ -42,21 +42,27 @@ class BoardsController extends BaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): array {
-        $json   = static::parseJson($container, $request);
-        $schema = static::getSchema($container);
+        $validator = new class ($container) extends AppValidator
+        {
+            /**
+             * @inheritdoc
+             */
+            public function __construct(ContainerInterface $container)
+            {
+                parent::__construct($container, Schema::TYPE, [
+                    self::RULE_INDEX      => $this->absentOrNull(),
+                    self::RULE_ATTRIBUTES => [
+                        Schema::ATTR_TITLE => $this->requiredText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
+                    ]
+                ]);
+            }
+        };
 
-        /** @var AppValidator $validator */
-        $validator = $container->get(AppValidator::class);
-
-        $idRule         = $validator->absentOrNull();
-        $attributeRules = [
-            Schema::ATTR_TITLE => $validator->requiredText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-        ];
-
-        list ($idCapture, $attrCaptures, $toManyCaptures) =
-            $validator->assert($schema, $json, $idRule, $attributeRules);
-
-        return [$idCapture, $attrCaptures, $toManyCaptures];
+        return static::prepareCaptures(
+            $validator->assert(static::parseJson($container, $request))->getCaptures(),
+            Model::FIELD_ID,
+            [Model::FIELD_TITLE]
+        );
     }
 
     /**
@@ -67,21 +73,27 @@ class BoardsController extends BaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): array {
-        $json   = static::parseJson($container, $request);
-        $schema = static::getSchema($container);
+        $validator = new class ($container, $index) extends AppValidator
+        {
+            /**
+             * @inheritdoc
+             */
+            public function __construct(ContainerInterface $container, $index)
+            {
+                parent::__construct($container, Schema::TYPE, [
+                    AppValidator::RULE_INDEX      => $this->idEquals($index),
+                    AppValidator::RULE_ATTRIBUTES => [
+                        Schema::ATTR_TITLE => $this->optionalText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
+                    ]
+                ]);
+            }
+        };
 
-        /** @var AppValidator $validator */
-        $validator = $container->get(AppValidator::class);
-
-        $idRule         = $validator->idEquals($index);
-        $attributeRules = [
-            Schema::ATTR_TITLE => $validator->optionalText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-        ];
-
-        list (, $attrCaptures, $toManyCaptures) =
-            $validator->assert($schema, $json, $idRule, $attributeRules);
-
-        return [$attrCaptures, $toManyCaptures];
+        return static::prepareCaptures(
+            $validator->assert(static::parseJson($container, $request))->getCaptures(),
+            Model::FIELD_ID,
+            [Model::FIELD_TITLE]
+        );
     }
 
     /**

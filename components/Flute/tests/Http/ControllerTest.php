@@ -48,7 +48,6 @@ use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
 use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
-use Limoncello\Tests\Flute\Data\Validation\AppValidator;
 use Limoncello\Tests\Flute\TestCase;
 use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
 use Limoncello\Validation\I18n\Locales\EnUsLocale;
@@ -1125,9 +1124,6 @@ EOT;
 
         $container[ValidationTranslatorInterface::class] = $validationTranslator =
             new ValidationTranslator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());
-
-        $container[AppValidator::class] =
-            new AppValidator($translator, $validationTranslator, $jsonSchemes, $modelSchemes, $connection);
 
         return $container;
     }

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Doctrine\DBAL\Types\Type;
 use Generator;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
@@ -23,64 +24,71 @@ use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Contracts\Validation\ValidatorInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
+use Limoncello\Flute\Types\DateBaseType;
+use Limoncello\Validation\Captures\CaptureAggregator;
 use Limoncello\Validation\Contracts\CaptureAggregatorInterface;
+use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\RuleInterface;
 use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
 use Limoncello\Validation\Errors\ErrorAggregator;
 use Limoncello\Validation\Validator\Captures;
 use Limoncello\Validation\Validator\Compares;
+use Limoncello\Validation\Validator\Converters;
 use Limoncello\Validation\Validator\ExpressionsX;
 use Limoncello\Validation\Validator\Generics;
 use Limoncello\Validation\Validator\Types;
-use Limoncello\Validation\Validator\ValidatorTrait;
 use Limoncello\Validation\Validator\Values;
 use Limoncello\Validation\Validator\Wrappers;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Flute
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-abstract class Validator implements ValidatorInterface
+class Validator implements ValidatorInterface
 {
-    use Captures, Compares, ExpressionsX, Generics, Types, Values, Wrappers, ValidatorTrait;
+    use Captures, Compares, Converters, ExpressionsX, Generics, Types, Values, Wrappers;
+
+    /** Rule description index */
+    const RULE_INDEX = 0;
+
+    /** Rule description index */
+    const RULE_ATTRIBUTES = self::RULE_INDEX + 1;
+
+    /** Rule description index */
+    const RULE_TO_ONE = self::RULE_ATTRIBUTES + 1;
+
+    /** Rule description index */
+    const RULE_TO_MANY = self::RULE_TO_ONE + 1;
+
+    /** Rule description index */
+    const RULE_UNLISTED_ATTRIBUTE = self::RULE_TO_MANY + 1;
+
+    /** Rule description index */
+    const RULE_UNLISTED_RELATIONSHIP = self::RULE_UNLISTED_ATTRIBUTE + 1;
 
     /**
-     * @return CaptureAggregatorInterface
+     * @var ContainerInterface
      */
-    abstract protected function createIdCaptureAggregator();
+    private $container;
 
     /**
-     * @return CaptureAggregatorInterface
+     * @var SchemaInterface|null
      */
-    abstract protected function createAttributesAndToOneCaptureAggregator();
+    private $schema = null;
 
     /**
-     * @return CaptureAggregatorInterface
+     * @var string
      */
-    abstract protected function createToManyCaptureAggregator();
+    private $jsonType;
 
     /**
-     * @var T
+     * @var RuleInterface[]
      */
-    private $jsonApiTranslator;
-
-    /**
-     * @var ValidationTranslatorInterface
-     */
-    private $validationTranslator;
-
-    /**
-     * @var JsonSchemesInterface
-     */
-    private $jsonSchemes;
-
-    /**
-     * @var ModelSchemeInfoInterface
-     */
-    private $modelSchemes;
+    private $rules;
 
     /**
      * @var int
@@ -88,96 +96,91 @@ abstract class Validator implements ValidatorInterface
     private $errorStatus;
 
     /**
-     * @var RuleInterface
+     * @var null|ErrorCollection
      */
-    private $unlistedAttributeRule;
+    private $errorCollection = null;
 
     /**
-     * @var RuleInterface
+     * @var null|CaptureAggregatorInterface
      */
-    private $unlistedRelationshipRule;
+    private $captureAggregator = null;
 
     /**
-     * @param T                             $jsonApiTranslator
-     * @param ValidationTranslatorInterface $validationTranslator
-     * @param JsonSchemesInterface          $jsonSchemes
-     * @param ModelSchemeInfoInterface      $modelSchemes
-     * @param int                           $errorStatus
-     * @param RuleInterface                 $unlistedAttrRule
-     * @param RuleInterface                 $unlistedRelationRule
+     * @param ContainerInterface $container
+     * @param string             $jsonType
+     * @param RuleInterface[]    $rules
+     * @param int                $errorStatus
      */
     public function __construct(
-        T $jsonApiTranslator,
-        ValidationTranslatorInterface $validationTranslator,
-        JsonSchemesInterface $jsonSchemes,
-        ModelSchemeInfoInterface $modelSchemes,
-        $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY,
-        RuleInterface $unlistedAttrRule = null,
-        RuleInterface $unlistedRelationRule = null
+        ContainerInterface $container,
+        string $jsonType,
+        array $rules,
+        $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
-        $this->jsonApiTranslator        = $jsonApiTranslator;
-        $this->validationTranslator     = $validationTranslator;
-        $this->jsonSchemes              = $jsonSchemes;
-        $this->modelSchemes             = $modelSchemes;
-        $this->errorStatus              = $errorStatus;
-        $this->unlistedAttributeRule    = $unlistedAttrRule;
-        $this->unlistedRelationshipRule = $unlistedRelationRule;
+        $this->container   = $container;
+        $this->jsonType    = $jsonType;
+        $this->rules       = $rules;
+        $this->errorStatus = $errorStatus;
     }
 
     /**
      * @inheritdoc
      */
-    public function assert(
-        SchemaInterface $schema,
-        array $jsonData,
-        RuleInterface $idRule,
-        array $attributeRules,
-        array $toOneRules = [],
-        array $toManyRules = []
-    ): array {
-        /** @var ErrorCollection $errors */
-        /** @var CaptureAggregatorInterface $idAggregator */
-        /** @var CaptureAggregatorInterface $attrTo1Aggregator */
-        /** @var CaptureAggregatorInterface $toManyAggregator */
-        list ($errors, $idAggregator, $attrTo1Aggregator, $toManyAggregator) =
-            $this->check($schema, $jsonData, $idRule, $attributeRules, $toOneRules, $toManyRules);
-
-        if ($errors->count() > 0) {
-            throw new JsonApiException($errors, $this->getErrorStatus());
+    public function assert(array $jsonData): ValidatorInterface
+    {
+        if ($this->check($jsonData) === false) {
+            throw new JsonApiException($this->getErrors(), $this->getErrorStatus());
         }
 
-        $idCaptureName = $this->getModelSchemes()->getPrimaryKey($schema::MODEL);
-        $idValue       = array_key_exists($idCaptureName, $idAggregator->getCaptures()) === true ?
-            $idAggregator->getCaptures()[$idCaptureName] : null;
-
-
-        return [$idValue, $attrTo1Aggregator->getCaptures(), $toManyAggregator->getCaptures()];
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function check(
-        SchemaInterface $schema,
-        array $jsonData,
-        RuleInterface $idRule,
-        array $attributeRules,
-        array $toOneRules = [],
-        array $toManyRules = []
-    ): array {
-        $errors            = $this->createErrorCollection();
-        $idAggregator      = $this->createIdCaptureAggregator();
-        $attrTo1Aggregator = $this->createAttributesAndToOneCaptureAggregator();
-        $toManyAggregator  = $this->createToManyCaptureAggregator();
+    public function check(array $jsonData): bool
+    {
+        $this->resetErrors();
+        $this->resetCaptureAggregator();
 
-        $this->validateType($errors, $jsonData, $schema::TYPE);
-        $this->validateId($errors, $schema, $jsonData, $idRule, $idAggregator);
-        $this->validateAttributes($errors, $schema, $jsonData, $attributeRules, $attrTo1Aggregator);
-        $relationshipCaptures = $this
-            ->createRelationshipCaptures($schema, $toOneRules, $attrTo1Aggregator, $toManyRules, $toManyAggregator);
-        $this->validateCaptures($errors, $jsonData, $relationshipCaptures);
+        $this->validateType($jsonData);
+        $this->validateId($jsonData);
+        $this->validateAttributes($jsonData);
+        $this->validateCaptures($jsonData, $this->createRelationshipCaptures());
 
-        return [$errors, $idAggregator, $attrTo1Aggregator, $toManyAggregator];
+        $hasNoErrors = $this->getErrors()->count() <= 0;
+
+        return $hasNoErrors;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getErrors(): ErrorCollection
+    {
+        if ($this->errorCollection === null) {
+            $this->resetErrors();
+        }
+
+        return $this->errorCollection;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCaptures(): array
+    {
+        $captures = $this->getCaptureAggregator()->getCaptures();
+
+        return $captures;
+    }
+
+    /**
+     * @return void
+     */
+    protected function resetErrors()
+    {
+        $this->errorCollection = $this->createErrorCollection();
     }
 
     /**
@@ -186,34 +189,26 @@ abstract class Validator implements ValidatorInterface
     protected function createErrorCollection(): ErrorCollection
     {
         return new ErrorCollection(
-            $this->getJsonApiTranslator(),
-            $this->getValidationTranslator(),
+            $this->getContainer()->get(T::class),
+            $this->getContainer()->get(ValidationTranslatorInterface::class),
             $this->getErrorStatus()
         );
     }
 
     /**
-     * @return T
+     * @return string
      */
-    protected function getJsonApiTranslator(): T
+    protected function getJsonType(): string
     {
-        return $this->jsonApiTranslator;
+        return $this->jsonType;
     }
 
     /**
-     * @return ValidationTranslatorInterface
+     * @return ContainerInterface
      */
-    protected function getValidationTranslator(): ValidationTranslatorInterface
+    protected function getContainer(): ContainerInterface
     {
-        return $this->validationTranslator;
-    }
-
-    /**
-     * @return JsonSchemesInterface
-     */
-    protected function getJsonSchemes(): JsonSchemesInterface
-    {
-        return $this->jsonSchemes;
+        return $this->container;
     }
 
     /**
@@ -221,7 +216,29 @@ abstract class Validator implements ValidatorInterface
      */
     protected function getModelSchemes(): ModelSchemeInfoInterface
     {
-        return $this->modelSchemes;
+        return $this->getContainer()->get(ModelSchemeInfoInterface::class);
+    }
+
+    /**
+     * @return SchemaInterface
+     */
+    protected function getSchema(): SchemaInterface
+    {
+        if ($this->schema === null) {
+            /** @var JsonSchemesInterface $jsonSchemes */
+            $jsonSchemes  = $this->getContainer()->get(JsonSchemesInterface::class);
+            $this->schema = $jsonSchemes->getSchemaByResourceType($this->getJsonType());
+        }
+
+        return $this->schema;
+    }
+
+    /**
+     * @return RuleInterface[]
+     */
+    protected function getRules(): array
+    {
+        return $this->rules;
     }
 
     /**
@@ -233,30 +250,49 @@ abstract class Validator implements ValidatorInterface
     }
 
     /**
-     * @return RuleInterface
+     * @return CaptureAggregatorInterface
      */
-    protected function getUnlistedRelationshipRule(): RuleInterface
+    protected function createCaptureAggregator(): CaptureAggregatorInterface
     {
-        return $this->unlistedRelationshipRule;
+        return new CaptureAggregator();
     }
 
     /**
-     * @return RuleInterface
+     * @return ErrorAggregatorInterface
      */
-    protected function getUnlistedAttributeRule(): RuleInterface
+    protected function createErrorAggregator(): ErrorAggregatorInterface
     {
-        return $this->unlistedAttributeRule;
+        return new ErrorAggregator();
     }
 
     /**
-     * @param ErrorCollection $errors
-     * @param array           $jsonData
-     * @param string          $expectedType
+     * @return CaptureAggregatorInterface
+     */
+    public function getCaptureAggregator(): CaptureAggregatorInterface
+    {
+        if ($this->captureAggregator === null) {
+            $this->resetCaptureAggregator();
+        }
+
+        return $this->captureAggregator;
+    }
+
+    /**
+     * @return void
+     */
+    protected function resetCaptureAggregator()
+    {
+        $this->captureAggregator = $this->createCaptureAggregator();
+    }
+
+    /**
+     * @param array $jsonData
      *
      * @return void
      */
-    private function validateType(ErrorCollection $errors, array $jsonData, string $expectedType)
+    private function validateType(array $jsonData)
     {
+        $expectedType = $this->getSchema()::TYPE;
         $ignoreOthers = static::success();
         $rule         = static::arrayX([
             DocumentInterface::KEYWORD_DATA => static::arrayX([
@@ -264,29 +300,23 @@ abstract class Validator implements ValidatorInterface
             ], $ignoreOthers),
         ], $ignoreOthers);
         foreach ($this->validateRule($rule, $jsonData) as $error) {
-            $errors->addValidationTypeError($error);
+            $this->getErrors()->addValidationTypeError($error);
         }
     }
 
     /**
-     * @param ErrorCollection            $errors
-     * @param SchemaInterface            $schema
-     * @param array                      $jsonData
-     * @param RuleInterface              $idRule
-     * @param CaptureAggregatorInterface $aggregator
+     * @param array $jsonData
      *
      * @return void
      */
-    private function validateId(
-        ErrorCollection $errors,
-        SchemaInterface $schema,
-        array $jsonData,
-        RuleInterface $idRule,
-        CaptureAggregatorInterface $aggregator
-    ) {
+    private function validateId(array $jsonData)
+    {
+        $idRule = $this->getRules()[static::RULE_INDEX] ?? static::success();
+        assert($idRule instanceof RuleInterface);
+
         // will use primary column name as a capture name for `id`
-        $captureName  = $this->getModelSchemes()->getPrimaryKey($schema::MODEL);
-        $idRule       = static::singleCapture($captureName, $idRule, $aggregator);
+        $captureName  = $this->getModelSchemes()->getPrimaryKey($this->getSchema()::MODEL);
+        $idRule       = static::singleCapture($captureName, $idRule, $this->getCaptureAggregator());
         $ignoreOthers = static::success();
         $rule         = static::arrayX([
             DocumentInterface::KEYWORD_DATA => static::arrayX([
@@ -294,77 +324,95 @@ abstract class Validator implements ValidatorInterface
             ], $ignoreOthers)
         ], $ignoreOthers);
         foreach ($this->validateRule($rule, $jsonData) as $error) {
-            $errors->addValidationIdError($error);
+            $this->getErrors()->addValidationIdError($error);
         }
     }
 
     /**
-     * @param ErrorCollection            $errors
-     * @param SchemaInterface            $schema
-     * @param array                      $jsonData
-     * @param RuleInterface[]            $attributeRules
-     * @param CaptureAggregatorInterface $aggregator
+     * @param array $jsonData
      *
      * @return void
      */
-    private function validateAttributes(
-        ErrorCollection $errors,
-        SchemaInterface $schema,
-        array $jsonData,
-        array $attributeRules,
-        CaptureAggregatorInterface $aggregator
-    ) {
-        $attributes        =
-            isset($jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_ATTRIBUTES]) === true ?
-                $jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_ATTRIBUTES] : [];
+    private function validateAttributes(array $jsonData)
+    {
+        $attributeRules     = $this->getRules()[static::RULE_ATTRIBUTES] ?? [];
+        $schema             = $this->getSchema();
+        $attributeTypes     = $this->getModelSchemes()->getAttributeTypes($schema::MODEL);
+        $createTypedCapture = function (string $name, RuleInterface $rule) use ($attributeTypes, $schema) {
+            $captureName    = $schema->getAttributeMapping($name);
+            $attributeType  = $attributeTypes[$captureName] ?? Type::STRING;
+            $untypedCapture = static::singleCapture($captureName, $rule, $this->getCaptureAggregator());
+            switch ($attributeType) {
+                case Type::INTEGER:
+                    $capture = static::toInt($untypedCapture);
+                    break;
+                case Type::FLOAT:
+                    $capture = static::toFloat($untypedCapture);
+                    break;
+                case Type::BOOLEAN:
+                    $capture = static::toBool($untypedCapture);
+                    break;
+                case Type::DATE:
+                case Type::DATETIME:
+                    $capture = static::toDateTime($untypedCapture, DateBaseType::JSON_API_FORMAT);
+                    break;
+                default:
+                    $capture = $untypedCapture;
+                    break;
+            }
+
+            return $capture;
+        };
+
         $attributeCaptures = [];
         foreach ($attributeRules as $name => $rule) {
-            $captureName              = $schema->getAttributeMapping($name);
-            $attributeCaptures[$name] = static::singleCapture($captureName, $rule, $aggregator);
+            assert(is_string($name) === true && empty($name) === false && $rule instanceof RuleInterface);
+            $attributeCaptures[$name] = $createTypedCapture($name, $rule);
         }
-        $dataErrors = $this
-            ->validateRule(static::arrayX($attributeCaptures, $this->getUnlistedAttributeRule()), $attributes);
+
+        $attributes   = $jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_ATTRIBUTES] ?? [];
+        $unlistedRule = $this->getRules()[static::RULE_UNLISTED_ATTRIBUTE] ?? null;
+        $dataErrors   = $this->validateRule(static::arrayX($attributeCaptures, $unlistedRule), $attributes);
+
         foreach ($dataErrors as $error) {
-            $errors->addValidationAttributeError($error);
+            $this->getErrors()->addValidationAttributeError($error);
         }
     }
 
     /**
-     * @param SchemaInterface            $schema
-     * @param RuleInterface[]            $toOneRules
-     * @param CaptureAggregatorInterface $toOneAggregator
-     * @param RuleInterface[]            $toManyRules
-     * @param CaptureAggregatorInterface $toManyAggregator
-     *
      * @return array
      */
-    private function createRelationshipCaptures(
-        SchemaInterface $schema,
-        array $toOneRules,
-        CaptureAggregatorInterface $toOneAggregator,
-        array $toManyRules,
-        CaptureAggregatorInterface $toManyAggregator
-    ): array {
-        $modelClass           = $schema::MODEL;
+    private function createRelationshipCaptures(): array
+    {
+        $toOneRules   = $this->getRules()[static::RULE_TO_ONE] ?? [];
+        $toManyRules  = $this->getRules()[static::RULE_TO_MANY] ?? [];
+        $aggregator   = $this->getCaptureAggregator();
+        $jsonSchemes  = $this->getContainer()->get(JsonSchemesInterface::class);
+        $schema       = $this->getSchema();
+        $modelSchemes = $this->getModelSchemes();
+        $modelClass   = $schema::MODEL;
+
         $relationshipCaptures = [];
         foreach ($toOneRules as $name => $rule) {
+            assert(is_string($name) === true && empty($name) === false && $rule instanceof RuleInterface);
             $modelRelName   = $schema->getRelationshipMapping($name);
-            $captureName    = $this->getModelSchemes()->getForeignKey($modelClass, $modelRelName);
-            $expectedSchema = $this->getJsonSchemes()->getModelRelationshipSchema($modelClass, $modelRelName);
+            $captureName    = $modelSchemes->getForeignKey($modelClass, $modelRelName);
+            $expectedSchema = $jsonSchemes->getModelRelationshipSchema($modelClass, $modelRelName);
             $relationshipCaptures[$name] = $this->createSingleData(
                 $name,
                 static::equals($expectedSchema::TYPE),
-                static::singleCapture($captureName, $rule, $toOneAggregator)
+                static::singleCapture($captureName, $rule, $aggregator)
             );
         }
         foreach ($toManyRules as $name => $rule) {
+            assert(is_string($name) === true && empty($name) === false && $rule instanceof RuleInterface);
             $modelRelName   = $schema->getRelationshipMapping($name);
-            $expectedSchema = $this->getJsonSchemes()->getModelRelationshipSchema($modelClass, $modelRelName);
+            $expectedSchema = $jsonSchemes->getModelRelationshipSchema($modelClass, $modelRelName);
             $captureName    = $modelRelName;
             $relationshipCaptures[$name] = $this->createMultiData(
                 $name,
                 static::equals($expectedSchema::TYPE),
-                static::multiCapture($captureName, $rule, $toManyAggregator)
+                static::multiCapture($captureName, $rule, $aggregator)
             );
         }
 
@@ -372,23 +420,18 @@ abstract class Validator implements ValidatorInterface
     }
 
     /**
-     * @param ErrorCollection $errors
-     * @param array           $jsonData
-     * @param array           $relationshipCaptures
+     * @param array $jsonData
+     * @param array $relationshipCaptures
      *
      * @return void
      */
-    private function validateCaptures(ErrorCollection $errors, array $jsonData, array $relationshipCaptures)
+    private function validateCaptures(array $jsonData, array $relationshipCaptures)
     {
-        $relationships =
-            isset($jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_RELATIONSHIPS]) === true ?
-                $jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_RELATIONSHIPS] : [];
-        $dataErrors    = $this->validateRule(
-            static::arrayX($relationshipCaptures, $this->getUnlistedRelationshipRule()),
-            $relationships
-        );
+        $relationships = $jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_RELATIONSHIPS] ?? [];
+        $unlistedRule  = $this->getRules()[static::RULE_UNLISTED_RELATIONSHIP] ?? null;
+        $dataErrors    = $this->validateRule(static::arrayX($relationshipCaptures, $unlistedRule), $relationships);
         foreach ($dataErrors as $error) {
-            $errors->addValidationRelationshipError($error);
+            $this->getErrors()->addValidationRelationshipError($error);
         }
     }
 
@@ -447,6 +490,15 @@ abstract class Validator implements ValidatorInterface
      */
     private function validateRule(RuleInterface $rule, $input): Generator
     {
-        return static::validateData($rule, $input, new ErrorAggregator());
+        foreach ($rule->validate($input) as $error) {
+            yield $error;
+        };
+
+        $aggregator = $this->createErrorAggregator();
+        $rule->onFinish($aggregator);
+
+        foreach ($aggregator->get() as $error) {
+            yield $error;
+        }
     }
 }

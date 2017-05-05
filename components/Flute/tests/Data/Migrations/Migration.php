@@ -56,7 +56,7 @@ abstract class Migration
     public function rollback()
     {
         $tableName = $this->getTableName();
-        if ($this->getSchemaManager()->tablesExist($tableName) === true) {
+        if ($this->getSchemaManager()->tablesExist([$tableName]) === true) {
             $this->getSchemaManager()->dropTable($tableName);
         }
     }

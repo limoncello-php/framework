@@ -17,18 +17,14 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface as JsonApiTranslatorInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Validation\Validator;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\Role;
-use Limoncello\Validation\Captures\CaptureAggregator;
 use Limoncello\Validation\Contracts\MessageCodes;
 use Limoncello\Validation\Contracts\RuleInterface;
-use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -36,37 +32,20 @@ use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorI
 class AppValidator extends Validator
 {
     /**
-     * @var Connection
+     * @param ContainerInterface $container
+     * @param string             $jsonType
+     * @param array              $rules
      */
-    private $connection;
+    public function __construct(ContainerInterface $container, string $jsonType, array $rules)
+    {
+        if (array_key_exists(static::RULE_UNLISTED_ATTRIBUTE, $rules) === false) {
+            $rules[static::RULE_UNLISTED_ATTRIBUTE] = static::fail();
+        }
+        if (array_key_exists(static::RULE_UNLISTED_RELATIONSHIP, $rules) === false) {
+            $rules[static::RULE_UNLISTED_RELATIONSHIP] = static::fail();
+        }
 
-    /**
-     * @param JsonApiTranslatorInterface    $jsonApiTranslator
-     * @param ValidationTranslatorInterface $validationTranslator
-     * @param JsonSchemesInterface          $jsonSchemes
-     * @param ModelSchemeInfoInterface      $modelSchemes
-     * @param Connection                    $connection
-     */
-    public function __construct(
-        JsonApiTranslatorInterface $jsonApiTranslator,
-        ValidationTranslatorInterface $validationTranslator,
-        JsonSchemesInterface $jsonSchemes,
-        ModelSchemeInfoInterface $modelSchemes,
-        Connection $connection
-    ) {
-        $this->connection      = $connection;
-        $errorStatus           = 422;
-        $unlistedAttributeRule = $unlistedRelationshipRule = static::fail();
-
-        parent::__construct(
-            $jsonApiTranslator,
-            $validationTranslator,
-            $jsonSchemes,
-            $modelSchemes,
-            $errorStatus,
-            $unlistedAttributeRule,
-            $unlistedRelationshipRule
-        );
+        parent::__construct($container, $jsonType, $rules);
     }
 
     /**
@@ -74,7 +53,7 @@ class AppValidator extends Validator
      *
      * @return RuleInterface
      */
-    public function idEquals($index)
+    protected function idEquals($index)
     {
         return static::equals($index);
     }
@@ -82,7 +61,7 @@ class AppValidator extends Validator
     /**
      * @return RuleInterface
      */
-    public function absentOrNull()
+    protected function absentOrNull()
     {
         return static::isNull();
     }
@@ -92,7 +71,7 @@ class AppValidator extends Validator
      *
      * @return RuleInterface
      */
-    public function requiredText($maxLength = null)
+    protected function requiredText($maxLength = null)
     {
         return static::required($this->optionalText($maxLength));
     }
@@ -102,7 +81,7 @@ class AppValidator extends Validator
      *
      * @return RuleInterface
      */
-    public function optionalText($maxLength = null)
+    protected function optionalText($maxLength = null)
     {
         return static::andX(static::isString(), static::stringLength(1, $maxLength));
     }
@@ -112,7 +91,7 @@ class AppValidator extends Validator
      *
      * @return RuleInterface
      */
-    public function requiredPostId($messageCode = MessageCodes::INVALID_VALUE)
+    protected function requiredPostId($messageCode = MessageCodes::INVALID_VALUE)
     {
         return static::required($this->optionalPostId($messageCode));
     }
@@ -122,17 +101,7 @@ class AppValidator extends Validator
      *
      * @return RuleInterface
      */
-    public function requiredRoleId($messageCode = MessageCodes::INVALID_VALUE)
-    {
-        return static::required($this->optionalRoleId($messageCode));
-    }
-
-    /**
-     * @param int $messageCode
-     *
-     * @return RuleInterface
-     */
-    public function optionalPostId($messageCode = MessageCodes::INVALID_VALUE)
+    protected function optionalPostId($messageCode = MessageCodes::INVALID_VALUE)
     {
         $exists = function ($index) {
             return static::exists($this->getConnection(), Post::TABLE_NAME, Post::FIELD_ID, $index);
@@ -142,11 +111,67 @@ class AppValidator extends Validator
     }
 
     /**
+     * @param Connection $connection
+     * @param string     $tableName
+     * @param string     $columnName
+     * @param string     $value
+     *
+     * @return bool
+     */
+    protected static function exists(Connection $connection, string $tableName, string $columnName, string $value)
+    {
+        $query = $connection->createQueryBuilder();
+        $query
+            ->select($columnName)
+            ->from($tableName)
+            ->where($columnName . '=' . $query->createPositionalParameter($value))
+            ->setMaxResults(1);
+
+
+        $fetched = $query->execute()->fetch();
+        $result  = $fetched !== false;
+
+        return $result;
+    }
+
+    /**
+     * @return Connection
+     */
+    protected function getConnection()
+    {
+        return $this->getContainer()->get(Connection::class);
+    }
+
+    /**
      * @param int $messageCode
      *
      * @return RuleInterface
      */
-    public function optionalCategoryId($messageCode = MessageCodes::INVALID_VALUE)
+    protected function requiredRoleId($messageCode = MessageCodes::INVALID_VALUE)
+    {
+        return static::required($this->optionalRoleId($messageCode));
+    }
+
+    /**
+     * @param int $messageCode
+     *
+     * @return RuleInterface
+     */
+    protected function optionalRoleId($messageCode = MessageCodes::INVALID_VALUE)
+    {
+        $exists = function ($index) {
+            return static::exists($this->getConnection(), Role::TABLE_NAME, Role::FIELD_ID, $index);
+        };
+
+        return static::callableX($exists, $messageCode);
+    }
+
+    /**
+     * @param int $messageCode
+     *
+     * @return RuleInterface
+     */
+    protected function optionalCategoryId($messageCode = MessageCodes::INVALID_VALUE)
     {
         $exists = function ($index) {
             return static::exists($this->getConnection(), Category::TABLE_NAME, Category::FIELD_ID, $index);
@@ -160,76 +185,12 @@ class AppValidator extends Validator
      *
      * @return RuleInterface
      */
-    public function optionalEmotionId($messageCode = MessageCodes::INVALID_VALUE)
+    protected function optionalEmotionId($messageCode = MessageCodes::INVALID_VALUE)
     {
         $exists = function ($index) {
             return static::exists($this->getConnection(), Emotion::TABLE_NAME, Emotion::FIELD_ID, $index);
         };
 
         return static::callableX($exists, $messageCode);
-    }
-
-    /**
-     * @param int $messageCode
-     *
-     * @return RuleInterface
-     */
-    public function optionalRoleId($messageCode = MessageCodes::INVALID_VALUE)
-    {
-        $exists = function ($index) {
-            return static::exists($this->getConnection(), Role::TABLE_NAME, Role::FIELD_ID, $index);
-        };
-
-        return static::callableX($exists, $messageCode);
-    }
-
-    /**
-     * @param Connection $connection
-     * @param string     $tableName
-     * @param string     $columnName
-     * @param string     $value
-     *
-     * @return bool
-     */
-    protected static function exists(Connection $connection, $tableName, $columnName, $value)
-    {
-        $fetched = $connection
-            ->executeQuery("SELECT $columnName FROM $tableName WHERE $columnName = ? LIMIT 1", [$value])
-            ->fetch();
-        $result = $fetched !== false;
-
-        return $result;
-    }
-
-    /**
-     * @return Connection
-     */
-    protected function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function createIdCaptureAggregator()
-    {
-        return new CaptureAggregator();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function createAttributesAndToOneCaptureAggregator()
-    {
-        return new CaptureAggregator();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function createToManyCaptureAggregator()
-    {
-        return new CaptureAggregator();
     }
 }

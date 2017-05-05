@@ -124,7 +124,7 @@ abstract class BaseController implements ControllerInterface
         ServerRequestInterface $request
     ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
-        list ($attributes, $toMany) = static::parseInputOnUpdate($index, $container, $request);
+        list (, $attributes, $toMany) = static::parseInputOnUpdate($index, $container, $request);
         $api   = self::createApi($container);
 
         return self::updateImpl($index, $attributes, $toMany, $container, $request, $api);
@@ -260,23 +260,6 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param ContainerInterface $container
-     *
-     * @return SchemaInterface
-     */
-    protected static function getSchema(ContainerInterface $container): SchemaInterface
-    {
-        /** @var SchemaInterface $schemaClass */
-        $schemaClass = static::SCHEMA_CLASS;
-        $modelClass  = $schemaClass::MODEL;
-        /** @var JsonSchemesInterface $jsonSchemes */
-        $jsonSchemes = $container->get(JsonSchemesInterface::class);
-        $schema      = $jsonSchemes->getSchemaByType($modelClass);
-
-        return $schema;
-    }
-
-    /**
      * @param int|string             $parentIndex
      * @param string                 $relationshipName
      * @param int|string             $childIndex
@@ -340,6 +323,37 @@ abstract class BaseController implements ControllerInterface
         $childApi = self::createApi($container, $childApiClass);
 
         return static::updateImpl($childIndex, $attributes, $toMany, $container, $request, $childApi);
+    }
+
+    /**
+     * @param array  $captures
+     * @param string $primaryKeyName
+     * @param array  $fieldNames
+     * @param array  $relationshipNames
+     *
+     * @return array
+     */
+    protected static function prepareCaptures(
+        array $captures,
+        string $primaryKeyName,
+        array $fieldNames,
+        array $relationshipNames = []
+    ): array {
+        $fields = [];
+        foreach ($fieldNames as $fieldName) {
+            if (array_key_exists($fieldName, $captures) === true) {
+                $fields[$fieldName] = $captures[$fieldName];
+            }
+        }
+
+        $relationships = [];
+        foreach ($relationshipNames as $relationshipName) {
+            if (array_key_exists($relationshipName, $captures) === true) {
+                $relationships[$relationshipName] = $captures[$relationshipName];
+            }
+        }
+
+        return [$captures[$primaryKeyName] ?? null, $fields, $relationships];
     }
 
     /**

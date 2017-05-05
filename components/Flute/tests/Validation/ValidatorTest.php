@@ -17,18 +17,23 @@
  */
 
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Flute\Contracts\I18n\TranslatorInterface as JsonApiTranslatorInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Validation\ValidatorInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\I18n\Translator as JsonApiTranslator;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
 use Limoncello\Tests\Flute\Data\Validation\AppValidator;
 use Limoncello\Tests\Flute\TestCase;
+use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
 use Limoncello\Validation\I18n\Locales\EnUsLocale;
 use Limoncello\Validation\I18n\Translator;
 use Limoncello\Validation\Validator as v;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -40,10 +45,7 @@ class ValidatorTest extends TestCase
      */
     public function testCaptureValidData()
     {
-        $jsonSchemes = $this->createJsonSchemes();
-        $validator   = $this->createValidator($jsonSchemes);
-
-        $text  = 'Outside every fat man there was an even fatter man trying to close in';
+        $text      = 'Outside every fat man there was an even fatter man trying to close in';
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -66,39 +68,39 @@ class ValidatorTest extends TestCase
             }
         }
 EOT;
-        $input = json_decode($jsonInput, true);
-
-        $idRule = v::isNull();
-        $attributeRules = [
-            CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1)),
+        $input     = json_decode($jsonInput, true);
+        $rules     = [
+            AppValidator::RULE_INDEX      => v::isNull(),
+            AppValidator::RULE_ATTRIBUTES => [
+                CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1)),
+            ],
+            AppValidator::RULE_TO_ONE     => [
+                CommentSchema::REL_USER => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15))),
+            ],
+            AppValidator::RULE_TO_MANY    => [
+                CommentSchema::REL_EMOTIONS => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15))),
+            ],
         ];
-        $toOneRules = [
-            CommentSchema::REL_USER => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15))),
-        ];
-        $toManyRules = [
-            CommentSchema::REL_EMOTIONS => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15))),
-        ];
 
-        $schema = $jsonSchemes->getSchemaByType(Comment::class);
-        list ($index, $attrCaptures, $toManyCaptures) =
-            $validator->assert($schema, $input, $idRule, $attributeRules, $toOneRules, $toManyRules);
+        $container = $this->createContainer();
+        $validator = $this->createValidator($container, CommentSchema::TYPE, $rules);
 
-        $this->assertCount(2, $attrCaptures);
-        $this->assertCount(1, $toManyCaptures);
-        $this->assertNull($index);
-        $this->assertEquals($text, $attrCaptures[Comment::FIELD_TEXT]);
-        $this->assertEquals(9, $attrCaptures[Comment::FIELD_ID_USER]);
-        $this->assertEquals([5, 12], $toManyCaptures[Comment::REL_EMOTIONS]);
+        $validator->assert($input);
+
+        $captures = $validator->getCaptures();
+        $this->assertCount(4, $captures);
+        $this->assertNull($captures[Comment::FIELD_ID]);
+        $this->assertEquals($text, $captures[Comment::FIELD_TEXT]);
+        $this->assertEquals(9, $captures[Comment::FIELD_ID_USER]);
+        $this->assertEquals([5, 12], $captures[Comment::REL_EMOTIONS]);
     }
+
     /**
      * Validation test.
      */
     public function testCaptureNullInTo1Relationship()
     {
-        $jsonSchemes = $this->createJsonSchemes();
-        $validator   = $this->createValidator($jsonSchemes);
-
-        $text  = 'Outside every fat man there was an even fatter man trying to close in';
+        $text      = 'Outside every fat man there was an even fatter man trying to close in';
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -114,23 +116,27 @@ EOT;
             }
         }
 EOT;
-        $input = json_decode($jsonInput, true);
+        $input     = json_decode($jsonInput, true);
 
-        $idRule = v::isNull();
-        $attributeRules = [
-            CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1)),
+        $rules = [
+            AppValidator::RULE_INDEX      => v::isNull(),
+            AppValidator::RULE_ATTRIBUTES => [
+                CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1)),
+            ],
+            AppValidator::RULE_TO_ONE     => [
+                CommentSchema::REL_USER => v::nullable(v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15)))),
+            ],
         ];
-        $toOneRules = [
-            CommentSchema::REL_USER => v::nullable(v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15)))),
-        ];
 
-        $schema = $jsonSchemes->getSchemaByType(Comment::class);
-        list ($index, $attrCaptures) = $validator->assert($schema, $input, $idRule, $attributeRules, $toOneRules);
+        $container = $this->createContainer();
+        $validator = $this->createValidator($container, CommentSchema::TYPE, $rules);
 
-        $this->assertNull($index);
-        $this->assertCount(2, $attrCaptures);
-        $this->assertEquals($text, $attrCaptures[Comment::FIELD_TEXT]);
-        $this->assertEquals(null, $attrCaptures[Comment::FIELD_ID_USER]);
+        $validator->assert($input);
+
+        $captures = $validator->getCaptures();
+        $this->assertCount(2, $captures);
+        $this->assertEquals($text, $captures[Comment::FIELD_TEXT]);
+        $this->assertEquals(null, $captures[Comment::FIELD_ID_USER]);
     }
 
     /**
@@ -138,10 +144,7 @@ EOT;
      */
     public function testCaptureInvalidData1()
     {
-        $jsonSchemes = $this->createJsonSchemes();
-        $validator   = $this->createValidator($jsonSchemes);
-
-        $text  = 'Outside every fat man there was an even fatter man trying to close in';
+        $text      = 'Outside every fat man there was an even fatter man trying to close in';
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -164,24 +167,33 @@ EOT;
             }
         }
 EOT;
-        $input = json_decode($jsonInput, true);
+        $input     = json_decode($jsonInput, true);
 
-        $idRule = v::isNull();
+        $idRule         = v::isNull();
         $attributeRules = [
             CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1, 5)),
         ];
-        $toOneRules = [
+        $toOneRules     = [
             CommentSchema::REL_USER => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
-        $toManyRules = [
+        $toManyRules    = [
             CommentSchema::REL_EMOTIONS => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
 
+        $rules = [
+            AppValidator::RULE_INDEX      => $idRule,
+            AppValidator::RULE_ATTRIBUTES => $attributeRules,
+            AppValidator::RULE_TO_ONE     => $toOneRules,
+            AppValidator::RULE_TO_MANY    => $toManyRules,
+        ];
+
+        $container = $this->createContainer();
+        $validator = $this->createValidator($container, CommentSchema::TYPE, $rules);
+
         $exception    = null;
         $gotException = false;
-        $schema       = $jsonSchemes->getSchemaByType(Comment::class);
         try {
-            $validator->assert($schema, $input, $idRule, $attributeRules, $toOneRules, $toManyRules);
+            $validator->assert($input);
         } catch (JsonApiException $exception) {
             $gotException = true;
         }
@@ -224,27 +236,33 @@ EOT;
      */
     public function testCaptureInvalidData2()
     {
-        $jsonSchemes = $this->createJsonSchemes();
-        $validator   = $this->createValidator($jsonSchemes);
-
         $input = json_decode('{}', true);
 
-        $idRule = v::required(v::isNull());
+        $idRule         = v::required(v::isNull());
         $attributeRules = [
             CommentSchema::ATTR_TEXT => v::required(v::andX(v::isString(), v::stringLength(1, 5))),
         ];
-        $toOneRules = [
+        $toOneRules     = [
             CommentSchema::REL_USER => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
-        $toManyRules = [
+        $toManyRules    = [
             CommentSchema::REL_EMOTIONS => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
 
+        $rules = [
+            AppValidator::RULE_INDEX      => $idRule,
+            AppValidator::RULE_ATTRIBUTES => $attributeRules,
+            AppValidator::RULE_TO_ONE     => $toOneRules,
+            AppValidator::RULE_TO_MANY    => $toManyRules,
+        ];
+
+        $container = $this->createContainer();
+        $validator = $this->createValidator($container, CommentSchema::TYPE, $rules);
+
         $exception    = null;
         $gotException = false;
-        $schema       = $jsonSchemes->getSchemaByType(Comment::class);
         try {
-            $validator->assert($schema, $input, $idRule, $attributeRules, $toOneRules, $toManyRules);
+            $validator->assert($input);
         } catch (JsonApiException $exception) {
             $gotException = true;
         }
@@ -274,9 +292,6 @@ EOT;
      */
     public function testCaptureInvalidData3()
     {
-        $jsonSchemes = $this->createJsonSchemes();
-        $validator   = $this->createValidator($jsonSchemes);
-
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -294,24 +309,33 @@ EOT;
             }
         }
 EOT;
-        $input = json_decode($jsonInput, true);
+        $input     = json_decode($jsonInput, true);
 
-        $idRule = v::isNull();
+        $idRule         = v::isNull();
         $attributeRules = [
             CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1, 5)),
         ];
-        $toOneRules = [
+        $toOneRules     = [
             CommentSchema::REL_USER => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
-        $toManyRules = [
+        $toManyRules    = [
             CommentSchema::REL_EMOTIONS => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
 
+        $rules = [
+            AppValidator::RULE_INDEX      => $idRule,
+            AppValidator::RULE_ATTRIBUTES => $attributeRules,
+            AppValidator::RULE_TO_ONE     => $toOneRules,
+            AppValidator::RULE_TO_MANY    => $toManyRules,
+        ];
+
+        $container = $this->createContainer();
+        $validator = $this->createValidator($container, CommentSchema::TYPE, $rules);
+
         $exception    = null;
         $gotException = false;
-        $schema       = $jsonSchemes->getSchemaByType(Comment::class);
         try {
-            $validator->assert($schema, $input, $idRule, $attributeRules, $toOneRules, $toManyRules);
+            $validator->assert($input);
         } catch (JsonApiException $exception) {
             $gotException = true;
         }
@@ -340,9 +364,6 @@ EOT;
      */
     public function testCaptureInvalidData4()
     {
-        $jsonSchemes = $this->createJsonSchemes();
-        $validator   = $this->createValidator($jsonSchemes);
-
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -356,24 +377,33 @@ EOT;
             }
         }
 EOT;
-        $input = json_decode($jsonInput, true);
+        $input     = json_decode($jsonInput, true);
 
-        $idRule = v::isNull();
+        $idRule         = v::isNull();
         $attributeRules = [
             CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1, 5)),
         ];
-        $toOneRules = [
+        $toOneRules     = [
             CommentSchema::REL_USER => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
-        $toManyRules = [
+        $toManyRules    = [
             CommentSchema::REL_EMOTIONS => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
 
+        $rules = [
+            AppValidator::RULE_INDEX      => $idRule,
+            AppValidator::RULE_ATTRIBUTES => $attributeRules,
+            AppValidator::RULE_TO_ONE     => $toOneRules,
+            AppValidator::RULE_TO_MANY    => $toManyRules,
+        ];
+
+        $container = $this->createContainer();
+        $validator = $this->createValidator($container, CommentSchema::TYPE, $rules);
+
         $exception    = null;
         $gotException = false;
-        $schema       = $jsonSchemes->getSchemaByType(Comment::class);
         try {
-            $validator->assert($schema, $input, $idRule, $attributeRules, $toOneRules, $toManyRules);
+            $validator->assert($input);
         } catch (JsonApiException $exception) {
             $gotException = true;
         }
@@ -402,27 +432,33 @@ EOT;
      */
     public function testCaptureInvalidData5()
     {
-        $jsonSchemes = $this->createJsonSchemes();
-        $validator   = $this->createValidator($jsonSchemes);
-
         $input = json_decode('{}', true);
 
-        $idRule = v::isNull();
+        $idRule         = v::isNull();
         $attributeRules = [
             CommentSchema::ATTR_TEXT => v::required(v::andX(v::isString(), v::stringLength(1, 5))),
         ];
-        $toOneRules = [
+        $toOneRules     = [
             CommentSchema::REL_USER => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
-        $toManyRules = [
+        $toManyRules    = [
             CommentSchema::REL_EMOTIONS => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(2))),
         ];
 
+        $rules = [
+            AppValidator::RULE_INDEX      => $idRule,
+            AppValidator::RULE_ATTRIBUTES => $attributeRules,
+            AppValidator::RULE_TO_ONE     => $toOneRules,
+            AppValidator::RULE_TO_MANY    => $toManyRules,
+        ];
+
+        $container = $this->createContainer();
+        $validator = $this->createValidator($container, CommentSchema::TYPE, $rules);
+
         $exception    = null;
         $gotException = false;
-        $schema       = $jsonSchemes->getSchemaByType(Comment::class);
         try {
-            $validator->assert($schema, $input, $idRule, $attributeRules, $toOneRules, $toManyRules);
+            $validator->assert($input);
         } catch (JsonApiException $exception) {
             $gotException = true;
         }
@@ -444,33 +480,35 @@ EOT;
     }
 
     /**
-     * @param $jsonSchemes
+     * @param ContainerInterface $container
+     * @param string             $jsonType
+     * @param array              $rules
      *
-     * @return AppValidator
+     * @return ValidatorInterface
      */
-    private function createValidator($jsonSchemes)
-    {
-        $jsonApiTranslator    = new JsonApiTranslator();
-        $validationTranslator = new Translator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());
-
-        $validator = new AppValidator(
-            $jsonApiTranslator,
-            $validationTranslator,
-            $jsonSchemes,
-            $this->getModelSchemes(),
-            $this->createConnection()
-        );
+    private function createValidator(
+        ContainerInterface $container,
+        string $jsonType,
+        array $rules
+    ): ValidatorInterface {
+        $validator = new AppValidator($container, $jsonType, $rules);
 
         return $validator;
     }
 
     /**
-     * @return JsonSchemesInterface
+     * @return ContainerInterface
      */
-    private function createJsonSchemes(): JsonSchemesInterface
+    private function createContainer(): ContainerInterface
     {
-        $jsonSchemes = $this->getJsonSchemes(new Factory(new Container()), $this->getModelSchemes());
+        $container = new Container();
 
-        return $jsonSchemes;
+        $container[ModelSchemeInfoInterface::class]      = $modelSchemes = $this->getModelSchemes();
+        $container[JsonSchemesInterface::class]          = $this->getJsonSchemes(new Factory($container), $modelSchemes);
+        $container[JsonApiTranslatorInterface::class]    = new JsonApiTranslator();
+        $container[ValidationTranslatorInterface::class] =
+            new Translator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());
+
+        return $container;
     }
 }

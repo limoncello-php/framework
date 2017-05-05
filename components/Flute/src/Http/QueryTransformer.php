@@ -124,7 +124,7 @@ class QueryTransformer
      * @param ErrorCollection $errors
      * @param array|null      $parameters
      *
-     * @return null|FilterParameterCollection[]
+     * @return null|FilterParameterCollection
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */

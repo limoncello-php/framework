@@ -16,58 +16,34 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Validation\Contracts\RuleInterface;
+use Limoncello\Flute\Validation\ErrorCollection;
 
 /**
  * @package Limoncello\Flute
  */
 interface ValidatorInterface
 {
-    /** Rule description index */
-    const RULE_INDEX = 0;
-
-    /** Rule description index */
-    const RULE_CAPTURE_NAME = 1;
-
-    /** Rule description index */
-    const RULE_EXPECTED_TYPE = 2;
+    /**
+     * @param array $jsonData
+     *
+     * @return bool
+     */
+    public function check(array $jsonData): bool;
 
     /**
-     * @param SchemaInterface $schema
-     * @param array           $jsonData
-     * @param RuleInterface   $idRule
-     * @param RuleInterface[] $attributeRules
-     * @param RuleInterface[] $toOneRules
-     * @param RuleInterface[] $toManyRules
+     * @param array $jsonData
      *
-     * @return array Captures
+     * @return self
      */
-    public function assert(
-        SchemaInterface $schema,
-        array $jsonData,
-        RuleInterface $idRule,
-        array $attributeRules,
-        array $toOneRules = [],
-        array $toManyRules = []
-    ): array;
+    public function assert(array $jsonData): self;
 
     /**
-     * @param SchemaInterface $schema
-     * @param array           $jsonData
-     * @param RuleInterface   $idRule
-     * @param RuleInterface[] $attributeRules
-     * @param RuleInterface[] $toOneRules
-     * @param RuleInterface[] $toManyRules
-     *
-     * @return array ErrorCollection and CaptureAggregatorInterface[]
+     * @return array
      */
-    public function check(
-        SchemaInterface $schema,
-        array $jsonData,
-        RuleInterface $idRule,
-        array $attributeRules,
-        array $toOneRules = [],
-        array $toManyRules = []
-    ): array;
+    public function getCaptures(): array;
+
+    /**
+     * @return ErrorCollection
+     */
+    public function getErrors(): ErrorCollection;
 }
