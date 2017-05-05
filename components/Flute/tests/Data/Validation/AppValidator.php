@@ -24,30 +24,12 @@ use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\Role;
 use Limoncello\Validation\Contracts\MessageCodes;
 use Limoncello\Validation\Contracts\RuleInterface;
-use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
  */
 class AppValidator extends Validator
 {
-    /**
-     * @param ContainerInterface $container
-     * @param string             $jsonType
-     * @param array              $rules
-     */
-    public function __construct(ContainerInterface $container, string $jsonType, array $rules)
-    {
-        if (array_key_exists(static::RULE_UNLISTED_ATTRIBUTE, $rules) === false) {
-            $rules[static::RULE_UNLISTED_ATTRIBUTE] = static::fail();
-        }
-        if (array_key_exists(static::RULE_UNLISTED_RELATIONSHIP, $rules) === false) {
-            $rules[static::RULE_UNLISTED_RELATIONSHIP] = static::fail();
-        }
-
-        parent::__construct($container, $jsonType, $rules);
-    }
-
     /**
      * @param int|string $index
      *

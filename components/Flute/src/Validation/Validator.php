@@ -117,6 +117,13 @@ class Validator implements ValidatorInterface
         array $rules,
         $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
+        if (array_key_exists(static::RULE_UNLISTED_ATTRIBUTE, $rules) === false) {
+            $rules[static::RULE_UNLISTED_ATTRIBUTE] = static::fail();
+        }
+        if (array_key_exists(static::RULE_UNLISTED_RELATIONSHIP, $rules) === false) {
+            $rules[static::RULE_UNLISTED_RELATIONSHIP] = static::fail();
+        }
+
         $this->container   = $container;
         $this->jsonType    = $jsonType;
         $this->rules       = $rules;
