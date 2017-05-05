@@ -21,6 +21,7 @@ use Limoncello\Validation\Converters\BoolConverter;
 use Limoncello\Validation\Converters\DateTimeConverter;
 use Limoncello\Validation\Converters\FloatConverter;
 use Limoncello\Validation\Converters\IntConverter;
+use Limoncello\Validation\Converters\StringConverter;
 
 /**
  * @package Limoncello\Validation
@@ -66,5 +67,15 @@ trait Converters
     protected static function toInt(RuleInterface $rule): RuleInterface
     {
         return new IntConverter($rule);
+    }
+
+    /**
+     * @param RuleInterface $rule
+     *
+     * @return RuleInterface
+     */
+    protected static function toString(RuleInterface $rule): RuleInterface
+    {
+        return new StringConverter($rule);
     }
 }

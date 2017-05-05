@@ -91,6 +91,7 @@ class Validator implements ValidatorInterface
         toDateTime as public;
         toFloat as public;
         toInt as public;
+        toString as public;
     }
 
     use Wrappers {

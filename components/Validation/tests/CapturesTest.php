@@ -76,7 +76,7 @@ class CapturesTest extends \PHPUnit_Framework_TestCase
 
         $rules = v::arrayX([
             'id'    => v::toInt($identityCapture),
-            'type'  => v::equals('comments'),
+            'type'  => v::toString(v::equals('comments')),
             'bool1' => v::toBool($bool1Capture),
             'bool2' => v::toBool($bool2Capture),
             'bool3' => v::toBool($bool3Capture),
@@ -153,7 +153,7 @@ class CapturesTest extends \PHPUnit_Framework_TestCase
 
         $rules  = v::arrayX([
             'id'    => $idRule,
-            'type'  => v::equals('comments'),
+            'type'  => v::toString(v::equals('comments')),
             'bool'  => v::toBool($boolCapture),
             'float' => v::toFloat($floatCapture),
             'dt'    => v::toDateTime($dtCapture, 'Y-m-d H:i:s'),
@@ -162,7 +162,7 @@ class CapturesTest extends \PHPUnit_Framework_TestCase
 
         $input = [
             'id'    => 'abc-id',
-            'type'  => 'comments',
+            'type'  => new stdClass(),
             'bool'  => new stdClass(),
             'float' => new stdClass(),
             'dt'    => new stdClass(),
@@ -170,14 +170,15 @@ class CapturesTest extends \PHPUnit_Framework_TestCase
         ];
 
         $errors = $this->readErrors(v::validator($rules), $input);
-        $this->assertCount(5, $errors);
+        $this->assertCount(6, $errors);
         $this->assertEquals($paramName, $errors[0]->getParameterName());
         $this->assertEquals('abc-id', $errors[0]->getParameterValue());
         $this->assertEquals(MessageCodes::IS_INT, $errors[0]->getMessageCode());
-        $this->assertEquals(MessageCodes::IS_BOOL, $errors[1]->getMessageCode());
-        $this->assertEquals(MessageCodes::IS_FLOAT, $errors[2]->getMessageCode());
-        $this->assertEquals(MessageCodes::IS_DATE_TIME, $errors[3]->getMessageCode());
-        $this->assertEquals(MessageCodes::MORE_THAN, $errors[4]->getMessageCode());
+        $this->assertEquals(MessageCodes::IS_STRING, $errors[1]->getMessageCode());
+        $this->assertEquals(MessageCodes::IS_BOOL, $errors[2]->getMessageCode());
+        $this->assertEquals(MessageCodes::IS_FLOAT, $errors[3]->getMessageCode());
+        $this->assertEquals(MessageCodes::IS_DATE_TIME, $errors[4]->getMessageCode());
+        $this->assertEquals(MessageCodes::MORE_THAN, $errors[5]->getMessageCode());
 
         $this->assertEquals($paramName, $identityCapture->getParameterName());
 
