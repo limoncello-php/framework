@@ -14,6 +14,9 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
+use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
+use Limoncello\Validation\I18n\Locales\EnUsLocale;
+use Limoncello\Validation\I18n\Translator;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -75,10 +78,10 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
         $container[TranslatorInterface::class] = $translator = $factory->createTranslator();
 
-//        $container[ValidationTranslatorInterface::class] = function () {
-//            // TODO load locale according to current user preferences
-//            return new ValidationTranslator(Validation::getLocaleCode(), Validation::getMessages());
-//        };
+        $container[ValidationTranslatorInterface::class] = function () {
+            // TODO load locale according to current user preferences
+            return new Translator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());
+        };
 
         $container[RepositoryInterface::class] = function (PsrContainerInterface $container) use ($factory, $translator) {
             $connection       = $container->get(Connection::class);
