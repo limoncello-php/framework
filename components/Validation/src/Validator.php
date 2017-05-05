@@ -23,6 +23,7 @@ use Limoncello\Validation\Contracts\ValidatorInterface;
 use Limoncello\Validation\Errors\ErrorAggregator;
 use Limoncello\Validation\Validator\Captures as CapturesX;
 use Limoncello\Validation\Validator\Compares;
+use Limoncello\Validation\Validator\Converters as ConvertersX;
 use Limoncello\Validation\Validator\ExpressionsX;
 use Limoncello\Validation\Validator\Generics;
 use Limoncello\Validation\Validator\Types;
@@ -83,6 +84,13 @@ class Validator implements ValidatorInterface
     use CapturesX {
         singleCapture as public;
         multiCapture as public;
+    }
+
+    use ConvertersX {
+        toBool as public;
+        toDateTime as public;
+        toFloat as public;
+        toInt as public;
     }
 
     use Wrappers {
