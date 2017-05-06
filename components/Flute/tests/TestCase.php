@@ -45,7 +45,6 @@ use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Mockery;
-use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -232,13 +231,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function getSchemeMap()
     {
         return [
-            Board::class   => function (
-                FactoryInterface $factory,
-                JsonSchemesInterface $container,
-                ModelSchemeInfoInterface $modelSchemes
-            ) {
-                return new BoardSchema($factory, $container, $modelSchemes);
-            },
+            Board::class    => BoardSchema::class,
             Comment::class  => CommentSchema::class,
             Emotion::class  => EmotionSchema::class,
             Post::class     => PostSchema::class,

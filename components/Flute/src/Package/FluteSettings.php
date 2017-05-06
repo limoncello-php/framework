@@ -1,6 +1,8 @@
 <?php namespace Limoncello\Flute\Package;
 
+use Generator;
 use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 
 /**
  * @package Limoncello\Flute
@@ -8,9 +10,17 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 abstract class FluteSettings implements SettingsInterface
 {
     /**
-     * @return array
+     * @return string
      */
-    abstract protected function getModelToSchemeMap(): array;
+    abstract protected function getSchemesPath(): string;
+
+    /**
+     * @param string $path
+     * @param string $implementClassName
+     *
+     * @return Generator
+     */
+    abstract protected function selectClasses(string $path, string $implementClassName): Generator;
 
     /** Config key */
     const KEY_MODEL_TO_SCHEME_MAP = 0;
@@ -43,8 +53,14 @@ abstract class FluteSettings implements SettingsInterface
     {
         $jsonOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES;
 
+        $map = [];
+        foreach ($this->selectClasses($this->getSchemesPath(), SchemaInterface::class) as $schemeClass) {
+            /** @var SchemaInterface $schemeClass */
+            $map[$schemeClass::MODEL] =$schemeClass;
+        }
+
         return [
-            static::KEY_MODEL_TO_SCHEME_MAP      => $this->getModelToSchemeMap(),
+            static::KEY_MODEL_TO_SCHEME_MAP      => $map,
             static::KEY_RELATIONSHIP_PAGING_SIZE => 20,
             static::KEY_JSON_ENCODE_OPTIONS      => $jsonOptions,
             static::KEY_JSON_ENCODE_DEPTH        => 512,

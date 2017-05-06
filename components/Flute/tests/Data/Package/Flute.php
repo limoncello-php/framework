@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Flute\Package\FluteSettings;
 
 /**
@@ -39,7 +40,25 @@ class Flute extends FluteSettings
     /**
      * @inheritdoc
      */
-    protected function getModelToSchemeMap(): array
+    protected function getSchemesPath(): string
+    {
+        return 'whatever';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function selectClasses(string $path, string $implementClassName): Generator
+    {
+        foreach ($this->getModelToSchemeMap() as $schemeClass) {
+            yield $schemeClass;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    private function getModelToSchemeMap(): array
     {
         return $this->modelToSchemeMap;
     }
