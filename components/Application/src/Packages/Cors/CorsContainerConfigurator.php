@@ -19,6 +19,7 @@
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
+use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Neomerx\Cors\Analyzer;
 use Neomerx\Cors\Contracts\AnalyzerInterface;

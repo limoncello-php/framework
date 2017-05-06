@@ -18,6 +18,7 @@
 
 use Closure;
 use Limoncello\Contracts\Application\MiddlewareInterface;
+use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
 use Neomerx\Cors\Contracts\AnalysisResultInterface;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
 use Psr\Container\ContainerInterface;

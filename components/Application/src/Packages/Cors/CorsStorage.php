@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
+
 /**
  * @package Limoncello\Application
  */

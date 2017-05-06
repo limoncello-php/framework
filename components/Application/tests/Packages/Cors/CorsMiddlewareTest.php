@@ -19,8 +19,8 @@
 use Closure;
 use Limoncello\Application\Packages\Cors\CorsMiddleware;
 use Limoncello\Application\Packages\Cors\CorsStorage;
-use Limoncello\Application\Packages\Cors\CorsStorageInterface;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
 use Mockery;
 use Mockery\Mock;
 use Neomerx\Cors\Contracts\AnalysisResultInterface;
