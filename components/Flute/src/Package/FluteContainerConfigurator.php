@@ -4,6 +4,7 @@ use Doctrine\DBAL\Connection;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Exceptions\ExceptionHandlerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
@@ -14,6 +15,7 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
+use Limoncello\Flute\Http\Errors\FluteExceptionHandler;
 use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
 use Limoncello\Validation\I18n\Locales\EnUsLocale;
 use Limoncello\Validation\I18n\Translator;
@@ -28,6 +30,9 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
     const HANDLER = [self::class, self::METHOD_NAME];
+
+    /** @var callable */
+    const CONFIGURE_EXCEPTION_HANDLER = [self::class, 'configureExceptionHandler'];
 
     /**
      * @inheritdoc
@@ -70,12 +75,6 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             return $encoder;
         };
 
-//        $container[JsonApiConfigInterface::class] = function (PsrContainerInterface $container) {
-//            $jsonConfig   = $container->get(ConfigInterface::class)->getConfig(JsonApiConfigInterface::class);
-//
-//            return (new JsonApiConfig)->setConfig($jsonConfig);
-//        };
-
         $container[TranslatorInterface::class] = $translator = $factory->createTranslator();
 
         $container[ValidationTranslatorInterface::class] = function () {
@@ -97,9 +96,17 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
             return new PaginationStrategy($settings[FluteSettings::KEY_RELATIONSHIP_PAGING_SIZE]);
         };
-//
-//        $container[ExceptionHandlerInterface::class] = function () {
-//            return new JsonApiHandler();
-//        };
+    }
+
+    /**
+     * @param LimoncelloContainerInterface $container
+     *
+     * @return void
+     */
+    public static function configureExceptionHandler(LimoncelloContainerInterface $container)
+    {
+        $container[ExceptionHandlerInterface::class] = function () {
+            return new FluteExceptionHandler();
+        };
     }
 }
