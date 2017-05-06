@@ -39,6 +39,7 @@ use Limoncello\Flute\Http\Query\FilterParameterCollection;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Exceptions\JsonApiException as E;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Flute
@@ -88,24 +89,22 @@ class Crud implements CrudInterface
     private $paginationStrategy;
 
     /**
-     * @param FactoryInterface            $factory
-     * @param string                      $modelClass
-     * @param RepositoryInterface         $repository
-     * @param ModelSchemeInfoInterface    $modelSchemes
-     * @param PaginationStrategyInterface $paginationStrategy
+     * @var ContainerInterface
      */
-    public function __construct(
-        FactoryInterface $factory,
-        string $modelClass,
-        RepositoryInterface $repository,
-        ModelSchemeInfoInterface $modelSchemes,
-        PaginationStrategyInterface $paginationStrategy
-    ) {
-        $this->factory            = $factory;
+    private $container;
+
+    /**
+     * @param ContainerInterface $container
+     * @param string             $modelClass
+     */
+    public function __construct(ContainerInterface $container, string $modelClass)
+    {
+        $this->factory            = $container->get(FactoryInterface::class);
         $this->modelClass         = $modelClass;
-        $this->repository         = $repository;
-        $this->modelSchemes       = $modelSchemes;
-        $this->paginationStrategy = $paginationStrategy;
+        $this->repository         = $container->get(RepositoryInterface::class);
+        $this->modelSchemes       = $container->get(ModelSchemeInfoInterface::class);
+        $this->paginationStrategy = $container->get(PaginationStrategyInterface::class);
+        $this->container          = $container;
     }
 
     /**
@@ -377,6 +376,14 @@ class Crud implements CrudInterface
         });
 
         return (int)$updated;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 
     /**

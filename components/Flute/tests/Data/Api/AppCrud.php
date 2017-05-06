@@ -17,11 +17,7 @@
  */
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Api\Crud;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
-use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
-use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Tests\Flute\Data\Models\Model;
 use Psr\Container\ContainerInterface;
 
@@ -34,32 +30,11 @@ abstract class AppCrud extends Crud
     const MODEL_CLASS = null;
 
     /**
-     * @var ContainerInterface|null
-     */
-    private $container;
-
-    /**
      * @inheritdoc
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
-
-        parent::__construct(
-            $this->getContainer()->get(FactoryInterface::class),
-            static::MODEL_CLASS,
-            $this->getContainer()->get(RepositoryInterface::class),
-            $this->getContainer()->get(ModelSchemeInfoInterface::class),
-            $this->getContainer()->get(PaginationStrategyInterface::class)
-        );
-    }
-
-    /**
-     * @return ContainerInterface|null
-     */
-    protected function getContainer()
-    {
-        return $this->container;
+        parent::__construct($container, static::MODEL_CLASS);
     }
 
     /**
