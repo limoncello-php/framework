@@ -50,7 +50,7 @@ class CoreSettings extends BaseCoreSettings
     /**
      * @var string
      */
-    private $configuratorsPaths;
+    private $configuratorsPath;
 
     /**
      * @var string[]
@@ -61,14 +61,14 @@ class CoreSettings extends BaseCoreSettings
      * CoreSettings constructor.
      *
      * @param string   $routesPath
-     * @param string   $configuratorsPaths
+     * @param string   $configuratorsPath
      * @param string[] $providerClasses
      */
-    public function __construct(string $routesPath, string $configuratorsPaths, array $providerClasses)
+    public function __construct(string $routesPath, string $configuratorsPath, array $providerClasses)
     {
-        $this->routesPath         = $routesPath;
-        $this->configuratorsPaths = $configuratorsPaths;
-        $this->providerClasses    = $providerClasses;
+        $this->routesPath        = $routesPath;
+        $this->configuratorsPath = $configuratorsPath;
+        $this->providerClasses   = $providerClasses;
     }
 
     /**
@@ -111,7 +111,7 @@ class CoreSettings extends BaseCoreSettings
     protected function getGlobalContainerConfigurators(): Generator
     {
         $interfaceName = ContainerConfiguratorInterface::class;
-        foreach ($this->selectClasses($this->getConfiguratorsPaths(), $interfaceName) as $selectClass) {
+        foreach ($this->selectClasses($this->getConfiguratorsPath(), $interfaceName) as $selectClass) {
             $configurator = [$selectClass, ContainerConfiguratorInterface::METHOD_NAME];
             assert($this->isValidContainerConfigurator($configurator) === true);
             yield $configurator;
@@ -199,9 +199,9 @@ class CoreSettings extends BaseCoreSettings
     /**
      * @return string
      */
-    protected function getConfiguratorsPaths(): string
+    protected function getConfiguratorsPath(): string
     {
-        return $this->configuratorsPaths;
+        return $this->configuratorsPath;
     }
 
     /**
