@@ -53,7 +53,7 @@ class DataCommand implements CommandInterface
     public function getCommandData(): array
     {
         return [
-            self::COMMAND_NAME        => 'limoncello:db',
+            self::COMMAND_NAME        => 'l:db',
             self::COMMAND_DESCRIPTION => 'Migrates and seeds application data.',
             self::COMMAND_HELP        => 'This command migrates, seeds and resets application data.',
         ];

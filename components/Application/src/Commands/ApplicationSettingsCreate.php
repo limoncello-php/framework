@@ -34,7 +34,7 @@ class ApplicationSettingsCreate extends ApplicationSettingsBase
     public function getCommandData(): array
     {
         return [
-            self::COMMAND_NAME        => 'limoncello:cache:application:create',
+            self::COMMAND_NAME        => 'l:cache:application:create',
             self::COMMAND_DESCRIPTION => 'Creates application caches.',
             self::COMMAND_HELP        => 'This command creates caches for routes, settings and etc.',
         ];

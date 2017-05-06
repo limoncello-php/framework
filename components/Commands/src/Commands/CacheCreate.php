@@ -33,7 +33,7 @@ class CacheCreate implements CommandInterface
     public function getCommandData(): array
     {
         return [
-            self::COMMAND_NAME        => 'limoncello:cache',
+            self::COMMAND_NAME        => 'l:cache',
             self::COMMAND_DESCRIPTION => 'Creates application caches.',
             self::COMMAND_HELP        => 'This command creates caches for routes, settings, templates and etc.',
         ];

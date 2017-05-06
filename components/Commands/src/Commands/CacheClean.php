@@ -33,7 +33,7 @@ class CacheClean implements CommandInterface
     public function getCommandData(): array
     {
         return [
-            self::COMMAND_NAME        => 'limoncello:cache:clean',
+            self::COMMAND_NAME        => 'l:cache:clean',
             self::COMMAND_DESCRIPTION => 'Cleans application caches.',
             self::COMMAND_HELP        => 'This command cleans caches for routes, settings, templates and etc.',
         ];
