@@ -33,8 +33,11 @@ trait Captures
      *
      * @return RuleInterface
      */
-    protected static function singleCapture($name, RuleInterface $rule, CaptureAggregatorInterface $aggregator)
-    {
+    protected static function singleCapture(
+        string $name,
+        RuleInterface $rule,
+        CaptureAggregatorInterface $aggregator
+    ): RuleInterface {
         return new SingleCapture($name, $rule, $aggregator);
     }
 
@@ -45,8 +48,11 @@ trait Captures
      *
      * @return RuleInterface
      */
-    protected static function multiCapture($name, RuleInterface $rule, CaptureAggregatorInterface $aggregator)
-    {
+    protected static function multiCapture(
+        string $name,
+        RuleInterface $rule,
+        CaptureAggregatorInterface $aggregator
+    ): RuleInterface {
         return new MultipleCaptures($name, $rule, $aggregator);
     }
 }

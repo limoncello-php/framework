@@ -24,10 +24,10 @@ interface IncludeParameterInterface
     /**
      * @return string[]
      */
-    public function getPath();
+    public function getPath(): array;
 
     /**
      * @return string
      */
-    public function getOriginalPath();
+    public function getOriginalPath(): string;
 }

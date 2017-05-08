@@ -26,7 +26,7 @@ class Translator implements TranslatorInterface
     /**
      * @inheritdoc
      */
-    public function get($messageId)
+    public function get(string $messageId): string
     {
         return $messageId;
     }

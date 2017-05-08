@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\MessageCodes;
 
 /**
@@ -34,7 +35,7 @@ class RegExp extends BaseRule
     /**
      * @param string $pattern
      */
-    public function __construct($pattern)
+    public function __construct(string $pattern)
     {
         $this->pattern = $pattern;
     }
@@ -42,7 +43,7 @@ class RegExp extends BaseRule
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         if (preg_match($this->pattern, $input) !== 1) {
             $context = [static::CONTEXT_PATTERN => $this->pattern];

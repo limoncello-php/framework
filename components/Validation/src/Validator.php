@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\RuleInterface;
 use Limoncello\Validation\Contracts\ValidatorInterface;
 use Limoncello\Validation\Errors\ErrorAggregator;
 use Limoncello\Validation\Validator\Captures as CapturesX;
 use Limoncello\Validation\Validator\Compares;
+use Limoncello\Validation\Validator\Converters as ConvertersX;
 use Limoncello\Validation\Validator\ExpressionsX;
 use Limoncello\Validation\Validator\Generics;
 use Limoncello\Validation\Validator\Types;
@@ -84,6 +86,14 @@ class Validator implements ValidatorInterface
         multiCapture as public;
     }
 
+    use ConvertersX {
+        toBool as public;
+        toDateTime as public;
+        toFloat as public;
+        toInt as public;
+        toString as public;
+    }
+
     use Wrappers {
         nullable as public;
         required as public;
@@ -107,7 +117,7 @@ class Validator implements ValidatorInterface
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         foreach (static::validateData($this->rule, $input, $this->createErrorAggregator()) as $error) {
             yield $error;
@@ -117,9 +127,9 @@ class Validator implements ValidatorInterface
     /**
      * @param RuleInterface $rule
      *
-     * @return static
+     * @return ValidatorInterface
      */
-    public static function validator(RuleInterface $rule)
+    public static function validator(RuleInterface $rule): ValidatorInterface
     {
         return new static ($rule);
     }
@@ -127,7 +137,7 @@ class Validator implements ValidatorInterface
     /**
      * @return ErrorAggregatorInterface
      */
-    protected function createErrorAggregator()
+    protected function createErrorAggregator(): ErrorAggregatorInterface
     {
         return new ErrorAggregator();
     }

@@ -116,6 +116,14 @@ interface TokenRepositoryInterface
     public function readScopeIdentifiers(int $identifier): array;
 
     /**
+     * @param string $tokenValue
+     * @param int    $expirationInSeconds
+     *
+     * @return array|null
+     */
+    public function readPassport(string $tokenValue, int $expirationInSeconds);
+
+    /**
      * @param TokenInterface $token
      *
      * @return void

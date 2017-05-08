@@ -22,9 +22,6 @@
 abstract class BaseController extends \Limoncello\Flute\Http\BaseController
 {
     /** URI key used in routing table */
-    const ROUTE_KEY_INDEX = 'idx';
-
-    /** URI key used in routing table */
     const ROUTE_KEY_CHILD_INDEX = 'child_idx';
 
     /** API URI prefix */

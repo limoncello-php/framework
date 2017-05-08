@@ -1,7 +1,7 @@
 <?php namespace Limoncello\l10n\Messages;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class ResourceBundle implements ResourceBundleInterface
      * @param string $namespace
      * @param array  $properties
      */
-    public function __construct($locale, $namespace, array $properties)
+    public function __construct(string $locale, string $namespace, array $properties)
     {
         $this->setLocale($locale)->setNamespace($namespace)->setProperties($properties);
     }
@@ -51,7 +51,7 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @inheritdoc
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
@@ -59,7 +59,7 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @inheritdoc
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->namespace;
     }
@@ -67,7 +67,7 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @inheritdoc
      */
-    public function getKeys()
+    public function getKeys(): array
     {
         return array_keys($this->getProperties());
     }
@@ -75,7 +75,7 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @inheritdoc
      */
-    public function getValue($key)
+    public function getValue($key): string
     {
         $properties = $this->getProperties();
 
@@ -85,9 +85,9 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @param string $locale
      *
-     * @return $this
+     * @return self
      */
-    public function setLocale($locale)
+    public function setLocale(string $locale): self
     {
         assert(is_string($locale) === true && empty($locale) === false && locale_canonicalize($locale) === $locale);
 
@@ -99,9 +99,9 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @param string $namespace
      *
-     * @return $this
+     * @return self
      */
-    public function setNamespace($namespace)
+    public function setNamespace(string $namespace): self
     {
         assert(is_string($namespace) === true && empty($namespace) === false);
 
@@ -113,9 +113,9 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @param array $properties
      *
-     * @return $this
+     * @return self
      */
-    public function setProperties($properties)
+    public function setProperties(array $properties): self
     {
         // check all keys and values are non-empty strings
         assert(call_user_func(function () use ($properties) {
@@ -136,7 +136,7 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @return array
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }

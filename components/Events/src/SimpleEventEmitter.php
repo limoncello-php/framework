@@ -17,7 +17,9 @@
  */
 
 use Closure;
+use Limoncello\Events\Contracts\EventDispatcherInterface;
 use Limoncello\Events\Contracts\EventEmitterInterface;
+use Limoncello\Events\Contracts\EventInterface;
 use Limoncello\Events\Exceptions\EventNotFoundException;
 use ReflectionException;
 use ReflectionMethod;
@@ -25,7 +27,7 @@ use ReflectionMethod;
 /**
  * @package Limoncello\Events
  */
-class SimpleEventEmitter implements EventEmitterInterface
+class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterface
 {
     /**
      * @var array
@@ -45,6 +47,14 @@ class SimpleEventEmitter implements EventEmitterInterface
         $this->isCancellingEnabled() === true ?
             $this->emitWithCancellingPropagationCheck($eventName, $arguments) :
             $this->emitWithoutCancellingPropagationCheck($eventName, $arguments);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function dispatch(EventInterface $event)
+    {
+        $this->emit(get_class($event), [$event]);
     }
 
     /**

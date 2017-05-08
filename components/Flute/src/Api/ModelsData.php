@@ -31,7 +31,7 @@ class ModelsData implements ModelsDataInterface
     private $paginatedData;
 
     /**
-     * @var RelationshipStorageInterface
+     * @var RelationshipStorageInterface|null
      */
     private $relationshipStorage;
 
@@ -50,7 +50,7 @@ class ModelsData implements ModelsDataInterface
     /**
      * @inheritdoc
      */
-    public function getPaginatedData()
+    public function getPaginatedData(): PaginatedDataInterface
     {
         return $this->paginatedData;
     }

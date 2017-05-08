@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Core\Routing;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use FastRoute\DataGenerator\GroupPosBased as GroupPosBasedGenerator;
 use FastRoute\DataGenerator\MarkBased as MarkBasedGenerator;
 use FastRoute\RouteParser;
-use Limoncello\Core\Contracts\Application\SapiInterface;
-use Limoncello\Core\Contracts\Routing\GroupInterface;
-use Limoncello\Core\Contracts\Routing\RouteInterface;
-use Limoncello\Core\Contracts\Routing\RouterInterface;
+use Limoncello\Contracts\Application\SapiInterface;
+use Limoncello\Contracts\Routing\GroupInterface;
+use Limoncello\Contracts\Routing\RouteInterface;
+use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Routing\Dispatcher\CharCountBased;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased;
 use Limoncello\Core\Routing\Dispatcher\GroupPosBased;

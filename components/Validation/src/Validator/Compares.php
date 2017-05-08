@@ -30,7 +30,7 @@ trait Compares
      *
      * @return RuleInterface
      */
-    protected static function equals($value)
+    protected static function equals($value): RuleInterface
     {
         return new CallableRule(function ($input) use ($value) {
             return $input === $value;
@@ -42,7 +42,7 @@ trait Compares
      *
      * @return RuleInterface
      */
-    protected static function notEquals($value)
+    protected static function notEquals($value): RuleInterface
     {
         return new CallableRule(function ($input) use ($value) {
             return $input !== $value;
@@ -54,7 +54,7 @@ trait Compares
      *
      * @return RuleInterface
      */
-    protected static function lessThan($value)
+    protected static function lessThan($value): RuleInterface
     {
         return new CallableRule(function ($input) use ($value) {
             return $input < $value;
@@ -66,7 +66,7 @@ trait Compares
      *
      * @return RuleInterface
      */
-    protected static function lessOrEquals($value)
+    protected static function lessOrEquals($value): RuleInterface
     {
         return new CallableRule(function ($input) use ($value) {
             return $input <= $value;
@@ -78,7 +78,7 @@ trait Compares
      *
      * @return RuleInterface
      */
-    protected static function moreThan($value)
+    protected static function moreThan($value): RuleInterface
     {
         return new CallableRule(function ($input) use ($value) {
             return $input > $value;
@@ -90,7 +90,7 @@ trait Compares
      *
      * @return RuleInterface
      */
-    protected static function moreOrEquals($value)
+    protected static function moreOrEquals($value): RuleInterface
     {
         return new CallableRule(function ($input) use ($value) {
             return $input >= $value;

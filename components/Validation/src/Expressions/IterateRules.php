@@ -52,7 +52,7 @@ abstract class IterateRules extends BaseExpression implements AutoNameRuleInterf
     /**
      * @inheritdoc
      */
-    public function enableAutoParameterNames()
+    public function enableAutoParameterNames(): AutoNameRuleInterface
     {
         $this->isAutoParamNames = true;
 
@@ -62,7 +62,7 @@ abstract class IterateRules extends BaseExpression implements AutoNameRuleInterf
     /**
      * @inheritdoc
      */
-    public function disableAutoParameterNames()
+    public function disableAutoParameterNames(): AutoNameRuleInterface
     {
         $this->isAutoParamNames = false;
 
@@ -72,7 +72,7 @@ abstract class IterateRules extends BaseExpression implements AutoNameRuleInterf
     /**
      * @inheritdoc
      */
-    public function isStateless()
+    public function isStateless(): bool
     {
         if ($this->isStateless !== null) {
             return $this->isStateless;
@@ -102,7 +102,7 @@ abstract class IterateRules extends BaseExpression implements AutoNameRuleInterf
     /**
      * @inheritdoc
      */
-    public function setParameterName($parameterName)
+    public function setParameterName(string $parameterName = null): RuleInterface
     {
         if ($this->isAutoNames() === true) {
             parent::setParameterName($parameterName);
@@ -114,7 +114,7 @@ abstract class IterateRules extends BaseExpression implements AutoNameRuleInterf
     /**
      * @return RuleInterface[]
      */
-    protected function getRules()
+    protected function getRules(): array
     {
         return $this->rules;
     }
@@ -122,7 +122,7 @@ abstract class IterateRules extends BaseExpression implements AutoNameRuleInterf
     /**
      * @return bool
      */
-    protected function isAutoNames()
+    protected function isAutoNames(): bool
     {
         return $this->isAutoParamNames;
     }

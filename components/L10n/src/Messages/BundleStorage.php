@@ -1,7 +1,7 @@
 <?php namespace Limoncello\l10n\Messages;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @inheritdoc
      */
-    public function has($locale, $namespace, $key)
+    public function has(string $locale, string $namespace, string $key): bool
     {
         assert(is_string($locale) === true && empty($locale) === false);
         assert(is_string($namespace) === true && empty($namespace) === false);
@@ -69,7 +69,7 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @inheritdoc
      */
-    public function get($locale, $namespace, $key)
+    public function get(string $locale, string $namespace, string $key)
     {
         $locale = $this->lookupLocale($this->getLocales(), $locale, $this->getDefaultLocale());
 
@@ -84,7 +84,7 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @inheritdoc
      */
-    public function hasResources($locale, $namespace)
+    public function hasResources(string $locale, string $namespace): bool
     {
         assert(is_string($locale) === true && empty($locale) === false);
         assert(is_string($namespace) === true && empty($namespace) === false);
@@ -97,7 +97,7 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @inheritdoc
      */
-    public function getResources($locale, $namespace)
+    public function getResources(string $locale, string $namespace): array
     {
         $locale = $this->lookupLocale($this->getLocales(), $locale, $this->getDefaultLocale());
 
@@ -111,7 +111,7 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @inheritdoc
      */
-    public function getDefaultLocale()
+    public function getDefaultLocale(): string
     {
         return $this->defaultLocale;
     }
@@ -119,7 +119,7 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @return array
      */
-    protected function getEncodedStorage()
+    protected function getEncodedStorage(): array
     {
         return $this->encodedStorage;
     }
@@ -131,7 +131,7 @@ class BundleStorage implements BundleStorageInterface
      *
      * @return string
      */
-    protected function lookupLocale(array $locales, $locale, $defaultLocale)
+    protected function lookupLocale(array $locales, string $locale, string $defaultLocale): string
     {
         return locale_lookup($locales, $locale, true, $defaultLocale);
     }
@@ -139,7 +139,7 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @return string[]
      */
-    protected function getLocales()
+    protected function getLocales(): array
     {
         return $this->locales;
     }
@@ -147,9 +147,9 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @param array $encodedStorage
      *
-     * @return $this
+     * @return self
      */
-    protected function setEncodedStorage(array $encodedStorage)
+    protected function setEncodedStorage(array $encodedStorage): self
     {
         assert(count($encodedStorage) === 2);
 
@@ -171,7 +171,7 @@ class BundleStorage implements BundleStorageInterface
      *
      * @return bool
      */
-    private function checkEncodedData(array $encodedData)
+    private function checkEncodedData(array $encodedData): bool
     {
         $isValid = true;
         foreach ($encodedData as $locale => $namespaceResources) {
@@ -189,7 +189,7 @@ class BundleStorage implements BundleStorageInterface
      *
      * @return bool
      */
-    private function checkNamespaceResources(array $namespaceResources)
+    private function checkNamespaceResources(array $namespaceResources): bool
     {
         $isValid = true;
         foreach ($namespaceResources as $namespace => $resources) {
@@ -207,7 +207,7 @@ class BundleStorage implements BundleStorageInterface
      *
      * @return bool
      */
-    private function checkResources(array $resources)
+    private function checkResources(array $resources): bool
     {
         $isValid = true;
         foreach ($resources as $key => $valueAndLocale) {
@@ -224,7 +224,7 @@ class BundleStorage implements BundleStorageInterface
      *
      * @return bool
      */
-    private function checkPair($key, array $valueAndLocale)
+    private function checkPair(string $key, array $valueAndLocale): bool
     {
         $result = $this->checkNonEmptyString($key) === true && $this->checkValueWithLocale($valueAndLocale) === true;
 
@@ -236,7 +236,7 @@ class BundleStorage implements BundleStorageInterface
      *
      * @return bool
      */
-    private function checkValueWithLocale(array $valueAndLocale)
+    private function checkValueWithLocale(array $valueAndLocale): bool
     {
         $result =
             count($valueAndLocale) === 2 &&
@@ -251,7 +251,7 @@ class BundleStorage implements BundleStorageInterface
      *
      * @return bool
      */
-    private function checkNonEmptyString($value)
+    private function checkNonEmptyString($value): bool
     {
         $result = is_string($value) === true && empty($value) === false;
 

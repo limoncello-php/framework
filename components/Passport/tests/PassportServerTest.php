@@ -20,7 +20,7 @@ use Doctrine\DBAL\Connection;
 use Limoncello\OAuthServer\Contracts\GrantTypes;
 use Limoncello\OAuthServer\Exceptions\OAuthRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
-use Limoncello\Passport\Adaptors\Generic\BasePassportServerIntegration;
+use Limoncello\Passport\Adaptors\Generic\GenericPassportServerIntegration;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\RedirectUri;
@@ -62,6 +62,7 @@ class PassportServerTest extends TestCase
     const TEST_CLIENT_REDIRECT_URI = 'http://client.server/redirect_uri';
     const TEST_SCOPE_1             = 'scope1';
     const TEST_SCOPE_2             = 'scope2';
+    const USERS_COLUMN_NAME        = 'name';
 
     /**
      * Test issuing resource owner password token.
@@ -417,7 +418,7 @@ class PassportServerTest extends TestCase
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
         $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
-   }
+    }
 
     /**
      * Test client grant.
@@ -696,7 +697,7 @@ class PassportServerTest extends TestCase
             );
         });
 
-        $integration = new class ($connection) extends BasePassportServerIntegration
+        $integration = new class ($connection) extends GenericPassportServerIntegration
         {
 
             /**

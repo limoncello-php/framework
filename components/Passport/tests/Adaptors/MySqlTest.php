@@ -155,7 +155,7 @@ class MySqlTest extends TestCase
         );
 
         $tokenRepo = $this->createTokenRepository();
-        $token     =$tokenRepo->createToken(
+        $token     = $tokenRepo->createToken(
             (new Token())
                 ->setClientIdentifier($client->getIdentifier())
                 ->setValue('secret-token')
@@ -166,6 +166,8 @@ class MySqlTest extends TestCase
         $sameToken = $tokenRepo->read($token->getIdentifier());
         $this->assertCount(2, $sameToken->getScopeIdentifiers());
         $this->assertTrue($sameToken->getValueCreatedAt() instanceof DateTimeInterface);
+
+        $this->assertNotEmpty($tokenRepo->readPassport($token->getValue(), 10));
     }
 
     /**

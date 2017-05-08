@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\RuleInterface;
 use Limoncello\Validation\Errors\ErrorAggregator;
@@ -53,7 +54,7 @@ class OrExpression extends BaseExpression
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         $secondaryHasErrors = false;
         foreach ($this->secondary->validate($input) as $error) {
@@ -74,7 +75,7 @@ class OrExpression extends BaseExpression
     /**
      * @inheritdoc
      */
-    public function isStateless()
+    public function isStateless(): bool
     {
         return $this->secondary->isStateless() === true && $this->primary->isStateless() === true;
     }

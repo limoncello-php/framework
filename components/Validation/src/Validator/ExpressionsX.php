@@ -39,7 +39,7 @@ trait ExpressionsX
      *
      * @return RuleInterface
      */
-    protected static function andX(RuleInterface $first, RuleInterface $second)
+    protected static function andX(RuleInterface $first, RuleInterface $second): RuleInterface
     {
         return new AndExpression($first, $second);
     }
@@ -50,7 +50,7 @@ trait ExpressionsX
      *
      * @return RuleInterface
      */
-    protected static function orX(RuleInterface $primary, RuleInterface $secondary)
+    protected static function orX(RuleInterface $primary, RuleInterface $secondary): RuleInterface
     {
         return new OrExpression($primary, $secondary);
     }
@@ -66,7 +66,7 @@ trait ExpressionsX
         callable $condition,
         RuleInterface $onTrue,
         RuleInterface $onFalse
-    ) {
+    ): RuleInterface {
         return new IfExpression($condition, $onTrue, $onFalse);
     }
 
@@ -76,7 +76,7 @@ trait ExpressionsX
      *
      * @return AutoNameRuleInterface
      */
-    protected static function arrayX(array $rules, RuleInterface $unlisted = null)
+    protected static function arrayX(array $rules, RuleInterface $unlisted = null): AutoNameRuleInterface
     {
         return new ArrayExpression($rules, $unlisted === null ? new Success() : $unlisted);
     }
@@ -86,7 +86,7 @@ trait ExpressionsX
      *
      * @return RuleInterface
      */
-    protected static function eachX(RuleInterface $rule)
+    protected static function eachX(RuleInterface $rule): RuleInterface
     {
         return new EachExpression($rule);
     }
@@ -97,7 +97,7 @@ trait ExpressionsX
      *
      * @return AutoNameRuleInterface
      */
-    protected static function objectX(array $rules, RuleInterface $unlisted = null)
+    protected static function objectX(array $rules, RuleInterface $unlisted = null): AutoNameRuleInterface
     {
         return new ObjectExpression($rules, $unlisted === null ? new Success() : $unlisted);
     }
@@ -108,8 +108,10 @@ trait ExpressionsX
      *
      * @return RuleInterface
      */
-    protected static function callableX(callable $callable, $messageCode = MessageCodes::INVALID_VALUE)
-    {
+    protected static function callableX(
+        callable $callable,
+        int $messageCode = MessageCodes::INVALID_VALUE
+    ): RuleInterface {
         return new CallableRule($callable, $messageCode);
     }
 }

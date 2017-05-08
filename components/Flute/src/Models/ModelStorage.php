@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 class ModelStorage implements ModelStorageInterface
 {
@@ -30,16 +30,16 @@ class ModelStorage implements ModelStorageInterface
     private $models = [];
 
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
-    private $schemaStorage;
+    private $schemes;
 
     /**
-     * @param ModelSchemesInterface $schemaStorage
+     * @param ModelSchemeInfoInterface $schemes
      */
-    public function __construct(ModelSchemesInterface $schemaStorage)
+    public function __construct(ModelSchemeInfoInterface $schemes)
     {
-        $this->schemaStorage = $schemaStorage;
+        $this->schemes = $schemes;
     }
 
     /**
@@ -52,7 +52,7 @@ class ModelStorage implements ModelStorageInterface
         }
 
         $class  = get_class($model);
-        $pkName = $this->schemaStorage->getPrimaryKey($class);
+        $pkName = $this->schemes->getPrimaryKey($class);
         $index  = $model->{$pkName};
 
         if ($this->has($class, $index) === false) {
@@ -66,7 +66,7 @@ class ModelStorage implements ModelStorageInterface
     /**
      * @inheritdoc
      */
-    public function has($class, $index)
+    public function has(string $class, string $index): bool
     {
         $result = isset($this->models[$class][$index]);
 
@@ -76,7 +76,7 @@ class ModelStorage implements ModelStorageInterface
     /**
      * @inheritdoc
      */
-    public function get($class, $index)
+    public function get(string $class, string $index)
     {
         $result = $this->models[$class][$index];
 

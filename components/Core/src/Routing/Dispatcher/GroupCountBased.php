@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Routing\Dispatcher;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,23 @@
  * limitations under the License.
  */
 
-use Limoncello\Core\Contracts\Routing\DispatcherInterface;
+use Limoncello\Contracts\Routing\DispatcherInterface;
+use Limoncello\Core\Routing\Traits\DispatcherTrait;
 
 /**
  * @package Limoncello\Core
  */
 class GroupCountBased extends \FastRoute\Dispatcher\GroupCountBased implements DispatcherInterface
 {
+    use DispatcherTrait;
+
     /** @noinspection PhpMissingParentConstructorInspection
      * Constructor.
      */
     public function __construct()
     {
+        assert($this->areCodeValid() === true);
+
         // Suppress parent constructor. Use `setData` instead.
     }
 

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Contracts\Authorization\PolicyDecision;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,5 +28,5 @@ interface PolicyDecisionPointInterface
      *
      * @return array
      */
-    public function evaluate(ContextInterface $context);
+    public function evaluate(ContextInterface $context): array;
 }

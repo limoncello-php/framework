@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Contracts\Authorization\PolicyAdministration;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,5 +24,5 @@ interface ObligationInterface extends MethodInterface
     /**
      * @return int
      */
-    public function getFulfillOn();
+    public function getFulfillOn(): int;
 }

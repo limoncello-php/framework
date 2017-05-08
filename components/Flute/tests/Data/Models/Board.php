@@ -17,7 +17,7 @@
  */
 
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 
 /**

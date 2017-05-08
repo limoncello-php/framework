@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Crypt;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Crypt\Exceptions\CryptException;
+
 /**
  * @package Limoncello\Crypt
  */
@@ -24,7 +26,7 @@ abstract class BasePublicKeyAsymmetricCrypt extends BaseAsymmetricCrypt
     /**
      * @param string $publicKeyOrPath Could be either public key or path to file prefixed with 'file://'.
      */
-    public function __construct($publicKeyOrPath)
+    public function __construct(string $publicKeyOrPath)
     {
         $this->clearErrors();
 

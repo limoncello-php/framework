@@ -23,13 +23,14 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 use Generator;
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
+use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\IncludeParameterInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -38,6 +39,7 @@ use Limoncello\Flute\Http\Query\FilterParameterCollection;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Exceptions\JsonApiException as E;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Flute
@@ -77,7 +79,7 @@ class Crud implements CrudInterface
     private $repository;
 
     /**
-     * @var ModelSchemesInterface
+     * @var ModelSchemeInfoInterface
      */
     private $modelSchemes;
 
@@ -87,24 +89,22 @@ class Crud implements CrudInterface
     private $paginationStrategy;
 
     /**
-     * @param FactoryInterface            $factory
-     * @param string                      $modelClass
-     * @param RepositoryInterface         $repository
-     * @param ModelSchemesInterface       $modelSchemes
-     * @param PaginationStrategyInterface $paginationStrategy
+     * @var ContainerInterface
      */
-    public function __construct(
-        FactoryInterface $factory,
-        $modelClass,
-        RepositoryInterface $repository,
-        ModelSchemesInterface $modelSchemes,
-        PaginationStrategyInterface $paginationStrategy
-    ) {
-        $this->factory            = $factory;
+    private $container;
+
+    /**
+     * @param ContainerInterface $container
+     * @param string             $modelClass
+     */
+    public function __construct(ContainerInterface $container, string $modelClass)
+    {
+        $this->factory            = $container->get(FactoryInterface::class);
         $this->modelClass         = $modelClass;
-        $this->repository         = $repository;
-        $this->modelSchemes       = $modelSchemes;
-        $this->paginationStrategy = $paginationStrategy;
+        $this->repository         = $container->get(RepositoryInterface::class);
+        $this->modelSchemes       = $container->get(ModelSchemeInfoInterface::class);
+        $this->paginationStrategy = $container->get(PaginationStrategyInterface::class);
+        $this->container          = $container;
     }
 
     /**
@@ -115,7 +115,7 @@ class Crud implements CrudInterface
         array $sortParams = null,
         array $includePaths = null,
         array $pagingParams = null
-    ) {
+    ): ModelsDataInterface {
         $modelClass = $this->getModelClass();
 
         $builder = $this->getRepository()->index($modelClass);
@@ -143,7 +143,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function indexResources(FilterParameterCollection $filterParams = null, array $sortParams = null)
+    public function indexResources(FilterParameterCollection $filterParams = null, array $sortParams = null): array
     {
         $modelClass = $this->getModelClass();
 
@@ -180,8 +180,11 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function read($index, FilterParameterCollection $filterParams = null, array $includePaths = null)
-    {
+    public function read(
+        $index,
+        FilterParameterCollection $filterParams = null,
+        array $includePaths = null
+    ): ModelsDataInterface {
         $model = $this->readResource($index, $filterParams);
         $data  = $this->getFactory()->createPaginatedData($model);
 
@@ -225,11 +228,11 @@ class Crud implements CrudInterface
      */
     public function readRelationship(
         $index,
-        $name,
+        string $name,
         FilterParameterCollection $filterParams = null,
         array $sortParams = null,
         array $pagingParams = null
-    ) {
+    ): PaginatedDataInterface {
         $modelClass = $this->getModelClass();
 
         /** @var QueryBuilder $builder */
@@ -261,7 +264,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function hasInRelationship($parentId, $name, $childId)
+    public function hasInRelationship($parentId, string $name, $childId): bool
     {
         $modelClass = $this->getModelClass();
 
@@ -294,7 +297,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function delete($index)
+    public function delete($index): int
     {
         $modelClass = $this->getModelClass();
 
@@ -310,7 +313,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function create($index, array $attributes, array $toMany = [])
+    public function create($index, array $attributes, array $toMany = []): string
     {
         $modelClass = $this->getModelClass();
 
@@ -342,7 +345,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function update($index, array $attributes, array $toMany = [])
+    public function update($index, array $attributes, array $toMany = []): int
     {
         $updated    = 0;
         $modelClass = $this->getModelClass();
@@ -376,9 +379,17 @@ class Crud implements CrudInterface
     }
 
     /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
+    /**
      * @return FactoryInterface
      */
-    protected function getFactory()
+    protected function getFactory(): FactoryInterface
     {
         return $this->factory;
     }
@@ -386,7 +397,7 @@ class Crud implements CrudInterface
     /**
      * @return string
      */
-    protected function getModelClass()
+    protected function getModelClass(): string
     {
         return $this->modelClass;
     }
@@ -394,15 +405,15 @@ class Crud implements CrudInterface
     /**
      * @return RepositoryInterface
      */
-    protected function getRepository()
+    protected function getRepository(): RepositoryInterface
     {
         return $this->repository;
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    protected function getModelSchemes()
+    protected function getModelSchemes(): ModelSchemeInfoInterface
     {
         return $this->modelSchemes;
     }
@@ -410,7 +421,7 @@ class Crud implements CrudInterface
     /**
      * @return PaginationStrategyInterface
      */
-    protected function getPaginationStrategy()
+    protected function getPaginationStrategy(): PaginationStrategyInterface
     {
         return $this->paginationStrategy;
     }
@@ -437,10 +448,10 @@ class Crud implements CrudInterface
      *
      * @return PaginatedDataInterface
      */
-    protected function fetchSingleData(QueryBuilder $builder, $class)
+    protected function fetchSingleData(QueryBuilder $builder, string $class): PaginatedDataInterface
     {
         $model = $this->fetchSingle($builder, $class);
-        $data  = $this->getFactory()->createPaginatedData($model);
+        $data  = $this->getFactory()->createPaginatedData($model)->markAsSingleItem();
 
         return $data;
     }
@@ -453,16 +464,20 @@ class Crud implements CrudInterface
      *
      * @return PaginatedDataInterface
      */
-    protected function fetchCollectionData(QueryBuilder $builder, $class, $limit, $offset)
-    {
+    protected function fetchCollectionData(
+        QueryBuilder $builder,
+        string $class,
+        int $limit,
+        int $offset
+    ): PaginatedDataInterface {
         list($models, $hasMore, $limit, $offset) = $this->fetchCollection($builder, $class, $limit, $offset);
 
         $data = $this->getFactory()
             ->createPaginatedData($models)
-            ->setIsCollection(true)
-            ->setHasMoreItems($hasMore)
+            ->markAsCollection()
             ->setOffset($offset)
             ->setLimit($limit);
+        $hasMore === true ? $data->markHasMoreItems() : $data->markHasNoMoreItems();
 
         return $data;
     }
@@ -473,16 +488,16 @@ class Crud implements CrudInterface
      *
      * @return array|null
      */
-    protected function fetchRow(QueryBuilder $builder, $class)
+    protected function fetchRow(QueryBuilder $builder, string $class)
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
-        $platform = $builder->getConnection()->getDatabasePlatform();
-        $types    = $this->getModelSchemes()->getAttributeTypeInstances($class);
+        $platform  = $builder->getConnection()->getDatabasePlatform();
+        $typeNames = $this->getModelSchemes()->getAttributeTypes($class);
 
         $model = null;
         if (($attributes = $statement->fetch()) !== false) {
-            $model = $this->readRowFromAssoc($attributes, $types, $platform);
+            $model = $this->readRowFromAssoc($attributes, $typeNames, $platform);
         }
 
         return $model;
@@ -494,16 +509,16 @@ class Crud implements CrudInterface
      *
      * @return mixed|null
      */
-    protected function fetchSingle(QueryBuilder $builder, $class)
+    protected function fetchSingle(QueryBuilder $builder, string $class)
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
         $platform = $builder->getConnection()->getDatabasePlatform();
-        $types    = $this->getModelSchemes()->getAttributeTypeInstances($class);
+        $typeNames = $this->getModelSchemes()->getAttributeTypes($class);
 
         $model = null;
         if (($attributes = $statement->fetch()) !== false) {
-            $model = $this->readInstanceFromAssoc($class, $attributes, $types, $platform);
+            $model = $this->readInstanceFromAssoc($class, $attributes, $typeNames, $platform);
         }
 
         return $model;
@@ -517,16 +532,16 @@ class Crud implements CrudInterface
      *
      * @return array
      */
-    protected function fetchCollection(QueryBuilder $builder, $class, $limit = null, $offset = null)
+    protected function fetchCollection(QueryBuilder $builder, string $class, $limit = null, $offset = null)
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
         $platform = $builder->getConnection()->getDatabasePlatform();
-        $types    = $this->getModelSchemes()->getAttributeTypeInstances($class);
+        $typeNames = $this->getModelSchemes()->getAttributeTypes($class);
 
         $models = [];
         while (($attributes = $statement->fetch()) !== false) {
-            $models[] = $this->readInstanceFromAssoc($class, $attributes, $types, $platform);
+            $models[] = $this->readInstanceFromAssoc($class, $attributes, $typeNames, $platform);
         }
 
         return $this->normalizePagingParams($models, $limit, $offset);
@@ -539,7 +554,7 @@ class Crud implements CrudInterface
      *
      * @return array
      */
-    protected function filterAttributesOnCreate($modelClass, array $attributes, $index = null)
+    protected function filterAttributesOnCreate(string $modelClass, array $attributes, string $index = null): array
     {
         $allowedAttributes = array_flip($this->getModelSchemes()->getAttributes($modelClass));
         $allowedChanges    = array_intersect_key($attributes, $allowedAttributes);
@@ -557,7 +572,7 @@ class Crud implements CrudInterface
      *
      * @return array
      */
-    protected function filterAttributesOnUpdate($modelClass, array $attributes)
+    protected function filterAttributesOnUpdate(string $modelClass, array $attributes): array
     {
         $allowedAttributes = array_flip($this->getModelSchemes()->getAttributes($modelClass));
         $allowedChanges    = array_intersect_key($attributes, $allowedAttributes);
@@ -570,7 +585,7 @@ class Crud implements CrudInterface
      *
      * @return QueryBuilder
      */
-    protected function builderOnCount(QueryBuilder $builder)
+    protected function builderOnCount(QueryBuilder $builder): QueryBuilder
     {
         return $builder;
     }
@@ -580,7 +595,7 @@ class Crud implements CrudInterface
      *
      * @return QueryBuilder
      */
-    protected function builderOnIndex(QueryBuilder $builder)
+    protected function builderOnIndex(QueryBuilder $builder): QueryBuilder
     {
         return $builder;
     }
@@ -590,7 +605,7 @@ class Crud implements CrudInterface
      *
      * @return QueryBuilder
      */
-    protected function builderOnRead(QueryBuilder $builder)
+    protected function builderOnRead(QueryBuilder $builder): QueryBuilder
     {
         return $builder;
     }
@@ -600,7 +615,7 @@ class Crud implements CrudInterface
      *
      * @return QueryBuilder
      */
-    protected function builderOnReadRelationship(QueryBuilder $builder)
+    protected function builderOnReadRelationship(QueryBuilder $builder): QueryBuilder
     {
         return $builder;
     }
@@ -610,7 +625,7 @@ class Crud implements CrudInterface
      *
      * @return QueryBuilder
      */
-    protected function builderSaveResourceOnCreate(QueryBuilder $builder)
+    protected function builderSaveResourceOnCreate(QueryBuilder $builder): QueryBuilder
     {
         return $builder;
     }
@@ -620,7 +635,7 @@ class Crud implements CrudInterface
      *
      * @return QueryBuilder
      */
-    protected function builderSaveResourceOnUpdate(QueryBuilder $builder)
+    protected function builderSaveResourceOnUpdate(QueryBuilder $builder): QueryBuilder
     {
         return $builder;
     }
@@ -636,7 +651,7 @@ class Crud implements CrudInterface
     protected function builderSaveRelationshipOnCreate(/** @noinspection PhpUnusedParameterInspection */
         $relationshipName,
         QueryBuilder $builder
-    ) {
+    ): QueryBuilder {
         return $builder;
     }
 
@@ -651,7 +666,7 @@ class Crud implements CrudInterface
     protected function builderSaveRelationshipOnUpdate(/** @noinspection PhpUnusedParameterInspection */
         $relationshipName,
         QueryBuilder $builder
-    ) {
+    ): QueryBuilder {
         return $builder;
     }
 
@@ -666,7 +681,7 @@ class Crud implements CrudInterface
     protected function builderCleanRelationshipOnUpdate(/** @noinspection PhpUnusedParameterInspection */
         $relationshipName,
         QueryBuilder $builder
-    ) {
+    ): QueryBuilder {
         return $builder;
     }
 
@@ -675,7 +690,7 @@ class Crud implements CrudInterface
      *
      * @return QueryBuilder
      */
-    protected function builderOnDelete(QueryBuilder $builder)
+    protected function builderOnDelete(QueryBuilder $builder): QueryBuilder
     {
         return $builder;
     }
@@ -688,7 +703,7 @@ class Crud implements CrudInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function readRelationships(PaginatedDataInterface $data, array $paths)
+    protected function readRelationships(PaginatedDataInterface $data, array $paths): RelationshipStorageInterface
     {
         $result = $this->getFactory()->createRelationshipStorage();
 
@@ -740,7 +755,7 @@ class Crud implements CrudInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function normalizePagingParams(array $models, $limit, $offset)
+    private function normalizePagingParams(array $models, $limit, $offset): array
     {
         if ($limit !== null) {
             $hasMore = count($models) >= $limit;
@@ -771,7 +786,7 @@ class Crud implements CrudInterface
      *
      * @return Generator
      */
-    private function getPaths(array $paths)
+    private function getPaths(array $paths): Generator
     {
         // The idea is to normalize paths. It means build all intermediate paths.
         // e.g. if only `a.b.c` path it given it will be normalized to `a`, `a.b` and `a.b.c`.
@@ -824,7 +839,7 @@ class Crud implements CrudInterface
         TagStorageInterface $modelsAtPath,
         ArrayObject $classAtPath,
         ModelStorageInterface $deDup,
-        $parentsPath,
+        string $parentsPath,
         array $childRelationships
     ) {
         $rootClass   = $classAtPath[static::$rootPath];
@@ -884,18 +899,21 @@ class Crud implements CrudInterface
     /**
      * @param string           $class
      * @param array            $attributes
-     * @param Type[]           $types
+     * @param Type[]           $typeNames
      * @param AbstractPlatform $platform
      *
      * @return mixed|null
      */
-    private function readInstanceFromAssoc($class, array $attributes, array $types, AbstractPlatform $platform)
-    {
+    private function readInstanceFromAssoc(
+        string $class,
+        array $attributes,
+        array $typeNames,
+        AbstractPlatform $platform
+    ) {
         $instance = new $class();
         foreach ($attributes as $name => $value) {
-            if (array_key_exists($name, $types) === true) {
-                /** @var Type $type */
-                $type  = $types[$name];
+            if (array_key_exists($name, $typeNames) === true) {
+                $type  = Type::getType($typeNames[$name]);
                 $value = $type->convertToPHPValue($value, $platform);
             }
             $instance->{$name} = $value;
@@ -906,18 +924,17 @@ class Crud implements CrudInterface
 
     /**
      * @param array            $attributes
-     * @param Type[]           $types
+     * @param Type[]           $typeNames
      * @param AbstractPlatform $platform
      *
      * @return array
      */
-    private function readRowFromAssoc(array $attributes, array $types, AbstractPlatform $platform)
+    private function readRowFromAssoc(array $attributes, array $typeNames, AbstractPlatform $platform): array
     {
         $row = [];
         foreach ($attributes as $name => $value) {
-            if (array_key_exists($name, $types) === true) {
-                /** @var Type $type */
-                $type  = $types[$name];
+            if (array_key_exists($name, $typeNames) === true) {
+                $type  = Type::getType($typeNames[$name]);
                 $value = $type->convertToPHPValue($value, $platform);
             }
             $row[$name] = $value;

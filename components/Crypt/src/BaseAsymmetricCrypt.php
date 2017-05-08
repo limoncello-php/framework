@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Crypt;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Generator;
+use Limoncello\Crypt\Exceptions\CryptException;
 
 /**
  * @package Limoncello\Crypt
@@ -42,9 +43,9 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
     }
 
     /**
-     * @return $this
+     * @return BaseAsymmetricCrypt
      */
-    public function closeKey()
+    public function closeKey(): BaseAsymmetricCrypt
     {
         if ($this->key !== null) {
             openssl_pkey_free($this->key);
@@ -66,9 +67,9 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
     /**
      * @param resource $key
      *
-     * @return $this
+     * @return BaseAsymmetricCrypt
      */
-    protected function setKey($key)
+    protected function setKey($key): BaseAsymmetricCrypt
     {
         assert(is_resource($key) === true);
 
@@ -123,9 +124,9 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
      *
      * @return Generator
      */
-    protected function chunkString($value, $maxSize)
+    protected function chunkString(string $value, int $maxSize): Generator
     {
-        $isValidInput = is_string($value) === true && is_int($maxSize) === true && $maxSize > 0;
+        $isValidInput = $maxSize > 0;
 
         assert($isValidInput === true);
 

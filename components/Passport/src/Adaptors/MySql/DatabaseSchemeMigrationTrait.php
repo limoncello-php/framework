@@ -35,12 +35,22 @@ trait DatabaseSchemeMigrationTrait
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $scheme
      *
+     * @throws DBALException
+     *
      * @return void
      */
     protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
     {
-        $this->createDatabaseTables($connection, $scheme);
-        $this->createDatabaseViews($connection, $scheme);
+        try {
+            $this->createDatabaseTables($connection, $scheme);
+            $this->createDatabaseViews($connection, $scheme);
+        } catch (DBALException $exception) {
+            if ($connection->isConnected() === true) {
+                $this->removeDatabaseScheme($connection, $scheme);
+            }
+
+            throw $exception;
+        }
     }
 
     /**
@@ -66,6 +76,7 @@ trait DatabaseSchemeMigrationTrait
         $this->createClientsView($connection, $scheme);
         $this->createTokensView($connection, $scheme);
         $this->createUsersView($connection, $scheme);
+        $this->createPassportView($connection, $scheme);
     }
 
     /**
@@ -76,6 +87,7 @@ trait DatabaseSchemeMigrationTrait
      */
     protected function removeDatabaseViews(Connection $connection, DatabaseSchemeInterface $scheme)
     {
+        $this->removePassportView($connection, $scheme);
         $this->removeClientsView($connection, $scheme);
         $this->removeTokensView($connection, $scheme);
         $this->removeUsersView($connection, $scheme);
@@ -122,6 +134,45 @@ EOT;
     protected function removeTokensView(Connection $connection, DatabaseSchemeInterface $scheme)
     {
         $view = $scheme->getTokensView();
+        $sql  = "DROP VIEW IF EXISTS {$view}";
+        $connection->exec($sql);
+    }
+
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $scheme
+     *
+     * @throws DBALException
+     *
+     * @return void
+     */
+    protected function createPassportView(Connection $connection, DatabaseSchemeInterface $scheme)
+    {
+        $tokensView   = $scheme->getTokensView();
+        $view         = $scheme->getPassportView();
+        $users        = $scheme->getUsersTable();
+        $tokensUserFk = $scheme->getTokensUserIdentityColumn();
+
+        $sql = <<< EOT
+CREATE OR REPLACE VIEW {$view} AS
+    SELECT *
+    FROM $tokensView
+      LEFT JOIN $users USING ($tokensUserFk);
+EOT;
+        $connection->exec($sql);
+    }
+
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $scheme
+     *
+     * @throws DBALException
+     *
+     * @return void
+     */
+    protected function removePassportView(Connection $connection, DatabaseSchemeInterface $scheme)
+    {
+        $view = $scheme->getPassportView();
         $sql  = "DROP VIEW IF EXISTS {$view}";
         $connection->exec($sql);
     }

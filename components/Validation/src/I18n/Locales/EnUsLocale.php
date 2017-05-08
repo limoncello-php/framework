@@ -31,7 +31,7 @@ class EnUsLocale implements LocaleInterface
     /**
      * @inheritdoc
      */
-    public static function getLocaleCode()
+    public static function getLocaleCode(): string
     {
         return 'en_US';
     }
@@ -39,7 +39,7 @@ class EnUsLocale implements LocaleInterface
     /**
      * @inheritdoc
      */
-    public static function getMessages()
+    public static function getMessages(): array
     {
         $dateTimeIdx        = Translator::CONTEXT_PARAMS_SHIFT + IsDateTimeFormat::CONTEXT_FORMAT;
         $stringLengthMinIdx = Translator::CONTEXT_PARAMS_SHIFT + StringLength::CONTEXT_MIN;

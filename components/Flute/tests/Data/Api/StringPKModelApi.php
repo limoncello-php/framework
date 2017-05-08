@@ -28,11 +28,11 @@ class StringPKModelApi extends AppCrud
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnCreate($modelClass, array $attributes, $index = null)
+    protected function filterAttributesOnCreate(string $modelClass, array $attributes, string $index = null): array
     {
         $allowedChanges = parent::filterAttributesOnCreate($modelClass, $attributes, $index);
 
-        // unset created_at as we dont have such column
+        // unset created_at as we don't have such column
         unset($allowedChanges[StringPKModel::FIELD_CREATED_AT]);
 
         return $allowedChanges;

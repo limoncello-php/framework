@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Container;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,6 @@ use Limoncello\Contracts\Container\ContainerInterface;
 class Container extends \Pimple\Container implements ContainerInterface
 {
     /**
-     * @var callable[]|null
-     */
-    private $destructorHandlers = null;
-
-    /**
      * @inheritdoc
      */
     public function get($identity)
@@ -48,28 +43,5 @@ class Container extends \Pimple\Container implements ContainerInterface
     public function has($identity)
     {
         return $this->offsetExists($identity);
-    }
-
-    /**
-     * @param callable $handler
-     *
-     * @return void
-     */
-    public function registerDestructor(callable $handler)
-    {
-        $this->destructorHandlers[] = $handler;
-    }
-
-    /**
-     * @return void
-     */
-    public function __destruct()
-    {
-        if ($this->destructorHandlers !== null) {
-            foreach ($this->destructorHandlers as $handler) {
-                call_user_func($handler);
-            }
-            unset($this->destructorHandlers);
-        }
     }
 }

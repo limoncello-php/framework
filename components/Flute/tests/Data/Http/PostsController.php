@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-use Interop\Container\ContainerInterface;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Api\PostsApi as Api;
 use Limoncello\Tests\Flute\Data\Models\Post as Model;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\AppValidator;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -39,47 +39,64 @@ class PostsController extends BaseController
     /**
      * @inheritdoc
      */
-    public static function parseInputOnCreate(ContainerInterface $container, ServerRequestInterface $request)
-    {
-        $json   = static::parseJson($container, $request);
-        $schema = static::getSchema($container);
+    public static function parseInputOnCreate(
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): array {
+        $validator = new class ($container) extends AppValidator
+        {
+            /**
+             * @inheritdoc
+             */
+            public function __construct(ContainerInterface $container)
+            {
+                parent::__construct($container, Schema::TYPE, [
+                    self::RULE_INDEX      => $this->absentOrNull(),
+                    self::RULE_ATTRIBUTES => [
+                        Schema::ATTR_TITLE => $this->requiredText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
+                        Schema::ATTR_TEXT  => $this->requiredText(Model::getAttributeLengths()[Model::FIELD_TEXT]),
+                    ]
+                ]);
+            }
+        };
 
-        /** @var AppValidator $validator */
-        $validator = $container->get(AppValidator::class);
-
-        $idRule         = $validator->absentOrNull();
-        $attributeRules = [
-            Schema::ATTR_TITLE => $validator->requiredText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-            Schema::ATTR_TEXT  => $validator->requiredText(Model::getAttributeLengths()[Model::FIELD_TEXT]),
-        ];
-
-        list ($idCapture, $attrCaptures, $toManyCaptures) =
-            $validator->assert($schema, $json, $idRule, $attributeRules);
-
-        return [$idCapture, $attrCaptures, $toManyCaptures];
+        return static::prepareCaptures(
+            $validator->assert(static::parseJson($container, $request))->getCaptures(),
+            Model::FIELD_ID,
+            [Model::FIELD_TITLE, Model::FIELD_TEXT]
+        );
     }
 
     /**
      * @inheritdoc
      */
-    public static function parseInputOnUpdate($index, ContainerInterface $container, ServerRequestInterface $request)
-    {
-        $json   = static::parseJson($container, $request);
-        $schema = static::getSchema($container);
+    public static function parseInputOnUpdate(
+        $index,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): array {
+        $validator = new class ($container, $index) extends AppValidator
+        {
+            /**
+             * @inheritdoc
+             */
+            public function __construct(ContainerInterface $container, $index)
+            {
+                parent::__construct($container, Schema::TYPE, [
+                    AppValidator::RULE_INDEX      => $this->idEquals($index),
+                    AppValidator::RULE_ATTRIBUTES => [
+                        Schema::ATTR_TITLE => $this->optionalText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
+                        Schema::ATTR_TEXT  => $this->optionalText(Model::getAttributeLengths()[Model::FIELD_TEXT]),
+                    ]
+                ]);
+            }
+        };
 
-        /** @var AppValidator $validator */
-        $validator = $container->get(AppValidator::class);
-
-        $idRule         = $validator->idEquals($index);
-        $attributeRules = [
-            Schema::ATTR_TITLE => $validator->optionalText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-            Schema::ATTR_TEXT  => $validator->optionalText(Model::getAttributeLengths()[Model::FIELD_TEXT]),
-        ];
-
-        list (, $attrCaptures, $toManyCaptures) =
-            $validator->assert($schema, $json, $idRule, $attributeRules);
-
-        return [$attrCaptures, $toManyCaptures];
+        return static::prepareCaptures(
+            $validator->assert(static::parseJson($container, $request))->getCaptures(),
+            Model::FIELD_ID,
+            [Model::FIELD_TITLE, Model::FIELD_TEXT]
+        );
     }
 
     /**
@@ -93,7 +110,7 @@ class PostsController extends BaseController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
         return static::readRelationship($index, Schema::REL_COMMENTS, $container, $request);
@@ -110,10 +127,10 @@ class PostsController extends BaseController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         $index        = $routeParams[static::ROUTE_KEY_INDEX];
         $commentIndex = $routeParams[static::ROUTE_KEY_CHILD_INDEX];
-        list ($attributes, $toMany) = CommentsController::parseInputOnUpdate($commentIndex, $container, $request);
+        list (, $attributes, $toMany) = CommentsController::parseInputOnUpdate($commentIndex, $container, $request);
 
         $response = static::updateInRelationship(
             $index,
@@ -140,7 +157,7 @@ class PostsController extends BaseController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         $index        = $routeParams[static::ROUTE_KEY_INDEX];
         $commentIndex = $routeParams[static::ROUTE_KEY_CHILD_INDEX];
 

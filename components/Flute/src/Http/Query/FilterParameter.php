@@ -56,11 +56,11 @@ class FilterParameter implements FilterParameterInterface
      * @param int|null    $relationshipType
      */
     public function __construct(
-        $originalName,
-        $relationshipName,
-        $attributeName,
-        $value,
-        $relationshipType = null
+        string $originalName,
+        string $relationshipName = null,
+        string $attributeName = null,
+        $value = null,
+        int $relationshipType = null
     ) {
         $this->originalName     = $originalName;
         $this->relationshipName = $relationshipName;
@@ -74,7 +74,7 @@ class FilterParameter implements FilterParameterInterface
     /**
      * @inheritdoc
      */
-    public function getOriginalName()
+    public function getOriginalName(): string
     {
         return $this->originalName;
     }
@@ -106,7 +106,7 @@ class FilterParameter implements FilterParameterInterface
     /**
      * @inheritdoc
      */
-    public function isForAttribute()
+    public function isForAttribute(): bool
     {
         return $this->getAttributeName() !== null;
     }
@@ -114,7 +114,7 @@ class FilterParameter implements FilterParameterInterface
     /**
      * @inheritdoc
      */
-    public function isForRelationship()
+    public function isForRelationship(): bool
     {
         return $this->getRelationshipName() !== null;
     }
@@ -122,7 +122,7 @@ class FilterParameter implements FilterParameterInterface
     /**
      * @inheritdoc
      */
-    public function isForAttributeInRelationship()
+    public function isForAttributeInRelationship(): bool
     {
         return $this->isForAttribute() === true && $this->isForRelationship() === true;
     }

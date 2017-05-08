@@ -17,13 +17,9 @@
  */
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Interop\Container\ContainerInterface;
 use Limoncello\Flute\Api\Crud;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
-use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
-use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Tests\Flute\Data\Models\Model;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests
@@ -34,44 +30,17 @@ abstract class AppCrud extends Crud
     const MODEL_CLASS = null;
 
     /**
-     * @var ContainerInterface|null
-     */
-    private $container;
-
-    /**
      * @inheritdoc
      */
-    public function __construct(
-        FactoryInterface $factory,
-        RepositoryInterface $repository,
-        ModelSchemesInterface $modelSchemes,
-        PaginationStrategyInterface $paginationStrategy,
-        ContainerInterface $container = null
-    ) {
-        parent::__construct(
-            $factory,
-            static::MODEL_CLASS,
-            $repository,
-            $modelSchemes,
-            $paginationStrategy
-        );
-        $this->container = $container;
-        // we do not use container in test (invoke for test coverage)
-        $this->getContainer();
-    }
-
-    /**
-     * @return ContainerInterface|null
-     */
-    protected function getContainer()
+    public function __construct(ContainerInterface $container)
     {
-        return $this->container;
+        parent::__construct($container, static::MODEL_CLASS);
     }
 
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnCreate($modelClass, array $attributes, $index = null)
+    protected function filterAttributesOnCreate(string $modelClass, array $attributes, string $index = null): array
     {
         $allowedChanges = parent::filterAttributesOnCreate($modelClass, $attributes, $index);
 
@@ -83,7 +52,7 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnUpdate($modelClass, array $attributes)
+    protected function filterAttributesOnUpdate(string $modelClass, array $attributes): array
     {
         $allowedChanges = parent::filterAttributesOnUpdate($modelClass, $attributes);
 
@@ -95,7 +64,7 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function builderSaveRelationshipOnCreate($relationshipName, QueryBuilder $builder)
+    protected function builderSaveRelationshipOnCreate($relationshipName, QueryBuilder $builder): QueryBuilder
     {
         $builder = parent::builderSaveRelationshipOnCreate($relationshipName, $builder);
 
@@ -107,7 +76,7 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function builderSaveRelationshipOnUpdate($relationshipName, QueryBuilder $builder)
+    protected function builderSaveRelationshipOnUpdate($relationshipName, QueryBuilder $builder): QueryBuilder
     {
         $builder = parent::builderSaveRelationshipOnUpdate($relationshipName, $builder);
 

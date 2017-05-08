@@ -56,8 +56,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     ) {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'eq', $params);
@@ -70,8 +70,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     ) {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'neq', $params);
@@ -84,8 +84,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     ) {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'gt', $params);
@@ -98,8 +98,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     ) {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'gte', $params);
@@ -112,8 +112,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     ) {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'lt', $params);
@@ -126,8 +126,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     ) {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'lte', $params);
@@ -140,8 +140,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     ) {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'like', $params);
@@ -154,8 +154,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         $params
     ) {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'notLike', $params);
@@ -168,8 +168,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         array $values
     ) {
         if ($this->isArrayOfScalars($values) === false) {
@@ -192,8 +192,8 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
+        string $table,
+        string $column,
         array $values
     ) {
         if ($this->isArrayOfScalars($values) === false) {
@@ -212,7 +212,7 @@ class FilterOperations implements FilterOperationsInterface
     /**
      * @inheritdoc
      */
-    public function applyIsNull(QueryBuilder $builder, CompositeExpression $link, $table, $column)
+    public function applyIsNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column)
     {
         $link->add($builder->expr()->isNull($this->getTableColumn($table, $column)));
     }
@@ -220,7 +220,7 @@ class FilterOperations implements FilterOperationsInterface
     /**
      * @inheritdoc
      */
-    public function applyIsNotNull(QueryBuilder $builder, CompositeExpression $link, $table, $column)
+    public function applyIsNotNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column)
     {
         $link->add($builder->expr()->isNotNull($this->getTableColumn($table, $column)));
     }
@@ -242,9 +242,9 @@ class FilterOperations implements FilterOperationsInterface
         QueryBuilder $builder,
         CompositeExpression $link,
         ErrorCollection $errors,
-        $table,
-        $column,
-        $method,
+        string $table,
+        string $column,
+        string $method,
         $params
     ) {
         // params could be in form of 1 value or array of values
@@ -270,7 +270,7 @@ class FilterOperations implements FilterOperationsInterface
     /**
      * @return T
      */
-    protected function getTranslator()
+    protected function getTranslator(): T
     {
         return $this->translator;
     }
@@ -281,7 +281,7 @@ class FilterOperations implements FilterOperationsInterface
      *
      * @return void
      */
-    protected function addInvalidQueryParameterError(ErrorCollection $errors, $name)
+    protected function addInvalidQueryParameterError(ErrorCollection $errors, string $name)
     {
         $errors->addQueryParameterError($name, $this->getInvalidParameterErrorMessage());
     }
@@ -289,7 +289,7 @@ class FilterOperations implements FilterOperationsInterface
     /**
      * @return string
      */
-    protected function getInvalidParameterErrorMessage()
+    protected function getInvalidParameterErrorMessage(): string
     {
         if ($this->errMsgInvalidParam === null) {
             $this->errMsgInvalidParam = $this->getTranslator()->get(T::MSG_ERR_INVALID_PARAMETER);
@@ -303,7 +303,7 @@ class FilterOperations implements FilterOperationsInterface
      *
      * @return bool
      */
-    private function isArrayOfScalars(array $input)
+    private function isArrayOfScalars(array $input): bool
     {
         foreach ($input as $value) {
             if (is_scalar($value) === false) {
@@ -320,7 +320,7 @@ class FilterOperations implements FilterOperationsInterface
      *
      * @return string
      */
-    private function getTableColumn($table, $column)
+    private function getTableColumn(string $table, string $column): string
     {
         return "`$table`.`$column`";
     }

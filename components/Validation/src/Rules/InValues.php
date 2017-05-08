@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\MessageCodes;
 
 /**
@@ -42,7 +43,7 @@ class InValues extends BaseRule
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function __construct(array $values, $isStrict = true)
+    public function __construct(array $values, bool $isStrict = true)
     {
         $this->values   = $values;
         $this->isStrict = $isStrict;
@@ -51,7 +52,7 @@ class InValues extends BaseRule
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         if (in_array($input, $this->values, $this->isStrict) === false) {
             $context = [static::CONTEXT_VALUES => $this->values];

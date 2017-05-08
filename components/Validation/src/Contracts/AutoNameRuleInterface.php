@@ -24,10 +24,10 @@ interface AutoNameRuleInterface extends RuleInterface
     /**
      * @return AutoNameRuleInterface
      */
-    public function enableAutoParameterNames();
+    public function enableAutoParameterNames(): self;
 
     /**
      * @return AutoNameRuleInterface
      */
-    public function disableAutoParameterNames();
+    public function disableAutoParameterNames(): self;
 }

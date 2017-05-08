@@ -1,7 +1,7 @@
 <?php namespace Limoncello\l10n\Messages;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class FileBundleEncoder extends BundleEncoder
      * @param string $localesDir
      * @param string $globMessagePatterns
      */
-    public function __construct($localesDir, $globMessagePatterns = '*.php')
+    public function __construct(string $localesDir, $globMessagePatterns = '*.php')
     {
         $this->setGlobMessagePatterns($globMessagePatterns)->loadBundles($localesDir);
     }
@@ -39,9 +39,9 @@ class FileBundleEncoder extends BundleEncoder
     /**
      * @param string $localesDir
      *
-     * @return $this
+     * @return self
      */
-    protected function loadBundles($localesDir)
+    protected function loadBundles(string $localesDir): self
     {
         assert(is_string($localesDir) === true && empty($localesDir) === false);
 
@@ -67,7 +67,7 @@ class FileBundleEncoder extends BundleEncoder
     /**
      * @return string
      */
-    protected function getGlobMessagePatterns()
+    protected function getGlobMessagePatterns(): string
     {
         return $this->globMessagePatterns;
     }
@@ -75,9 +75,9 @@ class FileBundleEncoder extends BundleEncoder
     /**
      * @param string $globMessagePatterns
      *
-     * @return $this
+     * @return self
      */
-    protected function setGlobMessagePatterns($globMessagePatterns)
+    protected function setGlobMessagePatterns(string $globMessagePatterns): self
     {
         assert(is_string($globMessagePatterns) === true && empty($globMessagePatterns) === false);
         $this->globMessagePatterns = $globMessagePatterns;
@@ -92,8 +92,11 @@ class FileBundleEncoder extends BundleEncoder
      *
      * @return ResourceBundleInterface
      */
-    protected function loadBundleFromFile($fileFullPath, $localeDir, $messageFile)
-    {
+    protected function loadBundleFromFile(
+        string $fileFullPath,
+        string $localeDir,
+        string $messageFile
+    ): ResourceBundleInterface {
         /** @noinspection PhpIncludeInspection */
         $properties = require $fileFullPath;
         $bundle     = new ResourceBundle($localeDir, $messageFile, $properties);

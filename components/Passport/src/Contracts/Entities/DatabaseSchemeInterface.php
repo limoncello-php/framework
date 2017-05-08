@@ -305,7 +305,7 @@ interface DatabaseSchemeInterface
     public function getTokensScopesScopeIdentityColumn(): string;
 
     /**************************************************************************
-     * Users table.
+     * Users table and view.
      *************************************************************************/
 
     /**
@@ -322,4 +322,13 @@ interface DatabaseSchemeInterface
      * @return string|null
      */
     public function getUsersIdentityColumn();
+
+    /**************************************************************************
+     * Passport view.
+     *************************************************************************/
+
+    /**
+     * @return string|null
+     */
+    public function getPassportView();
 }

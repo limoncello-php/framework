@@ -1,7 +1,7 @@
 <?php namespace Limoncello\l10n\Format;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class Translator extends Formatter implements TranslatorInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function translateMessage($locale, $namespace, $key, array $args = [])
+    public function translateMessage(string $locale, string $namespace, string $key, array $args = []): string
     {
         $translation = $this->getStorage()->get($locale, $namespace, $key);
         if ($translation !== null) {
@@ -58,7 +58,7 @@ class Translator extends Formatter implements TranslatorInterface
     /**
      * @return BundleStorageInterface
      */
-    public function getStorage()
+    public function getStorage(): BundleStorageInterface
     {
         return $this->storage;
     }
@@ -66,9 +66,9 @@ class Translator extends Formatter implements TranslatorInterface
     /**
      * @param BundleStorageInterface $storage
      *
-     * @return $this
+     * @return Translator
      */
-    public function setStorage($storage)
+    public function setStorage(BundleStorageInterface $storage): Translator
     {
         $this->storage = $storage;
 

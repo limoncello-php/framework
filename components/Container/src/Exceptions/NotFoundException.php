@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Container\Exceptions;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,13 @@
  * limitations under the License.
  */
 
-class NotFoundException extends \InvalidArgumentException implements \Interop\Container\Exception\NotFoundException
+use InvalidArgumentException;
+use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface as LEI;
+use Psr\Container\NotFoundExceptionInterface;
+
+/**
+ * @package Limoncello\Container
+ */
+class NotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface, LEI
 {
 }

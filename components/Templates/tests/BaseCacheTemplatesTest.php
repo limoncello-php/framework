@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Templates;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-use Composer\Script\Event;
-use Limoncello\AppCache\Contracts\FileSystemInterface;
-use Limoncello\Templates\Scripts\BaseCacheTemplates;
+use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Mockery;
 use Mockery\Mock;
 use Twig_Environment;
+
+// TODO update tests to test commands + rename test class
 
 /**
  * @package Limoncello\Tests\AppCache

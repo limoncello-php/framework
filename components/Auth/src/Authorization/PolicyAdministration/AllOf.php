@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Auth\Authorization\PolicyAdministration;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class AllOf implements AllOfInterface
     /**
      * @inheritdoc
      */
-    public function getPairs()
+    public function getPairs(): array
     {
         return $this->pairs;
     }

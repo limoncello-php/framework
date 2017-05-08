@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Generator;
+
 /**
  * @package Limoncello\Validation
  */
@@ -24,7 +26,7 @@ class Success extends BaseRule
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         // yield empty Generator to comply with interface
         foreach ([] as $item) {

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\RuleInterface;
 
@@ -41,7 +42,7 @@ class EachExpression extends BaseExpression
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         foreach ($input as $value) {
             foreach ($this->getRule()->validate($value) as $error) {
@@ -53,7 +54,7 @@ class EachExpression extends BaseExpression
     /**
      * @inheritdoc
      */
-    public function isStateless()
+    public function isStateless(): bool
     {
         return $this->getRule()->isStateless();
     }
@@ -69,7 +70,7 @@ class EachExpression extends BaseExpression
     /**
      * @return RuleInterface
      */
-    protected function getRule()
+    protected function getRule(): RuleInterface
     {
         return $this->rule;
     }

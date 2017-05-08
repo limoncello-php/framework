@@ -19,18 +19,18 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Model\RelationshipTypes;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\Models\ModelSchemes;
 use Limoncello\Tests\Flute\Data\Migrations\Runner as MigrationRunner;
 use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\ModelInterface;
+use Limoncello\Tests\Flute\Data\Models\ModelSchemes;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\Role;
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
@@ -45,21 +45,22 @@ use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Mockery;
-use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class TestCase extends \PHPUnit_Framework_TestCase
+class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array $modelClasses
      * @param bool  $requireReverseRelationships
      *
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
-    public static function createSchemes(array $modelClasses, $requireReverseRelationships = true)
-    {
+    public static function createSchemes(
+        array $modelClasses,
+        $requireReverseRelationships = true
+    ): ModelSchemeInfoInterface {
         $registered    = [];
         $modelSchemes  = new ModelSchemes();
         $registerModel = function ($modelClass) use ($modelSchemes, &$registered, $requireReverseRelationships) {
@@ -188,7 +189,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ModelSchemesInterface
+     * @return ModelSchemeInfoInterface
      */
     protected function getModelSchemes()
     {
@@ -207,18 +208,18 @@ class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ModelSchemesInterface             $modelSchemes
+     * @param Factory                           $factory
+     * @param ModelSchemeInfoInterface          $modelSchemes
      * @param RelationshipStorageInterface|null $storage
      *
      * @return JsonSchemesInterface
      */
     protected function getJsonSchemes(
-        ModelSchemesInterface $modelSchemes,
+        Factory $factory,
+        ModelSchemeInfoInterface $modelSchemes,
         RelationshipStorageInterface $storage = null
     ) {
-        $factory = new Factory();
         $schemes = $factory->createJsonSchemes($this->getSchemeMap(), $modelSchemes);
-
         $storage === null ?: $schemes->setRelationshipStorage($storage);
 
         return $schemes;
@@ -230,13 +231,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
     protected function getSchemeMap()
     {
         return [
-            Board::class   => function (
-                FactoryInterface $factory,
-                JsonSchemesInterface $container,
-                ModelSchemesInterface $modelSchemes
-            ) {
-                return new BoardSchema($factory, $container, $modelSchemes);
-            },
+            Board::class    => BoardSchema::class,
             Comment::class  => CommentSchema::class,
             Emotion::class  => EmotionSchema::class,
             Post::class     => PostSchema::class,

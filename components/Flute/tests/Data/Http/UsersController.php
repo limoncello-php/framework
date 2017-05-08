@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-use Interop\Container\ContainerInterface;
 use Limoncello\Tests\Flute\Data\Api\UsersApi as Api;
 use Limoncello\Tests\Flute\Data\Models\User as Model;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\AppValidator;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -38,59 +38,90 @@ class UsersController extends BaseController
     /**
      * @inheritdoc
      */
-    public static function parseInputOnCreate(ContainerInterface $container, ServerRequestInterface $request)
-    {
-        $json   = static::parseJson($container, $request);
-        $schema = static::getSchema($container);
+    public static function parseInputOnCreate(
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): array {
+        $validator = new class ($container) extends AppValidator
+        {
+            /**
+             * @inheritdoc
+             */
+            public function __construct(ContainerInterface $container)
+            {
+                $lengths = Model::getAttributeLengths();
+                parent::__construct($container, Schema::TYPE, [
+                    self::RULE_INDEX      => $this->absentOrNull(),
+                    self::RULE_ATTRIBUTES => [
+                        Schema::ATTR_TITLE      => $this->requiredText($lengths[Model::FIELD_TITLE]),
+                        Schema::ATTR_FIRST_NAME => $this->requiredText($lengths[Model::FIELD_FIRST_NAME]),
+                        Schema::ATTR_LAST_NAME  => $this->requiredText($lengths[Model::FIELD_LAST_NAME]),
+                        Schema::ATTR_EMAIL      => $this->requiredText($lengths[Model::FIELD_EMAIL]),
+                        Schema::ATTR_LANGUAGE   => $this->requiredText($lengths[Model::FIELD_LANGUAGE]),
+                    ],
+                    self::RULE_TO_ONE     => [
+                        Schema::REL_ROLE => $this->requiredRoleId(),
+                    ],
+                ]);
+            }
+        };
 
-        /** @var AppValidator $validator */
-        $validator = $container->get(AppValidator::class);
-
-        $idRule         = $validator->absentOrNull();
-        $attributeRules = [
-            Schema::ATTR_TITLE      => $validator->requiredText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-            Schema::ATTR_FIRST_NAME => $validator->requiredText(Model::getAttributeLengths()[Model::FIELD_FIRST_NAME]),
-            Schema::ATTR_LAST_NAME  => $validator->requiredText(Model::getAttributeLengths()[Model::FIELD_LAST_NAME]),
-            Schema::ATTR_EMAIL      => $validator->requiredText(Model::getAttributeLengths()[Model::FIELD_EMAIL]),
-            Schema::ATTR_LANGUAGE   => $validator->requiredText(Model::getAttributeLengths()[Model::FIELD_LANGUAGE]),
-        ];
-        $toOneRules     = [
-            Schema::REL_ROLE => $validator->requiredRoleId(),
-        ];
-
-        list ($idCapture, $attrCaptures, $toManyCaptures) =
-            $validator->assert($schema, $json, $idRule, $attributeRules, $toOneRules);
-
-        return [$idCapture, $attrCaptures, $toManyCaptures];
+        return static::prepareCaptures(
+            $validator->assert(static::parseJson($container, $request))->getCaptures(),
+            Model::FIELD_ID, [
+                Model::FIELD_TITLE,
+                Model::FIELD_FIRST_NAME,
+                Model::FIELD_LAST_NAME,
+                Model::FIELD_EMAIL,
+                Model::FIELD_LANGUAGE,
+            ],
+            [Model::REL_ROLE]
+        );
     }
 
     /**
      * @inheritdoc
      */
-    public static function parseInputOnUpdate($index, ContainerInterface $container, ServerRequestInterface $request)
-    {
-        $json   = static::parseJson($container, $request);
-        $schema = static::getSchema($container);
+    public static function parseInputOnUpdate(
+        $index,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): array {
+        $validator = new class ($container) extends AppValidator
+        {
+            /**
+             * @inheritdoc
+             */
+            public function __construct(ContainerInterface $container)
+            {
+                $lengths = Model::getAttributeLengths();
+                parent::__construct($container, Schema::TYPE, [
+                    self::RULE_INDEX      => $this->absentOrNull(),
+                    self::RULE_ATTRIBUTES => [
+                        Schema::ATTR_TITLE      => $this->optionalText($lengths[Model::FIELD_TITLE]),
+                        Schema::ATTR_FIRST_NAME => $this->optionalText($lengths[Model::FIELD_FIRST_NAME]),
+                        Schema::ATTR_LAST_NAME  => $this->optionalText($lengths[Model::FIELD_LAST_NAME]),
+                        Schema::ATTR_EMAIL      => $this->optionalText($lengths[Model::FIELD_EMAIL]),
+                        Schema::ATTR_LANGUAGE   => $this->optionalText($lengths[Model::FIELD_LANGUAGE]),
+                    ],
+                    self::RULE_TO_ONE     => [
+                        Schema::REL_ROLE => $this->requiredRoleId(),
+                    ],
+                ]);
+            }
+        };
 
-        /** @var AppValidator $validator */
-        $validator = $container->get(AppValidator::class);
-
-        $idRule         = $validator->idEquals($index);
-        $attributeRules = [
-            Schema::ATTR_TITLE      => $validator->optionalText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-            Schema::ATTR_FIRST_NAME => $validator->optionalText(Model::getAttributeLengths()[Model::FIELD_FIRST_NAME]),
-            Schema::ATTR_LAST_NAME  => $validator->optionalText(Model::getAttributeLengths()[Model::FIELD_LAST_NAME]),
-            Schema::ATTR_EMAIL      => $validator->optionalText(Model::getAttributeLengths()[Model::FIELD_EMAIL]),
-            Schema::ATTR_LANGUAGE   => $validator->optionalText(Model::getAttributeLengths()[Model::FIELD_LANGUAGE]),
-        ];
-        $toOneRules     = [
-            Schema::REL_ROLE => $validator->optionalRoleId(),
-        ];
-
-        list (, $attrCaptures, $toManyCaptures) =
-            $validator->assert($schema, $json, $idRule, $attributeRules, $toOneRules);
-
-        return [$attrCaptures, $toManyCaptures];
+        return static::prepareCaptures(
+            $validator->assert(static::parseJson($container, $request))->getCaptures(),
+            Model::FIELD_ID, [
+            Model::FIELD_TITLE,
+            Model::FIELD_FIRST_NAME,
+            Model::FIELD_LAST_NAME,
+            Model::FIELD_EMAIL,
+            Model::FIELD_LANGUAGE,
+        ],
+            [Model::REL_ROLE]
+        );
     }
 
     /**
@@ -104,7 +135,7 @@ class UsersController extends BaseController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         return static::readRelationship($routeParams[static::ROUTE_KEY_INDEX], Schema::REL_POSTS, $container, $request);
     }
 
@@ -119,7 +150,7 @@ class UsersController extends BaseController
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
-    ) {
+    ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
         return static::readRelationship($index, Schema::REL_COMMENTS, $container, $request);

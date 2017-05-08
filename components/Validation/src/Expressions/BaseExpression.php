@@ -52,7 +52,7 @@ abstract class BaseExpression implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function setParameterName($parameterName)
+    public function setParameterName(string $parameterName = null): RuleInterface
     {
         $this->parameterName = $parameterName;
 

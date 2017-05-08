@@ -16,16 +16,17 @@
  * limitations under the License.
  */
 
-use Interop\Container\ContainerInterface;
-use Limoncello\Flute\Contracts\Config\JsonApiConfigInterface;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Http\Responses;
+use Limoncello\Flute\Package\FluteSettings as S;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use Neomerx\JsonApi\Http\Headers\SupportedExtensions;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -44,15 +45,14 @@ trait CreateResponsesTrait
         ContainerInterface $container,
         ServerRequestInterface $request,
         EncodingParametersInterface $parameters = null
-    ) {
+    ): ResponsesInterface {
         /** @var EncoderInterface $encoder */
         $encoder = $container->get(EncoderInterface::class);
         $encoder->forOriginalUri($request->getUri());
 
-        /** @var JsonApiConfigInterface $config */
-        $config    = $container->get(JsonApiConfigInterface::class);
-        $urlPrefix = $config
-            ->getConfig()[JsonApiConfigInterface::KEY_JSON][JsonApiConfigInterface::KEY_JSON_URL_PREFIX];
+        /** @var SettingsProviderInterface $provider */
+        $provider = $container->get(SettingsProviderInterface::class);
+        $settings = $provider->get(S::class);
 
         /** @var JsonSchemesInterface $jsonSchemes */
         $jsonSchemes = $container->get(JsonSchemesInterface::class);
@@ -62,7 +62,7 @@ trait CreateResponsesTrait
             $encoder,
             $jsonSchemes,
             $parameters,
-            $urlPrefix
+            $settings[S::KEY_URI_PREFIX]
         );
 
         return $responses;

@@ -27,7 +27,7 @@ interface ModelsDataInterface
     /**
      * @return PaginatedDataInterface
      */
-    public function getPaginatedData();
+    public function getPaginatedData(): PaginatedDataInterface;
 
     /**
      * @return RelationshipStorageInterface|null

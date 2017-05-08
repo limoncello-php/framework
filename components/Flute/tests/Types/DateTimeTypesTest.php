@@ -24,7 +24,6 @@ use Limoncello\Flute\Types\DateTimeDefaultStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiNativeType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
 use Limoncello\Tests\Flute\TestCase;
-use Limoncello\Validation\Validator as v;
 
 /**
  * @package Limoncello\Tests\Flute

@@ -18,20 +18,20 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
-use Limoncello\Flute\Config\JsonApiConfig;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
-use Limoncello\Flute\Contracts\Config\JsonApiConfigInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
+use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Http\BoardsController;
 use Limoncello\Tests\Flute\Data\Http\CategoriesController;
@@ -40,13 +40,14 @@ use Limoncello\Tests\Flute\Data\Http\PostsController;
 use Limoncello\Tests\Flute\Data\Http\UsersController;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
+use Limoncello\Tests\Flute\Data\Package\Flute;
+use Limoncello\Tests\Flute\Data\Package\SettingsProvider;
 use Limoncello\Tests\Flute\Data\Schemes\BoardSchema;
 use Limoncello\Tests\Flute\Data\Schemes\CategorySchema;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
 use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
-use Limoncello\Tests\Flute\Data\Validation\AppValidator;
 use Limoncello\Tests\Flute\TestCase;
 use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
 use Limoncello\Validation\I18n\Locales\EnUsLocale;
@@ -57,6 +58,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Uri;
 
@@ -1041,7 +1043,7 @@ EOT;
                 ],
             ]
         ];
-        $container   = $this->createContainer();
+        $container = $this->createContainer();
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
@@ -1069,19 +1071,20 @@ EOT;
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface
      */
-    private function createContainer()
+    protected function createContainer(): ContainerInterface
     {
         $container = new Container();
 
-        $container[FactoryInterface::class]               = $factory = new Factory();
+        $container[FactoryInterface::class]               = $factory = new Factory($container);
         $container[QueryParametersParserInterface::class] = $factory
             ->getJsonApiFactory()->createQueryParametersParser();
-        $container[ModelSchemesInterface::class]       = $modelSchemes = $this->getModelSchemes();
+        $container[ModelSchemeInfoInterface::class]       = $modelSchemes = $this->getModelSchemes();
         /** @var RelationshipStorageInterface $storage */
         $storage                                       = null;
-        $container[JsonSchemesInterface::class]        = $jsonSchemes = $this->getJsonSchemes($modelSchemes, $storage);
+        $container[JsonSchemesInterface::class]        = $jsonSchemes = $this
+            ->getJsonSchemes($factory, $modelSchemes, $storage);
         $container[Connection::class]                  = $connection = $this->initDb();
         $container[TranslatorInterface::class]         = $translator = $factory->createTranslator();
         $container[FilterOperationsInterface::class]   = $filterOperations = new FilterOperations($translator);
@@ -1092,23 +1095,26 @@ EOT;
             $filterOperations,
             $translator
         );
-        $container[JsonApiConfigInterface::class]        = $config = $this->createJsonApiConfig();
+        $container[SettingsProviderInterface::class] = new SettingsProvider([
+            FluteSettings::class => (new Flute($this->getSchemeMap()))->get(),
+        ]);
+        $container[EncoderInterface::class] = function (ContainerInterface $container) use ($factory, $jsonSchemes) {
+            /** @var SettingsProviderInterface $provider */
+            $provider = $container->get(SettingsProviderInterface::class);
+            $settings = $provider->get(FluteSettings::class);
 
-        $container[EncoderInterface::class] = function () use ($config, $factory, $jsonSchemes) {
-            $encoderConfig = $config->getConfig()[JsonApiConfigInterface::KEY_JSON];
-
-            $urlPrefix = $encoderConfig[JsonApiConfigInterface::KEY_JSON_URL_PREFIX];
+            $urlPrefix = $settings[FluteSettings::KEY_URI_PREFIX];
             $encoder   = $factory->createEncoder($jsonSchemes, new EncoderOptions(
-                $encoderConfig[JsonApiConfigInterface::KEY_JSON_OPTIONS],
+                $settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS],
                 $urlPrefix,
-                $encoderConfig[JsonApiConfigInterface::KEY_JSON_DEPTH]
+                $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
             ));
-            if (isset($encoderConfig[JsonApiConfigInterface::KEY_JSON_VERSION_META]) === true) {
-                $meta = $encoderConfig[JsonApiConfigInterface::KEY_JSON_VERSION_META];
+            if (isset($settings[FluteSettings::KEY_META]) === true) {
+                $meta = $settings[FluteSettings::KEY_META];
                 $encoder->withMeta($meta);
             }
-            if (isset($encoderConfig[JsonApiConfigInterface::KEY_JSON_IS_SHOW_VERSION]) === true &&
-                $encoderConfig[JsonApiConfigInterface::KEY_JSON_IS_SHOW_VERSION] === true
+            if (isset($settings[FluteSettings::KEY_IS_SHOW_VERSION]) === true &&
+                $settings[FluteSettings::KEY_IS_SHOW_VERSION] === true
             ) {
                 $encoder->withJsonApiVersion();
             }
@@ -1119,24 +1125,6 @@ EOT;
         $container[ValidationTranslatorInterface::class] = $validationTranslator =
             new ValidationTranslator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());
 
-        $container[AppValidator::class] =
-            new AppValidator($translator, $validationTranslator, $jsonSchemes, $modelSchemes, $connection);
-
         return $container;
-    }
-
-    /**
-     * @return JsonApiConfigInterface
-     */
-    private function createJsonApiConfig()
-    {
-        $config = new JsonApiConfig();
-        $config
-            ->setModelSchemaMap($this->getSchemeMap())
-            ->setRelationshipPagingSize(20)
-            ->setJsonEncodeOptions($config->getJsonEncodeOptions() | JSON_PRETTY_PRINT)
-            ->setHideVersion();
-
-        return $config;
     }
 }

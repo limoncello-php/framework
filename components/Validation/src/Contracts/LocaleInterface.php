@@ -24,10 +24,10 @@ interface LocaleInterface
     /**
      * @return string
      */
-    public static function getLocaleCode();
+    public static function getLocaleCode(): string;
 
     /**
      * @return array
      */
-    public static function getMessages();
+    public static function getMessages(): array;
 }

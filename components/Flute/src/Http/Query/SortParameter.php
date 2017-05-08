@@ -50,8 +50,12 @@ class SortParameter implements SortParameterInterface
      * @param bool                              $isRelationship
      * @param int|null                          $relationshipType
      */
-    public function __construct(JsonLibrarySortParameterInterface $sortParam, $name, $isRelationship, $relationshipType)
-    {
+    public function __construct(
+        JsonLibrarySortParameterInterface $sortParam,
+        string $name,
+        bool $isRelationship,
+        int $relationshipType = null
+    ) {
         $this->libSortParam   = $sortParam;
         $this->name           = $name;
         $this->isRelationship = $isRelationship;
@@ -63,7 +67,7 @@ class SortParameter implements SortParameterInterface
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -71,7 +75,7 @@ class SortParameter implements SortParameterInterface
     /**
      * @inheritdoc
      */
-    public function getOriginalName()
+    public function getOriginalName(): string
     {
         return $this->libSortParam->getField();
     }
@@ -79,7 +83,7 @@ class SortParameter implements SortParameterInterface
     /**
      * @inheritdoc
      */
-    public function isAscending()
+    public function isAscending(): bool
     {
         return $this->libSortParam->isAscending();
     }
@@ -87,7 +91,7 @@ class SortParameter implements SortParameterInterface
     /**
      * @inheritdoc
      */
-    public function isRelationship()
+    public function isRelationship(): bool
     {
         return $this->isRelationship;
     }

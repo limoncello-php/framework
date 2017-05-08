@@ -20,7 +20,7 @@ use Closure;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Tests\Flute\Data\Models\Model;
 use Limoncello\Tests\Flute\Data\Models\ModelInterface;
 
@@ -56,7 +56,7 @@ abstract class Migration
     public function rollback()
     {
         $tableName = $this->getTableName();
-        if ($this->getSchemaManager()->tablesExist($tableName) === true) {
+        if ($this->getSchemaManager()->tablesExist([$tableName]) === true) {
             $this->getSchemaManager()->dropTable($tableName);
         }
     }

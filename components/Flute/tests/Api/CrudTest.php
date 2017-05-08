@@ -17,11 +17,15 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Contracts\Model\RelationshipTypes;
+use Limoncello\Container\Container;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
+use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
+use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\FilterParameter;
@@ -650,20 +654,21 @@ class CrudTest extends TestCase
      */
     private function createCrud($class)
     {
-        $this->connection = $this->initDb();
-        $factory          = new Factory();
-        $translator       = $factory->createTranslator();
-        $filterOperations = new FilterOperations($translator);
-        $modelSchemes     = $this->getModelSchemes();
-        $repository       = $factory->createRepository(
+        $container = new Container();
+
+        $container[Connection::class] = $this->connection = $this->initDb();
+        $container[FactoryInterface::class] = $factory = new Factory($container);
+        $translator = $factory->createTranslator();
+        $container[ModelSchemeInfoInterface::class] = $modelSchemes     = $this->getModelSchemes();
+        $container[RepositoryInterface::class] = $factory->createRepository(
             $this->connection,
             $modelSchemes,
-            $filterOperations,
+            new FilterOperations($translator),
             $translator
         );
 
-        $relPaging = new PaginationStrategy(self::DEFAULT_PAGE);
-        $crud      = new $class($factory, $repository, $modelSchemes, $relPaging);
+        $container[PaginationStrategyInterface::class] = new PaginationStrategy(self::DEFAULT_PAGE);
+        $crud      = new $class($container);
 
         return $crud;
     }

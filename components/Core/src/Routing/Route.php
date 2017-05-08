@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Routing;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Core\Contracts\Routing\GroupInterface;
-use Limoncello\Core\Contracts\Routing\RouteInterface;
+use Limoncello\Contracts\Routing\GroupInterface;
+use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Core\Routing\Traits\CallableTrait;
 use Limoncello\Core\Routing\Traits\HasConfiguratorsTrait;
 use Limoncello\Core\Routing\Traits\HasMiddlewareTrait;
@@ -67,7 +67,7 @@ class Route implements RouteInterface
      * @param string         $method
      * @param string         $uriPath
      */
-    public function __construct(GroupInterface $group, $method, $uriPath)
+    public function __construct(GroupInterface $group, string $method, string $uriPath)
     {
         $this->group   = $group;
         $this->method  = $method;
@@ -77,9 +77,9 @@ class Route implements RouteInterface
     /**
      * @param callable $handler
      *
-     * @return $this
+     * @return Route
      */
-    public function setHandler(callable $handler)
+    public function setHandler(callable $handler): Route
     {
         if ($this->isCallableToCache($handler) === false) {
             throw new LogicException($this->getCallableToCacheMessage());
@@ -92,9 +92,9 @@ class Route implements RouteInterface
     /**
      * @param string|null $name
      *
-     * @return $this
+     * @return Route
      */
-    public function setName($name)
+    public function setName(string $name = null): Route
     {
         $this->name = $name;
 
@@ -104,7 +104,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getGroup()
+    public function getGroup(): GroupInterface
     {
         return $this->group;
     }
@@ -112,7 +112,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -120,7 +120,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getUriPath()
+    public function getUriPath(): string
     {
         $uriPath = $this->concatUri($this->getGroup()->getUriPrefix(), $this->uriPath);
 
@@ -130,7 +130,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getMiddleware()
+    public function getMiddleware(): array
     {
         return array_merge($this->getGroup()->getMiddleware(), $this->middleware);
     }
@@ -138,7 +138,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getHandler()
+    public function getHandler(): callable
     {
         return $this->handler;
     }
@@ -146,7 +146,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getContainerConfigurators()
+    public function getContainerConfigurators(): array
     {
         return array_merge($this->getGroup()->getContainerConfigurators(), $this->configurators);
     }
@@ -166,7 +166,7 @@ class Route implements RouteInterface
     /**
      * @return bool
      */
-    public function isUseGroupRequestFactory()
+    public function isUseGroupRequestFactory(): bool
     {
         return $this->isGroupRequestFactory;
     }
@@ -174,9 +174,9 @@ class Route implements RouteInterface
     /**
      * @param bool $isGroupFactory
      *
-     * @return $this
+     * @return Route
      */
-    public function setUseGroupRequestFactory($isGroupFactory)
+    public function setUseGroupRequestFactory(bool $isGroupFactory): Route
     {
         $this->isGroupRequestFactory = $isGroupFactory;
 

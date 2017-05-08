@@ -17,12 +17,13 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
+use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
-use Limoncello\Flute\Contracts\Models\ModelSchemesInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -39,24 +40,24 @@ interface FactoryInterface
     /**
      * @return ErrorCollection
      */
-    public function createErrorCollection();
+    public function createErrorCollection(): ErrorCollection;
 
     /**
      * @return RelationshipStorageInterface
      */
-    public function createRelationshipStorage();
+    public function createRelationshipStorage(): RelationshipStorageInterface;
 
     /**
-     * @param ModelSchemesInterface $modelSchemes
+     * @param ModelSchemeInfoInterface $modelSchemes
      *
      * @return ModelStorageInterface
      */
-    public function createModelStorage(ModelSchemesInterface $modelSchemes);
+    public function createModelStorage(ModelSchemeInfoInterface $modelSchemes): ModelStorageInterface;
 
     /**
      * @return TagStorageInterface
      */
-    public function createTagStorage();
+    public function createTagStorage(): TagStorageInterface;
 
     /**
      * @param PaginatedDataInterface       $paginatedData
@@ -67,16 +68,16 @@ interface FactoryInterface
     public function createModelsData(
         PaginatedDataInterface $paginatedData,
         RelationshipStorageInterface $relationshipStorage = null
-    );
+    ): ModelsDataInterface;
 
     /**
      * @return TranslatorInterface
      */
-    public function createTranslator();
+    public function createTranslator(): TranslatorInterface;
 
     /**
      * @param Connection                $connection
-     * @param ModelSchemesInterface     $modelSchemes
+     * @param ModelSchemeInfoInterface  $modelSchemes
      * @param FilterOperationsInterface $filterOperations
      * @param TranslatorInterface       $translator
      *
@@ -84,18 +85,18 @@ interface FactoryInterface
      */
     public function createRepository(
         Connection $connection,
-        ModelSchemesInterface $modelSchemes,
+        ModelSchemeInfoInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
         TranslatorInterface $translator
-    );
+    ): RepositoryInterface;
 
     /**
-     * @param array                 $schemes
-     * @param ModelSchemesInterface $modelSchemes
+     * @param array                    $schemes
+     * @param ModelSchemeInfoInterface $modelSchemes
      *
      * @return JsonSchemesInterface
      */
-    public function createJsonSchemes(array $schemes, ModelSchemesInterface $modelSchemes);
+    public function createJsonSchemes(array $schemes, ModelSchemeInfoInterface $modelSchemes): JsonSchemesInterface;
 
     /**
      * @param JsonSchemesInterface $schemes
@@ -103,11 +104,22 @@ interface FactoryInterface
      *
      * @return EncoderInterface
      */
-    public function createEncoder(JsonSchemesInterface $schemes, EncoderOptions $encoderOptions = null);
+    public function createEncoder(
+        JsonSchemesInterface $schemes,
+        EncoderOptions $encoderOptions = null
+    ): EncoderInterface;
+
     /**
      * @param mixed $data
      *
      * @return PaginatedDataInterface
      */
-    public function createPaginatedData($data);
+    public function createPaginatedData($data): PaginatedDataInterface;
+
+    /**
+     * @param string $apiClass
+     *
+     * @return CrudInterface
+     */
+    public function createApi(string $apiClass);
 }

@@ -17,7 +17,7 @@
  */
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 interface RelationshipStorageInterface
 {
@@ -37,7 +37,7 @@ interface RelationshipStorageInterface
      *
      * @return bool
      */
-    public function addToOneRelationship($model, $relationship, $one);
+    public function addToOneRelationship($model, string $relationship, $one): bool;
 
     /**
      * @param mixed    $model
@@ -49,7 +49,14 @@ interface RelationshipStorageInterface
      *
      * @return bool
      */
-    public function addToManyRelationship($model, $relationship, array $many, $hasMore, $offset, $size);
+    public function addToManyRelationship(
+        $model,
+        string $relationship,
+        array $many,
+        bool $hasMore,
+        int $offset = null,
+        $size = null
+    ): bool;
 
     /**
      * @param mixed  $model
@@ -57,7 +64,7 @@ interface RelationshipStorageInterface
      *
      * @return bool
      */
-    public function hasRelationship($model, $relationship);
+    public function hasRelationship($model, string $relationship): bool;
 
     /**
      * @param mixed  $model
@@ -65,13 +72,13 @@ interface RelationshipStorageInterface
      *
      * @return int
      */
-    public function getRelationshipType($model, $relationship);
+    public function getRelationshipType($model, string $relationship): int;
 
     /**
      * @param mixed  $model
      * @param string $relationship
      *
-     * @return PaginatedDataInterface
+     * @return PaginatedDataInterface|null
      */
-    public function getRelationship($model, $relationship);
+    public function getRelationship($model, string $relationship);
 }

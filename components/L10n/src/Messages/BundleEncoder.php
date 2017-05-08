@@ -1,7 +1,7 @@
 <?php namespace Limoncello\l10n\Messages;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class BundleEncoder implements BundleEncoderInterface
     /**
      * @inheritdoc
      */
-    public function addBundle(ResourceBundleInterface $bundle)
+    public function addBundle(ResourceBundleInterface $bundle): BundleEncoderInterface
     {
         assert($this->hasLocalizedNamespace($bundle->getLocale(), $bundle->getNamespace()) === false);
 
@@ -45,7 +45,7 @@ class BundleEncoder implements BundleEncoderInterface
     /**
      * @inheritdoc
      */
-    public function getStorageData($defaultLocale)
+    public function getStorageData(string  $defaultLocale): array
     {
         $defaultNamespaces = $this->getNamespaces($defaultLocale);
 
@@ -70,7 +70,7 @@ class BundleEncoder implements BundleEncoderInterface
     /**
      * @return array
      */
-    protected function getBundles()
+    protected function getBundles(): array
     {
         return $this->bundles;
     }
@@ -80,7 +80,7 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return array
      */
-    private function encodeBundle(ResourceBundleInterface $bundle)
+    private function encodeBundle(ResourceBundleInterface $bundle): array
     {
         $encodedBundle = [];
         foreach ($bundle->getKeys() as $key) {
@@ -96,7 +96,7 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return null|ResourceBundleInterface
      */
-    private function getBundle($locale, $namespace)
+    private function getBundle(string $locale, string $namespace)
     {
         $this->assertLocale($locale);
         $this->assertNamespace($namespace);
@@ -117,7 +117,7 @@ class BundleEncoder implements BundleEncoderInterface
     private function encodeMergedBundles(
         ResourceBundleInterface $localizedBundle,
         ResourceBundleInterface $defaultBundle = null
-    ) {
+    ): array {
         if ($defaultBundle === null) {
             // there is no default bundle for this localized one
             return $this->encodeBundle($localizedBundle);
@@ -148,7 +148,7 @@ class BundleEncoder implements BundleEncoderInterface
     /**
      * @return array
      */
-    private function getLocales()
+    private function getLocales(): array
     {
         return array_keys($this->getBundles());
     }
@@ -158,7 +158,7 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return bool
      */
-    private function hasLocale($locale)
+    private function hasLocale(string $locale): bool
     {
         $this->assertLocale($locale);
         $result = in_array($locale, $this->getLocales());
@@ -171,7 +171,7 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return string[]
      */
-    private function getNamespaces($locale)
+    private function getNamespaces(string $locale): array
     {
         $result = $this->hasLocale($locale) === true ? array_keys($this->getBundles()[$locale]) : [];
 
@@ -184,7 +184,7 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return bool
      */
-    private function hasLocalizedNamespace($locale, $namespace)
+    private function hasLocalizedNamespace(string $locale, string $namespace): bool
     {
         $this->assertNamespace($namespace);
 
@@ -198,7 +198,7 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return void
      */
-    private function assertLocale($locale)
+    private function assertLocale(string $locale)
     {
         assert(is_string($locale) === true && empty($locale) === false);
     }
@@ -208,9 +208,9 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return void
      */
-    private function assertNamespace($namespace)
+    private function assertNamespace(string $namespace)
     {
-        assert(is_string($namespace) === true && empty($namespace) === false);
+        assert(empty($namespace) === false);
     }
 
     /**
@@ -219,7 +219,7 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return string[]
      */
-    private function getBundleValue(ResourceBundleInterface $bundle, $key)
+    private function getBundleValue(ResourceBundleInterface $bundle, $key): array
     {
         return [
             BundleStorageInterface::INDEX_PAIR_VALUE  => $bundle->getValue($key),

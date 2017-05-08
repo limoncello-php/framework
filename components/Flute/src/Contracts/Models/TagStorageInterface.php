@@ -17,7 +17,7 @@
  */
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 interface TagStorageInterface
 {
@@ -25,22 +25,22 @@ interface TagStorageInterface
      * @param mixed  $item
      * @param string $tag
      *
-     * @return void
+     * @return self
      */
-    public function register($item, $tag);
+    public function register($item, string $tag): self;
 
     /**
      * @param mixed    $item
      * @param string[] $tags
      *
-     * @return void
+     * @return self
      */
-    public function registerArray($item, array $tags);
+    public function registerArray($item, array $tags): self;
 
     /**
      * @param string $tag
      *
      * @return array
      */
-    public function get($tag);
+    public function get(string $tag): array;
 }

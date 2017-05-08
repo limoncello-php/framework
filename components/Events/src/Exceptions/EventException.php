@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface;
 use RuntimeException;
 
 /**
  * @package Limoncello\Events
  */
-abstract class EventException extends RuntimeException
+abstract class EventException extends RuntimeException implements LimoncelloExceptionInterface
 {
 }

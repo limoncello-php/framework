@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\MessageCodes;
 
 /**
@@ -43,7 +44,7 @@ class Between extends BaseRule
      * @param int|null $min
      * @param int|null $max
      */
-    public function __construct($min = null, $max = null)
+    public function __construct(int $min = null, int $max = null)
     {
         $this->min = $min;
         $this->max = $max;
@@ -54,7 +55,7 @@ class Between extends BaseRule
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         $lowerLimitFailed = $this->min !== null && $input < $this->min;
         $upperLimitFailed = $this->max !== null && $input > $this->max;

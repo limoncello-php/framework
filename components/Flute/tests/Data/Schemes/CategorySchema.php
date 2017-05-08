@@ -41,7 +41,7 @@ class CategorySchema extends BaseSchema
     /**
      * @inheritdoc
      */
-    public static function getMappings()
+    public static function getMappings(): array
     {
         return [
             self::SCHEMA_ATTRIBUTES => [

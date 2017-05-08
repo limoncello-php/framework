@@ -32,7 +32,7 @@ trait ValidatorTrait
      *
      * @return Generator
      */
-    protected static function validateData(RuleInterface $rule, $input, ErrorAggregatorInterface $aggregator)
+    protected static function validateData(RuleInterface $rule, $input, ErrorAggregatorInterface $aggregator): Generator
     {
         foreach ($rule->validate($input) as $error) {
             yield $error;

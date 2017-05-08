@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\MessageCodes;
 
 /**
@@ -37,7 +38,7 @@ class CallableRule extends BaseRule
      * @param callable $callable
      * @param int      $messageCode
      */
-    public function __construct(callable $callable, $messageCode = MessageCodes::INVALID_VALUE)
+    public function __construct(callable $callable, int $messageCode = MessageCodes::INVALID_VALUE)
     {
         $this->toCall      = $callable;
         $this->messageCode = $messageCode;
@@ -46,7 +47,7 @@ class CallableRule extends BaseRule
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         $result = call_user_func($this->toCall, $input);
         if ($result !== true) {

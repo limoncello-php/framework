@@ -28,6 +28,7 @@ use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
 use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
+use Limoncello\Tests\Passport\PassportServerTest;
 use Limoncello\Tests\Passport\TestCase;
 
 /**
@@ -58,7 +59,7 @@ class TokenRepositoryTest extends TestCase
         list($tokenRepo, $scopeRepo, $clientRepo) = $this->createRepositories();
 
         $newCode = (new Token())
-            ->setUserIdentifier(1)
+            ->setUserIdentifier(PassportServerTest::TEST_USER_ID)
             ->setClientIdentifier('abc')
             ->setCode('some-secret-code');
         $tokenRepo->inTransaction(function () use (
@@ -113,6 +114,8 @@ class TokenRepositoryTest extends TestCase
         $this->assertTrue($sameToken->getValueCreatedAt() instanceof DateTimeImmutable);
         $this->assertTrue($sameToken->getRefreshCreatedAt() instanceof DateTimeImmutable);
 
+        $this->assertNotEmpty($tokenRepo->readPassport($sameToken->getValue(), 10));
+
         $tokenRepo->unbindScopes($sameToken->getIdentifier());
         $sameToken = $tokenRepo->read($token->getIdentifier());
         $this->assertCount(0, $sameToken->getScopeIdentifiers());
@@ -137,7 +140,7 @@ class TokenRepositoryTest extends TestCase
         $clientRepo->create($client = (new Client())->setIdentifier('client1')->setName('client name'));
         $unsavedToken = (new Token())
             ->setClientIdentifier($client->getIdentifier())
-            ->setUserIdentifier(1)
+            ->setUserIdentifier(PassportServerTest::TEST_USER_ID)
             ->setValue('some-token')
             ->setType('bearer')
             ->setRefreshValue('refresh-token');
@@ -160,7 +163,7 @@ class TokenRepositoryTest extends TestCase
         $clientRepo->create($client = (new Client())->setIdentifier('client1')->setName('client name'));
         $unsavedToken = (new Token())
             ->setClientIdentifier($client->getIdentifier())
-            ->setUserIdentifier(1)
+            ->setUserIdentifier(PassportServerTest::TEST_USER_ID)
             ->setValue('some-token')
             ->setType('bearer')
             ->setRefreshValue('refresh-token');
@@ -188,7 +191,7 @@ class TokenRepositoryTest extends TestCase
         $clientRepo->create($client = (new Client())->setIdentifier('client1')->setName('client name'));
         $unsavedToken = (new Token())
             ->setClientIdentifier($client->getIdentifier())
-            ->setUserIdentifier(1)
+            ->setUserIdentifier(PassportServerTest::TEST_USER_ID)
             ->setValue('some-token')
             ->setType('bearer')
             ->setRefreshValue('refresh-token')
@@ -212,7 +215,7 @@ class TokenRepositoryTest extends TestCase
         $clientRepo->create($client = (new Client())->setIdentifier('client1')->setName('client name'));
         $unsavedToken = (new Token())
             ->setClientIdentifier($client->getIdentifier())
-            ->setUserIdentifier(1)
+            ->setUserIdentifier(PassportServerTest::TEST_USER_ID)
             ->setValue('some-token')
             ->setType('bearer');
         $this->assertNotNull($newToken = $tokenRepo->createToken($unsavedToken));

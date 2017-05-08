@@ -26,5 +26,5 @@ interface TranslatorInterface
      *
      * @return string
      */
-    public function translate(ErrorInterface $error);
+    public function translate(ErrorInterface $error): string;
 }

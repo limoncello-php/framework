@@ -1,7 +1,7 @@
 <?php namespace Limoncello\l10n\Contracts\Messages;
 
-    /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+/**
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ interface BundleStorageInterface
     /**
      * @return string
      */
-    public function getDefaultLocale();
+    public function getDefaultLocale(): string;
 
     /**
      * @param string $locale
@@ -39,7 +39,7 @@ interface BundleStorageInterface
      *
      * @return bool
      */
-    public function has($locale, $namespace, $key);
+    public function has(string $locale, string $namespace, string $key): bool;
 
     /**
      * @param string $locale
@@ -48,7 +48,7 @@ interface BundleStorageInterface
      *
      * @return array|null
      */
-    public function get($locale, $namespace, $key);
+    public function get(string $locale, string $namespace, string $key);
 
     /**
      * @param string $locale
@@ -56,7 +56,7 @@ interface BundleStorageInterface
      *
      * @return bool
      */
-    public function hasResources($locale, $namespace);
+    public function hasResources(string $locale, string $namespace): bool;
 
     /**
      * @param string $locale
@@ -64,5 +64,5 @@ interface BundleStorageInterface
      *
      * @return array
      */
-    public function getResources($locale, $namespace);
+    public function getResources(string $locale, string $namespace): array;
 }

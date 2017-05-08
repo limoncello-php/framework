@@ -34,7 +34,7 @@ class CommentsApi extends AppCrud
     /**
      * @inheritdoc
      */
-    protected function builderOnIndex(QueryBuilder $builder)
+    protected function builderOnIndex(QueryBuilder $builder): QueryBuilder
     {
         $builder = parent::builderOnIndex($builder);
 
@@ -55,7 +55,7 @@ class CommentsApi extends AppCrud
     /**
      * @inheritdoc
      */
-    public function create($index, array $attributes, array $toMany = [])
+    public function create($index, array $attributes, array $toMany = []): string
     {
         // suppose we want to create comments using current user as an author.
         $curUserId = 1;

@@ -31,5 +31,5 @@ interface ErrorAggregatorInterface
     /**
      * @return ErrorInterface[]
      */
-    public function get();
+    public function get(): array;
 }

@@ -32,7 +32,7 @@ trait Values
     /**
      * @return RuleInterface
      */
-    protected static function isRequired()
+    protected static function isRequired(): RuleInterface
     {
         return new Required();
     }
@@ -40,7 +40,7 @@ trait Values
     /**
      * @return RuleInterface
      */
-    protected static function isNull()
+    protected static function isNull(): RuleInterface
     {
         return new CallableRule('is_null', MessageCodes::IS_NULL);
     }
@@ -48,7 +48,7 @@ trait Values
     /**
      * @return RuleInterface
      */
-    protected static function notNull()
+    protected static function notNull(): RuleInterface
     {
         return new CallableRule(function ($input) {
             return $input !== null;
@@ -60,7 +60,7 @@ trait Values
      *
      * @return RuleInterface
      */
-    protected static function regExp($pattern)
+    protected static function regExp(string $pattern): RuleInterface
     {
         return new RegExp($pattern);
     }
@@ -71,7 +71,7 @@ trait Values
      *
      * @return RuleInterface
      */
-    protected static function between($min = null, $max = null)
+    protected static function between(int $min = null, int $max = null): RuleInterface
     {
         return new Between($min, $max);
     }
@@ -82,7 +82,7 @@ trait Values
      *
      * @return RuleInterface
      */
-    protected static function stringLength($min = null, $max = null)
+    protected static function stringLength(int $min = null, int $max = null): RuleInterface
     {
         return new StringLength($min, $max);
     }

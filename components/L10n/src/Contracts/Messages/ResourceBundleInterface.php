@@ -1,7 +1,7 @@
 <?php namespace Limoncello\l10n\Contracts\Messages;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,20 +26,20 @@ interface ResourceBundleInterface
      *
      * @return string
      */
-    public function getValue($key);
+    public function getValue($key): string;
 
     /**
      * @return string
      */
-    public function getLocale();
+    public function getLocale(): string;
 
     /**
      * @return string
      */
-    public function getNamespace();
+    public function getNamespace(): string;
 
     /**
      * @return array<int,string>
      */
-    public function getKeys();
+    public function getKeys(): array;
 }

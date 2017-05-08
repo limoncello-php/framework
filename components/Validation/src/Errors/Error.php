@@ -49,7 +49,7 @@ class Error implements ErrorInterface
      * @param int         $code
      * @param mixed       $context
      */
-    public function __construct($name, $value, $code, $context)
+    public function __construct($name, $value, int $code, $context)
     {
         $this->name    = $name;
         $this->value   = $value;
@@ -76,7 +76,7 @@ class Error implements ErrorInterface
     /**
      * @inheritdoc
      */
-    public function getMessageCode()
+    public function getMessageCode(): int
     {
         return $this->code;
     }

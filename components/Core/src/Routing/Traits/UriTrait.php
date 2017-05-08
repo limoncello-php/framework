@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Routing\Traits;
 
 /**
- * Copyright 2015-2016 info@neomerx.com (www.neomerx.com)
+ * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ trait UriTrait
      *
      * @return string
      */
-    protected function normalizeUri($uri, $trailingSlash)
+    protected function normalizeUri(string $uri, bool $trailingSlash): string
     {
         // add starting '/' and cut ending '/' if necessary
         $uri = strlen($uri) > 0 && $uri[0] === '/' ? $uri : '/' . $uri;
@@ -46,7 +46,7 @@ trait UriTrait
      *
      * @return string
      */
-    protected function concatUri($uri1, $uri2)
+    protected function concatUri(string $uri1, string $uri2): string
     {
         $fEndsWithSlash   = strlen($uri1) > 0 && substr($uri1, -1) === '/';
         $sStartsWithSlash = strlen($uri2) > 0 && $uri2[0] === '/';

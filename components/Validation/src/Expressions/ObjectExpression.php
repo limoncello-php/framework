@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Validation\Contracts\RuleInterface;
 use Limoncello\Validation\Rules;
 
@@ -44,7 +45,7 @@ class ObjectExpression extends IterateRules
     /**
      * @inheritdoc
      */
-    public function validate($input)
+    public function validate($input): Generator
     {
         foreach (get_object_vars($input) as $key => $value) {
             $this->setParameterName($key);
