@@ -19,7 +19,7 @@
 use Limoncello\Contracts\Routing\GroupInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Contracts
  */
 interface RoutesConfiguratorInterface
 {

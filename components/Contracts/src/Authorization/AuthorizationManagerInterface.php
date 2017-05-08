@@ -19,7 +19,7 @@
 use Limoncello\Contracts\Exceptions\AuthorizationExceptionInterface;
 
 /**
- * @package Limoncello\Auth
+ * @package Limoncello\Contracts
  */
 interface AuthorizationManagerInterface
 {

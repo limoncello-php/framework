@@ -19,7 +19,7 @@
 /**
  * Provides settings for a component by its class name.
  *
- * @package Limoncello\Core
+ * @package Limoncello\Contracts
  */
 interface SettingsProviderInterface
 {

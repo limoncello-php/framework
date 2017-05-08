@@ -17,7 +17,7 @@
  */
 
 /**
- * @package Limoncello\Auth
+ * @package Limoncello\Contracts
  */
 interface AccountManagerInterface
 {

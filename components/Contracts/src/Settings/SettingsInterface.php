@@ -19,7 +19,7 @@
 /**
  * Provides individual settings for a component.
  *
- * @package Limoncello\Core
+ * @package Limoncello\Contracts
  */
 interface SettingsInterface
 {

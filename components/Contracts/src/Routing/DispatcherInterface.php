@@ -17,7 +17,7 @@
  */
 
 /**
- * @package Limoncello\Core
+ * @package Limoncello\Contracts
  */
 interface DispatcherInterface
 {

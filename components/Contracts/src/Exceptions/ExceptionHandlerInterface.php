@@ -22,7 +22,7 @@ use Psr\Container\ContainerInterface;
 use Throwable;
 
 /**
- * @package Limoncello\Core
+ * @package Limoncello\Contracts
  */
 interface ExceptionHandlerInterface
 {

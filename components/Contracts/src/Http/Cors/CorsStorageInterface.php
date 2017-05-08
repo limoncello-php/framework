@@ -17,7 +17,7 @@
  */
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Contracts
  */
 interface CorsStorageInterface
 {

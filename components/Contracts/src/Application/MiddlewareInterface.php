@@ -22,7 +22,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Contracts
  */
 interface MiddlewareInterface
 {

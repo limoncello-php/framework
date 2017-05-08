@@ -18,7 +18,7 @@
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @package Limoncello\Core
+ * @package Limoncello\Contracts
  */
 interface RouterInterface
 {

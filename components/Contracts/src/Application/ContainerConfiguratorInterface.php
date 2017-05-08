@@ -19,7 +19,7 @@
 use Limoncello\Contracts\Container\ContainerInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Contracts
  */
 interface ContainerConfiguratorInterface
 {

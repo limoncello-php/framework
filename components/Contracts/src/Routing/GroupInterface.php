@@ -20,7 +20,7 @@ use Closure;
 use Iterator;
 
 /**
- * @package Limoncello\Core
+ * @package Limoncello\Contracts
  */
 interface GroupInterface
 {
