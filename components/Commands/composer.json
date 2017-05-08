@@ -22,6 +22,7 @@
 
         "limoncello-php/contracts": "dev-develop",
         "limoncello-php/core": "dev-develop",
+        "limoncello-php/auth": "dev-develop",
         "limoncello-php/container": "dev-develop"
     },
     "require-dev": {
