@@ -32,6 +32,11 @@ class DataCommand implements CommandInterface
 {
     use ParseCallableTrait;
 
+    /**
+     * Command name.
+     */
+    const NAME = 'l:db';
+
     /** Argument name */
     const ARG_ACTION = 'action';
 
@@ -53,7 +58,7 @@ class DataCommand implements CommandInterface
     public function getCommandData(): array
     {
         return [
-            self::COMMAND_NAME        => 'l:db',
+            self::COMMAND_NAME        => static::NAME,
             self::COMMAND_DESCRIPTION => 'Migrates and seeds application data.',
             self::COMMAND_HELP        => 'This command migrates, seeds and resets application data.',
         ];
