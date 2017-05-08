@@ -154,7 +154,7 @@ class LimoncelloCommand extends BaseCommand
         }
 
         /** @var ApplicationInterface $application */
-        $container = $application->createContainer(static::HTTP_METHOD, $commandName);
+        $container = $application->createContainer(static::HTTP_METHOD, '/' . $commandName);
 
         return $container;
     }
