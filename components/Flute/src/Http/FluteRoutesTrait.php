@@ -25,7 +25,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 /**
  * @package Limoncello\Flute
  */
-trait RoutesTrait
+trait FluteRoutesTrait
 {
     /**
      * @param GroupInterface $group
