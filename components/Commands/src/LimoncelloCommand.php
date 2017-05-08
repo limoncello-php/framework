@@ -34,6 +34,33 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class LimoncelloCommand extends BaseCommand
 {
+    /**
+     * When command is executed it creates a container from user application. On container creation
+     * an HTTP verb (e.g. GET, PUT, etc) and HTTP path (e.g. '/homepage') could be specified so
+     * the container could be configured for those verb and path.
+     *
+     * In order to give the application and idea that it's executed for command a special
+     * HTTP verb and command name as HTTP path would be used as input parameters.
+     * The verb is 'special' because it cannot collide with any HTTP verbs from HTTP server due to
+     * it starts from special character in its name.
+     *
+     * According to https://tools.ietf.org/html/rfc2068#section-5.1.1 there are a few built-in
+     * methods such as 'OPTIONS', 'GET', 'HEAD', 'POST' and others. Custom or so called
+     * 'extension-methods' are also possible which should have syntax of a 'token'.
+     *
+     * According to https://tools.ietf.org/html/rfc2068#section-2.2 a 'token' should be
+     *     1*<any CHAR except CTLs or tspecials>
+     * (non empty string without CTL and tspecial characters)
+     * where
+     *     CTL       - any US-ASCII control character (octets 0 - 31) and DEL (127)
+     *     tspecials - "(" | ")" | "<" | ">" | "@" | "," | ";" | ":" | "\" | <"> | "/" |
+     *                 "[" | "]" | "?" | "=" | "{" | "}" |
+     *                 US-ASCII SP, space (32) | US-ASCII HT, horizontal-tab (9)
+     *
+     * So if we start the verb from '>' we guarantee it will be collision free.
+     */
+    const HTTP_METHOD = '>COMMAND';
+
     /** Expected key at `composer.json` -> "extra" */
     const COMPOSER_JSON__EXTRA__APPLICATION = 'application';
 
@@ -91,13 +118,16 @@ class LimoncelloCommand extends BaseCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->getWrapper()->execute($this->getAppContainer(), $this->wrapIo($input, $output));
+        $commandName = $this->getWrapper()->getName();
+        $this->getWrapper()->execute($this->getAppContainer($commandName), $this->wrapIo($input, $output));
     }
 
     /**
+     * @param string $commandName
+     *
      * @return ContainerInterface
      */
-    private function getAppContainer(): ContainerInterface
+    private function getAppContainer(string $commandName): ContainerInterface
     {
         // use application auto loader otherwise no app classes will be visible for us
         $autoLoaderPath = $this->getComposer()->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'autoload.php';
@@ -124,7 +154,7 @@ class LimoncelloCommand extends BaseCommand
         }
 
         /** @var ApplicationInterface $application */
-        $container = $application->createContainer();
+        $container = $application->createContainer(static::HTTP_METHOD, $commandName);
 
         return $container;
     }
