@@ -17,13 +17,12 @@
         "php": ">=7.0.0",
         "filp/whoops": "^2.1",
         "doctrine/dbal": "^2.5.0",
-        "neomerx/cors-psr7": "^1.0.0",
         "monolog/monolog": "^1.22",
-        "limoncello-php/contracts": "dev-develop",
-        "limoncello-php/auth": "dev-develop",
-
-        "limoncello-php/container": "dev-develop",
-        "limoncello-php/core": "dev-develop"
+        "neomerx/cors-psr7": "^1.0.0",
+        "limoncello-php/contracts": "^0.6.1",
+        "limoncello-php/core": "^0.6.1",
+        "limoncello-php/auth": "^0.6.1",
+        "limoncello-php/container": "^0.6.1"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.8",

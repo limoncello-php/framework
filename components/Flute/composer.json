@@ -18,8 +18,8 @@
         "zendframework/zend-diactoros": "^1.3",
         "doctrine/dbal": "^2.5.0",
         "neomerx/json-api": "^1.0.0",
-        "limoncello-php/contracts": "dev-develop",
-        "limoncello-php/validation": "dev-develop"
+        "limoncello-php/contracts": "^0.6.1",
+        "limoncello-php/validation": "^0.6.1"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.5",
@@ -27,7 +27,7 @@
         "scrutinizer/ocular": "^1.3",
         "phpunit/phpunit": "^5.0",
         "mockery/mockery": "^0.9.4",
-        "limoncello-php/container": "dev-develop",
+        "limoncello-php/container": "^0.6.1",
         "fzaninotto/faker": "dev-master"
     },
     "autoload": {

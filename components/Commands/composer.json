@@ -17,13 +17,8 @@
     "require": {
         "php": ">=7.0.0",
         "composer-plugin-api": "^1.1",
-        "limoncello-php/application": "dev-develop",
-        "limoncello-php/templates": "dev-develop",
-
-        "limoncello-php/contracts": "dev-develop",
-        "limoncello-php/core": "dev-develop",
-        "limoncello-php/auth": "dev-develop",
-        "limoncello-php/container": "dev-develop"
+        "limoncello-php/application": "^0.6.1",
+        "limoncello-php/templates": "^0.6.1"
     },
     "require-dev": {
         "composer/composer": "^1.0.0",

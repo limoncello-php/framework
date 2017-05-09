@@ -16,9 +16,7 @@
     "require": {
         "php": ">=7.0.0",
         "psr/log": "^1.0",
-        "limoncello-php/container": "dev-develop",
-
-        "limoncello-php/contracts": "dev-develop"
+        "limoncello-php/container": "^0.6.1"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.5",
