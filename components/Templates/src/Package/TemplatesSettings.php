@@ -21,7 +21,7 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 use SplFileInfo;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Templates
  */
 abstract class TemplatesSettings implements SettingsInterface
 {

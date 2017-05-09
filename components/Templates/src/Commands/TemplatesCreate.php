@@ -22,7 +22,7 @@ use Limoncello\Templates\TwigTemplates;
 use Psr\Container\ContainerInterface;
 
 /**
- * @package Limoncello\Commands
+ * @package Limoncello\Templates
  */
 class TemplatesCreate extends TemplatesBase
 {
@@ -32,7 +32,7 @@ class TemplatesCreate extends TemplatesBase
     public function getCommandData(): array
     {
         return [
-            self::COMMAND_NAME        => 'limoncello:cache:templates:create',
+            self::COMMAND_NAME        => 'l:cache:templates:create',
             self::COMMAND_DESCRIPTION => 'Creates templates caches.',
             self::COMMAND_HELP        => 'This command creates caches for HTML templates.',
         ];
@@ -67,8 +67,7 @@ class TemplatesCreate extends TemplatesBase
 
         foreach ($templates as $templateName) {
             // it will write template to cache
-            /** @noinspection PhpInternalEntityUsedInspection */
-            $templateEngine->getTwig()->loadTemplate($templateName);
+            $templateEngine->getTwig()->resolveTemplate($templateName);
         }
     }
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Templates\Contracts\TemplatesInterface;
+use Limoncello\Contracts\Templates\TemplatesInterface;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
 

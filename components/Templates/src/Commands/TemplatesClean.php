@@ -22,7 +22,7 @@ use Limoncello\Templates\Package\TemplatesSettings;
 use Psr\Container\ContainerInterface;
 
 /**
- * @package Limoncello\Commands
+ * @package Limoncello\Templates
  */
 class TemplatesClean extends TemplatesBase
 {
@@ -32,7 +32,7 @@ class TemplatesClean extends TemplatesBase
     public function getCommandData(): array
     {
         return [
-            self::COMMAND_NAME        => 'limoncello:cache:templates:clean',
+            self::COMMAND_NAME        => 'l:cache:templates:clean',
             self::COMMAND_DESCRIPTION => 'Cleans templates caches.',
             self::COMMAND_HELP        => 'This command cleans caches for HTML templates.',
         ];

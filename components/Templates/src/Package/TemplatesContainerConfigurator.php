@@ -19,13 +19,13 @@
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Templates\Contracts\TemplatesInterface;
+use Limoncello\Contracts\Templates\TemplatesInterface;
 use Limoncello\Templates\TwigTemplates;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Limoncello\Templates\Package\TemplatesSettings as C;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Templates
  */
 class TemplatesContainerConfigurator implements ContainerConfiguratorInterface
 {

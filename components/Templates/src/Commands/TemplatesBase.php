@@ -22,7 +22,7 @@ use Limoncello\Templates\Package\TemplatesSettings;
 use Psr\Container\ContainerInterface;
 
 /**
- * @package Limoncello\Commands
+ * @package Limoncello\Templates
  */
 abstract class TemplatesBase implements CommandInterface
 {
