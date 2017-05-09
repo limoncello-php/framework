@@ -42,10 +42,12 @@ trait CommandRoutesTrait
         return $group->method(
             LimoncelloCommand::HTTP_METHOD,
             $commandName,
-            [static::class, 'handlerStub'], [
-            RouteInterface::PARAM_REQUEST_FACTORY         => null,
-            RouteInterface::PARAM_CONTAINER_CONFIGURATORS => [$configurator],
-        ]);
+            [static::class, 'handlerStub'],
+            [
+                RouteInterface::PARAM_REQUEST_FACTORY         => null,
+                RouteInterface::PARAM_CONTAINER_CONFIGURATORS => [$configurator],
+                ]
+        );
     }
 
     /**

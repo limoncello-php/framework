@@ -41,6 +41,8 @@ class ComposerCommandProvider implements CommandProvider
      * @param BaseCommand[] $commands
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public static function setCommands(array $commands)
     {

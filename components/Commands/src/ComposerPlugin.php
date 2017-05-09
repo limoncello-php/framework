@@ -50,6 +50,8 @@ class ComposerPlugin implements PluginInterface, Capable
 
     /**
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     protected function loadCommands()
     {
