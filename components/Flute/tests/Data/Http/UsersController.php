@@ -68,7 +68,8 @@ class UsersController extends BaseController
 
         return static::prepareCaptures(
             $validator->assert(static::parseJson($container, $request))->getCaptures(),
-            Model::FIELD_ID, [
+            Model::FIELD_ID,
+            [
                 Model::FIELD_TITLE,
                 Model::FIELD_FIRST_NAME,
                 Model::FIELD_LAST_NAME,
@@ -113,13 +114,14 @@ class UsersController extends BaseController
 
         return static::prepareCaptures(
             $validator->assert(static::parseJson($container, $request))->getCaptures(),
-            Model::FIELD_ID, [
-            Model::FIELD_TITLE,
-            Model::FIELD_FIRST_NAME,
-            Model::FIELD_LAST_NAME,
-            Model::FIELD_EMAIL,
-            Model::FIELD_LANGUAGE,
-        ],
+            Model::FIELD_ID,
+            [
+                Model::FIELD_TITLE,
+                Model::FIELD_FIRST_NAME,
+                Model::FIELD_LAST_NAME,
+                Model::FIELD_EMAIL,
+                Model::FIELD_LANGUAGE,
+            ],
             [Model::REL_ROLE]
         );
     }
@@ -136,7 +138,12 @@ class UsersController extends BaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        return static::readRelationship($routeParams[static::ROUTE_KEY_INDEX], Schema::REL_POSTS, $container, $request);
+        return static::readRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Schema::REL_POSTS,
+            $container,
+            $request
+        );
     }
 
     /**

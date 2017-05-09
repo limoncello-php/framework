@@ -124,7 +124,8 @@ EOT;
                 CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1)),
             ],
             AppValidator::RULE_TO_ONE     => [
-                CommentSchema::REL_USER => v::nullable(v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15)))),
+                CommentSchema::REL_USER =>
+                    v::nullable(v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15)))),
             ],
         ];
 
@@ -503,8 +504,8 @@ EOT;
     {
         $container = new Container();
 
-        $container[ModelSchemeInfoInterface::class]      = $modelSchemes = $this->getModelSchemes();
-        $container[JsonSchemesInterface::class]          = $this->getJsonSchemes(new Factory($container), $modelSchemes);
+        $container[ModelSchemeInfoInterface::class]      = $schemes = $this->getModelSchemes();
+        $container[JsonSchemesInterface::class]          = $this->getJsonSchemes(new Factory($container), $schemes);
         $container[JsonApiTranslatorInterface::class]    = new JsonApiTranslator();
         $container[ValidationTranslatorInterface::class] =
             new Translator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());

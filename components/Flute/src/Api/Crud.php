@@ -903,6 +903,8 @@ class Crud implements CrudInterface
      * @param AbstractPlatform $platform
      *
      * @return mixed|null
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function readInstanceFromAssoc(
         string $class,
@@ -928,6 +930,8 @@ class Crud implements CrudInterface
      * @param AbstractPlatform $platform
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function readRowFromAssoc(array $attributes, array $typeNames, AbstractPlatform $platform): array
     {

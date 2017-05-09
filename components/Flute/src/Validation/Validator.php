@@ -46,7 +46,9 @@ use Psr\Container\ContainerInterface;
 /**
  * @package Limoncello\Flute
  *
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Validator implements ValidatorInterface
 {

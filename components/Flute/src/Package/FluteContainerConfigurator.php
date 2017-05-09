@@ -25,6 +25,8 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 
 /**
  * @package Limoncello\Flute
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class FluteContainerConfigurator implements ContainerConfiguratorInterface
 {
@@ -36,6 +38,8 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public static function configure(LimoncelloContainerInterface $container)
     {
@@ -82,7 +86,10 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             return new Translator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());
         };
 
-        $container[RepositoryInterface::class] = function (PsrContainerInterface $container) use ($factory, $translator) {
+        $container[RepositoryInterface::class] = function (PsrContainerInterface $container) use (
+            $factory,
+            $translator
+        ) {
             $connection       = $container->get(Connection::class);
             $filterOperations = new FilterOperations($translator);
             /** @var ModelSchemeInfoInterface $modelSchemes */
