@@ -56,6 +56,8 @@ class TemplatesCreate extends TemplatesBase
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function execute(ContainerInterface $container, IoInterface $inOut)
     {
@@ -63,7 +65,7 @@ class TemplatesCreate extends TemplatesBase
         $cacheFolder     = $settings[TemplatesSettings::KEY_CACHE_FOLDER];
         $templatesFolder = $settings[TemplatesSettings::KEY_TEMPLATES_FOLDER];
         $templates       = TemplatesSettings::getTemplateNames($templatesFolder);
-        $templateEngine  = static::createCachingTemplateEngine($templatesFolder, $cacheFolder);
+        $templateEngine  = $this->createCachingTemplateEngine($templatesFolder, $cacheFolder);
 
         foreach ($templates as $templateName) {
             // it will write template to cache
