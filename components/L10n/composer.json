@@ -1,6 +1,6 @@
 {
     "name": "limoncello-php/l10n",
-    "description": "Limoncello framework localization support",
+    "description": "Limoncello framework localization support.",
     "keywords": ["limoncello", "framework", "l10n", "localization"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/L10n",
     "support": {

@@ -1,8 +1,8 @@
 {
     "name": "limoncello-php/commands",
     "type": "composer-plugin",
-    "description": "Limoncello application commands support",
-    "keywords": ["limoncello", "framework", "composer", "composer"],
+    "description": "Limoncello application commands support.",
+    "keywords": ["limoncello", "framework", "composer", "commands"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Commands",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

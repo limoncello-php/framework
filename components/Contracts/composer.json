@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/contracts",
     "description": "Limoncello PHP Framework Contracts (interfaces) required for components integration.",
-    "keywords": ["Limoncello Framework", "Limoncello", "Framework", "PHP", "Contracts", "Interfaces"],
+    "keywords": ["limoncello", "framework", "contracts", "interfaces"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Contracts",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

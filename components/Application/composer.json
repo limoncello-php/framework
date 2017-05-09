@@ -1,6 +1,6 @@
 {
     "name": "limoncello-php/application",
-    "description": "PHP application components (PSR-7)",
+    "description": "PHP application components (PSR-7).",
     "keywords": ["limoncello", "framework", "PSR-7", "PSR7"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Application",
     "support": {

@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/validation",
-    "description": "Limoncello framework validation support",
-    "keywords": ["limoncello", "framework", "validation"],
+    "description": "Validation framework.",
+    "keywords": ["validation"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Validation",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

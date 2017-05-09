@@ -1,6 +1,6 @@
 {
     "name": "limoncello-php/crypt",
-    "description": "Limoncello framework crypt support",
+    "description": "Limoncello framework crypt support.",
     "keywords": ["limoncello", "framework", "crypt"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Crypt",
     "support": {

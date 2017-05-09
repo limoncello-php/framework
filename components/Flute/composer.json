@@ -1,6 +1,6 @@
 {
     "name": "limoncello-php/flute",
-    "description": "Limoncello framework json-api support",
+    "description": "Limoncello framework json-api support.",
     "keywords": ["limoncello", "framework", "json-api", "flute"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Flute",
     "support": {

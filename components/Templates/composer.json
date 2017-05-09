@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/templates",
-    "description": "Limoncello application templates",
-    "keywords": ["limoncello", "framework", "cache"],
+    "description": "Limoncello application templates.",
+    "keywords": ["limoncello", "framework", "templates"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Templates",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

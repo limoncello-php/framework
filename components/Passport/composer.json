@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/passport",
-    "description": "OAuth 2.0 Server implementation",
-    "keywords": ["PSR-7", "PSR7", "OAuth", "OAuth 2", "OAuth 2.0"],
+    "description": "Limoncello framework OAuth 2.0 Server implementation.",
+    "keywords": ["limoncello", "framework", "PSR-7", "PSR7", "OAuth", "OAuth 2", "OAuth 2.0"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Passport",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

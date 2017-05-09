@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/auth",
-    "description": "Limoncello framework auth support",
-    "keywords": ["limoncello", "framework", "auth"],
+    "description": "Limoncello framework authorization support.",
+    "keywords": ["limoncello", "framework", "auth", "authorization"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Auth",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

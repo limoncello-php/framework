@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/events",
-    "description": "Events library for Limoncello PHP framework",
-    "keywords": ["framework", "PSR-7", "PSR7"],
+    "description": "Events library for Limoncello PHP framework.",
+    "keywords": ["limoncello", "framework", "events"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Events",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/oauth-server",
-    "description": "Framework agnostic OAuth 2.0 Server library (PSR-7)",
-    "keywords": ["PSR-7", "PSR7", "OAuth", "OAuth 2", "OAuth 2.0"],
+    "description": "Framework agnostic OAuth 2.0 Server library (PSR-7).",
+    "keywords": ["PSR-7", "PSR7", "OAuth", "OAuth 2", "OAuth 2.0", "server"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/OAuthServer",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/data",
-    "description": "Data library for Limoncello PHP framework",
-    "keywords": ["framework", "PSR-7", "PSR7"],
+    "description": "Data library for Limoncello PHP framework.",
+    "keywords": ["limoncello", "framework", "data", "migration", "seed"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Data",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"

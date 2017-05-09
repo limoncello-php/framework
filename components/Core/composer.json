@@ -1,7 +1,7 @@
 {
     "name": "limoncello-php/core",
-    "description": "PHP micro-framework core (PSR-7)",
-    "keywords": ["framework", "micro", "PSR-7", "PSR7"],
+    "description": "PHP framework core (PSR-7).",
+    "keywords": ["limoncello", "framework", "PSR-7", "PSR7"],
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Core",
     "support": {
         "issues": "https://github.com/limoncello-php/framework/issues"
