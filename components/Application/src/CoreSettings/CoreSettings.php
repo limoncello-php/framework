@@ -297,7 +297,9 @@ class CoreSettings extends BaseCoreSettings
                     for ($index = 0; $index < $count; $index++) {
                         $parameterType =$parameterTypes[$index];
                         $paramClass = $reflectionParams[$index]->getClass();
-                        if (!$paramClass->implementsInterface($parameterType) && !$paramClass->isSubclassOf($parameterType)) {
+                        if ($paramClass->implementsInterface($parameterType) === false &&
+                            $paramClass->isSubclassOf($parameterType) === false
+                        ) {
                             $result = false;
                             break;
                         }
