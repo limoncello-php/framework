@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface;
 use LogicException;
 
 /**
  * @package Limoncello\Passport
  */
-abstract class PassportException extends LogicException
+abstract class PassportException extends LogicException implements LimoncelloExceptionInterface
 {
 }
