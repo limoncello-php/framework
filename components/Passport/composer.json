@@ -16,12 +16,8 @@
     "require": {
         "php": ">=7.0.0",
         "psr/log": "^1.0",
-        "psr/http-message": "^1.0",
-
         "doctrine/dbal": "^2.5.0",
-
         "zendframework/zend-diactoros": "^1.3",
-
         "limoncello-php/contracts": "^0.6.0",
         "limoncello-php/oauth-server": "^0.6.0"
     },
