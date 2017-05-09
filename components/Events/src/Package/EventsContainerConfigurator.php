@@ -25,7 +25,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Limoncello\Events\Package\EventSettings as C;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Events
  */
 class EventsContainerConfigurator implements ContainerConfiguratorInterface
 {

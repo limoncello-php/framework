@@ -28,7 +28,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Passport
  */
 class PassportMiddleware implements MiddlewareInterface
 {

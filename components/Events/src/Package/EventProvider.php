@@ -19,7 +19,7 @@
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Events
  */
 class EventProvider implements ProvidesContainerConfiguratorsInterface
 {

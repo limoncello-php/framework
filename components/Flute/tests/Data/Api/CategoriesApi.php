@@ -19,7 +19,7 @@
 use Limoncello\Tests\Flute\Data\Models\Category;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 class CategoriesApi extends AppCrud
 {

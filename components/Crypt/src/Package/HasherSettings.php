@@ -19,7 +19,7 @@
 use Limoncello\Contracts\Settings\SettingsInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Crypt
  */
 class HasherSettings implements SettingsInterface
 {

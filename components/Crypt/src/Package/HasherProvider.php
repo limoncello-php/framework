@@ -20,7 +20,7 @@ use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Crypt
  */
 class HasherProvider implements ProvidesSettingsInterface, ProvidesContainerConfiguratorsInterface
 {

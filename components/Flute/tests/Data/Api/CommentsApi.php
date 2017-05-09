@@ -20,7 +20,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 class CommentsApi extends AppCrud
 {

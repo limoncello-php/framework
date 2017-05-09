@@ -1,6 +1,6 @@
 <?php namespace Limoncello\Tests\Application\Data\Models;
 
-    /**
+/**
  * Copyright 2015-2017 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

@@ -19,7 +19,7 @@
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Crypt
  */
 class AsymmetricPrivateEncryptPublicDecryptProvider implements ProvidesContainerConfiguratorsInterface
 {

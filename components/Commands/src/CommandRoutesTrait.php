@@ -23,7 +23,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @package Limoncello\Flute
+ * @package Limoncello\Commands
  */
 trait CommandRoutesTrait
 {

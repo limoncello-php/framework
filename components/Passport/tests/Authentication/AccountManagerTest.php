@@ -22,7 +22,7 @@ use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Mockery;
 
 /**
- * @package Limoncello\Tests\Auth
+ * @package Limoncello\Tests\Passport
  */
 class AccountManagerTest extends \PHPUnit_Framework_TestCase
 {

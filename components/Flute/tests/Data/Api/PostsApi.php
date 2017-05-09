@@ -19,7 +19,7 @@
 use Limoncello\Tests\Flute\Data\Models\Post;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 class PostsApi extends AppCrud
 {

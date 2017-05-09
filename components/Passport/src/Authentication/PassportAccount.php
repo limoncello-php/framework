@@ -20,7 +20,7 @@ use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Passport
  */
 class PassportAccount implements PassportAccountInterface
 {

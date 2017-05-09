@@ -19,7 +19,7 @@
 use Limoncello\Tests\Flute\Data\Models\Emotion;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 class EmotionsApi extends AppCrud
 {

@@ -19,7 +19,7 @@
 use Mockery;
 
 /**
- * @package Limoncello\Tests\Core
+ * @package Limoncello\Tests\Commands
  */
 class TestCase extends \PHPUnit\Framework\TestCase
 {

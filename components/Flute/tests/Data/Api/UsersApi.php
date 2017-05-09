@@ -19,7 +19,7 @@
 use Limoncello\Tests\Flute\Data\Models\User;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 class UsersApi extends AppCrud
 {

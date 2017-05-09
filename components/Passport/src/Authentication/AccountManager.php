@@ -20,7 +20,7 @@ use Limoncello\Contracts\Authentication\AccountInterface;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
 
 /**
- * @package Limoncello\Auth
+ * @package Limoncello\Passport
  */
 class AccountManager implements AccountManagerInterface
 {

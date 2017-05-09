@@ -22,7 +22,7 @@ use Limoncello\Tests\Flute\Data\Models\Model;
 use Psr\Container\ContainerInterface;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 abstract class AppCrud extends Crud
 {

@@ -26,7 +26,7 @@ use ReflectionClass;
 use ReflectionMethod;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Events
  */
 abstract class EventSettings implements SettingsInterface
 {

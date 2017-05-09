@@ -19,7 +19,7 @@
 use Limoncello\Tests\Flute\Data\Models\Board;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 class BoardsApi extends AppCrud
 {

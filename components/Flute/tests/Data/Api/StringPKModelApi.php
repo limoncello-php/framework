@@ -19,7 +19,7 @@
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 class StringPKModelApi extends AppCrud
 {

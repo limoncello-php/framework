@@ -28,7 +28,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Limoncello\Crypt\Package\AsymmetricCryptSettings as C;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Crypt
  */
 class AsymmetricPublicEncryptPrivateDecryptContainerConfigurator implements ContainerConfiguratorInterface
 {

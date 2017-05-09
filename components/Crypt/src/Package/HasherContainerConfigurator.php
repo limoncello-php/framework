@@ -25,7 +25,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Limoncello\Crypt\Package\HasherSettings as C;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Crypt
  */
 class HasherContainerConfigurator implements ContainerConfiguratorInterface
 {

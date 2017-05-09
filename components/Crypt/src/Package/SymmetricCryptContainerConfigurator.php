@@ -26,7 +26,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Limoncello\Crypt\Package\SymmetricCryptSettings as C;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Crypt
  */
 class SymmetricCryptContainerConfigurator implements ContainerConfiguratorInterface
 {

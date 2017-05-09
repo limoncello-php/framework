@@ -19,7 +19,7 @@
 use Limoncello\Tests\Flute\Data\Models\Role;
 
 /**
- * @package Limoncello\Tests
+ * @package Limoncello\Tests\Flute
  */
 class RolesApi extends AppCrud
 {

@@ -21,7 +21,7 @@ use Generator;
 use ReflectionClass;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Events
  */
 trait SelectClassesTrait
 {

@@ -22,7 +22,7 @@ use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 
 /**
- * @package Limoncello\Models
+ * @package Limoncello\Flute
  */
 class ModelSchemes implements ModelSchemeInfoInterface
 {
