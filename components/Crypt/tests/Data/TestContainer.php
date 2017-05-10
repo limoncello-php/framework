@@ -24,6 +24,9 @@ use Limoncello\Contracts\Container\ContainerInterface;
  */
 class TestContainer implements ContainerInterface
 {
+    /**
+     * @var array
+     */
     private $data = [];
 
     /**
