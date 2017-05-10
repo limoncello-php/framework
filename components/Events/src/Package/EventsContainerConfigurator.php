@@ -20,9 +20,9 @@ use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Events\Contracts\EventEmitterInterface;
+use Limoncello\Events\Package\EventSettings as C;
 use Limoncello\Events\SimpleEventEmitter;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Events\Package\EventSettings as C;
 
 /**
  * @package Limoncello\Events
