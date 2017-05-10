@@ -28,6 +28,11 @@ abstract class BasePublicKeyAsymmetricCrypt extends BaseAsymmetricCrypt
      */
     public function __construct(string $publicKeyOrPath)
     {
+        assert(
+            $this->checkIfPathToFileCheckPrefix($publicKeyOrPath),
+            'It seems you try to use path to file. If so you should prefix it with \'file://\'.'
+        );
+
         $this->clearErrors();
 
         $publicKey = openssl_pkey_get_public($publicKeyOrPath);

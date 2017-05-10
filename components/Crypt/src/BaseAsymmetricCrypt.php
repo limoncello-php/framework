@@ -142,4 +142,18 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
             }
         }
     }
+
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    protected function checkIfPathToFileCheckPrefix(string $path): bool
+    {
+        if (file_exists($path) === true) {
+            return substr($path, 0, 7) === 'file://';
+        }
+
+        return true;
+    }
 }
