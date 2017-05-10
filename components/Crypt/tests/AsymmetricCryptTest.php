@@ -20,11 +20,12 @@ use Limoncello\Crypt\PrivateKeyAsymmetricDecrypt;
 use Limoncello\Crypt\PrivateKeyAsymmetricEncrypt;
 use Limoncello\Crypt\PublicKeyAsymmetricDecrypt;
 use Limoncello\Crypt\PublicKeyAsymmetricEncrypt;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Crypt
  */
-class AsymmetricCryptTest extends \PHPUnit_Framework_TestCase
+class AsymmetricCryptTest extends TestCase
 {
     /** Path to key file */
     const PRIVATE_FILE = __DIR__ . DIRECTORY_SEPARATOR . 'Data'  . DIRECTORY_SEPARATOR . 'sample_private_key.pem';

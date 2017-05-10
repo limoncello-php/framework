@@ -18,11 +18,12 @@
 
 use Limoncello\Crypt\Contracts\HasherInterface;
 use Limoncello\Crypt\Hasher;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Crypt
  */
-class HasherTest extends \PHPUnit_Framework_TestCase
+class HasherTest extends TestCase
 {
     /**
      * Test hash value and verify hash.

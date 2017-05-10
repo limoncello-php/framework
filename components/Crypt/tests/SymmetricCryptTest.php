@@ -20,11 +20,12 @@ use Limoncello\Crypt\Exceptions\CryptException;
 use Limoncello\Crypt\SymmetricCrypt;
 use Mockery;
 use Mockery\Mock;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Crypt
  */
-class SymmetricCryptTest extends \PHPUnit_Framework_TestCase
+class SymmetricCryptTest extends TestCase
 {
     /**
      * Test encrypt & decrypt.
