@@ -1,0 +1,2138 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "1bdac19ef3f3ad1bd5215e78cb23b046",
+    "packages": [
+        {
+            "name": "doctrine/annotations",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/annotations.git",
+                "reference": "54cacc9b81758b14e3ce750f205a393d52339e97"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/54cacc9b81758b14e3ce750f205a393d52339e97",
+                "reference": "54cacc9b81758b14e3ce750f205a393d52339e97",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/lexer": "1.*",
+                "php": "^5.6 || ^7.0"
+            },
+            "require-dev": {
+                "doctrine/cache": "1.*",
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Doctrine\\Common\\Annotations\\": "lib/Doctrine/Common/Annotations"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Docblock Annotations Parser",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "annotations",
+                "docblock",
+                "parser"
+            ],
+            "time": "2017-02-24T16:22:25+00:00"
+        },
+        {
+            "name": "doctrine/cache",
+            "version": "v1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/cache.git",
+                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/b6f544a20f4807e81f7044d31e679ccbb1866dc3",
+                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~5.5|~7.0"
+            },
+            "conflict": {
+                "doctrine/common": ">2.2,<2.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8|~5.0",
+                "predis/predis": "~1.0",
+                "satooshi/php-coveralls": "~0.6"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.6.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Doctrine\\Common\\Cache\\": "lib/Doctrine/Common/Cache"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Caching library offering an object-oriented API for many cache backends",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "cache",
+                "caching"
+            ],
+            "time": "2016-10-29T11:16:17+00:00"
+        },
+        {
+            "name": "doctrine/collections",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/collections.git",
+                "reference": "1a4fb7e902202c33cce8c55989b945612943c2ba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/1a4fb7e902202c33cce8c55989b945612943c2ba",
+                "reference": "1a4fb7e902202c33cce8c55989b945612943c2ba",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6 || ^7.0"
+            },
+            "require-dev": {
+                "doctrine/coding-standard": "~0.1@dev",
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Doctrine\\Common\\Collections\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Collections Abstraction library",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "array",
+                "collections",
+                "iterator"
+            ],
+            "time": "2017-01-03T10:49:41+00:00"
+        },
+        {
+            "name": "doctrine/common",
+            "version": "v2.7.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/common.git",
+                "reference": "930297026c8009a567ac051fd545bf6124150347"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/common/zipball/930297026c8009a567ac051fd545bf6124150347",
+                "reference": "930297026c8009a567ac051fd545bf6124150347",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/annotations": "1.*",
+                "doctrine/cache": "1.*",
+                "doctrine/collections": "1.*",
+                "doctrine/inflector": "1.*",
+                "doctrine/lexer": "1.*",
+                "php": "~5.6|~7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.4.6"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Doctrine\\Common\\": "lib/Doctrine/Common"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Common Library for Doctrine projects",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "annotations",
+                "collections",
+                "eventmanager",
+                "persistence",
+                "spl"
+            ],
+            "time": "2017-01-13T14:02:13+00:00"
+        },
+        {
+            "name": "doctrine/dbal",
+            "version": "v2.5.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/dbal.git",
+                "reference": "7b9e911f9d8b30d43b96853dab26898c710d8f44"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/7b9e911f9d8b30d43b96853dab26898c710d8f44",
+                "reference": "7b9e911f9d8b30d43b96853dab26898c710d8f44",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/common": ">=2.4,<2.8-dev",
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*",
+                "symfony/console": "2.*||^3.0"
+            },
+            "suggest": {
+                "symfony/console": "For helpful console commands such as SQL execution and import of files."
+            },
+            "bin": [
+                "bin/doctrine-dbal"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Doctrine\\DBAL\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                }
+            ],
+            "description": "Database Abstraction Layer",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "database",
+                "dbal",
+                "persistence",
+                "queryobject"
+            ],
+            "time": "2017-02-08T12:53:47+00:00"
+        },
+        {
+            "name": "doctrine/inflector",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/inflector.git",
+                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/inflector/zipball/90b2128806bfde671b6952ab8bea493942c1fdae",
+                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Doctrine\\Common\\Inflector\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Common String Manipulations with regard to casing and singular/plural rules.",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "inflection",
+                "pluralize",
+                "singularize",
+                "string"
+            ],
+            "time": "2015-11-06T14:35:42+00:00"
+        },
+        {
+            "name": "doctrine/lexer",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/lexer.git",
+                "reference": "83893c552fd2045dd78aef794c31e694c37c0b8c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/lexer/zipball/83893c552fd2045dd78aef794c31e694c37c0b8c",
+                "reference": "83893c552fd2045dd78aef794c31e694c37c0b8c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Doctrine\\Common\\Lexer\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Base library for a lexer that can be used in Top-Down, Recursive Descent Parsers.",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "lexer",
+                "parser"
+            ],
+            "time": "2014-09-09T13:34:57+00:00"
+        },
+        {
+            "name": "filp/whoops",
+            "version": "2.1.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/filp/whoops.git",
+                "reference": "f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3",
+                "reference": "f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9 || ^7.0",
+                "psr/log": "^1.0.1"
+            },
+            "require-dev": {
+                "mockery/mockery": "0.9.*",
+                "phpunit/phpunit": "^4.8 || ^5.0",
+                "symfony/var-dumper": "^2.6 || ^3.0"
+            },
+            "suggest": {
+                "symfony/var-dumper": "Pretty print complex values better with var-dumper available",
+                "whoops/soap": "Formats errors as SOAP responses"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Whoops\\": "src/Whoops/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Filipe Dobreira",
+                    "homepage": "https://github.com/filp",
+                    "role": "Developer"
+                }
+            ],
+            "description": "php error handling for cool kids",
+            "homepage": "https://filp.github.io/whoops/",
+            "keywords": [
+                "error",
+                "exception",
+                "handling",
+                "library",
+                "whoops",
+                "zf2"
+            ],
+            "time": "2017-03-07T09:04:45+00:00"
+        },
+        {
+            "name": "limoncello-php/application",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/application.git",
+                "reference": "65169e9e1d640c0ba555da4c892239da947a8671"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/application/zipball/65169e9e1d640c0ba555da4c892239da947a8671",
+                "reference": "65169e9e1d640c0ba555da4c892239da947a8671",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/dbal": "^2.5.0",
+                "filp/whoops": "^2.1",
+                "limoncello-php/auth": "^0.6.1",
+                "limoncello-php/core": "^0.6.1",
+                "monolog/monolog": "^1.22",
+                "neomerx/cors-psr7": "^1.0.0",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.8"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Application\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "PHP application components (PSR-7).",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Application",
+            "keywords": [
+                "framework",
+                "limoncello",
+                "psr-7",
+                "psr7"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/auth",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/auth.git",
+                "reference": "fd14b21c39463217affb2acd2c64363c76ddd4c5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/auth/zipball/fd14b21c39463217affb2acd2c64363c76ddd4c5",
+                "reference": "fd14b21c39463217affb2acd2c64363c76ddd4c5",
+                "shasum": ""
+            },
+            "require": {
+                "limoncello-php/container": "^0.6.1",
+                "php": ">=7.0.0",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "monolog/monolog": "^1.21",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Auth\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Limoncello framework authorization support.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Auth",
+            "keywords": [
+                "auth",
+                "authorization",
+                "framework",
+                "limoncello"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/commands",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/commands.git",
+                "reference": "651ca8c018d9eafa55b422df691a37b4c5d34f43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/commands/zipball/651ca8c018d9eafa55b422df691a37b4c5d34f43",
+                "reference": "651ca8c018d9eafa55b422df691a37b4c5d34f43",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1",
+                "limoncello-php/application": "^0.6.1",
+                "limoncello-php/templates": "^0.6.1",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "composer/composer": "^1.0.0",
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Limoncello\\Commands\\ComposerPlugin",
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Commands\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Limoncello application commands support.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Commands",
+            "keywords": [
+                "commands",
+                "composer",
+                "framework",
+                "limoncello"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/container",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/container.git",
+                "reference": "6a3cf381094c114168a9085377df855ea661e59d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/container/zipball/6a3cf381094c114168a9085377df855ea661e59d",
+                "reference": "6a3cf381094c114168a9085377df855ea661e59d",
+                "shasum": ""
+            },
+            "require": {
+                "limoncello-php/contracts": "^0.6.0",
+                "php": ">=7.0.0",
+                "pimple/pimple": "^3.0"
+            },
+            "require-dev": {
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Container\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Lightweight container (container interoperability).",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Container",
+            "keywords": [
+                "container",
+                "container interoperability",
+                "framework",
+                "interoperability",
+                "limoncello",
+                "psr"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/contracts",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/contracts.git",
+                "reference": "65ee9d609412870344836e242bbacf014b7b0270"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/contracts/zipball/65ee9d609412870344836e242bbacf014b7b0270",
+                "reference": "65ee9d609412870344836e242bbacf014b7b0270",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0",
+                "psr/container": "^1.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "phpmd/phpmd": "^2.6",
+                "squizlabs/php_codesniffer": "^2.8"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Contracts\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Limoncello PHP Framework Contracts (interfaces) required for components integration.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Contracts",
+            "keywords": [
+                "contracts",
+                "framework",
+                "interfaces",
+                "limoncello"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/core",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/core.git",
+                "reference": "77c296e5f78537362c9eca89b8579c9f846ee603"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/core/zipball/77c296e5f78537362c9eca89b8579c9f846ee603",
+                "reference": "77c296e5f78537362c9eca89b8579c9f846ee603",
+                "shasum": ""
+            },
+            "require": {
+                "limoncello-php/contracts": "^0.6.0",
+                "nikic/fast-route": "^1.0",
+                "php": ">=7.0.0",
+                "zendframework/zend-diactoros": "^1.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.8"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Core\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "PHP framework core (PSR-7).",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Core",
+            "keywords": [
+                "framework",
+                "limoncello",
+                "psr-7",
+                "psr7"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/crypt",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/crypt.git",
+                "reference": "e54969e6f8d319437af8a0b066ce2beaf2e66ef8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/crypt/zipball/e54969e6f8d319437af8a0b066ce2beaf2e66ef8",
+                "reference": "e54969e6f8d319437af8a0b066ce2beaf2e66ef8",
+                "shasum": ""
+            },
+            "require": {
+                "limoncello-php/contracts": "^0.6.0",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Crypt\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Limoncello framework crypt support.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Crypt",
+            "keywords": [
+                "crypt",
+                "framework",
+                "limoncello"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/data",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/data.git",
+                "reference": "d329ae4806b3c20fc8cd929e8e7c1d0a44c1e9dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/data/zipball/d329ae4806b3c20fc8cd929e8e7c1d0a44c1e9dc",
+                "reference": "d329ae4806b3c20fc8cd929e8e7c1d0a44c1e9dc",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/dbal": "^2.5.0",
+                "limoncello-php/contracts": "^0.6.0",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Data\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Data library for Limoncello PHP framework.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Data",
+            "keywords": [
+                "data",
+                "framework",
+                "limoncello",
+                "migration",
+                "seed"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/events",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/events.git",
+                "reference": "09def0d991c0dbc8ce33849acce54e93b6a71a94"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/events/zipball/09def0d991c0dbc8ce33849acce54e93b6a71a94",
+                "reference": "09def0d991c0dbc8ce33849acce54e93b6a71a94",
+                "shasum": ""
+            },
+            "require": {
+                "limoncello-php/contracts": "^0.6.0",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Events\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Events library for Limoncello PHP framework.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Events",
+            "keywords": [
+                "events",
+                "framework",
+                "limoncello"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/flute",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/flute.git",
+                "reference": "0d242f111c98d00bd75a34d1e03cafc56f3ec890"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/flute/zipball/0d242f111c98d00bd75a34d1e03cafc56f3ec890",
+                "reference": "0d242f111c98d00bd75a34d1e03cafc56f3ec890",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/dbal": "^2.5.0",
+                "limoncello-php/contracts": "^0.6.1",
+                "limoncello-php/validation": "^0.6.1",
+                "neomerx/json-api": "^1.0.0",
+                "php": ">=7.0.0",
+                "zendframework/zend-diactoros": "^1.3"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "dev-master",
+                "limoncello-php/container": "^0.6.1",
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Flute\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Limoncello framework json-api support.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Flute",
+            "keywords": [
+                "JSON-API",
+                "flute",
+                "framework",
+                "limoncello"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/framework",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php/framework.git",
+                "reference": "b7814d4691efafc642bb6f97d0139318b2bb8cfb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php/framework/zipball/b7814d4691efafc642bb6f97d0139318b2bb8cfb",
+                "reference": "b7814d4691efafc642bb6f97d0139318b2bb8cfb",
+                "shasum": ""
+            },
+            "require": {
+                "limoncello-php/application": "^0.6.0",
+                "limoncello-php/auth": "^0.6.0",
+                "limoncello-php/commands": "^0.6.0",
+                "limoncello-php/container": "^0.6.0",
+                "limoncello-php/contracts": "^0.6.0",
+                "limoncello-php/core": "^0.6.0",
+                "limoncello-php/crypt": "^0.6.0",
+                "limoncello-php/data": "^0.6.0",
+                "limoncello-php/events": "^0.6.0",
+                "limoncello-php/flute": "^0.6.0",
+                "limoncello-php/l10n": "^0.6.0",
+                "limoncello-php/oauth-server": "^0.6.0",
+                "limoncello-php/passport": "^0.6.0",
+                "limoncello-php/templates": "^0.6.0",
+                "limoncello-php/validation": "^0.6.0",
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.5.x-dev",
+                    "dev-develop": "0.6.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "PHP framework framework (PSR-7)",
+            "homepage": "https://github.com/limoncello-php/framework",
+            "keywords": [
+                "framework",
+                "limoncello",
+                "psr-7",
+                "psr7"
+            ],
+            "time": "2017-05-09T04:18:02+00:00"
+        },
+        {
+            "name": "limoncello-php/l10n",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/l10n.git",
+                "reference": "2018baac2e75fee666ddd9a82c9be3d7645d2f2b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/l10n/zipball/2018baac2e75fee666ddd9a82c9be3d7645d2f2b",
+                "reference": "2018baac2e75fee666ddd9a82c9be3d7645d2f2b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-intl": "*",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\l10n\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Limoncello framework localization support.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/L10n",
+            "keywords": [
+                "framework",
+                "l10n",
+                "limoncello",
+                "localization"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/oauth-server",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/oauth-server.git",
+                "reference": "266f0d11df4d19c8f2bf117ba0acb0e5eeb55638"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/oauth-server/zipball/266f0d11df4d19c8f2bf117ba0acb0e5eeb55638",
+                "reference": "266f0d11df4d19c8f2bf117ba0acb0e5eeb55638",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.7",
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "^2.7",
+                "zendframework/zend-diactoros": "^1.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\OAuthServer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Framework agnostic OAuth 2.0 Server library (PSR-7).",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/OAuthServer",
+            "keywords": [
+                "oauth",
+                "oauth 2",
+                "oauth 2.0",
+                "psr-7",
+                "psr7",
+                "server"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/passport",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/passport.git",
+                "reference": "26bee31623bbffc5e17376335b09c9e327f5ae10"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/passport/zipball/26bee31623bbffc5e17376335b09c9e327f5ae10",
+                "reference": "26bee31623bbffc5e17376335b09c9e327f5ae10",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/dbal": "^2.5.0",
+                "limoncello-php/contracts": "^0.6.0",
+                "limoncello-php/oauth-server": "^0.6.0",
+                "php": ">=7.0.0",
+                "psr/log": "^1.0",
+                "zendframework/zend-diactoros": "^1.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.7",
+                "monolog/monolog": "^1.22",
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "^2.7",
+                "vlucas/phpdotenv": "^2.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Passport\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Limoncello framework OAuth 2.0 Server implementation.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Passport",
+            "keywords": [
+                "framework",
+                "limoncello",
+                "oauth",
+                "oauth 2",
+                "oauth 2.0",
+                "psr-7",
+                "psr7"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/templates",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/templates.git",
+                "reference": "94f66c9c66ef980ae1876e1c4f56908ebd5af325"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/templates/zipball/94f66c9c66ef980ae1876e1c4f56908ebd5af325",
+                "reference": "94f66c9c66ef980ae1876e1c4f56908ebd5af325",
+                "shasum": ""
+            },
+            "require": {
+                "limoncello-php/contracts": "^0.6.1",
+                "php": ">=7.0.0",
+                "twig/twig": "^2.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Templates\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Limoncello application templates.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Templates",
+            "keywords": [
+                "framework",
+                "limoncello",
+                "templates"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "limoncello-php/validation",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/limoncello-php-dist/validation.git",
+                "reference": "90ec51b7fdb378bde32732a43efb588195583231"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/limoncello-php-dist/validation/zipball/90ec51b7fdb378bde32732a43efb588195583231",
+                "reference": "90ec51b7fdb378bde32732a43efb588195583231",
+                "shasum": ""
+            },
+            "require": {
+                "ext-intl": "*",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpmd/phpmd": "^2.4",
+                "phpunit/phpunit": "^5.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev",
+                    "dev-develop": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Limoncello\\Validation\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Validation framework.",
+            "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Validation",
+            "keywords": [
+                "validation"
+            ],
+            "time": "2017-05-09T03:56:25+00:00"
+        },
+        {
+            "name": "monolog/monolog",
+            "version": "1.22.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "1e044bc4b34e91743943479f1be7a1d5eb93add0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/1e044bc4b34e91743943479f1be7a1d5eb93add0",
+                "reference": "1e044bc4b34e91743943479f1be7a1d5eb93add0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "psr/log": "~1.0"
+            },
+            "provide": {
+                "psr/log-implementation": "1.0.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "^2.4.9 || ^3.0",
+                "doctrine/couchdb": "~1.0@dev",
+                "graylog2/gelf-php": "~1.0",
+                "jakub-onderka/php-parallel-lint": "0.9",
+                "php-amqplib/php-amqplib": "~2.4",
+                "php-console/php-console": "^3.1.3",
+                "phpunit/phpunit": "~4.5",
+                "phpunit/phpunit-mock-objects": "2.3.0",
+                "ruflin/elastica": ">=0.90 <3.0",
+                "sentry/sentry": "^0.13",
+                "swiftmailer/swiftmailer": "~5.3"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
+                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+                "ext-mongo": "Allow sending log messages to a MongoDB server",
+                "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
+                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
+                "php-console/php-console": "Allow sending log messages to Google Chrome",
+                "rollbar/rollbar": "Allow sending log messages to Rollbar",
+                "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
+                "sentry/sentry": "Allow sending log messages to a Sentry server"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Monolog\\": "src/Monolog"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+            "homepage": "http://github.com/Seldaek/monolog",
+            "keywords": [
+                "log",
+                "logging",
+                "psr-3"
+            ],
+            "time": "2017-03-13T07:08:03+00:00"
+        },
+        {
+            "name": "neomerx/cors-psr7",
+            "version": "v1.0.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/neomerx/cors-psr7.git",
+                "reference": "cc0413d6843ca27f90d15dbaf3bc6f9f972476f0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/neomerx/cors-psr7/zipball/cc0413d6843ca27f90d15dbaf3bc6f9f972476f0",
+                "reference": "cc0413d6843ca27f90d15dbaf3bc6f9f972476f0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0",
+                "psr/http-message": "^1.0",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpunit/phpunit": "^4.8",
+                "scrutinizer/ocular": "^1.1",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Neomerx\\Cors\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Framework agnostic (PSR-7) CORS implementation (www.w3.org/TR/cors/)",
+            "homepage": "https://github.com/neomerx/cors-psr7",
+            "keywords": [
+                "Cross Origin Resource Sharing",
+                "Cross-Origin Resource Sharing",
+                "cors",
+                "neomerx",
+                "psr-7",
+                "psr7",
+                "w3.org",
+                "www.w3.org"
+            ],
+            "time": "2016-08-03T16:32:06+00:00"
+        },
+        {
+            "name": "neomerx/json-api",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/neomerx/json-api.git",
+                "reference": "3a56655b206ef7a54d117ba8573d70566811bf06"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/neomerx/json-api/zipball/3a56655b206ef7a54d117ba8573d70566811bf06",
+                "reference": "3a56655b206ef7a54d117ba8573d70566811bf06",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0",
+                "psr/http-message": "^1.0",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9.4",
+                "monolog/monolog": "^1.18",
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "^4.6 || ^5.0 || ^6.0",
+                "scrutinizer/ocular": "^1.3",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Neomerx\\JsonApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Framework agnostic JSON API (jsonapi.org) implementation",
+            "homepage": "https://github.com/neomerx/json-api",
+            "keywords": [
+                "JSON-API",
+                "api",
+                "json",
+                "jsonapi",
+                "jsonapi.org",
+                "neomerx"
+            ],
+            "time": "2017-04-20T09:35:30+00:00"
+        },
+        {
+            "name": "nikic/fast-route",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nikic/FastRoute.git",
+                "reference": "b5f95749071c82a8e0f58586987627054400cdf6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nikic/FastRoute/zipball/b5f95749071c82a8e0f58586987627054400cdf6",
+                "reference": "b5f95749071c82a8e0f58586987627054400cdf6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FastRoute\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Nikita Popov",
+                    "email": "nikic@php.net"
+                }
+            ],
+            "description": "Fast request router for PHP",
+            "keywords": [
+                "router",
+                "routing"
+            ],
+            "time": "2017-01-19T11:35:12+00:00"
+        },
+        {
+            "name": "pimple/pimple",
+            "version": "v3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silexphp/Pimple.git",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Pimple": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Pimple, a simple Dependency Injection Container",
+            "homepage": "http://pimple.sensiolabs.org",
+            "keywords": [
+                "container",
+                "dependency injection"
+            ],
+            "time": "2015-09-11T15:10:35+00:00"
+        },
+        {
+            "name": "psr/container",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/container.git",
+                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
+                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Container\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common Container Interface (PHP FIG PSR-11)",
+            "homepage": "https://github.com/php-fig/container",
+            "keywords": [
+                "PSR-11",
+                "container",
+                "container-interface",
+                "container-interop",
+                "psr"
+            ],
+            "time": "2017-02-14T16:28:37+00:00"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2016-08-06T14:39:51+00:00"
+        },
+        {
+            "name": "psr/log",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2016-10-10T12:19:37+00:00"
+        },
+        {
+            "name": "symfony/polyfill-mbstring",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-mbstring.git",
+                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/e79d363049d1c2128f133a2667e4f4190904f7f4",
+                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "ext-mbstring": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Mbstring\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for the Mbstring extension",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "mbstring",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2016-11-14T01:06:16+00:00"
+        },
+        {
+            "name": "twig/twig",
+            "version": "v2.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twigphp/Twig.git",
+                "reference": "85e8372c451510165c04bf781295f9d922fa524b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/85e8372c451510165c04bf781295f9d922fa524b",
+                "reference": "85e8372c451510165c04bf781295f9d922fa524b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0",
+                "symfony/polyfill-mbstring": "~1.0"
+            },
+            "require-dev": {
+                "psr/container": "^1.0",
+                "symfony/debug": "~2.7",
+                "symfony/phpunit-bridge": "~3.3@dev"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Twig_": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
+                },
+                {
+                    "name": "Armin Ronacher",
+                    "email": "armin.ronacher@active-4.com",
+                    "role": "Project Founder"
+                },
+                {
+                    "name": "Twig Team",
+                    "homepage": "http://twig.sensiolabs.org/contributors",
+                    "role": "Contributors"
+                }
+            ],
+            "description": "Twig, the flexible, fast, and secure template language for PHP",
+            "homepage": "http://twig.sensiolabs.org",
+            "keywords": [
+                "templating"
+            ],
+            "time": "2017-04-21T00:13:02+00:00"
+        },
+        {
+            "name": "vlucas/phpdotenv",
+            "version": "v2.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vlucas/phpdotenv.git",
+                "reference": "3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c",
+                "reference": "3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8 || ^5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dotenv\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause-Attribution"
+            ],
+            "authors": [
+                {
+                    "name": "Vance Lucas",
+                    "email": "vance@vancelucas.com",
+                    "homepage": "http://www.vancelucas.com"
+                }
+            ],
+            "description": "Loads environment variables from `.env` to `getenv()`, `$_ENV` and `$_SERVER` automagically.",
+            "keywords": [
+                "dotenv",
+                "env",
+                "environment"
+            ],
+            "time": "2016-09-01T10:05:43+00:00"
+        },
+        {
+            "name": "zendframework/zend-diactoros",
+            "version": "1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-diactoros.git",
+                "reference": "b03f285a333f51e58c95cce54109a4a9ed691436"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/b03f285a333f51e58c95cce54109a4a9ed691436",
+                "reference": "b03f285a333f51e58c95cce54109a4a9ed691436",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.4 || ^7.0",
+                "psr/http-message": "~1.0"
+            },
+            "provide": {
+                "psr/http-message-implementation": "1.0"
+            },
+            "require-dev": {
+                "ext-dom": "*",
+                "ext-libxml": "*",
+                "phpunit/phpunit": "^4.6 || ^5.5",
+                "zendframework/zend-coding-standard": "~1.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev",
+                    "dev-develop": "1.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\Diactoros\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "PSR HTTP Message implementations",
+            "homepage": "https://github.com/zendframework/zend-diactoros",
+            "keywords": [
+                "http",
+                "psr",
+                "psr-7"
+            ],
+            "time": "2017-04-06T16:18:34+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=7.0.0"
+    },
+    "platform-dev": []
+}
