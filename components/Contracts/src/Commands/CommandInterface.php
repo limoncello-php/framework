@@ -23,15 +23,6 @@ use Psr\Container\ContainerInterface;
  */
 interface CommandInterface
 {
-    /** Data command key */
-    const COMMAND_NAME = 0;
-
-    /** Data command key */
-    const COMMAND_DESCRIPTION = self::COMMAND_NAME + 1;
-
-    /** Data command key */
-    const COMMAND_HELP = self::COMMAND_DESCRIPTION + 1;
-
     /** Data argument key */
     const ARGUMENT_NAME = 0;
 
@@ -81,19 +72,29 @@ interface CommandInterface
     const OPTION_MODE__IS_ARRAY = 8;
 
     /**
-     * @return string[]
+     * @return string
      */
-    public function getCommandData(): array;
+    public static function getName(): string;
+
+    /**
+     * @return string
+     */
+    public static function getDescription(): string;
+
+    /**
+     * @return string
+     */
+    public static function getHelp(): string;
 
     /**
      * @return array
      */
-    public function getArguments(): array;
+    public static function getArguments(): array;
 
     /**
      * @return array
      */
-    public function getOptions(): array;
+    public static function getOptions(): array;
 
     /**
      * @param ContainerInterface $container
@@ -101,5 +102,5 @@ interface CommandInterface
      *
      * @return void
      */
-    public function execute(ContainerInterface $container, IoInterface $inOut);
+    public static function execute(ContainerInterface $container, IoInterface $inOut);
 }
