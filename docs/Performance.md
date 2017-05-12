@@ -2,7 +2,7 @@
 
 Performance was tested for the following PHP frameworks (alphabetical order)
 
-- Limoncello 0.6.4
+- Limoncello 0.6.7
 - Lumen 5.4.0
 - Slim 3.8.1
 
@@ -10,9 +10,9 @@ Performance was tested for the following PHP frameworks (alphabetical order)
 
 |               | RPS (more is better) |    %   |
 | ------------- |----------------------| -------|
-| Limoncello    |        1130,88       | 154,2% |
-| Slim          |        885,37        | 120,7% |
-| Lumen         |        733,59        | 100,0% |
+| Limoncello    |        1143,68       | 156,4% |
+| Slim          |        885,37        | 121,1% |
+| Lumen         |        731,26        | 100,0% |
 
 RPS - Requests per Second (more is better)
 

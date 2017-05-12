@@ -30,9 +30,10 @@ class Application extends ApplicationSettings
     {
         (new Dotenv(__DIR__ . DIRECTORY_SEPARATOR . '..'))->load();
 
-        $routesPath  = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'app', 'Http', '*Routes.php']);
-        $confPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'app', 'Container', '*.php']);
-        $cacheFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'storage', 'cache', 'settings']);
+        $routesPath     = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'app', 'Http', '*Routes.php']);
+        $confPath       = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'app', 'Container', '*.php']);
+        $commandsFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'app', 'Commands']);
+        $cacheFolder    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'storage', 'cache', 'settings']);
 
         return [
             static::KEY_APP_NAME                     => getenv('APP_NAME'),
@@ -41,7 +42,9 @@ class Application extends ApplicationSettings
             static::KEY_CONTAINER_CONFIGURATORS_PATH => $confPath,
             static::KEY_CACHE_FOLDER                 => $cacheFolder,
             static::KEY_CACHE_CALLABLE               => static::CACHE_CALLABLE,
+            static::KEY_COMMANDS_FOLDER              => $commandsFolder,
             static::KEY_PROVIDER_CLASSES             => [
+                \Limoncello\Application\Packages\Application\ApplicationProvider::class,
                 \Limoncello\Application\Packages\FileSystem\FileSystemProvider::class,
             ],
         ];

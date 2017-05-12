@@ -14,7 +14,7 @@
     "require": {
         "php": ">=7.0.0",
         "vlucas/phpdotenv": "^2.3",
-        "limoncello-php/framework": "^0.6.3"
+        "limoncello-php/framework": "^0.6.7"
     },
     "autoload": {
         "psr-4": {
@@ -23,10 +23,22 @@
             "Cached\\": "storage/cache/settings/"
         }
     },
+    "extra": {
+        "application": {
+            "commands_cache": "storage/cache/settings/commands_cache.php"
+        }
+    },
     "config": {
         "optimize-autoloader": true
     },
     "scripts": {
-        "build": ["@composer install --no-dev --quiet", "@composer l:cache", "@composer dumpautoload --optimize --quiet"]
+        "post-root-package-install": ["php -r \"copy('.env.example', '.env');\"", "@composer l:commands connect"],
+        "post-update-cmd": ["@composer l:commands connect"],
+
+        "build": [
+            "@composer install --no-dev --quiet",
+            "@composer l:app cache",
+            "@composer dumpautoload --optimize --quiet"
+        ]
     }
 }
