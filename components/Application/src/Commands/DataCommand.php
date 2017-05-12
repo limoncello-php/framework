@@ -55,19 +55,31 @@ class DataCommand implements CommandInterface
     /**
      * @inheritdoc
      */
-    public function getCommandData(): array
+    public static function getName(): string
     {
-        return [
-            self::COMMAND_NAME        => static::NAME,
-            self::COMMAND_DESCRIPTION => 'Migrates and seeds application data.',
-            self::COMMAND_HELP        => 'This command migrates, seeds and resets application data.',
-        ];
+        return static::NAME;
     }
 
     /**
      * @inheritdoc
      */
-    public function getArguments(): array
+    public static function getDescription(): string
+    {
+        return 'Migrates and seeds application data.';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getHelp(): string
+    {
+        return 'This command migrates, seeds and resets application data.';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getArguments(): array
     {
         $migrate  = static::ACTION_MIGRATE;
         $seed     = static::ACTION_SEED;
@@ -85,7 +97,7 @@ class DataCommand implements CommandInterface
     /**
      * @inheritdoc
      */
-    public function getOptions(): array
+    public static function getOptions(): array
     {
         return [
             [
@@ -101,11 +113,14 @@ class DataCommand implements CommandInterface
     /**
      * @inheritdoc
      */
-    public function execute(ContainerInterface $container, IoInterface $inOut)
+    public static function execute(ContainerInterface $container, IoInterface $inOut)
     {
         $arguments = $inOut->getArguments();
         $options   = $inOut->getOptions();
-        $settings  = $this->getSettings($container);
+
+        /** @var SettingsProviderInterface $provider */
+        $provider = $container->get(SettingsProviderInterface::class);
+        $settings = $provider->get(DataSettings::class);
 
         $path   = $options[static::OPT_PATH] ?? false;
         $action = $arguments[static::ARG_ACTION];
@@ -127,19 +142,5 @@ class DataCommand implements CommandInterface
                 $inOut->writeError("Unsupported action `$action`." . PHP_EOL);
                 break;
         }
-    }
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return array
-     */
-    protected function getSettings(ContainerInterface $container): array
-    {
-        /** @var SettingsProviderInterface $provider */
-        $provider = $container->get(SettingsProviderInterface::class);
-        $settings = $provider->get(DataSettings::class);
-
-        return $settings;
     }
 }

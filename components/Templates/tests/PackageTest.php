@@ -69,6 +69,7 @@ class PackageTest extends TestCase
     public function testTemplateProvider()
     {
         $this->assertNotEmpty(TemplatesProvider::getContainerConfigurators());
+        $this->assertNotEmpty(TemplatesProvider::getCommands());
     }
 
     /**

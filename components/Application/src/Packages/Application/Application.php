@@ -167,12 +167,14 @@ class Application extends \Limoncello\Core\Application\Application
 
         $throwableHandler = function (Throwable $throwable) use ($sapi, $container, $createHandler) {
             /** @var ExceptionHandlerInterface $handler */
+            /** @noinspection PhpParamsInspection */
             $handler = $createHandler();
             $handler->handleThrowable($throwable, $sapi, $container);
         };
 
         $exceptionHandler = function (Exception $exception) use ($sapi, $container, $createHandler) {
             /** @var ExceptionHandlerInterface $handler */
+            /** @noinspection PhpParamsInspection */
             $handler = $createHandler();
             $handler->handleException($exception, $sapi, $container);
         };

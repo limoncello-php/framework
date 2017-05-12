@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Templates\Package;
+<?php namespace Limoncello\Application\Packages\Application;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Commands\ApplicationCommand;
+use Limoncello\Application\Commands\DataCommand;
 use Limoncello\Contracts\Provider\ProvidesCommandsInterface;
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
-use Limoncello\Templates\Commands\TemplatesCommand;
 
 /**
- * @package Limoncello\Templates
+ * @package Limoncello\Application
  */
-class TemplatesProvider implements ProvidesContainerConfiguratorsInterface, ProvidesCommandsInterface
+class ApplicationProvider implements ProvidesContainerConfiguratorsInterface, ProvidesCommandsInterface
 {
     /**
      * @inheritdoc
@@ -31,7 +32,7 @@ class TemplatesProvider implements ProvidesContainerConfiguratorsInterface, Prov
     public static function getContainerConfigurators(): array
     {
         return [
-            TemplatesContainerConfigurator::HANDLER,
+            ApplicationContainerConfigurator::HANDLER,
         ];
     }
 
@@ -41,7 +42,8 @@ class TemplatesProvider implements ProvidesContainerConfiguratorsInterface, Prov
     public static function getCommands(): array
     {
         return [
-            TemplatesCommand::class,
+            ApplicationCommand::class,
+            DataCommand::class,
         ];
     }
 }

@@ -18,6 +18,7 @@
 
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
+use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -40,7 +41,7 @@ trait CommandRoutesTrait
         callable $configurator
     ): GroupInterface {
         return $group->method(
-            LimoncelloCommand::HTTP_METHOD,
+            CommandConstants::HTTP_METHOD,
             $commandName,
             [static::class, 'handlerStub'],
             [
@@ -64,6 +65,6 @@ trait CommandRoutesTrait
     ): ResponseInterface {
         assert($routeParams || $container || $request);
 
-        throw new \LogicException('This handler should not be used.');
+        throw new LogicException('This handler should not be used.');
     }
 }

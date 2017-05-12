@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Templates\Commands;
+<?php namespace Limoncello\Commands\Traits;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -17,24 +17,27 @@
  */
 
 use Limoncello\Contracts\Commands\CommandInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Templates\Package\TemplatesSettings;
-use Psr\Container\ContainerInterface;
 
 /**
- * @package Limoncello\Templates
+ * @package Limoncello\Commands
  */
-abstract class TemplatesBase implements CommandInterface
+trait CommandSerializationTrait
 {
     /**
-     * @param ContainerInterface $container
+     * @param string $commandClass
      *
      * @return array
      */
-    protected function getTemplatesSettings(ContainerInterface $container)
+    protected function commandClassToArray(string $commandClass): array
     {
-        $tplConfig = $container->get(SettingsProviderInterface::class)->get(TemplatesSettings::class);
-
-        return $tplConfig;
+        /** @var CommandInterface $commandClass */
+        return [
+            $commandClass::getName(),
+            $commandClass::getDescription(),
+            $commandClass::getHelp(),
+            $commandClass::getArguments(),
+            $commandClass::getOptions(),
+            [$commandClass, 'execute'],
+        ];
     }
 }

@@ -1,0 +1,109 @@
+<?php namespace App\Commands;
+
+use Limoncello\Contracts\Commands\CommandInterface;
+use Limoncello\Contracts\Commands\IoInterface;
+use Psr\Container\ContainerInterface;
+
+/**
+ * {TO_DO}: Add command description.
+ */
+class {CLASS_NAME} implements CommandInterface
+{
+    /**
+     * @inheritdoc
+     */
+    public static function getName(): string
+    {
+        // {TO_DO}: Set command name.
+        return "app:{COMMAND_NAME}";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getDescription(): string
+    {
+        // {TO_DO}: Set command description.
+        return 'Please put command description here.';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getHelp(): string
+    {
+        // {TO_DO}: Set command help.
+        return 'Please put command help text here.';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getArguments(): array
+    {
+        // The package reuses `Composer` console functionality which in its turn uses `Symfony Console Component`.
+        // For more info and example usage for `REQUIRED`, `OPTIONAL` and `IS_ARRAY`
+        // @see http://symfony.com/doc/current/console/input.html
+
+        // {TO_DO}: Set command arguments or return an empty array.
+        return [
+            [
+                static::ARGUMENT_NAME        => 'arg1',
+                static::ARGUMENT_DESCRIPTION => 'An example of required argument.',
+                static::ARGUMENT_MODE        => static::ARGUMENT_MODE__REQUIRED,
+            ], [
+                static::ARGUMENT_NAME        => 'arg2',
+                static::ARGUMENT_DESCRIPTION => 'An example of optional argument.',
+                static::ARGUMENT_MODE        => static::ARGUMENT_MODE__OPTIONAL,
+            ], [
+                static::ARGUMENT_NAME        => 'arg3',
+                static::ARGUMENT_DESCRIPTION => 'An example of optional array argument.',
+                static::ARGUMENT_MODE        => static::ARGUMENT_MODE__OPTIONAL | static::ARGUMENT_MODE__IS_ARRAY,
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getOptions(): array
+    {
+        // The package reuses `Composer` console functionality which in its turn uses `Symfony Console Component`.
+        // For more info and example usage for `REQUIRED`, `OPTIONAL` and `IS_ARRAY`
+        // @see http://symfony.com/doc/current/console/input.html
+
+        // {TO_DO}: Set command options or return an empty array.
+        return [
+            [
+                static::OPTION_NAME        => 'option1',
+                static::OPTION_DESCRIPTION => 'An example of required value.',
+                static::OPTION_SHORTCUT    => 'o1',
+                static::OPTION_MODE        => static::OPTION_MODE__REQUIRED,
+            ], [
+                static::OPTION_NAME        => 'option2',
+                static::OPTION_DESCRIPTION => 'An example of optional value.',
+                static::OPTION_SHORTCUT    => 'o2',
+                static::OPTION_MODE        => static::OPTION_MODE__OPTIONAL,
+            ], [
+                static::OPTION_NAME        => 'option3',
+                static::OPTION_DESCRIPTION => 'An example of option without a value.',
+                static::OPTION_SHORTCUT    => 'o3',
+                static::OPTION_MODE        => static::OPTION_MODE__NONE,
+            ], [
+                static::OPTION_NAME        => 'option4',
+                static::OPTION_DESCRIPTION => 'An example of required multi-value option.',
+                static::OPTION_SHORTCUT    => 'o4',
+                static::OPTION_MODE        => static::OPTION_MODE__REQUIRED | static::OPTION_MODE__IS_ARRAY,
+            ],
+        ];
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function execute(ContainerInterface $container, IoInterface $inOut)
+    {
+        // {TO_DO}: Implement execute() method.
+    }
+}

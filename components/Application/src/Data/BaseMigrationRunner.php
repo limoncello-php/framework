@@ -78,10 +78,10 @@ abstract class BaseMigrationRunner
         }
 
         $manager = $this->getConnection($container)->getSchemaManager();
-        if ($manager->tablesExist(static::MIGRATIONS_TABLE) === true) {
+        if ($manager->tablesExist([static::MIGRATIONS_TABLE]) === true) {
             $manager->dropTable(static::MIGRATIONS_TABLE);
         }
-        if ($manager->tablesExist(static::SEEDS_TABLE) === true) {
+        if ($manager->tablesExist([static::SEEDS_TABLE]) === true) {
             $manager->dropTable(static::SEEDS_TABLE);
         }
     }
@@ -96,7 +96,7 @@ abstract class BaseMigrationRunner
         $connection = $this->getConnection($container);
         $manager    = $connection->getSchemaManager();
 
-        if ($manager->tablesExist(static::MIGRATIONS_TABLE) === true) {
+        if ($manager->tablesExist([static::MIGRATIONS_TABLE]) === true) {
             $migrated = $this->readMigrated($connection);
         } else {
             $this->createMigrationsTable($manager);
@@ -172,7 +172,7 @@ abstract class BaseMigrationRunner
         $builder  = $connection->createQueryBuilder();
         $migrated = [];
 
-        if ($connection->getSchemaManager()->tablesExist(static::MIGRATIONS_TABLE) === true) {
+        if ($connection->getSchemaManager()->tablesExist([static::MIGRATIONS_TABLE]) === true) {
             $migrations = $builder
                 ->select(static::MIGRATIONS_COLUMN_ID, static::MIGRATIONS_COLUMN_CLASS)
                 ->from(static::MIGRATIONS_TABLE)

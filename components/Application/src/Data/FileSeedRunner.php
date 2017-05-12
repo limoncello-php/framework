@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Closure;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Psr\Container\ContainerInterface;
 

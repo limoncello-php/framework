@@ -91,7 +91,7 @@ abstract class BaseSeedRunner
         $connection = $this->getConnection($container);
         $manager    = $connection->getSchemaManager();
 
-        if ($manager->tablesExist($this->getSeedsTable()) === true) {
+        if ($manager->tablesExist([$this->getSeedsTable()]) === true) {
             $seeded = $this->readSeeded($connection);
         } else {
             $this->createSeedsTable($manager);
@@ -164,7 +164,7 @@ abstract class BaseSeedRunner
         $builder = $connection->createQueryBuilder();
         $seeded  = [];
 
-        if ($connection->getSchemaManager()->tablesExist($this->getSeedsTable()) === true) {
+        if ($connection->getSchemaManager()->tablesExist([$this->getSeedsTable()]) === true) {
             $seeds = $builder
                 ->select(static::SEEDS_COLUMN_ID, static::SEEDS_COLUMN_CLASS)
                 ->from($this->getSeedsTable())

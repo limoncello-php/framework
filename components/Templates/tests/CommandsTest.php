@@ -20,8 +20,7 @@ use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Templates\Commands\TemplatesClean;
-use Limoncello\Templates\Commands\TemplatesCreate;
+use Limoncello\Templates\Commands\TemplatesCommand;
 use Limoncello\Templates\Package\TemplatesSettings;
 use Limoncello\Templates\TwigTemplates;
 use Limoncello\Tests\Templates\Data\Templates;
@@ -57,12 +56,13 @@ class CommandsTest extends TestCase
             ->addSettingsProvider($container)
             ->addFileSystem($container);
 
-        $command = new TemplatesClean();
-        $this->assertEmpty($command->getArguments());
-        $this->assertEmpty($command->getOptions());
-        $this->assertNotEmpty($command->getCommandData());
+        /** @var Mock $command */
+        $command = Mockery::mock(TemplatesCommand::class . '[createCachingTemplateEngine]');
+        $command->shouldAllowMockingProtectedMethods();
 
-        $command->execute($container, $this->createIo());
+        /** @var TemplatesCommand $command */
+
+        $command->execute($container, $this->createIo(TemplatesCommand::ACTION_CLEAR_CACHE));
     }
 
     /**
@@ -75,7 +75,7 @@ class CommandsTest extends TestCase
             ->addSettingsProvider($container);
 
         /** @var Mock $command */
-        $command = Mockery::mock(TemplatesCreate::class . '[createCachingTemplateEngine]');
+        $command = Mockery::mock(TemplatesCommand::class . '[createCachingTemplateEngine]');
         $command->shouldAllowMockingProtectedMethods();
         /** @var Mock $tplMock */
         $tplMock = Mockery::mock(TwigTemplates::class);
@@ -85,13 +85,32 @@ class CommandsTest extends TestCase
         $tplMock->shouldReceive('getTwig')->zeroOrMoreTimes()->withNoArgs()->andReturn($twigMock);
         $twigMock->shouldReceive('resolveTemplate')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
 
-        /** @var TemplatesCreate $command */
+        /** @var TemplatesCommand $command */
 
-        $this->assertEmpty($command->getArguments());
-        $this->assertEmpty($command->getOptions());
-        $this->assertNotEmpty($command->getCommandData());
+        $this->assertNotEmpty($command::getName());
+        $this->assertNotEmpty($command::getDescription());
+        $this->assertNotEmpty($command::getHelp());
+        $this->assertNotEmpty($command::getArguments());
+        $this->assertEmpty($command::getOptions());
 
-        $command->execute($container, $this->createIo());
+        $command::execute($container, $this->createIo(TemplatesCommand::ACTION_CREATE_CACHE));
+    }
+
+    /**
+     * Test invalid action command.
+     */
+    public function testInvalidAction()
+    {
+        $container = $this->createContainer();
+
+        /** @var Mock $command */
+        $command = Mockery::mock(TemplatesCommand::class . '[createCachingTemplateEngine]');
+        $command->shouldAllowMockingProtectedMethods();
+
+        /** @var TemplatesCommand $command */
+
+        $errors = 1;
+        $command->execute($container, $this->createIo('XXX', $errors));
     }
 
     /**
@@ -103,9 +122,9 @@ class CommandsTest extends TestCase
         $templatesFolder = $settings[Templates::KEY_TEMPLATES_FOLDER];
         $cacheFolder     = $settings[Templates::KEY_CACHE_FOLDER];
 
-        $method = new ReflectionMethod(TemplatesCreate::class, 'createCachingTemplateEngine');
+        $method = new ReflectionMethod(TemplatesCommand::class, 'createCachingTemplateEngine');
         $method->setAccessible(true);
-        $result = $method->invoke(new TemplatesCreate(), $templatesFolder, $cacheFolder);
+        $result = $method->invoke(new TemplatesCommand(), $templatesFolder, $cacheFolder);
 
         $this->assertTrue($result instanceof TwigTemplates);
     }
@@ -156,11 +175,23 @@ class CommandsTest extends TestCase
     }
 
     /**
+     * @param string $action
+     * @param int    $errors
+     *
      * @return IoInterface
      */
-    private function createIo(): IoInterface
+    private function createIo(string $action, int $errors = 0): IoInterface
     {
+        /** @var Mock $ioMock */
         $ioMock = Mockery::mock(IoInterface::class);
+
+        $ioMock->shouldReceive('getArgument')->once()
+            ->with(TemplatesCommand::ARG_ACTION)->andReturn($action);
+
+        if ($errors > 0) {
+            $ioMock->shouldReceive('writeError')->times($errors)
+                ->withAnyArgs()->andReturnSelf();
+        }
 
         /** @var IoInterface $ioMock */
 
