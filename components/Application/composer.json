@@ -49,10 +49,5 @@
         "test-unit-php-7-0": "docker-compose run --rm cli_7_0_php php ./vendor/bin/phpunit",
         "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php    ./vendor/bin/phpunit"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.6.x-dev",
-            "dev-develop": "0.7.x-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }
