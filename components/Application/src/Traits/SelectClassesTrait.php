@@ -32,10 +32,11 @@ trait SelectClassesTrait
      *
      * @param string $path
      * @param string $implementClassName
+     * @param bool   $onlyInstantiable
      *
      * @return Generator
      */
-    protected function selectClasses(string $path, string $implementClassName): Generator
+    protected function selectClasses(string $path, string $implementClassName, bool $onlyInstantiable = true): Generator
     {
         $selectedFiles = [];
 
@@ -53,7 +54,11 @@ trait SelectClassesTrait
             // if class actually implements requested one and ...
             if ($class === $implementClassName || is_subclass_of($class, $implementClassName) === true) {
                 // ... it was loaded from a file we've selected then...
-                if (array_key_exists((new ReflectionClass($class))->getFileName(), $selectedFiles) === true) {
+                $reflectionClass = new ReflectionClass($class);
+                if ($onlyInstantiable === true && $reflectionClass->isInstantiable() === false) {
+                    continue;
+                }
+                if (array_key_exists(($reflectionClass)->getFileName(), $selectedFiles) === true) {
                     // ... that's what we need.
                     yield $class;
                 }
