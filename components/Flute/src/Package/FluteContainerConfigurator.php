@@ -1,6 +1,7 @@
 <?php namespace Limoncello\Flute\Package;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
@@ -16,6 +17,8 @@ use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Errors\FluteExceptionHandler;
+use Limoncello\Flute\Types\DateJsonApiStringType;
+use Limoncello\Flute\Types\DateTimeJsonApiStringType;
 use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
 use Limoncello\Validation\I18n\Locales\EnUsLocale;
 use Limoncello\Validation\I18n\Translator;
@@ -103,6 +106,14 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
             return new PaginationStrategy($settings[FluteSettings::KEY_RELATIONSHIP_PAGING_SIZE]);
         };
+
+        // register date/date time types
+        if (Type::hasType(DateTimeJsonApiStringType::NAME) === false) {
+            Type::addType(DateTimeJsonApiStringType::NAME, DateTimeJsonApiStringType::class);
+        }
+        if (Type::hasType(DateJsonApiStringType::NAME) === false) {
+            Type::addType(DateJsonApiStringType::NAME, DateJsonApiStringType::class);
+        }
     }
 
     /**
