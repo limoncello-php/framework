@@ -27,7 +27,8 @@
         "phpmd/phpmd": "^2.6",
         "mockery/mockery": "^0.9.7",
         "vlucas/phpdotenv": "^2.4",
-        "monolog/monolog": "^1.22"
+        "monolog/monolog": "^1.22",
+        "limoncello-php/core": "self.version"
     },
     "autoload": {
         "psr-4": {

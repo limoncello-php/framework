@@ -517,7 +517,10 @@ abstract class Client extends DatabaseItem implements ClientInterface
      */
     public function setCreatedAt(DateTimeInterface $createdAt): ClientInterface
     {
-        return $this->setCreatedAtImpl($createdAt);
+        /** @var ClientInterface $self */
+        $self = $this->setCreatedAtImpl($createdAt);
+
+        return $self;
     }
 
     /**
@@ -525,7 +528,10 @@ abstract class Client extends DatabaseItem implements ClientInterface
      */
     public function setUpdatedAt(DateTimeInterface $createdAt): ClientInterface
     {
-        return $this->setUpdatedAtImpl($createdAt);
+        /** @var ClientInterface $self */
+        $self = $this->setUpdatedAtImpl($createdAt);
+
+        return $self;
     }
 
     /**

@@ -147,7 +147,10 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
      */
     public function setCreatedAt(DateTimeInterface $createdAt): RedirectUriInterface
     {
-        return $this->setCreatedAtImpl($createdAt);
+        /** @var RedirectUriInterface $self */
+        $self = $this->setCreatedAtImpl($createdAt);
+
+        return $self;
     }
 
     /**
@@ -155,6 +158,9 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
      */
     public function setUpdatedAt(DateTimeInterface $createdAt): RedirectUriInterface
     {
-        return $this->setUpdatedAtImpl($createdAt);
+        /** @var RedirectUriInterface $self */
+        $self = $this->setUpdatedAtImpl($createdAt);
+
+        return $self;
     }
 }

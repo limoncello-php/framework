@@ -63,22 +63,22 @@ trait DatabaseSchemeMigrationTrait
     {
         $manager = $connection->getSchemaManager();
 
-        if ($manager->tablesExist($scheme->getTokensScopesTable()) === true) {
+        if ($manager->tablesExist([$scheme->getTokensScopesTable()]) === true) {
             $manager->dropTable($scheme->getTokensScopesTable());
         }
-        if ($manager->tablesExist($scheme->getClientsScopesTable()) === true) {
+        if ($manager->tablesExist([$scheme->getClientsScopesTable()]) === true) {
             $manager->dropTable($scheme->getClientsScopesTable());
         }
-        if ($manager->tablesExist($scheme->getTokensTable()) === true) {
+        if ($manager->tablesExist([$scheme->getTokensTable()]) === true) {
             $manager->dropTable($scheme->getTokensTable());
         }
-        if ($manager->tablesExist($scheme->getRedirectUrisTable()) === true) {
+        if ($manager->tablesExist([$scheme->getRedirectUrisTable()]) === true) {
             $manager->dropTable($scheme->getRedirectUrisTable());
         }
-        if ($manager->tablesExist($scheme->getClientsTable()) === true) {
+        if ($manager->tablesExist([$scheme->getClientsTable()]) === true) {
             $manager->dropTable($scheme->getClientsTable());
         }
-        if ($manager->tablesExist($scheme->getScopesTable()) === true) {
+        if ($manager->tablesExist([$scheme->getScopesTable()]) === true) {
             $manager->dropTable($scheme->getScopesTable());
         }
     }

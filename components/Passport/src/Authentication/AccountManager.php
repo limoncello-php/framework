@@ -18,16 +18,37 @@
 
 use Limoncello\Contracts\Authentication\AccountInterface;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
+use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
+use Limoncello\Passport\Exceptions\InvalidArgumentException;
+use Psr\Container\ContainerInterface;
+use Limoncello\Passport\Package\PassportSettings as S;
 
 /**
  * @package Limoncello\Passport
  */
-class AccountManager implements AccountManagerInterface
+class AccountManager implements PassportAccountManagerInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
     /**
      * @var null|AccountInterface
      */
     private $account = null;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @inheritdoc
@@ -45,5 +66,44 @@ class AccountManager implements AccountManagerInterface
         $this->account = $account;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAccountWithTokenValue(string $value): PassportAccountInterface
+    {
+        /** @var TokenRepositoryInterface $tokenRepo */
+        $tokenRepo    = $this->getContainer()->get(TokenRepositoryInterface::class);
+        $expInSeconds = $this->getPassportSettings()[S::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS];
+        $properties   = $tokenRepo->readPassport($value, $expInSeconds);
+        if ($properties === null) {
+            throw new InvalidArgumentException($value);
+        }
+
+        /** @var DatabaseSchemeInterface $scheme */
+        $scheme  = $this->getContainer()->get(DatabaseSchemeInterface::class);
+        $account = new PassportAccount($scheme, $properties);
+        $this->setAccount($account);
+
+        return $account;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPassportSettings(): array
+    {
+        $settings = $this->getContainer()->get(SettingsProviderInterface::class)->get(S::class);
+
+        return $settings;
     }
 }

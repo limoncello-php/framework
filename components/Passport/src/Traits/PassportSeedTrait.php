@@ -17,19 +17,52 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\RedirectUri;
-use Limoncello\Passport\Adaptors\Generic\RedirectUriRepository;
 use Limoncello\Passport\Adaptors\Generic\Scope;
-use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
 use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
+use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
+use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
 
 /**
  * @package Limoncello\Passport
  */
 trait PassportSeedTrait
 {
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $schemes
+     *
+     * @return ClientRepositoryInterface
+     */
+    abstract protected function createClientRepository(
+        Connection $connection,
+        DatabaseSchemeInterface $schemes
+    ): ClientRepositoryInterface;
+
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $schemes
+     *
+     * @return ScopeRepositoryInterface
+     */
+    abstract protected function createScopeRepository(
+        Connection $connection,
+        DatabaseSchemeInterface $schemes
+    ): ScopeRepositoryInterface;
+
+    /**
+     * @param Connection              $connection
+     * @param DatabaseSchemeInterface $schemes
+     *
+     * @return RedirectUriRepositoryInterface
+     */
+    abstract protected function createRedirectUriRepository(
+        Connection $connection,
+        DatabaseSchemeInterface $schemes
+    ): RedirectUriRepositoryInterface;
+
     /**
      * @param Connection              $connection
      * @param DatabaseSchemeInterface $schemes
@@ -46,11 +79,8 @@ trait PassportSeedTrait
         array $scopeDescriptions,
         array $redirectUris = []
     ) {
-        $clientRepo = new ClientRepository($connection, $schemes);
-        $scopeRepo  = new ScopeRepository($connection, $schemes);
-        $uriRepo    = new RedirectUriRepository($connection, $schemes);
-
-        $scopeIds = [];
+        $scopeIds  = $client->getScopeIdentifiers();
+        $scopeRepo = $this->createScopeRepository($connection, $schemes);
         foreach ($scopeDescriptions as $scopeId => $scopeDescription) {
             $scopeRepo->create(
                 (new Scope())
@@ -60,8 +90,9 @@ trait PassportSeedTrait
             $scopeIds[] = $scopeId;
         }
 
-        $clientRepo->create($client->setScopeIdentifiers($scopeIds));
+        $this->createClientRepository($connection, $schemes)->create($client->setScopeIdentifiers($scopeIds));
 
+        $uriRepo = $this->createRedirectUriRepository($connection, $schemes);
         foreach ($redirectUris as $uri) {
             $uriRepo->create(
                 (new RedirectUri())

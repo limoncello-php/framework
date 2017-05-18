@@ -50,8 +50,11 @@ abstract class DatabaseItem
      */
     public function getCreatedAt()
     {
-        if ($this->createdAtField === null && ($createdAt = $this->{static::FIELD_CREATED_AT}) !== null) {
-            $this->createdAtField = $this->parseDateTime($createdAt);
+        if ($this->createdAtField === null &&
+            $this->hasDynamicProperty(static::FIELD_CREATED_AT) === true &&
+            ($createdAt = $this->{static::FIELD_CREATED_AT}) !== null
+        ) {
+            $this->setCreatedAtImpl($this->parseDateTime($createdAt));
         }
 
         return $this->createdAtField;
@@ -62,8 +65,11 @@ abstract class DatabaseItem
      */
     public function getUpdatedAt()
     {
-        if ($this->updatedAtField === null && ($updatedAt = $this->{static::FIELD_UPDATED_AT}) !== null) {
-            $this->updatedAtField = $this->parseDateTime($updatedAt);
+        if ($this->updatedAtField === null &&
+            $this->hasDynamicProperty(static::FIELD_UPDATED_AT) === true &&
+            ($updatedAt = $this->{static::FIELD_UPDATED_AT}) !== null
+        ) {
+            $this->setUpdatedAtImpl($this->parseDateTime($updatedAt));
         }
 
         return $this->updatedAtField;
