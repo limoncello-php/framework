@@ -16,13 +16,11 @@
  * limitations under the License.
  */
 
-use FastRoute\DataGenerator;
 use FastRoute\DataGenerator\CharCountBased as CharCountBasedGenerator;
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use FastRoute\DataGenerator\GroupPosBased as GroupPosBasedGenerator;
 use FastRoute\DataGenerator\MarkBased as MarkBasedGenerator;
-use FastRoute\RouteParser;
-use Limoncello\Contracts\Application\SapiInterface;
+use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Contracts\Routing\RouterInterface;

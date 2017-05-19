@@ -21,6 +21,7 @@ use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
+use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Application;
 use Limoncello\Core\Application\Sapi;
@@ -36,6 +37,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
+use ReflectionMethod;
 use Zend\Diactoros\Response\EmitterInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequestFactory;
@@ -215,12 +217,26 @@ class ApplicationTest extends TestCase
     }
 
     /**
+     * Test page.
+     */
+    public function testGetRouter()
+    {
+        /** @var Application $app */
+        list($app) = $this->createApp('GET', '/', $this->getRoutesData());
+        $app->run();
+
+        $method = new ReflectionMethod(Application::class, 'getRouter');
+        $method->setAccessible(true);
+        $this->assertTrue($method->invoke($app) instanceof RouterInterface);
+    }
+
+    /**
      * @param string $method
      * @param string $uri
      * @param array  $routesData
      * @param array  $globalMiddleware
      *
-     * @return Application
+     * @return array
      */
     private function createApp(
         $method,
