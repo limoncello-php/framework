@@ -48,9 +48,9 @@ abstract class Application implements ApplicationInterface
     private $sapi;
 
     /**
-     * @var RouterInterface
+     * @var RouterInterface|null
      */
-    private $router;
+    private $router = null;
 
     /**
      * @return SettingsProviderInterface
@@ -105,7 +105,7 @@ abstract class Application implements ApplicationInterface
 
         // match route from `Request` to handler, route container configurators/middleware, etc
         list($matchCode, $allowedMethods, $handlerParams, $handler,
-            $routeMiddleware, $routeConfigurators, $requestFactory) = $this->getRouter($coreSettings)
+            $routeMiddleware, $routeConfigurators, $requestFactory) = $this->initRouter($coreSettings)
                 ->match($this->sapi->getMethod(), $this->sapi->getUri()->getPath());
 
         // configure container
@@ -201,26 +201,10 @@ abstract class Application implements ApplicationInterface
     }
 
     /**
-     * @param array $coreSettings
-     *
-     * @return RouterInterface
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @return RouterInterface|null
      */
-    protected function getRouter(array $coreSettings): RouterInterface
+    protected function getRouter()
     {
-        if ($this->router === null) {
-            $routerParams    = BaseCoreSettings::getRouterParametersFromData($coreSettings);
-            $routesData      = BaseCoreSettings::getRoutesDataFromData($coreSettings);
-            $generatorClass  = BaseCoreSettings::getGeneratorFromParametersData($routerParams);
-            $dispatcherClass = BaseCoreSettings::getDispatcherFromParametersData($routerParams);
-
-            $router = new Router($generatorClass, $dispatcherClass);
-            $router->loadCachedRoutes($routesData);
-
-            $this->router = $router;
-        }
-
         return $this->router;
     }
 
@@ -285,6 +269,26 @@ abstract class Application implements ApplicationInterface
         $response = call_user_func($handler, $handlerParams, $container, $request);
 
         return $response;
+    }
+
+    /**
+     * @param array $coreSettings
+     *
+     * @return RouterInterface
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function initRouter(array $coreSettings): RouterInterface
+    {
+        $routerParams    = BaseCoreSettings::getRouterParametersFromData($coreSettings);
+        $routesData      = BaseCoreSettings::getRoutesDataFromData($coreSettings);
+        $generatorClass  = BaseCoreSettings::getGeneratorFromParametersData($routerParams);
+        $dispatcherClass = BaseCoreSettings::getDispatcherFromParametersData($routerParams);
+
+        $this->router = new Router($generatorClass, $dispatcherClass);
+        $this->router->loadCachedRoutes($routesData);
+
+        return $this->router;
     }
 
     /**
