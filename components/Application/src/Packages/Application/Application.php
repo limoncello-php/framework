@@ -89,7 +89,7 @@ class Application extends \Limoncello\Core\Application\Application
 
         $routeConfigurators = [];
         if (empty($method) === false && empty($path) === false) {
-            list(, , , , , $routeConfigurators) = $this->getRouter($coreSettings)->match($method, $path);
+            list(, , , , , $routeConfigurators) = $this->initRouter($coreSettings)->match($method, $path);
         }
 
         // configure container
