@@ -29,7 +29,6 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Diactoros\ServerRequest;
 
@@ -210,10 +209,9 @@ abstract class Application implements ApplicationInterface
      */
     protected function getRouter(array $coreSettings): RouterInterface
     {
-        $routerParams = BaseCoreSettings::getRouterParametersFromData($coreSettings);
-        $routesData   = BaseCoreSettings::getRoutesDataFromData($coreSettings);
-
         if ($this->router === null) {
+            $routerParams    = BaseCoreSettings::getRouterParametersFromData($coreSettings);
+            $routesData      = BaseCoreSettings::getRoutesDataFromData($coreSettings);
             $generatorClass  = BaseCoreSettings::getGeneratorFromParametersData($routerParams);
             $dispatcherClass = BaseCoreSettings::getDispatcherFromParametersData($routerParams);
 
