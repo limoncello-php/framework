@@ -38,7 +38,7 @@ class AccountManager implements PassportAccountManagerInterface
     private $container;
 
     /**
-     * @var null|AccountInterface
+     * @var null|PassportAccountInterface
      */
     private $account = null;
 
@@ -55,6 +55,14 @@ class AccountManager implements PassportAccountManagerInterface
      */
     public function getAccount()
     {
+        return $this->getPassport();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPassport()
+    {
         return $this->account;
     }
 
@@ -63,6 +71,8 @@ class AccountManager implements PassportAccountManagerInterface
      */
     public function setAccount(AccountInterface $account): AccountManagerInterface
     {
+        assert($account instanceof PassportAccountInterface);
+
         $this->account = $account;
 
         return $this;

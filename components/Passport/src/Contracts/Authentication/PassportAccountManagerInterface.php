@@ -29,4 +29,9 @@ interface PassportAccountManagerInterface extends AccountManagerInterface
      * @return PassportAccountInterface
      */
     public function setAccountWithTokenValue(string $value): PassportAccountInterface;
+
+    /**
+     * @return PassportAccountInterface|null
+     */
+    public function getPassport();
 }

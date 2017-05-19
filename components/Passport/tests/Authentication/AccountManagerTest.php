@@ -18,8 +18,8 @@
 
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Authentication\AccountManager;
-use Limoncello\Contracts\Authentication\AccountInterface;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
+use Limoncello\Passport\Authentication\PassportAccount;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
@@ -45,9 +45,11 @@ class AccountManagerTest extends TestCase
         $manager = new AccountManager($container);
         $this->assertNull($manager->getAccount());
 
-        /** @var AccountInterface $mockAccount */
-        $mockAccount = Mockery::mock(AccountInterface::class);
-        $this->assertSame($mockAccount, $manager->setAccount($mockAccount)->getAccount());
+        /** @var DatabaseSchemeInterface $schemeMock */
+        $schemeMock = Mockery::mock(DatabaseSchemeInterface::class);
+        $passport   = new PassportAccount($schemeMock);
+
+        $this->assertSame($passport, $manager->setAccount($passport)->getAccount());
     }
 
     /**
