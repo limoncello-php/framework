@@ -278,7 +278,7 @@ abstract class Application implements ApplicationInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private function initRouter(array $coreSettings): RouterInterface
+    protected function initRouter(array $coreSettings): RouterInterface
     {
         $routerParams    = BaseCoreSettings::getRouterParametersFromData($coreSettings);
         $routesData      = BaseCoreSettings::getRoutesDataFromData($coreSettings);
