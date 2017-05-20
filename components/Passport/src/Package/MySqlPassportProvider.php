@@ -19,11 +19,13 @@
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as CCI;
 use Limoncello\Contracts\Provider\ProvidesMigrationsInterface as MI;
 use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface as CI;
+use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as MWI;
+use Limoncello\Passport\Authentication\PassportMiddleware;
 
 /**
  * @package Limoncello\Passport
  */
-class MySqlPassportProvider implements CCI, MI, CI
+class MySqlPassportProvider implements CCI, MI, CI, MWI
 {
     /**
      * @inheritdoc
@@ -52,6 +54,16 @@ class MySqlPassportProvider implements CCI, MI, CI
     {
         return [
             PassportRoutesConfigurator::CONFIGURATOR,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getMiddleware(): array
+    {
+        return [
+            PassportMiddleware::HANDLER,
         ];
     }
 }
