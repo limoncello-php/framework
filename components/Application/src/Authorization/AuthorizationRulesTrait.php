@@ -29,11 +29,21 @@ trait AuthorizationRulesTrait
     /**
      * @param ContextInterface $context
      *
+     * @return bool
+     */
+    protected static function ctxHasAction(ContextInterface $context): bool
+    {
+        return $context->has(RequestProperties::REQ_ACTION);
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
      * @return string
      */
     protected static function ctxGetAction(ContextInterface $context): string
     {
-        assert($context->has(RequestProperties::REQ_ACTION));
+        assert(static::ctxHasAction($context));
 
         $value = $context->get(RequestProperties::REQ_ACTION);
 
@@ -43,11 +53,21 @@ trait AuthorizationRulesTrait
     /**
      * @param ContextInterface $context
      *
+     * @return bool
+     */
+    protected static function ctxHasResourceType(ContextInterface $context): bool
+    {
+        return $context->has(RequestProperties::REQ_RESOURCE_TYPE);
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
      * @return string|null
      */
     protected static function ctxGetResourceType(ContextInterface $context)
     {
-        assert($context->has(RequestProperties::REQ_RESOURCE_TYPE));
+        assert(static::ctxHasResourceType($context));
 
         $value = $context->get(RequestProperties::REQ_RESOURCE_TYPE);
 
@@ -59,11 +79,21 @@ trait AuthorizationRulesTrait
     /**
      * @param ContextInterface $context
      *
+     * @return bool
+     */
+    protected static function ctxHasResourceIdentity(ContextInterface $context): bool
+    {
+        return $context->has(RequestProperties::REQ_RESOURCE_IDENTITY);
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
      * @return string|int|null
      */
     protected static function ctxGetResourceIdentity(ContextInterface $context)
     {
-        assert($context->has(RequestProperties::REQ_RESOURCE_IDENTITY));
+        assert(static::ctxHasResourceIdentity($context));
 
         $value = $context->get(RequestProperties::REQ_RESOURCE_IDENTITY);
 
@@ -75,19 +105,43 @@ trait AuthorizationRulesTrait
     /**
      * @param ContextInterface $context
      *
+     * @return bool
+     */
+    protected static function ctxHasCurrentAccount(ContextInterface $context): bool
+    {
+        /** @var AccountManagerInterface $manager */
+        $container = static::ctxGetContainer($context);
+        $manager   = $container->get(AccountManagerInterface::class);
+        $account   = $manager->getAccount();
+
+        return $account !== null;
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
      * @return AccountInterface
      */
     protected static function ctxGetCurrentAccount(ContextInterface $context): AccountInterface
     {
-        $container = static::ctxGetContainer($context);
-
-        assert($container->has(AccountManagerInterface::class));
+        assert(static::ctxHasCurrentAccount($context));
 
         /** @var AccountManagerInterface $manager */
-        $manager = $container->get(AccountManagerInterface::class);
-        $account = $manager->getAccount();
+        $container = static::ctxGetContainer($context);
+        $manager   = $container->get(AccountManagerInterface::class);
+        $account   = $manager->getAccount();
 
         return $account;
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return bool
+     */
+    protected static function ctxHasContainer(ContextInterface $context): bool
+    {
+        return $context->has(ContextProperties::CTX_CONTAINER);
     }
 
     /**
@@ -97,7 +151,7 @@ trait AuthorizationRulesTrait
      */
     protected static function ctxGetContainer(ContextInterface $context): ContainerInterface
     {
-        assert($context->has(ContextProperties::CTX_CONTAINER));
+        assert(static::ctxHasContainer($context));
 
         return $context->get(ContextProperties::CTX_CONTAINER);
     }
