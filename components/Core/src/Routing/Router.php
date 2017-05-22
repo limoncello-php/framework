@@ -141,7 +141,7 @@ class Router implements RouterInterface
     /**
      * @inheritdoc
      */
-    public function getUriPath($routeName)
+    public function getUriPath(string $routeName)
     {
         $this->checkRoutesLoaded();
 
@@ -157,7 +157,7 @@ class Router implements RouterInterface
      */
     public function get(
         ServerRequestInterface $request,
-        $routeName,
+        string $routeName,
         array $placeholders = [],
         array $queryParams = []
     ): string {
