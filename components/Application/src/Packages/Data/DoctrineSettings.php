@@ -36,7 +36,13 @@ abstract class DoctrineSettings implements SettingsInterface
     const KEY_HOST = self::KEY_DATABASE_NAME + 1;
 
     /** Settings key */
-    const KEY_DRIVER = self::KEY_HOST + 1;
+    const KEY_PORT = self::KEY_HOST + 1;
+
+    /** Settings key */
+    const KEY_CHARSET = self::KEY_PORT + 1;
+
+    /** Settings key */
+    const KEY_DRIVER = self::KEY_CHARSET + 1;
 
     /** Settings key */
     const KEY_LAST = self::KEY_DRIVER + 1;

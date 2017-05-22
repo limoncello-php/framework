@@ -54,7 +54,9 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
                 'user'     => $settings[DoctrineSettings::KEY_USER_NAME],
                 'password' => $settings[DoctrineSettings::KEY_PASSWORD],
                 'host'     => $settings[DoctrineSettings::KEY_HOST],
+                'port'     => $settings[DoctrineSettings::KEY_PORT],
                 'driver'   => $settings[DoctrineSettings::KEY_DRIVER],
+                'charset'  => $settings[DoctrineSettings::KEY_CHARSET],
             ];
 
             $connection = DriverManager::getConnection($params);
