@@ -156,17 +156,30 @@ class Router implements RouterInterface
      * @inheritdoc
      */
     public function get(
-        ServerRequestInterface $request,
+        string $hostUri,
         string $routeName,
         array $placeholders = [],
         array $queryParams = []
     ): string {
-        $prefix = $this->getServerUriPrefix($request);
         $path   = $this->getUriPath($routeName);
         $path   = $this->replacePlaceholders($path, $placeholders);
-        $url    = empty($queryParams) === true ? "$prefix$path" : "$prefix$path?" . http_build_query($queryParams);
+        $url    = empty($queryParams) === true ? "$hostUri$path" : "$hostUri$path?" . http_build_query($queryParams);
 
         return $url;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHostUri(ServerRequestInterface $request): string
+    {
+        $uri       = $request->getUri();
+        $uriScheme = $uri->getScheme();
+        $uriHost   = $uri->getHost();
+        $uriPort   = $uri->getPort();
+        $hostUri   = empty($uriPort) === true ? "$uriScheme://$uriHost" : "$uriScheme://$uriHost:$uriPort";
+
+        return $hostUri;
     }
 
     /**
@@ -183,22 +196,6 @@ class Router implements RouterInterface
     protected function createDispatcher()
     {
         return new $this->dispatcherClass;
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     *
-     * @return string
-     */
-    private function getServerUriPrefix(ServerRequestInterface $request)
-    {
-        $uri       = $request->getUri();
-        $uriScheme = $uri->getScheme();
-        $uriHost   = $uri->getHost();
-        $uriPort   = $uri->getPort();
-        $prefix    = empty($uriPort) === true ? "$uriScheme://$uriHost" : "$uriScheme://$uriHost:$uriPort";
-
-        return $prefix;
     }
 
     /**

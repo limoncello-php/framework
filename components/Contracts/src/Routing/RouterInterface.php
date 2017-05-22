@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -69,17 +70,24 @@ interface RouterInterface
     /**
      * Compose URL for named route.
      *
-     * @param ServerRequestInterface $request
-     * @param string                 $routeName
-     * @param array                  $placeholders
-     * @param array                  $queryParams
+     * @param string $hostUri
+     * @param string $routeName
+     * @param array  $placeholders
+     * @param array  $queryParams
      *
      * @return string
      */
     public function get(
-        ServerRequestInterface $request,
+        string $hostUri,
         string $routeName,
         array $placeholders = [],
         array $queryParams = []
     ): string;
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return string
+     */
+    public function getHostUri(ServerRequestInterface $request): string;
 }

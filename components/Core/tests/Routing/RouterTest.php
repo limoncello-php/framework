@@ -98,17 +98,35 @@ class RouterTest extends TestCase
         $this->createGroupCountBasedRouter()->match('GET', '/');
     }
 
-    public function testXXX()
+    /**
+     * Test compose URI for named route with parameters.
+     */
+    public function testRouterGetNamedRouteWithParams()
+    {
+        $router = $this->createGroupCountBasedRouter();
+        $router->loadCachedRoutes($router->getCachedRoutes($this->createGroup()));
+
+        $hostUri = 'http://server.foo';
+        $this->assertEquals(
+            'http://server.foo/posts/{id}',
+            $router->get($hostUri, self::ROUTE_NAME_DELETE_POST)
+        );
+        $this->assertEquals(
+            'http://server.foo/posts/123',
+            $router->get($hostUri, self::ROUTE_NAME_DELETE_POST, ['id' => 123])
+        );
+    }
+
+    /**
+     * Test extract host URI from server request.
+     */
+    public function testGetHostUri()
     {
         $router = $this->createGroupCountBasedRouter();
         $router->loadCachedRoutes($router->getCachedRoutes($this->createGroup()));
 
         $request = new ServerRequest([], [], new Uri('http://server.foo/bla'));
-        $this->assertEquals('http://server.foo/posts/{id}', $router->get($request, self::ROUTE_NAME_DELETE_POST));
-        $this->assertEquals(
-            'http://server.foo/posts/123',
-            $router->get($request, self::ROUTE_NAME_DELETE_POST, ['id' => 123])
-        );
+        $this->assertEquals('http://server.foo', $router->getHostUri($request));
     }
 
     /**
