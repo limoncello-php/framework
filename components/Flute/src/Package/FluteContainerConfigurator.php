@@ -9,6 +9,7 @@ use Limoncello\Contracts\Exceptions\ExceptionHandlerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
+use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
@@ -83,6 +84,7 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
         };
 
         $container[TranslatorInterface::class] = $translator = $factory->createTranslator();
+        $container[FilterOperationsInterface::class] = $filerOps = new FilterOperations($translator);
 
         $container[ValidationTranslatorInterface::class] = function () {
             // TODO load locale according to current user preferences
@@ -91,14 +93,14 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
         $container[RepositoryInterface::class] = function (PsrContainerInterface $container) use (
             $factory,
+            $filerOps,
             $translator
         ) {
             $connection       = $container->get(Connection::class);
-            $filterOperations = new FilterOperations($translator);
             /** @var ModelSchemeInfoInterface $modelSchemes */
             $modelSchemes     = $container->get(ModelSchemeInfoInterface::class);
 
-            return $factory->createRepository($connection, $modelSchemes, $filterOperations, $translator);
+            return $factory->createRepository($connection, $modelSchemes, $filerOps, $translator);
         };
 
         $container[PaginationStrategyInterface::class] = function (PsrContainerInterface $container) {
