@@ -19,6 +19,8 @@
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
+use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
+use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -41,6 +43,16 @@ interface PassportServerIntegrationInterface
      * @return TokenRepositoryInterface
      */
     public function getTokenRepository(): TokenRepositoryInterface;
+
+    /**
+     * @return ScopeRepositoryInterface
+     */
+    public function getScopeRepository(): ScopeRepositoryInterface;
+
+    /**
+     * @return RedirectUriRepositoryInterface
+     */
+    public function getRedirectUriRepository(): RedirectUriRepositoryInterface;
 
     /**
      * @param string $userName

@@ -16,14 +16,10 @@
  * limitations under the License.
  */
 
-use Doctrine\DBAL\Connection;
 use Limoncello\Passport\Adaptors\Generic\RedirectUri;
 use Limoncello\Passport\Adaptors\Generic\Scope;
 use Limoncello\Passport\Contracts\Entities\ClientInterface;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
-use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
-use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
-use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
+use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 
 /**
  * @package Limoncello\Passport
@@ -31,56 +27,21 @@ use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
 trait PassportSeedTrait
 {
     /**
-     * @param Connection              $connection
-     * @param DatabaseSchemeInterface $schemes
-     *
-     * @return ClientRepositoryInterface
-     */
-    abstract protected function createClientRepository(
-        Connection $connection,
-        DatabaseSchemeInterface $schemes
-    ): ClientRepositoryInterface;
-
-    /**
-     * @param Connection              $connection
-     * @param DatabaseSchemeInterface $schemes
-     *
-     * @return ScopeRepositoryInterface
-     */
-    abstract protected function createScopeRepository(
-        Connection $connection,
-        DatabaseSchemeInterface $schemes
-    ): ScopeRepositoryInterface;
-
-    /**
-     * @param Connection              $connection
-     * @param DatabaseSchemeInterface $schemes
-     *
-     * @return RedirectUriRepositoryInterface
-     */
-    abstract protected function createRedirectUriRepository(
-        Connection $connection,
-        DatabaseSchemeInterface $schemes
-    ): RedirectUriRepositoryInterface;
-
-    /**
-     * @param Connection              $connection
-     * @param DatabaseSchemeInterface $schemes
-     * @param ClientInterface         $client
-     * @param array                   $scopeDescriptions
-     * @param string[]                $redirectUris
+     * @param PassportServerIntegrationInterface $integration
+     * @param ClientInterface                    $client
+     * @param array                              $scopeDescriptions
+     * @param string[]                           $redirectUris
      *
      * @return void
      */
     protected function seedClient(
-        Connection $connection,
-        DatabaseSchemeInterface $schemes,
+        PassportServerIntegrationInterface $integration,
         ClientInterface $client,
         array $scopeDescriptions,
         array $redirectUris = []
     ) {
         $scopeIds  = $client->getScopeIdentifiers();
-        $scopeRepo = $this->createScopeRepository($connection, $schemes);
+        $scopeRepo = $integration->getScopeRepository();
         foreach ($scopeDescriptions as $scopeId => $scopeDescription) {
             $scopeRepo->create(
                 (new Scope())
@@ -90,9 +51,9 @@ trait PassportSeedTrait
             $scopeIds[] = $scopeId;
         }
 
-        $this->createClientRepository($connection, $schemes)->create($client->setScopeIdentifiers($scopeIds));
+        $integration->getClientRepository()->create($client->setScopeIdentifiers($scopeIds));
 
-        $uriRepo = $this->createRedirectUriRepository($connection, $schemes);
+        $uriRepo = $integration->getRedirectUriRepository();
         foreach ($redirectUris as $uri) {
             $uriRepo->create(
                 (new RedirectUri())

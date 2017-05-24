@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-use Doctrine\DBAL\Connection;
 use Limoncello\Passport\Adaptors\Generic\Client;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\Entities\RedirectUriInterface;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
+use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
@@ -37,55 +36,19 @@ class PassportSeedTraitTest extends TestCase
     use PassportSeedTrait;
 
     /**
-     * @var Mock|null
-     */
-    private $clientRepoMock = null;
-
-    /**
-     * @var Mock|null
-     */
-    private $scopeRepoMock = null;
-
-    /**
-     * @var Mock|null
-     */
-    private $uriRepoMock = null;
-
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->clientRepoMock = Mockery::mock(ClientRepositoryInterface::class);
-        $this->scopeRepoMock  = Mockery::mock(ScopeRepositoryInterface::class);
-        $this->uriRepoMock    = Mockery::mock(RedirectUriRepositoryInterface::class);
-    }
-
-    /**
      * @inheritdoc
      */
     protected function tearDown()
     {
         parent::tearDown();
 
-        $this->clientRepoMock = null;
-        $this->scopeRepoMock  = null;
-        $this->uriRepoMock    = null;
-
         Mockery::close();
     }
 
     public function testSeedClient()
     {
-        /** @var Connection $connection */
-        $connection = Mockery::mock(Connection::class);
-        /** @var DatabaseSchemeInterface $schemes */
-        $schemes    = Mockery::mock(DatabaseSchemeInterface::class);
-
-        $client = (new Client())->setScopeIdentifiers(['scope_1']);
-        $scopes = [
+        $client       = (new Client())->setScopeIdentifiers(['scope_1']);
+        $scopes       = [
             'scope_2' => 'Description for scope_2',
             'scope_3' => 'Description for scope_3',
         ];
@@ -93,75 +56,41 @@ class PassportSeedTraitTest extends TestCase
             'http://some-uri.foo',
         ];
 
-        $this->scopeRepoMock
+        /** @var Mock $clientRepoMock */
+        /** @var Mock $scopeRepoMock */
+        /** @var Mock $uriRepoMock */
+        $clientRepoMock = Mockery::mock(ClientRepositoryInterface::class);
+        $scopeRepoMock  = Mockery::mock(ScopeRepositoryInterface::class);
+        $uriRepoMock    = Mockery::mock(RedirectUriRepositoryInterface::class);
+
+        $scopeRepoMock
             ->shouldReceive('create')
             ->times(2)
             ->withAnyArgs()
             ->andReturn(Mockery::mock(ScopeInterface::class));
 
-        $this->clientRepoMock
+        $clientRepoMock
             ->shouldReceive('create')
             ->once()
             ->with($client)
             ->andReturn($client);
 
-        $this->uriRepoMock
+        $uriRepoMock
             ->shouldReceive('create')
             ->times(1)
             ->withAnyArgs()
             ->andReturn(Mockery::mock(RedirectUriInterface::class));
 
-        $this->seedClient(
-            $connection,
-            $schemes,
-            $client,
-            $scopes,
-            $redirectUris
-        );
+        /** @var Mock $intMock */
+        $intMock = Mockery::mock(PassportServerIntegrationInterface::class);
+        $intMock->shouldReceive('getScopeRepository')->once()->withNoArgs()->andReturn($scopeRepoMock);
+        $intMock->shouldReceive('getClientRepository')->once()->withNoArgs()->andReturn($clientRepoMock);
+        $intMock->shouldReceive('getRedirectUriRepository')->once()->withNoArgs()->andReturn($uriRepoMock);
+        /** @var PassportServerIntegrationInterface $intMock */
+
+        $this->seedClient($intMock, $client, $scopes, $redirectUris);
 
         // assert it executed exactly as described above and we need at lease 1 assert to avoid PHP unit warning.
         $this->assertTrue(true);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function createClientRepository(
-        Connection $connection,
-        DatabaseSchemeInterface $schemes
-    ): ClientRepositoryInterface {
-        assert($connection || $schemes);
-        /** @var ClientRepositoryInterface $repo */
-        $repo = $this->clientRepoMock;
-
-        return $repo;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function createScopeRepository(
-        Connection $connection,
-        DatabaseSchemeInterface $schemes
-    ): ScopeRepositoryInterface {
-        assert($connection || $schemes);
-        /** @var ScopeRepositoryInterface $repo */
-        $repo = $this->scopeRepoMock;
-
-        return $repo;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function createRedirectUriRepository(
-        Connection $connection,
-        DatabaseSchemeInterface $schemes
-    ): RedirectUriRepositoryInterface {
-        assert($connection || $schemes);
-        /** @var RedirectUriRepositoryInterface $repo */
-        $repo = $this->uriRepoMock;
-
-        return $repo;
     }
 }

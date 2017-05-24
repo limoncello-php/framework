@@ -18,6 +18,8 @@
 
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
+use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
+use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Integration\BasePassportServerIntegration;
 
@@ -37,6 +39,16 @@ abstract class GenericPassportServerIntegration extends BasePassportServerIntegr
     private $tokenRepo;
 
     /**
+     * @var ScopeRepositoryInterface|null
+     */
+    private $scopeRepo;
+
+    /**
+     * @var RedirectUriRepositoryInterface|null
+     */
+    private $uriRepo;
+
+    /**
      * @inheritdoc
      */
     public function getClientRepository(): ClientRepositoryInterface
@@ -46,6 +58,30 @@ abstract class GenericPassportServerIntegration extends BasePassportServerIntegr
         }
 
         return $this->clientRepo;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getScopeRepository(): ScopeRepositoryInterface
+    {
+        if ($this->scopeRepo === null) {
+            $this->scopeRepo = new ScopeRepository($this->getConnection(), $this->getDatabaseScheme());
+        }
+
+        return $this->scopeRepo;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRedirectUriRepository(): RedirectUriRepositoryInterface
+    {
+        if ($this->uriRepo === null) {
+            $this->uriRepo = new RedirectUriRepository($this->getConnection(), $this->getDatabaseScheme());
+        }
+
+        return $this->uriRepo;
     }
 
     /**
