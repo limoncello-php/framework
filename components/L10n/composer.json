@@ -42,7 +42,7 @@
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
         "test-unit-php-7-1": "docker-compose run --rm cli_7_1_php php ./vendor/bin/phpunit",
         "test-unit-php-7-0": "docker-compose run --rm cli_7_0_php php ./vendor/bin/phpunit",
-        "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php    ./vendor/bin/phpunit"
+        "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php -d hhvm.php7.all=1 ./vendor/bin/phpunit"
     },
     "extra": {
         "branch-alias": {
