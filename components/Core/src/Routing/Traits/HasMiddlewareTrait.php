@@ -16,17 +16,22 @@
  * limitations under the License.
  */
 
+use Closure;
+use Limoncello\Core\Reflection\CheckCallableTrait;
 use LogicException;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @package Limoncello\Core
  *
- * @method bool   isCallableToCache($value);
- * @method bool   isCallableToCacheArray(array $values);
  * @method string getCallableToCacheMessage();
  */
 trait HasMiddlewareTrait
 {
+    use CheckCallableTrait;
+
     /**
      * @var callable[]
      */
@@ -39,9 +44,17 @@ trait HasMiddlewareTrait
      */
     public function setMiddleware(array $middleware)
     {
-        if ($this->isCallableToCacheArray($middleware) === false) {
-            throw new LogicException($this->getCallableToCacheMessage());
+        foreach ($middleware as $item) {
+            $isValid = $this->checkPublicStaticCallable($item, [
+                ServerRequestInterface::class,
+                Closure::class,
+                ContainerInterface::class,
+            ], ResponseInterface::class);
+            if ($isValid === false) {
+                throw new LogicException($this->getCallableToCacheMessage());
+            }
         }
+
         $this->middleware = $middleware;
 
         return $this;

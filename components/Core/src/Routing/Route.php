@@ -18,19 +18,28 @@
 
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
+use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Routing\Traits\CallableTrait;
 use Limoncello\Core\Routing\Traits\HasConfiguratorsTrait;
 use Limoncello\Core\Routing\Traits\HasMiddlewareTrait;
 use Limoncello\Core\Routing\Traits\HasRequestFactoryTrait;
 use Limoncello\Core\Routing\Traits\UriTrait;
 use LogicException;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use ReflectionParameter;
 
 /**
  * @package Limoncello\Core
  */
 class Route implements RouteInterface
 {
-    use CallableTrait, UriTrait, HasConfiguratorsTrait, HasMiddlewareTrait, HasRequestFactoryTrait;
+    use CallableTrait, UriTrait, HasConfiguratorsTrait, HasMiddlewareTrait, HasRequestFactoryTrait, CheckCallableTrait {
+        CheckCallableTrait::checkPublicStaticCallable insteadof HasMiddlewareTrait;
+        CheckCallableTrait::checkPublicStaticCallable insteadof HasConfiguratorsTrait;
+        CheckCallableTrait::checkPublicStaticCallable insteadof HasRequestFactoryTrait;
+    }
 
     /**
      * @var GroupInterface
@@ -81,9 +90,22 @@ class Route implements RouteInterface
      */
     public function setHandler(callable $handler): Route
     {
-        if ($this->isCallableToCache($handler) === false) {
+        $isValidHandler = $this->checkPublicStaticCallable($handler, [
+            'array',
+            ContainerInterface::class,
+            function (ReflectionParameter $parameter): bool {
+                return
+                    $parameter->allowsNull() === true &&
+                    $parameter->getType() !== null &&
+                    (string)$parameter->getType() === ServerRequestInterface::class;
+            },
+        ], ResponseInterface::class);
+        if ($isValidHandler === false) {
+            // Handler method should have signature
+            // `public static methodName(array, ContainerInterface, ServerRequestInterface): ResponseInterface`'
             throw new LogicException($this->getCallableToCacheMessage());
         }
+
         $this->handler = $handler;
 
         return $this;

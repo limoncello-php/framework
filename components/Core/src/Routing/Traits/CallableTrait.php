@@ -22,48 +22,11 @@
 trait CallableTrait
 {
     /**
-     * If callable can be cached.
-     *
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    protected function isCallableToCache($value): bool
-    {
-        $result = is_callable($value) && (
-                // string `Class::method`
-                is_string($value) ||
-                // array of strings [`Class`, `method`]
-                (is_array($value) && count($value) === 2 && is_string($value[0]) && is_string($value[1]))
-            );
-
-        return $result;
-    }
-
-    /**
-     * If array of callable values can be cached.
-     *
-     * @param array $values
-     *
-     * @return bool
-     */
-    protected function isCallableToCacheArray(array $values): bool
-    {
-        foreach ($values as $value) {
-            if ($this->isCallableToCache($value) === false) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * @return string
      */
     protected function getCallableToCacheMessage(): string
     {
-        return 'Value either not callable or cannot be cached. ' .
+        return 'Value either not callable or cannot be cached or do not meet method signature requirements. ' .
             'Use callable in form of \'ClassName::methodName\' or [ClassName::class, \'methodName\'].';
     }
 }

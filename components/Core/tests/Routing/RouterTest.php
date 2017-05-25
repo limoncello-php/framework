@@ -31,6 +31,9 @@ use Limoncello\Core\Routing\Dispatcher\MarkBased;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;
 use Limoncello\Tests\Core\TestCase;
+use Mockery;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
 
@@ -227,48 +230,89 @@ class RouterTest extends TestCase
         return new Router(MarkBasedGenerator::class, MarkBased::class);
     }
 
-    public static function homeIndex()
+    /**
+     * @return ResponseInterface
+     */
+    public static function homeIndex(): ResponseInterface
     {
-        // dummy for tests
-    }
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
 
-    public static function createNews()
-    {
-        // dummy for tests
-    }
-
-    public static function postsIndex()
-    {
-        // dummy for tests
-    }
-
-    public static function postsCreate()
-    {
-        // dummy for tests
+        return $response;
     }
 
     /**
-     * @param mixed $idx
+     * @return ResponseInterface
      */
-    public static function postsDelete($idx)
+    public static function createNews(): ResponseInterface
     {
-        $idx ?: null;
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
 
-        // dummy for tests
+        return $response;
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public static function postsIndex(): ResponseInterface
+    {
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public static function postsCreate(): ResponseInterface
+    {
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return ResponseInterface
+     */
+    public static function postsDelete(array $parameters): ResponseInterface
+    {
+        $parameters ?: null;
+
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
     /**
      * @param SapiInterface $sapi
+     *
+     * @return ServerRequestInterface
      */
-    public static function createRequest(SapiInterface $sapi)
+    public static function createRequest(SapiInterface $sapi): ServerRequestInterface
     {
         $sapi ?: null;
-        // dummy for tests
+
+        /** @var ServerRequestInterface $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+
+        return $request;
     }
 
-    public static function createPostMiddleware()
+    /**
+     * @return ResponseInterface
+     */
+    public static function createPostMiddleware(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
     public static function createPostConfigurator()

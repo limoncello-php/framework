@@ -16,17 +16,22 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Core\Application\Application;
+use Limoncello\Core\Reflection\CheckCallableTrait;
 use LogicException;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @package Limoncello\Core
  *
- * @method bool   isCallableToCache($value);
  * @method string getCallableToCacheMessage();
  */
 trait HasRequestFactoryTrait
 {
+    use CheckCallableTrait;
+
     /**
      * @var callable|false|null
      */
@@ -39,7 +44,10 @@ trait HasRequestFactoryTrait
      */
     public function setRequestFactory(callable $requestFactory = null)
     {
-        if ($requestFactory !== null && $this->isCallableToCache($requestFactory) === false) {
+        $parameters = [SapiInterface::class, ContainerInterface::class];
+        if ($requestFactory !== null &&
+            $this->checkPublicStaticCallable($requestFactory, $parameters, ServerRequestInterface::class) === false
+        ) {
             throw new LogicException($this->getCallableToCacheMessage());
         }
         $this->requestFactory = $requestFactory;

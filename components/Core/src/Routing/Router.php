@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 
+use FastRoute\DataGenerator;
+use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
 use Limoncello\Contracts\Routing\DispatcherInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
+use Limoncello\Core\Reflection\ClassIsTrait;
 use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -30,6 +33,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class Router implements RouterInterface
 {
+    use ClassIsTrait;
+
     /**
      * @var false|array
      */
@@ -56,8 +61,8 @@ class Router implements RouterInterface
      */
     public function __construct($generatorClass, $dispatcherClass)
     {
-        assert(class_exists($generatorClass) === true);
-        assert(class_exists($dispatcherClass) === true);
+        assert(static::classImplements($generatorClass, DataGenerator::class));
+        assert(static::classImplements($dispatcherClass, Dispatcher::class));
 
         $this->generatorClass  = $generatorClass;
         $this->dispatcherClass = $dispatcherClass;

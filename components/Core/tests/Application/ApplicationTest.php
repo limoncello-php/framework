@@ -325,10 +325,15 @@ class ApplicationTest extends TestCase
     }
 
     /**
+     * @param SapiInterface         $sapi
+     * @param PsrContainerInterface $container
+     *
      * @return ServerRequestInterface
      */
-    public static function createRequest()
+    public static function createRequest(SapiInterface $sapi, PsrContainerInterface $container): ServerRequestInterface
     {
+        assert($sapi || $container);
+
         // dummy for tests
         self::$isRequestFactoryCalled = true;
 
@@ -346,7 +351,7 @@ class ApplicationTest extends TestCase
         ServerRequestInterface $request,
         Closure $next,
         PsrContainerInterface $container
-    ) {
+    ): ResponseInterface {
         self::assertFalse(self::$isGlobalMiddleware1Called);
         self::assertFalse(self::$isGlobalMiddleware2Called);
 
@@ -364,7 +369,7 @@ class ApplicationTest extends TestCase
      *
      * @return ResponseInterface
      */
-    public static function globalMiddlewareItem2(ServerRequestInterface $request, Closure $next)
+    public static function globalMiddlewareItem2(ServerRequestInterface $request, Closure $next): ResponseInterface
     {
         self::assertTrue(self::$isGlobalMiddleware1Called);
         self::assertFalse(self::$isGlobalMiddleware2Called);
@@ -385,7 +390,7 @@ class ApplicationTest extends TestCase
         ServerRequestInterface $request,
         Closure $next,
         PsrContainerInterface $container
-    ) {
+    ): ResponseInterface {
 
         $container ?: null;
 
@@ -436,7 +441,7 @@ class ApplicationTest extends TestCase
         array $params,
         PsrContainerInterface $container,
         ServerRequestInterface $request = null
-    ) {
+    ): ResponseInterface {
         // dummy for tests
 
         $params && $request && $container ?: null;
@@ -447,7 +452,7 @@ class ApplicationTest extends TestCase
     /**
      * @return ResponseInterface
      */
-    public static function postsCreate()
+    public static function postsCreate(): ResponseInterface
     {
         // dummy for tests
         return new TextResponse('post create');
@@ -464,7 +469,7 @@ class ApplicationTest extends TestCase
         array $params,
         PsrContainerInterface $container,
         ServerRequestInterface $request = null
-    ) {
+    ): ResponseInterface {
         // we didn't specified any middleware and request factory was set to null thus request should be null
         self::assertNull($request);
 

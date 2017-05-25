@@ -16,17 +16,19 @@
  * limitations under the License.
  */
 
+use Limoncello\Core\Reflection\CheckCallableTrait;
 use LogicException;
+use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 
 /**
  * @package Limoncello\Core
  *
- * @method bool   isCallableToCache($value);
- * @method bool   isCallableToCacheArray(array $values);
  * @method string getCallableToCacheMessage();
  */
 trait HasConfiguratorsTrait
 {
+    use CheckCallableTrait;
+
     /**
      * @var callable[]
      */
@@ -39,9 +41,13 @@ trait HasConfiguratorsTrait
      */
     public function setConfigurators(array $configurators)
     {
-        if ($this->isCallableToCacheArray($configurators) === false) {
-            throw new LogicException($this->getCallableToCacheMessage());
+        foreach ($configurators as $configurator) {
+            $isValid = $this->checkPublicStaticCallable($configurator, [LimoncelloContainerInterface::class]);
+            if ($isValid === false) {
+                throw new LogicException($this->getCallableToCacheMessage());
+            }
         }
+
         $this->configurators = $configurators;
 
         return $this;

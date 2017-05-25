@@ -20,6 +20,7 @@ use Closure;
 use Iterator;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
+use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Routing\Traits\CallableTrait;
 use Limoncello\Core\Routing\Traits\HasConfiguratorsTrait;
 use Limoncello\Core\Routing\Traits\HasMiddlewareTrait;
@@ -31,7 +32,11 @@ use Limoncello\Core\Routing\Traits\UriTrait;
  */
 abstract class BaseGroup implements GroupInterface
 {
-    use CallableTrait, UriTrait, HasConfiguratorsTrait, HasMiddlewareTrait, HasRequestFactoryTrait;
+    use CallableTrait, UriTrait, HasConfiguratorsTrait, HasMiddlewareTrait, HasRequestFactoryTrait, CheckCallableTrait {
+        CheckCallableTrait::checkPublicStaticCallable insteadof HasMiddlewareTrait;
+        CheckCallableTrait::checkPublicStaticCallable insteadof HasConfiguratorsTrait;
+        CheckCallableTrait::checkPublicStaticCallable insteadof HasRequestFactoryTrait;
+    }
 
     /** Default value if routes should use request factory from its group */
     const USE_FACTORY_FROM_GROUP_DEFAULT = true;

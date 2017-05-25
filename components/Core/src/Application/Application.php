@@ -23,12 +23,14 @@ use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Contracts\CoreSettingsInterface;
+use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Routing\Router;
 use LogicException;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionParameter;
 use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Diactoros\ServerRequest;
 
@@ -39,6 +41,8 @@ use Zend\Diactoros\ServerRequest;
  */
 abstract class Application implements ApplicationInterface
 {
+    use CheckCallableTrait;
+
     /** Method name for default request factory. */
     const FACTORY_METHOD = 'defaultRequestFactory';
 
@@ -222,11 +226,13 @@ abstract class Application implements ApplicationInterface
     ) {
         if (empty($globalConfigurators) === false) {
             foreach ($globalConfigurators as $configurator) {
+                assert($this->checkPublicStaticCallable($configurator, [LimoncelloContainerInterface::class]));
                 $configurator($container);
             }
         }
         if (empty($routeConfigurators) === false) {
             foreach ($routeConfigurators as $configurator) {
+                assert($this->checkPublicStaticCallable($configurator, [LimoncelloContainerInterface::class]));
                 $configurator($container);
             }
         }
@@ -266,6 +272,21 @@ abstract class Application implements ApplicationInterface
         PsrContainerInterface $container,
         ServerRequestInterface $request = null
     ): ResponseInterface {
+        // check the handler method signature
+        assert($this->checkPublicStaticCallable($handler, [
+            'array',
+            PsrContainerInterface::class,
+            function (ReflectionParameter $parameter): bool {
+                return
+                    $parameter->allowsNull() === true &&
+                    $parameter->getType() !== null &&
+                    (string)$parameter->getType() === ServerRequestInterface::class;
+            },
+        ], ResponseInterface::class),
+            'Handler method should have signature ' .
+            '`public static methodName(array, PsrContainerInterface, ServerRequestInterface): ResponseInterface`'
+        );
+
         $response = call_user_func($handler, $handlerParams, $container, $request);
 
         return $response;
@@ -303,6 +324,19 @@ abstract class Application implements ApplicationInterface
         PsrContainerInterface $container,
         callable $requestFactory
     ): ServerRequestInterface {
+        // check the factory method signature
+        assert($this->checkPublicStaticCallable($requestFactory, [
+            SapiInterface::class,
+            function (ReflectionParameter $parameter): bool {
+                return
+                    $parameter->getType() !== null &&
+                    (string)$parameter->getType() === PsrContainerInterface::class;
+            },
+        ], ServerRequestInterface::class),
+            'Factory method should have signature ' .
+            '`public static methodName(SapiInterface, PsrContainerInterface): ServerRequestInterface`'
+        );
+
         $request = call_user_func($requestFactory, $sapi, $container);
 
         return $request;
@@ -381,6 +415,16 @@ abstract class Application implements ApplicationInterface
         callable $middleware,
         PsrContainerInterface $container
     ): Closure {
+        // check the middleware method signature
+        assert($this->checkPublicStaticCallable($middleware, [
+            ServerRequestInterface::class,
+            Closure::class,
+            PsrContainerInterface::class,
+        ], ResponseInterface::class),
+            'Middleware method should have signature ' .
+            '`public static methodName(ServerRequestInterface, Closure, PsrContainerInterface): ResponseInterface`'
+        );
+
         return function (ServerRequestInterface $request) use ($next, $middleware, $container) {
             return call_user_func($middleware, $request, $next, $container);
         };

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Closure;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Routing\GroupInterface as GI;
 use Limoncello\Contracts\Routing\RouteInterface;
@@ -23,6 +24,9 @@ use Limoncello\Core\Application\Application;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Traits\CallableTrait;
 use Limoncello\Tests\Core\TestCase;
+use Mockery;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @package Limoncello\Tests\Core
@@ -248,18 +252,6 @@ class GroupTest extends TestCase
     }
 
     /**
-     * Test checking that callable can be cached.
-     */
-    public function testIsCallableToCache()
-    {
-        $this->assertTrue($this->isCallableToCache([self::class, 'homeIndex']));
-        $this->assertTrue($this->isCallableToCache(self::class . '::homeIndex'));
-        $this->assertFalse($this->isCallableToCache([$this, 'homeIndex']));
-        $this->assertFalse($this->isCallableToCache(function () {
-        }));
-    }
-
-    /**
      * @expectedException \LogicException
      */
     public function testInvalidCallable1()
@@ -332,72 +324,149 @@ class GroupTest extends TestCase
         );
     }
 
-    public static function homeIndex()
+    /**
+     * @return ResponseInterface
+     */
+    public static function homeIndex(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
-    public static function postsIndex()
+    /**
+     * @return ResponseInterface
+     */
+    public static function postsIndex(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
-    public static function postsCreate()
+    /**
+     * @return ResponseInterface
+     */
+    public static function postsCreate(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
-    public static function postsUpdate()
+    /**
+     * @return ResponseInterface
+     */
+    public static function postsUpdate(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
-    public static function postEdit()
+    /**
+     * @return ResponseInterface
+     */
+    public static function postEdit(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
-    public static function postsSearch()
+    /**
+     * @return ResponseInterface
+     */
+    public static function postsSearch(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
-    public static function postsDelete()
+    /**
+     * @return ResponseInterface
+     */
+    public static function postsDelete(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
-    public static function postsDeleteAll()
+    /**
+     * @return ResponseInterface
+     */
+    public static function postsDeleteAll(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
-    public static function createNews()
+    /**
+     * @return ResponseInterface
+     */
+    public static function createNews(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
     /**
      * @param SapiInterface $sapi
+     *
+     * @return ServerRequestInterface
      */
-    public static function requestFactory(SapiInterface $sapi)
+    public static function requestFactory(SapiInterface $sapi): ServerRequestInterface
     {
         $sapi ?: null;
-        // dummy for tests
+
+        /** @var ServerRequestInterface $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+
+        return $request;
     }
 
     /**
      * @param SapiInterface $sapi
+     *
+     * @return ServerRequestInterface
      */
-    public static function patchRequestFactory(SapiInterface $sapi)
+    public static function patchRequestFactory(SapiInterface $sapi): ServerRequestInterface
     {
         $sapi ?: null;
-        // dummy for tests
+
+        /** @var ServerRequestInterface $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+
+        return $request;
     }
 
-    public static function topMiddlewareHandler()
+    /**
+     * @param ServerRequestInterface $request
+     * @param Closure                $next
+     *
+     * @return ResponseInterface
+     */
+    public static function topMiddlewareHandler(ServerRequestInterface $request, Closure $next): ResponseInterface
     {
-        // dummy for tests
+        assert($request || $next);
+
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
     public static function topContainerConfigurator()
@@ -405,9 +474,15 @@ class GroupTest extends TestCase
         // dummy for tests
     }
 
-    public static function groupMiddlewareHandler()
+    /**
+     * @return ResponseInterface
+     */
+    public static function groupMiddlewareHandler(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
     public static function groupContainerConfigurator()
@@ -415,9 +490,15 @@ class GroupTest extends TestCase
         // dummy for tests
     }
 
-    public static function methodMiddlewareHandler()
+    /**
+     * @return ResponseInterface
+     */
+    public static function methodMiddlewareHandler(): ResponseInterface
     {
-        // dummy for tests
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class);
+
+        return $response;
     }
 
     public static function methodContainerConfigurator()

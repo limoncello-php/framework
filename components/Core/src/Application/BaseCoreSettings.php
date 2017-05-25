@@ -16,13 +16,18 @@
  * limitations under the License.
  */
 
+use FastRoute\DataGenerator;
+use FastRoute\Dispatcher;
 use Limoncello\Core\Contracts\CoreSettingsInterface;
+use Limoncello\Core\Reflection\ClassIsTrait;
 
 /**
  * @package Limoncello\Core
  */
 abstract class BaseCoreSettings implements CoreSettingsInterface
 {
+    use ClassIsTrait;
+
     /**
      * @param array $data
      *
@@ -47,6 +52,7 @@ abstract class BaseCoreSettings implements CoreSettingsInterface
         assert(array_key_exists(self::KEY_ROUTER_PARAMS__GENERATOR, $data));
         $result = $data[self::KEY_ROUTER_PARAMS__GENERATOR];
         assert(empty($result) === false);
+        assert(static::classImplements($result, DataGenerator::class));
 
         return $result;
     }
@@ -61,6 +67,7 @@ abstract class BaseCoreSettings implements CoreSettingsInterface
         assert(array_key_exists(self::KEY_ROUTER_PARAMS__DISPATCHER, $data));
         $result = $data[self::KEY_ROUTER_PARAMS__DISPATCHER];
         assert(empty($result) === false);
+        assert(static::classImplements($result, Dispatcher::class));
 
         return $result;
     }
