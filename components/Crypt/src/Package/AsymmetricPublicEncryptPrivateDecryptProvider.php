@@ -29,7 +29,7 @@ class AsymmetricPublicEncryptPrivateDecryptProvider implements ProvidesContainer
     public static function getContainerConfigurators(): array
     {
         return [
-            AsymmetricPublicEncryptPrivateDecryptContainerConfigurator::HANDLER,
+            AsymmetricPublicEncryptPrivateDecryptContainerConfigurator::class,
         ];
     }
 }

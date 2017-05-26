@@ -32,13 +32,10 @@ use Limoncello\Crypt\Package\AsymmetricCryptSettings as C;
  */
 class AsymmetricPublicEncryptPrivateDecryptContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $container[EncryptInterface::class] = function (PsrContainerInterface $container) {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);

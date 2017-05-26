@@ -33,7 +33,7 @@ class PassportProvider implements CCI, MI, CI, MWI
     public static function getContainerConfigurators(): array
     {
         return [
-            PassportContainerConfigurator::HANDLER,
+            PassportContainerConfigurator::class,
         ];
     }
 
@@ -53,7 +53,7 @@ class PassportProvider implements CCI, MI, CI, MWI
     public static function getRouteConfigurators(): array
     {
         return [
-            PassportRoutesConfigurator::CONFIGURATOR,
+            PassportRoutesConfigurator::class,
         ];
     }
 
@@ -63,7 +63,7 @@ class PassportProvider implements CCI, MI, CI, MWI
     public static function getMiddleware(): array
     {
         return [
-            PassportMiddleware::HANDLER,
+            PassportMiddleware::class,
         ];
     }
 }

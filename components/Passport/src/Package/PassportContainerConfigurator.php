@@ -33,15 +33,12 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
  */
 class PassportContainerConfigurator extends BasePassportContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
-        static::configureContainer($container);
+        static::baseConfigureContainer($container);
 
         $container[PassportServerIntegrationInterface::class] = function (PsrContainerInterface $container) {
             assert($container !== null);

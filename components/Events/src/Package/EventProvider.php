@@ -29,7 +29,7 @@ class EventProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            EventsContainerConfigurator::HANDLER,
+            EventsContainerConfigurator::class,
         ];
     }
 }

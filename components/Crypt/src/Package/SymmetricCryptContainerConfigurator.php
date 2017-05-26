@@ -30,13 +30,10 @@ use Limoncello\Crypt\Package\SymmetricCryptSettings as C;
  */
 class SymmetricCryptContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $crypt = null;
 

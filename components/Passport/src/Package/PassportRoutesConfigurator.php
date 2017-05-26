@@ -24,8 +24,6 @@ use Limoncello\Contracts\Routing\GroupInterface;
  */
 class PassportRoutesConfigurator implements RoutesConfiguratorInterface
 {
-    const CONFIGURATOR = [self::class, self::METHOD_NAME];
-
     /** Route group prefix */
     const GROUP_PREFIX = '';
 

@@ -35,9 +35,6 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 class FluteContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
-    /** @var callable */
     const CONFIGURE_EXCEPTION_HANDLER = [self::class, 'configureExceptionHandler'];
 
     /**
@@ -45,7 +42,7 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $factory = new Factory($container);
 

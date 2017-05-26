@@ -13,7 +13,7 @@ class FluteProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            FluteContainerConfigurator::HANDLER,
+            FluteContainerConfigurator::class,
         ];
     }
 }

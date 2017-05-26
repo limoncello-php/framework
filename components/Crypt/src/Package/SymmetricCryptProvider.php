@@ -29,7 +29,7 @@ class SymmetricCryptProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            SymmetricCryptContainerConfigurator::HANDLER,
+            SymmetricCryptContainerConfigurator::class,
         ];
     }
 }

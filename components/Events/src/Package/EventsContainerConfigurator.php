@@ -29,13 +29,10 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
  */
 class EventsContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $container[EventEmitterInterface::class] = function (PsrContainerInterface $container) {
             $emitter   = new SimpleEventEmitter();
