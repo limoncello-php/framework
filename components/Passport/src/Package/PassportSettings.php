@@ -17,12 +17,16 @@
  */
 
 use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Core\Reflection\CheckCallableTrait;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Passport
  */
 abstract class PassportSettings implements SettingsInterface
 {
+    use CheckCallableTrait;
+
     /** Config key */
     const KEY_ENABLE_LOGS = 0;
 
@@ -101,7 +105,11 @@ abstract class PassportSettings implements SettingsInterface
      */
     public function get(): array
     {
-        // TODO add check that validator is valid callable (static with proper in/out signature).
+        $validator = $this->getUserCredentialsValidator();
+
+        // check that validator is valid callable (static with proper in/out signature).
+        assert($this->checkPublicStaticCallable($validator, [ContainerInterface::class, 'string', 'string']));
+
         return [
             static::KEY_ENABLE_LOGS                          => false,
             static::KEY_APPROVAL_URI_STRING                  => $this->getApprovalUri(),
@@ -112,7 +120,7 @@ abstract class PassportSettings implements SettingsInterface
             static::KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH => true,
             static::KEY_USER_TABLE_NAME                      => $this->getUserTableName(),
             static::KEY_USER_PRIMARY_KEY_NAME                => $this->getUserPrimaryKeyName(),
-            static::KEY_USER_CREDENTIALS_VALIDATOR           => $this->getUserCredentialsValidator(),
+            static::KEY_USER_CREDENTIALS_VALIDATOR           => $validator,
         ];
     }
 }
