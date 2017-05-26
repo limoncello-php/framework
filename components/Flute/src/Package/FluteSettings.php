@@ -17,15 +17,10 @@ abstract class FluteSettings implements SettingsInterface
     /**
      * @param string $path
      * @param string $implementClassName
-     * @param bool   $onlyInstantiable
      *
      * @return Generator
      */
-    abstract protected function selectClasses(
-        string $path,
-        string $implementClassName,
-        bool $onlyInstantiable = true
-    ): Generator;
+    abstract protected function selectClasses(string $path, string $implementClassName): Generator;
 
     /** Config key */
     const KEY_MODEL_TO_SCHEME_MAP = 0;
