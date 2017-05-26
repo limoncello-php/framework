@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Events\Contracts\EventEmitterInterface;
@@ -37,12 +38,13 @@ class ContainerConfiguratorTest extends TestCase
      */
     public function testEventProvider()
     {
-        list($configurator) = EventProvider::getContainerConfigurators();
+        /** @var ContainerConfiguratorInterface $configuratorClass */
+        list($configuratorClass) = EventProvider::getContainerConfigurators();
         $container    = new TestContainer();
 
         $this->addSettings($container, BaseEventSettings::class, (new EventSettings())->get());
 
-        $configurator($container);
+        $configuratorClass::configureContainer($container);
 
         $this->assertNotNull($container->get(EventEmitterInterface::class));
     }

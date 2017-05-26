@@ -18,10 +18,10 @@
 
 use Generator;
 use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Core\Reflection\ClassIsTrait;
 use Limoncello\Events\Contracts\EventHandlerInterface;
 use Limoncello\Events\Contracts\EventInterface;
 use Limoncello\Events\SimpleEventEmitter;
-use Limoncello\Events\Traits\SelectClassesTrait;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -30,7 +30,7 @@ use ReflectionMethod;
  */
 abstract class EventSettings implements SettingsInterface
 {
-    use SelectClassesTrait;
+    use ClassIsTrait;
 
     /**
      * @return string
@@ -117,14 +117,13 @@ abstract class EventSettings implements SettingsInterface
         $reflection = new ReflectionClass($eventClass);
         foreach ($eventClasses as $curEventClass) {
             $curReflection = new ReflectionClass($curEventClass);
-            if ($curReflection->isAbstract() === true) {
-                continue;
-            }
-            if ($eventClass === $curEventClass ||
-                $curReflection->isSubclassOf($eventClass) === true ||
-                ($reflection->isInterface() === true && $curReflection->implementsInterface($eventClass))
-            ) {
-                yield $curEventClass;
+            if ($curReflection->isAbstract() === false) {
+                if ($eventClass === $curEventClass ||
+                    $curReflection->isSubclassOf($eventClass) === true ||
+                    ($reflection->isInterface() === true && $curReflection->implementsInterface($eventClass))
+                ) {
+                    yield $curEventClass;
+                }
             }
         }
     }

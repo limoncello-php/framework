@@ -15,7 +15,8 @@
     ],
     "require": {
         "php": ">=7.0.0",
-        "limoncello-php/contracts": "self.version"
+        "limoncello-php/contracts": "self.version",
+        "limoncello-php/core": "self.version"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.5",
