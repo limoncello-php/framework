@@ -30,7 +30,6 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use ReflectionParameter;
 use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Diactoros\ServerRequest;
 
@@ -276,12 +275,7 @@ abstract class Application implements ApplicationInterface
         assert($this->checkPublicStaticCallable($handler, [
             'array',
             PsrContainerInterface::class,
-            function (ReflectionParameter $parameter): bool {
-                return
-                    $parameter->allowsNull() === true &&
-                    $parameter->getType() !== null &&
-                    (string)$parameter->getType() === ServerRequestInterface::class;
-            },
+            ServerRequestInterface::class,
         ], ResponseInterface::class),
             'Handler method should have signature ' .
             '`public static methodName(array, PsrContainerInterface, ServerRequestInterface): ResponseInterface`'
@@ -327,11 +321,7 @@ abstract class Application implements ApplicationInterface
         // check the factory method signature
         assert($this->checkPublicStaticCallable($requestFactory, [
             SapiInterface::class,
-            function (ReflectionParameter $parameter): bool {
-                return
-                    $parameter->getType() !== null &&
-                    (string)$parameter->getType() === PsrContainerInterface::class;
-            },
+            PsrContainerInterface::class,
         ], ServerRequestInterface::class),
             'Factory method should have signature ' .
             '`public static methodName(SapiInterface, PsrContainerInterface): ServerRequestInterface`'

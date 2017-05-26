@@ -28,7 +28,6 @@ use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use ReflectionParameter;
 
 /**
  * @package Limoncello\Core
@@ -93,12 +92,7 @@ class Route implements RouteInterface
         $isValidHandler = $this->checkPublicStaticCallable($handler, [
             'array',
             ContainerInterface::class,
-            function (ReflectionParameter $parameter): bool {
-                return
-                    $parameter->allowsNull() === true &&
-                    $parameter->getType() !== null &&
-                    (string)$parameter->getType() === ServerRequestInterface::class;
-            },
+            ServerRequestInterface::class,
         ], ResponseInterface::class);
         if ($isValidHandler === false) {
             // Handler method should have signature

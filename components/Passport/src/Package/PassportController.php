@@ -33,16 +33,16 @@ class PassportController
     const TOKEN_HANDLER = [self::class, 'token'];
 
     /**
-     * @param array                       $routeParams
-     * @param ContainerInterface          $container
-     * @param ServerRequestInterface|null $request
+     * @param array                  $routeParams
+     * @param ContainerInterface     $container
+     * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
      */
     public static function authorize(
         array $routeParams,
         ContainerInterface $container,
-        ServerRequestInterface $request = null
+        ServerRequestInterface $request
     ): ResponseInterface {
         assert($routeParams !== null && $request !== null);
 
@@ -54,16 +54,16 @@ class PassportController
     }
 
     /**
-     * @param array                       $routeParams
-     * @param ContainerInterface          $container
-     * @param ServerRequestInterface|null $request
+     * @param array                  $routeParams
+     * @param ContainerInterface     $container
+     * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
      */
     public static function token(
         array $routeParams,
         ContainerInterface $container,
-        ServerRequestInterface $request = null
+        ServerRequestInterface $request
     ): ResponseInterface {
         assert($routeParams !== null && $request !== null);
 
