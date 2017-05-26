@@ -26,7 +26,7 @@ interface RoutesConfiguratorInterface
     /**
      * Configurator's method name.
      */
-    const METHOD_NAME = 'configureRoutes';
+    const ROUTES_METHOD_NAME = 'configureRoutes';
 
     /**
      * @return string[]

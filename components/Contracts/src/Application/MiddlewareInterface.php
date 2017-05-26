@@ -29,7 +29,7 @@ interface MiddlewareInterface
     /**
      * Configurator's method name.
      */
-    const METHOD_NAME = 'handle';
+    const MIDDLEWARE_METHOD_NAME = 'handle';
 
     /**
      * @param ServerRequestInterface $request

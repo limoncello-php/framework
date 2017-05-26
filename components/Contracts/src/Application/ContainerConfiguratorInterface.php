@@ -26,12 +26,12 @@ interface ContainerConfiguratorInterface
     /**
      * Configurator's method name.
      */
-    const METHOD_NAME = 'configure';
+    const CONTAINER_METHOD_NAME = 'configureContainer';
 
     /**
      * @param ContainerInterface $container
      *
      * @return void
      */
-    public static function configure(ContainerInterface $container);
+    public static function configureContainer(ContainerInterface $container);
 }
