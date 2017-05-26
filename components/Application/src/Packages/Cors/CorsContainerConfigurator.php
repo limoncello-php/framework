@@ -33,13 +33,10 @@ use Psr\Log\LoggerInterface;
  */
 class CorsContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $container[AnalyzerInterface::class] = function (PsrContainerInterface $container) {
             $settingsProvider = $container->get(SettingsProviderInterface::class);

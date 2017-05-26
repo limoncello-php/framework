@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-use Closure;
+use Limoncello\Contracts\Application\ContainerConfiguratorInterface as CCI;
+use Limoncello\Contracts\Application\RoutesConfiguratorInterface as RCI;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as CCI;
-use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as MI;
-use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface as RCI;
-use Limoncello\Contracts\Provider\ProvidesSettingsInterface as SI;
+use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as PrCCI;
+use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as PrMI;
+use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface as PrRCI;
+use Limoncello\Contracts\Provider\ProvidesSettingsInterface as PrSI;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Tests\Application\Data\CoreSettings\Middleware\PluginMiddleware;
@@ -33,59 +34,40 @@ use Zend\Diactoros\Response\EmptyResponse;
 /**
  * @package Limoncello\Tests\Application
  */
-class Provider1 implements CCI, MI, RCI, SI
+class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI
 {
     /**
-     * Get container configurators.
-     *
-     * @return callable[]
+     * @inheritdoc
      */
     public static function getContainerConfigurators(): array
     {
         return [
-            [static::class, 'containerConfigure'],
+            static::class,
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public static function containerConfigure(LimoncelloContainerInterface $container)
-    {
-        $container[static::class] = 'Hello container';
-    }
-
-    /**
-     * Get middleware.
-     *
-     * @return callable[]
-     */
     public static function getMiddleware(): array
     {
         return [
-            PluginMiddleware::ENTRY,
+            PluginMiddleware::class,
         ];
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @param Closure                $next
-     * @param PsrContainerInterface  $container
-     *
-     * @return ResponseInterface
+     * @inheritdoc
      */
-    public static function middlewareHandle(
-        ServerRequestInterface $request,
-        Closure $next,
-        PsrContainerInterface $container
-    ): ResponseInterface {
-        return $next($request);
+    public static function getRouteConfigurators(): array
+    {
+        return [
+            static::class,
+        ];
     }
 
     /**
-     * Get provider default settings.
-     *
-     * @return SettingsInterface[]
+     * @inheritdoc
      */
     public static function getSettings(): array
     {
@@ -101,21 +83,17 @@ class Provider1 implements CCI, MI, RCI, SI
     }
 
     /**
-     * Get route configurators.
-     *
-     * @return callable[]
+     * @inheritdoc
      */
-    public static function getRouteConfigurators(): array
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
-        return [
-            [static::class, 'routeConfigurator']
-        ];
+        $container[static::class] = 'Hello container';
     }
 
     /**
-     * @param GroupInterface $routes
+     * @inheritdoc
      */
-    public static function routeConfigurator(GroupInterface $routes)
+    public static function configureRoutes(GroupInterface $routes)
     {
         $routes->get('/plugin1', [static::class, 'onIndex']);
     }

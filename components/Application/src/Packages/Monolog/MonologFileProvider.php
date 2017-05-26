@@ -29,7 +29,7 @@ class MonologFileProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            MonologFileContainerConfigurator::HANDLER,
+            MonologFileContainerConfigurator::class,
         ];
     }
 }

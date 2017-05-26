@@ -19,8 +19,8 @@
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Application\Data\ModelSchemeInfo;
-use Limoncello\Application\Traits\SelectClassesTrait;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Core\Reflection\ClassIsTrait;
 
 /**
  * @package Limoncello\Application
@@ -42,7 +42,7 @@ abstract class DataSettings implements SettingsInterface
     /** Settings key */
     const KEY_LAST = self::KEY_MODELS_SCHEME_INFO + 1;
 
-    use SelectClassesTrait;
+    use ClassIsTrait;
 
     /**
      * @return string

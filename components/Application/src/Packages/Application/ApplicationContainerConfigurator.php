@@ -17,14 +17,13 @@
  */
 
 use Limoncello\Application\Commands\CommandStorage;
-use Limoncello\Application\Traits\SelectClassesTrait;
-use Limoncello\Application\Traits\SelectClassImplementsTrait;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Provider\ProvidesCommandsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Core\Reflection\ClassIsTrait;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 
 /**
@@ -32,18 +31,15 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
  */
 class ApplicationContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $container[CommandStorageInterface::class] = function (PsrContainerInterface $container) {
             $creator = new class
             {
-                use SelectClassesTrait, SelectClassImplementsTrait;
+                use ClassIsTrait;
 
                 /**
                  * @param string $commandsPath

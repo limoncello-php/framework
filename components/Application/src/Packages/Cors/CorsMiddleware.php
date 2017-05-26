@@ -31,9 +31,6 @@ use Zend\Diactoros\Response\EmptyResponse;
  */
 class CorsMiddleware implements MiddlewareInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @param ServerRequestInterface $request
      * @param Closure                $next

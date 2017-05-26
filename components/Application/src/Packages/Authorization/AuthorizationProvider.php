@@ -29,7 +29,7 @@ class AuthorizationProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            AuthorizationContainerConfigurator::HANDLER,
+            AuthorizationContainerConfigurator::class,
         ];
     }
 }

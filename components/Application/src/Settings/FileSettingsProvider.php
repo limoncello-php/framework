@@ -17,8 +17,8 @@
  */
 
 use Limoncello\Application\Exceptions\InvalidSettingsClassException;
-use Limoncello\Application\Traits\SelectClassesTrait;
 use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Core\Reflection\ClassIsTrait;
 use ReflectionClass;
 use ReflectionException;
 
@@ -27,7 +27,7 @@ use ReflectionException;
  */
 class FileSettingsProvider extends InstanceSettingsProvider
 {
-    use SelectClassesTrait;
+    use ClassIsTrait;
 
     /**
      * @param string $path

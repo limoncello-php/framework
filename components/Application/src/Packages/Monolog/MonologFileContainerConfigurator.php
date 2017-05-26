@@ -36,13 +36,10 @@ use Psr\Log\LoggerInterface;
  */
 class MonologFileContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $container[LoggerInterface::class] = function (PsrContainerInterface $container) {
             $settingsProvider = $container->get(SettingsProviderInterface::class);

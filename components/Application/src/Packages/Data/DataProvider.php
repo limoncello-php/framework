@@ -29,7 +29,7 @@ class DataProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            DataContainerConfigurator::HANDLER,
+            DataContainerConfigurator::class,
         ];
     }
 }

@@ -28,13 +28,10 @@ use Limoncello\Application\Packages\PDO\PdoSettings as C;
  */
 class PdoContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const METHOD = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $container[PDO::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);

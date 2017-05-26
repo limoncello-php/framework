@@ -27,7 +27,7 @@ class ContainerConfigurator1 implements ContainerConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configure(ContainerInterface $container)
+    public static function configureContainer(ContainerInterface $container)
     {
         $container[self::class] = 'Hello container';
     }

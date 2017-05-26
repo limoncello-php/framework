@@ -22,13 +22,13 @@ use Limoncello\Application\CoreSettings\CoreSettings;
 use Limoncello\Application\ExceptionHandlers\DefaultHandler;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
-use Limoncello\Application\Traits\SelectClassImplementsTrait;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Exceptions\ExceptionHandlerInterface;
 use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Sapi;
 use Limoncello\Core\Contracts\CoreSettingsInterface;
+use Limoncello\Core\Reflection\ClassIsTrait;
 use Throwable;
 use Zend\Diactoros\Response\SapiEmitter;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
@@ -40,7 +40,7 @@ use Limoncello\Container\Container;
  */
 class Application extends \Limoncello\Core\Application\Application
 {
-    use SelectClassImplementsTrait;
+    use ClassIsTrait;
 
     /**
      * @var string

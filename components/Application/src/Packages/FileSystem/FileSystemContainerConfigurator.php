@@ -26,13 +26,10 @@ use Limoncello\Contracts\FileSystem\FileSystemInterface;
  */
 class FileSystemContainerConfigurator implements ContainerConfiguratorInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @inheritdoc
      */
-    public static function configure(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container)
     {
         $container[FileSystemInterface::class] = function () {
             return new FileSystem();

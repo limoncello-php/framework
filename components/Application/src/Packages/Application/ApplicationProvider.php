@@ -32,7 +32,7 @@ class ApplicationProvider implements ProvidesContainerConfiguratorsInterface, Pr
     public static function getContainerConfigurators(): array
     {
         return [
-            ApplicationContainerConfigurator::HANDLER,
+            ApplicationContainerConfigurator::class,
         ];
     }
 

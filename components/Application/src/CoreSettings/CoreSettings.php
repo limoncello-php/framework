@@ -18,8 +18,6 @@
 
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use Generator;
-use Limoncello\Application\Traits\SelectClassesTrait;
-use Limoncello\Application\Traits\SelectClassImplementsTrait;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Application\MiddlewareInterface;
 use Limoncello\Contracts\Application\RoutesConfiguratorInterface;
@@ -30,17 +28,18 @@ use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Application\BaseCoreSettings;
+use Limoncello\Core\Reflection\CheckCallableTrait;
+use Limoncello\Core\Reflection\ClassIsTrait;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;
-use ReflectionMethod;
 
 /**
  * @package Limoncello\Application
  */
 class CoreSettings extends BaseCoreSettings
 {
-    use SelectClassesTrait, SelectClassImplementsTrait;
+    use ClassIsTrait, CheckCallableTrait;
 
     /**
      * @var string
@@ -77,7 +76,6 @@ class CoreSettings extends BaseCoreSettings
     public function get(): array
     {
         list ($generatorClass, $dispatcherClass) = $this->getGeneratorAndDispatcherClasses();
-        assert($this->isValidRouterGeneratorAndDispatcher($generatorClass, $dispatcherClass) === true);
 
         $routesData = $this
             ->createRouter($generatorClass, $dispatcherClass)
@@ -111,8 +109,8 @@ class CoreSettings extends BaseCoreSettings
     protected function getGlobalContainerConfigurators(): Generator
     {
         $interfaceName = ContainerConfiguratorInterface::class;
-        foreach ($this->selectClasses($this->getConfiguratorsPath(), $interfaceName) as $selectClass) {
-            $configurator = [$selectClass, ContainerConfiguratorInterface::METHOD_NAME];
+        foreach ($this->selectClasses($this->getConfiguratorsPath(), $interfaceName) as $configuratorClass) {
+            $configurator = [$configuratorClass, ContainerConfiguratorInterface::CONTAINER_METHOD_NAME];
             assert($this->isValidContainerConfigurator($configurator) === true);
             yield $configurator;
         }
@@ -120,7 +118,8 @@ class CoreSettings extends BaseCoreSettings
         $interfaceName = ProvidesContainerConfiguratorsInterface::class;
         foreach ($this->selectClassImplements($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesContainerConfiguratorsInterface $providerClass */
-            foreach ($providerClass::getContainerConfigurators() as $configurator) {
+            foreach ($providerClass::getContainerConfigurators() as $configuratorClass) {
+                $configurator = [$configuratorClass, ContainerConfiguratorInterface::CONTAINER_METHOD_NAME];
                 assert($this->isValidContainerConfigurator($configurator) === true);
                 yield $configurator;
             }
@@ -134,17 +133,18 @@ class CoreSettings extends BaseCoreSettings
      */
     protected function addRoutes(GroupInterface $group): GroupInterface
     {
-        foreach ($this->selectClasses($this->getRoutesPath(), RoutesConfiguratorInterface::class) as $selectClass) {
-            /** @var RoutesConfiguratorInterface $selectClass */
-            $selectClass::configureRoutes($group);
+        $interfaceName = RoutesConfiguratorInterface::class;
+        foreach ($this->selectClasses($this->getRoutesPath(), $interfaceName) as $routesConfClass) {
+            /** @var RoutesConfiguratorInterface $routesConfClass */
+            $routesConfClass::configureRoutes($group);
         }
 
         $interfaceName = ProvidesRouteConfiguratorsInterface::class;
         foreach ($this->selectClassImplements($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesRouteConfiguratorsInterface $providerClass */
-            foreach ($providerClass::getRouteConfigurators() as $configurator) {
-                assert($this->isValidRouteConfigurator($configurator) === true);
-                $configurator($group);
+            foreach ($providerClass::getRouteConfigurators() as $routesConfClass) {
+                /** @var RoutesConfiguratorInterface $routesConfClass */
+                $routesConfClass::configureRoutes($group);
             }
         }
 
@@ -160,8 +160,7 @@ class CoreSettings extends BaseCoreSettings
         foreach ($this->selectClasses($this->getRoutesPath(), RoutesConfiguratorInterface::class) as $selectClass) {
             /** @var RoutesConfiguratorInterface $selectClass */
             foreach ($selectClass::getMiddleware() as $middlewareClass) {
-                $handler = [$middlewareClass, MiddlewareInterface::METHOD_NAME];
-                assert($this->isValidMiddlewareHandler($handler) === true);
+                $handler = [$middlewareClass, MiddlewareInterface::MIDDLEWARE_METHOD_NAME];
                 yield $handler;
             }
         }
@@ -170,8 +169,8 @@ class CoreSettings extends BaseCoreSettings
         $interfaceName = ProvidesMiddlewareInterface::class;
         foreach ($this->selectClassImplements($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesMiddlewareInterface $providerClass */
-            foreach ($providerClass::getMiddleware() as $handler) {
-                assert($this->isValidMiddlewareHandler($handler) === true);
+            foreach ($providerClass::getMiddleware() as $middlewareClass) {
+                $handler = [$middlewareClass, MiddlewareInterface::MIDDLEWARE_METHOD_NAME];
                 yield $handler;
             }
         }
@@ -221,93 +220,12 @@ class CoreSettings extends BaseCoreSettings
     }
 
     /**
-     * @param string $generatorClass
-     * @param string $dispatcherClass
-     *
-     * @return bool
-     */
-    private function isValidRouterGeneratorAndDispatcher(string $generatorClass, string $dispatcherClass): bool
-    {
-        assert($generatorClass && $dispatcherClass);
-
-        // TODO add validation for router generator and dispatcher classes
-        return true;
-    }
-
-    /**
-     * @param $mightBeConfigurator
+     * @param string|array|callable $mightBeConfigurator
      *
      * @return bool
      */
     private function isValidContainerConfigurator($mightBeConfigurator): bool
     {
-        return $this->isStaticCallableWithParameters($mightBeConfigurator, [ContainerInterface::class]);
-    }
-
-    /**
-     * @param $mightBeHandler
-     *
-     * @return bool
-     */
-    private function isValidMiddlewareHandler($mightBeHandler): bool
-    {
-        //return $this->isStaticCallableWithParameters($mightBeHandler, [ContainerInterface::class]);
-
-        // TODO add validation for middleware handler
-        return is_callable($mightBeHandler);
-    }
-
-    /**
-     * @param $mightBeConfigurator
-     *
-     * @return bool
-     */
-    private function isValidRouteConfigurator($mightBeConfigurator): bool
-    {
-        //return $this->isStaticCallableWithParameters($mightBeConfigurator, [ContainerInterface::class]);
-
-        // TODO add validation for routes configurator
-        return is_callable($mightBeConfigurator);
-    }
-
-    /**
-     * @param mixed $mightBeCallable
-     * @param array $parameterTypes
-     *
-     * @return bool
-     */
-    private function isStaticCallableWithParameters($mightBeCallable, array $parameterTypes = []): bool
-    {
-        $result = false;
-        if (is_callable($mightBeCallable) === true) {
-            $class = $method = null;
-            if (is_string($mightBeCallable) === true) {
-                list ($class, $method) = explode('::', $mightBeCallable);
-            } elseif (is_array($mightBeCallable) === true && is_string($class = $mightBeCallable[0])) {
-                $method = $mightBeCallable[1];
-            }
-
-            if ($class !== null && $method !== null) {
-                $reflectionMethod = new ReflectionMethod($class, $method);
-                $result           = $reflectionMethod->isStatic();
-                $reflectionParams = $reflectionMethod->getParameters();
-                $count            = count($reflectionParams);
-                $result           = $result === true && count($parameterTypes) === $count;
-                if ($result === true) {
-                    for ($index = 0; $index < $count; $index++) {
-                        $parameterType =$parameterTypes[$index];
-                        $paramClass = $reflectionParams[$index]->getClass();
-                        if ($paramClass->implementsInterface($parameterType) === false &&
-                            $paramClass->isSubclassOf($parameterType) === false
-                        ) {
-                            $result = false;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $result;
+        return $this->checkPublicStaticCallable($mightBeConfigurator, [ContainerInterface::class]);
     }
 }

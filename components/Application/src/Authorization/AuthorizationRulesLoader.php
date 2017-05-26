@@ -18,7 +18,6 @@
 
 use Limoncello\Application\Contracts\Authorization\AuthorizationRulesInterface;
 use Limoncello\Application\Contracts\Authorization\ResourceAuthorizationRulesInterface;
-use Limoncello\Application\Traits\SelectClassesTrait;
 use Limoncello\Auth\Authorization\PolicyAdministration\AllOf;
 use Limoncello\Auth\Authorization\PolicyAdministration\AnyOf;
 use Limoncello\Auth\Authorization\PolicyAdministration\Logical;
@@ -33,6 +32,7 @@ use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\PolicyInterface
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\RuleInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
+use Limoncello\Core\Reflection\ClassIsTrait;
 use ReflectionClass;
 
 /**
@@ -40,7 +40,7 @@ use ReflectionClass;
  */
 class AuthorizationRulesLoader
 {
-    use SelectClassesTrait;
+    use ClassIsTrait;
 
     /**
      * @var array

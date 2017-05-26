@@ -19,7 +19,6 @@
 use Limoncello\Application\Data\FileMigrationRunner;
 use Limoncello\Application\Data\FileSeedRunner;
 use Limoncello\Application\Packages\Data\DataSettings;
-use Limoncello\Application\Traits\ParseCallableTrait;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
@@ -30,8 +29,6 @@ use Psr\Container\ContainerInterface;
  */
 class DataCommand implements CommandInterface
 {
-    use ParseCallableTrait;
-
     /**
      * Command name.
      */

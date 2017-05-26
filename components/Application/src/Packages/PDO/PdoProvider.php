@@ -29,7 +29,7 @@ class PdoProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            PdoContainerConfigurator::METHOD,
+            PdoContainerConfigurator::class,
         ];
     }
 }

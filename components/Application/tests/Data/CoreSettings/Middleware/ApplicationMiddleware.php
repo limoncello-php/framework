@@ -17,6 +17,7 @@
  */
 
 use Closure;
+use Limoncello\Contracts\Application\MiddlewareInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,17 +25,10 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * @package Limoncello\Tests\Application
  */
-class ApplicationMiddleware
+class ApplicationMiddleware implements MiddlewareInterface
 {
-    /** @var callable */
-    const ENTRY = [self::class, 'handle'];
-
     /**
-     * @param ServerRequestInterface $request
-     * @param Closure                $next
-     * @param ContainerInterface     $container
-     *
-     * @return ResponseInterface
+     * @inheritdoc
      */
     public static function handle(
         ServerRequestInterface $request,

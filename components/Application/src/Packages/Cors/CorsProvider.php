@@ -31,7 +31,17 @@ class CorsProvider implements SI, CCI, MI
     public static function getContainerConfigurators(): array
     {
         return [
-            CorsContainerConfigurator::HANDLER,
+            CorsContainerConfigurator::class,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getMiddleware(): array
+    {
+        return [
+            CorsMiddleware::class,
         ];
     }
 
@@ -42,16 +52,6 @@ class CorsProvider implements SI, CCI, MI
     {
         return [
             new CorsSettings(),
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getMiddleware(): array
-    {
-        return [
-            CorsMiddleware::HANDLER,
         ];
     }
 }

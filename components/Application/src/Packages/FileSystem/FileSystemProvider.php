@@ -29,7 +29,7 @@ class FileSystemProvider implements ProvidesContainerConfiguratorsInterface
     public static function getContainerConfigurators(): array
     {
         return [
-            FileSystemContainerConfigurator::HANDLER,
+            FileSystemContainerConfigurator::class,
         ];
     }
 }

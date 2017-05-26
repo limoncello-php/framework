@@ -17,7 +17,6 @@
  */
 
 use Limoncello\Application\Exceptions\ConfigurationException;
-use Limoncello\Application\Traits\ParseCallableTrait;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
@@ -31,8 +30,6 @@ use Psr\Container\ContainerInterface;
  */
 class ApplicationCommand implements CommandInterface
 {
-    use ParseCallableTrait;
-
     /** Argument name */
     const ARG_ACTION = 'action';
 
@@ -157,6 +154,47 @@ class ApplicationCommand implements CommandInterface
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
         $this->createFileSystem($container)->write($path, $content);
+    }
+    /**
+     * @param mixed $mightBeCallable
+     *
+     * @return array
+     */
+    protected function parseCacheCallable($mightBeCallable): array
+    {
+        if (is_string($mightBeCallable) === true &&
+            count($nsClassMethod = explode('::', $mightBeCallable, 2)) === 2 &&
+            count($nsClass = explode('\\', $nsClassMethod[0])) > 1
+        ) {
+            $canBeClass     = array_pop($nsClass);
+            $canBeNamespace = array_filter($nsClass);
+            $canBeMethod    = $nsClassMethod[1];
+        } elseif (is_array($mightBeCallable) === true &&
+            count($mightBeCallable) === 2 &&
+            count($nsClass = explode('\\', $mightBeCallable[0])) > 1
+        ) {
+            $canBeClass     = array_pop($nsClass);
+            $canBeNamespace = array_filter($nsClass);
+            $canBeMethod    = $mightBeCallable[1];
+        } else {
+            return [null, null, null];
+        }
+
+        foreach (array_merge($canBeNamespace, [$canBeClass, $canBeMethod]) as $value) {
+            // is string might have a-z, A-Z, _, numbers but has at least one a-z or A-Z.
+            if (is_string($value) === false ||
+                preg_match('/^\\w+$/i', $value) !== 1 ||
+                preg_match('/^[a-z]+$/i', $value) !== 1
+            ) {
+                return [null, null, null];
+            }
+        }
+
+        $namespace = implode('\\', $canBeNamespace);
+        $class     = $canBeClass;
+        $method    = $canBeMethod;
+
+        return [$namespace, $class, $method];
     }
 
     /**
