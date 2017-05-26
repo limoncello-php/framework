@@ -16,15 +16,19 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\RoutesConfiguratorInterface;
+
 /**
  * @package Limoncello\Contracts
  */
 interface ProvidesRouteConfiguratorsInterface
 {
     /**
-     * Get route configurators.
+     * Get route configurator classes.
      *
-     * @return callable[]
+     * @see RoutesConfiguratorInterface
+     *
+     * @return string[]
      */
     public static function getRouteConfigurators(): array;
 }

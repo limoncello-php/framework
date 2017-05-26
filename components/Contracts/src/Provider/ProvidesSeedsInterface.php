@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Data\SeedInterface;
+
 /**
  * @package Limoncello\Contracts
  */
@@ -23,6 +25,8 @@ interface ProvidesSeedsInterface
 {
     /**
      * Get provider seed classes.
+     *
+     * @see SeedInterface
      *
      * @return string[]
      */

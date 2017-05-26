@@ -16,13 +16,17 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Commands\CommandInterface;
+
 /**
  * @package Limoncello\Contracts
  */
 interface ProvidesCommandsInterface
 {
     /**
-     * Get provider commands.
+     * Get command classes.
+     *
+     * @see CommandInterface
      *
      * @return string[]
      */

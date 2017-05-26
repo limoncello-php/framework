@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Data\MigrationInterface;
+
 /**
  * @package Limoncello\Contracts
  */
@@ -23,6 +25,8 @@ interface ProvidesMigrationsInterface
 {
     /**
      * Get provider migration classes.
+     *
+     * @see MigrationInterface
      *
      * @return string[]
      */

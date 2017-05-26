@@ -16,15 +16,19 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
+
 /**
  * @package Limoncello\Contracts
  */
 interface ProvidesContainerConfiguratorsInterface
 {
     /**
-     * Get container configurators.
+     * Get container configurator classes.
      *
-     * @return callable[]
+     * @see ContainerConfiguratorInterface
+     *
+     * @return string[]
      */
     public static function getContainerConfigurators(): array;
 }

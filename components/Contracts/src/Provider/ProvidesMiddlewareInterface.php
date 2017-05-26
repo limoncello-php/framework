@@ -16,15 +16,19 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\MiddlewareInterface;
+
 /**
  * @package Limoncello\Contracts
  */
 interface ProvidesMiddlewareInterface
 {
     /**
-     * Get middleware.
+     * Get middleware classes.
      *
-     * @return callable[]
+     * @see MiddlewareInterface
+     *
+     * @return string[]
      */
     public static function getMiddleware(): array;
 }
