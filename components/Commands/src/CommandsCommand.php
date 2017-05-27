@@ -124,7 +124,7 @@ class CommandsCommand extends BaseCommand
      */
     private function executeConnect(ContainerInterface $container, IoInterface $inOut)
     {
-        assert ($container->has(CommandStorageInterface::class));
+        assert($container->has(CommandStorageInterface::class));
         /** @var CommandStorageInterface $commandStorage */
         $commandStorage = $container->get(CommandStorageInterface::class);
 
@@ -221,7 +221,7 @@ EOT;
      */
     private function getAppSettings(ContainerInterface $container): array
     {
-        assert ($container->has(SettingsProviderInterface::class));
+        assert($container->has(SettingsProviderInterface::class));
 
         /** @var SettingsProviderInterface $provider */
         $provider = $container->get(SettingsProviderInterface::class);

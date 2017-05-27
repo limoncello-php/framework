@@ -47,7 +47,7 @@ trait CommandRoutesTrait
             [
                 RouteInterface::PARAM_REQUEST_FACTORY         => null,
                 RouteInterface::PARAM_CONTAINER_CONFIGURATORS => [$configurator],
-                ]
+            ]
         );
     }
 

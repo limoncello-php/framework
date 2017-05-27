@@ -58,12 +58,12 @@ class ComposerCommandProvider implements CommandProvider
      */
     private static function areCommands(array $commands): bool
     {
+        $areCommands = true;
+
         foreach ($commands as $command) {
-            if (($command instanceof BaseCommand) === false) {
-                return false;
-            }
+            $areCommands = $areCommands && ($command instanceof BaseCommand);
         }
 
-        return true;
+        return $areCommands;
     }
 }

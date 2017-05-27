@@ -48,9 +48,9 @@ class ComposerPlugin implements PluginInterface, Capable
         // create application and execute the command.
         $commands          = [];
         $commandsCacheFile = $this->getCommandsCacheFilePath($composer);
-        if ($commandsCacheFile !== null && file_exists($commandsCacheFile)) {
+        if ($commandsCacheFile !== null && file_exists($commandsCacheFile) === true) {
             /** @noinspection PhpIncludeInspection */
-            $cacheData = require_once $commandsCacheFile;
+            $cacheData = require $commandsCacheFile;
             assert(is_array($cacheData));
             foreach ($cacheData as $commandData) {
                 list($name, $description, $help, $arguments, $options, $callable) = $commandData;
