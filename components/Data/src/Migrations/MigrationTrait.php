@@ -45,7 +45,10 @@ trait MigrationTrait
     {
         $this->container = $container;
 
-        return $this;
+        /** @var MigrationInterface $self */
+        $self = $this;
+
+        return $self;
     }
 
     /**
@@ -115,7 +118,7 @@ trait MigrationTrait
         $tableName     = $this->getModelSchemes()->getTable($modelClass);
         $schemeManager = $this->getSchemaManager();
 
-        if ($schemeManager->tablesExist($tableName) === true) {
+        if ($schemeManager->tablesExist([$tableName]) === true) {
             $schemeManager->dropTable($tableName);
         }
     }
@@ -367,6 +370,8 @@ trait MigrationTrait
      * @param bool   $cascadeDelete
      *
      * @return Closure
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function foreignRelationship($column, $referredClass, $cascadeDelete = false): Closure
     {
@@ -385,6 +390,8 @@ trait MigrationTrait
      * @param bool   $cascadeDelete
      *
      * @return Closure
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function foreignColumn($localKey, $foreignTable, $foreignKey, $type, $cascadeDelete = false): Closure
     {
@@ -399,6 +406,8 @@ trait MigrationTrait
      * @param bool   $cascadeDelete
      *
      * @return Closure
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function nullableForeignColumn(
         string $localKey,
@@ -415,6 +424,8 @@ trait MigrationTrait
      * @param bool   $cascadeDelete
      *
      * @return Closure
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function nullableRelationship($name, $cascadeDelete = false): Closure
     {
@@ -426,6 +437,8 @@ trait MigrationTrait
      * @param bool   $cascadeDelete
      *
      * @return Closure
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function relationship($name, $cascadeDelete = false): Closure
     {
@@ -487,6 +500,8 @@ trait MigrationTrait
      * @param bool   $notNullable
      *
      * @return Closure
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function enumImpl($name, array $values, $notNullable): Closure
     {

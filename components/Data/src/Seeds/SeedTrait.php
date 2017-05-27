@@ -43,7 +43,10 @@ trait SeedTrait
     {
         $this->container = $container;
 
-        return $this;
+        /** @var SeedInterface $self */
+        $self = $this;
+
+        return $self;
     }
 
     /**
