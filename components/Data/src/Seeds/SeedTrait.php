@@ -175,7 +175,7 @@ trait SeedTrait
      */
     protected function seedModelData(string $modelClass, array $data)
     {
-        return $this->insertRow($this->getModelSchemes()->getTable($modelClass), $this->getConnection(), $data);
+        return $this->seedRowData($this->getModelSchemes()->getTable($modelClass), $data);
     }
 
     /**

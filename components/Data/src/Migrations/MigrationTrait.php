@@ -141,7 +141,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function primaryString($name): Closure
+    protected function primaryString(string $name): Closure
     {
         return function (Table $table, MigrationContextInterface $context) use ($name) {
             $length = $context->getModelSchemes()->getAttributeLength($context->getModelClass(), $name);
@@ -151,38 +151,38 @@ trait MigrationTrait
     }
 
     /**
-     * @param string     $name
-     * @param null|mixed $default
+     * @param string   $name
+     * @param null|int $default
      *
      * @return Closure
      */
-    protected function unsignedInt($name, $default = null): Closure
+    protected function unsignedInt(string $name, int $default = null): Closure
     {
         return $this->unsignedIntImpl($name, true, $default);
     }
 
     /**
-     * @param string     $name
-     * @param null|mixed $default
+     * @param string   $name
+     * @param null|int $default
      *
      * @return Closure
      */
-    protected function nullableUnsignedInt($name, $default = null): Closure
+    protected function nullableUnsignedInt(string $name, int $default = null): Closure
     {
         return $this->unsignedIntImpl($name, false, $default);
     }
 
     /**
      * @param string $name
-     * @param int    $precision
-     * @param int    $scale
      *
      * @return Closure
      */
-    protected function float($name, $precision, $scale): Closure
+    protected function float(string $name): Closure
     {
-        return function (Table $table) use ($name, $precision, $scale) {
-            $table->addColumn($name, Type::FLOAT)->setPrecision($precision)->setScale($scale)->setNotnull(true);
+        // precision and scale both seems to be ignored in Doctrine so not much sense to have them as inputs
+
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, Type::FLOAT)->setNotnull(true);
         };
     }
 
@@ -191,7 +191,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function string($name): Closure
+    protected function string(string $name): Closure
     {
         return function (Table $table, MigrationContextInterface $context) use ($name) {
             $length = $context->getModelSchemes()->getAttributeLength($context->getModelClass(), $name);
@@ -204,7 +204,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function nullableString($name): Closure
+    protected function nullableString(string $name): Closure
     {
         return function (Table $table, MigrationContextInterface $context) use ($name) {
             $length = $context->getModelSchemes()->getAttributeLength($context->getModelClass(), $name);
@@ -217,7 +217,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function text($name): Closure
+    protected function text(string $name): Closure
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::TEXT)->setNotnull(true);
@@ -229,7 +229,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function nullableText($name): Closure
+    protected function nullableText(string $name): Closure
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::TEXT)->setNotnull(false);
@@ -242,7 +242,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function bool($name, $default = null): Closure
+    protected function bool(string $name, $default = null): Closure
     {
         return function (Table $table) use ($name, $default) {
             $column = $table->addColumn($name, Type::BOOLEAN)->setNotnull(true);
@@ -258,7 +258,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function enum($name, array $values): Closure
+    protected function enum(string $name, array $values): Closure
     {
         return $this->enumImpl($name, $values, true);
     }
@@ -269,7 +269,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function nullableEnum($name, array $values): Closure
+    protected function nullableEnum(string $name, array $values): Closure
     {
         return $this->enumImpl($name, $values, false);
     }
@@ -309,7 +309,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function datetime($name): Closure
+    protected function datetime(string $name): Closure
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::DATETIME)->setNotnull(true);
@@ -321,7 +321,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function nullableDatetime($name): Closure
+    protected function nullableDatetime(string $name): Closure
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::DATETIME)->setNotnull(false);
@@ -333,7 +333,19 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function nullableDate($name): Closure
+    protected function date(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, Type::DATE)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableDate(string $name): Closure
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::DATE)->setNotnull(false);
@@ -373,13 +385,59 @@ trait MigrationTrait
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected function foreignRelationship($column, $referredClass, $cascadeDelete = false): Closure
-    {
-        $tableName  = $this->getTableNameForClass($referredClass);
-        $pkName     = $this->getModelSchemes()->getPrimaryKey($referredClass);
-        $columnType = $this->getModelSchemes()->getAttributeType($referredClass, $column);
+    protected function foreignRelationship(
+        string $column,
+        string $referredClass,
+        bool $cascadeDelete = false
+    ): Closure {
+        return function (
+            Table $table,
+            MigrationContextInterface $context
+        ) use (
+            $column,
+            $referredClass,
+            $cascadeDelete
+        ) {
+            $tableName  = $this->getTableNameForClass($referredClass);
+            $pkName     = $this->getModelSchemes()->getPrimaryKey($referredClass);
+            $columnType = $this->getModelSchemes()->getAttributeType($context->getModelClass(), $column);
 
-        return $this->foreignColumn($column, $tableName, $pkName, $columnType, $cascadeDelete);
+            $closure = $this->foreignColumn($column, $tableName, $pkName, $columnType, $cascadeDelete);
+
+            return $closure($table, $context);
+        };
+    }
+
+    /**
+     * @param string $column
+     * @param string $referredClass
+     * @param bool   $cascadeDelete
+     *
+     * @return Closure
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
+    protected function nullableForeignRelationship(
+        string $column,
+        string $referredClass,
+        bool $cascadeDelete = false
+    ): Closure {
+        return function (
+            Table $table,
+            MigrationContextInterface $context
+        ) use (
+            $column,
+            $referredClass,
+            $cascadeDelete
+        ) {
+            $tableName  = $this->getTableNameForClass($referredClass);
+            $pkName     = $this->getModelSchemes()->getPrimaryKey($referredClass);
+            $columnType = $this->getModelSchemes()->getAttributeType($context->getModelClass(), $column);
+
+            $closure = $this->nullableForeignColumn($column, $tableName, $pkName, $columnType, $cascadeDelete);
+
+            return $closure($table, $context);
+        };
     }
 
     /**
@@ -393,8 +451,13 @@ trait MigrationTrait
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected function foreignColumn($localKey, $foreignTable, $foreignKey, $type, $cascadeDelete = false): Closure
-    {
+    protected function foreignColumn(
+        string $localKey,
+        string $foreignTable,
+        string $foreignKey,
+        string $type,
+        bool $cascadeDelete = false
+    ): Closure {
         return $this->foreignColumnImpl($localKey, $foreignTable, $foreignKey, $type, true, $cascadeDelete);
     }
 
@@ -427,7 +490,7 @@ trait MigrationTrait
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected function nullableRelationship($name, $cascadeDelete = false): Closure
+    protected function nullableRelationship(string $name, bool $cascadeDelete = false): Closure
     {
         return $this->relationshipImpl($name, false, $cascadeDelete);
     }
@@ -440,7 +503,7 @@ trait MigrationTrait
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected function relationship($name, $cascadeDelete = false): Closure
+    protected function relationship(string $name, bool $cascadeDelete = false): Closure
     {
         return $this->relationshipImpl($name, true, $cascadeDelete);
     }
@@ -450,33 +513,16 @@ trait MigrationTrait
      *
      * @return string
      */
-    protected function getTableNameForClass($modelClass): string
+    protected function getTableNameForClass(string $modelClass): string
     {
-        $hasClass = $this->getModelSchemes()->hasClass($modelClass);
-        if ($hasClass === false) {
-            assert('$hasClass !== null', "Table name is not specified for model '$modelClass'.");
-        }
+        assert(
+            $this->getModelSchemes()->hasClass($modelClass),
+            "Table name is not specified for model '$modelClass'."
+        );
 
         $tableName = $this->getModelSchemes()->getTable($modelClass);
 
         return $tableName;
-    }
-
-    /**
-     * @param string $modelClass
-     *
-     * @return string
-     */
-    protected function getPrimaryKeyNameForClass($modelClass): string
-    {
-        $hasClass = $this->getModelSchemes()->hasClass($modelClass);
-        if ($hasClass === false) {
-            assert('$hasClass !== null', "Table name is not specified for model '$modelClass'.");
-        }
-
-        $primary = $this->getModelSchemes()->getPrimaryKey($modelClass);
-
-        return $primary;
     }
 
     /**
@@ -506,9 +552,7 @@ trait MigrationTrait
     private function enumImpl($name, array $values, $notNullable): Closure
     {
         return function (Table $table) use ($name, $values, $notNullable) {
-            if (Type::hasType(EnumType::TYPE_NAME) === false) {
-                Type::addType(EnumType::TYPE_NAME, EnumType::class);
-            }
+            Type::hasType(EnumType::TYPE_NAME) === true ?: Type::addType(EnumType::TYPE_NAME, EnumType::class);
             EnumType::setValues($values);
             $table->addColumn($name, EnumType::TYPE_NAME)->setNotnull($notNullable);
         };
@@ -565,23 +609,18 @@ trait MigrationTrait
         ) {
             $modelClass = $context->getModelClass();
 
-            $hasRelationship = $this->getModelSchemes()->hasRelationship($modelClass, $name);
-            if ($hasRelationship === false) {
-                assert('$hasRelationship === true', "Relationship `$name` not found for model `$modelClass`.");
-            }
-
-            $relationshipType = $this->getModelSchemes()->getRelationshipType($modelClass, $name);
-            $canBeCreated = $relationshipType === RelationshipTypes::BELONGS_TO;
-            if ($canBeCreated === false) {
-                assert('$canBeCreated === true', "Relationship `$name` for model `$modelClass` must be `belongsTo`.");
-            }
-
-            $columnType = $this->getModelSchemes()->getAttributeType(
-                $modelClass,
-                $this->getModelSchemes()->getForeignKey($modelClass, $name)
+            assert(
+                $this->getModelSchemes()->hasRelationship($modelClass, $name),
+                "Relationship `$name` not found for model `$modelClass`."
+            );
+            assert(
+                $this->getModelSchemes()->getRelationshipType($modelClass, $name) === RelationshipTypes::BELONGS_TO,
+                "Relationship `$name` for model `$modelClass` must be `belongsTo`."
             );
 
-            $localKey        = $this->getModelSchemes()->getForeignKey($modelClass, $name);
+            $localKey   = $this->getModelSchemes()->getForeignKey($modelClass, $name);
+            $columnType = $this->getModelSchemes()->getAttributeType($modelClass, $localKey);
+
             $otherModelClass = $this->getModelSchemes()->getReverseModelClass($modelClass, $name);
             $foreignTable    = $this->getModelSchemes()->getTable($otherModelClass);
             $foreignKey      = $this->getModelSchemes()->getPrimaryKey($otherModelClass);
