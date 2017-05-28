@@ -361,6 +361,8 @@ abstract class BaseRepository
      * @param mixed        $value
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function createTypedParameter(QueryBuilder $query, $value): string
     {

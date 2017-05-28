@@ -32,6 +32,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package Limoncello\Passport
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 abstract class BasePassportContainerConfigurator
 {
@@ -40,16 +42,16 @@ abstract class BasePassportContainerConfigurator
      */
     protected static function baseConfigureContainer(LimoncelloContainerInterface $container)
     {
-        $accountManager        = null;
-        $accountManagerFactory = function (PsrContainerInterface $container) use (&$accountManager) {
+        $accountManager = null;
+        $factory        = function (PsrContainerInterface $container) use (&$accountManager) {
             if ($accountManager === null) {
                 $accountManager = new AccountManager($container);
             }
 
             return $accountManager;
         };
-        $container[AccountManagerInterface::class]         = $accountManagerFactory;
-        $container[PassportAccountManagerInterface::class] = $accountManagerFactory;
+        $container[AccountManagerInterface::class]         = $factory;
+        $container[PassportAccountManagerInterface::class] = $factory;
 
         $container[DatabaseSchemeInterface::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);

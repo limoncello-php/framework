@@ -35,6 +35,8 @@ class MySqlPassportContainerConfigurator extends BasePassportContainerConfigurat
 {
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public static function configureContainer(LimoncelloContainerInterface $container)
     {

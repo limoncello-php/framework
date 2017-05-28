@@ -26,11 +26,15 @@ use PDO;
 
 /**
  * @package Limoncello\Passport
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class TokenRepository extends BaseRepository implements TokenRepositoryInterface
 {
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function createCode(TokenInterface $code): TokenInterface
     {
@@ -92,6 +96,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function createToken(TokenInterface $token): TokenInterface
     {

@@ -21,6 +21,10 @@ use Limoncello\Passport\Contracts\Entities\ClientInterface;
 
 /**
  * @package Limoncello\Passport
+ *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class Client extends DatabaseItem implements ClientInterface
 {
@@ -138,6 +142,8 @@ abstract class Client extends DatabaseItem implements ClientInterface
 
     /**
      * Constructor.
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function __construct()
     {

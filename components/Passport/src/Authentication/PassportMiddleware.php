@@ -28,9 +28,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class PassportMiddleware implements MiddlewareInterface
 {
-    /** @var callable */
-    const HANDLER = [self::class, self::METHOD_NAME];
-
     /**
      * @param ServerRequestInterface $request
      * @param Closure                $next

@@ -38,6 +38,10 @@ use Zend\Diactoros\Uri;
 
 /**
  * @package Limoncello\Passport
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class BasePassportServer extends BaseAuthorizationServer implements PassportServerInterface, LAI
 {
@@ -311,6 +315,8 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
 
     /** @noinspection PhpTooManyParametersInspection
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function passValidateCredentialsAndCreateAccessTokenResponse(
         $userName,
@@ -403,6 +409,8 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function refreshCreateAccessTokenResponse(
         ClientInterface $client,
@@ -442,6 +450,8 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      * @param string|null $redirectFromQuery
      *
      * @return array [client|null, uri|null]
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function getValidClientAndRedirectUri(string $clientId = null, string $redirectFromQuery = null)
     {
@@ -635,9 +645,9 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
     /**
      * @param PassportServerIntegrationInterface $integration
      *
-     * @return PassportServer
+     * @return self
      */
-    protected function setIntegration(PassportServerIntegrationInterface $integration): PassportServer
+    protected function setIntegration(PassportServerIntegrationInterface $integration): self
     {
         $this->integration = $integration;
 

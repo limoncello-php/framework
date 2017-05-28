@@ -103,6 +103,8 @@ abstract class DatabaseItem
      * @param string $createdAt
      *
      * @return DateTimeInterface
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     protected function parseDateTime(string $createdAt): DateTimeInterface
     {

@@ -34,6 +34,7 @@ trait BasicClientAuthenticationTrait
      *
      * @return ClientInterface|null
      *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */

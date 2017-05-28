@@ -35,6 +35,8 @@ class PassportContainerConfigurator extends BasePassportContainerConfigurator im
 {
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public static function configureContainer(LimoncelloContainerInterface $container)
     {

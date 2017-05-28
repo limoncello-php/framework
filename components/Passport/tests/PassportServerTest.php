@@ -29,6 +29,8 @@ use Limoncello\Passport\Adaptors\Generic\Scope;
 use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
 use Limoncello\Passport\Adaptors\Generic\Token;
 use Limoncello\Passport\Adaptors\Generic\TokenRepository;
+use Limoncello\Passport\Adaptors\MySql\MySqlPassportServerIntegration;
+use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\PassportServerInterface;
 use Limoncello\Passport\PassportServer;
 use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
@@ -97,7 +99,7 @@ class PassportServerTest extends TestCase
         $server   = $this->createPassportServer();
         $response = $server->postCreateToken($this->createPasswordTokenRequest(
             static::TEST_USER_NAME,
-            static::TEST_USER_PASSWORD . 'XXX' // <- invalid passwod
+            static::TEST_USER_PASSWORD . 'XXX' // <- invalid password
         ));
         $this->assertEquals(400, $response->getStatusCode());
         $error = json_decode((string)$response->getBody());
@@ -512,6 +514,34 @@ class PassportServerTest extends TestCase
     }
 
     /**
+     * Test create repositories.
+     */
+    public function testCreateGenericRepositories()
+    {
+        $connection  = $this->getConnection();
+        $integration = $this->createGenericIntegration($connection);
+
+        $this->assertNotNull($integration->getClientRepository());
+        $this->assertNotNull($integration->getScopeRepository());
+        $this->assertNotNull($integration->getRedirectUriRepository());
+    }
+
+    /**
+     * Test create repositories.
+     */
+    public function testCreateMySqlRepositories()
+    {
+        $connection  = $this->getConnection();
+        $integration = $this->createMySqlIntegration($connection);
+
+        $this->assertNotNull($integration->getClientRepository());
+        $this->assertNotNull($integration->getScopeRepository());
+        $this->assertNotNull($integration->getRedirectUriRepository());
+        $this->assertNotNull($integration->getTokenRepository());
+        $this->assertNotNull($integration->createTokenInstance());
+    }
+
+    /**
      * @param string|null $username
      * @param string|null $password
      * @param string|null $scope
@@ -697,7 +727,22 @@ class PassportServerTest extends TestCase
             );
         });
 
-        $integration = new class ($connection) extends GenericPassportServerIntegration
+        $integration = $this->createGenericIntegration($connection);
+
+        $server = new PassportServer($integration);
+        $server->setLogger($this->getLogger());
+
+        return $server;
+    }
+
+    /**
+     * @param Connection $connection
+     *
+     * @return PassportServerIntegrationInterface
+     */
+    private function createGenericIntegration(Connection $connection): PassportServerIntegrationInterface
+    {
+        return new class ($connection) extends GenericPassportServerIntegration
         {
 
             /**
@@ -724,11 +769,42 @@ class PassportServerTest extends TestCase
                         PassportServerTest::TEST_USER_ID : null;
             }
         };
+    }
 
-        $server = new PassportServer($integration);
-        $server->setLogger($this->getLogger());
+    /**
+     * @param Connection $connection
+     *
+     * @return PassportServerIntegrationInterface
+     */
+    private function createMySqlIntegration(Connection $connection): PassportServerIntegrationInterface
+    {
+        return new class ($connection) extends MySqlPassportServerIntegration
+        {
 
-        return $server;
+            /**
+             * @param Connection $connection
+             */
+            public function __construct(Connection $connection)
+            {
+                parent::__construct(
+                    $connection,
+                    PassportServerTest::TEST_DEFAULT_CLIENT_ID,
+                    PassportServerTest::TEST_APPROVAL_URI,
+                    PassportServerTest::TEST_ERROR_URI
+                );
+            }
+
+            /**
+             * @inheritdoc
+             */
+            public function validateUserId(string $userName, string $password)
+            {
+                return
+                    $userName === PassportServerTest::TEST_USER_NAME &&
+                    $password === PassportServerTest::TEST_USER_PASSWORD ?
+                        PassportServerTest::TEST_USER_ID : null;
+            }
+        };
     }
 
     /**

@@ -45,6 +45,7 @@ class PassportControllerTest extends TestCase
 
         $this->assertSame($response, PassportController::authorize([], $container, $request));
     }
+
     /**
      * Test authorize.
      */

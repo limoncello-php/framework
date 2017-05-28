@@ -508,6 +508,8 @@ abstract class Token implements TokenInterface
      * @param string $createdAt
      *
      * @return DateTimeInterface
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     protected function parseDateTime(string $createdAt): DateTimeInterface
     {

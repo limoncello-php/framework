@@ -20,6 +20,8 @@ use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 
 /**
  * @package Limoncello\Passport
+ *
+ * @SuppressWarnings(PHPMD)
  */
 class DatabaseScheme implements DatabaseSchemeInterface
 {

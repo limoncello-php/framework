@@ -85,6 +85,8 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      * @param Type[]|null $attributeTypes
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function readUserByToken(
         string $token,
@@ -133,6 +135,8 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      * @param Type[]           $attributeTypes
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function fetchTyped(
         Statement $statement,
@@ -175,6 +179,8 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      * @param string    $createdAtColumn
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function fetchUnTyped(
         Statement $statement,

@@ -93,7 +93,10 @@ abstract class Scope extends DatabaseItem implements ScopeInterface
      */
     public function setCreatedAt(DateTimeInterface $createdAt): ScopeInterface
     {
-        return $this->setCreatedAtImpl($createdAt);
+        /** @var ScopeInterface $self */
+        $self = $this->setCreatedAtImpl($createdAt);
+
+        return $self;
     }
 
     /**
@@ -101,6 +104,9 @@ abstract class Scope extends DatabaseItem implements ScopeInterface
      */
     public function setUpdatedAt(DateTimeInterface $createdAt): ScopeInterface
     {
-        return $this->setUpdatedAtImpl($createdAt);
+        /** @var ScopeInterface $self */
+        $self = $this->setUpdatedAtImpl($createdAt);
+
+        return $self;
     }
 }

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Psr\Container\ContainerInterface;
+
 /**
  * @package Limoncello\Tests\Templates
  */
@@ -70,16 +72,16 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
     }
 
     /**
-     * @param string $userName
-     * @param string $password
+     * @param ContainerInterface $container
+     * @param string             $userName
+     * @param string             $password
      *
      * @return int|null
      */
-    public static function validateUser(string $userName, string $password)
+    public static function validateUser(ContainerInterface $container, string $userName, string $password)
     {
-        assert($userName || $password);
+        assert($container || $userName || $password);
 
         return 123;
     }
-
 }

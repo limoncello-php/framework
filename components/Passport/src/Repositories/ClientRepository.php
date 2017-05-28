@@ -36,6 +36,8 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function create(ClientInterface $client): ClientInterface
     {

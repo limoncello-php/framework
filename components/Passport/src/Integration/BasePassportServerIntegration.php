@@ -101,6 +101,8 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
      * @param int        $codeExpiration
      * @param int        $tokenExpiration
      * @param bool       $isRenewRefreshValue
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function __construct(
         Connection $connection,
