@@ -57,7 +57,7 @@ class PackageTest extends TestCase
 
         $container[SettingsProviderInterface::class] = $settingsMock;
 
-        TemplatesContainerConfigurator::configure($container);
+        TemplatesContainerConfigurator::configureContainer($container);
 
         $this->assertTrue($container->has(TemplatesInterface::class));
         $this->assertNotNull($container->get(TemplatesInterface::class));
