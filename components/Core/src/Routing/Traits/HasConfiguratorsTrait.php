@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Limoncello\Core\Reflection\CheckCallableTrait;
 use LogicException;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 
@@ -27,8 +26,6 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
  */
 trait HasConfiguratorsTrait
 {
-    use CheckCallableTrait;
-
     /**
      * @var callable[]
      */

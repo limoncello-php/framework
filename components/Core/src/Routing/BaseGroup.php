@@ -32,11 +32,7 @@ use Limoncello\Core\Routing\Traits\UriTrait;
  */
 abstract class BaseGroup implements GroupInterface
 {
-    use CallableTrait, UriTrait, HasConfiguratorsTrait, HasMiddlewareTrait, HasRequestFactoryTrait, CheckCallableTrait {
-        CheckCallableTrait::checkPublicStaticCallable insteadof HasMiddlewareTrait;
-        CheckCallableTrait::checkPublicStaticCallable insteadof HasConfiguratorsTrait;
-        CheckCallableTrait::checkPublicStaticCallable insteadof HasRequestFactoryTrait;
-    }
+    use CallableTrait, UriTrait, HasConfiguratorsTrait, HasMiddlewareTrait, HasRequestFactoryTrait, CheckCallableTrait;
 
     /** Default value if routes should use request factory from its group */
     const USE_FACTORY_FROM_GROUP_DEFAULT = true;

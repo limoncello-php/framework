@@ -17,7 +17,6 @@
  */
 
 use Closure;
-use Limoncello\Core\Reflection\CheckCallableTrait;
 use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -30,8 +29,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 trait HasMiddlewareTrait
 {
-    use CheckCallableTrait;
-
     /**
      * @var callable[]
      */

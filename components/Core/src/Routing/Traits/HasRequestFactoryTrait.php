@@ -18,7 +18,6 @@
 
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Core\Application\Application;
-use Limoncello\Core\Reflection\CheckCallableTrait;
 use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -30,8 +29,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 trait HasRequestFactoryTrait
 {
-    use CheckCallableTrait;
-
     /**
      * @var callable|false|null
      */

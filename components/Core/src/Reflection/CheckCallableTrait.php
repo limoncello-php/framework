@@ -33,6 +33,10 @@ trait CheckCallableTrait
      * @param string|null $returnType
      *
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function checkPublicStaticCallable(
         $callable,

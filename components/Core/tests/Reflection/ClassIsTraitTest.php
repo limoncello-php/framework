@@ -21,7 +21,7 @@ use DateTimeInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
 use Limoncello\Tests\Core\TestCase;
-use PHPUnit_Framework_Test;
+use PHPUnit\Framework\Test;
 
 /**
  * @package Limoncello\Tests\Core
@@ -43,13 +43,13 @@ class ClassIsTraitTest extends TestCase
 
         $this->assertTrue($this->classInherits(self::class, TestCase::class));
         $this->assertFalse($this->classInherits(self::class, DateTime::class));
-        $this->assertTrue($this->classInherits(self::class, PHPUnit_Framework_Test::class));
+        $this->assertTrue($this->classInherits(self::class, Test::class));
         $this->assertFalse($this->classInherits(self::class, DateTimeInterface::class));
 
         // test `selectClassImplements` (interface yes/no)
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClassImplements([self::class], PHPUnit_Framework_Test::class))
+            iterator_to_array($this->selectClassImplements([self::class], Test::class))
         );
         $this->assertEquals(
             [],
@@ -69,7 +69,7 @@ class ClassIsTraitTest extends TestCase
         // test `selectClassInherits` (interface yes/no, class yes/no)
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClassInherits([self::class], PHPUnit_Framework_Test::class))
+            iterator_to_array($this->selectClassInherits([self::class], Test::class))
         );
         $this->assertEquals(
             [],
@@ -87,7 +87,7 @@ class ClassIsTraitTest extends TestCase
         // test `selectClasses` (interface yes/no, class yes/no)
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClasses(__FILE__, PHPUnit_Framework_Test::class))
+            iterator_to_array($this->selectClasses(__FILE__, Test::class))
         );
         $this->assertEquals(
             [],
