@@ -17,11 +17,12 @@
  */
 
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\EvaluationEnum;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Auth
  */
-class EvaluationEnumTest extends \PHPUnit_Framework_TestCase
+class EvaluationEnumTest extends TestCase
 {
     /**
      * Test to string conversion.

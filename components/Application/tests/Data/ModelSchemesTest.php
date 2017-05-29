@@ -24,11 +24,12 @@ use Limoncello\Tests\Application\Data\Models\Comment;
 use Limoncello\Tests\Application\Data\Models\CommentEmotion;
 use Limoncello\Tests\Application\Data\Models\Emotion;
 use Limoncello\Tests\Application\Data\Models\User;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Application
  */
-class ModelSchemesTest extends \PHPUnit_Framework_TestCase
+class ModelSchemesTest extends TestCase
 {
     /**
      * @var ModelSchemeInfoInterface

@@ -23,12 +23,13 @@ use Limoncello\Validation\Contracts\CaptureAggregatorInterface;
 use Limoncello\Validation\Contracts\MessageCodes;
 use Limoncello\Validation\Contracts\ValidatorInterface;
 use Limoncello\Validation\Errors\Error;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 
 /**
  * @package Limoncello\Tests\Validation
  */
-class CapturesTest extends \PHPUnit_Framework_TestCase
+class CapturesTest extends TestCase
 {
     /**
      * @var CaptureAggregatorInterface

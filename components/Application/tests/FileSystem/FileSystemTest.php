@@ -19,11 +19,12 @@
 use Limoncello\Application\FileSystem\FileSystem;
 use Mockery;
 use Mockery\Mock;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Application
  */
-class FileSystemTest extends \PHPUnit_Framework_TestCase
+class FileSystemTest extends TestCase
 {
     /**
      * @var FileSystem

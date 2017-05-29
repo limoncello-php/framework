@@ -19,11 +19,12 @@
 use Limoncello\l10n\Messages\BundleEncoder;
 use Limoncello\l10n\Messages\BundleStorage;
 use Limoncello\l10n\Messages\ResourceBundle;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\l10n
  */
-class BundleEncoderTest extends \PHPUnit_Framework_TestCase
+class BundleEncoderTest extends TestCase
 {
     /**
      * Test basic get and set operations.

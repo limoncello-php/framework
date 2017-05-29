@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @package Limoncello\Tests\Auth
  */
-class TargetTest extends \PHPUnit_Framework_TestCase
+class TargetTest extends TestCase
 {
     public function test1()
     {

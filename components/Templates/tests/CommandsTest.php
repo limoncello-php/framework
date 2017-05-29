@@ -63,6 +63,9 @@ class CommandsTest extends TestCase
         /** @var TemplatesCommand $command */
 
         $command->execute($container, $this->createIo(TemplatesCommand::ACTION_CLEAR_CACHE));
+
+        // Mockery will do checks when the test finished
+        $this->assertTrue(true);
     }
 
     /**
@@ -111,6 +114,9 @@ class CommandsTest extends TestCase
 
         $errors = 1;
         $command->execute($container, $this->createIo('XXX', $errors));
+
+        // Mockery will do checks when the test finished
+        $this->assertTrue(true);
     }
 
     /**

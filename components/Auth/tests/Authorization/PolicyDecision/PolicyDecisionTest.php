@@ -31,12 +31,13 @@ use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\RuleCombiningAl
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\RuleInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 /**
  * @package Limoncello\Tests\Auth
  */
-class PolicyDecisionTest extends \PHPUnit_Framework_TestCase
+class PolicyDecisionTest extends TestCase
 {
     /**
      * @var bool

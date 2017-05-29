@@ -38,12 +38,13 @@ use Limoncello\Tests\Auth\Authorization\PolicyEnforcement\Data\RequestProperties
 use Limoncello\Tests\Auth\Authorization\PolicyEnforcement\Data\TestRuleAlgorithm;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @package Limoncello\Tests\Auth
  */
-class PolicyEnforcementTest extends \PHPUnit_Framework_TestCase
+class PolicyEnforcementTest extends TestCase
 {
     /**
      * @var bool

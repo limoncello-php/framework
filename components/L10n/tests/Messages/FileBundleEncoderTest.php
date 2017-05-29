@@ -18,11 +18,12 @@
 
 use Limoncello\l10n\Messages\BundleStorage;
 use Limoncello\l10n\Messages\FileBundleEncoder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\l10n
  */
-class FileBundleEncoderTest extends \PHPUnit_Framework_TestCase
+class FileBundleEncoderTest extends TestCase
 {
     /**
      * Test load resources from files.

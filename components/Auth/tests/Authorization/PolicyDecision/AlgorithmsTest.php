@@ -37,12 +37,13 @@ use Limoncello\Auth\Authorization\PolicyEnforcement\Request;
 use Limoncello\Auth\Authorization\PolicyInformation\Context;
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\EvaluationEnum;
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetInterface;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 /**
  * @package Limoncello\Tests\Auth
  */
-class AlgorithmsTest extends \PHPUnit_Framework_TestCase
+class AlgorithmsTest extends TestCase
 {
     const CALLBACK_11 = [self::class, 'callback11'];
     const CALLBACK_12 = [self::class, 'callback12'];

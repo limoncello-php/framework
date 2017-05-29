@@ -18,11 +18,12 @@
 
 use Limoncello\Auth\Authorization\PolicyDecision\PolicyAlgorithm;
 use Limoncello\Auth\Authorization\PolicyDecision\RuleAlgorithm;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Auth
  */
-class AlgorithmFactoryTest extends \PHPUnit_Framework_TestCase
+class AlgorithmFactoryTest extends TestCase
 {
     /**
      * Test algorithm creation.

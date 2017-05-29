@@ -28,12 +28,13 @@ use Limoncello\Validation\Rules\InValues;
 use Limoncello\Validation\Rules\IsDateTimeFormat;
 use Limoncello\Validation\Rules\RegExp;
 use Limoncello\Validation\Rules\StringLength;
+use PHPUnit\Framework\TestCase;
 use Sample\Application;
 
 /**
  * @package Limoncello\Tests\Validation
  */
-class ValidatorTest extends \PHPUnit_Framework_TestCase
+class ValidatorTest extends TestCase
 {
     /**
      * @var Translator

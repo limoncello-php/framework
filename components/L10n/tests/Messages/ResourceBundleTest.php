@@ -17,11 +17,12 @@
  */
 
 use Limoncello\l10n\Messages\ResourceBundle;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\l10n
  */
-class ResourceBundleTest extends \PHPUnit_Framework_TestCase
+class ResourceBundleTest extends TestCase
 {
     /**
      * Test basic get and set operations.

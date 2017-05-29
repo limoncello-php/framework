@@ -26,11 +26,12 @@ use Limoncello\Auth\Authorization\PolicyDecision\Algorithms\Encoder;
 use Limoncello\Auth\Authorization\PolicyDecision\PolicyAlgorithm;
 use Limoncello\Auth\Authorization\PolicyDecision\RuleAlgorithm;
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Auth
  */
-class EncoderTest extends \PHPUnit_Framework_TestCase
+class EncoderTest extends TestCase
 {
     public function testEncodePolicy()
     {

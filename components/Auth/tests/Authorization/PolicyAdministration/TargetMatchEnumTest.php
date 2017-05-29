@@ -17,11 +17,12 @@
  */
 
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetMatchEnum;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Auth
  */
-class TargetMatchEnumTest extends \PHPUnit_Framework_TestCase
+class TargetMatchEnumTest extends TestCase
 {
     /**
      * Test to string conversion.

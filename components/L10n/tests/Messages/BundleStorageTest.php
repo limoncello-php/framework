@@ -17,11 +17,12 @@
  */
 
 use Limoncello\l10n\Messages\BundleStorage;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\l10n
  */
-class BundleStorageTest extends \PHPUnit_Framework_TestCase
+class BundleStorageTest extends TestCase
 {
     /**
      * Test basic get and set operations.

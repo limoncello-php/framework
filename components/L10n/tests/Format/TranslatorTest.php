@@ -20,11 +20,12 @@ use Limoncello\l10n\Contracts\Format\TranslatorInterface;
 use Limoncello\l10n\Format\Translator;
 use Limoncello\l10n\Messages\BundleStorage;
 use Limoncello\l10n\Messages\FileBundleEncoder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\l10n
  */
-class TranslatorTest extends \PHPUnit_Framework_TestCase
+class TranslatorTest extends TestCase
 {
     /**
      * Test translate.
