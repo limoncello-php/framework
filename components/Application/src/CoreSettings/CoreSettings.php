@@ -36,6 +36,8 @@ use Limoncello\Core\Routing\Router;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class CoreSettings extends BaseCoreSettings
 {

@@ -37,6 +37,8 @@ use ReflectionClass;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class AuthorizationRulesLoader
 {
@@ -61,6 +63,8 @@ class AuthorizationRulesLoader
      * @param string $name
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function loadData(string $path, string $name): array
     {
@@ -134,6 +138,8 @@ class AuthorizationRulesLoader
      * @param string|null $resourcesType
      *
      * @return PolicyInterface
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function createClassPolicy(
         string $policiesName,

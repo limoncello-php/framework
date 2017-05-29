@@ -115,6 +115,8 @@ class ApplicationCommand implements CommandInterface
      */
     protected function executeClear(ContainerInterface $container, IoInterface $inOut)
     {
+        assert($inOut);
+
         $appSettings    = $this->getApplicationSettings($container);
         $cacheDir       = $appSettings[ApplicationSettingsInterface::KEY_CACHE_FOLDER];
         $cacheCallable  = $appSettings[ApplicationSettingsInterface::KEY_CACHE_CALLABLE];
@@ -138,6 +140,8 @@ class ApplicationCommand implements CommandInterface
      */
     protected function executeCache(ContainerInterface $container, IoInterface $inOut)
     {
+        assert($inOut);
+
         $appSettings   = $this->getApplicationSettings($container);
         $cacheDir      = $appSettings[ApplicationSettingsInterface::KEY_CACHE_FOLDER];
         $cacheCallable = $appSettings[ApplicationSettingsInterface::KEY_CACHE_CALLABLE];
@@ -159,6 +163,9 @@ class ApplicationCommand implements CommandInterface
      * @param mixed $mightBeCallable
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function parseCacheCallable($mightBeCallable): array
     {

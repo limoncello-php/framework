@@ -90,6 +90,8 @@ abstract class BaseMigrationRunner
      * @param ContainerInterface $container
      *
      * @return Generator
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function getMigrations(ContainerInterface $container): Generator
     {

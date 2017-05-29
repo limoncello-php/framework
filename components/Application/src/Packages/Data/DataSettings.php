@@ -81,6 +81,8 @@ abstract class DataSettings implements SettingsInterface
      * @param string $modelsPath
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getModelsSchemeInfo(string $modelsPath): array
     {

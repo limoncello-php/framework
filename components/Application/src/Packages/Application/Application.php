@@ -37,6 +37,8 @@ use Limoncello\Container\Container;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Application extends \Limoncello\Core\Application\Application
 {
@@ -77,6 +79,8 @@ class Application extends \Limoncello\Core\Application\Application
      * @param string|null $path
      *
      * @return LimoncelloContainerInterface
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function createContainer(string $method = null, string $path = null): LimoncelloContainerInterface
     {
@@ -101,6 +105,8 @@ class Application extends \Limoncello\Core\Application\Application
 
     /**
      * @return SettingsProviderInterface
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function createSettingsProvider(): SettingsProviderInterface
     {

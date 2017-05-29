@@ -33,6 +33,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class MonologFileContainerConfigurator implements ContainerConfiguratorInterface
 {

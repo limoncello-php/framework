@@ -85,6 +85,8 @@ abstract class BaseSeedRunner
      * @param ContainerInterface $container
      *
      * @return Generator
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function getSeeds(ContainerInterface $container): Generator
     {
