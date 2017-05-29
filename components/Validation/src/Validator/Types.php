@@ -17,6 +17,7 @@
  */
 
 use DateTime;
+use DateTimeInterface;
 use Limoncello\Validation\Contracts\MessageCodes;
 use Limoncello\Validation\Contracts\RuleInterface;
 use Limoncello\Validation\Rules\CallableRule;
@@ -74,7 +75,7 @@ trait Types
     protected static function isDateTime(): RuleInterface
     {
         return new CallableRule(function ($value) {
-            return $value instanceof DateTime;
+            return $value instanceof DateTimeInterface;
         }, MessageCodes::IS_DATE_TIME);
     }
 
