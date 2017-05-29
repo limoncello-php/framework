@@ -88,7 +88,7 @@ trait CheckCallableTrait
                 }
             } elseif ($parameter instanceof Closure) {
                 $isOk = $parameter($methodParam);
-                if($isOk !== true) {
+                if ($isOk !== true) {
                     $isParamOk = false;
                 }
             } else {

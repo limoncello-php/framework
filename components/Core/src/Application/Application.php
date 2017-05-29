@@ -272,11 +272,12 @@ abstract class Application implements ApplicationInterface
         ServerRequestInterface $request = null
     ): ResponseInterface {
         // check the handler method signature
-        assert($this->checkPublicStaticCallable($handler, [
-            'array',
-            PsrContainerInterface::class,
-            ServerRequestInterface::class,
-        ], ResponseInterface::class),
+        assert(
+            $this->checkPublicStaticCallable(
+                $handler,
+                ['array', PsrContainerInterface::class, ServerRequestInterface::class],
+                ResponseInterface::class
+            ),
             'Handler method should have signature ' .
             '`public static methodName(array, PsrContainerInterface, ServerRequestInterface): ResponseInterface`'
         );
@@ -319,10 +320,12 @@ abstract class Application implements ApplicationInterface
         callable $requestFactory
     ): ServerRequestInterface {
         // check the factory method signature
-        assert($this->checkPublicStaticCallable($requestFactory, [
-            SapiInterface::class,
-            PsrContainerInterface::class,
-        ], ServerRequestInterface::class),
+        assert(
+            $this->checkPublicStaticCallable(
+                $requestFactory,
+                [SapiInterface::class, PsrContainerInterface::class],
+                ServerRequestInterface::class
+            ),
             'Factory method should have signature ' .
             '`public static methodName(SapiInterface, PsrContainerInterface): ServerRequestInterface`'
         );
@@ -406,11 +409,12 @@ abstract class Application implements ApplicationInterface
         PsrContainerInterface $container
     ): Closure {
         // check the middleware method signature
-        assert($this->checkPublicStaticCallable($middleware, [
-            ServerRequestInterface::class,
-            Closure::class,
-            PsrContainerInterface::class,
-        ], ResponseInterface::class),
+        assert(
+            $this->checkPublicStaticCallable(
+                $middleware,
+                [ServerRequestInterface::class, Closure::class, PsrContainerInterface::class],
+                ResponseInterface::class
+            ),
             'Middleware method should have signature ' .
             '`public static methodName(ServerRequestInterface, Closure, PsrContainerInterface): ResponseInterface`'
         );
