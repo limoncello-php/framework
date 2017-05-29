@@ -70,12 +70,8 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
                 $settings[FluteSettings::KEY_URI_PREFIX],
                 $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
             ));
-            if (isset($settings[FluteSettings::KEY_META])) {
-                $encoder->withMeta($settings[FluteSettings::KEY_META]);
-            }
-            if ($settings[FluteSettings::KEY_IS_SHOW_VERSION] ?? false) {
-                $encoder->withJsonApiVersion();
-            }
+            isset($settings[FluteSettings::KEY_META]) ? $encoder->withMeta($settings[FluteSettings::KEY_META]): null;
+            ($settings[FluteSettings::KEY_IS_SHOW_VERSION] ?? false) ? $encoder->withJsonApiVersion() : null;
 
             return $encoder;
         };

@@ -32,6 +32,18 @@ class CommentSchema extends BaseSchema
     /** Attribute name */
     const ATTR_TEXT = 'text-attribute';
 
+    /** Attribute name */
+    const ATTR_INT = 'int-attribute';
+
+    /** Attribute name */
+    const ATTR_FLOAT = 'float-attribute';
+
+    /** Attribute name */
+    const ATTR_BOOL = 'bool-attribute';
+
+    /** Attribute name */
+    const ATTR_DATE_TIME = 'date-time-attribute';
+
     /** Relationship name */
     const REL_USER = 'user-relationship';
 
@@ -49,6 +61,10 @@ class CommentSchema extends BaseSchema
         return [
             self::SCHEMA_ATTRIBUTES => [
                 self::ATTR_TEXT       => Model::FIELD_TEXT,
+                self::ATTR_INT        => Model::FIELD_INT,
+                self::ATTR_FLOAT      => Model::FIELD_FLOAT,
+                self::ATTR_BOOL       => Model::FIELD_BOOL,
+                self::ATTR_DATE_TIME  => Model::FIELD_DATE_TIME,
                 self::ATTR_CREATED_AT => Model::FIELD_CREATED_AT,
                 self::ATTR_UPDATED_AT => Model::FIELD_UPDATED_AT,
             ],

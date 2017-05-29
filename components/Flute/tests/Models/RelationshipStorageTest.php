@@ -22,12 +22,13 @@ use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\User;
 use Mockery;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class RelationshipStorageTest extends \PHPUnit_Framework_TestCase
+class RelationshipStorageTest extends TestCase
 {
     /**
      * Test storage.

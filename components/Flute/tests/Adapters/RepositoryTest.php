@@ -419,7 +419,9 @@ class RepositoryTest extends TestCase
 
         $expected =
             'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, `comments`.`text`, '.
-                '`comments`.`created_at`, `comments`.`updated_at`, `comments`.`deleted_at` '.
+                '`comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+                '`comments`.`deleted_at` ' .
             'FROM `comments` '.
             'INNER JOIN `comments_emotions` comments_emotions1 ON '.
                 '`comments`.`id_comment`=`comments_emotions1`.`id_comment_fk` '.
@@ -471,7 +473,9 @@ class RepositoryTest extends TestCase
 
         $expected =
             'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-                '`comments`.`text`, `comments`.`created_at`, `comments`.`updated_at`, `comments`.`deleted_at` ' .
+                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+                '`comments`.`deleted_at` ' .
             'FROM `comments` ' .
             'ORDER BY `comments`.`id_user_fk` DESC';
 
@@ -684,8 +688,11 @@ class RepositoryTest extends TestCase
         $this->assertEquals(Comment::class, $targetClass);
         $this->assertEquals(RelationshipTypes::HAS_MANY, $relType);
 
-        $expected = 'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-            '`comments`.`text`, `comments`.`created_at`, `comments`.`updated_at`, `comments`.`deleted_at` '.
+        $expected =
+            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
+                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+                '`comments`.`deleted_at` ' .
             'FROM `comments` ' .
             "WHERE `comments`.`id_post_fk`=$indexBind";
 
@@ -738,8 +745,11 @@ class RepositoryTest extends TestCase
         $this->assertEquals(Comment::class, $targetClass);
         $this->assertEquals(RelationshipTypes::HAS_MANY, $relType);
 
-        $expected = 'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-            '`comments`.`text`, `comments`.`created_at`, `comments`.`updated_at`, `comments`.`deleted_at` '.
+        $expected =
+            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
+                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+                '`comments`.`deleted_at` ' .
             'FROM `comments` ' .
             "WHERE (`comments`.`id_post_fk`=$indexBind) AND (`comments`.`id_comment`=$childIndexBind)";
 
@@ -820,8 +830,10 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            "SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, `comments`.`text`," .
-            " `comments`.`created_at`, `comments`.`updated_at`, `comments`.`deleted_at`" .
+            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
+                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+                '`comments`.`deleted_at`' .
             " FROM `comments` INNER JOIN `posts` posts1 ON `comments`.`id_post_fk`=`posts1`.`id_post`" .
             " WHERE `posts1`.`text` LIKE :dcValue1 GROUP BY `comments`.`id_comment`";
 
@@ -892,8 +904,10 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            "SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, `comments`.`text`," .
-            " `comments`.`created_at`, `comments`.`updated_at`, `comments`.`deleted_at`" .
+            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
+                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+                '`comments`.`deleted_at`' .
             " FROM `comments`" .
             " INNER JOIN `comments_emotions` comments_emotions1 ON" .
                 " `comments`.`id_comment`=`comments_emotions1`.`id_comment_fk`" .

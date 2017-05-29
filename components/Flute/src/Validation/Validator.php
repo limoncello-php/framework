@@ -167,9 +167,7 @@ class Validator implements ValidatorInterface
      */
     public function getErrors(): ErrorCollection
     {
-        if ($this->errorCollection === null) {
-            $this->resetErrors();
-        }
+        $this->errorCollection !== null ?: $this->resetErrors();
 
         return $this->errorCollection;
     }
@@ -279,9 +277,7 @@ class Validator implements ValidatorInterface
      */
     public function getCaptureAggregator(): CaptureAggregatorInterface
     {
-        if ($this->captureAggregator === null) {
-            $this->resetCaptureAggregator();
-        }
+        $this->captureAggregator !== null ?: $this->resetCaptureAggregator();
 
         return $this->captureAggregator;
     }

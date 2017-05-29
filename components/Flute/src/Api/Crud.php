@@ -99,12 +99,13 @@ class Crud implements CrudInterface
      */
     public function __construct(ContainerInterface $container, string $modelClass)
     {
-        $this->factory            = $container->get(FactoryInterface::class);
-        $this->modelClass         = $modelClass;
-        $this->repository         = $container->get(RepositoryInterface::class);
-        $this->modelSchemes       = $container->get(ModelSchemeInfoInterface::class);
-        $this->paginationStrategy = $container->get(PaginationStrategyInterface::class);
         $this->container          = $container;
+
+        $this->factory            = $this->getContainer()->get(FactoryInterface::class);
+        $this->modelClass         = $modelClass;
+        $this->repository         = $this->getContainer()->get(RepositoryInterface::class);
+        $this->modelSchemes       = $this->getContainer()->get(ModelSchemeInfoInterface::class);
+        $this->paginationStrategy = $this->getContainer()->get(PaginationStrategyInterface::class);
     }
 
     /**

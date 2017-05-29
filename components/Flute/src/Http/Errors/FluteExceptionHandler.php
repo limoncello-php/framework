@@ -47,6 +47,7 @@ class FluteExceptionHandler implements ExceptionHandlerInterface
     private static $ignoredErrorClasses = [
         JsonApiException::class,
     ];
+
     /**
      * @inheritdoc
      */

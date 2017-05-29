@@ -18,11 +18,12 @@
 
 use Limoncello\Flute\Models\TagStorage;
 use Limoncello\Tests\Flute\Data\Models\Post;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class TagStorageTest extends \PHPUnit_Framework_TestCase
+class TagStorageTest extends TestCase
 {
     /**
      * Test storage.

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Http;
+<?php namespace Limoncello\Flute\Http\Traits;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -20,6 +20,7 @@ use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Flute\Contracts\Http\ControllerInterface as CI;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
+use Limoncello\Flute\Http\BaseController;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
 /**

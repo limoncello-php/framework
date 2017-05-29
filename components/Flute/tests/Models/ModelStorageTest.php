@@ -20,11 +20,12 @@ use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Models\ModelStorage;
 use Limoncello\Tests\Flute\Data\Models\ModelSchemes;
 use Limoncello\Tests\Flute\Data\Models\Post;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class ModelStorageTest extends \PHPUnit_Framework_TestCase
+class ModelStorageTest extends TestCase
 {
     /**
      * Test storage.

@@ -85,7 +85,7 @@ abstract class Migration
      *
      * @return Table
      */
-    protected function createTable($name, array $expressions = [])
+    protected function createTable(string $name, array $expressions = [])
     {
         $table = new Table($name);
 
@@ -104,7 +104,7 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function primaryInt($name)
+    protected function primaryInt(string $name)
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::INTEGER)->setAutoincrement(true)->setUnsigned(true)->setNotnull(true);
@@ -117,7 +117,7 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function primaryString($name)
+    protected function primaryString(string $name)
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::STRING)->setNotnull(true);
@@ -130,7 +130,7 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function string($name)
+    protected function string(string $name)
     {
         return function (Table $table) use ($name) {
             $modelClass = $this->getModelClass();
@@ -149,7 +149,7 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function text($name)
+    protected function text(string $name)
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::TEXT)->setNotnull(true);
@@ -161,10 +161,10 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function bool($name)
+    protected function nullableInt(string $name)
     {
         return function (Table $table) use ($name) {
-            $table->addColumn($name, Type::BOOLEAN)->setNotnull(true);
+            $table->addColumn($name, Type::INTEGER)->setNotnull(false);
         };
     }
 
@@ -173,7 +173,32 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function datetime($name)
+    protected function nullableFloat(string $name)
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, Type::FLOAT)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     * @param bool   $default
+     *
+     * @return Closure
+     */
+    protected function bool(string $name, bool $default = false)
+    {
+        return function (Table $table) use ($name, $default) {
+            $table->addColumn($name, Type::BOOLEAN)->setNotnull(true)->setDefault($default);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function datetime(string $name)
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::DATETIME)->setNotnull(true);
@@ -185,7 +210,7 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function nullableDatetime($name)
+    protected function nullableDatetime(string $name)
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::DATETIME)->setNotnull(false);
@@ -211,7 +236,7 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function foreignInt($name, $referredClass, $notNull = true)
+    protected function foreignInt(string $name, $referredClass, $notNull = true)
     {
         return function (Table $table) use ($name, $referredClass, $notNull) {
             $table->addColumn($name, Type::INTEGER)->setUnsigned(true)->setNotnull($notNull);
@@ -228,7 +253,7 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function relationship($name)
+    protected function relationship(string $name)
     {
         /** @var ModelInterface $modelClass */
         $modelClass    = $this->getModelClass();
@@ -247,7 +272,7 @@ abstract class Migration
      *
      * @return Closure
      */
-    protected function nullableRelationship($name)
+    protected function nullableRelationship(string $name)
     {
         /** @var ModelInterface $modelClass */
         $modelClass    = $this->getModelClass();
@@ -265,7 +290,7 @@ abstract class Migration
      *
      * @return string
      */
-    protected function getTableNameForClass($modelClass)
+    protected function getTableNameForClass(string $modelClass)
     {
         /** @var Model $modelClass*/
         $tableName = $modelClass::TABLE_NAME;

@@ -49,6 +49,18 @@ class Comment extends Model
     /** Field name */
     const FIELD_TEXT = 'text';
 
+    /** Field name */
+    const FIELD_INT = 'int_value';
+
+    /** Field name */
+    const FIELD_FLOAT = 'float_value';
+
+    /** Field name */
+    const FIELD_BOOL = 'bool_value';
+
+    /** Field name */
+    const FIELD_DATE_TIME = 'datetime_value';
+
     /** Length constant */
     const LENGTH_TEXT = 255;
 
@@ -62,6 +74,10 @@ class Comment extends Model
             self::FIELD_ID_POST    => Type::INTEGER,
             self::FIELD_ID_USER    => Type::INTEGER,
             self::FIELD_TEXT       => Type::STRING,
+            self::FIELD_INT        => Type::INTEGER,
+            self::FIELD_FLOAT      => Type::FLOAT,
+            self::FIELD_BOOL       => Type::BOOLEAN,
+            self::FIELD_DATE_TIME  => Type::DATETIME,
             self::FIELD_CREATED_AT => SystemDateTimeType::NAME,
             self::FIELD_UPDATED_AT => SystemDateTimeType::NAME,
             self::FIELD_DELETED_AT => SystemDateTimeType::NAME,

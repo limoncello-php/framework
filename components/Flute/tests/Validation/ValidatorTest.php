@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\I18n\TranslatorInterface as JsonApiTranslatorInterface;
@@ -23,6 +25,7 @@ use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Validation\ValidatorInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\I18n\Translator as JsonApiTranslator;
+use Limoncello\Flute\Types\DateBaseType;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
 use Limoncello\Tests\Flute\Data\Validation\AppValidator;
@@ -46,13 +49,22 @@ class ValidatorTest extends TestCase
     public function testCaptureValidData()
     {
         $text      = 'Outside every fat man there was an even fatter man trying to close in';
+        $int       = 123;
+        $float     = 3.21;
+        $bool      = true;
+        $now       = new DateTimeImmutable();
+        $dateTime  = $now->format(DateBaseType::JSON_API_FORMAT);
         $jsonInput = <<<EOT
         {
             "data" : {
                 "type"  : "comments",
                 "id"    : null,
                 "attributes" : {
-                    "text-attribute"  : "$text"
+                    "text-attribute"      : "$text",
+                    "int-attribute"       : "$int",
+                    "float-attribute"     : "$float",
+                    "bool-attribute"      : "$bool",
+                    "date-time-attribute" : "$dateTime"
                 },
                 "relationships" : {
                     "user-relationship" : {
@@ -70,9 +82,13 @@ class ValidatorTest extends TestCase
 EOT;
         $input     = json_decode($jsonInput, true);
         $rules     = [
-            AppValidator::RULE_INDEX      => v::isNull(),
-            AppValidator::RULE_ATTRIBUTES => [
-                CommentSchema::ATTR_TEXT => v::andX(v::isString(), v::stringLength(1)),
+            AppValidator::RULE_INDEX          => v::isNull(),
+            AppValidator::RULE_ATTRIBUTES     => [
+                CommentSchema::ATTR_TEXT      => v::andX(v::isString(), v::stringLength(1)),
+                CommentSchema::ATTR_INT       => v::isInt(),
+                CommentSchema::ATTR_FLOAT     => v::isFloat(),
+                CommentSchema::ATTR_BOOL      => v::isBool(),
+                CommentSchema::ATTR_DATE_TIME => v::isDateTime(),
             ],
             AppValidator::RULE_TO_ONE     => [
                 CommentSchema::REL_USER => v::andX(v::isNumeric(), v::andX(v::moreThan(0), v::lessThan(15))),
@@ -88,9 +104,13 @@ EOT;
         $validator->assert($input);
 
         $captures = $validator->getCaptures();
-        $this->assertCount(4, $captures);
+        $this->assertCount(8, $captures);
         $this->assertNull($captures[Comment::FIELD_ID]);
         $this->assertEquals($text, $captures[Comment::FIELD_TEXT]);
+        $this->assertEquals($int, $captures[Comment::FIELD_INT]);
+        $this->assertEquals($float, $captures[Comment::FIELD_FLOAT]);
+        $this->assertEquals($bool, $captures[Comment::FIELD_BOOL]);
+        $this->assertTrue($captures[Comment::FIELD_DATE_TIME] instanceof DateTimeInterface);
         $this->assertEquals(9, $captures[Comment::FIELD_ID_USER]);
         $this->assertEquals([5, 12], $captures[Comment::REL_EMOTIONS]);
     }

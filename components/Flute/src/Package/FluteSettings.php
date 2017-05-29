@@ -55,8 +55,13 @@ abstract class FluteSettings implements SettingsInterface
 
         $map = [];
         foreach ($this->selectClasses($this->getSchemesPath(), SchemaInterface::class) as $schemeClass) {
+            assert(
+                is_string($schemeClass) &&
+                class_exists($schemeClass) &&
+                array_key_exists(SchemaInterface::class, class_implements($schemeClass))
+            );
             /** @var SchemaInterface $schemeClass */
-            $map[$schemeClass::MODEL] =$schemeClass;
+            $map[$schemeClass::MODEL] = $schemeClass;
         }
 
         return [

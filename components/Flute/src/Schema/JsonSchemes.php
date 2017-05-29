@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-use Closure;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
+use Limoncello\Flute\Exceptions\InvalidSchemeFactoryException;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
 use Neomerx\JsonApi\Schema\Container;
 
@@ -106,15 +106,18 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection
-     * @param Closure $closure
+     * @param callable $callable
      *
      * @return SchemaInterface
+     *
+     * @codeCoverageIgnore
      */
-    protected function createSchemaFromClosure(Closure $closure)
+    protected function createSchemaFromCallable(callable $callable)
     {
-        $schema = $closure($this->getFactory(), $this, $this->getModelSchemes());
+        assert($callable);
 
-        return $schema;
+        // callable as Scheme factory is not supported.
+        throw new InvalidSchemeFactoryException();
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection
