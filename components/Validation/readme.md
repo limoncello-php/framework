@@ -1,8 +1,6 @@
-[![Project Management](https://img.shields.io/badge/project-management-blue.svg)](https://waffle.io/limoncello-php/framework)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/limoncello-php/validation/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/limoncello-php/validation/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/limoncello-php/validation/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/limoncello-php/validation/?branch=master)
-[![Build Status](https://travis-ci.org/limoncello-php/validation.svg?branch=master)](https://travis-ci.org/limoncello-php/validation)
-[![HHVM](https://img.shields.io/hhvm/limoncello-php/validation.svg)](https://travis-ci.org/limoncello-php/validation)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/limoncello-php-dist/validation/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/limoncello-php-dist/validation/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/limoncello-php-dist/validation/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/limoncello-php-dist/validation/?branch=master)
+[![Build Status](https://travis-ci.org/limoncello-php-dist/validation.svg?branch=master)](https://travis-ci.org/limoncello-php-dist/validation)
 [![License](https://img.shields.io/packagist/l/limoncello-php/validation.svg)](https://packagist.org/packages/limoncello-php/validation)
 
 This validation library is simple to use yet very powerful and flexible solution. Unlike many other libraries it do not try to give you 'validation rules' for all possible cases because in some cases these rules do not fit our requirements and using such libraries is a pain.

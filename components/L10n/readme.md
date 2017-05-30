@@ -11,6 +11,6 @@ This is localization component for [Limoncello Framework](https://github.com/lim
 
 ## Testing
 
-```
+```bash
 composer test
 ```
