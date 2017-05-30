@@ -46,7 +46,7 @@ class CorsContainerConfigurator implements ContainerConfiguratorInterface
             $corsSettings     = $settingsProvider->get(C::class);
             $analyzer         = Analyzer::instance(new Settings($corsSettings));
 
-            if ($appSettings[A::KEY_IS_DEBUG] === true) {
+            if ($appSettings[A::KEY_IS_DEBUG] === true && $container->has(LoggerInterface::class)) {
                 $logger = $container->get(LoggerInterface::class);
                 $analyzer->setLogger($logger);
             }

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Application\Data\Models;
+<?php namespace Limoncello\Tests\Application\Data\Authorization;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,33 +16,26 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Contracts\Authorization\AuthorizationRulesInterface;
+use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
+
 /**
  * @package Limoncello\Tests\Application
  */
-interface ModelInterface
+class NotificationRules implements AuthorizationRulesInterface
 {
-    /**
-     * @return string
-     */
-    public static function getTableName();
+    /** Action name */
+    const ACTION_CAN_SEND_PERSONAL_EMAILS = 'canSendPersonalEmails';
 
     /**
-     * @return string
+     * @param ContextInterface $context
+     *
+     * @return bool
      */
-    public static function getPrimaryKeyName();
+    public static function canSendPersonalEmails(ContextInterface $context): bool
+    {
+        assert($context);
 
-    /**
-     * @return array
-     */
-    public static function getAttributeTypes();
-
-    /**
-     * @return array
-     */
-    public static function getAttributeLengths();
-
-    /**
-     * @return array
-     */
-    public static function getRelationships();
+        return true;
+    }
 }

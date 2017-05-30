@@ -191,6 +191,9 @@ class FileSystemTest extends TestCase
         $this->mock->shouldReceive('deleteFolder')->with('root')->once()->andReturn(true);
 
         $this->fileSystem->deleteFolderRecursive($rootPath);
+
+        // Mockery will do checks when the test finished
+        $this->assertTrue(true);
     }
 
     /**

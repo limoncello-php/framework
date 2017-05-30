@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Application\Data\Models;
+<?php namespace Limoncello\Tests\Application\Data\Authorization;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,41 +16,34 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Application\ModelInterface;
+use Limoncello\Application\Contracts\Authorization\ResourceAuthorizationRulesInterface;
+use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
 
 /**
  * @package Limoncello\Tests\Application
  */
-abstract class Model implements ModelInterface
+class CommentRules implements ResourceAuthorizationRulesInterface
 {
-    /** Table name */
-    const TABLE_NAME = null;
-
-    /** Primary key */
-    const FIELD_ID = null;
-
-    /** Field name */
-    const FIELD_CREATED_AT = 'created_at';
-
-    /** Field name */
-    const FIELD_UPDATED_AT = 'updated_at';
-
-    /** Field name */
-    const FIELD_DELETED_AT = 'deleted_at';
+    /** Action name */
+    const ACTION_CAN_CREATE = 'canCreate';
 
     /**
      * @inheritdoc
      */
-    public static function getTableName()
+    public static function getResourcesType(): string
     {
-        return static::TABLE_NAME;
+        return 'comments';
     }
 
     /**
-     * @inheritdoc
+     * @param ContextInterface $context
+     *
+     * @return bool
      */
-    public static function getPrimaryKeyName()
+    public static function canCreate(ContextInterface $context): bool
     {
-        return static::FIELD_ID;
+        assert($context);
+
+        return true;
     }
 }

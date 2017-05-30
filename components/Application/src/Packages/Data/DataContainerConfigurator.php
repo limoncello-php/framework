@@ -48,17 +48,22 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
 
         $container[Connection::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(DoctrineSettings::class);
-            $params   = [
-                'dbname'   => $settings[DoctrineSettings::KEY_DATABASE_NAME],
-                'user'     => $settings[DoctrineSettings::KEY_USER_NAME],
-                'password' => $settings[DoctrineSettings::KEY_PASSWORD],
-                'host'     => $settings[DoctrineSettings::KEY_HOST],
-                'port'     => $settings[DoctrineSettings::KEY_PORT],
-                'driver'   => $settings[DoctrineSettings::KEY_DRIVER],
-                'charset'  => $settings[DoctrineSettings::KEY_CHARSET],
-            ];
+            $params   = array_filter([
+                'driver'   => $settings[DoctrineSettings::KEY_DRIVER] ?? null,
+                'dbname'   => $settings[DoctrineSettings::KEY_DATABASE_NAME] ?? null,
+                'user'     => $settings[DoctrineSettings::KEY_USER_NAME] ?? null,
+                'password' => $settings[DoctrineSettings::KEY_PASSWORD] ?? null,
+                'host'     => $settings[DoctrineSettings::KEY_HOST] ?? null,
+                'port'     => $settings[DoctrineSettings::KEY_PORT] ?? null,
+                'url'      => $settings[DoctrineSettings::KEY_URL] ?? null,
+                'memory'   => $settings[DoctrineSettings::KEY_MEMORY] ?? null,
+                'charset'  => $settings[DoctrineSettings::KEY_CHARSET] ?? 'UTF8',
+            ], function ($value) {
+                return $value !== null;
+            });
+            $extra = $settings[DoctrineSettings::KEY_EXTRA] ?? [];
 
-            $connection = DriverManager::getConnection($params);
+            $connection = DriverManager::getConnection($params + $extra);
 
             return $connection;
         };

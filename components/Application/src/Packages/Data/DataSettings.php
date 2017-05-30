@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
-use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Application\Data\ModelSchemeInfo;
+use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Reflection\ClassIsTrait;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Application
@@ -42,7 +44,7 @@ abstract class DataSettings implements SettingsInterface
     /** Settings key */
     const KEY_LAST = self::KEY_MODELS_SCHEME_INFO + 1;
 
-    use ClassIsTrait;
+    use ClassIsTrait, CheckCallableTrait;
 
     /**
      * @return string
@@ -60,20 +62,23 @@ abstract class DataSettings implements SettingsInterface
     abstract protected function getSeedsPath(): string;
 
     /**
-     * @return array
+     * @return callable|null
      */
-    abstract protected function getSeedInit(): array;
+    abstract protected function getSeedInit();
 
     /**
      * @inheritdoc
      */
     public function get(): array
     {
+        $seedInit = $this->getSeedInit();
+        assert($this->checkPublicStaticCallable($seedInit, [ContainerInterface::class, 'string']));
+
         return [
             static::KEY_MIGRATIONS_PATH    => $this->getMigrationsPath(),
             static::KEY_SEEDS_PATH         => $this->getSeedsPath(),
             static::KEY_MODELS_SCHEME_INFO => $this->getModelsSchemeInfo($this->getModelsPath()),
-            static::KEY_SEED_INIT          => $this->getSeedInit(),
+            static::KEY_SEED_INIT          => $seedInit,
         ];
     }
 

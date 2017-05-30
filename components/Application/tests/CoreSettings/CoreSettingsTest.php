@@ -25,7 +25,10 @@ use Limoncello\Tests\Application\TestCase;
  */
 class CoreSettingsTest extends TestCase
 {
-    public function testXXX()
+    /**
+     * Test compose settings.
+     */
+    public function testSettings()
     {
         $coreSettings = new CoreSettings(
             implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'CoreSettings', 'Routes', '*.php']),
@@ -33,7 +36,6 @@ class CoreSettingsTest extends TestCase
             [Provider1::class]
         );
 
-        // TODO add actual asserts
-        $foo = $coreSettings->get();
+        $this->assertNotEmpty($coreSettings->get());
     }
 }

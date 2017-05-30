@@ -37,9 +37,9 @@ class PdoContainerConfigurator implements ContainerConfiguratorInterface
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
             $database = new PDO(
                 $settings[C::KEY_CONNECTION_STRING],
-                $settings[C::KEY_USER_NAME],
-                $settings[C::KEY_PASSWORD],
-                $settings[C::KEY_OPTIONS]
+                $settings[C::KEY_USER_NAME] ?? '',
+                $settings[C::KEY_PASSWORD] ?? '',
+                $settings[C::KEY_OPTIONS] ?? []
             );
 
             return $database;
