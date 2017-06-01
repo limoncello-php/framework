@@ -39,5 +39,8 @@ interface ApplicationSettingsInterface extends SettingsInterface
     const KEY_COMMANDS_FOLDER = self::KEY_CACHE_CALLABLE + 1;
 
     /** Settings key */
-    const KEY_IS_DEBUG = self::KEY_COMMANDS_FOLDER + 1;
+    const KEY_COMMANDS_FILE_MASK = self::KEY_COMMANDS_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_IS_DEBUG = self::KEY_COMMANDS_FILE_MASK + 1;
 }
