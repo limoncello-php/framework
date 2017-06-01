@@ -126,8 +126,8 @@ abstract class BaseSeedRunner
      */
     protected function executeSeedInit(ContainerInterface $container, string $seedClass)
     {
-        if (($closure = $this->seedInit) !== null) {
-            call_user_func($closure, $container, $seedClass);
+        if ($this->seedInit !== null) {
+            call_user_func($this->seedInit, $container, $seedClass);
         }
     }
 

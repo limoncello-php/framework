@@ -65,7 +65,7 @@ class AuthorizationPackageTest extends TestCase
     /**
      * @return C
      */
-    private function getAuthorizationSettings(): C
+    public static function getAuthorizationSettings(): C
     {
         return new class extends C
         {

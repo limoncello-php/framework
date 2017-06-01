@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Commands\DataCommand;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface as CCI;
 use Limoncello\Contracts\Application\RoutesConfiguratorInterface as RCI;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
+use Limoncello\Contracts\Provider\ProvidesCommandsInterface as PrCmdI;
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as PrCCI;
 use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as PrMI;
 use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface as PrRCI;
@@ -34,7 +36,7 @@ use Zend\Diactoros\Response\EmptyResponse;
 /**
  * @package Limoncello\Tests\Application
  */
-class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI
+class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI, PrCmdI
 {
     /**
      * @inheritdoc
@@ -63,6 +65,16 @@ class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI
     {
         return [
             static::class,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getCommands(): array
+    {
+        return [
+            DataCommand::class,
         ];
     }
 

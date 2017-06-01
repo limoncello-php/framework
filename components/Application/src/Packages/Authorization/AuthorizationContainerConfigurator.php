@@ -39,8 +39,9 @@ class AuthorizationContainerConfigurator implements ContainerConfiguratorInterfa
             $settingsProvider = $container->get(SettingsProviderInterface::class);
             $settings         = $settingsProvider->get(S::class);
 
-            $manager = new AuthorizationManager($container, $settings[S::KEY_POLICIES_DATA]);
-            if ($settings[S::KEY_LOG_IS_ENABLED] === true) {
+            $manager      = new AuthorizationManager($container, $settings[S::KEY_POLICIES_DATA]);
+            $isLogEnabled = $settings[S::KEY_LOG_IS_ENABLED] ?? false;
+            if ($isLogEnabled === true && $container->has(LoggerInterface::class)) {
                 $logger = $container->get(LoggerInterface::class);
                 $manager->setLogger($logger);
             }

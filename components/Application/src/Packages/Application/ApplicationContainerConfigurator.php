@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Application\Commands\CommandStorage;
+use Limoncello\Application\Packages\Application\ApplicationSettings as S;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
@@ -72,11 +73,11 @@ class ApplicationContainerConfigurator implements ContainerConfiguratorInterface
 
             /** @var SettingsProviderInterface $provider */
             $provider = $container->get(SettingsProviderInterface::class);
-            $settings = $provider->get(ApplicationSettings::class);
+            $settings = $provider->get(S::class);
 
-            $providerClasses  = $settings[ApplicationSettings::KEY_PROVIDER_CLASSES];
-            $commandsFileMask = '*.php';
-            $commandsFolder   = $settings[ApplicationSettings::KEY_COMMANDS_FOLDER];
+            $providerClasses  = $settings[S::KEY_PROVIDER_CLASSES];
+            $commandsFolder   = $settings[S::KEY_COMMANDS_FOLDER];
+            $commandsFileMask = $settings[S::KEY_COMMANDS_FILE_MASK] ?? '*.php';
             $commandsPath     = $commandsFolder . DIRECTORY_SEPARATOR . $commandsFileMask;
 
             $storage = $creator->createCommandStorage($commandsPath, $providerClasses);

@@ -18,12 +18,15 @@
 
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
+use Limoncello\Core\Reflection\ClassIsTrait;
 
 /**
  * @package Limoncello\Application
  */
 class CommandStorage implements CommandStorageInterface
 {
+    use ClassIsTrait;
+
     /**
      * @var string[]
      */
@@ -66,8 +69,6 @@ class CommandStorage implements CommandStorageInterface
      */
     private function isCommand(string $class): bool
     {
-        return
-            class_exists($class) === true &&
-            array_key_exists(CommandInterface::class, class_implements($class)) === true;
+        return $this->classImplements($class, CommandInterface::class);
     }
 }

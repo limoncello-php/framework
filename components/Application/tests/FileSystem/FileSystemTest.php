@@ -260,4 +260,16 @@ class FileSystemTest extends TestCase
 
         $this->fileSystem->deleteFolderRecursive($rootPath);
     }
+
+    /**
+     * Test require file.
+     */
+    public function testRequire()
+    {
+        $path = __DIR__ . DIRECTORY_SEPARATOR . 'TestArray.php';
+        $this->assertNotEmpty($this->fileSystem->requireFile($path));
+
+        // second time to make sure it causes no problems with requiring arrays.
+        $this->assertNotEmpty($this->fileSystem->requireFile($path));
+    }
 }

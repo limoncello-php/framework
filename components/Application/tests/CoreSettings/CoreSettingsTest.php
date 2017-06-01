@@ -30,12 +30,22 @@ class CoreSettingsTest extends TestCase
      */
     public function testSettings()
     {
+        $coreSettings = $this->createCoreSettings();
+
+        $this->assertNotEmpty($coreSettings->get());
+    }
+
+    /**
+     * @return CoreSettings
+     */
+    public static function createCoreSettings(): CoreSettings
+    {
         $coreSettings = new CoreSettings(
             implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'CoreSettings', 'Routes', '*.php']),
             implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'CoreSettings', 'Configurators', '*.php']),
             [Provider1::class]
         );
 
-        $this->assertNotEmpty($coreSettings->get());
+        return $coreSettings;
     }
 }

@@ -39,7 +39,7 @@ class FileMigrationRunner extends BaseMigrationRunner
      */
     public function __construct(string $migrationsPath)
     {
-        $this->migrationsPath = $migrationsPath;
+        $this->setMigrationsPath($migrationsPath);
     }
 
     /**
@@ -54,8 +54,7 @@ class FileMigrationRunner extends BaseMigrationRunner
 
         assert($fileSystem->exists($this->getMigrationsPath()) === true);
 
-        /** @noinspection PhpIncludeInspection */
-        $migrationClasses = require $this->getMigrationsPath();
+        $migrationClasses = $fileSystem->requireFile($this->getMigrationsPath());
         $this->setMigrationClasses($migrationClasses);
 
         // ... and run actual migration

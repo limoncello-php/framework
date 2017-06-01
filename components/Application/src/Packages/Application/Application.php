@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
+use Closure;
 use ErrorException;
-use Exception;
+use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
 use Limoncello\Application\CoreSettings\CoreSettings;
 use Limoncello\Application\ExceptionHandlers\DefaultHandler;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
+use Limoncello\Application\Settings\InstanceSettingsProvider;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Exceptions\ExceptionHandlerInterface;
 use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
@@ -55,15 +57,16 @@ class Application extends \Limoncello\Core\Application\Application
     private $settingCacheMethod;
 
     /**
-     * Application constructor.
-     *
-     * @param string               $settingsPath
-     * @param string|callable|null $settingCacheMethod
-     * @param SapiInterface|null   $sapi
+     * @param string                     $settingsPath
+     * @param string|array|callable|null $settingCacheMethod
+     * @param SapiInterface|null         $sapi
      */
     public function __construct(string $settingsPath, $settingCacheMethod = null, SapiInterface $sapi = null)
     {
-        assert($settingCacheMethod === null || is_string($settingCacheMethod) === true);
+        // The reason we do not use `callable` for the input parameter is that at the moment
+        // of calling the callable might not exist. Therefore when created it will pass
+        // `is_callable` check and will be used for getting the cached data.
+        assert(is_null($settingCacheMethod) || is_string($settingCacheMethod) || is_array($settingCacheMethod));
 
         $this->settingsPath       = $settingsPath;
         $this->settingCacheMethod = $settingCacheMethod;
@@ -88,6 +91,7 @@ class Application extends \Limoncello\Core\Application\Application
 
         $settingsProvider = $this->createSettingsProvider();
         $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
+        $container->offsetSet(CacheSettingsProviderInterface::class, $settingsProvider);
 
         $coreSettings = $settingsProvider->get(CoreSettingsInterface::class);
 
@@ -122,9 +126,9 @@ class Application extends \Limoncello\Core\Application\Application
     }
 
     /**
-     * @return FileSettingsProvider
+     * @return InstanceSettingsProvider
      */
-    protected function createFileSettingsProvider(): FileSettingsProvider
+    protected function createFileSettingsProvider(): InstanceSettingsProvider
     {
         // Load all settings from path specified
         $provider = (new FileSettingsProvider())->load($this->getSettingsPath());
@@ -164,44 +168,9 @@ class Application extends \Limoncello\Core\Application\Application
     {
         error_reporting(E_ALL);
 
-        $createHandler = function () use ($container) {
-            $has     = $container->has(ExceptionHandlerInterface::class);
-            $handler = $has === true ? $container->get(ExceptionHandlerInterface::class) : new DefaultHandler();
-
-            return $handler;
-        };
-
-        $throwableHandler = function (Throwable $throwable) use ($sapi, $container, $createHandler) {
-            /** @var ExceptionHandlerInterface $handler */
-            /** @noinspection PhpParamsInspection */
-            $handler = $createHandler();
-            $handler->handleThrowable($throwable, $sapi, $container);
-        };
-
-        $exceptionHandler = function (Exception $exception) use ($sapi, $container, $createHandler) {
-            /** @var ExceptionHandlerInterface $handler */
-            /** @noinspection PhpParamsInspection */
-            $handler = $createHandler();
-            $handler->handleException($exception, $sapi, $container);
-        };
-
-        set_exception_handler(PHP_MAJOR_VERSION >= 7 ? $throwableHandler : $exceptionHandler);
-
-        set_error_handler(function ($severity, $message, $fileName, $lineNumber) use ($exceptionHandler) {
-            $errorException = new ErrorException($message, 0, $severity, $fileName, $lineNumber);
-            $exceptionHandler($errorException);
-            throw $errorException;
-        });
-
-        // handle fatal error
-        register_shutdown_function(function () use ($container, $createHandler) {
-            $error = error_get_last();
-            if ($error !== null && ((int)$error['type'] & (E_ERROR | E_COMPILE_ERROR))) {
-                /** @var ExceptionHandlerInterface $handler */
-                $handler = $createHandler();
-                $handler->handleFatal($error, $container);
-            }
-        });
+        set_exception_handler($this->createThrowableHandler($sapi, $container));
+        set_error_handler($this->createErrorHandler($sapi, $container));
+        register_shutdown_function($this->createFatalErrorHandler($container));
     }
 
     /**
@@ -218,5 +187,74 @@ class Application extends \Limoncello\Core\Application\Application
     protected function getSettingCacheMethod()
     {
         return $this->settingCacheMethod;
+    }
+
+    /**
+     * @param PsrContainerInterface $container
+     *
+     * @return ExceptionHandlerInterface
+     */
+    protected function createExceptionHandler(PsrContainerInterface $container): ExceptionHandlerInterface
+    {
+        $has     = $container->has(ExceptionHandlerInterface::class);
+        $handler = $has === true ? $container->get(ExceptionHandlerInterface::class) : new DefaultHandler();
+
+        return $handler;
+    }
+
+    /**
+     * @param SapiInterface         $sapi
+     * @param PsrContainerInterface $container
+     *
+     * @return Closure
+     */
+    protected function createThrowableHandler(SapiInterface $sapi, PsrContainerInterface $container): Closure
+    {
+        return function (Throwable $throwable) use ($sapi, $container) {
+            $handler = $this->createExceptionHandler($container);
+            $handler->handleThrowable($throwable, $sapi, $container);
+        };
+    }
+
+    /**
+     * @param SapiInterface         $sapi
+     * @param PsrContainerInterface $container
+     *
+     * @return Closure
+     */
+    protected function createErrorHandler(SapiInterface $sapi, PsrContainerInterface $container): Closure
+    {
+        return function ($severity, $message, $fileName, $lineNumber) use ($sapi, $container) {
+            $errorException = new ErrorException($message, 0, $severity, $fileName, $lineNumber);
+            $handler = $this->createThrowableHandler($sapi, $container);
+            $handler($errorException);
+            throw $errorException;
+        };
+    }
+
+    /**
+     * @param PsrContainerInterface $container
+     *
+     * @return Closure
+     */
+    protected function createFatalErrorHandler(PsrContainerInterface $container): Closure
+    {
+        return function () use ($container) {
+            $error = $this->getLastError();
+            if ($error !== null && ((int)$error['type'] & (E_ERROR | E_COMPILE_ERROR))) {
+                $handler = $this->createExceptionHandler($container);
+                $handler->handleFatal($error, $container);
+            }
+        };
+    }
+
+    /**
+     * It is needed for mocking while testing.
+     *
+     * @return array|null
+     */
+    protected function getLastError()
+    {
+        return error_get_last();
     }
 }

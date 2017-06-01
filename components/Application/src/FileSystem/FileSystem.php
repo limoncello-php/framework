@@ -122,6 +122,17 @@ class FileSystem implements FileSystemInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function requireFile(string $path)
+    {
+        /** @noinspection PhpIncludeInspection */
+        $result = require $path;
+
+        return $result;
+    }
+
+    /**
      * @param FileSystemException $exception
      *
      * @return void

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Data\BaseMigrationRunner;
 use Limoncello\Application\Data\FileMigrationRunner;
 use Limoncello\Application\Data\FileSeedRunner;
 use Limoncello\Application\Packages\Data\DataSettings;
@@ -112,6 +113,17 @@ class DataCommand implements CommandInterface
      */
     public static function execute(ContainerInterface $container, IoInterface $inOut)
     {
+        (new static())->run($container, $inOut);
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param IoInterface        $inOut
+     *
+     * @return void
+     */
+    protected function run(ContainerInterface $container, IoInterface $inOut)
+    {
         $arguments = $inOut->getArguments();
         $options   = $inOut->getOptions();
 
@@ -124,20 +136,45 @@ class DataCommand implements CommandInterface
         switch ($action) {
             case static::ACTION_MIGRATE:
                 $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
-                (new FileMigrationRunner($path))->migrate($container);
+                $this->createMigrationRunner($path)->migrate($container);
                 break;
             case static::ACTION_ROLLBACK:
                 $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
-                (new FileMigrationRunner($path))->rollback($container);
+                $this->createMigrationRunner($path)->rollback($container);
                 break;
             case static::ACTION_SEED:
                 $path     = $path !== false ? $path : $settings[DataSettings::KEY_SEEDS_PATH] ?? '';
                 $seedInit = $settings[DataSettings::KEY_SEED_INIT] ?? null;
-                (new FileSeedRunner($path, $seedInit))->run($container);
+                $this->createSeedRunner($path, $seedInit)->run($container);
                 break;
             default:
                 $inOut->writeError("Unsupported action `$action`." . PHP_EOL);
                 break;
         }
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return FileMigrationRunner
+     */
+    protected function createMigrationRunner(string $path): FileMigrationRunner
+    {
+        return new FileMigrationRunner($path);
+    }
+
+    /**
+     * @param string        $seedsPath
+     * @param callable|null $seedInit
+     * @param string        $seedsTable
+     *
+     * @return FileSeedRunner
+     */
+    protected function createSeedRunner(
+        string $seedsPath,
+        callable $seedInit = null,
+        string $seedsTable = BaseMigrationRunner::SEEDS_TABLE
+    ): FileSeedRunner {
+        return new FileSeedRunner($seedsPath, $seedInit, $seedsTable);
     }
 }

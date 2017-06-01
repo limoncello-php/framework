@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
 use Limoncello\Application\Exceptions\ConfigurationException;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
-use Limoncello\Contracts\Serializable\ArraySerializableInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 
@@ -93,13 +93,24 @@ class ApplicationCommand implements CommandInterface
      */
     public static function execute(ContainerInterface $container, IoInterface $inOut)
     {
-        $action    = $inOut->getArgument(static::ARG_ACTION);
+        (new static())->run($container, $inOut);
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param IoInterface        $inOut
+     *
+     * @return void
+     */
+    protected function run(ContainerInterface $container, IoInterface $inOut)
+    {
+        $action = $inOut->getArgument(static::ARG_ACTION);
         switch ($action) {
             case static::ACTION_CREATE_CACHE:
-                (new self())->executeCache($container, $inOut);
+                $this->executeCache($container, $inOut);
                 break;
             case static::ACTION_CLEAR_CACHE:
-                (new self())->executeClear($container, $inOut);
+                $this->executeClear($container, $inOut);
                 break;
             default:
                 $inOut->writeError("Unsupported action `$action`." . PHP_EOL);
@@ -129,7 +140,7 @@ class ApplicationCommand implements CommandInterface
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
 
-        $this->createFileSystem($container)->delete($path);
+        $this->getFileSystem($container)->delete($path);
     }
 
     /**
@@ -151,14 +162,15 @@ class ApplicationCommand implements CommandInterface
             throw new ConfigurationException();
         }
 
-        $settingsProvider = $container->get(SettingsProviderInterface::class);
-        assert($settingsProvider instanceof ArraySerializableInterface);
-        $settingsData = $settingsProvider->serialize();
-        $content      = $this->composeContent($settingsData, $namespace, $class, $method);
+        /** @var CacheSettingsProviderInterface $settingsProvider */
+        $settingsProvider = $container->get(CacheSettingsProviderInterface::class);
+        $settingsData     = $settingsProvider->serialize();
+        $content          = $this->composeContent($settingsData, $namespace, $class, $method);
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
-        $this->createFileSystem($container)->write($path, $content);
+        $this->getFileSystem($container)->write($path, $content);
     }
+
     /**
      * @param mixed $mightBeCallable
      *
@@ -260,7 +272,7 @@ EOT;
      *
      * @return FileSystemInterface
      */
-    protected function createFileSystem(ContainerInterface $container): FileSystemInterface
+    protected function getFileSystem(ContainerInterface $container): FileSystemInterface
     {
         return $container->get(FileSystemInterface::class);
     }

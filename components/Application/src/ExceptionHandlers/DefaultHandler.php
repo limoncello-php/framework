@@ -76,7 +76,18 @@ class DefaultHandler implements ExceptionHandlerInterface
         list($isDebug, $appName, $exceptionDumper) = $this->getSettings($container);
 
         if ($isDebug === true) {
-            $run     = new Run();
+            $run = new Run();
+
+            // If these two options are not used it would work fine with PHP Unit and XDebug,
+            // however it produces output to console under PhpDbg. So we need a couple of
+            // tweaks to make it work predictably in both environments.
+            //
+            // this one forbids Whoops spilling output to console
+            $run->writeToOutput(false);
+            // by default after sending error to output Whoops stops execution
+            // as we want just generated output `string` we instruct not to halt
+            $run->allowQuit(false);
+
             $handler = new PrettyPageHandler();
 
             if ($exceptionDumper !== null) {

@@ -16,15 +16,14 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
 use Limoncello\Application\Exceptions\AmbiguousSettingsException;
 use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
-use Limoncello\Contracts\Serializable\ArraySerializableInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 
 /**
  * @package Limoncello\Application
  */
-class CacheSettingsProvider implements SettingsProviderInterface, ArraySerializableInterface
+class CacheSettingsProvider implements CacheSettingsProviderInterface
 {
     /** Internal data index */
     const KEY_SETTINGS_MAP = 0;

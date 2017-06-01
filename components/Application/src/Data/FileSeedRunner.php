@@ -44,7 +44,7 @@ class FileSeedRunner extends BaseSeedRunner
         callable $seedInit = null,
         string $seedsTable = BaseMigrationRunner::SEEDS_TABLE
     ) {
-        $this->seedsPath = $seedsPath;
+        $this->setSeedsPath($seedsPath);
 
         parent::__construct($seedInit, $seedsTable);
     }
@@ -61,8 +61,7 @@ class FileSeedRunner extends BaseSeedRunner
 
         assert($fileSystem->exists($this->getSeedsPath()) === true);
 
-        /** @noinspection PhpIncludeInspection */
-        $seedClasses = require $this->getSeedsPath();
+        $seedClasses = $fileSystem->requireFile($this->getSeedsPath());
         $this->setSeedClasses($seedClasses);
 
         // ... and run actual seeding

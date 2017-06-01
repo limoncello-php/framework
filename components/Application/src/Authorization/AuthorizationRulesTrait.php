@@ -31,7 +31,7 @@ trait AuthorizationRulesTrait
      *
      * @return bool
      */
-    protected static function ctxHasAction(ContextInterface $context): bool
+    protected static function reqHasAction(ContextInterface $context): bool
     {
         return $context->has(RequestProperties::REQ_ACTION);
     }
@@ -41,9 +41,9 @@ trait AuthorizationRulesTrait
      *
      * @return string
      */
-    protected static function ctxGetAction(ContextInterface $context): string
+    protected static function reqGetAction(ContextInterface $context): string
     {
-        assert(static::ctxHasAction($context));
+        assert(static::reqHasAction($context));
 
         $value = $context->get(RequestProperties::REQ_ACTION);
 
@@ -55,7 +55,7 @@ trait AuthorizationRulesTrait
      *
      * @return bool
      */
-    protected static function ctxHasResourceType(ContextInterface $context): bool
+    protected static function reqHasResourceType(ContextInterface $context): bool
     {
         return $context->has(RequestProperties::REQ_RESOURCE_TYPE);
     }
@@ -65,9 +65,9 @@ trait AuthorizationRulesTrait
      *
      * @return string|null
      */
-    protected static function ctxGetResourceType(ContextInterface $context)
+    protected static function reqGetResourceType(ContextInterface $context)
     {
-        assert(static::ctxHasResourceType($context));
+        assert(static::reqHasResourceType($context));
 
         $value = $context->get(RequestProperties::REQ_RESOURCE_TYPE);
 
@@ -81,7 +81,7 @@ trait AuthorizationRulesTrait
      *
      * @return bool
      */
-    protected static function ctxHasResourceIdentity(ContextInterface $context): bool
+    protected static function reqHasResourceIdentity(ContextInterface $context): bool
     {
         return $context->has(RequestProperties::REQ_RESOURCE_IDENTITY);
     }
@@ -91,9 +91,9 @@ trait AuthorizationRulesTrait
      *
      * @return string|int|null
      */
-    protected static function ctxGetResourceIdentity(ContextInterface $context)
+    protected static function reqGetResourceIdentity(ContextInterface $context)
     {
-        assert(static::ctxHasResourceIdentity($context));
+        assert(static::reqHasResourceIdentity($context));
 
         $value = $context->get(RequestProperties::REQ_RESOURCE_IDENTITY);
 
