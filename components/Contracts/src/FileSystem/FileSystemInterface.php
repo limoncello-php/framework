@@ -84,4 +84,11 @@ interface FileSystemInterface
      * @return void
      */
     public function deleteFolderRecursive(string $folderPath);
+
+    /**
+     * @param string $path
+     *
+     * @return mixed
+     */
+    public function requireFile(string $path);
 }
