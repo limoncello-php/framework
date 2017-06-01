@@ -19,8 +19,8 @@
         "doctrine/dbal": "^2.5.0",
         "monolog/monolog": "^1.22",
         "neomerx/cors-psr7": "^1.0.0",
-        "limoncello-php/core": "self.version",
-        "limoncello-php/auth": "self.version"
+        "limoncello-php/core": "^0.6.9",
+        "limoncello-php/auth": "^0.6.9"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.8",

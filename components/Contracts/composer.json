@@ -31,11 +31,5 @@
         "test": ["@test-cs", "@test-md"],
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src",
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.6.x-dev",
-            "dev-develop": "0.7.x-dev"
-        }
     }
 }

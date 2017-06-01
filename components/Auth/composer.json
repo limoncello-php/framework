@@ -16,7 +16,7 @@
     "require": {
         "php": ">=7.0.0",
         "psr/log": "^1.0",
-        "limoncello-php/container": "self.version"
+        "limoncello-php/container": "^0.6.9"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.5",
@@ -45,11 +45,5 @@
         "test-unit-php-7-1": "docker-compose run --rm cli_7_1_php php ./vendor/bin/phpunit",
         "test-unit-php-7-0": "docker-compose run --rm cli_7_0_php php ./vendor/bin/phpunit",
         "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php -d hhvm.php7.all=1 ./vendor/bin/phpunit"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.6.x-dev",
-            "dev-develop": "0.7.x-dev"
-        }
     }
 }
