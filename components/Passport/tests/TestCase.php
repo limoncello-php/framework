@@ -167,10 +167,10 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return Connection
      */
-    protected function createSqliteDatabaseConnection(): Connection
+    public static function createSqliteDatabaseConnection(): Connection
     {
         $connection = DriverManager::getConnection(['url' => 'sqlite:///', 'memory' => true]);
-        $this->assertNotSame(false, $connection->exec('PRAGMA foreign_keys = ON;'));
+        static::assertNotSame(false, $connection->exec('PRAGMA foreign_keys = ON;'));
 
         return $connection;
     }

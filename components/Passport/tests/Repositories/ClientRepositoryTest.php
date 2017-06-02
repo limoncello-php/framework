@@ -49,20 +49,21 @@ class ClientRepositoryTest extends TestCase
      */
     public function testCrud()
     {
-        /** @var ClientRepositoryInterface $repo */
-        list($repo) = $this->createRepositories();
+        /** @var ClientRepositoryInterface $clientRepo */
+        list($clientRepo) = $this->createRepositories();
 
-        $this->assertEmpty($repo->index());
+        $this->assertEmpty($clientRepo->index());
 
-        $repo->create(
+        $clientRepo->create(
             (new Client())
                 ->setIdentifier('client1')
                 ->setName('client name')
                 ->setConfidential()
                 ->enablePasswordGrant()
+                ->setScopeIdentifiers([])
         );
 
-        $this->assertNotEmpty($clients = $repo->index());
+        $this->assertNotEmpty($clients = $clientRepo->index());
         $this->assertCount(1, $clients);
         /** @var Client $client */
         $client = $clients[0];
@@ -76,8 +77,8 @@ class ClientRepositoryTest extends TestCase
 
         $client->setDescription(null);
 
-        $repo->update($client);
-        $sameClient = $repo->read($client->getIdentifier());
+        $clientRepo->update($client);
+        $sameClient = $clientRepo->read($client->getIdentifier());
         $this->assertEquals('client1', $sameClient->getIdentifier());
         $this->assertNull($sameClient->getDescription());
         $this->assertEmpty($sameClient->getScopeIdentifiers());
@@ -85,9 +86,9 @@ class ClientRepositoryTest extends TestCase
         $this->assertTrue($sameClient->getCreatedAt() instanceof DateTimeImmutable);
         $this->assertTrue($sameClient->getUpdatedAt() instanceof DateTimeImmutable);
 
-        $repo->delete($sameClient->getIdentifier());
+        $clientRepo->delete($sameClient->getIdentifier());
 
-        $this->assertEmpty($repo->index());
+        $this->assertEmpty($clientRepo->index());
     }
 
     /**
@@ -115,6 +116,17 @@ class ClientRepositoryTest extends TestCase
         $clientRepo->unbindScopes($client->getIdentifier());
         $this->assertNotNull($client = $clientRepo->read($client->getIdentifier()));
         $this->assertCount(0, $client->getScopeIdentifiers());
+
+        // create a client with scopes
+        $client2 = $clientRepo->create(
+            (new Client())
+                ->setIdentifier('client2')
+                ->setName('client name')
+                ->setConfidential()
+                ->enablePasswordGrant()
+                ->setScopeIdentifiers(['scope1', 'scope2'])
+        );
+        $this->assertNotNull($client2);
     }
 
     /**
