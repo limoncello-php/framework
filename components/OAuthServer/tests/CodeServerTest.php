@@ -25,7 +25,6 @@ use Limoncello\Tests\OAuthServer\Data\SampleServer;
 use Mockery;
 use Mockery\Mock;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Request;
 
 /**
  * @package Limoncello\Tests\OAuthServer
@@ -71,6 +70,28 @@ class CodeServerTest extends ServerTestCase
             static::CLIENT_ID,
             static::REDIRECT_URI_1,
             static::CLIENT_DEFAULT_SCOPE,
+            $state
+        );
+        $response = $server->getCreateAuthorization($request);
+
+        $this->validateRedirectResponse($response, static::REDIRECT_URI_1, $this->getExpectedRedirectCode($state));
+    }
+
+    /**
+     * Test successful auth with redirect URI.
+     *
+     * @link https://github.com/limoncello-php/framework/issues/49
+     */
+    public function testSuccessfulCodeIssueEmptyScope()
+    {
+        $client = $this->createClient()->useDefaultScopesOnEmptyRequest();
+        $server = new SampleServer($this->createRepositoryMock($client));
+        $state  = '123';
+
+        $request  = $this->createAuthRequest(
+            static::CLIENT_ID,
+            static::REDIRECT_URI_1,
+            '', // <-- empty scope
             $state
         );
         $response = $server->getCreateAuthorization($request);
@@ -403,6 +424,8 @@ class CodeServerTest extends ServerTestCase
         $mock = Mockery::mock(RepositoryInterface::class);
         $mock->shouldReceive('readClient')->once()->with($client->getIdentifier())->andReturn($client);
 
+        /** @var RepositoryInterface $mock */
+
         return $mock;
     }
 
@@ -413,6 +436,8 @@ class CodeServerTest extends ServerTestCase
     {
         /** @var Mock $mock */
         $mock = Mockery::mock(RepositoryInterface::class);
+
+        /** @var RepositoryInterface $mock */
 
         return $mock;
     }

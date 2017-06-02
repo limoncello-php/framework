@@ -59,7 +59,9 @@ trait ClientGrantTrait
      */
     protected function clientGetScope(array $parameters)
     {
-        return ($scope = $this->clientReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
+        $scope = $this->clientReadStringValue($parameters, 'scope');
+
+        return empty($scope) === false ? explode(' ', $scope) : null;
     }
 
     /**

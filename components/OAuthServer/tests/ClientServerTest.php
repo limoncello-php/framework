@@ -24,7 +24,6 @@ use Limoncello\Tests\OAuthServer\Data\SampleServer;
 use Mockery;
 use Mockery\Mock;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Request;
 
 /**
  * @package Limoncello\Tests\OAuthServer
@@ -140,6 +139,8 @@ class ClientServerTest extends ServerTestCase
         /** @var Mock $mock */
         $mock = Mockery::mock(RepositoryInterface::class);
         $mock->shouldReceive('readClient')->once()->with($client->getIdentifier())->andReturn($client);
+
+        /** @var RepositoryInterface $mock */
 
         return $mock;
     }

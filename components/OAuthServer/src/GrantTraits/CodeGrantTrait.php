@@ -79,7 +79,9 @@ trait CodeGrantTrait
      */
     protected function codeGetScope(array $parameters)
     {
-        return ($scope = $this->codeReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
+        $scope = $this->codeReadStringValue($parameters, 'scope');
+
+        return empty($scope) === false ? explode(' ', $scope) : null;
     }
 
     /**

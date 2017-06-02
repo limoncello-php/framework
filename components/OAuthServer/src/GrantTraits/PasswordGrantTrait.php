@@ -81,7 +81,9 @@ trait PasswordGrantTrait
      */
     protected function passGetScope(array $parameters)
     {
-        return ($scope = $this->passReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
+        $scope = $this->passReadStringValue($parameters, 'scope');
+
+        return empty($scope) === false ? explode(' ', $scope) : null;
     }
 
     /**

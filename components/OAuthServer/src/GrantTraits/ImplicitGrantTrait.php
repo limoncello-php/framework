@@ -81,7 +81,9 @@ trait ImplicitGrantTrait
      */
     protected function implicitGetScope(array $parameters)
     {
-        return ($scope = $this->implicitReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
+        $scope = $this->implicitReadStringValue($parameters, 'scope');
+
+        return empty($scope) === false ? explode(' ', $scope) : null;
     }
 
     /**

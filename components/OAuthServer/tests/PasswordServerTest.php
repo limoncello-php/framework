@@ -23,7 +23,6 @@ use Limoncello\Tests\OAuthServer\Data\SampleServer;
 use Mockery;
 use Mockery\Mock;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Request;
 
 /**
  * @package Limoncello\Tests\OAuthServer
@@ -46,6 +45,26 @@ class PasswordServerTest extends ServerTestCase
             static::GRANT_TYPE_PASSWORD,
             SampleServer::TEST_USER_NAME,
             SampleServer::TEST_PASSWORD
+        );
+        $response = $server->postCreateToken($request);
+
+        $this->validateBodyResponse($response, 200, $this->getExpectedBodyToken());
+    }
+
+    /**
+     * Test successful token issue.
+     *
+     * @link https://github.com/limoncello-php/framework/issues/49
+     */
+    public function testSuccessfulTokenIssueEmptyScope()
+    {
+        $server = new SampleServer($this->createDefaultClientRepositoryMock());
+
+        $request  = $this->createTokenRequest(
+            static::GRANT_TYPE_PASSWORD,
+            SampleServer::TEST_USER_NAME,
+            SampleServer::TEST_PASSWORD,
+            '' // <-- empty scope
         );
         $response = $server->postCreateToken($request);
 
@@ -192,7 +211,7 @@ class PasswordServerTest extends ServerTestCase
     /**
      * @return RepositoryInterface
      */
-    private function createDefaultClientRepositoryMock()
+    private function createDefaultClientRepositoryMock(): RepositoryInterface
     {
         $identifier    = 'default_client_id';
         $defaultClient = (new Client($identifier))
@@ -202,6 +221,8 @@ class PasswordServerTest extends ServerTestCase
         /** @var Mock $mock */
         $mock = Mockery::mock(RepositoryInterface::class);
         $mock->shouldReceive('readDefaultClient')->zeroOrMoreTimes()->withNoArgs()->andReturn($defaultClient);
+
+        /** @var RepositoryInterface $mock */
 
         return $mock;
     }

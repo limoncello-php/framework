@@ -24,7 +24,6 @@ use Limoncello\Tests\OAuthServer\Data\SampleServer;
 use Mockery;
 use Mockery\Mock;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Request;
 
 /**
  * @package Limoncello\Tests\OAuthServer
@@ -68,6 +67,32 @@ class ImplicitServerTest extends ServerTestCase
         $response = $server->postCreateAuthorization($request);
 
         $this->validateRedirectResponse($response, static::REDIRECT_URI_1, $this->getExpectedRedirectToken($state));
+    }
+
+    /**
+     * Test successful auth with redirect URI (POST method).
+     *
+     * @link https://github.com/limoncello-php/framework/issues/49
+     */
+    public function testSuccessfulTokenIssueEmptyScope()
+    {
+        $client = $this->createClient()->useDefaultScopesOnEmptyRequest();
+        $server = new SampleServer($this->createRepositoryMock($client));
+        $state  = '123';
+
+        $request = $this->createPostAuthRequest(
+            static::CLIENT_ID,
+            static::REDIRECT_URI_1,
+            '', // <-- empty scope
+            $state
+        );
+        $response = $server->postCreateAuthorization($request);
+
+        $this->validateRedirectResponse(
+            $response,
+            static::REDIRECT_URI_1,
+            $this->getExpectedRedirectToken($state, static::CLIENT_DEFAULT_SCOPE)
+        );
     }
 
     /**
@@ -194,6 +219,8 @@ class ImplicitServerTest extends ServerTestCase
         /** @var Mock $mock */
         $mock = Mockery::mock(RepositoryInterface::class);
         $mock->shouldReceive('readClient')->once()->with($client->getIdentifier())->andReturn($client);
+
+        /** @var RepositoryInterface $mock */
 
         return $mock;
     }

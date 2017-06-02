@@ -54,7 +54,7 @@ trait RefreshGrantTrait
     /**
      * @param string[] $parameters
      *
-     * @return string[]|null
+     * @return string|null
      */
     protected function refreshGetValue(array $parameters)
     {
@@ -68,7 +68,9 @@ trait RefreshGrantTrait
      */
     protected function refreshGetScope(array $parameters)
     {
-        return ($scope = $this->refreshReadStringValue($parameters, 'scope')) !== null ? explode(' ', $scope) : null;
+        $scope = $this->refreshReadStringValue($parameters, 'scope');
+
+        return empty($scope) === false ? explode(' ', $scope) : null;
     }
 
     /**

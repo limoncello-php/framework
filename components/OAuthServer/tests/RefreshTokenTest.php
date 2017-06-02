@@ -26,7 +26,6 @@ use Limoncello\Tests\OAuthServer\Data\Token;
 use Mockery;
 use Mockery\Mock;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Request;
 
 /**
  * @package Limoncello\Tests\OAuthServer
@@ -53,6 +52,24 @@ class RefreshTokenTest extends ServerTestCase
         $server = new SampleServer($this->createClientRepositoryMock($client, $token));
 
         $scope    = null;
+        $request  = $this->createTokenRequest($token->getRefreshValue(), $scope, $client->getIdentifier());
+        $response = $server->postCreateToken($request);
+
+        $this->validateBodyResponse($response, 200, $this->getExpectedBodyToken());
+    }
+
+    /**
+     * Test successful token issue.
+     *
+     * @link https://github.com/limoncello-php/framework/issues/49
+     */
+    public function testSuccessfulTokenIssueWithoutScopeChangeEmptyScope()
+    {
+        $client = $this->createDefaultClient();
+        $token  = $this->createToken($client);
+        $server = new SampleServer($this->createClientRepositoryMock($client, $token));
+
+        $scope    = '';
         $request  = $this->createTokenRequest($token->getRefreshValue(), $scope, $client->getIdentifier());
         $response = $server->postCreateToken($request);
 
@@ -162,8 +179,10 @@ class RefreshTokenTest extends ServerTestCase
      *
      * @return RepositoryInterface
      */
-    private function createClientRepositoryMock(ClientInterface $client, TokenInterface $token = null)
-    {
+    private function createClientRepositoryMock(
+        ClientInterface $client,
+        TokenInterface $token = null
+    ): RepositoryInterface {
         /** @var Mock $mock */
         $mock = Mockery::mock(RepositoryInterface::class);
         $mock->shouldReceive('readClient')->zeroOrMoreTimes()->with($client->getIdentifier())->andReturn($client);
@@ -171,6 +190,7 @@ class RefreshTokenTest extends ServerTestCase
         if ($token !== null) {
             $mock->shouldReceive('readTokenByRefreshValue')->once()->with($token->getRefreshValue())->andReturn($token);
         }
+        /** @var RepositoryInterface $mock */
 
         return $mock;
     }
@@ -180,12 +200,14 @@ class RefreshTokenTest extends ServerTestCase
      *
      * @return RepositoryInterface
      */
-    private function createClientRepositoryMockNoTokenFound(ClientInterface $client)
+    private function createClientRepositoryMockNoTokenFound(ClientInterface $client): RepositoryInterface
     {
         /** @var Mock $mock */
         $mock = Mockery::mock(RepositoryInterface::class);
         $mock->shouldReceive('readClient')->zeroOrMoreTimes()->with($client->getIdentifier())->andReturn($client);
         $mock->shouldReceive('readTokenByRefreshValue')->once()->withAnyArgs()->andReturnNull();
+
+        /** @var RepositoryInterface $mock */
 
         return $mock;
     }
