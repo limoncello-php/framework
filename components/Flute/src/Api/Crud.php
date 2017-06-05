@@ -200,10 +200,7 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param                                $index
-     * @param FilterParameterCollection|null $filterParams
-     *
-     * @return mixed|null
+     * @inheritdoc
      */
     public function readResource($index, FilterParameterCollection $filterParams = null)
     {
