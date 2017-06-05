@@ -101,6 +101,7 @@ class AuthorizationManagerTest extends TestCase
             $this->assertEquals($actionName, $exception->getAction());
             $this->assertEmpty($exception->getResourceType());
             $this->assertEmpty($exception->getResourceIdentity());
+            $this->assertEmpty($exception->getExtraParameters());
         }
         $this->assertTrue($gotException);
 

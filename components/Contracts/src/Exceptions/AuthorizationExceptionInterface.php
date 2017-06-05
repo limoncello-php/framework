@@ -35,4 +35,9 @@ interface AuthorizationExceptionInterface extends LimoncelloExceptionInterface
      * @return string|int|null
      */
     public function getResourceIdentity();
+
+    /**
+     * @return array
+     */
+    public function getExtraParameters(): array;
 }

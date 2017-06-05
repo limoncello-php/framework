@@ -40,17 +40,28 @@ class AuthorizationException extends RuntimeException implements AuthorizationEx
     private $resourceIdentity;
 
     /**
+     * @var array
+     */
+    private $extraParameters;
+
+    /**
      * @param string          $action
      * @param null|string     $resourceType
      * @param int|null|string $resourceIdentity
+     * @param array           $extraParams
      */
-    public function __construct(string $action, string $resourceType = null, $resourceIdentity = null)
-    {
+    public function __construct(
+        string $action,
+        string $resourceType = null,
+        $resourceIdentity = null,
+        array $extraParams = []
+    ) {
         assert($resourceIdentity === null || is_string($resourceIdentity) || is_int($resourceIdentity));
 
-        $this->action = $action;
-        $this->resourceType = $resourceType;
+        $this->action           = $action;
+        $this->resourceType     = $resourceType;
         $this->resourceIdentity = $resourceIdentity;
+        $this->extraParameters  = $extraParams;
     }
 
     /**
@@ -75,5 +86,13 @@ class AuthorizationException extends RuntimeException implements AuthorizationEx
     public function getResourceIdentity()
     {
         return $this->resourceIdentity;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getExtraParameters(): array
+    {
+        return $this->extraParameters;
     }
 }

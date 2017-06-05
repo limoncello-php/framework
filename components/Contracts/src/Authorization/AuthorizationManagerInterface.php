@@ -27,19 +27,31 @@ interface AuthorizationManagerInterface
      * @param string          $action
      * @param string|null     $resourceType
      * @param string|int|null $resourceIdentity
+     * @param array           $extraParams
      *
      * @return bool
      */
-    public function isAllowed(string $action, string $resourceType = null, $resourceIdentity = null): bool;
+    public function isAllowed(
+        string $action,
+        string $resourceType = null,
+        $resourceIdentity = null,
+        array $extraParams = []
+    ): bool;
 
     /**
      * @param string          $action
      * @param string|null     $resourceType
      * @param string|int|null $resourceIdentity
+     * @param array           $extraParams
      *
      * @return void
      *
      * @throws AuthorizationExceptionInterface
      */
-    public function authorize(string $action, string $resourceType = null, $resourceIdentity = null);
+    public function authorize(
+        string $action,
+        string $resourceType = null,
+        $resourceIdentity = null,
+        array $extraParams = []
+    );
 }

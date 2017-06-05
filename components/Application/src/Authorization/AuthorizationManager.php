@@ -54,15 +54,15 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
     }
 
     /**
-     * @param string          $action
-     * @param string|null     $resourceType
-     * @param string|int|null $resourceIdentity
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function isAllowed(string $action, string $resourceType = null, $resourceIdentity = null): bool
-    {
-        $request = $this->createRequest($action, $resourceType, $resourceIdentity);
+    public function isAllowed(
+        string $action,
+        string $resourceType = null,
+        $resourceIdentity = null,
+        array $extraParams = []
+    ): bool {
+        $request = $this->createRequest($action, $resourceType, $resourceIdentity, $extraParams);
         $result  = $this->createPolicyEnforcementPoint($this->getContainer())->authorize($request);
 
         return $result;
@@ -71,10 +71,14 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function authorize(string $action, string $resourceType = null, $resourceIdentity = null)
-    {
+    public function authorize(
+        string $action,
+        string $resourceType = null,
+        $resourceIdentity = null,
+        array $extraParams = []
+    ) {
         if ($this->isAllowed($action, $resourceType, $resourceIdentity) !== true) {
-            throw new AuthorizationException($action, $resourceType, $resourceIdentity);
+            throw new AuthorizationException($action, $resourceType, $resourceIdentity, $extraParams);
         }
     }
 
@@ -146,19 +150,21 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
      * @param string          $action
      * @param string|null     $type
      * @param string|int|null $identity
+     * @param array           $extraParams
      *
      * @return RequestInterface
      */
     private function createRequest(
         string $action,
         string $type = null,
-        $identity = null
+        $identity = null,
+        array $extraParams = []
     ): RequestInterface {
         assert($identity === null || is_string($identity) || is_int($identity));
         return new Request([
             RequestProperties::REQ_ACTION            => $action,
             RequestProperties::REQ_RESOURCE_TYPE     => $type,
             RequestProperties::REQ_RESOURCE_IDENTITY => $identity,
-        ]);
+        ] + $extraParams);
     }
 }
