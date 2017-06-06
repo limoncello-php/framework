@@ -10,6 +10,16 @@ use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 abstract class FluteSettings implements SettingsInterface
 {
     /**
+     * By default it checks that all Schemes have unique resource types. That's a legit case
+     * to have multiple Schemes for a same resource type however it's more likely that developer
+     * just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
+     * to set it to `false`.
+     *
+     * @var bool
+     */
+    protected $requireUniqueTypes = true;
+
+    /**
      * @return string
      */
     abstract protected function getSchemesPath(): string;
@@ -53,7 +63,8 @@ abstract class FluteSettings implements SettingsInterface
     {
         $jsonOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES;
 
-        $map = [];
+        $map   = [];
+        $types = [];
         foreach ($this->selectClasses($this->getSchemesPath(), SchemaInterface::class) as $schemeClass) {
             assert(
                 is_string($schemeClass) &&
@@ -61,7 +72,23 @@ abstract class FluteSettings implements SettingsInterface
                 array_key_exists(SchemaInterface::class, class_implements($schemeClass))
             );
             /** @var SchemaInterface $schemeClass */
-            $map[$schemeClass::MODEL] = $schemeClass;
+            $modelClass   = $schemeClass::MODEL;
+            $resourceType = $schemeClass::TYPE;
+
+            assert(is_string($modelClass) === true && empty($modelClass) === false);
+            assert(is_string($resourceType) === true && empty($resourceType) === false);
+
+            // By default it checks that all Schemes have unique resource types. That's a legit case
+            // to have multiple Schemes for a same resource type however it's more likely that developer
+            // just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
+            // to set to turn off this check.
+            assert(
+                $this->requireUniqueTypes === false || array_key_exists($resourceType, $types) === false,
+                "Are you sure it's not an error to use resource type `$resourceType` more than once?"
+            );
+            $types[$resourceType] = true;
+
+            $map[$modelClass] = $schemeClass;
         }
 
         return [
