@@ -20,6 +20,7 @@ use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Errors\FluteExceptionHandler;
 use Limoncello\Flute\Types\DateJsonApiStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
+use Limoncello\Flute\Types\JsonApiDateTimeType;
 use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
 use Limoncello\Validation\I18n\Locales\EnUsLocale;
 use Limoncello\Validation\I18n\Translator;
@@ -108,6 +109,9 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
         }
         if (Type::hasType(DateJsonApiStringType::NAME) === false) {
             Type::addType(DateJsonApiStringType::NAME, DateJsonApiStringType::class);
+        }
+        if (Type::hasType(JsonApiDateTimeType::NAME) === false) {
+            Type::addType(JsonApiDateTimeType::NAME, JsonApiDateTimeType::class);
         }
     }
 

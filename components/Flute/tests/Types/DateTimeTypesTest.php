@@ -23,6 +23,8 @@ use Limoncello\Flute\Types\DateTimeDefaultNativeType;
 use Limoncello\Flute\Types\DateTimeDefaultStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiNativeType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
+use Limoncello\Flute\Types\JsonApiDateTime;
+use Limoncello\Flute\Types\JsonApiDateTimeType;
 use Limoncello\Tests\Flute\TestCase;
 
 /**
@@ -51,6 +53,9 @@ class DateTimeTypesTest extends TestCase
         }
         if (Type::hasType(DateJsonApiStringType::NAME) === false) {
             Type::addType(DateJsonApiStringType::NAME, DateJsonApiStringType::class);
+        }
+        if (Type::hasType(JsonApiDateTimeType::NAME) === false) {
+            Type::addType(JsonApiDateTimeType::NAME, JsonApiDateTimeType::class);
         }
     }
 
@@ -200,6 +205,22 @@ class DateTimeTypesTest extends TestCase
 
         $this->assertNull($type->convertToDatabaseValue(null, $platform));
         $this->assertNull($type->convertToPHPValue(null, $platform));
+    }
+
+    /**
+     * Test date conversions.
+     */
+    public function testJsonApiDateTimeTypeConversions()
+    {
+        $type     = Type::getType(JsonApiDateTimeType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = '2001-02-03T04:05:06+0000';
+
+        /** @var JsonApiDateTime $phpValue */
+        $phpValue = $type->convertToPHPValue($jsonDate, $platform);
+        $this->assertEquals(981173106, $phpValue->getValue()->getTimestamp());
+        $this->assertEquals($jsonDate, $phpValue->jsonSerialize());
     }
 
     /**
