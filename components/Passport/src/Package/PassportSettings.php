@@ -19,6 +19,7 @@
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Psr\Container\ContainerInterface;
+use ReflectionParameter;
 
 /**
  * @package Limoncello\Passport
@@ -61,7 +62,10 @@ abstract class PassportSettings implements SettingsInterface
     const KEY_FAILED_AUTHENTICATION_FACTORY = self::KEY_USER_CREDENTIALS_VALIDATOR + 1;
 
     /** Config key */
-    const KEY_LAST = self::KEY_FAILED_AUTHENTICATION_FACTORY + 1;
+    const KEY_USER_SCOPE_VALIDATOR = self::KEY_FAILED_AUTHENTICATION_FACTORY + 1;
+
+    /** Config key */
+    const KEY_LAST = self::KEY_USER_SCOPE_VALIDATOR + 1;
 
     /**
      * @return string
@@ -89,13 +93,13 @@ abstract class PassportSettings implements SettingsInterface
     abstract protected function getUserPrimaryKeyName(): string;
 
     /**
-     * Should return static callable to user credentials validator (login and password).
+     * Should return static callable for user credentials validator (login and password).
      *
      * Examples ['SomeNamespace\ClassName', 'staticMethodName'] or 'SomeNamespace\ClassName::staticMethodName'
      *
      * Method signature
      *
-     * public static function validateUser(string $userName, string $password): ?int
+     * public static function validateUser(ContainerInterface $container, string $userName, string $password): ?int
      *
      * which returns either user ID (int) or null if user not found/invalid credentials.
      *
@@ -104,14 +108,43 @@ abstract class PassportSettings implements SettingsInterface
     abstract protected function getUserCredentialsValidator(): callable;
 
     /**
+     * Should return static callable for user scope validator (allowed scope identities).
+     *
+     * Examples ['SomeNamespace\ClassName', 'staticMethodName'] or 'SomeNamespace\ClassName::staticMethodName'
+     *
+     * Method signature
+     *
+     * public static function validateScope(ContainerInterface $container, int $userId, array $scopeIds): ?array
+     *
+     * which returns either changed allowed scope IDs or null if scope was not changed or throws auth exception.
+     *
+     * @return callable
+     */
+    abstract protected function getUserScopeValidator(): callable;
+
+    /**
      * @inheritdoc
      */
     public function get(): array
     {
-        $validator = $this->getUserCredentialsValidator();
+        $credentialsValidator = $this->getUserCredentialsValidator();
+        $scopeValidator       = $this->getUserScopeValidator();
 
-        // check that validator is valid callable (static with proper in/out signature).
-        assert($this->checkPublicStaticCallable($validator, [ContainerInterface::class, 'string', 'string']));
+        // check that validators are valid callable (static with proper in/out signature).
+        assert($this->checkPublicStaticCallable(
+            $credentialsValidator,
+            [ContainerInterface::class, 'string', 'string']
+        ));
+        assert($this->checkPublicStaticCallable(
+            $scopeValidator,
+            [
+                ContainerInterface::class,
+                'int',
+                function (ReflectionParameter $parameter) {
+                    return $parameter->allowsNull() === true && $parameter->isArray() === true;
+                }
+            ]
+        ));
 
         return [
             static::KEY_ENABLE_LOGS                          => false,
@@ -123,7 +156,8 @@ abstract class PassportSettings implements SettingsInterface
             static::KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH => true,
             static::KEY_USER_TABLE_NAME                      => $this->getUserTableName(),
             static::KEY_USER_PRIMARY_KEY_NAME                => $this->getUserPrimaryKeyName(),
-            static::KEY_USER_CREDENTIALS_VALIDATOR           => $validator,
+            static::KEY_USER_CREDENTIALS_VALIDATOR           => $credentialsValidator,
+            static::KEY_USER_SCOPE_VALIDATOR                 => $scopeValidator,
         ];
     }
 }

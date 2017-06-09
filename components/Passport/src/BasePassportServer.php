@@ -335,6 +335,13 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         assert(is_int($userIdentifier) === true);
         $this->logDebug('User authenticated with provided username and password.', ['username' => $userName]);
 
+        $changedScopeOrNull = $this->getIntegration()->verifyAllowedUserScope($userIdentifier, $scope);
+        if ($changedScopeOrNull !== null) {
+            assert(is_array($changedScopeOrNull));
+            $isScopeModified = true;
+            $scope           = $changedScopeOrNull;
+        }
+
         $unsavedToken = $this->getIntegration()->createTokenInstance();
         $unsavedToken
             ->setClientIdentifier($client->getIdentifier())

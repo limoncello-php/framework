@@ -768,6 +768,14 @@ class PassportServerTest extends TestCase
                     $password === PassportServerTest::TEST_USER_PASSWORD ?
                         PassportServerTest::TEST_USER_ID : null;
             }
+
+            /**
+             * @inheritdoc
+             */
+            public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
+            {
+                return $scope;
+            }
         };
     }
 
@@ -803,6 +811,14 @@ class PassportServerTest extends TestCase
                     $userName === PassportServerTest::TEST_USER_NAME &&
                     $password === PassportServerTest::TEST_USER_PASSWORD ?
                         PassportServerTest::TEST_USER_ID : null;
+            }
+
+            /**
+             * @inheritdoc
+             */
+            public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
+            {
+                return $scope;
             }
         };
     }

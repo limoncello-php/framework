@@ -63,6 +63,14 @@ interface PassportServerIntegrationInterface
     public function validateUserId(string $userName, string $password);
 
     /**
+     * @param int        $userIdentity
+     * @param array|null $scope
+     *
+     * @return array|null
+     */
+    public function verifyAllowedUserScope(int $userIdentity, array $scope = null);
+
+    /**
      * @param TokenInterface $token
      *
      * @return string

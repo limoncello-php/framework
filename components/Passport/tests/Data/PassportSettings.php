@@ -72,6 +72,14 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function getUserScopeValidator(): callable
+    {
+        return [static::class, 'validateScope'];
+    }
+
+    /**
      * @param ContainerInterface $container
      * @param string             $userName
      * @param string             $password
@@ -83,5 +91,19 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
         assert($container || $userName || $password);
 
         return 123;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param int                $userId
+     * @param array|null         $scope
+     *
+     * @return null|array
+     */
+    public static function validateScope(ContainerInterface $container, int $userId, array $scope = null)
+    {
+        assert($container || $userId || $scope);
+
+        return null;
     }
 }

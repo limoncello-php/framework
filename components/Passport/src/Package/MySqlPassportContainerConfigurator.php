@@ -89,6 +89,17 @@ class MySqlPassportContainerConfigurator extends BasePassportContainerConfigurat
 
                     return $nullOrUserId;
                 }
+
+                /**
+                 * @inheritdoc
+                 */
+                public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
+                {
+                    $validator   = $this->settings[C::KEY_USER_SCOPE_VALIDATOR];
+                    $nullOrScope = call_user_func($validator, $this->container, $userIdentity, $scope);
+
+                    return $nullOrScope;
+                }
             };
         };
 

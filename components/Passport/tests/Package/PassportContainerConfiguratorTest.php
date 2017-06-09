@@ -57,7 +57,9 @@ class PassportContainerConfiguratorTest extends TestCase
         $this->assertNotNull($container->get(TokenRepositoryInterface::class));
         /** @var PassportServerIntegrationInterface $integration */
         $this->assertNotNull($integration = $container->get(PassportServerIntegrationInterface::class));
-        $this->assertTrue($integration->validateUserId('test', 'test'));
+        $this->assertNotNull($userId = $integration->validateUserId('test', 'test'));
+
+        $integration->verifyAllowedUserScope($userId, []);
     }
 
     /**
@@ -75,7 +77,8 @@ class PassportContainerConfiguratorTest extends TestCase
         $this->assertNotNull($container->get(TokenRepositoryInterface::class));
         /** @var PassportServerIntegrationInterface $integration */
         $this->assertNotNull($integration = $container->get(PassportServerIntegrationInterface::class));
-        $this->assertTrue($integration->validateUserId('test', 'test'));
+        $this->assertInternalType('int', $userId = $integration->validateUserId('test', 'test'));
+        $integration->verifyAllowedUserScope($userId, []);
     }
 
     /**
@@ -109,6 +112,10 @@ class PassportContainerConfiguratorTest extends TestCase
                         PassportContainerConfiguratorTest::class,
                         'userValidator'
                     ],
+                    C::KEY_USER_SCOPE_VALIDATOR                 => [
+                        PassportContainerConfiguratorTest::class,
+                        'scopeValidator'
+                    ],
                 ],
             ];
 
@@ -131,10 +138,19 @@ class PassportContainerConfiguratorTest extends TestCase
     }
 
     /**
+     * @return int
+     */
+    public static function userValidator(): int
+    {
+        return 123;
+    }
+
+    /**
      * @return bool
      */
-    public static function userValidator(): bool
+    public static function scopeValidator()
     {
-        return true;
+        // no scope change
+        return null;
     }
 }

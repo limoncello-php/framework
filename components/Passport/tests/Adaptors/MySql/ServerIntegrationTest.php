@@ -104,6 +104,16 @@ class ServerIntegrationTest extends TestCase
 
                 return null;
             }
+
+            /**
+             * @inheritdoc
+             */
+            public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
+            {
+                assert($userIdentity || $scope);
+
+                return null;
+            }
         };
     }
 }
