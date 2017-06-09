@@ -18,10 +18,14 @@
 
 use Closure;
 use Limoncello\Contracts\Application\MiddlewareInterface;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
+use Limoncello\Passport\Exceptions\AuthenticationException;
+use Limoncello\Passport\Package\PassportSettings as S;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response\EmptyResponse;
 
 /**
  * @package Limoncello\Passport
@@ -51,10 +55,33 @@ class PassportMiddleware implements MiddlewareInterface
 
             /** @var PassportAccountManagerInterface $accountManager */
             $accountManager = $container->get(PassportAccountManagerInterface::class);
-            $accountManager->setAccountWithTokenValue($tokenValue);
+            try {
+                $accountManager->setAccountWithTokenValue($tokenValue);
+            } catch (AuthenticationException $exception) {
+                return static::createAuthenticationFailedResponse($container);
+            }
         }
 
         // call next middleware handler
         return $next($request);
+    }
+
+    /**
+     * @param ContainerInterface $container
+     *
+     * @return ResponseInterface
+     */
+    protected static function createAuthenticationFailedResponse(ContainerInterface $container): ResponseInterface
+    {
+        /** @var SettingsProviderInterface $provider */
+        $provider = $container->get(SettingsProviderInterface::class);
+        $settings = $provider->get(S::class);
+        $factory  = $settings[S::KEY_FAILED_AUTHENTICATION_FACTORY] ?? null;
+
+        assert($factory === null || is_callable($factory) === true);
+
+        $response = $factory === null ? new EmptyResponse(401) : call_user_func($factory);
+
+        return $response;
     }
 }

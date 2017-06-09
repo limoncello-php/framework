@@ -94,7 +94,7 @@ class AccountManagerTest extends TestCase
     /**
      * Test setting current account with invalid token value.
      *
-     * @expectedException \Limoncello\Passport\Exceptions\InvalidArgumentException
+     * @expectedException \Limoncello\Passport\Exceptions\AuthenticationException
      */
     public function testSetAccountWithInvalidTokenValue()
     {

@@ -23,7 +23,7 @@ use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
-use Limoncello\Passport\Exceptions\InvalidArgumentException;
+use Limoncello\Passport\Exceptions\AuthenticationException;
 use Psr\Container\ContainerInterface;
 use Limoncello\Passport\Package\PassportSettings as S;
 
@@ -88,7 +88,7 @@ class AccountManager implements PassportAccountManagerInterface
         $expInSeconds = $this->getPassportSettings()[S::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS];
         $properties   = $tokenRepo->readPassport($value, $expInSeconds);
         if ($properties === null) {
-            throw new InvalidArgumentException($value);
+            throw new AuthenticationException();
         }
 
         /** @var DatabaseSchemeInterface $scheme */

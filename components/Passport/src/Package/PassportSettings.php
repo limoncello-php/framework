@@ -58,7 +58,10 @@ abstract class PassportSettings implements SettingsInterface
     const KEY_USER_CREDENTIALS_VALIDATOR = self::KEY_USER_PRIMARY_KEY_NAME + 1;
 
     /** Config key */
-    const KEY_LAST = self::KEY_USER_CREDENTIALS_VALIDATOR + 1;
+    const KEY_FAILED_AUTHENTICATION_FACTORY = self::KEY_USER_CREDENTIALS_VALIDATOR + 1;
+
+    /** Config key */
+    const KEY_LAST = self::KEY_FAILED_AUTHENTICATION_FACTORY + 1;
 
     /**
      * @return string
