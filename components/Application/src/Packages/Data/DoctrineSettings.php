@@ -54,5 +54,8 @@ abstract class DoctrineSettings implements SettingsInterface
     const KEY_EXTRA = self::KEY_MEMORY + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_EXTRA + 1;
+    const KEY_PATH = self::KEY_EXTRA + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_PATH + 1;
 }

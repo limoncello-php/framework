@@ -57,6 +57,7 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
                 'port'     => $settings[DoctrineSettings::KEY_PORT] ?? null,
                 'url'      => $settings[DoctrineSettings::KEY_URL] ?? null,
                 'memory'   => $settings[DoctrineSettings::KEY_MEMORY] ?? null,
+                'path'     => $settings[DoctrineSettings::KEY_PATH] ?? null,
                 'charset'  => $settings[DoctrineSettings::KEY_CHARSET] ?? 'UTF8',
             ], function ($value) {
                 return $value !== null;
