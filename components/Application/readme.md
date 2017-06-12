@@ -12,5 +12,5 @@ This is application utility component for [Limoncello Framework](https://github.
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```

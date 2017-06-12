@@ -12,5 +12,5 @@ This is data component for [Limoncello Framework](https://github.com/limoncello-
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```

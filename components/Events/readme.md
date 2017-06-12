@@ -12,5 +12,5 @@ This is events component for [Limoncello Framework](https://github.com/limoncell
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```

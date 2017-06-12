@@ -12,5 +12,5 @@ This is OAuth 2.0 Server component for [Limoncello Framework](https://github.com
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```

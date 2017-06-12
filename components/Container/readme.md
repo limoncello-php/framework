@@ -12,5 +12,5 @@ This is Container component for [Limoncello Framework](https://github.com/limonc
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```

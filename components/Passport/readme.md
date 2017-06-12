@@ -12,5 +12,5 @@ This is OAuth 2.0 Server integration component for [Limoncello Framework](https:
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```

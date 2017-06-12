@@ -12,5 +12,5 @@ This is Authorization component for [Limoncello Framework](https://github.com/li
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```

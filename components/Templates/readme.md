@@ -12,5 +12,5 @@ This is HTML templates component for [Limoncello Framework](https://github.com/l
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```

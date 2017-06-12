@@ -12,5 +12,5 @@ This is JSON API implementation component for [Limoncello Framework](https://git
 ## Testing
 
 ```bash
-composer test
+$ composer test
 ```
