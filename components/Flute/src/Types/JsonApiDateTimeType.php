@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
 
 /**
@@ -36,5 +38,21 @@ class JsonApiDateTimeType extends DateTimeType
         $dateTimeOrNot = parent::convertToPHPValue($value, $platform);
 
         return $dateTimeOrNot instanceof DateTimeInterface ? new JsonApiDateTime($dateTimeOrNot) : $dateTimeOrNot;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    {
+        if (is_string($value) === false ||
+            ($dateTime = DateTimeImmutable::createFromFormat(DateBaseType::JSON_API_FORMAT, $value)) === false
+        ) {
+            throw ConversionException::conversionFailed($value, $this->getName());
+        }
+
+        return parent::convertToDatabaseValue($dateTime, $platform);
     }
 }

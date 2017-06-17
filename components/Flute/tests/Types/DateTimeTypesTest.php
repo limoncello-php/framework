@@ -225,6 +225,36 @@ class DateTimeTypesTest extends TestCase
 
     /**
      * Test date conversions.
+     */
+    public function testJsonApiDateTimeTypeToDatabaseConversions()
+    {
+        $type     = Type::getType(JsonApiDateTimeType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = '2001-02-03T04:05:06+0000';
+
+        /** @var string $phpValue */
+        $phpValue = $type->convertToDatabaseValue($jsonDate, $platform);
+        $this->assertEquals('2001-02-03 04:05:06', $phpValue);
+    }
+
+    /**
+     * Test date conversions.
+     *
+     * @expectedException \Doctrine\DBAL\Types\ConversionException
+     */
+    public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput()
+    {
+        $type     = Type::getType(JsonApiDateTimeType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = 'XXX';
+
+        $type->convertToDatabaseValue($jsonDate, $platform);
+    }
+
+    /**
+     * Test date conversions.
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
