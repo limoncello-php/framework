@@ -106,11 +106,15 @@ class FluteExceptionHandler implements ExceptionHandlerInterface
 
         // encode the error and send to client
         /** @var EncoderInterface $encoder */
-        $encoder     = $container->get(EncoderInterface::class);
-        $content     = $encoder->encodeErrors($errors);
-        /** @var CorsStorageInterface $corsStorage */
-        $corsStorage = $container->get(CorsStorageInterface::class);
-        $response    = new JsonApiResponse($content, $httpCode, $corsStorage->getHeaders());
+        $encoder = $container->get(EncoderInterface::class);
+        $content = $encoder->encodeErrors($errors);
+        $headers = [];
+        if ($container->has(CorsStorageInterface::class) === true) {
+            /** @var CorsStorageInterface $corsStorage */
+            $corsStorage = $container->get(CorsStorageInterface::class);
+            $headers     = $corsStorage->getHeaders();
+        }
+        $response = new JsonApiResponse($content, $httpCode, $headers);
         $sapi->handleResponse($response);
     }
 

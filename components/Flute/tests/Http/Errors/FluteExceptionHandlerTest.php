@@ -75,6 +75,38 @@ class FluteExceptionHandlerTest extends TestCase
     }
 
     /**
+     * Test Exception handler.
+     */
+    public function testExceptionHandlerWithoutCorsHeaders()
+    {
+        $handler = new FluteExceptionHandler();
+
+        $container = new Container();
+        $container[SettingsProviderInterface::class] = new SettingsProvider([
+            FluteSettings::class => (new Flute($this->getSchemeMap()))->get(),
+            ApplicationSettingsInterface::class => [
+                ApplicationSettingsInterface::KEY_IS_DEBUG => true,
+            ],
+        ]);
+        $container[LoggerInterface::class] = new NullLogger();
+        /** @var Mock $encoderMock */
+        $container[EncoderInterface::class] = $encoderMock = Mockery::mock(EncoderInterface::class);
+
+        $encoderMock->shouldReceive('encodeErrors')->once()->withAnyArgs()->andReturn('error_info');
+
+        /** @var Mock $sapi */
+        $sapi = Mockery::mock(SapiInterface::class);
+        $sapi->shouldReceive('handleResponse')->once()->withAnyArgs()->andReturnSelf();
+
+        /** @var SapiInterface $sapi */
+
+        $handler->handleException(new Exception(), $sapi, $container);
+
+        // Mock will do the checks when test finishes
+        $this->assertTrue(true);
+    }
+
+    /**
      * Test Throwable handler.
      */
     public function testThrowableHandler()
