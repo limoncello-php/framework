@@ -114,7 +114,7 @@ abstract class PassportSettings implements SettingsInterface
      *
      * Method signature
      *
-     * public static function validateScope(ContainerInterface $container, int $userId, array $scopeIds): ?array
+     * public static function validateScope(ContainerInterface $container, int $userId, array $scopeIds = null): ?array
      *
      * which returns either changed allowed scope IDs or null if scope was not changed or throws auth exception.
      *
