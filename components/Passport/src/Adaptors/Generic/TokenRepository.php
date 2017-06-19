@@ -102,6 +102,58 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
+    public function readByUser(int $userId, int $expirationInSeconds, int $limit = null): array
+    {
+        /** @var TokenInterface[] $tokens */
+        $tokens = parent::readByUser($userId, $expirationInSeconds, $limit);
+
+        // select scope identifiers for tokens
+        if (empty($tokens) === false) {
+            $scheme        = $this->getDatabaseScheme();
+            $tokenIdColumn = $scheme->getTokensScopesTokenIdentityColumn();
+            $scopeIdColumn = $scheme->getTokensScopesScopeIdentityColumn();
+
+            $connection = $this->getConnection();
+            $query      = $connection->createQueryBuilder();
+
+            $tokenIds = array_keys($tokens);
+            $query
+                ->select([$tokenIdColumn, $scopeIdColumn])
+                ->from($scheme->getTokensScopesTable())
+                ->where($query->expr()->in($tokenIdColumn, $tokenIds))
+                ->orderBy($tokenIdColumn);
+
+            $statement = $query->execute();
+            $statement->setFetchMode(PDO::FETCH_ASSOC);
+            $tokenScopePairs = $statement->fetchAll();
+
+            $curTokenId = null;
+            $curScopes  = null;
+            // set selected scopes to tokens
+            foreach ($tokenScopePairs as $pair) {
+                $tokenId = $pair[$tokenIdColumn];
+                $scopeId = $pair[$scopeIdColumn];
+
+                if ($curTokenId !== $tokenId) {
+                    $assignScopes = $curTokenId !== null && empty($curScopes) === false;
+                    $assignScopes ? $tokens[$curTokenId]->setScopeIdentifiers($curScopes) : null;
+                    $curTokenId = $tokenId;
+                    $curScopes  = [$scopeId];
+
+                    continue;
+                }
+
+                $curScopes[] = $scopeId;
+            }
+            $curTokenId === null || empty($curScopes) === true ?: $tokens[$curTokenId]->setScopeIdentifiers($curScopes);
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function readPassport(string $tokenValue, int $expirationInSeconds)
     {
         $statement = $this->createPassportDataQuery($tokenValue, $expirationInSeconds)->execute();

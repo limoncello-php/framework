@@ -109,6 +109,15 @@ interface TokenRepositoryInterface
     public function readByRefresh(string $refreshValue, int $expirationInSeconds);
 
     /**
+     * @param int      $userId
+     * @param int      $expirationInSeconds
+     * @param int|null $limit
+     *
+     * @return array
+     */
+    public function readByUser(int $userId, int $expirationInSeconds, int $limit = null): array;
+    
+    /**
      * @param int $identifier
      *
      * @return string[]

@@ -83,6 +83,7 @@ class TokenRepositoryTest extends TestCase
 
         $this->assertNotNull($tokenRepo->read($newCode->getIdentifier()));
         $this->assertNotNull($token = $tokenRepo->readByCode($newCode->getCode(), 10));
+        $this->assertEquals(PassportServerTest::TEST_USER_ID, $token->getUserIdentifier());
         $this->assertEquals($newCode->getCode(), $token->getCode());
         $this->assertNull($tokenRepo->readByCode($newCode->getCode(), 0));
         $this->assertNull($tokenRepo->readByRefresh($newCode->getCode(), 10));
@@ -113,6 +114,10 @@ class TokenRepositoryTest extends TestCase
         $this->assertTrue($sameToken->getCodeCreatedAt() instanceof DateTimeImmutable);
         $this->assertTrue($sameToken->getValueCreatedAt() instanceof DateTimeImmutable);
         $this->assertTrue($sameToken->getRefreshCreatedAt() instanceof DateTimeImmutable);
+
+        /** @var TokenInterface[] $tokensByUser */
+        $this->assertCount(1, $tokensByUser = $tokenRepo->readByUser(PassportServerTest::TEST_USER_ID, 10));
+        $this->assertEquals('scope1 scope2', array_shift($tokensByUser)->getScopeList());
 
         $this->assertNotEmpty($tokenRepo->readPassport($sameToken->getValue(), 10));
 

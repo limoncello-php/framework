@@ -240,6 +240,25 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
+    public function readByUser(int $userId, int $expirationInSeconds, int $limit = null): array
+    {
+        $scheme = $this->getDatabaseScheme();
+        /** @var TokenInterface[] $tokens */
+        $tokens = $this->readEnabledTokensByColumnWithExpirationCheck(
+            $userId,
+            $scheme->getTokensUserIdentityColumn(),
+            $expirationInSeconds,
+            $scheme->getTokensValueCreatedAtColumn(),
+            ['*'],
+            $limit
+        );
+
+        return $tokens;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function readScopeIdentifiers(int $identifier): array
     {
         $scheme = $this->getDatabaseScheme();
@@ -352,6 +371,45 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         $result = $statement->fetch();
 
         return $result === false ? null : $result;
+    }
+
+    /** @noinspection PhpTooManyParametersInspection
+     * @param string   $identifier
+     * @param string   $column
+     * @param int      $expirationInSeconds
+     * @param string   $createdAtColumn
+     * @param array    $columns
+     * @param int|null $limit
+     *
+     * @return array
+     */
+    protected function readEnabledTokensByColumnWithExpirationCheck(
+        string $identifier,
+        string $column,
+        int $expirationInSeconds,
+        string $createdAtColumn,
+        array $columns = ['*'],
+        int $limit = null
+    ): array {
+        $query = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
+            $identifier,
+            $column,
+            $expirationInSeconds,
+            $createdAtColumn,
+            $columns
+        );
+        $limit === null ?: $query->setMaxResults($limit);
+
+        $statement = $query->execute();
+        $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
+
+        $result = [];
+        while (($token = $statement->fetch()) !== false) {
+            /** @var TokenInterface $token */
+            $result[$token->getIdentifier()] = $token;
+        }
+
+        return $result;
     }
 
     /**

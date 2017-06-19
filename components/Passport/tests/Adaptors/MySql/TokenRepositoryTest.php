@@ -22,7 +22,6 @@ use Doctrine\DBAL\Types\Type;
 use Limoncello\Passport\Adaptors\MySql\TokenRepository;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
-use Limoncello\Tests\Passport\Data\User;
 
 /**
  * @package Limoncello\Tests\Passport
@@ -46,51 +45,6 @@ class TokenRepositoryTest extends TestCase
 
         $repository = new TokenRepository($connection, $scheme);
         $this->assertNotEmpty($repository->readPassport(self::TEST_TOKEN_VALUE, 3600));
-    }
-
-    /**
-     * Test read user.
-     */
-    public function testReadUserUntyped()
-    {
-        $connection = $this->createConnection();
-        $scheme     = new DatabaseScheme('users_table', 'id_user');
-        $this->prepareUserTable($connection, $scheme);
-
-
-        /** @var Connection $connection */
-        /** @var DatabaseSchemeInterface $scheme */
-
-        $repository = new TokenRepository($connection, $scheme);
-        $this->assertNotEmpty($repository->readUserByToken(self::TEST_TOKEN_VALUE, 3600, User::class));
-        $this->assertEquals(
-            [null, null],
-            $repository->readUserByToken(self::TEST_TOKEN_VALUE . 'xxx', 3600, User::class)
-        );
-    }
-
-    /**
-     * Test read user.
-     */
-    public function testReadUserTyped()
-    {
-        $connection = $this->createConnection();
-        $scheme     = new DatabaseScheme('users_table', 'id_user');
-        $this->prepareUserTable($connection, $scheme);
-
-
-        /** @var Connection $connection */
-        /** @var DatabaseSchemeInterface $scheme */
-
-        $types      = [
-            $scheme->getUsersIdentityColumn() => Type::getType(Type::INTEGER),
-        ];
-        $repository = new TokenRepository($connection, $scheme);
-        $this->assertNotEmpty($repository->readUserByToken(self::TEST_TOKEN_VALUE, 3600, User::class, $types));
-        $this->assertEquals(
-            [null, null],
-            $repository->readUserByToken(self::TEST_TOKEN_VALUE . 'xxx', 3600, User::class, $types)
-        );
     }
 
     /**
@@ -119,31 +73,5 @@ class TokenRepositoryTest extends TestCase
 
         $this->createTable($connection, $scheme->getPassportView(), $types);
         $connection->insert($scheme->getPassportView(), $data, $types);
-    }
-
-    /**
-     * @param Connection     $connection
-     * @param DatabaseScheme $scheme
-     *
-     * @return void
-     */
-    private function prepareUserTable(Connection $connection, DatabaseScheme $scheme)
-    {
-        // emulate view with table
-        $types = [
-            $scheme->getUsersIdentityColumn()        => Type::INTEGER,
-            $scheme->getTokensValueColumn()          => Type::STRING,
-            $scheme->getClientsViewScopesColumn()    => Type::STRING,
-            $scheme->getTokensValueCreatedAtColumn() => Type::DATETIME,
-        ];
-        $data  = [
-            $scheme->getUsersIdentityColumn()        => 1,
-            $scheme->getTokensValueColumn()          => self::TEST_TOKEN_VALUE,
-            $scheme->getClientsViewScopesColumn()    => 'one two three',
-            $scheme->getTokensValueCreatedAtColumn() => new DateTimeImmutable(),
-        ];
-
-        $this->createTable($connection, $scheme->getUsersView(), $types);
-        $connection->insert($scheme->getUsersView(), $data, $types);
     }
 }
