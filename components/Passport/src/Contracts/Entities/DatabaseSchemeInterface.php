@@ -297,6 +297,11 @@ interface DatabaseSchemeInterface
     /**
      * @return string
      */
+    public function getTokensScopesIdentityColumn(): string;
+
+    /**
+     * @return string
+     */
     public function getTokensScopesTokenIdentityColumn(): string;
 
     /**

@@ -258,10 +258,13 @@ trait DatabaseSchemeMigrationTrait
         $manager = $connection->getSchemaManager();
 
         $table = new Table($scheme->getTokensScopesTable());
+        $table->addColumn($scheme->getTokensScopesIdentityColumn(), Type::INTEGER)
+            ->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
         $table->addColumn($scheme->getTokensScopesTokenIdentityColumn(), Type::INTEGER)->setNotnull(true)
             ->setUnsigned(true);
         $table->addColumn($scheme->getTokensScopesScopeIdentityColumn(), Type::STRING)->setNotnull(true);
-        $table->setPrimaryKey([
+        $table->setPrimaryKey([$scheme->getTokensScopesIdentityColumn()]);
+        $table->addUniqueIndex([
             $scheme->getTokensScopesTokenIdentityColumn(),
             $scheme->getTokensScopesScopeIdentityColumn()
         ]);

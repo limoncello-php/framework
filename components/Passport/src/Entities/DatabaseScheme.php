@@ -55,6 +55,9 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /** Field name */
     const CLIENTS_SCOPES_FIELD_ID = 'clients_scopes_id';
 
+    /** Field name */
+    const TOKENS_SCOPES_FIELD_ID = 'tokens_scopes_id';
+
     /** View name */
     const VIEW_PASSPORT = 'vw_oauth_passport';
 
@@ -476,6 +479,14 @@ class DatabaseScheme implements DatabaseSchemeInterface
     public function getTokensScopesTable(): string
     {
         return static::TABLE_TOKENS_SCOPES;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTokensScopesIdentityColumn(): string
+    {
+        return static::TOKENS_SCOPES_FIELD_ID;
     }
 
     /**
