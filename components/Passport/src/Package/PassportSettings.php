@@ -18,6 +18,7 @@
 
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
+use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionParameter;
 
@@ -65,7 +66,10 @@ abstract class PassportSettings implements SettingsInterface
     const KEY_USER_SCOPE_VALIDATOR = self::KEY_FAILED_AUTHENTICATION_FACTORY + 1;
 
     /** Config key */
-    const KEY_LAST = self::KEY_USER_SCOPE_VALIDATOR + 1;
+    const KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER = self::KEY_USER_SCOPE_VALIDATOR + 1;
+
+    /** Config key */
+    const KEY_LAST = self::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER + 1;
 
     /**
      * @return string
@@ -129,6 +133,7 @@ abstract class PassportSettings implements SettingsInterface
     {
         $credentialsValidator = $this->getUserCredentialsValidator();
         $scopeValidator       = $this->getUserScopeValidator();
+        $customPropsProvider  = $this->getTokenCustomPropertiesProvider();
 
         // check that validators are valid callable (static with proper in/out signature).
         assert($this->checkPublicStaticCallable(
@@ -145,6 +150,11 @@ abstract class PassportSettings implements SettingsInterface
                 }
             ]
         ));
+        assert($customPropsProvider === null || $this->checkPublicStaticCallable(
+            $customPropsProvider,
+            [ContainerInterface::class, TokenInterface::class],
+            'array'
+        ));
 
         return [
             static::KEY_ENABLE_LOGS                          => false,
@@ -158,6 +168,15 @@ abstract class PassportSettings implements SettingsInterface
             static::KEY_USER_PRIMARY_KEY_NAME                => $this->getUserPrimaryKeyName(),
             static::KEY_USER_CREDENTIALS_VALIDATOR           => $credentialsValidator,
             static::KEY_USER_SCOPE_VALIDATOR                 => $scopeValidator,
+            static::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER     => $customPropsProvider,
         ];
+    }
+
+    /**
+     * @return null|callable (static)
+     */
+    protected function getTokenCustomPropertiesProvider()
+    {
+        return null;
     }
 }

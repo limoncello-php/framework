@@ -17,10 +17,11 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\OAuthServer\Contracts\GrantTypes;
 use Limoncello\OAuthServer\Exceptions\OAuthRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
-use Limoncello\Passport\Adaptors\Generic\GenericPassportServerIntegration;
+use Limoncello\Passport\Adaptors\Generic\PassportServerIntegration;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\RedirectUri;
@@ -29,13 +30,16 @@ use Limoncello\Passport\Adaptors\Generic\Scope;
 use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
 use Limoncello\Passport\Adaptors\Generic\Token;
 use Limoncello\Passport\Adaptors\Generic\TokenRepository;
-use Limoncello\Passport\Adaptors\MySql\MySqlPassportServerIntegration;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\PassportServerInterface;
+use Limoncello\Passport\Package\MySqlPassportContainerConfigurator;
 use Limoncello\Passport\PassportServer;
 use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
+use Limoncello\Tests\Passport\Data\TestContainer;
+use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Uri;
+use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest as T;
 
 /**
  * @package Limoncello\Tests\Passport
@@ -54,13 +58,10 @@ class PassportServerTest extends TestCase
         $this->initSqliteDatabase();
     }
 
-    const TEST_DEFAULT_CLIENT_ID   = 'MainClient';
     const TEST_DEFAULT_CLIENT_PASS = 'secret';
     const TEST_USER_NAME           = 'john';
     const TEST_USER_PASSWORD       = 'secret';
     const TEST_USER_ID             = 5;
-    const TEST_ERROR_URI           = 'http://example.app/auth_request_error';
-    const TEST_APPROVAL_URI        = 'http://example.app/resource_owner_approval';
     const TEST_CLIENT_REDIRECT_URI = 'http://client.server/redirect_uri';
     const TEST_SCOPE_1             = 'scope1';
     const TEST_SCOPE_2             = 'scope2';
@@ -129,7 +130,7 @@ class PassportServerTest extends TestCase
 
         // refresh the token
         $response = $server->postCreateToken(
-            $this->createRefreshTokenRequest($refreshToken, null, PassportServerTest::TEST_DEFAULT_CLIENT_ID)
+            $this->createRefreshTokenRequest($refreshToken, null, T::TEST_DEFAULT_CLIENT_ID)
         );
         $this->assertNotNull($response);
         $newToken = json_decode((string)$response->getBody());
@@ -162,7 +163,7 @@ class PassportServerTest extends TestCase
         $response = $server->postCreateToken($this->createRefreshTokenRequest(
             $refreshToken,
             static::TEST_SCOPE_1,
-            PassportServerTest::TEST_DEFAULT_CLIENT_ID
+            T::TEST_DEFAULT_CLIENT_ID
         ));
         $this->assertNotNull($response);
         $newToken = json_decode((string)$response->getBody());
@@ -206,13 +207,13 @@ class PassportServerTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_APPROVAL_URI, $location);
 
         // Step 2 - Get a token.
         // Resource owner agreed to auth some scopes for the client and browser sends approval to server.
         $token = (new Token())
             ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI)
-            ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
+            ->setClientIdentifier(T::TEST_DEFAULT_CLIENT_ID)
             ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
             ->setUserIdentifier(static::TEST_USER_ID)
             ->setScopeModified();
@@ -237,7 +238,7 @@ class PassportServerTest extends TestCase
         $redirectUriRepo = new RedirectUriRepository($connection, $scheme);
         $redirectUriRepo->create(
             $uri1 = (new RedirectUri())
-                ->setClientIdentifier(PassportServerTest::TEST_DEFAULT_CLIENT_ID)
+                ->setClientIdentifier(T::TEST_DEFAULT_CLIENT_ID)
                 ->setValue(static::TEST_CLIENT_REDIRECT_URI . 'XXX') // <- not very creative URI :smile:
         );
 
@@ -246,7 +247,7 @@ class PassportServerTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_ERROR_URI, $location);
 
         $this->assertNotEmpty($this->getLogs());
     }
@@ -263,20 +264,20 @@ class PassportServerTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_APPROVAL_URI, $location);
 
         // Step 2 - Get a token.
         // Resource owner agreed to auth some scopes for the client and browser sends approval to server.
         $token = (new Token())
             ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI . 'XXX') // <- invalid redirect URI
-            ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
+            ->setClientIdentifier(T::TEST_DEFAULT_CLIENT_ID)
             ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
             ->setUserIdentifier(static::TEST_USER_ID)
             ->setScopeModified();
         $response = $server->createTokenResponse($token);
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_ERROR_URI, $location);
 
         $this->assertNotEmpty($this->getLogs());
     }
@@ -294,7 +295,7 @@ class PassportServerTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_ERROR_URI, $location);
     }
 
     /**
@@ -309,13 +310,13 @@ class PassportServerTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_APPROVAL_URI, $location);
 
         // Step 2 - Get a code.
         // Resource owner agreed to auth some scopes for the client and browser sends approval to server.
         $token    = (new Token())
             ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI)
-            ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
+            ->setClientIdentifier(T::TEST_DEFAULT_CLIENT_ID)
             ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
             ->setUserIdentifier(static::TEST_USER_ID)
             ->setScopeModified();
@@ -358,14 +359,14 @@ class PassportServerTest extends TestCase
 
         // Step 1 - ask resource owner for approval
         $response = $server->getCreateAuthorization($this->createCodeRequest(
-            self::TEST_DEFAULT_CLIENT_ID,
+            T::TEST_DEFAULT_CLIENT_ID,
             null,
             static::TEST_SCOPE_1 . ' ' . static::TEST_SCOPE_2
         ));
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_APPROVAL_URI, $location);
         parse_str((new Uri($location))->getQuery(), $parameters);
         $this->assertArrayHasKey('is_scope_modified', $parameters);
         $this->assertEquals('0', $parameters['is_scope_modified']);
@@ -386,13 +387,13 @@ class PassportServerTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_APPROVAL_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_APPROVAL_URI, $location);
 
         // Step 2 - Get a code.
         // Resource owner agreed to auth some scopes for the client and browser sends approval to server.
         $token    = (new Token())
             ->setRedirectUriString(static::TEST_CLIENT_REDIRECT_URI . 'XXX') // <- invalid redirect URI
-            ->setClientIdentifier(static::TEST_DEFAULT_CLIENT_ID)
+            ->setClientIdentifier(T::TEST_DEFAULT_CLIENT_ID)
             ->setScopeIdentifiers([static::TEST_SCOPE_1, static::TEST_SCOPE_2])
             ->setUserIdentifier(static::TEST_USER_ID)
             ->setScopeModified()
@@ -401,7 +402,7 @@ class PassportServerTest extends TestCase
         $response = $server->createCodeResponse($token, $state);
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_ERROR_URI, $location);
 
         $this->assertNotEmpty($this->getLogs());
     }
@@ -419,7 +420,7 @@ class PassportServerTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
         $location = $response->getHeader('location')[0];
-        $this->assertStringStartsWith(static::TEST_ERROR_URI, $location);
+        $this->assertStringStartsWith(PassportContainerConfiguratorTest::TEST_ERROR_URI, $location);
     }
 
     /**
@@ -431,7 +432,7 @@ class PassportServerTest extends TestCase
 
         // add client authentication so we can actually get any tokens
         $clientRepo    = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
-        $defaultClient = $clientRepo->read(static::TEST_DEFAULT_CLIENT_ID);
+        $defaultClient = $clientRepo->read(T::TEST_DEFAULT_CLIENT_ID);
         $defaultClient->enableClientGrant()->setCredentials(
             password_hash(static::TEST_DEFAULT_CLIENT_PASS, PASSWORD_DEFAULT)
         );
@@ -481,7 +482,7 @@ class PassportServerTest extends TestCase
 
         $request = $this->createServerRequest(null, [
             'response_type' => 'UNKNOWN_RESPONSE_TYPE',
-            'client_id'     => self::TEST_DEFAULT_CLIENT_ID,
+            'client_id'     => T::TEST_DEFAULT_CLIENT_ID,
         ]);
 
         // Step 1 - Ask resource owner for an approval.
@@ -502,7 +503,7 @@ class PassportServerTest extends TestCase
     {
         $noClientIdRequest = $this->createServerRequest([
             'grant_type' => 'UNKNOWN_GRANT_TYPE',
-            'client_id'  => self::TEST_DEFAULT_CLIENT_ID,
+            'client_id'  => T::TEST_DEFAULT_CLIENT_ID,
         ]);
         $response = $this->createPassportServer()->postCreateToken($noClientIdRequest);
         $this->assertEquals(400, $response->getStatusCode());
@@ -532,7 +533,7 @@ class PassportServerTest extends TestCase
     public function testCreateMySqlRepositories()
     {
         $connection  = $this->getConnection();
-        $integration = $this->createMySqlIntegration($connection);
+        $integration = $this->createInstance($connection);
 
         $this->assertNotNull($integration->getClientRepository());
         $this->assertNotNull($integration->getScopeRepository());
@@ -575,7 +576,7 @@ class PassportServerTest extends TestCase
      * @return ServerRequestInterface
      */
     private function createImplicitRequest(
-        string $clientId = self::TEST_DEFAULT_CLIENT_ID,
+        string $clientId = T::TEST_DEFAULT_CLIENT_ID,
         string $redirectUri = null,
         string $scope = null,
         string $state = null,
@@ -602,7 +603,7 @@ class PassportServerTest extends TestCase
      * @return ServerRequestInterface
      */
     private function createCodeRequest(
-        string $clientId = self::TEST_DEFAULT_CLIENT_ID,
+        string $clientId = T::TEST_DEFAULT_CLIENT_ID,
         string $redirectUri = null,
         string $scope = null,
         string $state = null,
@@ -629,7 +630,7 @@ class PassportServerTest extends TestCase
      */
     private function createTokenRequest(
         string $code,
-        string $clientId = self::TEST_DEFAULT_CLIENT_ID,
+        string $clientId = T::TEST_DEFAULT_CLIENT_ID,
         string $redirectUri = self::TEST_CLIENT_REDIRECT_URI,
         array $headers = []
     ) {
@@ -653,7 +654,7 @@ class PassportServerTest extends TestCase
      */
     private function createClientTokenRequest(
         string $scope = null,
-        string $clientId = self::TEST_DEFAULT_CLIENT_ID,
+        string $clientId = T::TEST_DEFAULT_CLIENT_ID,
         string $clientPass = self::TEST_DEFAULT_CLIENT_PASS,
         array $headers = []
     ) {
@@ -707,7 +708,7 @@ class PassportServerTest extends TestCase
         $clientRepo->inTransaction(function () use ($scopeRepo, $clientRepo, $redirectUriRepo) {
             $client = $clientRepo->create(
                 (new Client())
-                    ->setIdentifier(PassportServerTest::TEST_DEFAULT_CLIENT_ID)
+                    ->setIdentifier(T::TEST_DEFAULT_CLIENT_ID)
                     ->setName('client name')
                     ->enableCodeGrant()
                     ->enableImplicitGrant()
@@ -742,41 +743,11 @@ class PassportServerTest extends TestCase
      */
     private function createGenericIntegration(Connection $connection): PassportServerIntegrationInterface
     {
-        return new class ($connection) extends GenericPassportServerIntegration
-        {
+        $container = new TestContainer();
+        $container[Connection::class] = $connection;
+        $container[SettingsProviderInterface::class] = PassportContainerConfiguratorTest::createSettingsProvider();
 
-            /**
-             * @param Connection $connection
-             */
-            public function __construct(Connection $connection)
-            {
-                parent::__construct(
-                    $connection,
-                    PassportServerTest::TEST_DEFAULT_CLIENT_ID,
-                    PassportServerTest::TEST_APPROVAL_URI,
-                    PassportServerTest::TEST_ERROR_URI
-                );
-            }
-
-            /**
-             * @inheritdoc
-             */
-            public function validateUserId(string $userName, string $password)
-            {
-                return
-                    $userName === PassportServerTest::TEST_USER_NAME &&
-                    $password === PassportServerTest::TEST_USER_PASSWORD ?
-                        PassportServerTest::TEST_USER_ID : null;
-            }
-
-            /**
-             * @inheritdoc
-             */
-            public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
-            {
-                return $scope;
-            }
-        };
+        return new PassportServerIntegration($container);
     }
 
     /**
@@ -784,43 +755,19 @@ class PassportServerTest extends TestCase
      *
      * @return PassportServerIntegrationInterface
      */
-    private function createMySqlIntegration(Connection $connection): PassportServerIntegrationInterface
+    private function createInstance(Connection $connection): PassportServerIntegrationInterface
     {
-        return new class ($connection) extends MySqlPassportServerIntegration
-        {
+        $container = new TestContainer();
+        $container[Connection::class] = $connection;
+        $container[SettingsProviderInterface::class] = PassportContainerConfiguratorTest::createSettingsProvider();
 
-            /**
-             * @param Connection $connection
-             */
-            public function __construct(Connection $connection)
-            {
-                parent::__construct(
-                    $connection,
-                    PassportServerTest::TEST_DEFAULT_CLIENT_ID,
-                    PassportServerTest::TEST_APPROVAL_URI,
-                    PassportServerTest::TEST_ERROR_URI
-                );
-            }
+        MySqlPassportContainerConfigurator::configureContainer($container);
 
-            /**
-             * @inheritdoc
-             */
-            public function validateUserId(string $userName, string $password)
-            {
-                return
-                    $userName === PassportServerTest::TEST_USER_NAME &&
-                    $password === PassportServerTest::TEST_USER_PASSWORD ?
-                        PassportServerTest::TEST_USER_ID : null;
-            }
+        $this->assertTrue($container->has(PassportServerIntegrationInterface::class));
 
-            /**
-             * @inheritdoc
-             */
-            public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
-            {
-                return $scope;
-            }
-        };
+        $integration = $container->get(PassportServerIntegrationInterface::class);
+
+        return $integration;
     }
 
     /**

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\Generic;
+<?php namespace Limoncello\Passport\Adaptors\MySql;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -26,7 +26,7 @@ use Limoncello\Passport\Integration\BasePassportServerIntegration;
 /**
  * @package Limoncello\Passport
  */
-abstract class GenericPassportServerIntegration extends BasePassportServerIntegration
+class PassportServerIntegration extends BasePassportServerIntegration
 {
     /**
      * @var ClientRepositoryInterface|null

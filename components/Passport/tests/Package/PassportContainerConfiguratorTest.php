@@ -21,6 +21,7 @@ use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\PassportServerInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
@@ -28,22 +29,29 @@ use Limoncello\Passport\Package\MySqlPassportContainerConfigurator;
 use Limoncello\Passport\Package\PassportContainerConfigurator;
 use Limoncello\Passport\Package\PassportSettings as C;
 use Limoncello\Tests\Passport\Data\TestContainer;
+use Limoncello\Tests\Passport\PassportServerTest;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest as T;
 
 /**
  * @package Limoncello\Tests\Templates
  */
 class PassportContainerConfiguratorTest extends TestCase
 {
+    const TEST_DEFAULT_CLIENT_ID = 'default_client';
+    const TEST_ERROR_URI         = 'http://example.app/auth_request_error';
+    const TEST_APPROVAL_URI      = 'http://example.app/resource_owner_approval';
+
     /**
      * Test container configurator.
      */
     public function testGenericContainerConfigurator()
     {
-        $container = new TestContainer();
+        $container                                   = new TestContainer();
         $container[SettingsProviderInterface::class] = $this->createSettingsProvider();
         $container[Connection::class]                = Mockery::mock(Connection::class);
         $container[LoggerInterface::class]           = new NullLogger();
@@ -57,7 +65,10 @@ class PassportContainerConfiguratorTest extends TestCase
         $this->assertNotNull($container->get(TokenRepositoryInterface::class));
         /** @var PassportServerIntegrationInterface $integration */
         $this->assertNotNull($integration = $container->get(PassportServerIntegrationInterface::class));
-        $this->assertNotNull($userId = $integration->validateUserId('test', 'test'));
+        $this->assertNotNull($userId = $integration->validateUserId(
+            PassportServerTest::TEST_USER_NAME,
+            PassportServerTest::TEST_USER_PASSWORD
+        ));
 
         $integration->verifyAllowedUserScope($userId, []);
     }
@@ -67,7 +78,7 @@ class PassportContainerConfiguratorTest extends TestCase
      */
     public function testMySqlContainerConfigurator()
     {
-        $container = new TestContainer();
+        $container                                   = new TestContainer();
         $container[SettingsProviderInterface::class] = $this->createSettingsProvider();
         $container[Connection::class]                = Mockery::mock(Connection::class);
         $container[LoggerInterface::class]           = new NullLogger();
@@ -77,7 +88,13 @@ class PassportContainerConfiguratorTest extends TestCase
         $this->assertNotNull($container->get(TokenRepositoryInterface::class));
         /** @var PassportServerIntegrationInterface $integration */
         $this->assertNotNull($integration = $container->get(PassportServerIntegrationInterface::class));
-        $this->assertInternalType('int', $userId = $integration->validateUserId('test', 'test'));
+        $this->assertInternalType(
+            'int',
+            $userId = $integration->validateUserId(
+                PassportServerTest::TEST_USER_NAME,
+                PassportServerTest::TEST_USER_PASSWORD
+            )
+        );
         $integration->verifyAllowedUserScope($userId, []);
     }
 
@@ -94,28 +111,24 @@ class PassportContainerConfiguratorTest extends TestCase
     /**
      * @return SettingsProviderInterface
      */
-    private function createSettingsProvider(): SettingsProviderInterface
+    public static function createSettingsProvider(): SettingsProviderInterface
     {
-        return new class implements SettingsProviderInterface {
+        return new class implements SettingsProviderInterface
+        {
             private $values = [
                 C::class => [
                     C::KEY_ENABLE_LOGS                          => true,
                     C::KEY_USER_TABLE_NAME                      => 'users',
                     C::KEY_USER_PRIMARY_KEY_NAME                => 'id_user',
-                    C::KEY_DEFAULT_CLIENT_ID                    => 'default_client',
-                    C::KEY_APPROVAL_URI_STRING                  => '/approval-uri',
-                    C::KEY_ERROR_URI_STRING                     => '/error-uri',
+                    C::KEY_DEFAULT_CLIENT_ID                    => T::TEST_DEFAULT_CLIENT_ID,
+                    C::KEY_APPROVAL_URI_STRING                  => T::TEST_APPROVAL_URI,
+                    C::KEY_ERROR_URI_STRING                     => T::TEST_ERROR_URI,
                     C::KEY_CODE_EXPIRATION_TIME_IN_SECONDS      => 3600,
                     C::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS     => 3600,
                     C::KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH => true,
-                    C::KEY_USER_CREDENTIALS_VALIDATOR           => [
-                        PassportContainerConfiguratorTest::class,
-                        'userValidator'
-                    ],
-                    C::KEY_USER_SCOPE_VALIDATOR                 => [
-                        PassportContainerConfiguratorTest::class,
-                        'scopeValidator'
-                    ],
+                    C::KEY_USER_CREDENTIALS_VALIDATOR           => [T::class, 'userValidator'],
+                    C::KEY_USER_SCOPE_VALIDATOR                 => [T::class, 'scopeValidator'],
+                    C::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER     => [T::class, 'tokenCustomPropertiesProvider'],
                 ],
             ];
 
@@ -138,19 +151,50 @@ class PassportContainerConfiguratorTest extends TestCase
     }
 
     /**
-     * @return int
+     * @param ContainerInterface $container
+     * @param string             $userName
+     * @param string             $password
+     *
+     * @return int|null
      */
-    public static function userValidator(): int
+    public static function userValidator(ContainerInterface $container, string $userName, string $password)
     {
-        return 123;
+        assert($container !== null);
+
+        $credOk =
+            PassportServerTest::TEST_USER_NAME === $userName &&
+            PassportServerTest::TEST_DEFAULT_CLIENT_PASS === $password;
+
+        return $credOk ? PassportServerTest::TEST_USER_ID : null;
     }
 
     /**
-     * @return bool
+     * @param ContainerInterface $container
+     * @param                    $userId
+     * @param array              $scope
+     *
+     * @return array|null
      */
-    public static function scopeValidator()
+    public static function scopeValidator(ContainerInterface $container, $userId, array $scope)
     {
-        // no scope change
-        return null;
+        assert($container !== null);
+        assert($userId !== null);
+
+        return $scope;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param TokenInterface     $token
+     *
+     * @return array
+     */
+    public static function tokenCustomPropertiesProvider(ContainerInterface $container, TokenInterface $token): array
+    {
+        assert($container !== null);
+
+        return [
+            'user_id' => $token->getUserIdentifier(),
+        ];
     }
 }

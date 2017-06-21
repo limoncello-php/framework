@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -80,6 +81,16 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function getTokenCustomPropertiesProvider()
+    {
+        assert(parent::getTokenCustomPropertiesProvider() === null);
+
+        return [self::class,  'tokenCustomPropertiesProvider'];
+    }
+
+    /**
      * @param ContainerInterface $container
      * @param string             $userName
      * @param string             $password
@@ -105,5 +116,20 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
         assert($container || $userId || $scope);
 
         return null;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param TokenInterface     $token
+     *
+     * @return array
+     */
+    public static function tokenCustomPropertiesProvider(ContainerInterface $container, TokenInterface $token): array
+    {
+        assert($container !== null);
+
+        return [
+            'user_id' => $token->getUserIdentifier(),
+        ];
     }
 }

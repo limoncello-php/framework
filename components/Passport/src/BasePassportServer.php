@@ -504,7 +504,13 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
             'scope'         => $scopeList,
         ]);
 
-        $response = new JsonResponse($parameters, 200, [
+        // extra parameters
+        // https://tools.ietf.org/html/rfc6749#section-4.1.4
+        // https://tools.ietf.org/html/rfc6749#section-4.3.3
+        // https://tools.ietf.org/html/rfc6749#section-4.4.3
+        $extraParameters = $this->getIntegration()->getBodyTokenExtraParameters($token);
+
+        $response = new JsonResponse($parameters + $extraParameters, 200, [
             'Cache-Control' => 'no-store',
             'Pragma'        => 'no-cache'
         ]);

@@ -144,4 +144,14 @@ interface PassportServerIntegrationInterface
      * @return bool
      */
     public function verifyClientCredentials(ClientInterface $client, string $credentials): bool;
+
+    /**
+     * This method will be called before token is sent back to client. Developers can add custom
+     * properties to the response by returning them from this method.
+     *
+     * @param TokenInterface $token
+     *
+     * @return array
+     */
+    public function getBodyTokenExtraParameters(TokenInterface $token): array;
 }

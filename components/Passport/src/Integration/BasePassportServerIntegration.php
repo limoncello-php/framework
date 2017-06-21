@@ -17,19 +17,24 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Entities\Client;
 use Limoncello\Passport\Entities\DatabaseScheme;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
+use Limoncello\Passport\Package\PassportSettings as C;
 
 /**
  * @package Limoncello\Passport
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 abstract class BasePassportServerIntegration implements PassportServerIntegrationInterface
 {
@@ -53,6 +58,16 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
 
     /** Approval parameter */
     const SCOPE_APPROVAL_STATE = 'state';
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * @var array
+     */
+    private $settings;
 
     /**
      * @var string
@@ -94,32 +109,58 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     private $isRenewRefreshValue;
 
     /**
-     * @param Connection $connection
-     * @param string     $defaultClientId
-     * @param string     $approvalUriString
-     * @param string     $errorUriString
-     * @param int        $codeExpiration
-     * @param int        $tokenExpiration
-     * @param bool       $isRenewRefreshValue
-     *
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @var callable|null
      */
-    public function __construct(
-        Connection $connection,
-        string $defaultClientId,
-        string $approvalUriString,
-        string $errorUriString,
-        int $codeExpiration = 600,
-        int $tokenExpiration = 3600,
-        bool $isRenewRefreshValue = false
-    ) {
-        $this->defaultClientId     = $defaultClientId;
+    private $customPropProvider;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+        $this->settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
+
+        /** @var Connection $connection */
+        $connection = $container->get(Connection::class);
+
+        /** @var callable|null $customPropProvider */
+        $customPropProvider = $this->settings[C::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER] ?? null;
+        $wrapper = $customPropProvider !== null ?
+            function (TokenInterface $token) use ($container, $customPropProvider): array {
+                return call_user_func($customPropProvider, $container, $token);
+            } : null;
+
+        $this->defaultClientId     = $this->settings[C::KEY_DEFAULT_CLIENT_ID];
         $this->connection          = $connection;
-        $this->approvalUriString   = $approvalUriString;
-        $this->errorUriString      = $errorUriString;
-        $this->codeExpiration      = $codeExpiration;
-        $this->tokenExpiration     = $tokenExpiration;
-        $this->isRenewRefreshValue = $isRenewRefreshValue;
+        $this->approvalUriString   = $this->settings[C::KEY_APPROVAL_URI_STRING];
+        $this->errorUriString      = $this->settings[C::KEY_ERROR_URI_STRING];
+        $this->codeExpiration      = $this->settings[C::KEY_CODE_EXPIRATION_TIME_IN_SECONDS] ?? 600;
+        $this->tokenExpiration     = $this->settings[C::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS] ?? 3600;
+        $this->isRenewRefreshValue = $this->settings[C::KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH] ?? false;
+        $this->customPropProvider  = $wrapper;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validateUserId(string $userName, string $password)
+    {
+        $validator    = $this->settings[C::KEY_USER_CREDENTIALS_VALIDATOR];
+        $nullOrUserId = call_user_func($validator, $this->container, $userName, $password);
+
+        return $nullOrUserId;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
+    {
+        $validator   = $this->settings[C::KEY_USER_SCOPE_VALIDATOR];
+        $nullOrScope = call_user_func($validator, $this->container, $userIdentity, $scope);
+
+        return $nullOrScope;
     }
 
     /**
@@ -235,6 +276,14 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         assert($client instanceof \Limoncello\Passport\Contracts\Entities\ClientInterface);
 
         return password_verify($credentials, $client->getCredentials());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBodyTokenExtraParameters(TokenInterface $token): array
+    {
+        return $this->customPropProvider !== null ? call_user_func($this->customPropProvider, $token) : [];
     }
 
     /**

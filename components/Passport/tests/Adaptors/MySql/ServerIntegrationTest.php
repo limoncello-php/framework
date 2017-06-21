@@ -17,14 +17,18 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Passport\Adaptors\MySql\MySqlPassportServerIntegration;
+use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Adaptors\MySql\RedirectUri;
 use Limoncello\Passport\Adaptors\MySql\RedirectUriRepository;
 use Limoncello\Passport\Adaptors\MySql\Scope;
 use Limoncello\Passport\Adaptors\MySql\ScopeRepository;
 use Limoncello\Passport\Adaptors\MySql\Token;
 use Limoncello\Passport\Adaptors\MySql\TokenRepository;
+use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Package\MySqlPassportContainerConfigurator;
+use Limoncello\Tests\Passport\Data\TestContainer;
+use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest;
 use Mockery;
 use ReflectionMethod;
 
@@ -72,48 +76,20 @@ class ServerIntegrationTest extends TestCase
     }
 
     /**
-     * @return MySqlPassportServerIntegration
+     * @return PassportServerIntegrationInterface
      */
-    private function createInstance(): MySqlPassportServerIntegration
+    private function createInstance(): PassportServerIntegrationInterface
     {
-        return new class extends MySqlPassportServerIntegration
-        {
-            /**
-             *  constructor.
-             */
-            public function __construct()
-            {
-                $connection = Mockery::mock(Connection::class);
+        $container = new TestContainer();
+        $container[SettingsProviderInterface::class] = PassportContainerConfiguratorTest::createSettingsProvider();
+        $container[Connection::class]                = Mockery::mock(Connection::class);
 
-                /** @var Connection $connection */
+        MySqlPassportContainerConfigurator::configureContainer($container);
 
-                parent::__construct(
-                    $connection,
-                    'some_client_id',
-                    'https://some.fake/uri',
-                    'https://some.fake/uri'
-                );
-            }
+        $this->assertTrue($container->has(PassportServerIntegrationInterface::class));
 
-            /**
-             * @inheritdoc
-             */
-            public function validateUserId(string $userName, string $password)
-            {
-                assert($userName || $password);
+        $integration = $container->get(PassportServerIntegrationInterface::class);
 
-                return null;
-            }
-
-            /**
-             * @inheritdoc
-             */
-            public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
-            {
-                assert($userIdentity || $scope);
-
-                return null;
-            }
-        };
+        return $integration;
     }
 }

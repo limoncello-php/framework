@@ -19,13 +19,11 @@
 use Doctrine\DBAL\Connection;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface as CCI;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Passport\Adaptors\MySql\MySqlPassportServerIntegration;
+use Limoncello\Passport\Adaptors\MySql\PassportServerIntegration;
 use Limoncello\Passport\Adaptors\MySql\TokenRepository;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
-use Limoncello\Passport\Package\PassportSettings as C;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 
 /**
@@ -35,8 +33,6 @@ class MySqlPassportContainerConfigurator extends BasePassportContainerConfigurat
 {
     /**
      * @inheritdoc
-     *
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public static function configureContainer(LimoncelloContainerInterface $container)
     {
@@ -45,62 +41,7 @@ class MySqlPassportContainerConfigurator extends BasePassportContainerConfigurat
         $container[PassportServerIntegrationInterface::class] = function (PsrContainerInterface $container) {
             assert($container !== null);
 
-            return new class ($container) extends MySqlPassportServerIntegration
-            {
-                /**
-                 * @var PsrContainerInterface
-                 */
-                private $container;
-
-                /**
-                 * @var array
-                 */
-                private $settings;
-
-                /**
-                 * @param PsrContainerInterface $container
-                 */
-                public function __construct(PsrContainerInterface $container)
-                {
-                    $this->container = $container;
-                    $this->settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
-
-                    /** @var Connection $connection */
-                    $connection = $container->get(Connection::class);
-
-                    parent::__construct(
-                        $connection,
-                        $this->settings[C::KEY_DEFAULT_CLIENT_ID],
-                        $this->settings[C::KEY_APPROVAL_URI_STRING],
-                        $this->settings[C::KEY_ERROR_URI_STRING],
-                        $this->settings[C::KEY_CODE_EXPIRATION_TIME_IN_SECONDS],
-                        $this->settings[C::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS],
-                        $this->settings[C::KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH]
-                    );
-                }
-
-                /**
-                 * @inheritdoc
-                 */
-                public function validateUserId(string $userName, string $password)
-                {
-                    $validator    = $this->settings[C::KEY_USER_CREDENTIALS_VALIDATOR];
-                    $nullOrUserId = call_user_func($validator, $this->container, $userName, $password);
-
-                    return $nullOrUserId;
-                }
-
-                /**
-                 * @inheritdoc
-                 */
-                public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
-                {
-                    $validator   = $this->settings[C::KEY_USER_SCOPE_VALIDATOR];
-                    $nullOrScope = call_user_func($validator, $this->container, $userIdentity, $scope);
-
-                    return $nullOrScope;
-                }
-            };
+            return new PassportServerIntegration($container);
         };
 
         $container[TokenRepositoryInterface::class] = function (PsrContainerInterface $container) {
