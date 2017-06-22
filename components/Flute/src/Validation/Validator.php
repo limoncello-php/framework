@@ -155,7 +155,7 @@ class Validator implements ValidatorInterface
         $this->validateType($jsonData);
         $this->validateId($jsonData);
         $this->validateAttributes($jsonData);
-        $this->validateCaptures($jsonData, $this->createRelationshipCaptures());
+        $this->validateRelationshipCaptures($jsonData, $this->createRelationshipCaptures());
 
         $hasNoErrors = $this->getErrors()->count() <= 0;
 
@@ -430,7 +430,7 @@ class Validator implements ValidatorInterface
      *
      * @return void
      */
-    private function validateCaptures(array $jsonData, array $relationshipCaptures)
+    private function validateRelationshipCaptures(array $jsonData, array $relationshipCaptures)
     {
         $relationships = $jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_RELATIONSHIPS] ?? [];
         $unlistedRule  = $this->getRules()[static::RULE_UNLISTED_RELATIONSHIP] ?? null;
