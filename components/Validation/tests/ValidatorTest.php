@@ -975,7 +975,10 @@ class ValidatorTest extends TestCase
     public function testSampleAppNotFail()
     {
         $outputToConsole = false;
-        (new Application($outputToConsole))->run();
+        $application     = new Application($outputToConsole);
+        $this->assertNotNull($application);
+
+        $application->run();
     }
 
     /**
