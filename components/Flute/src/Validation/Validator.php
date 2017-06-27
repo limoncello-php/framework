@@ -310,6 +310,26 @@ class Validator implements ValidatorInterface
     }
 
     /**
+     * @param RuleInterface $rule
+     * @param mixed         $input
+     *
+     * @return Generator
+     */
+    protected function validateRule(RuleInterface $rule, $input): Generator
+    {
+        foreach ($rule->validate($input) as $error) {
+            yield $error;
+        };
+
+        $aggregator = $this->createErrorAggregator();
+        $rule->onFinish($aggregator);
+
+        foreach ($aggregator->get() as $error) {
+            yield $error;
+        }
+    }
+
+    /**
      * @param array $jsonData
      *
      * @return void
@@ -485,25 +505,5 @@ class Validator implements ValidatorInterface
         return static::andX(static::isArray(), static::arrayX([
             DocumentInterface::KEYWORD_DATA => static::andX(static::isArray(), static::eachX($identityRule)),
         ])->disableAutoParameterNames()->setParameterName($name));
-    }
-
-    /**
-     * @param RuleInterface $rule
-     * @param mixed         $input
-     *
-     * @return Generator
-     */
-    private function validateRule(RuleInterface $rule, $input): Generator
-    {
-        foreach ($rule->validate($input) as $error) {
-            yield $error;
-        };
-
-        $aggregator = $this->createErrorAggregator();
-        $rule->onFinish($aggregator);
-
-        foreach ($aggregator->get() as $error) {
-            yield $error;
-        }
     }
 }
