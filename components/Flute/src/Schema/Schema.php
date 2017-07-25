@@ -50,6 +50,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
         JsonSchemesInterface $jsonSchemes,
         ModelSchemeInfoInterface $modelSchemes
     ) {
+        /** @noinspection PhpUndefinedFieldInspection */
         $this->resourceType = static::TYPE;
 
         parent::__construct($factory);
@@ -79,7 +80,11 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      */
     public static function hasAttributeMapping(string $jsonName): bool
     {
-        return array_key_exists($jsonName, static::getMappings()[static::SCHEMA_ATTRIBUTES]);
+        $mappings = static::getMappings();
+
+        return
+            array_key_exists(static::SCHEMA_ATTRIBUTES, $mappings) === true &&
+            array_key_exists($jsonName, $mappings[static::SCHEMA_ATTRIBUTES]) === true;
     }
 
     /**
@@ -87,7 +92,11 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      */
     public static function hasRelationshipMapping(string $jsonName): bool
     {
-        return array_key_exists($jsonName, static::getMappings()[static::SCHEMA_RELATIONSHIPS]);
+        $mappings = static::getMappings();
+
+        return
+            array_key_exists(static::SCHEMA_RELATIONSHIPS, $mappings) === true &&
+            array_key_exists($jsonName, $mappings[static::SCHEMA_RELATIONSHIPS]) === true;
     }
 
     /**

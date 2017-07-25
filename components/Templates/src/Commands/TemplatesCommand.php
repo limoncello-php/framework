@@ -92,7 +92,7 @@ class TemplatesCommand implements CommandInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function execute(ContainerInterface $container, IoInterface $inOut)
+    public static function execute(ContainerInterface $container, IoInterface $inOut): void
     {
         $action    = $inOut->getArgument(static::ARG_ACTION);
         switch ($action) {
@@ -113,7 +113,7 @@ class TemplatesCommand implements CommandInterface
      *
      * @return void
      */
-    protected function executeClear(ContainerInterface $container)
+    protected function executeClear(ContainerInterface $container): void
     {
         $settings    = $this->getTemplatesSettings($container);
         $cacheFolder = $settings[TemplatesSettings::KEY_CACHE_FOLDER];
@@ -132,7 +132,7 @@ class TemplatesCommand implements CommandInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    protected function executeCache(ContainerInterface $container)
+    protected function executeCache(ContainerInterface $container): void
     {
         $settings        = $this->getTemplatesSettings($container);
         $cacheFolder     = $settings[TemplatesSettings::KEY_CACHE_FOLDER];
@@ -163,7 +163,7 @@ class TemplatesCommand implements CommandInterface
      *
      * @return array
      */
-    protected function getTemplatesSettings(ContainerInterface $container)
+    protected function getTemplatesSettings(ContainerInterface $container): array
     {
         $tplConfig = $container->get(SettingsProviderInterface::class)->get(TemplatesSettings::class);
 

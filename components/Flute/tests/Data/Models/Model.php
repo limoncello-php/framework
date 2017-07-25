@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ModelInterface;
+
 /**
  * @package Limoncello\Tests\Flute
  */
@@ -39,7 +41,7 @@ abstract class Model implements ModelInterface
     /**
      * @inheritdoc
      */
-    public static function getTableName()
+    public static function getTableName(): string
     {
         return static::TABLE_NAME;
     }
@@ -47,7 +49,7 @@ abstract class Model implements ModelInterface
     /**
      * @inheritdoc
      */
-    public static function getPrimaryKeyName()
+    public static function getPrimaryKeyName(): string
     {
         return static::FIELD_ID;
     }

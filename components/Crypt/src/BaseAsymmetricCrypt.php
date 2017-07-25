@@ -43,9 +43,9 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
     }
 
     /**
-     * @return BaseAsymmetricCrypt
+     * @return self
      */
-    public function closeKey(): BaseAsymmetricCrypt
+    public function closeKey(): self
     {
         if ($this->key !== null) {
             openssl_pkey_free($this->key);
@@ -67,9 +67,9 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
     /**
      * @param resource $key
      *
-     * @return BaseAsymmetricCrypt
+     * @return self
      */
-    protected function setKey($key): BaseAsymmetricCrypt
+    protected function setKey($key): self
     {
         assert(is_resource($key) === true);
 

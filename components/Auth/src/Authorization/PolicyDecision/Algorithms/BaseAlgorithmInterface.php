@@ -38,7 +38,7 @@ interface BaseAlgorithmInterface
         ContextInterface $context,
         array $optimizedTargets,
         LoggerInterface $logger = null
-    );
+    ): Generator;
 
     /**
      * @param ContextInterface     $context
@@ -50,8 +50,8 @@ interface BaseAlgorithmInterface
      */
     public static function evaluateItem(
         ContextInterface $context,
-        $match,
+        int $match,
         array $encodedItem,
         LoggerInterface $logger = null
-    );
+    ): array;
 }

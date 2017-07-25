@@ -32,7 +32,7 @@ class EventsContainerConfigurator implements ContainerConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[EventEmitterInterface::class] = function (PsrContainerInterface $container) {
             $emitter   = new SimpleEventEmitter();

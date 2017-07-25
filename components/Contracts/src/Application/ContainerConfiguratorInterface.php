@@ -33,5 +33,5 @@ interface ContainerConfiguratorInterface
      *
      * @return void
      */
-    public static function configureContainer(ContainerInterface $container);
+    public static function configureContainer(ContainerInterface $container): void;
 }

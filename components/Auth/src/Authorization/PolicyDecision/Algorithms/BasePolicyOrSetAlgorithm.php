@@ -34,14 +34,14 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @return array
      */
-    abstract protected function optimizeTargets(array $targets);
+    abstract protected function optimizeTargets(array $targets): array;
 
     /**
      * @param ContextInterface     $context
      * @param array                $policiesAndSetsData
      * @param LoggerInterface|null $logger
      *
-     * @return int
+     * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -49,7 +49,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
         ContextInterface $context,
         array $policiesAndSetsData,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         return static::callAlgorithm(
             static::getCallable($policiesAndSetsData),
             $context,
@@ -100,17 +100,17 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      * @param array                $encodedPolicy
      * @param LoggerInterface|null $logger
      *
-     * @return int
+     * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public static function evaluatePolicy(
         ContextInterface $context,
-        $match,
+        int $match,
         array $encodedPolicy,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         assert(Encoder::isPolicy($encodedPolicy));
         assert($match !== TargetMatchEnum::NO_TARGET);
 
@@ -175,7 +175,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      */
     public static function evaluatePolicySet(
         ContextInterface $context,
-        $match,
+        int $match,
         array $encodedPolicySet,
         LoggerInterface $logger = null
     ) {
@@ -239,10 +239,10 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      */
     public static function evaluateItem(
         ContextInterface $context,
-        $match,
+        int $match,
         array $encodedItem,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         $isSet = Encoder::isPolicySet($encodedItem);
 
         return $isSet === true ?
@@ -258,7 +258,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private static function correctEvaluationOnIntermediateTarget($evaluation, LoggerInterface $logger = null)
+    private static function correctEvaluationOnIntermediateTarget(int $evaluation, LoggerInterface $logger = null): int
     {
         /** @see http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html #7.14 (table 7) */
 
@@ -301,7 +301,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @return array
      */
-    private static function getTargets(array $policiesAndSetsData)
+    private static function getTargets(array $policiesAndSetsData): array
     {
         return $policiesAndSetsData[self::INDEX_TARGETS];
     }
@@ -311,7 +311,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @return array
      */
-    private static function getPoliciesAndSets(array $policiesAndSetsData)
+    private static function getPoliciesAndSets(array $policiesAndSetsData): array
     {
         return $policiesAndSetsData[self::INDEX_POLICIES_AND_SETS];
     }
@@ -335,7 +335,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private static function mergeFulfilledObligations(array $obligations, $evaluation, array $obligationsMap)
+    private static function mergeFulfilledObligations(array $obligations, $evaluation, array $obligationsMap): array
     {
         return array_merge($obligations, Encoder::getFulfillObligations($evaluation, $obligationsMap));
     }
@@ -349,7 +349,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private static function mergeAppliedAdvice(array $advice, $evaluation, array $adviceMap)
+    private static function mergeAppliedAdvice(array $advice, $evaluation, array $adviceMap): array
     {
         return array_merge($advice, Encoder::getAppliedAdvice($evaluation, $adviceMap));
     }

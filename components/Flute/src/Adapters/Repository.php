@@ -22,12 +22,13 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
+use Limoncello\Flute\L10n\Messages;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
@@ -70,32 +71,31 @@ class Repository implements RepositoryInterface
     private $filterOperations;
 
     /**
-     * @var T
+     * @var FormatterInterface
      */
-    private $translator;
+    private $fluteMsgFormatter;
 
     /**
      * @var int
      */
     private $aliasIdCounter = 0;
 
-    // TODO replace input params with container
     /**
      * @param Connection                $connection
      * @param ModelSchemeInfoInterface  $modelSchemes
      * @param FilterOperationsInterface $filterOperations
-     * @param T                         $translator
+     * @param FormatterInterface        $fluteMsgFormatter
      */
     public function __construct(
         Connection $connection,
         ModelSchemeInfoInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
-        T $translator
+        FormatterInterface $fluteMsgFormatter
     ) {
-        $this->connection       = $connection;
-        $this->modelSchemes     = $modelSchemes;
-        $this->filterOperations = $filterOperations;
-        $this->translator       = $translator;
+        $this->connection        = $connection;
+        $this->modelSchemes      = $modelSchemes;
+        $this->filterOperations  = $filterOperations;
+        $this->fluteMsgFormatter = $fluteMsgFormatter;
     }
 
     /**
@@ -136,8 +136,8 @@ class Repository implements RepositoryInterface
 
         $valuesAsParams = [];
         foreach ($attributes as $column => $value) {
-            $type     = Type::getType($types[$column]);
-            $pdoValue = $type->convertToDatabaseValue($value, $dbPlatform);
+            $type                        = Type::getType($types[$column]);
+            $pdoValue                    = $type->convertToDatabaseValue($value, $dbPlatform);
             $valuesAsParams["`$column`"] = $builder->createNamedParameter($pdoValue, $type->getBindingType());
         }
 
@@ -287,7 +287,7 @@ class Repository implements RepositoryInterface
         $table = $this->getTableName($modelClass);
         foreach ($sortParams as $sortParam) {
             /** @var SortParameterInterface $sortParam */
-            $column    = null;
+            $column = null;
             if ($sortParam->isRelationship() === false) {
                 $column = $sortParam->getName();
             } elseif ($sortParam->getRelationshipType() === RelationshipTypes::BELONGS_TO) {
@@ -351,13 +351,13 @@ class Repository implements RepositoryInterface
             foreach ($filterValue as $operation => $params) {
                 $filterTable  = null;
                 $filterColumn = null;
-                $lcOp = strtolower((string)$operation);
+                $lcOp         = strtolower((string)$operation);
 
                 if ($filterParam->isForRelationship() === true) {
                     switch ($filterParam->getRelationshipType()) {
                         case RelationshipTypes::BELONGS_TO:
                             if ($filterParam->isForAttributeInRelationship() === true) {
-                                $foreignKey   = $modelSchemes->getForeignKey(
+                                $foreignKey = $modelSchemes->getForeignKey(
                                     $modelClass,
                                     $filterParam->getRelationshipName()
                                 );
@@ -390,7 +390,7 @@ class Repository implements RepositoryInterface
                             break;
                         case RelationshipTypes::HAS_MANY:
                             // here we join hasMany table and apply filter on its primary key
-                            $primaryKey    = $modelSchemes->getPrimaryKey($modelClass);
+                            $primaryKey = $modelSchemes->getPrimaryKey($modelClass);
                             list ($reverseClass, $reverseName) = $modelSchemes
                                 ->getReverseRelationship($modelClass, $filterParam->getRelationshipName());
                             $filterTable   = $modelSchemes->getTable($reverseClass);
@@ -414,7 +414,7 @@ class Repository implements RepositoryInterface
                             break;
                         case RelationshipTypes::BELONGS_TO_MANY:
                             // here we join intermediate belongsToMany table and apply filter on its 2nd foreign key
-                            list ($intermediateTable, $intermediatePk , $intermediateFk) = $modelSchemes
+                            list ($intermediateTable, $intermediatePk, $intermediateFk) = $modelSchemes
                                 ->getBelongsToManyRelationship($modelClass, $filterParam->getRelationshipName());
                             $primaryKey    = $modelSchemes->getPrimaryKey($modelClass);
                             $aliased       = $intermediateTable . $this->getNewAliasId();
@@ -438,8 +438,8 @@ class Repository implements RepositoryInterface
                                 // so we have to join that table
                                 list ($reverseClass) = $modelSchemes
                                     ->getReverseRelationship($modelClass, $filterParam->getRelationshipName());
-                                $reverseTable  = $modelSchemes->getTable($reverseClass);
-                                $reversePk     = $modelSchemes->getPrimaryKey($reverseClass);
+                                $reverseTable = $modelSchemes->getTable($reverseClass);
+                                $reversePk    = $modelSchemes->getPrimaryKey($reverseClass);
                                 // now join the table with intermediate
                                 $aliased2      = $reverseTable . $this->getNewAliasId();
                                 $joinCondition = $this->buildColumnName($aliased, $intermediateFk) .
@@ -557,11 +557,11 @@ class Repository implements RepositoryInterface
     }
 
     /**
-     * @return T
+     * @return FormatterInterface
      */
-    protected function getTranslator(): T
+    protected function getFluteMessageFormatter(): FormatterInterface
     {
-        return $this->translator;
+        return $this->fluteMsgFormatter;
     }
 
     /**
@@ -681,7 +681,7 @@ class Repository implements RepositoryInterface
                 $this->getFilterOperations()->applyIsNotNull($builder, $link, $table, $field);
                 break;
             default:
-                $errMsg = $this->getTranslator()->get(T::MSG_ERR_INVALID_OPERATION);
+                $errMsg = $this->getFluteMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_OPERATION);
                 $errors->addQueryParameterError($filterParam->getOriginalName(), $errMsg, $operation);
                 break;
         }

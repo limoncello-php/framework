@@ -31,7 +31,7 @@ class Sapi extends \Limoncello\Core\Application\Sapi
     /** @noinspection PhpMissingParentCallCommonInspection
      * @inheritdoc
      */
-    public function handleResponse(ResponseInterface $response)
+    public function handleResponse(ResponseInterface $response): void
     {
         $this->response = $response;
     }

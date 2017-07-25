@@ -35,7 +35,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         try {
             $this->createScopesTable($connection, $scheme);
@@ -59,7 +59,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $manager = $connection->getSchemaManager();
 
@@ -89,7 +89,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createScopesTable(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createScopesTable(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $manager = $connection->getSchemaManager();
 
@@ -109,7 +109,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createClientsTable(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createClientsTable(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $manager = $connection->getSchemaManager();
 
@@ -138,7 +138,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createRedirectUrisTable(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createRedirectUrisTable(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $manager = $connection->getSchemaManager();
 
@@ -167,7 +167,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createTokensTable(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createTokensTable(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $manager = $connection->getSchemaManager();
 
@@ -215,7 +215,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createClientsScopesTable(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createClientsScopesTable(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $manager = $connection->getSchemaManager();
 
@@ -253,7 +253,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createTokensScopesTable(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createTokensScopesTable(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $manager = $connection->getSchemaManager();
 

@@ -19,9 +19,11 @@
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Limoncello\Container\Container;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
-use Limoncello\Flute\I18n\Translator;
+use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\TestCase;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
@@ -47,10 +49,12 @@ class FilterOperationsTest extends TestCase
     {
         parent::setUp();
 
-        $connection = $this->createConnection();
+        $connection                                  = $this->createConnection();
+        $container                                   = new Container();
+        $container[FormatterFactoryInterface::class] = new FormatterFactory();
 
         $this->builder = $connection->createQueryBuilder();
-        $this->filters = new FilterOperations(new Translator());
+        $this->filters = new FilterOperations($container);
 
         $schemaManager = $connection->getSchemaManager();
         $table         = new Table('table_name');

@@ -35,7 +35,7 @@ class AsymmetricPublicEncryptPrivateDecryptContainerConfigurator implements Cont
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[EncryptInterface::class] = function (PsrContainerInterface $container) {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);

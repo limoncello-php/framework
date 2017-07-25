@@ -36,7 +36,7 @@ trait RefreshGrantTrait
     /**
      * @return RefreshIntegrationInterface
      */
-    protected function refreshGetIntegration()
+    protected function refreshGetIntegration(): RefreshIntegrationInterface
     {
         return $this->refreshIntegration;
     }
@@ -46,7 +46,7 @@ trait RefreshGrantTrait
      *
      * @return void
      */
-    public function refreshSetIntegration(RefreshIntegrationInterface $refreshIntegration)
+    public function refreshSetIntegration(RefreshIntegrationInterface $refreshIntegration): void
     {
         $this->refreshIntegration = $refreshIntegration;
     }

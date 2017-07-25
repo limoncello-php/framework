@@ -22,6 +22,8 @@ use Limoncello\Crypt\Exceptions\CryptException;
 
 /**
  * @package Limoncello\Crypt
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInterface
 {
@@ -47,6 +49,29 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
      */
     private $initializationVector = '';
 
+    // Authenticated Encryption with Associated Data options (since PHP 7.1)
+
+    /**
+     * Use Authenticated Encryption with Associated Data (since PHP 7.1)
+     *
+     * @var bool
+     */
+    private $useAuthentication = false;
+
+    /**
+     * Additional authentication data.
+     *
+     * @var string
+     */
+    private $aad = '';
+
+    /**
+     * The length of the authentication tag. Its value can be between 4 and 16 for GCM (Galois/Counter Mode) mode.
+     *
+     * @var int
+     */
+    private $tagLength = 16;
+
     /**
      * @param string $method
      * @param string $password
@@ -58,6 +83,8 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function decrypt(string $data): string
     {
@@ -70,19 +97,37 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
             $data     = $this->extractData($data, $ivLength);
         }
 
-        $decrypted = $this->openSslDecrypt(
-            $data,
-            $this->getMethod(),
-            $this->getPassword(),
-            $this->getOptions(),
-            $vector
-        );
+        if ($this->isUseAuthentication() === true) {
+            $tagLength = $this->getTagLength();
+            $tag       = $this->readTag($data, $tagLength);
+            $data      = $this->extractData($data, $tagLength);
+
+            $decrypted = $this->openSslDecryptAuthenticated(
+                $data,
+                $this->getMethod(),
+                $this->getPassword(),
+                $this->getOptions(),
+                $vector,
+                $this->getAdditionalAuthenticationData(),
+                $tag
+            );
+        } else {
+            $decrypted = $this->openSslDecrypt(
+                $data,
+                $this->getMethod(),
+                $this->getPassword(),
+                $this->getOptions(),
+                $vector
+            );
+        }
 
         return $decrypted;
     }
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function encrypt(string $data): string
     {
@@ -95,13 +140,33 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
             $isAddIvToOutput = true;
         }
 
-        $encrypted = $this->openSslEncrypt(
-            $data,
-            $this->getMethod(),
-            $this->getPassword(),
-            $this->getOptions(),
-            $vector
-        );
+        if ($this->isUseAuthentication() === true) {
+            $encrypted = $this->openSslEncryptAuthenticated(
+                $data,
+                $this->getMethod(),
+                $this->getPassword(),
+                $this->getOptions(),
+                $vector,
+                $this->getAdditionalAuthenticationData(),
+                $tag,
+                $this->getTagLength()
+            );
+
+            // Tag/Message authentication code should be sent with the encrypted message
+            // otherwise it won't be possible to validate and encrypt the message.
+            // Though https://tools.ietf.org/html/rfc5084 do not directly says it should
+            // be passed along with the encrypted message adding it is one of the possible
+            // solutions.
+            $encrypted = $tag . $encrypted;
+        } else {
+            $encrypted = $this->openSslEncrypt(
+                $data,
+                $this->getMethod(),
+                $this->getPassword(),
+                $this->getOptions(),
+                $vector
+            );
+        }
 
         // Add initialization vector (IV) if it was generated otherwise it won't be possible to encrypt the message.
         //
@@ -137,9 +202,9 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param string $method
      *
-     * @return SymmetricCrypt
+     * @return self
      */
-    public function setMethod(string $method): SymmetricCrypt
+    public function setMethod(string $method): self
     {
         assert(
             ($availableMethods = openssl_get_cipher_methods(true)) !== false &&
@@ -154,9 +219,9 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param string $password
      *
-     * @return SymmetricCrypt
+     * @return self
      */
-    public function setPassword(string $password): SymmetricCrypt
+    public function setPassword(string $password): self
     {
         assert(empty($password) === false);
 
@@ -168,9 +233,9 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param string $value
      *
-     * @return SymmetricCrypt
+     * @return self
      */
-    public function setIV(string $value): SymmetricCrypt
+    public function setIV(string $value): self
     {
         $this->initializationVector = $value;
 
@@ -186,25 +251,99 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     }
 
     /**
-     * @return SymmetricCrypt
+     * @return self
      */
-    public function withZeroPadding(): SymmetricCrypt
+    public function withZeroPadding(): self
     {
         return $this->setOption(OPENSSL_ZERO_PADDING);
     }
 
     /**
-     * @return SymmetricCrypt
+     * @return self
      */
-    public function withoutZeroPadding(): SymmetricCrypt
+    public function withoutZeroPadding(): self
     {
         return $this->clearOption(OPENSSL_ZERO_PADDING);
     }
 
     /**
-     * @return SymmetricCrypt
+     * @return bool
      */
-    protected function asRaw(): SymmetricCrypt
+    public function isUseAuthentication(): bool
+    {
+        return $this->useAuthentication;
+    }
+
+    /**
+     * Authenticated Encryption with Associated Data available for certain methods since PHP 7.1.
+     *
+     * @return self
+     */
+    public function enableAuthentication(): self
+    {
+        $this->useAuthentication = true;
+
+        return $this;
+    }
+
+    /**
+     * Authenticated Encryption with Associated Data available for certain methods since PHP 7.1.
+     *
+     * @return self
+     */
+    public function disableAuthentication(): self
+    {
+        $this->useAuthentication = false;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAdditionalAuthenticationData(): string
+    {
+        return $this->aad;
+    }
+
+    /**
+     * @param string $data
+     *
+     * @return self
+     */
+    public function setAdditionalAuthenticationData(string $data): self
+    {
+        $this->aad = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTagLength(): int
+    {
+        return $this->tagLength;
+    }
+
+    /**
+     * @param int $length
+     *
+     * @return self
+     */
+    public function setTagLength(int $length): self
+    {
+        assert($this->isTagLengthMightBeValid($length));
+
+        $this->tagLength = $length;
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    protected function asRaw(): self
     {
         return $this->setOption(OPENSSL_RAW_DATA);
     }
@@ -220,9 +359,9 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param int $options
      *
-     * @return SymmetricCrypt
+     * @return self
      */
-    protected function setOptions(int $options): SymmetricCrypt
+    protected function setOptions(int $options): self
     {
         $this->options = $options;
 
@@ -245,9 +384,9 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param int $option
      *
-     * @return SymmetricCrypt
+     * @return self
      */
-    protected function setOption(int $option): SymmetricCrypt
+    protected function setOption(int $option): self
     {
         $this->setOptions($this->getOptions() | $option);
 
@@ -257,9 +396,9 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     /**
      * @param int $option
      *
-     * @return SymmetricCrypt
+     * @return self
      */
-    protected function clearOption(int $option): SymmetricCrypt
+    protected function clearOption(int $option): self
     {
         $this->setOptions($this->getOptions() & ~$option);
 
@@ -280,6 +419,22 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
         $isOk === true ?: $this->throwException(new CryptException($this->getReadVectorErrorMessage()));
 
         return $vector;
+    }
+
+    /**
+     * @param string $data
+     * @param int    $tagLength
+     *
+     * @return string
+     */
+    protected function readTag(string $data, int $tagLength): string
+    {
+        $tag  = substr($data, 0, $tagLength);
+        $isOk = $tag !== false && strlen($tag) === $tagLength;
+
+        $isOk === true ?: $this->throwException(new CryptException($this->getReadTagErrorMessage()));
+
+        return $tag;
     }
 
     /**
@@ -345,6 +500,73 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
         return $decrypted;
     }
 
+    /** @noinspection PhpTooManyParametersInspection
+     * @param string       $data
+     * @param string       $method
+     * @param string       $password
+     * @param int          $options
+     * @param string       $initializationVector
+     * @param string       $aad
+     * @param string|null &$tag
+     * @param int          $tagLength
+     *
+     * @return string
+     */
+    protected function openSslEncryptAuthenticated(
+        string $data,
+        string $method,
+        string $password,
+        int $options,
+        string $initializationVector,
+        string $aad,
+        string &$tag = null,
+        int $tagLength = 16
+    ): string {
+        $encrypted = $this->openSslEncryptAuthenticatedImpl(
+            $data,
+            $method,
+            $password,
+            $options,
+            $initializationVector,
+            $aad,
+            $tag,
+            $tagLength
+        );
+
+        $message = $this->getErrorMessage();
+        $encrypted !== false ?: $this->throwException(new CryptException($message));
+
+        return $encrypted;
+    }
+
+    /**
+     * @param string $data
+     * @param string $method
+     * @param string $password
+     * @param int    $options
+     * @param string $initializationVector
+     * @param string $aad
+     * @param string $tag
+     *
+     * @return string
+     */
+    protected function openSslDecryptAuthenticated(
+        string $data,
+        string $method,
+        string $password,
+        int $options,
+        string $initializationVector,
+        string $aad,
+        string $tag
+    ): string {
+        $decrypted = $this
+            ->openSslDecryptAuthenticatedImpl($data, $method, $password, $options, $initializationVector, $aad, $tag);
+
+        $decrypted !== false ?: $this->throwException(new CryptException($this->getErrorMessage()));
+
+        return $decrypted;
+    }
+
     /**
      * @param string $method
      *
@@ -365,6 +587,14 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     protected function getReadVectorErrorMessage(): string
     {
         return 'Reading Initialization Vector (IV) failed';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getReadTagErrorMessage(): string
+    {
+        return 'Reading Authenticated Encryption Tag failed';
     }
 
     /**
@@ -417,6 +647,65 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
         return openssl_decrypt($data, $method, $password, $options, $initializationVector);
     }
 
+    /** @noinspection PhpTooManyParametersInspection
+     * We need this wrapper for testing purposes so we can mock system call to Open SSL.
+     *
+     * @param string       $data
+     * @param string       $method
+     * @param string       $password
+     * @param int          $options
+     * @param string       $initializationVector
+     * @param string       $aad
+     * @param string|null &$tag
+     * @param int          $tagLength
+     *
+     * @return false|string
+     */
+    protected function openSslEncryptAuthenticatedImpl(
+        string $data,
+        string $method,
+        string $password,
+        int $options,
+        string $initializationVector,
+        string $aad,
+        string &$tag = null,
+        int $tagLength = 16
+    ) {
+        assert(PHP_VERSION_ID >= 70100);
+        assert($this->isTagLengthMightBeValid($tagLength));
+
+        $result = openssl_encrypt($data, $method, $password, $options, $initializationVector, $tag, $aad, $tagLength);
+
+        return $result;
+    }
+
+    /**
+     * We need this wrapper for testing purposes so we can mock system call to Open SSL.
+     *
+     * @param string $data
+     * @param string $method
+     * @param string $password
+     * @param int    $options
+     * @param string $initializationVector
+     * @param string $aad
+     * @param string $tag
+     *
+     * @return false|string
+     */
+    protected function openSslDecryptAuthenticatedImpl(
+        string $data,
+        string $method,
+        string $password,
+        int $options,
+        string $initializationVector,
+        string $aad,
+        string $tag
+    ) {
+        assert(PHP_VERSION_ID >= 70100);
+
+        return openssl_decrypt($data, $method, $password, $options, $initializationVector, $tag, $aad);
+    }
+
     /**
      * We need this wrapper for testing purposes so we can mock system call to Open SSL.
      *
@@ -427,5 +716,17 @@ class SymmetricCrypt extends BaseCrypt implements EncryptInterface, DecryptInter
     protected function openSslIvLengthImpl(string $method)
     {
         return openssl_cipher_iv_length($method);
+    }
+
+    /**
+     * @param int $length
+     *
+     * @return bool
+     */
+    private function isTagLengthMightBeValid(int $length): bool
+    {
+        // @link http://php.net/manual/en/function.openssl-encrypt.php
+
+        return 4 <= $length && $length <= 16;
     }
 }

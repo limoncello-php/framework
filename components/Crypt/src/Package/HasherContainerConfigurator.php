@@ -32,7 +32,7 @@ class HasherContainerConfigurator implements ContainerConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[HasherInterface::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);

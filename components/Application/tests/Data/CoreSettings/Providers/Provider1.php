@@ -83,7 +83,8 @@ class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI, PrCmdI
      */
     public static function getSettings(): array
     {
-        return [new class implements SettingsInterface {
+        return [new class implements SettingsInterface
+        {
             /**
              * @return array
              */
@@ -97,7 +98,7 @@ class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI, PrCmdI
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[static::class] = 'Hello container';
     }
@@ -105,7 +106,7 @@ class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI, PrCmdI
     /**
      * @inheritdoc
      */
-    public static function configureRoutes(GroupInterface $routes)
+    public static function configureRoutes(GroupInterface $routes): void
     {
         $routes->get('/plugin1', [static::class, 'onIndex']);
     }

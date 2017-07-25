@@ -31,7 +31,7 @@ abstract class PolicyAlgorithm
     /**
      * @return PolicyCombiningAlgorithmInterface
      */
-    public static function firstApplicable()
+    public static function firstApplicable(): PolicyCombiningAlgorithmInterface
     {
         return new PoliciesOrSetsFirstApplicable();
     }
@@ -39,7 +39,7 @@ abstract class PolicyAlgorithm
     /**
      * @return PolicyCombiningAlgorithmInterface
      */
-    public static function denyOverrides()
+    public static function denyOverrides(): PolicyCombiningAlgorithmInterface
     {
         return new PoliciesOrSetsDenyOverrides();
     }
@@ -47,7 +47,7 @@ abstract class PolicyAlgorithm
     /**
      * @return PolicyCombiningAlgorithmInterface
      */
-    public static function permitOverrides()
+    public static function permitOverrides(): PolicyCombiningAlgorithmInterface
     {
         return new PoliciesOrSetsPermitOverrides();
     }
@@ -55,7 +55,7 @@ abstract class PolicyAlgorithm
     /**
      * @return PolicyCombiningAlgorithmInterface
      */
-    public static function denyUnlessPermit()
+    public static function denyUnlessPermit(): PolicyCombiningAlgorithmInterface
     {
         return new PoliciesOrSetsDenyUnlessPermit();
     }
@@ -63,7 +63,7 @@ abstract class PolicyAlgorithm
     /**
      * @return PolicyCombiningAlgorithmInterface
      */
-    public static function permitUnlessDeny()
+    public static function permitUnlessDeny(): PolicyCombiningAlgorithmInterface
     {
         return new PoliciesOrSetsPermitUnlessDeny();
     }

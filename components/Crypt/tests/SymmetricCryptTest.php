@@ -35,12 +35,40 @@ class SymmetricCryptTest extends TestCase
         $input = str_repeat('Hello world' . PHP_EOL, 1000);
 
         $crypt = new SymmetricCrypt('aes128', 'secret');
-        $encrypted = $crypt->withoutZeroPadding()->encrypt($input);
+        $encrypted = $crypt->withoutZeroPadding()->disableAuthentication()->encrypt($input);
         $this->assertNotEmpty($encrypted);
         $this->assertNotEquals($input, $encrypted);
 
         $crypt = new SymmetricCrypt('aes128', 'secret');
         $decrypted = $crypt->decrypt($encrypted);
+        $this->assertNotEmpty($decrypted);
+        $this->assertEquals($input, $decrypted);
+    }
+
+    /**
+     * Test encrypt & decrypt.
+     */
+    public function testAuthenticatedEncryptDecrypt()
+    {
+        $input = str_repeat('Hello world' . PHP_EOL, 1000);
+
+        $crypt = new SymmetricCrypt('aes-256-gcm', 'secret');
+        $encrypted = $crypt
+            ->withoutZeroPadding()
+            ->enableAuthentication()
+            ->setAdditionalAuthenticationData('Extra data to be authenticated but not encrypted')
+            ->setTagLength(16)
+            ->encrypt($input);
+        $this->assertNotEmpty($encrypted);
+        $this->assertNotEquals($input, $encrypted);
+
+        $crypt = new SymmetricCrypt('aes-256-gcm', 'secret');
+        $decrypted = $crypt
+            ->withoutZeroPadding()
+            ->enableAuthentication()
+            ->setAdditionalAuthenticationData('Extra data to be authenticated but not encrypted')
+            ->setTagLength(16)
+            ->decrypt($encrypted);
         $this->assertNotEmpty($decrypted);
         $this->assertEquals($input, $decrypted);
     }
@@ -101,6 +129,23 @@ class SymmetricCryptTest extends TestCase
      * @expectedException \Limoncello\Crypt\Exceptions\CryptException
      */
     public function testInvalidInputOnDecrypt2()
+    {
+        // resembles IV but not enough characters for tag
+        $encrypted = '1234567890123456_no_tag';
+
+        $crypt = new SymmetricCrypt('aes-256-gcm', 'secret');
+        $decrypted = $crypt
+            ->enableAuthentication()
+            ->decrypt($encrypted);
+        $this->assertNotEmpty($decrypted);
+    }
+
+    /**
+     * Test invalid input on decrypt.
+     *
+     * @expectedException \Limoncello\Crypt\Exceptions\CryptException
+     */
+    public function testInvalidInputOnDecrypt3()
     {
         // input resembles IV (16 symbols) but no encrypted data
         $encrypted = '1234567890123456';

@@ -121,7 +121,7 @@ class Encoder
      *
      * @return array
      */
-    public static function encodeRule(RuleInterface $rule)
+    public static function encodeRule(RuleInterface $rule): array
     {
         $result = [
             static::TYPE             => static::TYPE_RULE,
@@ -141,7 +141,7 @@ class Encoder
      *
      * @return array
      */
-    public static function encodePolicy(PolicyInterface $policy)
+    public static function encodePolicy(PolicyInterface $policy): array
     {
         $result = [
             static::TYPE               => static::TYPE_POLICY,
@@ -160,7 +160,7 @@ class Encoder
      *
      * @return array
      */
-    public static function encodePolicySet(PolicySetInterface $set)
+    public static function encodePolicySet(PolicySetInterface $set): array
     {
         $algorithm       = $set->getCombiningAlgorithm();
         $policiesAndSets = $set->getPoliciesAndSets();
@@ -181,7 +181,7 @@ class Encoder
      *
      * @return int
      */
-    public static function getType(array $encoded)
+    public static function getType(array $encoded): int
     {
         assert(array_key_exists(static::TYPE, $encoded) === true);
 
@@ -193,7 +193,7 @@ class Encoder
      *
      * @return bool
      */
-    public static function isTarget(array $encoded)
+    public static function isTarget(array $encoded): bool
     {
         return static::getType($encoded) === static::TYPE_TARGET;
     }
@@ -203,7 +203,7 @@ class Encoder
      *
      * @return bool
      */
-    public static function isRule(array $encoded)
+    public static function isRule(array $encoded): bool
     {
         return static::getType($encoded) === static::TYPE_RULE;
     }
@@ -213,7 +213,7 @@ class Encoder
      *
      * @return bool
      */
-    public static function isPolicy(array $encoded)
+    public static function isPolicy(array $encoded): bool
     {
         return static::getType($encoded) === static::TYPE_POLICY;
     }
@@ -223,7 +223,7 @@ class Encoder
      *
      * @return bool
      */
-    public static function isPolicySet(array $encoded)
+    public static function isPolicySet(array $encoded): bool
     {
         $type = static::getType($encoded);
 
@@ -259,9 +259,9 @@ class Encoder
     /**
      * @param array $encodedRule
      *
-     * @return array
+     * @return string
      */
-    public static function ruleName(array $encodedRule)
+    public static function ruleName(array $encodedRule): string
     {
         assert(static::isRule($encodedRule));
 
@@ -273,7 +273,7 @@ class Encoder
      *
      * @return array
      */
-    public static function ruleTarget(array $encodedRule)
+    public static function ruleTarget(array $encodedRule): array
     {
         assert(static::isRule($encodedRule));
 
@@ -283,7 +283,7 @@ class Encoder
     /**
      * @param array $encodedRule
      *
-     * @return array
+     * @return array|null
      */
     public static function ruleEffect(array $encodedRule)
     {
@@ -309,7 +309,7 @@ class Encoder
      *
      * @return callable[]
      */
-    public static function ruleObligations(array $encodedRule)
+    public static function ruleObligations(array $encodedRule): array
     {
         assert(static::isRule($encodedRule));
 
@@ -321,7 +321,7 @@ class Encoder
      *
      * @return callable[]
      */
-    public static function ruleAdvice(array $encodedRule)
+    public static function ruleAdvice(array $encodedRule): array
     {
         assert(static::isRule($encodedRule));
 
@@ -331,7 +331,7 @@ class Encoder
     /**
      * @param array $encodedPolicy
      *
-     * @return array
+     * @return string|null
      */
     public static function policyName(array $encodedPolicy)
     {
@@ -345,7 +345,7 @@ class Encoder
      *
      * @return array
      */
-    public static function policyTarget(array $encodedPolicy)
+    public static function policyTarget(array $encodedPolicy): array
     {
         assert(static::isPolicy($encodedPolicy));
 
@@ -357,7 +357,7 @@ class Encoder
      *
      * @return callable[]
      */
-    public static function policyObligations(array $encodedPolicy)
+    public static function policyObligations(array $encodedPolicy): array
     {
         assert(static::isPolicy($encodedPolicy));
 
@@ -369,7 +369,7 @@ class Encoder
      *
      * @return callable[]
      */
-    public static function policyAdvice(array $encodedPolicy)
+    public static function policyAdvice(array $encodedPolicy): array
     {
         assert(static::isPolicy($encodedPolicy));
 
@@ -381,7 +381,7 @@ class Encoder
      *
      * @return array
      */
-    public static function policyRules(array $encodedPolicy)
+    public static function policyRules(array $encodedPolicy): array
     {
         assert(static::isPolicy($encodedPolicy));
 
@@ -391,9 +391,9 @@ class Encoder
     /**
      * @param array $encodedPolicySet
      *
-     * @return array
+     * @return string
      */
-    public static function policySetName(array $encodedPolicySet)
+    public static function policySetName(array $encodedPolicySet): string
     {
         assert(static::isPolicySet($encodedPolicySet));
 
@@ -405,7 +405,7 @@ class Encoder
      *
      * @return array
      */
-    public static function policySetTarget(array $encodedPolicySet)
+    public static function policySetTarget(array $encodedPolicySet): array
     {
         assert(static::isPolicySet($encodedPolicySet));
 
@@ -417,7 +417,7 @@ class Encoder
      *
      * @return callable[]
      */
-    public static function policySetObligations(array $encodedPolicySet)
+    public static function policySetObligations(array $encodedPolicySet): array
     {
         assert(static::isPolicySet($encodedPolicySet));
 
@@ -429,7 +429,7 @@ class Encoder
      *
      * @return callable[]
      */
-    public static function policySetAdvice(array $encodedPolicySet)
+    public static function policySetAdvice(array $encodedPolicySet): array
     {
         assert(static::isPolicySet($encodedPolicySet));
 
@@ -441,7 +441,7 @@ class Encoder
      *
      * @return array
      */
-    public static function policySetChildren(array $encodedPolicySet)
+    public static function policySetChildren(array $encodedPolicySet): array
     {
         assert(static::isPolicySet($encodedPolicySet));
 
@@ -453,7 +453,7 @@ class Encoder
      *
      * @return array
      */
-    public static function rulesData(array $rules)
+    public static function rulesData(array $rules): array
     {
         assert(static::getType($rules) === static::TYPE_RULES);
 
@@ -465,7 +465,7 @@ class Encoder
      *
      * @return array
      */
-    public static function policiesAndSetsData(array $policesAndSets)
+    public static function policiesAndSetsData(array $policesAndSets): array
     {
         assert(static::getType($policesAndSets) === static::TYPE_POLICIES_AND_SETS);
 
@@ -478,7 +478,7 @@ class Encoder
      *
      * @return array
      */
-    public static function getFulfillObligations($evaluation, array $obligations)
+    public static function getFulfillObligations(int $evaluation, array $obligations): array
     {
         $result = array_key_exists($evaluation, $obligations) === true ? $obligations[$evaluation] : [];
 
@@ -491,7 +491,7 @@ class Encoder
      *
      * @return array
      */
-    public static function getAppliedAdvice($evaluation, array $advice)
+    public static function getAppliedAdvice(int $evaluation, array $advice): array
     {
         $result = array_key_exists($evaluation, $advice) === true ? $advice[$evaluation] : [];
 
@@ -513,7 +513,7 @@ class Encoder
      *
      * @return array
      */
-    private static function encodeObligations(array $obligations)
+    private static function encodeObligations(array $obligations): array
     {
         $result = [];
         foreach ($obligations as $item) {
@@ -529,7 +529,7 @@ class Encoder
      *
      * @return array
      */
-    private static function encodeAdvice(array $advice)
+    private static function encodeAdvice(array $advice): array
     {
         $result = [];
         foreach ($advice as $item) {
@@ -546,7 +546,7 @@ class Encoder
      *
      * @return array
      */
-    private static function encodeRules(RuleCombiningAlgorithmInterface $algorithm, array $rules)
+    private static function encodeRules(RuleCombiningAlgorithmInterface $algorithm, array $rules): array
     {
         return [
             static::TYPE       => static::TYPE_RULES,
@@ -563,7 +563,7 @@ class Encoder
     private static function serializePoliciesAndSets(
         PolicyCombiningAlgorithmInterface $algorithm,
         array $policiesAndSets
-    ) {
+    ): array {
         return [
             static::TYPE                   => static::TYPE_POLICIES_AND_SETS,
             static::POLICIES_AND_SETS_DATA => $algorithm->optimize($policiesAndSets)

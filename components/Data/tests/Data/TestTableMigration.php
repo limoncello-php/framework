@@ -49,7 +49,7 @@ class TestTableMigration implements MigrationInterface
     /**
      * @inheritdoc
      */
-    public function migrate()
+    public function migrate(): void
     {
         $this->createTable($this->modelClass, $this->columns);
     }
@@ -57,7 +57,7 @@ class TestTableMigration implements MigrationInterface
     /**
      * @inheritdoc
      */
-    public function rollback()
+    public function rollback(): void
     {
         $this->dropTableIfExists($this->modelClass);
     }

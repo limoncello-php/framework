@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
-use Limoncello\Validation\Contracts\ErrorInterface;
+use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
+use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 
 /**
  * @package Limoncello\Validation
@@ -27,14 +27,24 @@ class ErrorAggregator implements ErrorAggregatorInterface
     /**
      * @var ErrorInterface[]
      */
-    private $errors = [];
+    private $errors;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->clear();
+    }
 
     /**
      * @inheritdoc
      */
-    public function add(ErrorInterface $error)
+    public function add(ErrorInterface $error): ErrorAggregatorInterface
     {
         $this->errors[] = $error;
+
+        return $this;
     }
 
     /**
@@ -43,5 +53,23 @@ class ErrorAggregator implements ErrorAggregatorInterface
     public function get(): array
     {
         return $this->errors;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function count()
+    {
+        return count($this->get());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function clear(): ErrorAggregatorInterface
+    {
+        $this->errors = [];
+
+        return $this;
     }
 }

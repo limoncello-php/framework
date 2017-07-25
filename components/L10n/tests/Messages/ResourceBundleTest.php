@@ -27,7 +27,7 @@ class ResourceBundleTest extends TestCase
     /**
      * Test basic get and set operations.
      */
-    public function testGetAndSet()
+    public function testGetAndSetStringKeys()
     {
         $bundle = new ResourceBundle('de_DE', 'ErrorMessages', [
             'Key as a readable text' => 'Lets assume it would be german translation',
@@ -38,5 +38,21 @@ class ResourceBundleTest extends TestCase
         $this->assertEquals('ErrorMessages', $bundle->getNamespace());
         $this->assertEquals(['Key as a readable text', 'key_as_an_id'], $bundle->getKeys());
         $this->assertEquals('And that would be another german translation', $bundle->getValue('key_as_an_id'));
+    }
+
+    /**
+     * Test basic get and set operations.
+     */
+    public function testGetAndSetIntKeys()
+    {
+        $bundle = new ResourceBundle('de_DE', 'ErrorMessages', [
+            0 => 'Lets assume it would be german translation',
+            1 => 'And that would be another german translation',
+        ]);
+
+        $this->assertEquals('de_DE', $bundle->getLocale());
+        $this->assertEquals('ErrorMessages', $bundle->getNamespace());
+        $this->assertEquals([0, 1], $bundle->getKeys());
+        $this->assertEquals('And that would be another german translation', $bundle->getValue('1'));
     }
 }

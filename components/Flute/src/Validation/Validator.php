@@ -16,43 +16,37 @@
  * limitations under the License.
  */
 
-use Doctrine\DBAL\Types\Type;
-use Generator;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
-use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Contracts\Validation\ValidatorInterface;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
+use Limoncello\Contracts\L10n\FormatterInterface;
+use Limoncello\Flute\Contracts\Validation\ErrorCodes;
+use Limoncello\Flute\Contracts\Validation\JsonApiValidatorInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
-use Limoncello\Flute\Types\DateBaseType;
-use Limoncello\Validation\Captures\CaptureAggregator;
-use Limoncello\Validation\Contracts\CaptureAggregatorInterface;
-use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
-use Limoncello\Validation\Contracts\RuleInterface;
-use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
-use Limoncello\Validation\Errors\ErrorAggregator;
-use Limoncello\Validation\Validator\Captures;
-use Limoncello\Validation\Validator\Compares;
-use Limoncello\Validation\Validator\Converters;
-use Limoncello\Validation\Validator\ExpressionsX;
-use Limoncello\Validation\Validator\Generics;
-use Limoncello\Validation\Validator\Types;
-use Limoncello\Validation\Validator\Values;
-use Limoncello\Validation\Validator\Wrappers;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Limoncello\Flute\Validation\Execution\ContextStorage;
+use Limoncello\Flute\Validation\Execution\JsonApiErrorCollection;
+use Limoncello\Flute\Validation\Execution\JsonApiRuleSerializer;
+use Limoncello\Flute\Validation\Rules\RelationshipsTrait;
+use Limoncello\Validation\Contracts\Errors\ErrorInterface;
+use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
+use Limoncello\Validation\Execution\BlockInterpreter;
+use Limoncello\Validation\Validator\BaseValidator;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Flute
  *
- * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class Validator implements ValidatorInterface
+class Validator extends BaseValidator implements JsonApiValidatorInterface
 {
-    use Captures, Compares, Converters, ExpressionsX, Generics, Types, Values, Wrappers;
+    use RelationshipsTrait;
+
+    /**
+     * Namespace for string resources.
+     */
+    const RESOURCES_NAMESPACE = 'Limoncello.Flute.Validation';
 
     /** Rule description index */
     const RULE_INDEX = 0;
@@ -78,67 +72,97 @@ class Validator implements ValidatorInterface
     private $container;
 
     /**
-     * @var SchemaInterface|null
-     */
-    private $schema = null;
-
-    /**
-     * @var string
-     */
-    private $jsonType;
-
-    /**
-     * @var RuleInterface[]
-     */
-    private $rules;
-
-    /**
      * @var int
      */
     private $errorStatus;
 
     /**
-     * @var null|ErrorCollection
+     * @var ContextStorageInterface
      */
-    private $errorCollection = null;
+    private $contextStorage;
 
     /**
-     * @var null|CaptureAggregatorInterface
+     * @var JsonApiErrorCollection
      */
-    private $captureAggregator = null;
+    private $jsonApiErrors;
 
     /**
+     * @var array
+     */
+    private $blocks;
+
+    /**
+     * @var array
+     */
+    private $idRule;
+
+    /**
+     * @var array
+     */
+    private $typeRule;
+
+    /**
+     * @var int[]
+     */
+    private $attributeRules;
+
+    /**
+     * @var int[]
+     */
+    private $toOneRules;
+
+    /**
+     * @var int[]
+     */
+    private $toManyRules;
+
+    /**
+     * @var bool
+     */
+    private $isIgnoreUnknowns;
+
+    /**
+     * @var FormatterInterface|null
+     */
+    private $messageFormatter;
+
+    /**
+     * @param string             $name
+     * @param array              $data
      * @param ContainerInterface $container
-     * @param string             $jsonType
-     * @param RuleInterface[]    $rules
      * @param int                $errorStatus
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function __construct(
+        string $name,
+        array $data,
         ContainerInterface $container,
-        string $jsonType,
-        array $rules,
-        $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
+        int $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
-        if (array_key_exists(static::RULE_UNLISTED_ATTRIBUTE, $rules) === false) {
-            $rules[static::RULE_UNLISTED_ATTRIBUTE] = static::fail();
-        }
-        if (array_key_exists(static::RULE_UNLISTED_RELATIONSHIP, $rules) === false) {
-            $rules[static::RULE_UNLISTED_RELATIONSHIP] = static::fail();
-        }
-
+        $ruleSet           = JsonApiRuleSerializer::extractRuleSet($name, $data);
+        $this->blocks      = JsonApiRuleSerializer::extractBlocks($data);
         $this->container   = $container;
-        $this->jsonType    = $jsonType;
-        $this->rules       = $rules;
+        $this->idRule      = JsonApiRuleSerializer::getIdRule($ruleSet);
+        $this->typeRule    = JsonApiRuleSerializer::getTypeRule($ruleSet);
         $this->errorStatus = $errorStatus;
+
+        $this
+            ->setAttributeRules(JsonApiRuleSerializer::getAttributeRules($ruleSet))
+            ->setToOneIndexes(JsonApiRuleSerializer::getToOneRules($ruleSet))
+            ->setToManyIndexes(JsonApiRuleSerializer::getToManyRules($ruleSet))
+            ->disableIgnoreUnknowns();
+
+        parent::__construct();
     }
 
     /**
      * @inheritdoc
      */
-    public function assert(array $jsonData): ValidatorInterface
+    public function assert($jsonData): JsonApiValidatorInterface
     {
-        if ($this->check($jsonData) === false) {
-            throw new JsonApiException($this->getErrors(), $this->getErrorStatus());
+        if ($this->validate($jsonData) === false) {
+            throw new JsonApiException($this->getJsonApiErrorCollection(), $this->getErrorStatus());
         }
 
         return $this;
@@ -147,17 +171,17 @@ class Validator implements ValidatorInterface
     /**
      * @inheritdoc
      */
-    public function check(array $jsonData): bool
+    public function validate($input): bool
     {
-        $this->resetErrors();
-        $this->resetCaptureAggregator();
+        $this->reInitAggregatorsIfNeeded();
 
-        $this->validateType($jsonData);
-        $this->validateId($jsonData);
-        $this->validateAttributes($jsonData);
-        $this->validateRelationshipCaptures($jsonData, $this->createRelationshipCaptures());
+        $this
+            ->validateType($input)
+            ->validateId($input)
+            ->validateAttributes($input)
+            ->validateRelationships($input);
 
-        $hasNoErrors = $this->getErrors()->count() <= 0;
+        $hasNoErrors = $this->getJsonApiErrorCollection()->count() <= 0;
 
         return $hasNoErrors;
     }
@@ -165,49 +189,426 @@ class Validator implements ValidatorInterface
     /**
      * @inheritdoc
      */
-    public function getErrors(): ErrorCollection
+    public function getJsonApiErrors(): array
     {
-        $this->errorCollection !== null ?: $this->resetErrors();
-
-        return $this->errorCollection;
+        return $this->getJsonApiErrorCollection()->getArrayCopy();
     }
 
     /**
      * @inheritdoc
      */
-    public function getCaptures(): array
+    public function getJsonApiCaptures(): array
     {
-        $captures = $this->getCaptureAggregator()->getCaptures();
-
-        return $captures;
+        return $this->getCaptures()->get();
     }
 
     /**
+     * @return BaseValidator
+     */
+    protected function resetAggregators(): BaseValidator
+    {
+        $self = parent::resetAggregators();
+
+        $this->jsonApiErrors  = $this->createJsonApiErrors();
+        $this->contextStorage = $this->createContextStorage();
+
+        return $self;
+    }
+
+    /**
+     * @param array $jsonData
+     *
+     * @return self
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    private function validateType(array $jsonData): self
+    {
+        // execute start(s)
+        $starts = JsonApiRuleSerializer::getRuleStartIndexes($this->getTypeRule());
+        $this->executeStarts($starts);
+
+        if (array_key_exists(DI::KEYWORD_DATA, $jsonData) === true &&
+            array_key_exists(DI::KEYWORD_TYPE, $data = $jsonData[DI::KEYWORD_DATA]) === true
+        ) {
+            // execute main validation block(s)
+            $index = JsonApiRuleSerializer::getRuleIndex($this->getTypeRule());
+            $this->executeBlock($data[DI::KEYWORD_TYPE], $index);
+        } else {
+            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $details = $this->formatMessage(ErrorCodes::TYPE_MISSING);
+            $this->getJsonApiErrorCollection()->addDataTypeError($title, $details, $this->getErrorStatus());
+        }
+
+        // execute end(s)
+        $ends = JsonApiRuleSerializer::getRuleEndIndexes($this->getTypeRule());
+        $this->executeEnds($ends);
+
+        if (count($this->getErrors()) > 0) {
+            $title = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            foreach ($this->getErrors()->get() as $error) {
+                $this->getJsonApiErrorCollection()
+                    ->addDataTypeError($title, $this->getMessage($error), $this->getErrorStatus());
+            }
+            $this->getErrors()->clear();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $jsonData
+     *
+     * @return self
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function validateId(array $jsonData): self
+    {
+        // execute start(s)
+        $starts = JsonApiRuleSerializer::getRuleStartIndexes($this->getIdRule());
+        $this->executeStarts($starts);
+
+        // execute main validation block(s)
+        if (array_key_exists(DI::KEYWORD_DATA, $jsonData) === true &&
+            array_key_exists(DI::KEYWORD_ID, $data = $jsonData[DI::KEYWORD_DATA]) === true
+        ) {
+            $index = JsonApiRuleSerializer::getRuleIndex($this->getIdRule());
+            $this->executeBlock($data[DI::KEYWORD_ID], $index);
+        }
+
+        // execute end(s)
+        $ends = JsonApiRuleSerializer::getRuleEndIndexes($this->getIdRule());
+        $this->executeEnds($ends);
+
+        if (count($this->getErrors()) > 0) {
+            $title = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            foreach ($this->getErrors()->get() as $error) {
+                $this->getJsonApiErrorCollection()
+                    ->addDataIdError($title, $this->getMessage($error), $this->getErrorStatus());
+            }
+            $this->getErrors()->clear();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $jsonData
+     *
+     * @return self
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    private function validateAttributes(array $jsonData): self
+    {
+        // execute start(s)
+        $starts = JsonApiRuleSerializer::getRulesStartIndexes($this->getAttributeRules());
+        $this->executeStarts($starts);
+
+        if (array_key_exists(DI::KEYWORD_DATA, $jsonData) === true &&
+            array_key_exists(DI::KEYWORD_ATTRIBUTES, $data = $jsonData[DI::KEYWORD_DATA]) === true
+        ) {
+            if (is_array($attributes = $data[DI::KEYWORD_ATTRIBUTES]) === false) {
+                $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+                $details = $this->formatMessage(ErrorCodes::INVALID_ATTRIBUTES);
+                $this->getJsonApiErrorCollection()->addAttributesError($title, $details, $this->getErrorStatus());
+            } else {
+                // execute main validation block(s)
+                foreach ($attributes as $name => $value) {
+                    if ($this->hasAttributeIndex($name) === true) {
+                        $this->executeBlock($value, $this->getAttributeIndex($name));
+                    } elseif ($this->isIgnoreUnknowns() === false) {
+                        $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+                        $details = $this->formatMessage(ErrorCodes::UNKNOWN_ATTRIBUTE);
+                        $status  = $this->getErrorStatus();
+                        $this->getJsonApiErrorCollection()->addDataAttributeError($name, $title, $details, $status);
+                    }
+                }
+            }
+        }
+
+        // execute end(s)
+        $ends = JsonApiRuleSerializer::getRulesEndIndexes($this->getAttributeRules());
+        $this->executeEnds($ends);
+
+        if (count($this->getErrors()) > 0) {
+            foreach ($this->getErrors()->get() as $error) {
+                $this->getJsonApiErrorCollection()->addValidationAttributeError($error);
+            }
+            $this->getErrors()->clear();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $jsonData
+     *
+     * @return self
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    private function validateRelationships(array $jsonData): self
+    {
+        // execute start(s)
+        $starts = array_merge(
+            JsonApiRuleSerializer::getRulesStartIndexes($this->getToOneRules()),
+            JsonApiRuleSerializer::getRulesStartIndexes($this->getToManyRules())
+        );
+        $this->executeStarts($starts);
+
+        if (array_key_exists(DI::KEYWORD_DATA, $jsonData) === true &&
+            array_key_exists(DI::KEYWORD_RELATIONSHIPS, $data = $jsonData[DI::KEYWORD_DATA]) === true
+        ) {
+            if (is_array($relationships = $data[DI::KEYWORD_RELATIONSHIPS]) === false) {
+                $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+                $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP_TYPE);
+                $this->getJsonApiErrorCollection()->addRelationshipsError($title, $details, $this->getErrorStatus());
+            } else {
+                // ok we got to something that could be null or a valid relationship
+                $toOneIndexes  = JsonApiRuleSerializer::getRulesIndexes($this->getToOneRules());
+                $toManyIndexes = JsonApiRuleSerializer::getRulesIndexes($this->getToManyRules());
+
+                foreach ($relationships as $name => $relationship) {
+                    if (array_key_exists($name, $toOneIndexes) === true) {
+                        // it might be to1 relationship
+                        $this->validateAsToOneRelationship($toOneIndexes[$name], $name, $relationship);
+                    } elseif (array_key_exists($name, $toManyIndexes) === true) {
+                        // it might be toMany relationship
+                        $this->validateAsToManyRelationship($toManyIndexes[$name], $name, $relationship);
+                    } else {
+                        // unknown relationship
+                        $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+                        $details = $this->formatMessage(ErrorCodes::UNKNOWN_RELATIONSHIP);
+                        $status  = $this->getErrorStatus();
+                        $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $status);
+                    }
+                }
+            }
+        }
+
+        // execute end(s)
+        $ends = array_merge(
+            JsonApiRuleSerializer::getRulesEndIndexes($this->getToOneRules()),
+            JsonApiRuleSerializer::getRulesEndIndexes($this->getToManyRules())
+        );
+        $this->executeEnds($ends);
+
+        if (count($this->getErrors()) > 0) {
+            foreach ($this->getErrors()->get() as $error) {
+                $this->getJsonApiErrorCollection()->addValidationRelationshipError($error);
+            }
+            $this->getErrors()->clear();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int    $index
+     * @param string $name
+     * @param mixed  $mightBeRelationship
+     *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function resetErrors()
+    private function validateAsToOneRelationship(int $index, string $name, $mightBeRelationship): void
     {
-        $this->errorCollection = $this->createErrorCollection();
+        if (is_array($mightBeRelationship) === true &&
+            array_key_exists(DI::KEYWORD_DATA, $mightBeRelationship) === true &&
+            ($parsed = $this->parseSingleRelationship($mightBeRelationship[DI::KEYWORD_DATA])) !== false
+        ) {
+            // All right we got something. Now pass it to a validation rule.
+            $this->executeBlock($parsed, $index);
+        } else {
+            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP);
+            $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $this->getErrorStatus());
+        }
     }
 
     /**
-     * @return ErrorCollection
+     * @param int    $index
+     * @param string $name
+     * @param mixed  $mightBeRelationship
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function createErrorCollection(): ErrorCollection
+    private function validateAsToManyRelationship(int $index, string $name, $mightBeRelationship): void
     {
-        return new ErrorCollection(
-            $this->getContainer()->get(T::class),
-            $this->getContainer()->get(ValidationTranslatorInterface::class),
-            $this->getErrorStatus()
+        $isParsed       = true;
+        $collectedPairs = [];
+        if (is_array($mightBeRelationship) === true &&
+            array_key_exists(DI::KEYWORD_DATA, $mightBeRelationship) === true &&
+            is_array($data = $mightBeRelationship[DI::KEYWORD_DATA]) === true
+        ) {
+            foreach ($data as $mightTypeAndId) {
+                // we accept only pairs of type and id (no `null`s are accepted).
+                if (is_array($parsed = $this->parseSingleRelationship($mightTypeAndId)) === true) {
+                    $collectedPairs[] = $parsed;
+                } else {
+                    $isParsed = false;
+                    break;
+                }
+            }
+        } else {
+            $isParsed = false;
+        }
+
+        if ($isParsed === true) {
+            // All right we got something. Now pass it to a validation rule.
+            $this->executeBlock($collectedPairs, $index);
+        } else {
+            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP);
+            $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $this->getErrorStatus());
+        }
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return array|null|false Either `array` ($type => $id), or `null`, or `false` on error.
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    private function parseSingleRelationship($data)
+    {
+        if ($data === null) {
+            $result = null;
+        } elseif (is_array($data) === true &&
+            array_key_exists(DI::KEYWORD_TYPE, $data) === true &&
+            array_key_exists(DI::KEYWORD_ID, $data) === true &&
+            is_scalar($type = $data[DI::KEYWORD_TYPE]) === true &&
+            is_scalar($index = $data[DI::KEYWORD_ID]) === true
+        ) {
+            $result = [$type => $index];
+        } else {
+            $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Re-initializes internal aggregators for captures, errors, etc.
+     */
+    private function reInitAggregatorsIfNeeded(): void
+    {
+        $this->areAggregatorsDirty() === false ?: $this->resetAggregators();
+    }
+
+    /**
+     * @param mixed $input
+     * @param int   $index
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function executeBlock($input, int $index): void
+    {
+        BlockInterpreter::executeBlock(
+            $input,
+            $index,
+            $this->getBlocks(),
+            $this->getContextStorage(),
+            $this->getCaptures(),
+            $this->getErrors()
         );
     }
 
     /**
+     * @param array $indexes
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function executeStarts(array $indexes): void
+    {
+        BlockInterpreter::executeStarts($indexes, $this->getBlocks(), $this->getContextStorage(), $this->getErrors());
+    }
+
+    /**
+     * @param array $indexes
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function executeEnds(array $indexes): void
+    {
+        BlockInterpreter::executeEnds($indexes, $this->getBlocks(), $this->getContextStorage(), $this->getErrors());
+    }
+
+    /**
+     * @param ErrorInterface $error
+     *
      * @return string
      */
-    protected function getJsonType(): string
+    private function getMessage(ErrorInterface $error): string
     {
-        return $this->jsonType;
+        $context = $error->getMessageContext();
+        $args    = $context === null ? [] : $context;
+        $message = $this->formatMessage($error->getMessageCode(), $args);
+
+        return $message;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getIdRule(): array
+    {
+        return $this->idRule;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getTypeRule(): array
+    {
+        return $this->typeRule;
+    }
+
+    /**
+     * @return ContextStorageInterface
+     */
+    protected function getContextStorage(): ContextStorageInterface
+    {
+        return $this->contextStorage;
+    }
+
+    /**
+     * @return ContextStorageInterface
+     */
+    protected function createContextStorage(): ContextStorageInterface
+    {
+        return new ContextStorage($this->getContainer(), $this->getBlocks());
+    }
+
+    /**
+     * @return JsonApiErrorCollection
+     */
+    protected function getJsonApiErrorCollection(): JsonApiErrorCollection
+    {
+        return $this->jsonApiErrors;
+    }
+
+    /**
+     * @return JsonApiErrorCollection
+     */
+    protected function createJsonApiErrors(): JsonApiErrorCollection
+    {
+        return new JsonApiErrorCollection($this->getContainer(), $this->getErrorStatus());
     }
 
     /**
@@ -219,36 +620,6 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * @return ModelSchemeInfoInterface
-     */
-    protected function getModelSchemes(): ModelSchemeInfoInterface
-    {
-        return $this->getContainer()->get(ModelSchemeInfoInterface::class);
-    }
-
-    /**
-     * @return SchemaInterface
-     */
-    protected function getSchema(): SchemaInterface
-    {
-        if ($this->schema === null) {
-            /** @var JsonSchemesInterface $jsonSchemes */
-            $jsonSchemes  = $this->getContainer()->get(JsonSchemesInterface::class);
-            $this->schema = $jsonSchemes->getSchemaByResourceType($this->getJsonType());
-        }
-
-        return $this->schema;
-    }
-
-    /**
-     * @return RuleInterface[]
-     */
-    protected function getRules(): array
-    {
-        return $this->rules;
-    }
-
-    /**
      * @return int
      */
     protected function getErrorStatus(): int
@@ -257,253 +628,185 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * @return CaptureAggregatorInterface
+     * @return bool
      */
-    protected function createCaptureAggregator(): CaptureAggregatorInterface
+    protected function isIgnoreUnknowns(): bool
     {
-        return new CaptureAggregator();
+        return $this->isIgnoreUnknowns;
     }
 
     /**
-     * @return ErrorAggregatorInterface
+     * @return Validator
      */
-    protected function createErrorAggregator(): ErrorAggregatorInterface
+    protected function enableIgnoreUnknowns(): self
     {
-        return new ErrorAggregator();
+        $this->isIgnoreUnknowns = true;
+
+        return $this;
     }
 
     /**
-     * @return CaptureAggregatorInterface
+     * @return Validator
      */
-    public function getCaptureAggregator(): CaptureAggregatorInterface
+    protected function disableIgnoreUnknowns(): self
     {
-        $this->captureAggregator !== null ?: $this->resetCaptureAggregator();
+        $this->isIgnoreUnknowns = false;
 
-        return $this->captureAggregator;
+        return $this;
     }
 
     /**
-     * @return void
-     */
-    protected function resetCaptureAggregator()
-    {
-        $this->captureAggregator = $this->createCaptureAggregator();
-    }
-
-    /**
-     * @param array $jsonData
+     * @param array $rules
      *
-     * @return void
+     * @return self
      */
-    private function validateType(array $jsonData)
+    private function setAttributeRules(array $rules): self
     {
-        $expectedType = $this->getSchema()::TYPE;
-        $ignoreOthers = static::success();
-        $rule         = static::arrayX([
-            DocumentInterface::KEYWORD_DATA => static::arrayX([
-                DocumentInterface::KEYWORD_TYPE => static::required(static::equals($expectedType)),
-            ], $ignoreOthers),
-        ], $ignoreOthers);
-        foreach ($this->validateRule($rule, $jsonData) as $error) {
-            $this->getErrors()->addValidationTypeError($error);
-        }
+        assert($this->debugCheckIndexesExist($rules));
+
+        $this->attributeRules = $rules;
+
+        return $this;
     }
 
     /**
-     * @param RuleInterface $rule
-     * @param mixed         $input
+     * @param array $rules
      *
-     * @return Generator
+     * @return self
      */
-    protected function validateRule(RuleInterface $rule, $input): Generator
+    private function setToOneIndexes(array $rules): self
     {
-        foreach ($rule->validate($input) as $error) {
-            yield $error;
-        };
+        assert($this->debugCheckIndexesExist($rules));
 
-        $aggregator = $this->createErrorAggregator();
-        $rule->onFinish($aggregator);
+        $this->toOneRules = $rules;
 
-        foreach ($aggregator->get() as $error) {
-            yield $error;
-        }
+        return $this;
     }
 
     /**
-     * @param array $jsonData
+     * @param array $rules
      *
-     * @return void
+     * @return self
      */
-    private function validateId(array $jsonData)
+    private function setToManyIndexes(array $rules): self
     {
-        $idRule = $this->getRules()[static::RULE_INDEX] ?? static::success();
-        assert($idRule instanceof RuleInterface);
+        assert($this->debugCheckIndexesExist($rules));
 
-        // will use primary column name as a capture name for `id`
-        $captureName  = $this->getModelSchemes()->getPrimaryKey($this->getSchema()::MODEL);
-        $idRule       = static::singleCapture($captureName, $idRule, $this->getCaptureAggregator());
-        $ignoreOthers = static::success();
-        $rule         = static::arrayX([
-            DocumentInterface::KEYWORD_DATA => static::arrayX([
-                DocumentInterface::KEYWORD_ID => $idRule,
-            ], $ignoreOthers)
-        ], $ignoreOthers);
-        foreach ($this->validateRule($rule, $jsonData) as $error) {
-            $this->getErrors()->addValidationIdError($error);
-        }
+        $this->toManyRules = $rules;
+
+        return $this;
     }
 
     /**
-     * @param array $jsonData
-     *
-     * @return void
+     * @return int[]
      */
-    private function validateAttributes(array $jsonData)
+    protected function getAttributeRules(): array
     {
-        $attributeRules     = $this->getRules()[static::RULE_ATTRIBUTES] ?? [];
-        $schema             = $this->getSchema();
-        $attributeTypes     = $this->getModelSchemes()->getAttributeTypes($schema::MODEL);
-        $createTypedCapture = function (string $name, RuleInterface $rule) use ($attributeTypes, $schema) {
-            $captureName    = $schema->getAttributeMapping($name);
-            $attributeType  = $attributeTypes[$captureName] ?? Type::STRING;
-            $untypedCapture = static::singleCapture($captureName, $rule, $this->getCaptureAggregator());
-            switch ($attributeType) {
-                case Type::INTEGER:
-                    $capture = static::toInt($untypedCapture);
-                    break;
-                case Type::FLOAT:
-                    $capture = static::toFloat($untypedCapture);
-                    break;
-                case Type::BOOLEAN:
-                    $capture = static::toBool($untypedCapture);
-                    break;
-                case Type::DATE:
-                case Type::DATETIME:
-                    $capture = static::toDateTime($untypedCapture, DateBaseType::JSON_API_FORMAT);
-                    break;
-                default:
-                    $capture = $untypedCapture;
-                    break;
-            }
+        return $this->attributeRules;
+    }
 
-            return $capture;
-        };
+    /**
+     * @return int[]
+     */
+    protected function getToOneRules(): array
+    {
+        return $this->toOneRules;
+    }
 
-        $attributeCaptures = [];
-        foreach ($attributeRules as $name => $rule) {
-            assert(is_string($name) === true && empty($name) === false && $rule instanceof RuleInterface);
-            $attributeCaptures[$name] = $createTypedCapture($name, $rule);
-        }
-
-        $attributes   = $jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_ATTRIBUTES] ?? [];
-        $unlistedRule = $this->getRules()[static::RULE_UNLISTED_ATTRIBUTE] ?? null;
-        $dataErrors   = $this->validateRule(static::arrayX($attributeCaptures, $unlistedRule), $attributes);
-
-        foreach ($dataErrors as $error) {
-            $this->getErrors()->addValidationAttributeError($error);
-        }
+    /**
+     * @return int[]
+     */
+    protected function getToManyRules(): array
+    {
+        return $this->toManyRules;
     }
 
     /**
      * @return array
      */
-    private function createRelationshipCaptures(): array
+    private function getBlocks(): array
     {
-        $toOneRules   = $this->getRules()[static::RULE_TO_ONE] ?? [];
-        $toManyRules  = $this->getRules()[static::RULE_TO_MANY] ?? [];
-        $aggregator   = $this->getCaptureAggregator();
-        $jsonSchemes  = $this->getContainer()->get(JsonSchemesInterface::class);
-        $schema       = $this->getSchema();
-        $modelSchemes = $this->getModelSchemes();
-        $modelClass   = $schema::MODEL;
+        return $this->blocks;
+    }
 
-        $relationshipCaptures = [];
-        foreach ($toOneRules as $name => $rule) {
-            assert(is_string($name) === true && empty($name) === false && $rule instanceof RuleInterface);
-            $modelRelName   = $schema->getRelationshipMapping($name);
-            $captureName    = $modelSchemes->getForeignKey($modelClass, $modelRelName);
-            $expectedSchema = $jsonSchemes->getModelRelationshipSchema($modelClass, $modelRelName);
-            $relationshipCaptures[$name] = $this->createSingleData(
-                $name,
-                static::equals($expectedSchema::TYPE),
-                static::singleCapture($captureName, $rule, $aggregator)
-            );
-        }
-        foreach ($toManyRules as $name => $rule) {
-            assert(is_string($name) === true && empty($name) === false && $rule instanceof RuleInterface);
-            $modelRelName   = $schema->getRelationshipMapping($name);
-            $expectedSchema = $jsonSchemes->getModelRelationshipSchema($modelClass, $modelRelName);
-            $captureName    = $modelRelName;
-            $relationshipCaptures[$name] = $this->createMultiData(
-                $name,
-                static::equals($expectedSchema::TYPE),
-                static::multiCapture($captureName, $rule, $aggregator)
-            );
+    /**
+     * @return FormatterInterface
+     */
+    protected function getMessageFormatter(): FormatterInterface
+    {
+        if ($this->messageFormatter === null) {
+            /** @var FormatterFactoryInterface $factory */
+            $factory                = $this->getContainer()->get(FormatterFactoryInterface::class);
+            $this->messageFormatter = $factory->createFormatter(static::RESOURCES_NAMESPACE);
         }
 
-        return $relationshipCaptures;
+        return $this->messageFormatter;
     }
 
     /**
-     * @param array $jsonData
-     * @param array $relationshipCaptures
+     * @param string $name
      *
-     * @return void
+     * @return int
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private function validateRelationshipCaptures(array $jsonData, array $relationshipCaptures)
+    private function getAttributeIndex(string $name): int
     {
-        $relationships = $jsonData[DocumentInterface::KEYWORD_DATA][DocumentInterface::KEYWORD_RELATIONSHIPS] ?? [];
-        $unlistedRule  = $this->getRules()[static::RULE_UNLISTED_RELATIONSHIP] ?? null;
-        $dataErrors    = $this->validateRule(static::arrayX($relationshipCaptures, $unlistedRule), $relationships);
-        foreach ($dataErrors as $error) {
-            $this->getErrors()->addValidationRelationshipError($error);
+        $indexes = JsonApiRuleSerializer::getRulesIndexes($this->getAttributeRules());
+        $index   = $indexes[$name];
+
+        return $index;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function hasAttributeIndex(string $name): bool
+    {
+        $indexes      = JsonApiRuleSerializer::getRulesIndexes($this->getAttributeRules());
+        $hasAttribute = array_key_exists($name, $indexes);
+
+        return $hasAttribute;
+    }
+
+    /**
+     * @param int   $messageId
+     * @param array $args
+     *
+     * @return string
+     */
+    private function formatMessage(int $messageId, array $args = []): string
+    {
+        $message = $this->getMessageFormatter()->formatMessage($messageId, $args);
+
+        return $message;
+    }
+
+    /**
+     * @param array $rules
+     *
+     * @return bool
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function debugCheckIndexesExist(array $rules): bool
+    {
+        $allOk = true;
+
+        $indexes = array_merge(
+            JsonApiRuleSerializer::getRulesIndexes($rules),
+            JsonApiRuleSerializer::getRulesStartIndexes($rules),
+            JsonApiRuleSerializer::getRulesEndIndexes($rules)
+        );
+
+        foreach ($indexes as $index) {
+            $allOk = $allOk && is_int($index) && JsonApiRuleSerializer::isRuleExist($index, $this->getBlocks());
         }
-    }
 
-    /**
-     * @param RuleInterface $typeRule
-     * @param RuleInterface $idRule
-     *
-     * @return RuleInterface
-     */
-    private function createOptionalIdentity(RuleInterface $typeRule, RuleInterface $idRule): RuleInterface
-    {
-        return self::andX(self::isArray(), self::arrayX([
-            DocumentInterface::KEYWORD_TYPE => $typeRule,
-            DocumentInterface::KEYWORD_ID   => $idRule,
-        ])->disableAutoParameterNames());
-    }
-
-    /**
-     * @param string        $name
-     * @param RuleInterface $typeRule
-     * @param RuleInterface $idRule
-     *
-     * @return RuleInterface
-     */
-    private function createSingleData($name, RuleInterface $typeRule, RuleInterface $idRule): RuleInterface
-    {
-        $identityRule  = $this->createOptionalIdentity($typeRule, $idRule);
-        $nullValueRule = static::andX($idRule, static::isNull());
-
-        return static::andX(static::isArray(), static::arrayX([
-            DocumentInterface::KEYWORD_DATA => static::orX($identityRule, $nullValueRule),
-        ])->disableAutoParameterNames()->setParameterName($name));
-    }
-
-    /**
-     * @param string        $name
-     * @param RuleInterface $typeRule
-     * @param RuleInterface $idRule
-     *
-     * @return RuleInterface
-     */
-    private function createMultiData(string $name, RuleInterface $typeRule, RuleInterface $idRule): RuleInterface
-    {
-        $identityRule = $this->createOptionalIdentity($typeRule, $idRule);
-
-        return static::andX(static::isArray(), static::arrayX([
-            DocumentInterface::KEYWORD_DATA => static::andX(static::isArray(), static::eachX($identityRule)),
-        ])->disableAutoParameterNames()->setParameterName($name));
+        return $allOk;
     }
 }

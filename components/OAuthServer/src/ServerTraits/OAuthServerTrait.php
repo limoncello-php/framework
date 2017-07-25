@@ -41,7 +41,7 @@ trait OAuthServerTrait
     /**
      * @return void
      */
-    public function setInputUriOptional()
+    public function setInputUriOptional(): void
     {
         $this->isInputUriOptional = true;
     }
@@ -49,7 +49,7 @@ trait OAuthServerTrait
     /**
      * @return void
      */
-    public function setInputUriMandatory()
+    public function setInputUriMandatory(): void
     {
         $this->isInputUriOptional = false;
     }

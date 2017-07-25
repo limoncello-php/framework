@@ -39,7 +39,7 @@ class GroupPosBased extends \FastRoute\Dispatcher\GroupPosBased implements Dispa
     /**
      * @inheritdoc
      */
-    public function setData(array $data)
+    public function setData(array $data): void
     {
         list($this->staticRouteMap, $this->variableRouteData) = $data;
     }

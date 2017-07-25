@@ -39,7 +39,7 @@ class CommentEmotion extends Model
     /**
      * @inheritdoc
      */
-    public static function getAttributeTypes()
+    public static function getAttributeTypes(): array
     {
         return [
             self::FIELD_ID         => Type::INTEGER,
@@ -53,7 +53,7 @@ class CommentEmotion extends Model
     /**
      * @inheritdoc
      */
-    public static function getAttributeLengths()
+    public static function getAttributeLengths(): array
     {
         return [];
     }
@@ -61,7 +61,7 @@ class CommentEmotion extends Model
     /**
      * @inheritdoc
      */
-    public static function getRelationships()
+    public static function getRelationships(): array
     {
         return [];
     }

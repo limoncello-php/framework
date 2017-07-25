@@ -39,7 +39,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         try {
             $this->createDatabaseTables($connection, $scheme);
@@ -59,7 +59,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $this->removeDatabaseTables($connection, $scheme);
         $this->removeDatabaseViews($connection, $scheme);
@@ -71,7 +71,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createDatabaseViews(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createDatabaseViews(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $this->createClientsView($connection, $scheme);
         $this->createTokensView($connection, $scheme);
@@ -85,7 +85,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function removeDatabaseViews(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function removeDatabaseViews(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $this->removePassportView($connection, $scheme);
         $this->removeClientsView($connection, $scheme);
@@ -101,7 +101,7 @@ trait DatabaseSchemeMigrationTrait
      *
      * @return void
      */
-    protected function createTokensView(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createTokensView(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $view                = $scheme->getTokensView();
         $tokens              = $scheme->getTokensTable();
@@ -146,7 +146,7 @@ EOT;
      *
      * @return void
      */
-    protected function createPassportView(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function createPassportView(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $tokensView   = $scheme->getTokensView();
         $view         = $scheme->getPassportView();
@@ -170,7 +170,7 @@ EOT;
      *
      * @return void
      */
-    protected function removePassportView(Connection $connection, DatabaseSchemeInterface $scheme)
+    protected function removePassportView(Connection $connection, DatabaseSchemeInterface $scheme): void
     {
         $view = $scheme->getPassportView();
         $sql  = "DROP VIEW IF EXISTS {$view}";

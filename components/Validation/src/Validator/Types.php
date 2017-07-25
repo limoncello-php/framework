@@ -16,13 +16,15 @@
  * limitations under the License.
  */
 
-use DateTime;
-use DateTimeInterface;
-use Limoncello\Validation\Contracts\MessageCodes;
-use Limoncello\Validation\Contracts\RuleInterface;
-use Limoncello\Validation\Rules\CallableRule;
-use Limoncello\Validation\Rules\InValues;
-use Limoncello\Validation\Rules\IsDateTimeFormat;
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Limoncello\Validation\Rules\Generic\AndOperator;
+use Limoncello\Validation\Rules\Types\AsArray;
+use Limoncello\Validation\Rules\Types\AsBool;
+use Limoncello\Validation\Rules\Types\AsDateTime;
+use Limoncello\Validation\Rules\Types\AsFloat;
+use Limoncello\Validation\Rules\Types\AsInt;
+use Limoncello\Validation\Rules\Types\AsNumeric;
+use Limoncello\Validation\Rules\Types\AsString;
 
 /**
  * @package Limoncello\Validation
@@ -30,83 +32,72 @@ use Limoncello\Validation\Rules\IsDateTimeFormat;
 trait Types
 {
     /**
-     * @return RuleInterface
-     */
-    protected static function isString(): RuleInterface
-    {
-        return new CallableRule('is_string', MessageCodes::IS_STRING);
-    }
-
-    /**
-     * @return RuleInterface
-     */
-    protected static function isBool(): RuleInterface
-    {
-        return new CallableRule('is_bool', MessageCodes::IS_BOOL);
-    }
-
-    /**
-     * @return RuleInterface
-     */
-    protected static function isInt(): RuleInterface
-    {
-        return new CallableRule('is_int', MessageCodes::IS_INT);
-    }
-
-    /**
-     * @return RuleInterface
-     */
-    protected static function isFloat(): RuleInterface
-    {
-        return new CallableRule('is_float', MessageCodes::IS_FLOAT);
-    }
-
-    /**
-     * @return RuleInterface
-     */
-    protected static function isNumeric(): RuleInterface
-    {
-        return new CallableRule('is_numeric', MessageCodes::IS_NUMERIC);
-    }
-
-    /**
-     * @return RuleInterface
-     */
-    protected static function isDateTime(): RuleInterface
-    {
-        return new CallableRule(function ($value) {
-            return $value instanceof DateTimeInterface;
-        }, MessageCodes::IS_DATE_TIME);
-    }
-
-    /**
-     * @param string $format
+     * @param RuleInterface|null $rule
      *
      * @return RuleInterface
      */
-    protected static function isDateTimeFormat(string $format = DateTime::W3C): RuleInterface
+    protected static function isArray(RuleInterface $rule = null): RuleInterface
     {
-        return new IsDateTimeFormat($format);
+        return $rule === null ? new AsArray() : new AndOperator(new AsArray(), $rule);
     }
 
     /**
+     * @param RuleInterface $rule
+     *
      * @return RuleInterface
      */
-    protected static function isArray(): RuleInterface
+    protected static function isString(RuleInterface $rule = null): RuleInterface
     {
-        return new CallableRule('is_array', MessageCodes::IS_ARRAY);
+        return $rule === null ? new AsString() : new AndOperator(new AsString(), $rule);
     }
 
     /**
-     * @param array $values
-     * @param bool  $isStrict
+     * @param RuleInterface $rule
      *
      * @return RuleInterface
-     *
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected static function inValues(array $values, bool $isStrict = true): RuleInterface
+    protected static function isBool(RuleInterface $rule = null): RuleInterface
     {
-        return new InValues($values, $isStrict);
+        return $rule === null ? new AsBool() : new AndOperator(new AsBool(), $rule);
+    }
+
+    /**
+     * @param RuleInterface $rule
+     *
+     * @return RuleInterface
+     */
+    protected static function isInt(RuleInterface $rule = null): RuleInterface
+    {
+        return $rule === null ? new AsInt() : new AndOperator(new AsInt(), $rule);
+    }
+
+    /**
+     * @param RuleInterface $rule
+     *
+     * @return RuleInterface
+     */
+    protected static function isFloat(RuleInterface $rule = null): RuleInterface
+    {
+        return $rule === null ? new AsFloat() : new AndOperator(new AsFloat(), $rule);
+    }
+
+    /**
+     * @param RuleInterface $rule
+     *
+     * @return RuleInterface
+     */
+    protected static function isNumeric(RuleInterface $rule = null): RuleInterface
+    {
+        return $rule === null ? new AsNumeric() : new AndOperator(new AsNumeric(), $rule);
+    }
+
+    /**
+     * @param RuleInterface $rule
+     *
+     * @return RuleInterface
+     */
+    protected static function isDateTime(RuleInterface $rule = null): RuleInterface
+    {
+        return $rule === null ? new AsDateTime() : new AndOperator(new AsDateTime(), $rule);
     }
 }

@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\RuleInterface;
-use Limoncello\Validation\Converters\BoolConverter;
-use Limoncello\Validation\Converters\DateTimeConverter;
-use Limoncello\Validation\Converters\FloatConverter;
-use Limoncello\Validation\Converters\IntConverter;
-use Limoncello\Validation\Converters\StringConverter;
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Limoncello\Validation\Rules\Converters\StringArrayToIntArray;
+use Limoncello\Validation\Rules\Converters\StringToBool;
+use Limoncello\Validation\Rules\Converters\StringToDateTime;
+use Limoncello\Validation\Rules\Converters\StringToFloat;
+use Limoncello\Validation\Rules\Converters\StringToInt;
+use Limoncello\Validation\Rules\Generic\AndOperator;
 
 /**
  * @package Limoncello\Validation
@@ -29,53 +30,53 @@ use Limoncello\Validation\Converters\StringConverter;
 trait Converters
 {
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface|null $rule
      *
      * @return RuleInterface
      */
-    protected static function toBool(RuleInterface $rule): RuleInterface
+    protected static function stringToBool(RuleInterface $rule = null): RuleInterface
     {
-        return new BoolConverter($rule);
+        return $rule === null ? new StringToBool() : new AndOperator(new StringToBool(), $rule);
     }
 
     /**
-     * @param RuleInterface $rule
-     * @param string        $format
+     * @param string             $format
+     * @param RuleInterface|null $rule
      *
      * @return RuleInterface
      */
-    protected static function toDateTime(RuleInterface $rule, string $format): RuleInterface
+    protected static function stringToDateTime(string $format, RuleInterface $rule = null): RuleInterface
     {
-        return new DateTimeConverter($rule, $format);
+        return $rule === null ? new StringToDateTime($format) : new AndOperator(new StringToDateTime($format), $rule);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface|null $rule
      *
      * @return RuleInterface
      */
-    protected static function toFloat(RuleInterface $rule): RuleInterface
+    protected static function stringToFloat(RuleInterface $rule = null): RuleInterface
     {
-        return new FloatConverter($rule);
+        return $rule === null ? new StringToFloat() : new AndOperator(new StringToFloat(), $rule);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface|null $rule
      *
      * @return RuleInterface
      */
-    protected static function toInt(RuleInterface $rule): RuleInterface
+    protected static function stringToInt(RuleInterface $rule = null): RuleInterface
     {
-        return new IntConverter($rule);
+        return $rule === null ? new StringToInt() : new AndOperator(new StringToInt(), $rule);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface|null $rule
      *
      * @return RuleInterface
      */
-    protected static function toString(RuleInterface $rule): RuleInterface
+    protected static function stringArrayToIntArray(RuleInterface $rule = null): RuleInterface
     {
-        return new StringConverter($rule);
+        return $rule === null ? new StringArrayToIntArray() : new AndOperator(new StringArrayToIntArray(), $rule);
     }
 }

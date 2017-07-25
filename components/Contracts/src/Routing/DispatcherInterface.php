@@ -35,7 +35,7 @@ interface DispatcherInterface
      *
      * @return void
      */
-    public function setData(array $data);
+    public function setData(array $data): void;
 
     /**
      * Dispatches against the provided HTTP method verb and URI.

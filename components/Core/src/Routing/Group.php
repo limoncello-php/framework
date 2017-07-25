@@ -48,8 +48,12 @@ class Group extends BaseGroup
      */
     public function parentGroup()
     {
-        // null
-        return parent::parentGroup();
+        $group = parent::parentGroup();
+
+        // for groups with a parent use NestedGroup
+        assert($group === null);
+
+        return $group;
     }
 
     /**

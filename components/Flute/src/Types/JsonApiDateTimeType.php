@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use DateTimeImmutable;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
@@ -48,7 +48,7 @@ class JsonApiDateTimeType extends DateTimeType
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if (is_string($value) === false ||
-            ($dateTime = DateTimeImmutable::createFromFormat(DateBaseType::JSON_API_FORMAT, $value)) === false
+            ($dateTime = DateTime::createFromFormat(DateBaseType::JSON_API_FORMAT, $value)) === false
         ) {
             throw ConversionException::conversionFailed($value, $this->getName());
         }

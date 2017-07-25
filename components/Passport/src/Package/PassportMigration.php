@@ -47,7 +47,7 @@ class PassportMigration implements MigrationInterface
     /**
      * @return void
      */
-    public function migrate()
+    public function migrate(): void
     {
         $this->createDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
     }
@@ -55,7 +55,7 @@ class PassportMigration implements MigrationInterface
     /**
      * @return void
      */
-    public function rollback()
+    public function rollback(): void
     {
         $this->removeDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
     }

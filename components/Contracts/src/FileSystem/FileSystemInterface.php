@@ -41,14 +41,14 @@ interface FileSystemInterface
      *
      * @return void
      */
-    public function write(string $filePath, string $contents);
+    public function write(string $filePath, string $contents): void;
 
     /**
      * @param string $filePath
      *
      * @return void
      */
-    public function delete(string $filePath);
+    public function delete(string $filePath): void;
 
     /**
      * @param string $folderPath
@@ -69,21 +69,29 @@ interface FileSystemInterface
      *
      * @return void
      */
-    public function createFolder(string $folderPath);
+    public function createFolder(string $folderPath): void;
 
     /**
      * @param string $folderPath
      *
      * @return void
      */
-    public function deleteFolder(string $folderPath);
+    public function deleteFolder(string $folderPath): void;
 
     /**
      * @param string $folderPath
      *
      * @return void
      */
-    public function deleteFolderRecursive(string $folderPath);
+    public function deleteFolderRecursive(string $folderPath): void;
+
+    /**
+     * @param string $targetPath
+     * @param string $linkPath
+     *
+     * @return void
+     */
+    public function symlink(string $targetPath, string $linkPath): void;
 
     /**
      * @param string $path

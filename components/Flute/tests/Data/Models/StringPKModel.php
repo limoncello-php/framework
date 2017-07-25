@@ -35,7 +35,7 @@ class StringPKModel extends Model
     /**
      * @inheritdoc
      */
-    public static function getAttributeTypes()
+    public static function getAttributeTypes(): array
     {
         return [
             self::FIELD_ID   => Type::STRING,
@@ -46,7 +46,7 @@ class StringPKModel extends Model
     /**
      * @inheritdoc
      */
-    public static function getAttributeLengths()
+    public static function getAttributeLengths(): array
     {
         return [
             self::FIELD_ID   => 255,
@@ -57,7 +57,7 @@ class StringPKModel extends Model
     /**
      * @inheritdoc
      */
-    public static function getRelationships()
+    public static function getRelationships(): array
     {
         return [];
     }

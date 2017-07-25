@@ -42,7 +42,7 @@ class RulesPermitOverrides extends BaseRuleAlgorithm
         array $optimizedTargets,
         array $serializedRules,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         return static::evaluatePermitOverrides($context, $optimizedTargets, $serializedRules, $logger);
     }
 }

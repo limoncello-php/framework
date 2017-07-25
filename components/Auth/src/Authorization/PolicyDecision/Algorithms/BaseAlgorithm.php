@@ -52,7 +52,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         array $optimizedTargets,
         array $encodedItems,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         return call_user_func($method, $context, $optimizedTargets, $encodedItems, $logger);
     }
 
@@ -62,7 +62,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
      *
      * @return bool
      */
-    protected static function evaluateLogical(ContextInterface $context, array $serializedLogical = null)
+    protected static function evaluateLogical(ContextInterface $context, array $serializedLogical = null): bool
     {
         if ($serializedLogical === null) {
             return true;
@@ -81,7 +81,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
      *
      * @return array
      */
-    protected static function packEvaluationResult($evaluation, array $obligations = [], array $advice = [])
+    protected static function packEvaluationResult(int $evaluation, array $obligations = [], array $advice = []): array
     {
         return [
             self::EVALUATION_VALUE       => $evaluation,
@@ -95,7 +95,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
      *
      * @return int
      */
-    protected static function unpackEvaluationValue(array $packedEvaluation)
+    protected static function unpackEvaluationValue(array $packedEvaluation): int
     {
         return $packedEvaluation[self::EVALUATION_VALUE];
     }
@@ -105,7 +105,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
      *
      * @return array
      */
-    protected static function unpackEvaluationObligations(array $packedEvaluation)
+    protected static function unpackEvaluationObligations(array $packedEvaluation): array
     {
         return $packedEvaluation[self::EVALUATION_OBLIGATIONS];
     }
@@ -115,7 +115,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
      *
      * @return array
      */
-    protected static function unpackEvaluationAdvice(array $packedEvaluation)
+    protected static function unpackEvaluationAdvice(array $packedEvaluation): array
     {
         return $packedEvaluation[self::EVALUATION_ADVICE];
     }
@@ -133,7 +133,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         array $optimizedTargets,
         array $encodedItems,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         foreach (static::evaluateTargets($context, $optimizedTargets, $logger) as $match => $itemId) {
             $encodedItem      = $encodedItems[$itemId];
             $packedEvaluation = static::evaluateItem($context, $match, $encodedItem, $logger);
@@ -162,7 +162,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         array $optimizedTargets,
         array $encodedItems,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         foreach (static::evaluateTargets($context, $optimizedTargets, $logger) as $match => $itemId) {
             $encodedItem      = $encodedItems[$itemId];
             $packedEvaluation = static::evaluateItem($context, $match, $encodedItem, $logger);
@@ -191,7 +191,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         array $optimizedTargets,
         array $encodedItems,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         foreach (static::evaluateTargets($context, $optimizedTargets, $logger) as $match => $itemId) {
             $encodedItem      = $encodedItems[$itemId];
             $packedEvaluation = static::evaluateItem($context, $match, $encodedItem, $logger);
@@ -224,7 +224,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         array $optimizedTargets,
         array $encodedItems,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         $foundDeny          = false;
         $foundPermit        = false;
         $foundIntDeny       = false;
@@ -302,7 +302,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         array $optimizedTargets,
         array $encodedItems,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         $foundDeny          = false;
         $foundPermit        = false;
         $foundIntDeny       = false;
@@ -370,7 +370,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
      *
      * @return array
      */
-    private static function mergeToStorage(array $storage, $key, array $list)
+    private static function mergeToStorage(array $storage, $key, array $list): array
     {
         $storage[$key] = array_key_exists($key, $storage) === true ? array_merge($storage[$key], $list) : $list;
 

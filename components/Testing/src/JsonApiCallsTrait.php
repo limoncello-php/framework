@@ -36,8 +36,12 @@ trait JsonApiCallsTrait
      *
      * @return ResponseInterface
      */
-    protected function postJsonApi(string $uri, string $json, array $headers = [], array $cookies = [])
-    {
+    protected function postJsonApi(
+        string $uri,
+        string $json,
+        array $headers = [],
+        array $cookies = []
+    ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/vnd.api+json';
 
         return $this->call('POST', $uri, [], [], $headers, $cookies, [], [], $this->streamFromString($json));
@@ -51,8 +55,12 @@ trait JsonApiCallsTrait
      *
      * @return ResponseInterface
      */
-    protected function putJsonApi(string $uri, string $json, array $headers = [], array $cookies = [])
-    {
+    protected function putJsonApi(
+        string $uri,
+        string $json,
+        array $headers = [],
+        array $cookies = []
+    ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/vnd.api+json';
 
         return $this->call('PUT', $uri, [], [], $headers, $cookies, [], [], $this->streamFromString($json));
@@ -66,8 +74,12 @@ trait JsonApiCallsTrait
      *
      * @return ResponseInterface
      */
-    protected function patchJsonApi(string $uri, string $json, array $headers = [], array $cookies = [])
-    {
+    protected function patchJsonApi(
+        string $uri,
+        string $json,
+        array $headers = [],
+        array $cookies = []
+    ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/vnd.api+json';
 
         return $this->call('PATCH', $uri, [], [], $headers, $cookies, [], [], $this->streamFromString($json));

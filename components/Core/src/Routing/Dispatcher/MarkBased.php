@@ -39,7 +39,7 @@ class MarkBased extends \FastRoute\Dispatcher\MarkBased implements DispatcherInt
     /**
      * @inheritdoc
      */
-    public function setData(array $data)
+    public function setData(array $data): void
     {
         list($this->staticRouteMap, $this->variableRouteData) = $data;
     }

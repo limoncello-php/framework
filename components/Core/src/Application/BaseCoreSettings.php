@@ -88,7 +88,7 @@ abstract class BaseCoreSettings implements CoreSettingsInterface
     /**
      * @param array $data
      *
-     * @return array
+     * @return callable[]
      */
     public static function getGlobalConfiguratorsFromData(array $data): array
     {

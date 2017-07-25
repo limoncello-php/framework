@@ -66,7 +66,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function assignValuesToCode(TokenInterface $token, int $expirationInSeconds)
+    public function assignValuesToCode(TokenInterface $token, int $expirationInSeconds): void
     {
         $query = $this->getConnection()->createQueryBuilder();
 
@@ -145,7 +145,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function bindScopes(int $identifier, array $scopes)
+    public function bindScopes(int $identifier, array $scopes): void
     {
         $scopeIdentifiers = [];
         foreach ($scopes as $scope) {
@@ -160,7 +160,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function bindScopeIdentifiers(int $identifier, array $scopeIdentifiers)
+    public function bindScopeIdentifiers(int $identifier, array $scopeIdentifiers): void
     {
         if (empty($scopeIdentifiers) === false) {
             $scheme = $this->getDatabaseScheme();
@@ -273,7 +273,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function updateValues(TokenInterface $token)
+    public function updateValues(TokenInterface $token): void
     {
         $query = $this->getConnection()->createQueryBuilder();
 
@@ -304,7 +304,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function delete(int $identifier)
+    public function delete(int $identifier): void
     {
         $this->deleteResource($identifier);
     }
@@ -312,7 +312,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function disable(int $identifier)
+    public function disable(int $identifier): void
     {
         $query = $this->getConnection()->createQueryBuilder();
 

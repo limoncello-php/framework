@@ -91,7 +91,7 @@ abstract class Application implements ApplicationInterface
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function run()
+    public function run(): void
     {
         if ($this->sapi === null) {
             throw new LogicException('SAPI not set.');
@@ -222,7 +222,7 @@ abstract class Application implements ApplicationInterface
         LimoncelloContainerInterface $container,
         array $globalConfigurators = null,
         array $routeConfigurators = null
-    ) {
+    ): void {
         if (empty($globalConfigurators) === false) {
             foreach ($globalConfigurators as $configurator) {
                 assert($this->checkPublicStaticCallable($configurator, [LimoncelloContainerInterface::class]));
@@ -419,7 +419,7 @@ abstract class Application implements ApplicationInterface
             '`public static methodName(ServerRequestInterface, Closure, PsrContainerInterface): ResponseInterface`'
         );
 
-        return function (ServerRequestInterface $request) use ($next, $middleware, $container) {
+        return function (ServerRequestInterface $request) use ($next, $middleware, $container): ResponseInterface {
             return call_user_func($middleware, $request, $next, $container);
         };
     }

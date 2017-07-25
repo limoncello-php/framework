@@ -27,24 +27,61 @@ use PHPUnit\Framework\TestCase;
  */
 class TranslatorTest extends TestCase
 {
+    const RESOURCES_DIR =
+        __DIR__ . DIRECTORY_SEPARATOR .
+        '..' . DIRECTORY_SEPARATOR .
+        'Messages' . DIRECTORY_SEPARATOR .
+        'Resources';
+
     /**
      * Test translate.
      */
-    public function testTranslate()
+    public function testTranslateWithNonExistingDefault()
     {
-        $encoder     = new FileBundleEncoder(
-            __DIR__ . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            'Messages' . DIRECTORY_SEPARATOR .
-            'Resources'
-        );
-        $storageData = $encoder->getStorageData('en');
-        $storage     = new BundleStorage($storageData);
+        $storageData = (new FileBundleEncoder(static::RESOURCES_DIR))->getStorageData('en');
 
         /** @var TranslatorInterface $translator */
-        $translator = new Translator($storage);
+        $translator = new Translator(new BundleStorage($storageData));
 
         $this->assertEquals('Hello World', $translator->translateMessage('en_US', 'Messages', 'Hello World'));
-        $this->assertEquals('Hallo Welt', $translator->translateMessage('de_AT', 'Messages', 'Hello World'));
+        $this->assertEquals('Hallo Welt', $translator->translateMessage('DE', 'Messages', 'Hello World'));
+        $this->assertEquals('Hallo Welt', $translator->translateMessage('dE_Lu', 'Messages', 'Hello World'));
+        $this->assertEquals(
+            'Hallo Welt aus Österreich',
+            $translator->translateMessage('de_AT', 'Messages', 'Hello World')
+        );
+        $this->assertEquals('Good morning', $translator->translateMessage('de', 'Messages', 'Good morning'));
+    }
+
+    /**
+     * Test translate.
+     */
+    public function testTranslateWithExistingDefault()
+    {
+        $storageData = (new FileBundleEncoder(static::RESOURCES_DIR))->getStorageData('de');
+
+        /** @var TranslatorInterface $translator */
+        $translator = new Translator(new BundleStorage($storageData));
+
+        // That might look odd but what is happening: we don't have any resources in `en_*` so it falls back to `de`.
+        // 'Hello World' is just a string key and the code of course doesn't know if it's in English. It's just a key.
+        // Then it searches a value for that key in `de` resources and finds it.
+        $this->assertEquals('Hallo Welt', $translator->translateMessage('en_US', 'Messages', 'Hello World'));
+
+        // Same story here but we don't have any values for a key 'Guten Morgen' so it returns the key itself.
+        $this->assertEquals('Guten Morgen', $translator->translateMessage('en_US', 'Messages', 'Guten Morgen'));
+
+        $this->assertEquals('Good morning', $translator->translateMessage('en_US', 'Messages', 'Good morning'));
+
+        $this->assertEquals('Good morning', $translator->translateMessage('de', 'Messages', 'Good morning'));
+
+        // this one uses existing `de` resources
+        $this->assertEquals('Hallo Welt', $translator->translateMessage('DE', 'Messages', 'Hello World'));
+
+        $this->assertEquals('Hallo Welt', $translator->translateMessage('dE_Lu', 'Messages', 'Hello World'));
+        $this->assertEquals(
+            'Hallo Welt aus Österreich',
+            $translator->translateMessage('de_AT', 'Messages', 'Hello World')
+        );
     }
 }

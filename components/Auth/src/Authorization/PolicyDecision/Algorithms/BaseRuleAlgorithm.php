@@ -34,7 +34,7 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
      *
      * @return array
      */
-    abstract protected function optimizeTargets(array $targets);
+    abstract protected function optimizeTargets(array $targets): array;
 
     /**
      * @param ContextInterface     $context
@@ -49,7 +49,7 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
         ContextInterface $context,
         array $rulesData,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         return static::callAlgorithm(
             static::getCallable($rulesData),
             $context,
@@ -68,8 +68,8 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
     {
         assert(empty($rules) === false);
 
-        $ruleId          = 0;
-        $rawTargets      = [];
+        $ruleId       = 0;
+        $rawTargets   = [];
         $encodedRules = [];
         foreach ($rules as $rule) {
             /** @var RuleInterface $rule */
@@ -100,10 +100,10 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
      */
     public static function evaluateItem(
         ContextInterface $context,
-        $match,
+        int $match,
         array $encodedItem,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         return static::evaluateRule($context, $match, $encodedItem, $logger);
     }
 
@@ -121,10 +121,10 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
      */
     private static function evaluateRule(
         ContextInterface $context,
-        $match,
+        int $match,
         array $encodedRule,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         assert(Encoder::isRule($encodedRule));
 
         $ruleName = null;
@@ -181,7 +181,7 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
      *
      * @return array
      */
-    private static function getTargets(array $rulesData)
+    private static function getTargets(array $rulesData): array
     {
         return $rulesData[self::INDEX_TARGETS];
     }
@@ -191,7 +191,7 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
      *
      * @return array
      */
-    private static function getRules(array $rulesData)
+    private static function getRules(array $rulesData): array
     {
         return $rulesData[self::INDEX_RULES];
     }

@@ -27,7 +27,7 @@ class ApplicationWrapperTraitTest extends TestCase
     /**
      * Test wrapper methods.
      */
-    public function testWrapperMethods()
+    public function testWrapperMethods(): void
     {
         $onRequest          = false;
         $onResponse         = false;

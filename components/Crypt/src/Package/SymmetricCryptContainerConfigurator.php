@@ -33,7 +33,7 @@ class SymmetricCryptContainerConfigurator implements ContainerConfiguratorInterf
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $crypt = null;
 
@@ -47,6 +47,15 @@ class SymmetricCryptContainerConfigurator implements ContainerConfiguratorInterf
 
                 $usePadding = $settings[C::KEY_USE_ZERO_PADDING] ?? false;
                 $usePadding === true ? $crypt->withZeroPadding() : $crypt->withoutZeroPadding();
+
+                $useAuthentication = $settings[C::KEY_USE_AUTHENTICATION] ?? false;
+                if ($useAuthentication === true) {
+                    $crypt->enableAuthentication();
+                    if (array_key_exists(C::KEY_TAG_LENGTH, $settings) === true) {
+                        $tagLength = $settings[C::KEY_TAG_LENGTH];
+                        $crypt->setTagLength($tagLength);
+                    }
+                }
             }
 
             return $crypt;

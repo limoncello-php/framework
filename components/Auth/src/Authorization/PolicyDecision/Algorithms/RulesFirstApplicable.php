@@ -42,7 +42,7 @@ class RulesFirstApplicable extends BaseRuleAlgorithm
         array $optimizedTargets,
         array $encodedRules,
         LoggerInterface $logger = null
-    ) {
+    ): array {
         return self::evaluateFirstApplicable($context, $optimizedTargets, $encodedRules, $logger);
     }
 }

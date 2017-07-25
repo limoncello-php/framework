@@ -19,6 +19,7 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
+use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -29,7 +30,6 @@ use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
-use Limoncello\Tests\Flute\Data\Models\ModelInterface;
 use Limoncello\Tests\Flute\Data\Models\ModelSchemes;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\Role;
@@ -44,6 +44,8 @@ use Limoncello\Tests\Flute\Data\Schemes\RoleSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
+use Limoncello\Tests\Flute\Data\Validation\RuleSets\CreateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateCommentRuleSet;
 use Mockery;
 
 /**
@@ -238,6 +240,17 @@ class TestCase extends \PHPUnit\Framework\TestCase
             Role::class     => RoleSchema::class,
             User::class     => UserSchema::class,
             Category::class => CategorySchema::class,
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getValidationRuleSets()
+    {
+        return [
+            CreateCommentRuleSet::class,
+            UpdateCommentRuleSet::class,
         ];
     }
 }

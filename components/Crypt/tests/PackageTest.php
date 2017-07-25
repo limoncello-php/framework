@@ -152,14 +152,26 @@ class PackageTest extends TestCase
     {
         $container = new TestContainer();
 
-        $settings = new class extends SymmetricCryptSettings {
-
+        $settings = new class extends SymmetricCryptSettings
+        {
             /**
              * @inheritdoc
              */
             protected function getPassword(): string
             {
                 return 'secret';
+            }
+
+            /**
+             * @inheritdoc
+             */
+            public function get(): array
+            {
+                $defaults = parent::get();
+
+                $defaults[self::KEY_USE_AUTHENTICATION] = true;
+
+                return $defaults;
             }
         };
         $this->addSettings($container, SymmetricCryptSettings::class, $settings->get());

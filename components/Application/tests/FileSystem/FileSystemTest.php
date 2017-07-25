@@ -262,6 +262,31 @@ class FileSystemTest extends TestCase
     }
 
     /**
+     * Test symlinks.
+     */
+    public function testSymlink()
+    {
+        $contents = 'some content';
+
+        // create tmp file with content
+        $tmpFileName = tempnam(null, null);
+        $this->fileSystem->write($tmpFileName, $contents);
+
+        // tmp name for symlink
+        $tmpSymlinkName = tempnam(null, null);
+        $this->fileSystem->delete($tmpSymlinkName);
+
+        // create symlink and read content
+        $this->fileSystem->symlink($tmpFileName, $tmpSymlinkName);
+        $readContent = $this->fileSystem->read($tmpSymlinkName);
+        $this->assertEquals($contents, $readContent);
+
+        // clean
+        $this->fileSystem->delete($tmpSymlinkName);
+        $this->fileSystem->delete($tmpFileName);
+    }
+
+    /**
      * Test require file.
      */
     public function testRequire()

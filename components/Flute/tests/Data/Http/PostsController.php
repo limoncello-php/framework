@@ -18,9 +18,9 @@
 
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Api\PostsApi as Api;
-use Limoncello\Tests\Flute\Data\Models\Post as Model;
+use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema as Schema;
-use Limoncello\Tests\Flute\Data\Validation\AppValidator;
+use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateCommentRuleSet;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,69 +35,6 @@ class PostsController extends BaseController
 
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
-
-    /**
-     * @inheritdoc
-     */
-    public static function parseInputOnCreate(
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array {
-        $validator = new class ($container) extends AppValidator
-        {
-            /**
-             * @inheritdoc
-             */
-            public function __construct(ContainerInterface $container)
-            {
-                parent::__construct($container, Schema::TYPE, [
-                    self::RULE_INDEX      => $this->absentOrNull(),
-                    self::RULE_ATTRIBUTES => [
-                        Schema::ATTR_TITLE => $this->requiredText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-                        Schema::ATTR_TEXT  => $this->requiredText(Model::getAttributeLengths()[Model::FIELD_TEXT]),
-                    ]
-                ]);
-            }
-        };
-
-        return static::prepareCaptures(
-            $validator->assert(static::parseJson($container, $request))->getCaptures(),
-            Model::FIELD_ID,
-            [Model::FIELD_TITLE, Model::FIELD_TEXT]
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function parseInputOnUpdate(
-        $index,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array {
-        $validator = new class ($container, $index) extends AppValidator
-        {
-            /**
-             * @inheritdoc
-             */
-            public function __construct(ContainerInterface $container, $index)
-            {
-                parent::__construct($container, Schema::TYPE, [
-                    AppValidator::RULE_INDEX      => $this->idEquals($index),
-                    AppValidator::RULE_ATTRIBUTES => [
-                        Schema::ATTR_TITLE => $this->optionalText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-                        Schema::ATTR_TEXT  => $this->optionalText(Model::getAttributeLengths()[Model::FIELD_TEXT]),
-                    ]
-                ]);
-            }
-        };
-
-        return static::prepareCaptures(
-            $validator->assert(static::parseJson($container, $request))->getCaptures(),
-            Model::FIELD_ID,
-            [Model::FIELD_TITLE, Model::FIELD_TEXT]
-        );
-    }
 
     /**
      * @param array                  $routeParams
@@ -130,7 +67,12 @@ class PostsController extends BaseController
     ): ResponseInterface {
         $index        = $routeParams[static::ROUTE_KEY_INDEX];
         $commentIndex = $routeParams[static::ROUTE_KEY_CHILD_INDEX];
-        list (, $attributes, $toMany) = CommentsController::parseInputOnUpdate($commentIndex, $container, $request);
+
+        $captures = static::createJsonApiValidator($container, UpdateCommentRuleSet::class)
+            ->assert(static::readJsonFromRequest($container, $request))
+            ->getJsonApiCaptures();
+
+        list (, $attributes, $toMany) = static::mapSchemeDataToModelData($container, $captures, CommentSchema::class);
 
         $response = static::updateInRelationship(
             $index,

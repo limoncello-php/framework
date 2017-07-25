@@ -64,7 +64,7 @@ abstract class BaseRepository
      *
      * @return void
      */
-    public function inTransaction(Closure $closure)
+    public function inTransaction(Closure $closure): void
     {
         $connection = $this->getConnection();
         $connection->beginTransaction();
@@ -78,7 +78,7 @@ abstract class BaseRepository
     /**
      * @return Connection
      */
-    protected function getConnection()
+    protected function getConnection(): Connection
     {
         return $this->connection;
     }
@@ -86,9 +86,9 @@ abstract class BaseRepository
     /**
      * @param Connection $connection
      *
-     * @return BaseRepository
+     * @return self
      */
-    protected function setConnection(Connection $connection)
+    protected function setConnection(Connection $connection): self
     {
         $this->connection = $connection;
 
@@ -228,7 +228,7 @@ abstract class BaseRepository
         string $intTableName,
         string $intPrimaryKeyName,
         string $intForeignKeyName
-    ) {
+    ): void {
         $connection = $this->getConnection();
         $query      = $connection->createQueryBuilder();
 
@@ -255,7 +255,7 @@ abstract class BaseRepository
         string $intTableName,
         string $intPrimaryKeyName,
         string $intForeignKeyName
-    ) {
+    ): array {
         $connection = $this->getConnection();
         $query      = $connection->createQueryBuilder();
 
@@ -284,7 +284,7 @@ abstract class BaseRepository
         string $hasManyTableName,
         string $hasManyColumn,
         string $hasManyFkName
-    ) {
+    ): array {
         $connection = $this->getConnection();
         $query      = $connection->createQueryBuilder();
 
@@ -311,7 +311,7 @@ abstract class BaseRepository
         string $intTableName,
         string $intPrimaryKeyName,
         $identifier
-    ) {
+    ): int {
         $connection = $this->getConnection();
         $query      = $connection->createQueryBuilder();
 
@@ -339,7 +339,7 @@ abstract class BaseRepository
     /**
      * @return DatabaseSchemeInterface
      */
-    protected function getDatabaseScheme()
+    protected function getDatabaseScheme(): DatabaseSchemeInterface
     {
         return $this->databaseScheme;
     }
@@ -347,9 +347,9 @@ abstract class BaseRepository
     /**
      * @param DatabaseSchemeInterface $databaseScheme
      *
-     * @return BaseRepository
+     * @return self
      */
-    protected function setDatabaseScheme(DatabaseSchemeInterface $databaseScheme): BaseRepository
+    protected function setDatabaseScheme(DatabaseSchemeInterface $databaseScheme): self
     {
         $this->databaseScheme = $databaseScheme;
 

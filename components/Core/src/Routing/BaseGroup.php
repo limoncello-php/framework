@@ -116,7 +116,7 @@ abstract class BaseGroup implements GroupInterface
     }
 
     /**
-     * @return null|GroupInterface
+     * @inheritdoc
      */
     public function parentGroup()
     {
@@ -249,12 +249,11 @@ abstract class BaseGroup implements GroupInterface
 
         $uriPath = $this->normalizeUri($uriPath, $this->hasTrailSlash());
 
-        $route = $this->createRoute($this, $method, $uriPath)
+        $route = $this->createRoute($this, $method, $uriPath, $handler)
             ->setUseGroupRequestFactory($useGroupFactory)
             ->setRequestFactory($requestFactory)
             ->setConfigurators($configurators)
             ->setMiddleware($middleware)
-            ->setHandler($handler)
             ->setName($name);
 
         return $this->addRoute($route);
@@ -312,12 +311,13 @@ abstract class BaseGroup implements GroupInterface
      * @param GroupInterface $group
      * @param string         $method
      * @param string         $uriPath
+     * @param callable       $handler
      *
      * @return Route
      */
-    protected function createRoute(GroupInterface $group, $method, $uriPath)
+    protected function createRoute(GroupInterface $group, string $method, string $uriPath, callable $handler): Route
     {
-        $route = (new Route($group, $method, $uriPath));
+        $route = (new Route($group, $method, $uriPath, $handler));
 
         return $route;
     }
@@ -327,7 +327,7 @@ abstract class BaseGroup implements GroupInterface
      *
      * @return array
      */
-    protected function normalizeRouteParameters(array $parameters)
+    protected function normalizeRouteParameters(array $parameters): array
     {
         $defaults = [
             RouteInterface::PARAM_NAME                    => null,
@@ -355,7 +355,7 @@ abstract class BaseGroup implements GroupInterface
      *
      * @return array
      */
-    protected function normalizeGroupParameters(array $parameters)
+    protected function normalizeGroupParameters(array $parameters): array
     {
         $defaults = [
             GroupInterface::PARAM_NAME_PREFIX             => null,
@@ -391,7 +391,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @return array
      */
-    private function getParentMiddleware()
+    private function getParentMiddleware(): array
     {
         $parent = $this->parentGroup();
         $result = $parent === null ? [] : $parent->getMiddleware();
@@ -402,7 +402,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @return array
      */
-    private function getParentConfigurators()
+    private function getParentConfigurators(): array
     {
         $parent = $this->parentGroup();
         $result = $parent === null ? [] : $parent->getContainerConfigurators();

@@ -32,7 +32,7 @@ class NestedGroup extends BaseGroup
     }
 
     /**
-     * @return GroupInterface
+     * @inheritdoc
      */
     public function parentGroup()
     {

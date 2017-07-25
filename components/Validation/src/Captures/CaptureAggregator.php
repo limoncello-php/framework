@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\CaptureAggregatorInterface;
+use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
 
 /**
  * @package Limoncello\Validation
@@ -26,21 +26,49 @@ class CaptureAggregator implements CaptureAggregatorInterface
     /**
      * @var array
      */
-    private $remembered = [];
+    private $remembered;
 
     /**
-     * @inheritdoc
+     * Constructor.
      */
-    public function remember(string $key, $value)
+    public function __construct()
     {
-        $this->remembered[$key] = $value;
+        $this->clear();
     }
 
     /**
      * @inheritdoc
      */
-    public function getCaptures(): array
+    public function remember(string $key, $value): CaptureAggregatorInterface
+    {
+        $this->remembered[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function get(): array
     {
         return $this->remembered;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function count()
+    {
+        return count($this->get());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function clear(): CaptureAggregatorInterface
+    {
+        $this->remembered = [];
+
+        return $this;
     }
 }

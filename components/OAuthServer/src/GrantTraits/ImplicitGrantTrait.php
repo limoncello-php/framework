@@ -41,7 +41,7 @@ trait ImplicitGrantTrait
      *
      * @return void
      */
-    public function implicitSetIntegration(ImplicitIntegrationInterface $integration)
+    public function implicitSetIntegration(ImplicitIntegrationInterface $integration): void
     {
         $this->implicitIntegration = $integration;
     }
@@ -49,7 +49,7 @@ trait ImplicitGrantTrait
     /**
      * @return ImplicitIntegrationInterface
      */
-    protected function implicitGetIntegration()
+    protected function implicitGetIntegration(): ImplicitIntegrationInterface
     {
         return $this->implicitIntegration;
     }

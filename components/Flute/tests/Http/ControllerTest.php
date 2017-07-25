@@ -19,6 +19,7 @@
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
@@ -27,17 +28,20 @@ use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Package\FluteSettings;
+use Limoncello\Flute\Validation\Execution\JsonApiValidatorFactory;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Http\BoardsController;
 use Limoncello\Tests\Flute\Data\Http\CategoriesController;
 use Limoncello\Tests\Flute\Data\Http\CommentsController;
 use Limoncello\Tests\Flute\Data\Http\PostsController;
 use Limoncello\Tests\Flute\Data\Http\UsersController;
+use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
 use Limoncello\Tests\Flute\Data\Package\Flute;
@@ -49,9 +53,6 @@ use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\TestCase;
-use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
-use Limoncello\Validation\I18n\Locales\EnUsLocale;
-use Limoncello\Validation\I18n\Translator as ValidationTranslator;
 use Mockery;
 use Mockery\Mock;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
@@ -144,7 +145,7 @@ class ControllerTest extends TestCase
     {
         $routeParams = [];
         $queryParams = [
-            'filter' => [
+            'filter'  => [
                 CommentSchema::RESOURCE_ID => [
                     'in' => ['10', '11', '15', '17', '21'],
                 ],
@@ -240,7 +241,7 @@ class ControllerTest extends TestCase
         $routeParams = [];
         $queryParams = [
             'filter' => [
-                'or' => [
+                'or'  => [
                     CommentSchema::RESOURCE_ID => [
                         'in' => ['10', '11',],
                     ],
@@ -274,7 +275,7 @@ class ControllerTest extends TestCase
     {
         $routeParams = [];
         $queryParams = [
-            'filter' => ['aaa' => ['in' => ['10', '11']]],
+            'filter'  => ['aaa' => ['in' => ['10', '11']]],
             'sort'    => 'bbb',
             'include' => 'ccc',
         ];
@@ -418,14 +419,14 @@ class ControllerTest extends TestCase
                     'gt' => '1',
                     'lt' => '10',
                 ],
-                UserSchema::REL_POSTS => [
+                UserSchema::REL_POSTS    => [
                     'gt' => '1',
                     'lt' => '7',
                 ],
-            ]
+            ],
         ];
         $container   = $this->createContainer();
-        $uri         = new Uri('http://localhost.local/comments?' . http_build_query($queryParams));
+        $uri         = new Uri('http://localhost.local/users?' . http_build_query($queryParams));
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
@@ -458,13 +459,13 @@ class ControllerTest extends TestCase
         // comments with ID 2 and 4 have more than 1 emotions. We will check that only distinct rows to be returned.
         $queryParams = [
             'filter' => [
-                CommentSchema::RESOURCE_ID => [
+                CommentSchema::RESOURCE_ID  => [
                     'in' => ['2', '3', '4'],
                 ],
                 CommentSchema::REL_EMOTIONS => [
                     'in' => ['2', '3', '4'],
                 ],
-            ]
+            ],
         ];
         $container   = $this->createContainer();
         $uri         = new Uri('http://localhost.local/comments?' . http_build_query($queryParams));
@@ -478,7 +479,7 @@ class ControllerTest extends TestCase
         try {
             // disable index filtering for this test
             CommentsApi::$isFilterIndexForCurrentUser = false;
-            $response = CommentsController::index($routeParams, $container, $request);
+            $response                                 = CommentsController::index($routeParams, $container, $request);
         } finally {
             CommentsApi::$isFilterIndexForCurrentUser = CommentsApi::DEBUG_KEY_DEFAULT_FILTER_INDEX;
         }
@@ -500,7 +501,7 @@ class ControllerTest extends TestCase
      */
     public function testCreate()
     {
-        $text = 'Some comment text';
+        $text      = 'Some comment text';
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -532,12 +533,12 @@ EOT;
         $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri('http://localhost.local/comments'));
 
         // check the item is not in the database
-        $tableName   = Comment::TABLE_NAME;
-        $idColumn    = Comment::FIELD_ID;
-        $index       = '101';
-        $container   = $this->createContainer();
+        $tableName = Comment::TABLE_NAME;
+        $idColumn  = Comment::FIELD_ID;
+        $index     = '101';
+        $container = $this->createContainer();
         /** @var Connection $connection */
-        $connection  = $container->get(Connection::class);
+        $connection = $container->get(Connection::class);
         $this->assertEmpty($connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $index")->fetch());
 
         /** @var ServerRequestInterface $request */
@@ -631,8 +632,8 @@ EOT;
         $this->assertNotEmpty($resource[DocumentInterface::KEYWORD_ATTRIBUTES][CommentSchema::ATTR_UPDATED_AT]);
 
         // check the item is in the database
-        $tableName  = Comment::TABLE_NAME;
-        $idColumn   = Comment::FIELD_ID;
+        $tableName = Comment::TABLE_NAME;
+        $idColumn  = Comment::FIELD_ID;
         /** @var Connection $connection */
         $connection = $container->get(Connection::class);
         $this->assertNotEmpty(
@@ -673,14 +674,60 @@ EOT;
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
-        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri('http://localhost.local/comments'));
 
         /** @var ServerRequestInterface $request */
 
         $container = $this->createContainer();
-        $response  = CommentsController::update($routeParams, $container, $request);
-        $this->assertNotNull($response);
-        $this->assertEquals(404, $response->getStatusCode());
+        $exception = null;
+        try {
+            CommentsController::update($routeParams, $container, $request);
+        } catch (JsonApiException $exception) {
+        }
+        $this->assertNotNull($exception);
+
+        $errors = $exception->getErrors();
+        $this->assertCount(1, $errors);
+        $this->assertEquals(['pointer' => '/data/id'], $errors[0]->getSource());
+    }
+
+    /**
+     * Controller test.
+     */
+    public function testUpdateNonMatchingIndexes()
+    {
+        $text      = 'Some comment text';
+        $index1    = '1';
+        $index2    = '2';
+        $jsonInput = <<<EOT
+        {
+            "data" : {
+                "type"  : "comments",
+                "id"    : "$index1",
+                "attributes" : {
+                    "text-attribute" : "$text"
+                }
+            }
+        }
+EOT;
+
+        $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index2];
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
+
+        /** @var ServerRequestInterface $request */
+
+        $container = $this->createContainer();
+        $exception = null;
+        try {
+            CommentsController::update($routeParams, $container, $request);
+        } catch (JsonApiException $exception) {
+        }
+        $this->assertNotNull($exception);
+
+        $errors = $exception->getErrors();
+        $this->assertCount(1, $errors);
+        $this->assertEquals(['pointer' => '/data/id'], $errors[0]->getSource());
     }
 
     /**
@@ -698,7 +745,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $exception  = null;
+        $exception = null;
         try {
             CommentsController::update($routeParams, $this->createContainer(), $request);
         } catch (JsonApiException $exception) {
@@ -717,9 +764,9 @@ EOT;
         $tableName = Comment::TABLE_NAME;
         $idColumn  = Comment::FIELD_ID;
 
-        $container   = $this->createContainer();
+        $container = $this->createContainer();
         /** @var Connection $connection */
-        $connection  = $container->get(Connection::class);
+        $connection = $container->get(Connection::class);
 
         // add comment to delete
         $this->assertEquals(1, $connection->insert($tableName, [
@@ -833,7 +880,7 @@ EOT;
         $column    = Comment::FIELD_TEXT;
         $attribute = CommentSchema::ATTR_TEXT;
 
-        $container  = $this->createContainer();
+        $container = $this->createContainer();
         /** @var Connection $connection */
         $connection = $container->get(Connection::class);
 
@@ -857,7 +904,7 @@ EOT;
             CommentsController::ROUTE_KEY_CHILD_INDEX => (string)$commentId,
         ];
 
-        $newValue = 'New text';
+        $newValue  = 'New text';
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -898,12 +945,12 @@ EOT;
         $postIdColumn = Comment::FIELD_TEXT;
         $attribute    = CommentSchema::ATTR_TEXT;
 
-        $container  = $this->createContainer();
+        $container = $this->createContainer();
         /** @var Connection $connection */
         $connection = $container->get(Connection::class);
 
         // add comment to update
-        $postId    = 2;
+        $postId = 2;
         // this comment id do not belong to post
         $commentId = 1;
 
@@ -920,7 +967,7 @@ EOT;
             CommentsController::ROUTE_KEY_CHILD_INDEX => (string)$commentId,
         ];
 
-        $newValue = 'New text';
+        $newValue  = 'New text';
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -953,7 +1000,7 @@ EOT;
         $tableName = Comment::TABLE_NAME;
         $idColumn  = Comment::FIELD_ID;
 
-        $container  = $this->createContainer();
+        $container = $this->createContainer();
         /** @var Connection $connection */
         $connection = $container->get(Connection::class);
 
@@ -1006,7 +1053,7 @@ EOT;
                 CommentSchema::REL_POST . '.' . PostSchema::ATTR_TEXT => [
                     'like' => ["%$seldomWord%"],
                 ],
-            ]
+            ],
         ];
         $container   = $this->createContainer();
         /** @var Mock $request */
@@ -1041,9 +1088,9 @@ EOT;
                 CommentSchema::REL_EMOTIONS . '.' . EmotionSchema::ATTR_NAME => [
                     'like' => ["%$seldomWord%"],
                 ],
-            ]
+            ],
         ];
-        $container = $this->createContainer();
+        $container   = $this->createContainer();
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
@@ -1078,6 +1125,7 @@ EOT;
         $container = new Container();
 
         $container[FactoryInterface::class]               = $factory = new Factory($container);
+        $container[FormatterFactoryInterface::class]      = $formatterFactory = new FormatterFactory();
         $container[QueryParametersParserInterface::class] = $factory
             ->getJsonApiFactory()->createQueryParametersParser();
         $container[ModelSchemeInfoInterface::class]       = $modelSchemes = $this->getModelSchemes();
@@ -1086,44 +1134,47 @@ EOT;
         $container[JsonSchemesInterface::class]        = $jsonSchemes = $this
             ->getJsonSchemes($factory, $modelSchemes, $storage);
         $container[Connection::class]                  = $connection = $this->initDb();
-        $container[TranslatorInterface::class]         = $translator = $factory->createTranslator();
-        $container[FilterOperationsInterface::class]   = $filterOperations = new FilterOperations($translator);
+        $container[FilterOperationsInterface::class]   = $filterOperations = new FilterOperations($container);
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(10);
         $container[RepositoryInterface::class]         = $repository = $factory->createRepository(
             $connection,
             $modelSchemes,
             $filterOperations,
-            $translator
+            $formatterFactory->createFormatter(Messages::RESOURCES_NAMESPACE)
         );
-        $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap()))->get(),
+        $container[SettingsProviderInterface::class]   = new SettingsProvider([
+            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
         ]);
-        $container[EncoderInterface::class] = function (ContainerInterface $container) use ($factory, $jsonSchemes) {
-            /** @var SettingsProviderInterface $provider */
-            $provider = $container->get(SettingsProviderInterface::class);
-            $settings = $provider->get(FluteSettings::class);
+        $container[EncoderInterface::class]            =
+            function (ContainerInterface $container) use ($factory, $jsonSchemes) {
+                /** @var SettingsProviderInterface $provider */
+                $provider = $container->get(SettingsProviderInterface::class);
+                $settings = $provider->get(FluteSettings::class);
 
-            $urlPrefix = $settings[FluteSettings::KEY_URI_PREFIX];
-            $encoder   = $factory->createEncoder($jsonSchemes, new EncoderOptions(
-                $settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS],
-                $urlPrefix,
-                $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
-            ));
-            if (isset($settings[FluteSettings::KEY_META]) === true) {
-                $meta = $settings[FluteSettings::KEY_META];
-                $encoder->withMeta($meta);
-            }
-            if (isset($settings[FluteSettings::KEY_IS_SHOW_VERSION]) === true &&
-                $settings[FluteSettings::KEY_IS_SHOW_VERSION] === true
-            ) {
-                $encoder->withJsonApiVersion();
-            }
+                $urlPrefix = $settings[FluteSettings::KEY_URI_PREFIX];
+                $encoder   = $factory->createEncoder($jsonSchemes, new EncoderOptions(
+                    $settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS],
+                    $urlPrefix,
+                    $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
+                ));
+                if (isset($settings[FluteSettings::KEY_META]) === true) {
+                    $meta = $settings[FluteSettings::KEY_META];
+                    $encoder->withMeta($meta);
+                }
+                if (isset($settings[FluteSettings::KEY_IS_SHOW_VERSION]) === true &&
+                    $settings[FluteSettings::KEY_IS_SHOW_VERSION] === true
+                ) {
+                    $encoder->withJsonApiVersion();
+                }
 
-            return $encoder;
+                return $encoder;
+            };
+
+        $container[JsonApiValidatorFactoryInterface::class] = function (ContainerInterface $container) {
+            $factory = new JsonApiValidatorFactory($container);
+
+            return $factory;
         };
-
-        $container[ValidationTranslatorInterface::class] = $validationTranslator =
-            new ValidationTranslator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());
 
         return $container;
     }

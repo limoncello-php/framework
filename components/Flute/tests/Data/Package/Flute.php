@@ -25,16 +25,23 @@ use Limoncello\Flute\Package\FluteSettings;
 class Flute extends FluteSettings
 {
     /**
-     * @var array
+     * @var string[]
      */
     private $modelToSchemeMap;
 
     /**
-     * @param array $modelToSchemeMap
+     * @var string[]
      */
-    public function __construct(array $modelToSchemeMap = [])
+    private $validationRuleSets;
+
+    /**
+     * @param string[] $modelToSchemeMap
+     * @param string[] $validationRuleSets
+     */
+    public function __construct(array $modelToSchemeMap = [], array $validationRuleSets = [])
     {
-        $this->modelToSchemeMap = $modelToSchemeMap;
+        $this->modelToSchemeMap   = $modelToSchemeMap;
+        $this->validationRuleSets = $validationRuleSets;
     }
 
     /**
@@ -42,7 +49,15 @@ class Flute extends FluteSettings
      */
     protected function getSchemesPath(): string
     {
-        return 'whatever';
+        return 'whatever_schemes';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getRuleSetsPath(): string
+    {
+        return 'whatever_rule_sets';
     }
 
     /**
@@ -50,8 +65,15 @@ class Flute extends FluteSettings
      */
     protected function selectClasses(string $path, string $implementClassName): Generator
     {
-        foreach ($this->getModelToSchemeMap() as $schemeClass) {
-            yield $schemeClass;
+        if ($path === 'whatever_schemes') {
+            foreach ($this->getModelToSchemeMap() as $schemeClass) {
+                yield $schemeClass;
+            }
+        } else {
+            assert($path === 'whatever_rule_sets');
+            foreach ($this->getValidationRuleSets() as $ruleSet) {
+                yield $ruleSet;
+            }
         }
     }
 
@@ -61,5 +83,13 @@ class Flute extends FluteSettings
     private function getModelToSchemeMap(): array
     {
         return $this->modelToSchemeMap;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getValidationRuleSets(): array
+    {
+        return $this->validationRuleSets;
     }
 }

@@ -30,7 +30,7 @@ interface ClientRepositoryInterface
      *
      * @return void
      */
-    public function inTransaction(Closure $closure);
+    public function inTransaction(Closure $closure): void;
 
     /**
      * @return ClientInterface[]
@@ -50,7 +50,7 @@ interface ClientRepositoryInterface
      *
      * @return void
      */
-    public function bindScopes(string $identifier, array $scopes);
+    public function bindScopes(string $identifier, array $scopes): void;
 
     /**
      * @param string   $identifier
@@ -58,14 +58,14 @@ interface ClientRepositoryInterface
      *
      * @return void
      */
-    public function bindScopeIdentifiers(string $identifier, array $scopeIdentifiers);
+    public function bindScopeIdentifiers(string $identifier, array $scopeIdentifiers): void;
 
     /**
      * @param string $identifier
      *
      * @return void
      */
-    public function unbindScopes(string $identifier);
+    public function unbindScopes(string $identifier): void;
 
     /**
      * @param string $identifier
@@ -93,12 +93,12 @@ interface ClientRepositoryInterface
      *
      * @return void
      */
-    public function update(ClientInterface $client);
+    public function update(ClientInterface $client): void;
 
     /**
      * @param string $identifier
      *
      * @return void
      */
-    public function delete(string $identifier);
+    public function delete(string $identifier): void;
 }

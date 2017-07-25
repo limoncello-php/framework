@@ -48,7 +48,7 @@ class FluteExceptionHandlerTest extends TestCase
 
         $container = new Container();
         $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap()))->get(),
+            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
             ApplicationSettingsInterface::class => [
                 ApplicationSettingsInterface::KEY_IS_DEBUG => true,
             ],
@@ -83,7 +83,7 @@ class FluteExceptionHandlerTest extends TestCase
 
         $container = new Container();
         $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap()))->get(),
+            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
             ApplicationSettingsInterface::class => [
                 ApplicationSettingsInterface::KEY_IS_DEBUG => true,
             ],
@@ -115,7 +115,7 @@ class FluteExceptionHandlerTest extends TestCase
 
         $container = new Container();
         $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap()))->get(),
+            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
             ApplicationSettingsInterface::class => [
                 ApplicationSettingsInterface::KEY_IS_DEBUG => true,
             ],

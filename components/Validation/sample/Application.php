@@ -16,9 +16,16 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Errors\Error;
-use Sample\Validation\Translator;
-use Sample\Validation\Validator as v;
+use DateTime;
+use DateTimeInterface;
+use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
+use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
+use Limoncello\Validation\Contracts\Errors\ErrorInterface;
+use Limoncello\Validation\Validator;
+use MessageFormatter;
+use Sample\Validation\CustomErrorMessages;
+use Sample\Validation\CustomRules as v;
+use Sample\Validation\CustomValidator as vv;
 
 /**
  * @package Sample
@@ -33,7 +40,7 @@ class Application
     /**
      * @param bool $isOutputToConsole
      */
-    public function __construct($isOutputToConsole = true)
+    public function __construct(bool $isOutputToConsole = true)
     {
         $this->isOutputToConsole = $isOutputToConsole;
     }
@@ -41,86 +48,163 @@ class Application
     /**
      * @return void
      */
-    public function run()
+    public function run(): void
     {
+        $this->showBasicUsage();
+
+        $this->showAdvancedUsageWithCustomValidator();
+    }
+
+    /**
+     * Shows basic usage with built-in rules.
+     */
+    private function showBasicUsage(): void
+    {
+        $this->console('Basic usage sample.' . PHP_EOL);
+        $this->console('===================' . PHP_EOL);
+
+        // Let's build a rule that validates an input to be either `null` or a string from 5 to 10 characters.
+        $validator = Validator::validator(
+            v::nullable(v::isString(v::stringLengthBetween(5, 10)))
+        );
+
+        // let's try validation with valid input
+        $input = null;
+        if ($validator->validate($input) === true) {
+            $this->console("Validation OK for `null`." . PHP_EOL);
+        } else {
+            assert(false, 'We should not be here.');
+        }
+        // another one
+        $input = 'Hello';
+        if ($validator->validate($input) === true) {
+            $this->console("Validation OK for `$input`." . PHP_EOL);
+        } else {
+            assert(false, 'We should not be here.');
+        }
+        // this one should not pass the validation
+        $input = 'This string is too long.';
+        if ($validator->validate($input) === false) {
+            $this->console("Input `$input` has not passed validation." . PHP_EOL);
+            $this->printErrors($validator->getErrors());
+        } else {
+            assert(false, 'We should not be here.');
+        }
+
+        // next example demonstrates
+        // - parsing strings as dates
+        // - validation for dates
+        // - data capture so you don't need to parse the input second time after validation
+        $fromDate  = new DateTime('2001-02-03');
+        $toDate    = new DateTime('2001-04-05');
+        $validator = Validator::validator(
+            v::isString(v::stringToDateTime(DATE_ATOM, v::between($fromDate, $toDate)))
+                ->setName('my_date')->enableCapture()
+        );
+        $input     = '2001-03-04T05:06:07+08:00';
+        if ($validator->validate($input) === true) {
+            $this->console("Validation OK for `$input`." . PHP_EOL);
+            $myDate = $validator->getCaptures()->get()['my_date'];
+            // note that captured date is already DateTime
+            assert($myDate instanceof DateTimeInterface);
+        } else {
+            assert(false, 'We should not be here.');
+        }
+
+        $this->console(PHP_EOL . PHP_EOL . PHP_EOL);
+
+        // The output would be
+        // -------------------------------------------------------------------------------------------------------
+        // Basic usage sample.
+        // ===================
+        // Validation OK for `null`.
+        // Validation OK for `Hello`.
+        // Input `This string is too long to pass validation.` has not passed validation.
+        // Validation failed for `This string is too long.` with: The value should be between 5 and 10 characters.
+        // Validation OK for `2001-03-04T05:06:07+08:00`.
+        // -------------------------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Shows advanced usage with custom validation rules and workflow.
+     */
+    private function showAdvancedUsageWithCustomValidator(): void
+    {
+        $this->console('Advanced usage sample.' . PHP_EOL);
+        $this->console('===================' . PHP_EOL);
+
         // Validation rules for input are
         // - `email` must be a string and a valid email value (as FILTER_VALIDATE_EMAIL describes)
         // - `first_name` required in input, must be a string with length from 1 to 255 characters
         // - `last_name` could be either `null` or if given it must be a string with length from 1 to 255 characters
         // - `payment_plan` must be a valid index for data in database (we will emulate request to database)
-        // - `interests` must be an array of non-empty strings (any number of items, no limit for max length)
-
-        $invalidInput = [
-            'email'        => 'john.dow',
-            //'first_name' => 'John',
-            'last_name'    => '',
-            'payment_plan' => 123,
-            'interests'    => ['leisure', false, 'php', 321],
-        ];
-
-        $validInput = [
-            'email'        => 'john@dow.com',
-            'first_name'   => 'John',
-            'last_name'    => null,
-            'payment_plan' => 2,
-            'interests'    => ['leisure', 'php', 'programming'],
-        ];
-
-        // Having app specific rules separated makes the code easier to read and reuse.
-        // Though you can have the rules in-lined.
-
-        $rules = [
+        $validator = vv::validator([
             'email'        => v::isEmail(),
             'first_name'   => v::isRequiredString(255),
             'last_name'    => v::isNullOrNonEmptyString(255),
             'payment_plan' => v::isExistingPaymentPlan(),
-            'interests'    => v::isListOfStrings(),
+        ]);
+
+        // Check with invalid data
+        $invalidInput = [
+            'email'        => 'john.dow',
+            //'first_name' => 'John',
+            'last_name'    => '',
+            'payment_plan' => '123',
         ];
+        $this->console('Invalid data (errors)' . PHP_EOL);
+        $validator->validate($invalidInput);
+        $this->printErrors($validator->getErrors());
+        $this->console('Invalid data (captures)' . PHP_EOL);
+        $this->printCaptures($validator->getCaptures());
 
-        $this->console('Invalid data' . PHP_EOL);
-        $this->printErrors(
-            v::validator(v::arrayX($rules))->validate($invalidInput)
-        );
+        // Check with valid data
+        $validInput = [
+            'email'        => 'john@dow.com',
+            'first_name'   => 'John',
+            'last_name'    => null,
+            'payment_plan' => '2',
+        ];
+        $this->console(PHP_EOL . 'Valid data (errors)' . PHP_EOL);
+        $validator->validate($validInput);
+        $this->printErrors($validator->getErrors());
+        $this->console('Valid data (captures)' . PHP_EOL);
+        $this->printCaptures($validator->getCaptures());
 
-        $this->console(PHP_EOL . 'Valid data' . PHP_EOL);
-        $this->printErrors(
-            v::validator(v::arrayX($rules))->validate($validInput)
-        );
-
-        // Note that error message placeholders like `first_name` are replaced with
-        // more readable such as `First Name` and others.
-        //
         // The output would be
         // -------------------------------------------------------------------------------------------------------
-        // Invalid data
-        // Param `email` failed for `john.dow` with: The `Email address` value should be a valid email address.
-        // Param `last_name` failed for `` with: The `Last Name` value should be between 1 and 255 characters.
-        // Param `payment_plan` failed for `123` with: The `Payment plan` value should be an existing payment plan.
-        // Param `interests` failed for `` with: The `Interests` value should be a string.
-        // Param `interests` failed for `321` with: The `Interests` value should be a string.
-        // Param `first_name` failed for `` with: The `First Name` value is required.
+        // Advanced usage sample.
+        // ===================
+        // Invalid data (errors)
+        // Param `email` failed for `john.dow` with: The value should be a valid email address.
+        // Param `last_name` failed for `` with: The value should be between 1 and 255 characters.
+        // Param `payment_plan` failed for `123` with: The value should be a valid payment plan.
+        // Param `first_name` failed for `` with: The value is required.
+        // Invalid data (captures)
+        // No captures
         //
-        // Valid data
+        // Valid data (errors)
         // No errors
+        // Valid data (captures)
+        // `email` = `john@dow.com` (string)
+        // `first_name` = `John` (string)
+        // `last_name` = `` (NULL)
+        // `payment_plan` = `2` (integer)
         // -------------------------------------------------------------------------------------------------------
     }
 
     /**
-     * @param $errors
+     * @param ErrorAggregatorInterface $errors
+     *
+     * @return void
      */
-    private function printErrors($errors)
+    private function printErrors(ErrorAggregatorInterface $errors): void
     {
-        $hasErrors  = false;
-        $translator = new Translator();
+        $hasErrors = false;
 
-        foreach ($errors as $error) {
+        foreach ($errors->get() as $error) {
             $hasErrors = true;
-            /** @var Error $error */
-            $paramName  = $error->getParameterName();
-            $paramValue = $error->getParameterValue();
-            $errorMsg   = $translator->translate($error);
-
-            $this->console("Param `$paramName` failed for `$paramValue` with: $errorMsg" . PHP_EOL);
+            $this->printError($error);
         }
 
         if ($hasErrors === false) {
@@ -129,9 +213,46 @@ class Application
     }
 
     /**
+     * @param ErrorInterface $error
+     *
+     * @return void
+     */
+    private function printError(ErrorInterface $error): void
+    {
+        $paramName  = $error->getParameterName();
+        $entry      = empty($paramName) ? 'Validation' : "Param `$paramName`";
+        $paramValue = $error->getParameterValue();
+        $errorMsg   = CustomErrorMessages::MESSAGES[$error->getMessageCode()];
+        $context    = $error->getMessageContext();
+        $errorMsg   = MessageFormatter::formatMessage('en', $errorMsg, $context !== null ? $context : []);
+
+        $this->console("$entry failed for `$paramValue` with: $errorMsg" . PHP_EOL);
+    }
+
+    /**
+     * @param CaptureAggregatorInterface $captures
+     *
+     * @return void
+     */
+    private function printCaptures(CaptureAggregatorInterface $captures): void
+    {
+        $hasCaptures = false;
+
+        foreach ($captures->get() as $name => $value) {
+            $hasCaptures = true;
+            $type        = gettype($value);
+            $this->console("`$name` = `$value` ($type)" . PHP_EOL);
+        }
+
+        if ($hasCaptures === false) {
+            $this->console('No captures' . PHP_EOL);
+        }
+    }
+
+    /**
      * @param string $string
      */
-    private function console($string)
+    private function console(string $string): void
     {
         if ($this->isOutputToConsole === true) {
             echo $string;

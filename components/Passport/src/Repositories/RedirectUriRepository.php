@@ -75,7 +75,7 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
     /**
      * @inheritdoc
      */
-    public function update(RedirectUriInterface $redirectUri)
+    public function update(RedirectUriInterface $redirectUri): void
     {
         $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();

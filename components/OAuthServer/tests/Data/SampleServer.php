@@ -256,7 +256,7 @@ class SampleServer extends BaseAuthorizationServer
     /**
      * @inheritdoc
      */
-    public function codeRevokeTokens(AuthorizationCodeInterface $code)
+    public function codeRevokeTokens(AuthorizationCodeInterface $code): void
     {
         // pretend we actually revoke all related tokens
     }

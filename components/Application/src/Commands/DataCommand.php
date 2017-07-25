@@ -111,7 +111,7 @@ class DataCommand implements CommandInterface
     /**
      * @inheritdoc
      */
-    public static function execute(ContainerInterface $container, IoInterface $inOut)
+    public static function execute(ContainerInterface $container, IoInterface $inOut): void
     {
         (new static())->run($container, $inOut);
     }

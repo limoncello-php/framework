@@ -34,7 +34,7 @@ class MySqlPassportContainerConfigurator extends BasePassportContainerConfigurat
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         static::baseConfigureContainer($container);
 

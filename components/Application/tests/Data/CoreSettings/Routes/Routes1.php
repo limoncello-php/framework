@@ -42,7 +42,7 @@ class Routes1 implements RoutesConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureRoutes(GroupInterface $routes)
+    public static function configureRoutes(GroupInterface $routes): void
     {
         $routes->get('/', [static::class, 'home']);
     }

@@ -59,7 +59,7 @@ class Router implements RouterInterface
      * @param string $generatorClass
      * @param string $dispatcherClass
      */
-    public function __construct($generatorClass, $dispatcherClass)
+    public function __construct(string $generatorClass, string $dispatcherClass)
     {
         assert(static::classImplements($generatorClass, DataGenerator::class));
         assert(static::classImplements($dispatcherClass, Dispatcher::class));
@@ -103,7 +103,7 @@ class Router implements RouterInterface
     /**
      * @inheritdoc
      */
-    public function loadCachedRoutes(array $cachedRoutes)
+    public function loadCachedRoutes(array $cachedRoutes): void
     {
         $this->cachedRoutes  = $cachedRoutes;
         list($collectorData) = $cachedRoutes;
@@ -167,7 +167,7 @@ class Router implements RouterInterface
         array $queryParams = []
     ): string {
         $path   = $this->getUriPath($routeName);
-        $path   = $this->replacePlaceholders($path, $placeholders);
+        $path   = $path === null ? $path : $this->replacePlaceholders($path, $placeholders);
         $url    = empty($queryParams) === true ? "$hostUri$path" : "$hostUri$path?" . http_build_query($queryParams);
 
         return $url;
@@ -190,7 +190,7 @@ class Router implements RouterInterface
     /**
      * @return RouteCollector
      */
-    protected function createRouteCollector()
+    protected function createRouteCollector(): RouteCollector
     {
         return new RouteCollector(new Std(), new $this->generatorClass);
     }
@@ -198,7 +198,7 @@ class Router implements RouterInterface
     /**
      * @return DispatcherInterface
      */
-    protected function createDispatcher()
+    protected function createDispatcher(): DispatcherInterface
     {
         return new $this->dispatcherClass;
     }
@@ -211,7 +211,7 @@ class Router implements RouterInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function replacePlaceholders($path, array $placeholders)
+    private function replacePlaceholders(string $path, array $placeholders): string
     {
         $result            = '';
         $inPlaceholder     = false;
@@ -252,7 +252,7 @@ class Router implements RouterInterface
     /**
      * @return void
      */
-    private function checkRoutesLoaded()
+    private function checkRoutesLoaded(): void
     {
         if ($this->cachedRoutes === false) {
             throw new LogicException('Routes are not loaded yet.');

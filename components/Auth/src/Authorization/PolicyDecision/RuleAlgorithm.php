@@ -31,7 +31,7 @@ abstract class RuleAlgorithm
     /**
      * @return RuleCombiningAlgorithmInterface
      */
-    public static function firstApplicable()
+    public static function firstApplicable(): RuleCombiningAlgorithmInterface
     {
         return new RulesFirstApplicable();
     }
@@ -39,7 +39,7 @@ abstract class RuleAlgorithm
     /**
      * @return RuleCombiningAlgorithmInterface
      */
-    public static function denyOverrides()
+    public static function denyOverrides(): RuleCombiningAlgorithmInterface
     {
         return new RulesDenyOverrides();
     }
@@ -47,7 +47,7 @@ abstract class RuleAlgorithm
     /**
      * @return RuleCombiningAlgorithmInterface
      */
-    public static function permitOverrides()
+    public static function permitOverrides(): RuleCombiningAlgorithmInterface
     {
         return new RulesPermitOverrides();
     }
@@ -55,7 +55,7 @@ abstract class RuleAlgorithm
     /**
      * @return RuleCombiningAlgorithmInterface
      */
-    public static function denyUnlessPermit()
+    public static function denyUnlessPermit(): RuleCombiningAlgorithmInterface
     {
         return new RulesDenyUnlessPermit();
     }
@@ -63,7 +63,7 @@ abstract class RuleAlgorithm
     /**
      * @return RuleCombiningAlgorithmInterface
      */
-    public static function permitUnlessDeny()
+    public static function permitUnlessDeny(): RuleCombiningAlgorithmInterface
     {
         return new RulesPermitUnlessDeny();
     }

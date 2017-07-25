@@ -32,7 +32,7 @@ class TemplatesContainerConfigurator implements ContainerConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[TemplatesInterface::class] = function (PsrContainerInterface $container) {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);

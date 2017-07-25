@@ -41,6 +41,11 @@ class FileBundleEncoderTest extends TestCase
                         'Hello World' => ['Hallo Welt', 'de'],
                     ],
                 ],
+                'de_AT' => [
+                    'Messages' => [
+                        'Hello World' => ['Hallo Welt aus Österreich', 'de_AT'],
+                    ],
+                ],
             ],
         ], $storageData);
 

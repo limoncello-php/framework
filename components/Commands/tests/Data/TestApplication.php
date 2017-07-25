@@ -48,7 +48,7 @@ class TestApplication implements ApplicationInterface
     /**
      * @inheritdoc
      */
-    public function run()
+    public function run(): void
     {
     }
 }

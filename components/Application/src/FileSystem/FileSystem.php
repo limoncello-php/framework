@@ -22,6 +22,8 @@ use Limoncello\Contracts\FileSystem\FileSystemInterface;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FileSystem implements FileSystemInterface
 {
@@ -47,7 +49,7 @@ class FileSystem implements FileSystemInterface
     /**
      * @inheritdoc
      */
-    public function write(string $filePath, string $contents)
+    public function write(string $filePath, string $contents): void
     {
         $bytesWritten = file_put_contents($filePath, $contents);
         $bytesWritten !== false ?: $this->throwEx(new FileSystemException());
@@ -56,7 +58,7 @@ class FileSystem implements FileSystemInterface
     /**
      * @inheritdoc
      */
-    public function delete(string $filePath)
+    public function delete(string $filePath): void
     {
         $isDeleted = file_exists($filePath) === false || unlink($filePath) === true;
         $isDeleted === true ?: $this->throwEx(new FileSystemException());
@@ -94,7 +96,7 @@ class FileSystem implements FileSystemInterface
     /**
      * @inheritdoc
      */
-    public function createFolder(string $folderPath)
+    public function createFolder(string $folderPath): void
     {
         $isCreated = mkdir($folderPath);
         $isCreated === true ?: $this->throwEx(new FileSystemException());
@@ -103,7 +105,7 @@ class FileSystem implements FileSystemInterface
     /**
      * @inheritdoc
      */
-    public function deleteFolder(string $folderPath)
+    public function deleteFolder(string $folderPath): void
     {
         $isDeleted = is_dir($folderPath) === true && rmdir($folderPath) === true;
         $isDeleted === true ?: $this->throwEx(new FileSystemException());
@@ -112,13 +114,22 @@ class FileSystem implements FileSystemInterface
     /**
      * @inheritdoc
      */
-    public function deleteFolderRecursive(string $folderPath)
+    public function deleteFolderRecursive(string $folderPath): void
     {
         foreach ($this->scanFolder($folderPath) as $path) {
             $this->isFolder($path) === true ? $this->deleteFolderRecursive($path) : $this->delete($path);
         }
 
         $this->deleteFolder($folderPath);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function symlink(string $targetPath, string $linkPath): void
+    {
+        $isCreated = symlink($targetPath, $linkPath) === true;
+        $isCreated === true ?: $this->throwEx(new FileSystemException());
     }
 
     /**

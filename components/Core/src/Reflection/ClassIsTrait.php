@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Generator;
 use GlobIterator;
 use ReflectionClass;
@@ -125,6 +126,8 @@ trait ClassIsTrait
      * @param string $classOrInterface
      *
      * @return Generator
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected static function selectClasses(string $path, string $classOrInterface): Generator
     {
@@ -134,8 +137,14 @@ trait ClassIsTrait
         foreach (new GlobIterator($path, $flags) as $filePath) {
             if (is_file($filePath) === true) {
                 $filePath = realpath($filePath);
-                /** @noinspection PhpIncludeInspection */
-                require_once $filePath;
+                try {
+                    /** @noinspection PhpIncludeInspection */
+                    require_once $filePath;
+                } catch (Exception $ex) {
+                    // Files might have syntax errors and etc.
+                    // For the purposes of this method it doesn't matter so just skip it.
+                    continue;
+                }
                 $selectedFiles[$filePath] = true;
             }
         }

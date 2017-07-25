@@ -17,7 +17,7 @@
     "require": {
         "php": ">=7.0.0",
         "composer-plugin-api": "^1.1",
-        "limoncello-php/contracts": "^0.6.9"
+        "limoncello-php/contracts": "^0.7.0"
     },
     "require-dev": {
         "composer/composer": "^1.0.0",
@@ -51,6 +51,9 @@
         "optimize-autoloader": true
     },
     "extra": {
+        "branch-alias": {
+            "dev-develop": "0.8.x-dev"
+        },
         "class": "Limoncello\\Commands\\ComposerPlugin"
     }
 }

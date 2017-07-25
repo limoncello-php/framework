@@ -36,7 +36,7 @@ class PassportContainerConfigurator extends BasePassportContainerConfigurator im
      *
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         static::baseConfigureContainer($container);
 

@@ -16,16 +16,59 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\MessageCodes;
-use Limoncello\Validation\Contracts\RuleInterface;
-use Limoncello\Validation\Rules\Fail;
-use Limoncello\Validation\Rules\Success;
+use Limoncello\Validation\Contracts\Errors\ErrorCodes;
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Limoncello\Validation\Rules\Generic\AndOperator;
+use Limoncello\Validation\Rules\Generic\Fail;
+use Limoncello\Validation\Rules\Generic\IfOperator;
+use Limoncello\Validation\Rules\Generic\OrOperator;
+use Limoncello\Validation\Rules\Generic\Required;
+use Limoncello\Validation\Rules\Generic\Success;
 
 /**
  * @package Limoncello\Validation
  */
 trait Generics
 {
+    /**
+     * @param RuleInterface $first
+     * @param RuleInterface $second
+     *
+     * @return RuleInterface
+     */
+    protected static function andX(RuleInterface $first, RuleInterface $second): RuleInterface
+    {
+        return new AndOperator($first, $second);
+    }
+
+    /**
+     * @param RuleInterface $primary
+     * @param RuleInterface $secondary
+     *
+     * @return RuleInterface
+     */
+    protected static function orX(RuleInterface $primary, RuleInterface $secondary): RuleInterface
+    {
+        return new OrOperator($primary, $secondary);
+    }
+
+    /**
+     * @param callable      $condition
+     * @param RuleInterface $onTrue
+     * @param RuleInterface $onFalse
+     * @param array         $settings
+     *
+     * @return RuleInterface
+     */
+    protected static function ifX(
+        callable $condition,
+        RuleInterface $onTrue,
+        RuleInterface $onFalse,
+        array $settings = []
+    ): RuleInterface {
+        return new IfOperator($condition, $onTrue, $onFalse, $settings);
+    }
+
     /**
      * @return RuleInterface
      */
@@ -35,12 +78,23 @@ trait Generics
     }
 
     /**
-     * @param int $messageCode
+     * @param int        $errorCode
+     * @param null|mixed $errorContext
      *
      * @return RuleInterface
      */
-    protected static function fail(int $messageCode = MessageCodes::INVALID_VALUE): RuleInterface
+    protected static function fail(int $errorCode = ErrorCodes::INVALID_VALUE, $errorContext = null): RuleInterface
     {
-        return new Fail($messageCode);
+        return new Fail($errorCode, $errorContext);
+    }
+
+    /**
+     * @param RuleInterface $rule
+     *
+     * @return RuleInterface
+     */
+    protected static function required(RuleInterface $rule): RuleInterface
+    {
+        return new Required($rule);
     }
 }

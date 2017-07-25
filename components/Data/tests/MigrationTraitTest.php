@@ -382,14 +382,14 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
     /**
      * @inheritdoc
      */
-    public function migrate()
+    public function migrate(): void
     {
     }
 
     /**
      * @inheritdoc
      */
-    public function rollback()
+    public function rollback(): void
     {
     }
 }

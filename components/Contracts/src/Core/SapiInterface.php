@@ -80,5 +80,5 @@ interface SapiInterface
      *
      * @return void
      */
-    public function handleResponse(ResponseInterface $response);
+    public function handleResponse(ResponseInterface $response): void;
 }

@@ -24,25 +24,25 @@ interface ModelInterface
     /**
      * @return string
      */
-    public static function getTableName();
+    public static function getTableName(): string;
 
     /**
      * @return string
      */
-    public static function getPrimaryKeyName();
+    public static function getPrimaryKeyName(): string;
 
     /**
      * @return array
      */
-    public static function getAttributeTypes();
+    public static function getAttributeTypes(): array;
 
     /**
      * @return array
      */
-    public static function getAttributeLengths();
+    public static function getAttributeLengths(): array;
 
     /**
      * @return array
      */
-    public static function getRelationships();
+    public static function getRelationships(): array;
 }

@@ -28,7 +28,7 @@ class MeasureExecutionTimeTraitTest extends TestCase
     /**
      * Test measure time.
      */
-    public function testMeasureTime()
+    public function testMeasureTime(): void
     {
         $retVal = $this->measureTime(function () {
             $value = 'some value';

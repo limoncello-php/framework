@@ -30,5 +30,6 @@ class FluteProviderTest extends TestCase
     public function testProvider()
     {
         $this->assertNotEmpty(FluteProvider::getContainerConfigurators());
+        $this->assertNotEmpty(FluteProvider::getMessageDescriptions());
     }
 }

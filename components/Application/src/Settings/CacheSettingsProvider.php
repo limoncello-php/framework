@@ -117,7 +117,7 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
     /**
      * @inheritdoc
      */
-    public function unserialize(array $serialized)
+    public function unserialize(array $serialized): void
     {
         list ($this->settingsMap, $this->settingsData, $this->ambiguousMap) = $serialized;
     }

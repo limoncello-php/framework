@@ -73,8 +73,17 @@ abstract class SymmetricCryptSettings implements SettingsInterface
      */
     const KEY_USE_ZERO_PADDING = self::KEY_IV + 1;
 
+    // Authenticated Encryption with Associated Data specific keys (since PHP 7.1)
+    // @link http://php.net/manual/en/function.openssl-encrypt.php
+
     /** Settings key */
-    const KEY_LAST = self::KEY_USE_ZERO_PADDING + 1;
+    const KEY_USE_AUTHENTICATION = self::KEY_USE_ZERO_PADDING + 1;
+
+    /** Settings key */
+    const KEY_TAG_LENGTH = self::KEY_USE_AUTHENTICATION + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_TAG_LENGTH;
 
     /**
      * @inheritdoc
@@ -82,10 +91,12 @@ abstract class SymmetricCryptSettings implements SettingsInterface
     public function get(): array
     {
         return [
-            static::KEY_METHOD           => static::DEFAULT_METHOD,
-            static::KEY_PASSWORD         => $this->getPassword(),
-            static::KEY_IV               => static::DEFAULT_IV,
-            static::KEY_USE_ZERO_PADDING => false,
+            static::KEY_METHOD             => static::DEFAULT_METHOD,
+            static::KEY_PASSWORD           => $this->getPassword(),
+            static::KEY_IV                 => static::DEFAULT_IV,
+            static::KEY_USE_ZERO_PADDING   => false,
+            static::KEY_USE_AUTHENTICATION => false,
+            static::KEY_TAG_LENGTH         => 16,
         ];
     }
 }

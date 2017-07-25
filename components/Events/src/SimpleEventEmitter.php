@@ -42,7 +42,7 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
     /**
      * @inheritdoc
      */
-    public function emit(string $eventName, array $arguments = [])
+    public function emit(string $eventName, array $arguments = []): void
     {
         $this->isCancellingEnabled() === true ?
             $this->emitWithCancellingPropagationCheck($eventName, $arguments) :
@@ -52,7 +52,7 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
     /**
      * @inheritdoc
      */
-    public function dispatch(EventInterface $event)
+    public function dispatch(EventInterface $event): void
     {
         $this->emit(get_class($event), [$event]);
     }
@@ -61,11 +61,11 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
      * @param string   $eventName
      * @param callable $subscriber
      *
-     * @return SimpleEventEmitter
+     * @return self
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function subscribe(string $eventName, callable $subscriber): SimpleEventEmitter
+    public function subscribe(string $eventName, callable $subscriber): self
     {
         if ($subscriber instanceof Closure || ($staticMethod = $this->parseStaticMethod($subscriber)) === null) {
             $this->subscribers[$eventName][] = $subscriber;
@@ -81,9 +81,9 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
      * @param string   $eventName
      * @param callable $subscriber
      *
-     * @return SimpleEventEmitter
+     * @return self
      */
-    public function unSubscribe(string $eventName, callable $subscriber): SimpleEventEmitter
+    public function unSubscribe(string $eventName, callable $subscriber): self
     {
         if (($subscriber instanceof Closure) === false &&
             ($staticMethod = $this->parseStaticMethod($subscriber)) !== null
@@ -108,9 +108,9 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
     }
 
     /**
-     * @return SimpleEventEmitter
+     * @return self
      */
-    public function enableCancelling(): SimpleEventEmitter
+    public function enableCancelling(): self
     {
         $this->cancellingEnabled = true;
 
@@ -118,9 +118,9 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
     }
 
     /**
-     * @return SimpleEventEmitter
+     * @return self
      */
-    public function disableCancelling(): SimpleEventEmitter
+    public function disableCancelling(): self
     {
         $this->cancellingEnabled = false;
 
@@ -130,9 +130,9 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
     /**
      * @param array $subscribers
      *
-     * @return SimpleEventEmitter
+     * @return self
      */
-    public function setStaticSubscribers(array $subscribers): SimpleEventEmitter
+    public function setStaticSubscribers(array $subscribers): self
     {
         assert($this->checkAllSubscribersAreStatic($subscribers) === true);
 
@@ -173,9 +173,9 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
     /**
      * @param callable[] $subscribers
      *
-     * @return SimpleEventEmitter
+     * @return self
      */
-    protected function setSubscribers(array $subscribers): SimpleEventEmitter
+    protected function setSubscribers(array $subscribers): self
     {
         $this->subscribers = $subscribers;
 
@@ -188,7 +188,7 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
      *
      * @return void
      */
-    protected function emitWithoutCancellingPropagationCheck(string $eventName, array $arguments = [])
+    protected function emitWithoutCancellingPropagationCheck(string $eventName, array $arguments = []): void
     {
         foreach ($this->getEventSubscribers($eventName) as $subscriber) {
             call_user_func_array($subscriber, $arguments);
@@ -201,7 +201,7 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
      *
      * @return void
      */
-    protected function emitWithCancellingPropagationCheck(string $eventName, array $arguments = [])
+    protected function emitWithCancellingPropagationCheck(string $eventName, array $arguments = []): void
     {
         foreach ($this->getEventSubscribers($eventName) as $subscriber) {
             if (call_user_func_array($subscriber, $arguments) === false) {
@@ -231,9 +231,9 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
      * @param string     $eventName
      * @param callable[] $eventSubscribers
      *
-     * @return SimpleEventEmitter
+     * @return self
      */
-    private function setEventSubscribers(string $eventName, array $eventSubscribers): SimpleEventEmitter
+    private function setEventSubscribers(string $eventName, array $eventSubscribers): self
     {
         $this->subscribers[$eventName] = $eventSubscribers;
 

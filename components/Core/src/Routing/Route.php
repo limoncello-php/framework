@@ -74,43 +74,23 @@ class Route implements RouteInterface
      * @param GroupInterface $group
      * @param string         $method
      * @param string         $uriPath
+     * @param callable       $handler
      */
-    public function __construct(GroupInterface $group, string $method, string $uriPath)
+    public function __construct(GroupInterface $group, string $method, string $uriPath, callable $handler)
     {
         $this->group   = $group;
         $this->method  = $method;
         $this->uriPath = $uriPath;
-    }
 
-    /**
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function setHandler(callable $handler): Route
-    {
-        $isValidHandler = $this->checkPublicStaticCallable($handler, [
-            'array',
-            ContainerInterface::class,
-            ServerRequestInterface::class,
-        ], ResponseInterface::class);
-        if ($isValidHandler === false) {
-            // Handler method should have signature
-            // `public static methodName(array, ContainerInterface, ServerRequestInterface): ResponseInterface`'
-            throw new LogicException($this->getCallableToCacheMessage());
-        }
-
-        $this->handler = $handler;
-
-        return $this;
+        $this->setHandler($handler);
     }
 
     /**
      * @param string|null $name
      *
-     * @return Route
+     * @return self
      */
-    public function setName(string $name = null): Route
+    public function setName(string $name = null): self
     {
         $this->name = $name;
 
@@ -190,9 +170,9 @@ class Route implements RouteInterface
     /**
      * @param bool $isGroupFactory
      *
-     * @return Route
+     * @return self
      */
-    public function setUseGroupRequestFactory(bool $isGroupFactory): Route
+    public function setUseGroupRequestFactory(bool $isGroupFactory): self
     {
         $this->isGroupRequestFactory = $isGroupFactory;
 
@@ -204,8 +184,31 @@ class Route implements RouteInterface
      */
     public function getName()
     {
-        $result = $this->name !== null ? $this->getGroup()->getName() . $this->name : null;
+        $result = $this->name !== null ? (string)$this->getGroup()->getName() . $this->name : null;
 
         return $result;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return self
+     */
+    protected function setHandler(callable $handler): self
+    {
+        $isValidHandler = $this->checkPublicStaticCallable($handler, [
+            'array',
+            ContainerInterface::class,
+            ServerRequestInterface::class,
+        ], ResponseInterface::class);
+        if ($isValidHandler === false) {
+            // Handler method should have signature
+            // `public static methodName(array, ContainerInterface, ServerRequestInterface): ResponseInterface`'
+            throw new LogicException($this->getCallableToCacheMessage());
+        }
+
+        $this->handler = $handler;
+
+        return $this;
     }
 }

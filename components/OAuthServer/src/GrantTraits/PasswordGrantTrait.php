@@ -39,7 +39,7 @@ trait PasswordGrantTrait
     /**
      * @return PasswordIntegrationInterface
      */
-    protected function passGetIntegration()
+    protected function passGetIntegration(): PasswordIntegrationInterface
     {
         return $this->passIntegration;
     }
@@ -49,7 +49,7 @@ trait PasswordGrantTrait
      *
      * @return void
      */
-    public function passSetIntegration(PasswordIntegrationInterface $passIntegration)
+    public function passSetIntegration(PasswordIntegrationInterface $passIntegration): void
     {
         $this->passIntegration = $passIntegration;
     }

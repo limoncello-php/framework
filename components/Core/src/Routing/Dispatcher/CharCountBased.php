@@ -39,7 +39,7 @@ class CharCountBased extends \FastRoute\Dispatcher\CharCountBased implements Dis
     /**
      * @inheritdoc
      */
-    public function setData(array $data)
+    public function setData(array $data): void
     {
         list($this->staticRouteMap, $this->variableRouteData) = $data;
     }

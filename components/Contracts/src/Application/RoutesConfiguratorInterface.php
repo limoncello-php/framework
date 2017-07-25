@@ -38,5 +38,5 @@ interface RoutesConfiguratorInterface
      *
      * @return void
      */
-    public static function configureRoutes(GroupInterface $routes);
+    public static function configureRoutes(GroupInterface $routes): void;
 }

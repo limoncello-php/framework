@@ -17,9 +17,7 @@
  */
 
 use Limoncello\Tests\Flute\Data\Api\BoardsApi as Api;
-use Limoncello\Tests\Flute\Data\Models\Board as Model;
 use Limoncello\Tests\Flute\Data\Schemes\BoardSchema as Schema;
-use Limoncello\Tests\Flute\Data\Validation\AppValidator;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -34,67 +32,6 @@ class BoardsController extends BaseController
 
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
-
-    /**
-     * @inheritdoc
-     */
-    public static function parseInputOnCreate(
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array {
-        $validator = new class ($container) extends AppValidator
-        {
-            /**
-             * @inheritdoc
-             */
-            public function __construct(ContainerInterface $container)
-            {
-                parent::__construct($container, Schema::TYPE, [
-                    self::RULE_INDEX      => $this->absentOrNull(),
-                    self::RULE_ATTRIBUTES => [
-                        Schema::ATTR_TITLE => $this->requiredText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-                    ]
-                ]);
-            }
-        };
-
-        return static::prepareCaptures(
-            $validator->assert(static::parseJson($container, $request))->getCaptures(),
-            Model::FIELD_ID,
-            [Model::FIELD_TITLE]
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function parseInputOnUpdate(
-        $index,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array {
-        $validator = new class ($container, $index) extends AppValidator
-        {
-            /**
-             * @inheritdoc
-             */
-            public function __construct(ContainerInterface $container, $index)
-            {
-                parent::__construct($container, Schema::TYPE, [
-                    AppValidator::RULE_INDEX      => $this->idEquals($index),
-                    AppValidator::RULE_ATTRIBUTES => [
-                        Schema::ATTR_TITLE => $this->optionalText(Model::getAttributeLengths()[Model::FIELD_TITLE]),
-                    ]
-                ]);
-            }
-        };
-
-        return static::prepareCaptures(
-            $validator->assert(static::parseJson($container, $request))->getCaptures(),
-            Model::FIELD_ID,
-            [Model::FIELD_TITLE]
-        );
-    }
 
     /**
      * @param array                  $routeParams

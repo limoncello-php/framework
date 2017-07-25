@@ -101,5 +101,11 @@ class ClassIsTraitTest extends TestCase
             [],
             iterator_to_array($this->selectClasses(__FILE__, DateTime::class))
         );
+        $this->assertEquals(
+            [],
+            iterator_to_array(
+                $this->selectClasses(__DIR__ . DIRECTORY_SEPARATOR . 'InvalidInclude.php', DateTime::class)
+            )
+        );
     }
 }

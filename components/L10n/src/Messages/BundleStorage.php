@@ -57,9 +57,11 @@ class BundleStorage implements BundleStorageInterface
      */
     public function has(string $locale, string $namespace, string $key): bool
     {
-        assert(is_string($locale) === true && empty($locale) === false);
-        assert(is_string($namespace) === true && empty($namespace) === false);
-        assert(is_string($key) === true && empty($key) === false);
+        assert(
+            $this->checkNonEmptyString($locale) === true &&
+            $this->checkNonEmptyString($namespace) === true &&
+            $this->checkNonEmptyStringOrInt($key) === true
+        );
 
         $has = isset($this->getEncodedStorage()[$locale][$namespace][$key]);
 
@@ -86,8 +88,7 @@ class BundleStorage implements BundleStorageInterface
      */
     public function hasResources(string $locale, string $namespace): bool
     {
-        assert(is_string($locale) === true && empty($locale) === false);
-        assert(is_string($namespace) === true && empty($namespace) === false);
+        assert($this->checkNonEmptyString($locale) === true && $this->checkNonEmptyString($namespace) === true);
 
         $has = isset($this->getEncodedStorage()[$locale][$namespace]);
 
@@ -133,7 +134,7 @@ class BundleStorage implements BundleStorageInterface
      */
     protected function lookupLocale(array $locales, string $locale, string $defaultLocale): string
     {
-        return locale_lookup($locales, $locale, true, $defaultLocale);
+        return locale_lookup($locales, $locale, false, $defaultLocale);
     }
 
     /**
@@ -226,7 +227,8 @@ class BundleStorage implements BundleStorageInterface
      */
     private function checkPair(string $key, array $valueAndLocale): bool
     {
-        $result = $this->checkNonEmptyString($key) === true && $this->checkValueWithLocale($valueAndLocale) === true;
+        $result =
+            $this->checkNonEmptyStringOrInt($key) === true && $this->checkValueWithLocale($valueAndLocale) === true;
 
         return $result;
     }
@@ -251,9 +253,21 @@ class BundleStorage implements BundleStorageInterface
      *
      * @return bool
      */
+    private function checkNonEmptyStringOrInt($value): bool
+    {
+        $result = $this->checkNonEmptyString($value) || is_int($value) === true;
+
+        return $result;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
     private function checkNonEmptyString($value): bool
     {
-        $result = is_string($value) === true && empty($value) === false;
+        $result = is_string($value) === true && (empty($value) === false || $value === '0');
 
         return $result;
     }

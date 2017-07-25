@@ -36,7 +36,7 @@ class PassportRoutesConfigurator implements RoutesConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureRoutes(GroupInterface $routes)
+    public static function configureRoutes(GroupInterface $routes): void
     {
         $routes->group(static::GROUP_PREFIX, function (GroupInterface $group) {
             $group->get(static::AUTHORIZE_URI, PassportController::AUTHORIZE_HANDLER);

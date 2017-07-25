@@ -107,7 +107,7 @@ trait ApplicationWrapperTrait
      *
      * @return void
      */
-    protected function dispatchEvent($eventId, array $arguments)
+    protected function dispatchEvent($eventId, array $arguments): void
     {
         $appAndArgs = array_merge([$this], $arguments);
         foreach ($this->events[$eventId] ?? [] as $handler) {
@@ -139,7 +139,7 @@ trait ApplicationWrapperTrait
         LimoncelloContainerInterface $container,
         array $globalConfigurators = null,
         array $routeConfigurators = null
-    ) {
+    ): void {
         /** @noinspection PhpUndefinedMethodInspection */
         parent::configureContainer($container, $globalConfigurators, $routeConfigurators);
 

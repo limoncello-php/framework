@@ -6,6 +6,7 @@ use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Exceptions\ExceptionHandlerInterface;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
@@ -14,16 +15,15 @@ use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Errors\FluteExceptionHandler;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Types\DateJsonApiStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
 use Limoncello\Flute\Types\JsonApiDateTimeType;
-use Limoncello\Validation\Contracts\TranslatorInterface as ValidationTranslatorInterface;
-use Limoncello\Validation\I18n\Locales\EnUsLocale;
-use Limoncello\Validation\I18n\Translator;
+use Limoncello\Flute\Validation\Execution\JsonApiValidatorFactory;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -43,7 +43,7 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $factory = new Factory($container);
 
@@ -71,36 +71,41 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
                 $settings[FluteSettings::KEY_URI_PREFIX],
                 $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
             ));
-            isset($settings[FluteSettings::KEY_META]) ? $encoder->withMeta($settings[FluteSettings::KEY_META]): null;
+            isset($settings[FluteSettings::KEY_META]) ? $encoder->withMeta($settings[FluteSettings::KEY_META]) : null;
             ($settings[FluteSettings::KEY_IS_SHOW_VERSION] ?? false) ? $encoder->withJsonApiVersion() : null;
 
             return $encoder;
         };
 
-        $container[TranslatorInterface::class] = $translator = $factory->createTranslator();
-        $container[FilterOperationsInterface::class] = $filerOps = new FilterOperations($translator);
-
-        $container[ValidationTranslatorInterface::class] = function () {
-            // TODO load locale according to current user preferences
-            return new Translator(EnUsLocale::getLocaleCode(), EnUsLocale::getMessages());
+        $container[FilterOperationsInterface::class] = function (PsrContainerInterface $container) {
+            return new FilterOperations($container);
         };
 
-        $container[RepositoryInterface::class] = function (PsrContainerInterface $container) use (
-            $factory,
-            $filerOps,
-            $translator
-        ) {
-            $connection       = $container->get(Connection::class);
+        $container[RepositoryInterface::class] = function (PsrContainerInterface $container) use ($factory) {
+            $connection = $container->get(Connection::class);
             /** @var ModelSchemeInfoInterface $modelSchemes */
-            $modelSchemes     = $container->get(ModelSchemeInfoInterface::class);
+            $modelSchemes = $container->get(ModelSchemeInfoInterface::class);
 
-            return $factory->createRepository($connection, $modelSchemes, $filerOps, $translator);
+            /** @var FilterOperationsInterface $filerOps */
+            $filerOps = $container->get(FilterOperationsInterface::class);
+
+            /** @var FormatterFactoryInterface $formatterFactory */
+            $formatterFactory = $container->get(FormatterFactoryInterface::class);
+            $formatter        = $formatterFactory->createFormatter(Messages::RESOURCES_NAMESPACE);
+
+            return $factory->createRepository($connection, $modelSchemes, $filerOps, $formatter);
         };
 
         $container[PaginationStrategyInterface::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
 
             return new PaginationStrategy($settings[FluteSettings::KEY_RELATIONSHIP_PAGING_SIZE]);
+        };
+
+        $container[JsonApiValidatorFactoryInterface::class] = function (PsrContainerInterface $container) {
+            $factory = new JsonApiValidatorFactory($container);
+
+            return $factory;
         };
 
         // register date/date time types

@@ -64,7 +64,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test call web method.
      */
-    public function testGet()
+    public function testGet(): void
     {
         $headers = ['x-header' => 'value'];
         $server  = ['HTTP_X_HEADER' => 'value'];
@@ -77,7 +77,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test call web method.
      */
-    public function testPost()
+    public function testPost(): void
     {
         $server = ['CONTENT_TYPE' => 'application/x-www-form-urlencoded'];
 
@@ -89,7 +89,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test call web method.
      */
-    public function testPut()
+    public function testPut(): void
     {
         $server = ['CONTENT_TYPE' => 'application/x-www-form-urlencoded'];
 
@@ -101,7 +101,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test call web method.
      */
-    public function testPatch()
+    public function testPatch(): void
     {
         $server = ['CONTENT_TYPE' => 'application/x-www-form-urlencoded'];
 
@@ -113,7 +113,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test call web method.
      */
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->willBeCalled('DELETE');
 
@@ -123,7 +123,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test stream convert.
      */
-    public function testStreamFromString()
+    public function testStreamFromString(): void
     {
         $string = 'whatever';
         $stream = $this->streamFromString($string);
@@ -135,7 +135,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test call web method.
      */
-    public function testJsonApiPost()
+    public function testJsonApiPost(): void
     {
         $json   = '{}';
         $server = ['CONTENT_TYPE' => 'application/vnd.api+json'];
@@ -148,7 +148,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test call web method.
      */
-    public function testJsonApiPut()
+    public function testJsonApiPut(): void
     {
         $json   = '{}';
         $server = ['CONTENT_TYPE' => 'application/vnd.api+json'];
@@ -161,7 +161,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test call web method.
      */
-    public function testJsonApiPatch()
+    public function testJsonApiPatch(): void
     {
         $json   = '{}';
         $server = ['CONTENT_TYPE' => 'application/vnd.api+json'];
@@ -174,7 +174,7 @@ class CallTraitsTest extends TestCase
     /**
      * Test subscriptions to internal app events.
      */
-    public function testEvenSubscriptions()
+    public function testEvenSubscriptions(): void
     {
         $this->assertEmpty($this->getHandleRequestEvents());
         $this->assertEmpty($this->getHandleResponseEvents());
@@ -261,7 +261,7 @@ class CallTraitsTest extends TestCase
      * @param array  $server
      * @param string $messageBody
      */
-    private function willBeCalled($method, array $server = [], string $messageBody = 'php://input')
+    private function willBeCalled($method, array $server = [], string $messageBody = 'php://input'): void
     {
         $server['HTTP_HOST']      = 'localhost';
         $server['REQUEST_URI']    = self::URI;

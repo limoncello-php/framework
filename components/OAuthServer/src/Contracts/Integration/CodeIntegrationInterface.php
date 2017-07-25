@@ -75,7 +75,7 @@ interface CodeIntegrationInterface extends IntegrationInterface
      *
      * @link https://tools.ietf.org/html/rfc6749#section-10.5
      */
-    public function codeRevokeTokens(AuthorizationCodeInterface $code);
+    public function codeRevokeTokens(AuthorizationCodeInterface $code): void;
 
     /**
      * @param AuthorizationCodeInterface $code

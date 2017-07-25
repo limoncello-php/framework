@@ -35,7 +35,7 @@ class ApplicationContainerConfigurator implements ContainerConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[CommandStorageInterface::class] = function (PsrContainerInterface $container) {
             $creator = new class

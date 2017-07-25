@@ -31,7 +31,7 @@ class PdoContainerConfigurator implements ContainerConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[PDO::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);

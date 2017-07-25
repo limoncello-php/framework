@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\l10n\Contracts\Format\FormatterInterface;
-use MessageFormatter;
+use Limoncello\Contracts\L10n\FormatterInterface;
+use Limoncello\l10n\Contracts\Format\TranslatorInterface;
 
 /**
  * @package Limoncello\l10n
@@ -25,12 +25,65 @@ use MessageFormatter;
 class Formatter implements FormatterInterface
 {
     /**
-     * @inheritdoc
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @var string
      */
-    public function formatMessage(string $locale, string $message, array $args): string
+    private $locale;
+
+    /**
+     * @var string
+     */
+    private $namespace;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param string              $locale
+     * @param string              $namespace
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(string $locale, string $namespace, TranslatorInterface $translator)
     {
-        return MessageFormatter::formatMessage($locale, $message, $args);
+        assert(empty($locale) === false && empty($namespace) === false);
+
+        $this->locale     = locale_canonicalize($locale);
+        $this->namespace  = $namespace;
+        $this->translator = $translator;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNamespace(): string
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * @return TranslatorInterface
+     */
+    public function getTranslator(): TranslatorInterface
+    {
+        return $this->translator;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function formatMessage(string $message, array $args = []): string
+    {
+        $result = $this->getTranslator()->translateMessage($this->getLocale(), $this->getNamespace(), $message, $args);
+
+        return $result;
     }
 }

@@ -16,112 +16,28 @@
  * limitations under the License.
  */
 
-use Generator;
-use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
-use Limoncello\Validation\Contracts\RuleInterface;
+use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Contracts\ValidatorInterface;
-use Limoncello\Validation\Errors\ErrorAggregator;
-use Limoncello\Validation\Validator\Captures as CapturesX;
-use Limoncello\Validation\Validator\Compares;
-use Limoncello\Validation\Validator\Converters as ConvertersX;
-use Limoncello\Validation\Validator\ExpressionsX;
-use Limoncello\Validation\Validator\Generics;
-use Limoncello\Validation\Validator\Types;
-use Limoncello\Validation\Validator\ValidatorTrait;
-use Limoncello\Validation\Validator\Values;
-use Limoncello\Validation\Validator\Wrappers;
+use Limoncello\Validation\Execution\ContextStorage;
+use Limoncello\Validation\Validator\BaseValidator;
+use Limoncello\Validation\Validator\SingleValidation;
 
 /**
  * @package Limoncello\Validation
  */
-class Validator implements ValidatorInterface
+class Validator extends BaseValidator
 {
-    use ExpressionsX {
-        andX as public;
-        orX as public;
-        ifX as public;
-        arrayX as public;
-        eachX as public;
-        objectX as public;
-        callableX as public;
-    }
-
-    use Generics {
-        success as public;
-        fail as public;
-    }
-
-    use Types {
-        isString as public;
-        isBool as public;
-        isInt as public;
-        isFloat as public;
-        isNumeric as public;
-        isDateTime as public;
-        isDateTimeFormat as public;
-        isArray as public;
-        inValues as public;
-    }
-
-    use Values {
-        isRequired as public;
-        isNull as public;
-        notNull as public;
-        regExp as public;
-        between as public;
-        stringLength as public;
-    }
-
-    use Compares {
-        equals as public;
-        notEquals as public;
-        lessThan as public;
-        lessOrEquals as public;
-        moreThan as public;
-        moreOrEquals as public;
-    }
-
-    use CapturesX {
-        singleCapture as public;
-        multiCapture as public;
-    }
-
-    use ConvertersX {
-        toBool as public;
-        toDateTime as public;
-        toFloat as public;
-        toInt as public;
-        toString as public;
-    }
-
-    use Wrappers {
-        nullable as public;
-        required as public;
-    }
-
-    use ValidatorTrait;
-
-    /**
-     * @var RuleInterface
-     */
-    private $rule;
+    use SingleValidation;
 
     /**
      * @param RuleInterface $rule
      */
     public function __construct(RuleInterface $rule)
     {
-        $this->rule = $rule;
-    }
+        parent::__construct();
 
-    /**
-     * @inheritdoc
-     */
-    public function validate($input): Generator
-    {
-        foreach (static::validateData($this->rule, $input, $this->createErrorAggregator()) as $error) {
-            yield $error;
-        }
+        $this->setRule($rule);
     }
 
     /**
@@ -131,14 +47,37 @@ class Validator implements ValidatorInterface
      */
     public static function validator(RuleInterface $rule): ValidatorInterface
     {
-        return new static ($rule);
+        $validator = new static ($rule);
+
+        return $validator;
     }
 
     /**
-     * @return ErrorAggregatorInterface
+     * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    protected function createErrorAggregator(): ErrorAggregatorInterface
+    public function validate($input): bool
     {
-        return new ErrorAggregator();
+        if ($this->areAggregatorsDirty() === true) {
+            $this->resetAggregators();
+        }
+
+        $this->validateImplementation($input, $this->getCaptures(), $this->getErrors());
+        $this->markAggregatorsAsDirty();
+
+        $noErrors = $this->getErrors()->count() <= 0;
+
+        return $noErrors;
+    }
+
+    /**
+     * @param array $blocks
+     *
+     * @return ContextStorageInterface
+     */
+    protected function createContextStorageFromBlocks(array $blocks): ContextStorageInterface
+    {
+        return new ContextStorage($blocks);
     }
 }

@@ -33,7 +33,7 @@ interface ExceptionHandlerInterface
      *
      * @return void
      */
-    public function handleException(Exception $exception, SapiInterface $sapi, ContainerInterface $container);
+    public function handleException(Exception $exception, SapiInterface $sapi, ContainerInterface $container): void;
 
     /**
      * @param Throwable          $throwable
@@ -42,7 +42,7 @@ interface ExceptionHandlerInterface
      *
      * @return void
      */
-    public function handleThrowable(Throwable $throwable, SapiInterface $sapi, ContainerInterface $container);
+    public function handleThrowable(Throwable $throwable, SapiInterface $sapi, ContainerInterface $container): void;
 
     /**
      * @param array              $error
@@ -50,5 +50,5 @@ interface ExceptionHandlerInterface
      *
      * @return void
      */
-    public function handleFatal(array $error, ContainerInterface $container);
+    public function handleFatal(array $error, ContainerInterface $container): void;
 }

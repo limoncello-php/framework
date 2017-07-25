@@ -3,6 +3,8 @@
 use Generator;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
+use Limoncello\Flute\Validation\Execution\JsonApiRuleSerializer;
 
 /**
  * @package Limoncello\Flute
@@ -25,6 +27,11 @@ abstract class FluteSettings implements SettingsInterface
     abstract protected function getSchemesPath(): string;
 
     /**
+     * @return string
+     */
+    abstract protected function getRuleSetsPath(): string;
+
+    /**
      * @param string $path
      * @param string $implementClassName
      *
@@ -36,7 +43,10 @@ abstract class FluteSettings implements SettingsInterface
     const KEY_MODEL_TO_SCHEME_MAP = 0;
 
     /** Config key */
-    const KEY_RELATIONSHIP_PAGING_SIZE = self::KEY_MODEL_TO_SCHEME_MAP + 1;
+    const KEY_VALIDATION_RULE_SETS_DATA = self::KEY_MODEL_TO_SCHEME_MAP + 1;
+
+    /** Config key */
+    const KEY_RELATIONSHIP_PAGING_SIZE = self::KEY_VALIDATION_RULE_SETS_DATA + 1;
 
     /** Config key */
     const KEY_JSON_ENCODE_OPTIONS = self::KEY_RELATIONSHIP_PAGING_SIZE + 1;
@@ -63,6 +73,23 @@ abstract class FluteSettings implements SettingsInterface
     {
         $jsonOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES;
 
+        return [
+            static::KEY_MODEL_TO_SCHEME_MAP       => $this->createModelToSchemeMap(),
+            static::KEY_VALIDATION_RULE_SETS_DATA => $this->createRulesSetData(),
+            static::KEY_RELATIONSHIP_PAGING_SIZE  => 20,
+            static::KEY_JSON_ENCODE_OPTIONS       => $jsonOptions,
+            static::KEY_JSON_ENCODE_DEPTH         => 512,
+            static::KEY_IS_SHOW_VERSION           => false,
+            static::KEY_META                      => null,
+            static::KEY_URI_PREFIX                => null,
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function createModelToSchemeMap(): array
+    {
         $map   = [];
         $types = [];
         foreach ($this->selectClasses($this->getSchemesPath(), SchemaInterface::class) as $schemeClass) {
@@ -91,14 +118,36 @@ abstract class FluteSettings implements SettingsInterface
             $map[$modelClass] = $schemeClass;
         }
 
-        return [
-            static::KEY_MODEL_TO_SCHEME_MAP      => $map,
-            static::KEY_RELATIONSHIP_PAGING_SIZE => 20,
-            static::KEY_JSON_ENCODE_OPTIONS      => $jsonOptions,
-            static::KEY_JSON_ENCODE_DEPTH        => 512,
-            static::KEY_IS_SHOW_VERSION          => false,
-            static::KEY_META                     => null,
-            static::KEY_URI_PREFIX               => null,
-        ];
+        return $map;
+    }
+
+    /**
+     * @return array
+     */
+    private function createRulesSetData(): array
+    {
+        $serializer = new JsonApiRuleSerializer();
+        foreach ($this->selectClasses($this->getRuleSetsPath(), JsonApiRuleSetInterface::class) as $setClass) {
+            /** @var string $setName */
+            $setName = $setClass;
+            assert(
+                is_string($setClass) &&
+                class_exists($setClass) &&
+                array_key_exists(JsonApiRuleSetInterface::class, class_implements($setClass))
+            );
+            /** @var JsonApiRuleSetInterface $setClass */
+            $serializer->addResourceRules(
+                $setName,
+                $setClass::getIdRule(),
+                $setClass::getTypeRule(),
+                $setClass::getAttributeRules(),
+                $setClass::getToOneRelationshipRules(),
+                $setClass::getToManyRelationshipRules()
+            );
+        }
+
+        $ruleSetsData = $serializer->getData();
+
+        return $ruleSetsData;
     }
 }

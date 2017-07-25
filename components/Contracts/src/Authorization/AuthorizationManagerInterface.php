@@ -53,5 +53,5 @@ interface AuthorizationManagerInterface
         string $resourceType = null,
         $resourceIdentity = null,
         array $extraParams = []
-    );
+    ): void;
 }

@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
@@ -32,10 +33,12 @@ use Limoncello\Flute\Http\Query\FilterParameter;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
 use Limoncello\Flute\Http\Query\IncludeParameter;
 use Limoncello\Flute\Http\Query\SortParameter;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Api\PostsApi;
 use Limoncello\Tests\Flute\Data\Api\StringPKModelApi;
 use Limoncello\Tests\Flute\Data\Api\UsersApi;
+use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
@@ -111,8 +114,8 @@ class CrudTest extends TestCase
      */
     public function testCreateReadAndDeleteStringPKModel()
     {
-        $pk   = 'new_pk_value';
-        $name = 'Some title';
+        $pk         = 'new_pk_value';
+        $name       = 'Some title';
         $attributes = [
             StringPKModel::FIELD_NAME => $name,
         ];
@@ -356,7 +359,7 @@ class CrudTest extends TestCase
 
         // check that editor relationship for selected post is `null`
         /** @noinspection SqlDialectInspection */
-        $query   = 'SELECT ' . Post::FIELD_ID_EDITOR . ' FROM ' . Post::TABLE_NAME .
+        $query    = 'SELECT ' . Post::FIELD_ID_EDITOR . ' FROM ' . Post::TABLE_NAME .
             ' WHERE ' . Post::FIELD_ID . " = $index";
         $idEditor = $this->connection->query($query)->fetch(PDO::FETCH_NUM)[0];
         $this->assertNull($idEditor);
@@ -392,8 +395,8 @@ class CrudTest extends TestCase
             new IncludeParameter($jsonPath2, $modelPath2),
         ];
 
-        $relType1       = RelationshipTypes::BELONGS_TO;
-        $sortParameters = [
+        $relType1            = RelationshipTypes::BELONGS_TO;
+        $sortParameters      = [
             $this->createSortParameter(PostSchema::REL_BOARD, Post::REL_BOARD, false, true, $relType1),
             $this->createSortParameter(PostSchema::ATTR_TITLE, Post::FIELD_TITLE, true),
         ];
@@ -403,7 +406,7 @@ class CrudTest extends TestCase
             PaginationStrategyInterface::PARAM_PAGING_SKIP => $pagingOffset,
             PaginationStrategyInterface::PARAM_PAGING_SIZE => $pagingSize,
         ];
-        $relType2 = RelationshipTypes::BELONGS_TO;
+        $relType2            = RelationshipTypes::BELONGS_TO;
         $filteringParameters = new FilterParameterCollection();
         $filteringParameters->add(
             new FilterParameter(PostSchema::ATTR_TITLE, null, Post::FIELD_TITLE, ['like' => ['%', '%']])
@@ -432,9 +435,9 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $pagingOffset        = 0;
-        $pagingSize          = 20;
-        $pagingParameters    = [
+        $pagingOffset     = 0;
+        $pagingSize       = 20;
+        $pagingParameters = [
             PaginationStrategyInterface::PARAM_PAGING_SKIP => $pagingOffset,
             PaginationStrategyInterface::PARAM_PAGING_SIZE => $pagingSize,
         ];
@@ -580,7 +583,7 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $relType = RelationshipTypes::BELONGS_TO;
+        $relType             = RelationshipTypes::BELONGS_TO;
         $filteringParameters = new FilterParameterCollection();
         $filteringParameters->add(
             new FilterParameter(PostSchema::REL_USER, Post::REL_USER, null, ['CCC' => '5'], $relType)
@@ -656,19 +659,19 @@ class CrudTest extends TestCase
     {
         $container = new Container();
 
-        $container[Connection::class] = $this->connection = $this->initDb();
-        $container[FactoryInterface::class] = $factory = new Factory($container);
-        $translator = $factory->createTranslator();
-        $container[ModelSchemeInfoInterface::class] = $modelSchemes     = $this->getModelSchemes();
-        $container[RepositoryInterface::class] = $factory->createRepository(
+        $container[FormatterFactoryInterface::class] = $formatterFactory = new FormatterFactory();
+        $container[Connection::class]                = $this->connection = $this->initDb();
+        $container[FactoryInterface::class]          = $factory = new Factory($container);
+        $container[ModelSchemeInfoInterface::class]  = $modelSchemes = $this->getModelSchemes();
+        $container[RepositoryInterface::class]       = $factory->createRepository(
             $this->connection,
             $modelSchemes,
-            new FilterOperations($translator),
-            $translator
+            new FilterOperations($container),
+            $formatterFactory->createFormatter(Messages::RESOURCES_NAMESPACE)
         );
 
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(self::DEFAULT_PAGE);
-        $crud      = new $class($container);
+        $crud                                          = new $class($container);
 
         return $crud;
     }

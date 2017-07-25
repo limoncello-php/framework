@@ -89,7 +89,7 @@ class ResourceBundle implements ResourceBundleInterface
      */
     public function setLocale(string $locale): self
     {
-        assert(is_string($locale) === true && empty($locale) === false && locale_canonicalize($locale) === $locale);
+        assert(empty($locale) === false && locale_canonicalize($locale) === $locale);
 
         $this->locale = $locale;
 
@@ -122,7 +122,7 @@ class ResourceBundle implements ResourceBundleInterface
             $result = true;
             foreach ($properties as $key => $value) {
                 $result = $result === true &&
-                    is_string($key) === true && empty($key) === false &&
+                    ((is_string($key) === true && empty($key) === false) || is_int($key)) &&
                     is_string($value) === true && empty($value) === false;
             }
             return $result;

@@ -110,20 +110,15 @@ class Sapi implements SapiInterface
     ) {
         $this->sapiEmitter = $sapiEmitter;
 
-        // returns value if not null or $fallback otherwise
-        $get = function ($nullable, $fallback) {
-            return $nullable !== null ? $nullable : $fallback;
-        };
-
         // Code below based on ServerRequestFactory::fromGlobals
-        $this->server          = ServerRequestFactory::normalizeServer($get($server, $_SERVER));
-        $this->files           = ServerRequestFactory::normalizeFiles($get($files, $_FILES));
+        $this->server          = ServerRequestFactory::normalizeServer($server ?? $_SERVER);
+        $this->files           = ServerRequestFactory::normalizeFiles($files ?? $_FILES);
         $this->headers         = ServerRequestFactory::marshalHeaders($this->server);
         $this->uri             = ServerRequestFactory::marshalUriFromServer($this->server, $this->headers);
         $this->method          = ServerRequestFactory::get('REQUEST_METHOD', $this->server, 'GET');
-        $this->cookies         = $get($cookies, $_COOKIE);
-        $this->queryParams     = $get($queryParams, $_GET);
-        $this->parsedBody      = $get($parsedBody, $_POST);
+        $this->cookies         = $cookies ?? $_COOKIE;
+        $this->queryParams     = $queryParams ?? $_GET;
+        $this->parsedBody      = $parsedBody ?? $_POST;
         $this->messageBody     = $messageBody;
         $this->protocolVersion = $protocolVersion;
     }
@@ -211,7 +206,7 @@ class Sapi implements SapiInterface
     /**
      * @inheritdoc
      */
-    public function handleResponse(ResponseInterface $response)
+    public function handleResponse(ResponseInterface $response): void
     {
         $this->sapiEmitter->emit($response);
     }

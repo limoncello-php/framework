@@ -16,94 +16,162 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\ErrorAggregatorInterface;
-use Limoncello\Validation\Contracts\ErrorInterface;
-use Limoncello\Validation\Contracts\MessageCodes;
-use Limoncello\Validation\Contracts\RuleInterface;
-use Limoncello\Validation\Errors\Error;
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
 
 /**
  * @package Limoncello\Validation
+ *
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
  */
 abstract class BaseRule implements RuleInterface
 {
     /**
-     * @var null|string
+     * State key.
      */
-    private $parameterName = null;
+    const STATE_ERROR_VALUE = 0;
 
     /**
-     * @var null|RuleInterface
+     * State key.
      */
-    private $parentRule = null;
+    const STATE_LAST = self::STATE_ERROR_VALUE;
+
+    /**
+     * Property key.
+     */
+    const PROPERTY_NAME = 0;
+
+    /**
+     * Property key.
+     */
+    const PROPERTY_IS_CAPTURE_ENABLED = self::PROPERTY_NAME + 1;
+
+    /**
+     * Property key.
+     */
+    const PROPERTY_LAST = self::PROPERTY_IS_CAPTURE_ENABLED;
+
+    /**
+     * @var string|null
+     */
+    private $name = null;
+
+    /**
+     * @var bool
+     */
+    private $isCaptureEnabled = false;
+
+    /**
+     * @var RuleInterface|null
+     */
+    private $parent = null;
 
     /**
      * @inheritdoc
      */
-    public function isStateless(): bool
+    public function getName(): string
     {
-        return true;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function onFinish(ErrorAggregatorInterface $aggregator)
-    {
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setParentRule(RuleInterface $parent)
-    {
-        $this->parentRule = $parent;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getParameterName()
-    {
-        if ($this->parameterName !== null) {
-            return $this->parameterName;
+        if ($this->name === null) {
+            return $this->parent === null ? '' : $this->getParent()->getName();
         }
 
-        if (($parentRule = $this->getParentRule()) !== null) {
-            return $parentRule->getParameterName();
-        }
-
-        return null;
+        return $this->name;
     }
 
     /**
      * @inheritdoc
      */
-    public function setParameterName(string $parameterName = null): RuleInterface
+    public function setName(string $name): RuleInterface
     {
-        $this->parameterName = $parameterName;
+        $this->name = $name;
 
         return $this;
     }
 
     /**
-     * @return RuleInterface|null
+     * @inheritdoc
      */
-    protected function getParentRule()
+    public function unsetName(): RuleInterface
     {
-        return $this->parentRule;
+        $this->name = null;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function enableCapture(): RuleInterface
+    {
+        $this->isCaptureEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function disableCapture(): RuleInterface
+    {
+        $this->isCaptureEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isCaptureEnabled(): bool
+    {
+        return $this->isCaptureEnabled;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setParent(RuleInterface $rule): RuleInterface
+    {
+        $this->parent = $rule;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function unsetParent(): RuleInterface
+    {
+        $this->parent = null;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getStandardProperties(): array
+    {
+        return static::composeStandardProperties($this->getName(), $this->isCaptureEnabled());
     }
 
     /**
      * @param string $name
-     * @param mixed  $value
-     * @param int    $code
-     * @param mixed  $context
+     * @param bool   $isCaptureEnabled
      *
-     * @return ErrorInterface
+     * @return array
      */
-    protected function createError($name, $value, $code = MessageCodes::INVALID_VALUE, $context = null)
+    protected function composeStandardProperties(string $name, bool $isCaptureEnabled): array
     {
-        return new Error($name, $value, $code, $context);
+        return [
+            static::PROPERTY_NAME               => $name,
+            static::PROPERTY_IS_CAPTURE_ENABLED => $isCaptureEnabled,
+        ];
     }
 }

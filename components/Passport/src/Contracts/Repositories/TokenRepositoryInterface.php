@@ -30,7 +30,7 @@ interface TokenRepositoryInterface
      *
      * @return void
      */
-    public function inTransaction(Closure $closure);
+    public function inTransaction(Closure $closure): void;
 
     /**
      * @param TokenInterface $code
@@ -45,7 +45,7 @@ interface TokenRepositoryInterface
      *
      * @return void
      */
-    public function assignValuesToCode(TokenInterface $token, int $expirationInSeconds);
+    public function assignValuesToCode(TokenInterface $token, int $expirationInSeconds): void;
 
     /**
      * @param TokenInterface $token
@@ -60,7 +60,7 @@ interface TokenRepositoryInterface
      *
      * @return void
      */
-    public function bindScopes(int $identifier, array $scopes);
+    public function bindScopes(int $identifier, array $scopes): void;
 
     /**
      * @param int      $identifier
@@ -68,7 +68,7 @@ interface TokenRepositoryInterface
      *
      * @return void
      */
-    public function bindScopeIdentifiers(int $identifier, array $scopeIdentifiers);
+    public function bindScopeIdentifiers(int $identifier, array $scopeIdentifiers): void;
 
     /**
      * @param int $identifier
@@ -137,19 +137,19 @@ interface TokenRepositoryInterface
      *
      * @return void
      */
-    public function updateValues(TokenInterface $token);
+    public function updateValues(TokenInterface $token): void;
 
     /**
      * @param int $identifier
      *
      * @return void
      */
-    public function delete(int $identifier);
+    public function delete(int $identifier): void;
 
     /**
      * @param int $identifier
      *
      * @return void
      */
-    public function disable(int $identifier);
+    public function disable(int $identifier): void;
 }

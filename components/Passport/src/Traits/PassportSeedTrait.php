@@ -39,7 +39,7 @@ trait PassportSeedTrait
         ClientInterface $client,
         array $scopeDescriptions,
         array $redirectUris = []
-    ) {
+    ): void {
         $scopeIds  = $client->getScopeIdentifiers();
         $scopeRepo = $integration->getScopeRepository();
         foreach ($scopeDescriptions as $scopeId => $scopeDescription) {

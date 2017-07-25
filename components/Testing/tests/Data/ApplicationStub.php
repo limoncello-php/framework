@@ -52,7 +52,7 @@ class ApplicationStub implements ApplicationInterface
     /**
      * @inheritdoc
      */
-    public function run()
+    public function run(): void
     {
     }
 

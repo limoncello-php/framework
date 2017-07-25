@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-use Generator;
+use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
+use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
 
 /**
  * @package Limoncello\Validation
@@ -26,7 +27,17 @@ interface ValidatorInterface
     /**
      * @param mixed $input
      *
-     * @return Generator
+     * @return bool
      */
-    public function validate($input): Generator;
+    public function validate($input): bool;
+
+    /**
+     * @return CaptureAggregatorInterface
+     */
+    public function getCaptures(): CaptureAggregatorInterface;
+
+    /**
+     * @return ErrorAggregatorInterface
+     */
+    public function getErrors(): ErrorAggregatorInterface;
 }

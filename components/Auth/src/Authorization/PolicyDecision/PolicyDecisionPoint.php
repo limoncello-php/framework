@@ -91,7 +91,7 @@ class PolicyDecisionPoint implements PolicyDecisionPointInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    protected function initWithPolicySet(PolicySetInterface $policySet)
+    protected function initWithPolicySet(PolicySetInterface $policySet): void
     {
         $this->initWithData(Encoder::encodePolicySet($policySet));
     }
@@ -101,7 +101,7 @@ class PolicyDecisionPoint implements PolicyDecisionPointInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    protected function initWithData(array $encodePolicySet)
+    protected function initWithData(array $encodePolicySet): void
     {
         assert(Encoder::isPolicySet($encodePolicySet));
 
@@ -111,7 +111,7 @@ class PolicyDecisionPoint implements PolicyDecisionPointInterface
     /**
      * @param array $encodePolicySet
      */
-    protected function setEncodePolicySet($encodePolicySet)
+    protected function setEncodePolicySet(array $encodePolicySet): void
     {
         $this->encodePolicySet = $encodePolicySet;
     }

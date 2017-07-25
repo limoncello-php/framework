@@ -18,16 +18,17 @@
 
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\IncludeParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Http\Query\FilterParameter;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
 use Limoncello\Flute\Http\Query\IncludeParameter;
 use Limoncello\Flute\Http\Query\SortParameter;
+use Limoncello\Flute\L10n\Messages;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface as JsonLibrarySortParameterInterface;
@@ -77,9 +78,9 @@ class QueryTransformer
     private $jsonSchemes;
 
     /**
-     * @var T
+     * @var FormatterInterface
      */
-    private $translator;
+    private $fluteMsgFormatter;
 
     /**
      * @var string
@@ -89,19 +90,19 @@ class QueryTransformer
     /**
      * @param ModelSchemeInfoInterface $modelSchemes
      * @param JsonSchemesInterface     $jsonSchemes
-     * @param T                        $translator
+     * @param FormatterInterface       $fluteMsgFormatter
      * @param string                   $schemaClass
      */
     public function __construct(
         ModelSchemeInfoInterface $modelSchemes,
         JsonSchemesInterface $jsonSchemes,
-        T $translator,
+        FormatterInterface $fluteMsgFormatter,
         string $schemaClass
     ) {
-        $this->modelSchemes = $modelSchemes;
-        $this->jsonSchemes  = $jsonSchemes;
-        $this->schemaClass  = $schemaClass;
-        $this->translator   = $translator;
+        $this->modelSchemes      = $modelSchemes;
+        $this->jsonSchemes       = $jsonSchemes;
+        $this->schemaClass       = $schemaClass;
+        $this->fluteMsgFormatter = $fluteMsgFormatter;
     }
 
     /**
@@ -142,8 +143,8 @@ class QueryTransformer
         if ($firstKey === 'or' || $firstKey === 'and') {
             if (count($parameters) > 1) {
                 next($parameters);
-                $field = key($parameters);
-                $errMsg = $this->getTranslator()->get(T::MSG_ERR_INVALID_PARAMETER);
+                $field  = key($parameters);
+                $errMsg = $this->getFluteMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_PARAMETER);
                 $errors->addQueryParameterError($field, $errMsg);
 
                 return null;
@@ -235,7 +236,7 @@ class QueryTransformer
             $mappedParam = $this->createFilterAttributeParameter($jsonName, $column, $value);
         } elseif ($this->canMapRelationship($jsonName) === true) {
             $modelName   = $this->getRelationshipMappings()[$jsonName];
-            $type        =  $this->getModelSchemes()->getRelationshipType($this->getCurrentModelClass(), $modelName);
+            $type        = $this->getModelSchemes()->getRelationshipType($this->getCurrentModelClass(), $modelName);
             $mappedParam = $this->createFilterRelationshipParameter($jsonName, $modelName, $value, $type);
         } else {
             // filters could actually be applied to attributes in relationships
@@ -309,7 +310,7 @@ class QueryTransformer
         foreach ($pathItems as $jsonName) {
             if ($this->canMapRelationship($jsonName) === true) {
                 $modelRelationships[] = $this->getRelationshipMappings()[$jsonName];
-                $nextSchema = $this->getRelationshipSchema($jsonName);
+                $nextSchema           = $this->getRelationshipSchema($jsonName);
                 $this->setCurrentSchema(get_class($nextSchema));
 
                 continue;
@@ -512,11 +513,11 @@ class QueryTransformer
     }
 
     /**
-     * @return T
+     * @return FormatterInterface
      */
-    protected function getTranslator(): T
+    protected function getFluteMessageFormatter(): FormatterInterface
     {
-        return $this->translator;
+        return $this->fluteMsgFormatter;
     }
 
     /**
@@ -560,7 +561,8 @@ class QueryTransformer
      */
     private function addQueryParamError(ErrorCollection $errors, string $name)
     {
-        $title = $this->getTranslator()->get(T::MSG_ERR_INVALID_ELEMENT);
+
+        $title = $this->getFluteMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ELEMENT);
         $errors->addQueryParameterError($name, $title, null, JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY);
     }
 

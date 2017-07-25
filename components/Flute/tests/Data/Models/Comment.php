@@ -67,7 +67,7 @@ class Comment extends Model
     /**
      * @inheritdoc
      */
-    public static function getAttributeTypes()
+    public static function getAttributeTypes(): array
     {
         return [
             self::FIELD_ID         => Type::INTEGER,
@@ -87,7 +87,7 @@ class Comment extends Model
     /**
      * @inheritdoc
      */
-    public static function getAttributeLengths()
+    public static function getAttributeLengths(): array
     {
         return [
             self::FIELD_TEXT => self::LENGTH_TEXT,
@@ -97,7 +97,7 @@ class Comment extends Model
     /**
      * @inheritdoc
      */
-    public static function getRelationships()
+    public static function getRelationships(): array
     {
         return [
             RelationshipTypes::BELONGS_TO => [

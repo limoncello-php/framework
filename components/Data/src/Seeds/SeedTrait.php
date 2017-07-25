@@ -136,7 +136,7 @@ trait SeedTrait
      *
      * @return void
      */
-    protected function seedTableData(int $records, $tableName, Closure $dataClosure)
+    protected function seedTableData(int $records, $tableName, Closure $dataClosure): void
     {
         $connection = $this->getConnection();
         for ($i = 0; $i !== $records; $i++) {
@@ -151,7 +151,7 @@ trait SeedTrait
      *
      * @return void
      */
-    protected function seedModelsData(int $records, string $modelClass, Closure $dataClosure)
+    protected function seedModelsData(int $records, string $modelClass, Closure $dataClosure): void
     {
         $this->seedTableData($records, $this->getModelSchemes()->getTable($modelClass), $dataClosure);
     }

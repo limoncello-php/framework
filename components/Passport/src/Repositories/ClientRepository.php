@@ -76,7 +76,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     /**
      * @inheritdoc
      */
-    public function bindScopes(string $identifier, array $scopes)
+    public function bindScopes(string $identifier, array $scopes): void
     {
         $scopeIdentifiers = [];
         foreach ($scopes as $scope) {
@@ -94,7 +94,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
      *
      * @return void
      */
-    public function bindScopeIdentifiers(string $identifier, array $scopeIdentifiers)
+    public function bindScopeIdentifiers(string $identifier, array $scopeIdentifiers): void
     {
         if (empty($scopeIdentifiers) === false) {
             $scheme = $this->getDatabaseScheme();
@@ -111,7 +111,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     /**
      * @inheritdoc
      */
-    public function unbindScopes(string $identifier)
+    public function unbindScopes(string $identifier): void
     {
         $scheme = $this->getDatabaseScheme();
         $this->deleteBelongsToManyRelationshipIdentifiers(
@@ -160,7 +160,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     /**
      * @inheritdoc
      */
-    public function update(ClientInterface $client)
+    public function update(ClientInterface $client): void
     {
         $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();
@@ -183,7 +183,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     /**
      * @inheritdoc
      */
-    public function delete(string $identifier)
+    public function delete(string $identifier): void
     {
         $this->deleteResource($identifier);
     }

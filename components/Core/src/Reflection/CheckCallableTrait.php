@@ -48,7 +48,8 @@ trait CheckCallableTrait
         // first of all check input is callable (class, method) in form of array or string...
         if (is_callable($callable) && is_string($callable) === true && strpos($callable, '::') !== false) {
             list ($class, $method) = explode('::', $callable, 2);
-        } elseif (is_callable($callable) && is_array($callable) === true &&
+        } elseif (is_callable($callable) &&
+            is_array($callable) === true &&
             count($callable) === 2 &&
             is_string($class = $callable[0]) &&
             is_string($method = $callable[1])
@@ -117,7 +118,7 @@ trait CheckCallableTrait
         $isOk = $areAllParamsOk === true && $isReturnTypeOk === true;
 
         if ($isOk === false) {
-            // you can put here a breakpoint and see the failed callable
+            // you can put here a breakpoint and see the failed condition
             $callable || $areAllParamsOk || $isReturnTypeOk ?: null;
         }
 

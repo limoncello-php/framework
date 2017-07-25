@@ -39,7 +39,7 @@ class GroupCountBased extends \FastRoute\Dispatcher\GroupCountBased implements D
     /**
      * @inheritdoc
      */
-    public function setData(array $data)
+    public function setData(array $data): void
     {
         list($this->staticRouteMap, $this->variableRouteData) = $data;
     }

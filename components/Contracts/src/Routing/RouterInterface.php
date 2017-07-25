@@ -47,7 +47,7 @@ interface RouterInterface
      *
      * @return void
      */
-    public function loadCachedRoutes(array $cachedRoutes);
+    public function loadCachedRoutes(array $cachedRoutes): void;
 
     /**
      * @param string $method

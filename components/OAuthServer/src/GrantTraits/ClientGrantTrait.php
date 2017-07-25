@@ -37,7 +37,7 @@ trait ClientGrantTrait
     /**
      * @return ClientIntegrationInterface
      */
-    protected function clientGetIntegration()
+    protected function clientGetIntegration(): ClientIntegrationInterface
     {
         return $this->clientIntegration;
     }
@@ -47,7 +47,7 @@ trait ClientGrantTrait
      *
      * @return void
      */
-    public function clientSetIntegration(ClientIntegrationInterface $clientIntegration)
+    public function clientSetIntegration(ClientIntegrationInterface $clientIntegration): void
     {
         $this->clientIntegration = $clientIntegration;
     }

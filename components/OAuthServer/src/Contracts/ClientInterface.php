@@ -133,5 +133,5 @@ interface ClientInterface
      *
      * @link https://tools.ietf.org/html/rfc6749#section-6
      */
-    public function isRefreshGrantEnabled();
+    public function isRefreshGrantEnabled(): bool;
 }

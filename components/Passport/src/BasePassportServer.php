@@ -277,7 +277,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
     /**
      * @inheritdoc
      */
-    public function codeRevokeTokens(AuthorizationCodeInterface $code)
+    public function codeRevokeTokens(AuthorizationCodeInterface $code): void
     {
         assert($code instanceof TokenInterface);
 
@@ -460,7 +460,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function getValidClientAndRedirectUri(string $clientId = null, string $redirectFromQuery = null)
+    protected function getValidClientAndRedirectUri(string $clientId = null, string $redirectFromQuery = null): array
     {
         $client           = null;
         $validRedirectUri = null;
@@ -685,7 +685,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      *
      * @return void
      */
-    protected function logDebug(string $message, array $context = [])
+    protected function logDebug(string $message, array $context = []): void
     {
         if ($this->logger !== null) {
             $this->logger->debug($message, $context);

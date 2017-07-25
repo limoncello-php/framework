@@ -42,7 +42,7 @@ class DummySeed implements SeedInterface
     /**
      * @inheritdoc
      */
-    public function run()
+    public function run(): void
     {
     }
 }

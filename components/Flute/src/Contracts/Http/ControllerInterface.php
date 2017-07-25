@@ -104,28 +104,4 @@ interface ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface;
-
-    /**
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
-     *
-     * @return array
-     */
-    public static function parseInputOnCreate(
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array;
-
-    /**
-     * @param string|int             $index
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
-     *
-     * @return array
-     */
-    public static function parseInputOnUpdate(
-        $index,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array;
 }

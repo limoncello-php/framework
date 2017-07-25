@@ -39,7 +39,7 @@ trait CodeGrantTrait
      *
      * @return void
      */
-    public function codeSetIntegration(CodeIntegrationInterface $integration)
+    public function codeSetIntegration(CodeIntegrationInterface $integration): void
     {
         $this->codeIntegration = $integration;
     }
@@ -47,7 +47,7 @@ trait CodeGrantTrait
     /**
      * @return CodeIntegrationInterface
      */
-    protected function codeGetIntegration()
+    protected function codeGetIntegration(): CodeIntegrationInterface
     {
         return $this->codeIntegration;
     }

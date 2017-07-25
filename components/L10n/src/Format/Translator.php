@@ -18,11 +18,12 @@
 
 use Limoncello\l10n\Contracts\Format\TranslatorInterface;
 use Limoncello\l10n\Contracts\Messages\BundleStorageInterface;
+use MessageFormatter;
 
 /**
  * @package Limoncello\l10n
  */
-class Translator extends Formatter implements TranslatorInterface
+class Translator implements TranslatorInterface
 {
     /**
      * @var BundleStorageInterface
@@ -73,5 +74,19 @@ class Translator extends Formatter implements TranslatorInterface
         $this->storage = $storage;
 
         return $this;
+    }
+
+    /**
+     * @param string $locale
+     * @param string $message
+     * @param array  $args
+     *
+     * @return string
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    protected function formatMessage(string $locale, string $message, array $args): string
+    {
+        return MessageFormatter::formatMessage($locale, $message, $args);
     }
 }

@@ -62,7 +62,7 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
     /**
      * @inheritdoc
      */
-    public function update(ScopeInterface $scope)
+    public function update(ScopeInterface $scope): void
     {
         $now    = new DateTimeImmutable();
         $scheme = $this->getDatabaseScheme();
@@ -76,7 +76,7 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
     /**
      * @inheritdoc
      */
-    public function delete(string $identifier)
+    public function delete(string $identifier): void
     {
         $this->deleteResource($identifier);
     }

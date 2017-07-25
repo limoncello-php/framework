@@ -41,7 +41,7 @@ class MonologFileContainerConfigurator implements ContainerConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[LoggerInterface::class] = function (PsrContainerInterface $container) {
             $settingsProvider = $container->get(SettingsProviderInterface::class);

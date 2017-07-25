@@ -29,7 +29,7 @@ interface ScopeRepositoryInterface
      *
      * @return void
      */
-    public function inTransaction(Closure $closure);
+    public function inTransaction(Closure $closure): void;
 
     /**
      * @return ScopeInterface[]
@@ -55,12 +55,12 @@ interface ScopeRepositoryInterface
      *
      * @return void
      */
-    public function update(ScopeInterface $scope);
+    public function update(ScopeInterface $scope): void;
 
     /**
      * @param string $identifier
      *
      * @return void
      */
-    public function delete(string $identifier);
+    public function delete(string $identifier): void;
 }

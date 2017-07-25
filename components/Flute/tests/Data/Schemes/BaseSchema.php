@@ -29,6 +29,9 @@ abstract class BaseSchema extends Schema
     const RESOURCE_ID = DocumentInterface::KEYWORD_ID;
 
     /** Attribute name */
+    const RESOURCE_TYPE = DocumentInterface::KEYWORD_TYPE;
+
+    /** Attribute name */
     const ATTR_CREATED_AT = 'created-at-attribute';
 
     /** Attribute name */

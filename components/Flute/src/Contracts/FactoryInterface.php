@@ -18,12 +18,12 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
@@ -71,15 +71,10 @@ interface FactoryInterface
     ): ModelsDataInterface;
 
     /**
-     * @return TranslatorInterface
-     */
-    public function createTranslator(): TranslatorInterface;
-
-    /**
      * @param Connection                $connection
      * @param ModelSchemeInfoInterface  $modelSchemes
      * @param FilterOperationsInterface $filterOperations
-     * @param TranslatorInterface       $translator
+     * @param FormatterInterface        $fluteMsgFormatter
      *
      * @return RepositoryInterface
      */
@@ -87,7 +82,7 @@ interface FactoryInterface
         Connection $connection,
         ModelSchemeInfoInterface $modelSchemes,
         FilterOperationsInterface $filterOperations,
-        TranslatorInterface $translator
+        FormatterInterface $fluteMsgFormatter
     ): RepositoryInterface;
 
     /**

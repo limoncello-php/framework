@@ -40,7 +40,7 @@ abstract class BasePassportContainerConfigurator
     /**
      * @inheritdoc
      */
-    protected static function baseConfigureContainer(LimoncelloContainerInterface $container)
+    protected static function baseConfigureContainer(LimoncelloContainerInterface $container): void
     {
         $accountManager = null;
         $factory        = function (PsrContainerInterface $container) use (&$accountManager) {

@@ -29,7 +29,7 @@ class FileSystemContainerConfigurator implements ContainerConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[FileSystemInterface::class] = function () {
             return new FileSystem();

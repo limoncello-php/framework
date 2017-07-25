@@ -33,7 +33,7 @@ class AuthorizationContainerConfigurator implements ContainerConfiguratorInterfa
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container)
+    public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[AuthorizationManagerInterface::class] = function (PsrContainerInterface $container) {
             $settingsProvider = $container->get(SettingsProviderInterface::class);

@@ -29,7 +29,7 @@ interface RedirectUriRepositoryInterface
      *
      * @return void
      */
-    public function inTransaction(Closure $closure);
+    public function inTransaction(Closure $closure): void;
 
     /**
      * @param string $clientIdentifier
@@ -57,7 +57,7 @@ interface RedirectUriRepositoryInterface
      *
      * @return void
      */
-    public function update(RedirectUriInterface $redirectUri);
+    public function update(RedirectUriInterface $redirectUri): void;
     /**
      * @param int $identifier
      *

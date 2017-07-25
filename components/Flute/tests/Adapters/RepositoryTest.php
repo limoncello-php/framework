@@ -18,7 +18,9 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\Repository;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
@@ -26,7 +28,8 @@ use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
 use Limoncello\Flute\Http\Query\FilterParameter;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
 use Limoncello\Flute\Http\Query\SortParameter;
-use Limoncello\Flute\I18n\Translator;
+use Limoncello\Flute\L10n\Messages;
+use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
@@ -63,13 +66,15 @@ class RepositoryTest extends TestCase
         parent::setUp();
 
         $this->connection = $this->createConnection();
+        $container                                   = new Container();
+        $container[FormatterFactoryInterface::class] = new FormatterFactory();
 
-        $translator       = new Translator();
+        $msgFormatter     = (new FormatterFactory())->createFormatter(Messages::RESOURCES_NAMESPACE);
         $this->repository = new Repository(
             $this->connection,
             $this->getModelSchemes(),
-            new FilterOperations($translator),
-            $translator
+            new FilterOperations($container),
+            $msgFormatter
         );
     }
 
@@ -82,7 +87,7 @@ class RepositoryTest extends TestCase
         $this->assertNotNull($builder = $this->repository->read(Board::class, $indexBind));
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` WHERE `boards`.`id_board`=' . $indexBind;
 
@@ -97,7 +102,7 @@ class RepositoryTest extends TestCase
         $this->assertNotNull($builder = $this->repository->index(Board::class));
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards`';
 
@@ -117,7 +122,7 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards`';
 
@@ -130,7 +135,7 @@ class RepositoryTest extends TestCase
      */
     public function testIndexWithFilters()
     {
-        $value       = [
+        $value        = [
             'equals'            => 'aaa',
             'not-equals'        => ['bbb', 'ccc'],
             'less-than'         => 'ddd',
@@ -155,7 +160,7 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'WHERE ' .
@@ -210,15 +215,15 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'WHERE (`boards`.`title` >= :dcValue1) OR (`boards`.`title` <= :dcValue2)';
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
-            'dcValue1'  => 'aaa',
-            'dcValue2'  => 'bbb',
+            'dcValue1' => 'aaa',
+            'dcValue2' => 'bbb',
         ], $builder->getParameters());
     }
 
@@ -239,7 +244,7 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'WHERE ' .
@@ -247,9 +252,9 @@ class RepositoryTest extends TestCase
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
-            'dcValue1'  => '1',
-            'dcValue2'  => '3',
-            'dcValue3'  => '2',
+            'dcValue1' => '1',
+            'dcValue2' => '3',
+            'dcValue3' => '2',
         ], $builder->getParameters());
     }
 
@@ -270,7 +275,7 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'WHERE ' .
@@ -278,7 +283,7 @@ class RepositoryTest extends TestCase
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
-            'dcValue1'  => '1',
+            'dcValue1' => '1',
         ], $builder->getParameters());
     }
 
@@ -299,7 +304,7 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'WHERE ' .
@@ -326,7 +331,7 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'INNER JOIN `posts` posts1 ON `boards`.`id_board`=`posts1`.`id_board_fk` ' .
@@ -335,9 +340,9 @@ class RepositoryTest extends TestCase
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
-            'dcValue1'  => '1',
-            'dcValue2'  => '3',
-            'dcValue3'  => '2',
+            'dcValue1' => '1',
+            'dcValue2' => '3',
+            'dcValue3' => '2',
         ], $builder->getParameters());
     }
 
@@ -358,9 +363,9 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `posts`.`id_post`, `posts`.`id_board_fk`, `posts`.`id_user_fk`, `posts`.`id_editor_fk`, '.
-            '`posts`.`title`, `posts`.`text`, `posts`.`created_at`, `posts`.`updated_at`, `posts`.`deleted_at` '.
-            'FROM `posts` '.
+            'SELECT `posts`.`id_post`, `posts`.`id_board_fk`, `posts`.`id_user_fk`, `posts`.`id_editor_fk`, ' .
+            '`posts`.`title`, `posts`.`text`, `posts`.`created_at`, `posts`.`updated_at`, `posts`.`deleted_at` ' .
+            'FROM `posts` ' .
             'WHERE `posts`.`id_board_fk` IS NOT NULL';
 
         $this->assertEquals($expected, $builder->getSQL());
@@ -384,7 +389,7 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'INNER JOIN `posts` posts1 ON `boards`.`id_board`=`posts1`.`id_board_fk` ' .
@@ -418,14 +423,14 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, `comments`.`text`, '.
-                '`comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-                '`comments`.`deleted_at` ' .
-            'FROM `comments` '.
-            'INNER JOIN `comments_emotions` comments_emotions1 ON '.
-                '`comments`.`id_comment`=`comments_emotions1`.`id_comment_fk` '.
-            'WHERE `comments_emotions1`.`id_emotion_fk` IS NOT NULL '.
+            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, `comments`.`text`, ' .
+            '`comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+            '`comments`.`deleted_at` ' .
+            'FROM `comments` ' .
+            'INNER JOIN `comments_emotions` comments_emotions1 ON ' .
+            '`comments`.`id_comment`=`comments_emotions1`.`id_comment_fk` ' .
+            'WHERE `comments_emotions1`.`id_emotion_fk` IS NOT NULL ' .
             'GROUP BY `comments`.`id_comment`';
 
         $this->assertEquals($expected, $builder->getSQL());
@@ -447,7 +452,7 @@ class RepositoryTest extends TestCase
         $this->repository->applySorting($builder, Board::class, $sortingParams);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'ORDER BY `boards`.`title` ASC, `boards`.`id_board` DESC, `boards`.`created_at` DESC';
@@ -473,9 +478,9 @@ class RepositoryTest extends TestCase
 
         $expected =
             'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-                '`comments`.`deleted_at` ' .
+            '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+            '`comments`.`deleted_at` ' .
             'FROM `comments` ' .
             'ORDER BY `comments`.`id_user_fk` DESC';
 
@@ -507,7 +512,7 @@ class RepositoryTest extends TestCase
         $this->assertEmpty($errors);
 
         $expected =
-            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, '.
+            'SELECT `boards`.`id_board`, `boards`.`title`, `boards`.`created_at`, ' .
             '`boards`.`updated_at`, `boards`.`deleted_at` ' .
             'FROM `boards` ' .
             'WHERE `boards`.`title` = :dcValue1 ' .
@@ -515,7 +520,7 @@ class RepositoryTest extends TestCase
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
-            'dcValue1'  => 'aaa',
+            'dcValue1' => 'aaa',
         ], $builder->getParameters());
     }
 
@@ -528,7 +533,6 @@ class RepositoryTest extends TestCase
         $filterParams
             // empty is valid
             ->add(new FilterParameter(BoardSchema::RESOURCE_ID, null, Board::FIELD_ID, ''))
-
             // unknown operation is invalid
             ->add(
                 new FilterParameter(BoardSchema::ATTR_TITLE, null, Board::FIELD_TITLE, ['unknown-op' => 'aaa'])
@@ -553,12 +557,12 @@ class RepositoryTest extends TestCase
         $this->assertNotNull($builder = $this->repository->create(Board::class, $attributes));
 
         /** @noinspection SqlDialectInspection */
-        $expected ='INSERT INTO `boards` (`id_board`, `title`) VALUES(:dcValue1, :dcValue2)';
+        $expected = 'INSERT INTO `boards` (`id_board`, `title`) VALUES(:dcValue1, :dcValue2)';
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
-            'dcValue1'  => '123',
-            'dcValue2'  => 'aaa',
+            'dcValue1' => '123',
+            'dcValue2' => 'aaa',
         ], $builder->getParameters());
     }
 
@@ -582,10 +586,10 @@ class RepositoryTest extends TestCase
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
-            'dcValue1'  => 'bbb',
-            'dcValue2'  => '2000-01-02',
-            'dcValue3'  => null,
-            'dcValue4'  => '123',
+            'dcValue1' => 'bbb',
+            'dcValue2' => '2000-01-02',
+            'dcValue3' => null,
+            'dcValue4' => '123',
         ], $builder->getParameters());
         $this->assertNull($builder->getParameters()['dcValue3']);
     }
@@ -599,7 +603,7 @@ class RepositoryTest extends TestCase
         $this->assertNotNull($builder = $this->repository->delete(Board::class, $indexBind));
 
         /** @noinspection SqlDialectInspection */
-        $expected ='DELETE FROM `boards` WHERE `boards`.`id_board`=' . $indexBind;
+        $expected = 'DELETE FROM `boards` WHERE `boards`.`id_board`=' . $indexBind;
 
         $this->assertEquals($expected, $builder->getSQL());
     }
@@ -664,7 +668,7 @@ class RepositoryTest extends TestCase
         $this->assertEquals(RelationshipTypes::BELONGS_TO, $relType);
 
         $expected = 'SELECT `posts`.`id_post`, `posts`.`id_board_fk`, `posts`.`id_user_fk`, `posts`.`id_editor_fk`, ' .
-            '`posts`.`title`, `posts`.`text`, `posts`.`created_at`, `posts`.`updated_at`, `posts`.`deleted_at` '.
+            '`posts`.`title`, `posts`.`text`, `posts`.`created_at`, `posts`.`updated_at`, `posts`.`deleted_at` ' .
             'FROM `posts` INNER JOIN comments comments1 ON `posts`.`id_post`=`comments1`.`id_post_fk` ' .
             "WHERE `comments1`.`id_comment`=$indexBind";
 
@@ -690,9 +694,9 @@ class RepositoryTest extends TestCase
 
         $expected =
             'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-                '`comments`.`deleted_at` ' .
+            '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+            '`comments`.`deleted_at` ' .
             'FROM `comments` ' .
             "WHERE `comments`.`id_post_fk`=$indexBind";
 
@@ -747,9 +751,9 @@ class RepositoryTest extends TestCase
 
         $expected =
             'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-                '`comments`.`deleted_at` ' .
+            '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+            '`comments`.`deleted_at` ' .
             'FROM `comments` ' .
             "WHERE (`comments`.`id_post_fk`=$indexBind) AND (`comments`.`id_comment`=$childIndexBind)";
 
@@ -810,7 +814,7 @@ class RepositoryTest extends TestCase
     {
         $this->migrateDatabase($this->connection);
 
-        $value = [
+        $value        = [
             'like' => '%ss%',
         ];
         $sep          = DocumentInterface::PATH_SEPARATOR;
@@ -831,9 +835,9 @@ class RepositoryTest extends TestCase
 
         $expected =
             'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-                '`comments`.`deleted_at`' .
+            '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+            '`comments`.`deleted_at`' .
             " FROM `comments` INNER JOIN `posts` posts1 ON `comments`.`id_post_fk`=`posts1`.`id_post`" .
             " WHERE `posts1`.`text` LIKE :dcValue1 GROUP BY `comments`.`id_comment`";
 
@@ -848,7 +852,7 @@ class RepositoryTest extends TestCase
     {
         $this->migrateDatabase($this->connection);
 
-        $value = [
+        $value        = [
             'like' => '%ss%',
         ];
         $sep          = DocumentInterface::PATH_SEPARATOR;
@@ -884,7 +888,7 @@ class RepositoryTest extends TestCase
     {
         $this->migrateDatabase($this->connection);
 
-        $value = [
+        $value        = [
             'like' => '%ss%',
         ];
         $sep          = DocumentInterface::PATH_SEPARATOR;
@@ -905,12 +909,12 @@ class RepositoryTest extends TestCase
 
         $expected =
             'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-                '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-                '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-                '`comments`.`deleted_at`' .
+            '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
+            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
+            '`comments`.`deleted_at`' .
             " FROM `comments`" .
             " INNER JOIN `comments_emotions` comments_emotions1 ON" .
-                " `comments`.`id_comment`=`comments_emotions1`.`id_comment_fk`" .
+            " `comments`.`id_comment`=`comments_emotions1`.`id_comment_fk`" .
             " INNER JOIN `emotions` emotions2 ON `comments_emotions1`.`id_emotion_fk`=`emotions2`.`id_emotion`" .
             " WHERE `emotions2`.`name` LIKE :dcValue1" .
             " GROUP BY `comments`.`id_comment`";

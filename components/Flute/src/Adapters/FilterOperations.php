@@ -18,9 +18,11 @@
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
-use Limoncello\Flute\Contracts\I18n\TranslatorInterface as T;
+use Limoncello\Flute\L10n\Messages;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Flute
@@ -30,23 +32,21 @@ use Neomerx\JsonApi\Exceptions\ErrorCollection;
 class FilterOperations implements FilterOperationsInterface
 {
     /**
-     * @var T
-     */
-    private $translator;
-
-    /**
      * @var string|null
      */
     private $errMsgInvalidParam = null;
 
     /**
-     * FilterOperations constructor.
-     *
-     * @param T $translator
+     * @var ContainerInterface
      */
-    public function __construct(T $translator)
+    private $container;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->translator = $translator;
+        $this->container = $container;
     }
 
     /**
@@ -174,6 +174,7 @@ class FilterOperations implements FilterOperationsInterface
     ) {
         if ($this->isArrayOfScalars($values) === false) {
             $this->addInvalidQueryParameterError($errors, $column);
+
             return;
         }
 
@@ -198,6 +199,7 @@ class FilterOperations implements FilterOperationsInterface
     ) {
         if ($this->isArrayOfScalars($values) === false) {
             $this->addInvalidQueryParameterError($errors, $column);
+
             return;
         }
 
@@ -268,14 +270,6 @@ class FilterOperations implements FilterOperationsInterface
     }
 
     /**
-     * @return T
-     */
-    protected function getTranslator(): T
-    {
-        return $this->translator;
-    }
-
-    /**
      * @param ErrorCollection $errors
      * @param string          $name
      *
@@ -292,7 +286,10 @@ class FilterOperations implements FilterOperationsInterface
     protected function getInvalidParameterErrorMessage(): string
     {
         if ($this->errMsgInvalidParam === null) {
-            $this->errMsgInvalidParam = $this->getTranslator()->get(T::MSG_ERR_INVALID_PARAMETER);
+            /** @var FormatterFactoryInterface $formatterFactory */
+            $formatterFactory         = $this->container->get(FormatterFactoryInterface::class);
+            $formatter                = $formatterFactory->createFormatter(Messages::RESOURCES_NAMESPACE);
+            $this->errMsgInvalidParam = $formatter->formatMessage(Messages::MSG_ERR_INVALID_PARAMETER);
         }
 
         return $this->errMsgInvalidParam;

@@ -102,5 +102,5 @@ interface CommandInterface
      *
      * @return void
      */
-    public static function execute(ContainerInterface $container, IoInterface $inOut);
+    public static function execute(ContainerInterface $container, IoInterface $inOut): void;
 }

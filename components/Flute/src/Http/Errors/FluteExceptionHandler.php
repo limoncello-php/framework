@@ -51,7 +51,7 @@ class FluteExceptionHandler implements ExceptionHandlerInterface
     /**
      * @inheritdoc
      */
-    public function handleException(Exception $exception, SapiInterface $sapi, ContainerInterface $container)
+    public function handleException(Exception $exception, SapiInterface $sapi, ContainerInterface $container): void
     {
         $this->handle($exception, $sapi, $container);
     }
@@ -59,7 +59,7 @@ class FluteExceptionHandler implements ExceptionHandlerInterface
     /**
      * @inheritdoc
      */
-    public function handleThrowable(Throwable $throwable, SapiInterface $sapi, ContainerInterface $container)
+    public function handleThrowable(Throwable $throwable, SapiInterface $sapi, ContainerInterface $container): void
     {
         $this->handle($throwable, $sapi, $container);
     }
@@ -67,7 +67,7 @@ class FluteExceptionHandler implements ExceptionHandlerInterface
     /**
      * @inheritdoc
      */
-    public function handleFatal(array $error, ContainerInterface $container)
+    public function handleFatal(array $error, ContainerInterface $container): void
     {
         $errorException = new ErrorException($error['message'], $error['type'], 1, $error['file'], $error['line']);
         $this->logError($errorException, $container, 'Fatal error');

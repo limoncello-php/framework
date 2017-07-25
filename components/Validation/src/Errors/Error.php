@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\ErrorInterface;
+use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 
 /**
  * @package Limoncello\Validation

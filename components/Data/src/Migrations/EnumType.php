@@ -37,7 +37,7 @@ class EnumType extends Type
      *
      * @return void
      */
-    public static function setValues(array $values)
+    public static function setValues(array $values): void
     {
         static::$values = $values;
     }
@@ -45,7 +45,7 @@ class EnumType extends Type
     /**
      * @return void
      */
-    public static function resetValues()
+    public static function resetValues(): void
     {
         static::$values = null;
     }

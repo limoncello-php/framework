@@ -26,8 +26,9 @@ abstract class BaseCrypt
     /**
      * @return void
      */
-    protected function clearErrors()
+    protected function clearErrors(): void
     {
+        /** @noinspection PhpStatementHasEmptyBodyInspection */
         while ($this->openSslErrorString() !== false) {
             // drop all accumulated error messages if any
         }
@@ -48,8 +49,10 @@ abstract class BaseCrypt
 
     /**
      * @param CryptException $exception
+     *
+     * @return void
      */
-    protected function throwException(CryptException $exception)
+    protected function throwException(CryptException $exception): void
     {
         throw $exception;
     }

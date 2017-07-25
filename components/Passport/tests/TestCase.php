@@ -56,7 +56,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    abstract protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme);
+    abstract protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme): void;
 
     /**
      * @param Connection              $connection
@@ -64,7 +64,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    abstract protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme);
+    abstract protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme): void;
 
     /**
      * DBAL option.

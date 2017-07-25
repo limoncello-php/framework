@@ -33,9 +33,10 @@ use Psr\Container\ContainerInterface;
 /**
  * @package Limoncello\Tests\Core
  */
-class SeedTraitTest extends TestCase implements SeedInterface
+class SeedTraitTest extends TestCase
 {
-    use SeedTrait;
+    const TEST_MODEL_CLASS = 'TestClass';
+    const TEST_COLUMN_NAME = 'value';
 
     /**
      * @var Connection
@@ -47,14 +48,13 @@ class SeedTraitTest extends TestCase implements SeedInterface
      */
     public function testSeeds()
     {
-        $modelClass = 'TestClass';
         $tableName  = 'table_name';
-        $columnName = 'value';
+        $columnName = self::TEST_COLUMN_NAME;
 
         $modelSchemes = Mockery::mock(ModelSchemeInfoInterface::class);
 
-        $this->init($this->createContainer($modelSchemes));
-        $this->prepareTable($modelSchemes, $modelClass, $tableName);
+        $container = $this->createContainer($modelSchemes);
+        $this->prepareTable($modelSchemes, self::TEST_MODEL_CLASS, $tableName);
 
         $manager = $this->connection->getSchemaManager();
         $table   = new Table(
@@ -64,23 +64,64 @@ class SeedTraitTest extends TestCase implements SeedInterface
         $table->addUniqueIndex([$columnName]);
         $manager->createTable($table);
 
-        $this->assertTrue(is_string($this->now()));
+        $this->createSeed($container)->run();
+    }
 
-        $this->assertCount(0, $this->readModelsData($modelClass));
+    /**
+     * @param ContainerInterface $container
+     *
+     * @return SeedInterface
+     */
+    private function createSeed(ContainerInterface $container): SeedInterface
+    {
+        $seed = new class ($this) implements SeedInterface
+        {
+            use SeedTrait;
 
-        $this->seedModelsData(1, $modelClass, function () use ($columnName) {
-            return [$columnName => 'value1'];
-        });
-        $this->assertCount(1, $this->readModelsData($modelClass));
+            /**
+             * @var TestCase
+             */
+            private $test;
 
-        $this->seedModelData($modelClass, [$columnName => 'value2']);
-        $this->assertCount(2, $this->readModelsData($modelClass));
+            /**
+             * @param TestCase $test
+             */
+            public function __construct(TestCase $test)
+            {
+                $this->test = $test;
+            }
 
-        $this->assertSame('2', $this->getLastInsertId());
+            /**
+             * @inheritdoc
+             */
+            public function run(): void
+            {
+                $modelClass = SeedTraitTest::TEST_MODEL_CLASS;
+                $columnName = SeedTraitTest::TEST_COLUMN_NAME;
 
-        // inserting non-unique row will be ignored
-        $this->seedModelData($modelClass, [$columnName => 'value2']);
-        $this->assertCount(2, $this->readModelsData($modelClass));
+                $this->test->assertTrue(is_string($this->now()));
+
+                $this->test->assertCount(0, $this->readModelsData($modelClass));
+
+                $this->seedModelsData(1, $modelClass, function () use ($columnName) {
+                    return [$columnName => 'value1'];
+                });
+                $this->test->assertCount(1, $this->readModelsData($modelClass));
+
+                $this->seedModelData($modelClass, [$columnName => 'value2']);
+                $this->test->assertCount(2, $this->readModelsData($modelClass));
+
+                $this->test->assertSame('2', $this->getLastInsertId());
+
+                // inserting non-unique row will be ignored
+                $this->seedModelData($modelClass, [$columnName => 'value2']);
+                $this->test->assertCount(2, $this->readModelsData($modelClass));
+            }
+        };
+
+        $seed->init($container);
+
+        return $seed;
     }
 
     /**

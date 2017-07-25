@@ -115,7 +115,7 @@ trait TestCaseTrait
     /**
      * @return void
      */
-    protected function resetEventHandlers()
+    protected function resetEventHandlers(): void
     {
         $this->eventHandlers = [];
     }
@@ -125,7 +125,7 @@ trait TestCaseTrait
      *
      * @return void
      */
-    protected function addOnHandleRequestEvent(Closure $handler)
+    protected function addOnHandleRequestEvent(Closure $handler): void
     {
         $this->eventHandlers[ApplicationWrapperInterface::EVENT_ON_HANDLE_REQUEST][] = $handler;
     }
@@ -135,7 +135,7 @@ trait TestCaseTrait
      *
      * @return void
      */
-    protected function addOnHandleResponseEvent(Closure $handler)
+    protected function addOnHandleResponseEvent(Closure $handler): void
     {
         $this->eventHandlers[ApplicationWrapperInterface::EVENT_ON_HANDLE_RESPONSE][] = $handler;
     }
@@ -145,7 +145,7 @@ trait TestCaseTrait
      *
      * @return void
      */
-    protected function addOnContainerCreatedEvent(Closure $handler)
+    protected function addOnContainerCreatedEvent(Closure $handler): void
     {
         $this->eventHandlers[ApplicationWrapperInterface::EVENT_ON_CONTAINER_CREATED][] = $handler;
     }
@@ -155,7 +155,7 @@ trait TestCaseTrait
      *
      * @return void
      */
-    protected function addOnContainerConfiguredEvent(Closure $handler)
+    protected function addOnContainerConfiguredEvent(Closure $handler): void
     {
         $this->eventHandlers[ApplicationWrapperInterface::EVENT_ON_CONTAINER_LAST_CONFIGURATOR][] = $handler;
     }

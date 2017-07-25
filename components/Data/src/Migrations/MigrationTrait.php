@@ -93,7 +93,7 @@ trait MigrationTrait
      *
      * @return Table
      */
-    protected function createTable(string $modelClass, array $expressions = [])
+    protected function createTable(string $modelClass, array $expressions = []): Table
     {
         $context   = new MigrationContext($modelClass, $this->getModelSchemes());
         $tableName = $this->getModelSchemes()->getTable($modelClass);
@@ -113,7 +113,7 @@ trait MigrationTrait
      *
      * @return void
      */
-    protected function dropTableIfExists(string $modelClass)
+    protected function dropTableIfExists(string $modelClass): void
     {
         $tableName     = $this->getModelSchemes()->getTable($modelClass);
         $schemeManager = $this->getSchemaManager();
@@ -277,7 +277,7 @@ trait MigrationTrait
     /**
      * @return Closure
      */
-    protected function timestamps()
+    protected function timestamps(): Closure
     {
         return function (Table $table, MigrationContextInterface $context) {
             $modelClass = $context->getModelClass();

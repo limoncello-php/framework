@@ -31,5 +31,5 @@ interface ArraySerializableInterface
      *
      * @return void
      */
-    public function unserialize(array $serialized);
+    public function unserialize(array $serialized): void;
 }

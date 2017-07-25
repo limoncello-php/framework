@@ -128,9 +128,9 @@ abstract class BaseAuthorizationServer implements AuthorizationServerInterface, 
     /**
      * @param int|null $maxStateLength
      *
-     * @return BaseAuthorizationServer
+     * @return self
      */
-    public function setMaxStateLength(int $maxStateLength = null): BaseAuthorizationServer
+    public function setMaxStateLength(int $maxStateLength = null): self
     {
         assert($maxStateLength === null || $maxStateLength > 0);
 

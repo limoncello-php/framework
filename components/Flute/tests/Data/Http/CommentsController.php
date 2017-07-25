@@ -17,9 +17,9 @@
  */
 
 use Limoncello\Tests\Flute\Data\Api\CommentsApi as Api;
-use Limoncello\Tests\Flute\Data\Models\Comment as Model;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema as Schema;
-use Limoncello\Tests\Flute\Data\Validation\AppValidator;
+use Limoncello\Tests\Flute\Data\Validation\RuleSets\CreateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateCommentRuleSet;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,80 +35,11 @@ class CommentsController extends BaseController
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
 
-    /**
-     * @inheritdoc
-     */
-    public static function parseInputOnCreate(
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array {
-        $validator = new class ($container) extends AppValidator
-        {
-            /**
-             * @inheritdoc
-             */
-            public function __construct(ContainerInterface $container)
-            {
-                parent::__construct($container, Schema::TYPE, [
-                    self::RULE_INDEX      => $this->absentOrNull(),
-                    self::RULE_ATTRIBUTES => [
-                        Schema::ATTR_TEXT => $this->requiredText(),
-                    ],
-                    self::RULE_TO_ONE     => [
-                        Schema::REL_POST => $this->requiredPostId(),
-                    ],
-                    self::RULE_TO_MANY    => [
-                        Schema::REL_EMOTIONS => $this->optionalEmotionId(),
-                    ],
-                ]);
-            }
-        };
+    /** JSON API validation rules set class */
+    const ON_CREATE_VALIDATION_RULES_SET_CLASS = CreateCommentRuleSet::class;
 
-        return static::prepareCaptures(
-            $validator->assert(static::parseJson($container, $request))->getCaptures(),
-            Model::FIELD_ID,
-            [Model::FIELD_TEXT, Model::FIELD_ID_POST],
-            [Model::REL_EMOTIONS]
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function parseInputOnUpdate(
-        $index,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array {
-        $validator = new class ($container, $index) extends AppValidator
-        {
-            /**
-             * @inheritdoc
-             */
-            public function __construct(ContainerInterface $container, $index)
-            {
-                parent::__construct($container, Schema::TYPE, [
-                    AppValidator::RULE_INDEX      => $this->idEquals($index),
-                    AppValidator::RULE_ATTRIBUTES => [
-                        Schema::ATTR_TEXT => $this->optionalText(),
-                    ],
-                    AppValidator::RULE_TO_ONE     => [
-                        Schema::REL_POST => $this->optionalPostId(),
-                    ],
-                    AppValidator::RULE_TO_MANY    => [
-                        Schema::REL_EMOTIONS => $this->optionalEmotionId(),
-                    ],
-                ]);
-            }
-        };
-
-        return static::prepareCaptures(
-            $validator->assert(static::parseJson($container, $request))->getCaptures(),
-            Model::FIELD_ID,
-            [Model::FIELD_TEXT, Model::FIELD_ID_POST],
-            [Model::REL_EMOTIONS]
-        );
-    }
+    /** JSON API validation rules set class */
+    const ON_UPDATE_VALIDATION_RULES_SET_CLASS = UpdateCommentRuleSet::class;
 
     /**
      * @param array                  $routeParams

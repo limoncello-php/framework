@@ -29,7 +29,7 @@ class SapiTest extends TestCase
     /**
      * Test handle response.
      */
-    public function testHandleResponse()
+    public function testHandleResponse(): void
     {
         /** @var EmitterInterface $emitter */
         $emitter  = Mockery::mock(EmitterInterface::class);
