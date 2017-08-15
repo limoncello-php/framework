@@ -56,5 +56,7 @@
             "dev-develop": "0.8.x-dev"
         },
         "class": "Limoncello\\Commands\\ComposerPlugin"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
