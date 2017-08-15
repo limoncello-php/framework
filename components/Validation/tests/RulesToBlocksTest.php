@@ -408,7 +408,7 @@ class RulesToBlocksTest extends TestCase
      *
      * @return bool
      */
-    public function dummyConditionCallable($input, ContextInterface $context): bool
+    public static function dummyConditionCallable($input, ContextInterface $context): bool
     {
         assert($input || $context);
 
