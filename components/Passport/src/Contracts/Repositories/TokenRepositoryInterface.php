@@ -75,14 +75,14 @@ interface TokenRepositoryInterface
      *
      * @return void
      */
-    public function unbindScopes(int $identifier);
+    public function unbindScopes(int $identifier): void;
 
     /**
      * @param int $identifier
      *
      * @return TokenInterface|null
      */
-    public function read(int $identifier);
+    public function read(int $identifier): ?TokenInterface;
 
     /**
      * @param string $code
@@ -90,7 +90,7 @@ interface TokenRepositoryInterface
      *
      * @return TokenInterface|null
      */
-    public function readByCode(string $code, int $expirationInSeconds);
+    public function readByCode(string $code, int $expirationInSeconds): ?TokenInterface;
 
     /**
      * @param string $tokenValue
@@ -98,7 +98,7 @@ interface TokenRepositoryInterface
      *
      * @return TokenInterface|null
      */
-    public function readByValue(string $tokenValue, int $expirationInSeconds);
+    public function readByValue(string $tokenValue, int $expirationInSeconds): ?TokenInterface;
 
     /**
      * @param string $refreshValue
@@ -106,7 +106,7 @@ interface TokenRepositoryInterface
      *
      * @return TokenInterface|null
      */
-    public function readByRefresh(string $refreshValue, int $expirationInSeconds);
+    public function readByRefresh(string $refreshValue, int $expirationInSeconds): ?TokenInterface;
 
     /**
      * @param int      $userId
@@ -130,7 +130,7 @@ interface TokenRepositoryInterface
      *
      * @return array|null
      */
-    public function readPassport(string $tokenValue, int $expirationInSeconds);
+    public function readPassport(string $tokenValue, int $expirationInSeconds): ?array;
 
     /**
      * @param TokenInterface $token

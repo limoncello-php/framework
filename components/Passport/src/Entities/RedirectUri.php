@@ -72,7 +72,7 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     /**
      * @inheritdoc
      */
-    public function getIdentifier()
+    public function getIdentifier(): ?int
     {
         return $this->identifierField;
     }
@@ -90,7 +90,7 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     /**
      * @inheritdoc
      */
-    public function getClientIdentifier()
+    public function getClientIdentifier(): ?string
     {
         return $this->clientIdentifierField;
     }
@@ -108,7 +108,7 @@ abstract class RedirectUri extends DatabaseItem implements RedirectUriInterface
     /**
      * @inheritdoc
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->valueField;
     }

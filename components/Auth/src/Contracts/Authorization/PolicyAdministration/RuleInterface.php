@@ -24,24 +24,24 @@ interface RuleInterface
     /**
      * @return string|null
      */
-    public function getName();
+    public function getName(): ?string;
 
     /**
      * @return TargetInterface|null
      */
-    public function getTarget();
+    public function getTarget(): ?TargetInterface;
 
     /**
      * Optional extra check if rule matches incoming request.
      *
      * @return MethodInterface|null
      */
-    public function getCondition();
+    public function getCondition(): ?MethodInterface;
 
     /**
      * @return MethodInterface|null
      */
-    public function effect();
+    public function effect(): ?MethodInterface;
 
     /**
      * @return ObligationInterface[]

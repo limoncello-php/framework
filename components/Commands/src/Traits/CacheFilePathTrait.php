@@ -29,7 +29,7 @@ trait CacheFilePathTrait
      *
      * @return null|string
      */
-    protected function getCommandsCacheFilePath(Composer $composer)
+    protected function getCommandsCacheFilePath(Composer $composer): ?string
     {
         $extra             = $composer->getPackage()->getExtra();
         $keyApp            = CommandConstants::COMPOSER_JSON__EXTRA__APPLICATION;

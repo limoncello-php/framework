@@ -128,7 +128,7 @@ interface RepositoryInterface
         QueryBuilder $builder,
         string $modelClass,
         FilterParameterCollection $filterParams
-    );
+    ): void;
 
     /**
      * @param QueryBuilder             $builder
@@ -137,7 +137,7 @@ interface RepositoryInterface
      *
      * @return void
      */
-    public function applySorting(QueryBuilder $builder, string $modelClass, array $sortParams);
+    public function applySorting(QueryBuilder $builder, string $modelClass, array $sortParams): void;
 
     /**
      * @param string $modelClass

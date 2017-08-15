@@ -80,5 +80,5 @@ interface RelationshipStorageInterface
      *
      * @return PaginatedDataInterface|null
      */
-    public function getRelationship($model, string $relationship);
+    public function getRelationship($model, string $relationship): ?PaginatedDataInterface;
 }

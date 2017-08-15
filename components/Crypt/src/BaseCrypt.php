@@ -37,7 +37,7 @@ abstract class BaseCrypt
     /**
      * @return null|string
      */
-    protected function getErrorMessage()
+    protected function getErrorMessage(): ?string
     {
         $message = null;
         while (($errorLine = $this->openSslErrorString()) !== false) {

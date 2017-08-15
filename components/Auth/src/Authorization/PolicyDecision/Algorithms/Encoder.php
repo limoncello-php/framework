@@ -237,7 +237,7 @@ class Encoder
      *
      * @return string|null
      */
-    public static function targetName(array $encodedTarget)
+    public static function targetName(array $encodedTarget): ?string
     {
         assert(static::isTarget($encodedTarget));
 
@@ -249,7 +249,7 @@ class Encoder
      *
      * @return array|null
      */
-    public static function targetAnyOfs(array $encodedTarget)
+    public static function targetAnyOfs(array $encodedTarget): ?array
     {
         assert(static::isTarget($encodedTarget));
 
@@ -285,7 +285,7 @@ class Encoder
      *
      * @return array|null
      */
-    public static function ruleEffect(array $encodedRule)
+    public static function ruleEffect(array $encodedRule): ?array
     {
         assert(static::isRule($encodedRule));
 
@@ -297,7 +297,7 @@ class Encoder
      *
      * @return callable|null
      */
-    public static function ruleCondition(array $encodedRule)
+    public static function ruleCondition(array $encodedRule): ?callable
     {
         assert(static::isRule($encodedRule));
 
@@ -333,7 +333,7 @@ class Encoder
      *
      * @return string|null
      */
-    public static function policyName(array $encodedPolicy)
+    public static function policyName(array $encodedPolicy): ?string
     {
         assert(static::isPolicy($encodedPolicy));
 
@@ -503,7 +503,7 @@ class Encoder
      *
      * @return callable|null
      */
-    private static function serializeMethod(MethodInterface $method = null)
+    private static function serializeMethod(MethodInterface $method = null): ?callable
     {
         return $method === null ? null : $method->getCallable();
     }

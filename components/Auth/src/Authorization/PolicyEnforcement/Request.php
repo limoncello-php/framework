@@ -23,6 +23,9 @@ use Limoncello\Auth\Contracts\Authorization\PolicyEnforcement\RequestInterface;
  */
 class Request implements RequestInterface
 {
+    /**
+     * @var array
+     */
     private $properties;
 
     /**
@@ -36,7 +39,7 @@ class Request implements RequestInterface
     /**
      * @inheritdoc
      */
-    public function has($key)
+    public function has($key): bool
     {
         $result = array_key_exists($key, $this->getProperties());
 
@@ -54,9 +57,9 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    protected function getProperties()
+    protected function getProperties(): array
     {
         return $this->properties;
     }

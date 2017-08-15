@@ -41,7 +41,7 @@ class RulesPermitUnlessDeny extends BaseRuleAlgorithm
         ContextInterface $context,
         array $optimizedTargets,
         array $encodedRules,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         return self::evaluatePermitUnlessDeny($context, $optimizedTargets, $encodedRules, $logger);
     }

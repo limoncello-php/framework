@@ -120,7 +120,7 @@ abstract class BaseAuthorizationServer implements AuthorizationServerInterface, 
     /**
      * @return int|null
      */
-    public function getMaxStateLength()
+    public function getMaxStateLength(): ?int
     {
         return $this->maxStateLength;
     }

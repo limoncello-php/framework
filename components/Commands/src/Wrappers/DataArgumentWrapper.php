@@ -58,7 +58,7 @@ class DataArgumentWrapper
     /**
      * @return string|null
      */
-    public function getDefault()
+    public function getDefault(): ?string
     {
         $value = $this->getData()[CommandInterface::ARGUMENT_DEFAULT] ?? null;
 
@@ -94,7 +94,7 @@ class DataArgumentWrapper
     /**
      * @return int|null
      */
-    public function getMode()
+    public function getMode(): ?int
     {
         $mode = null;
 

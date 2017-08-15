@@ -53,7 +53,7 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getRelationshipStorage()
+    public function getRelationshipStorage(): ?RelationshipStorageInterface
     {
         return $this->relationshipStorage;
     }
@@ -61,7 +61,7 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     /**
      * @inheritdoc
      */
-    public function setRelationshipStorage(RelationshipStorageInterface $storage = null): JsonSchemesInterface
+    public function setRelationshipStorage(?RelationshipStorageInterface $storage): JsonSchemesInterface
     {
         $this->relationshipStorage = $storage;
 
@@ -89,7 +89,7 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     /**
      * @inheritdoc
      */
-    public function getModelRelationshipSchema($modelClass, $relationshipName)
+    public function getModelRelationshipSchema(string $modelClass, string $relationshipName): SchemaInterface
     {
         $reverseModelClass = $this->getModelSchemes()->getReverseModelClass($modelClass, $relationshipName);
         $targetSchema      = $this->getSchemaByType($reverseModelClass);

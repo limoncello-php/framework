@@ -24,7 +24,7 @@ interface ProcedureBlockInterface extends ExecutionBlockInterface
     /**
      * @return callable|null
      */
-    public function getStartCallable();
+    public function getStartCallable(): ?callable;
 
     /**
      * @return callable
@@ -34,5 +34,5 @@ interface ProcedureBlockInterface extends ExecutionBlockInterface
     /**
      * @return callable|null
      */
-    public function getEndCallable();
+    public function getEndCallable(): ?callable;
 }

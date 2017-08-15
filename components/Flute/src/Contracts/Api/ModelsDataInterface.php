@@ -32,5 +32,5 @@ interface ModelsDataInterface
     /**
      * @return RelationshipStorageInterface|null
      */
-    public function getRelationshipStorage();
+    public function getRelationshipStorage(): ?RelationshipStorageInterface;
 }

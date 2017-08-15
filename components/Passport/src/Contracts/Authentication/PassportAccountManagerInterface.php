@@ -33,5 +33,5 @@ interface PassportAccountManagerInterface extends AccountManagerInterface
     /**
      * @return PassportAccountInterface|null
      */
-    public function getPassport();
+    public function getPassport(): ?PassportAccountInterface;
 }

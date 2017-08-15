@@ -41,7 +41,7 @@ class PoliciesOrSetsDenyUnlessPermit extends BasePolicyOrSetAlgorithm
         ContextInterface $context,
         array $optimizedTargets,
         array $encPoliciesOrSets,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         return self::evaluateDenyUnlessPermit($context, $optimizedTargets, $encPoliciesOrSets, $logger);
     }

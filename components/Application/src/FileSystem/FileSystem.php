@@ -148,7 +148,7 @@ class FileSystem implements FileSystemInterface
      *
      * @return void
      */
-    protected function throwEx(FileSystemException $exception)
+    protected function throwEx(FileSystemException $exception): void
     {
         throw $exception;
     }

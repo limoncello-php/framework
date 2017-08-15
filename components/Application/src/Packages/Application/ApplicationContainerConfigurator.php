@@ -37,52 +37,53 @@ class ApplicationContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
-        $container[CommandStorageInterface::class] = function (PsrContainerInterface $container) {
-            $creator = new class
-            {
-                use ClassIsTrait;
+        $container[CommandStorageInterface::class] =
+            function (PsrContainerInterface $container): CommandStorageInterface {
+                $creator = new class
+                {
+                    use ClassIsTrait;
 
-                /**
-                 * @param string $commandsPath
-                 * @param array  $providerClasses
-                 *
-                 * @return CommandStorageInterface
-                 */
-                public function createCommandStorage(
-                    string $commandsPath,
-                    array $providerClasses
-                ): CommandStorageInterface {
-                    $storage = new CommandStorage();
+                    /**
+                     * @param string $commandsPath
+                     * @param array  $providerClasses
+                     *
+                     * @return CommandStorageInterface
+                     */
+                    public function createCommandStorage(
+                        string $commandsPath,
+                        array $providerClasses
+                    ): CommandStorageInterface {
+                        $storage = new CommandStorage();
 
-                    $interfaceName = CommandInterface::class;
-                    foreach ($this->selectClasses($commandsPath, $interfaceName) as $commandClass) {
-                        $storage->add($commandClass);
-                    }
-
-                    $interfaceName = ProvidesCommandsInterface::class;
-                    foreach ($this->selectClassImplements($providerClasses, $interfaceName) as $providerClass) {
-                        /** @var ProvidesCommandsInterface $providerClass */
-                        foreach ($providerClass::getCommands() as $commandClass) {
+                        $interfaceName = CommandInterface::class;
+                        foreach ($this->selectClasses($commandsPath, $interfaceName) as $commandClass) {
                             $storage->add($commandClass);
                         }
+
+                        $interfaceName = ProvidesCommandsInterface::class;
+                        foreach ($this->selectClassImplements($providerClasses, $interfaceName) as $providerClass) {
+                            /** @var ProvidesCommandsInterface $providerClass */
+                            foreach ($providerClass::getCommands() as $commandClass) {
+                                $storage->add($commandClass);
+                            }
+                        }
+
+                        return $storage;
                     }
+                };
 
-                    return $storage;
-                }
+                /** @var SettingsProviderInterface $provider */
+                $provider = $container->get(SettingsProviderInterface::class);
+                $settings = $provider->get(S::class);
+
+                $providerClasses  = $settings[S::KEY_PROVIDER_CLASSES];
+                $commandsFolder   = $settings[S::KEY_COMMANDS_FOLDER];
+                $commandsFileMask = $settings[S::KEY_COMMANDS_FILE_MASK] ?? '*.php';
+                $commandsPath     = $commandsFolder . DIRECTORY_SEPARATOR . $commandsFileMask;
+
+                $storage = $creator->createCommandStorage($commandsPath, $providerClasses);
+
+                return $storage;
             };
-
-            /** @var SettingsProviderInterface $provider */
-            $provider = $container->get(SettingsProviderInterface::class);
-            $settings = $provider->get(S::class);
-
-            $providerClasses  = $settings[S::KEY_PROVIDER_CLASSES];
-            $commandsFolder   = $settings[S::KEY_COMMANDS_FOLDER];
-            $commandsFileMask = $settings[S::KEY_COMMANDS_FILE_MASK] ?? '*.php';
-            $commandsPath     = $commandsFolder . DIRECTORY_SEPARATOR . $commandsFileMask;
-
-            $storage = $creator->createCommandStorage($commandsPath, $providerClasses);
-
-            return $storage;
-        };
     }
 }

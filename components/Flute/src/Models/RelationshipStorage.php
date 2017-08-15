@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Flute\Contracts\FactoryInterface;
+use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 
 /**
@@ -119,7 +120,7 @@ class RelationshipStorage implements RelationshipStorageInterface
     /**
      * @inheritdoc
      */
-    public function getRelationship($model, string $relationship)
+    public function getRelationship($model, string $relationship): ?PaginatedDataInterface
     {
         $uniqueId = spl_object_hash($model);
         $result = $this->relationships[$uniqueId][$relationship][self::IDX_DATA];

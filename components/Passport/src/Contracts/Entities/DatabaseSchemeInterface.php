@@ -316,17 +316,17 @@ interface DatabaseSchemeInterface
     /**
      * @return string|null
      */
-    public function getUsersView();
+    public function getUsersView(): ?string;
 
     /**
      * @return string|null
      */
-    public function getUsersTable();
+    public function getUsersTable(): ?string;
 
     /**
      * @return string|null
      */
-    public function getUsersIdentityColumn();
+    public function getUsersIdentityColumn(): ?string;
 
     /**************************************************************************
      * Passport view.
@@ -335,5 +335,5 @@ interface DatabaseSchemeInterface
     /**
      * @return string|null
      */
-    public function getPassportView();
+    public function getPassportView(): ?string;
 }

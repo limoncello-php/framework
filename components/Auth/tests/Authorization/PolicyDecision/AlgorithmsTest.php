@@ -191,12 +191,22 @@ class AlgorithmsTest extends TestCase
             (new Policy([$rule], new RulesFirstApplicable()))->setTarget($this->target('key1', 'value1')),
         ]);
 
-        $result = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'value1'])), $policiesData);
+        $logger = null;
+
+        $result = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'value1'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsDenyUnlessPermit::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::PERMIT, $value);
 
-        $result = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'non-existing'])), $policiesData);
+        $result = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'non-existing'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsDenyUnlessPermit::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::DENY, $value);
@@ -217,12 +227,22 @@ class AlgorithmsTest extends TestCase
                 ->setTarget($this->target('key1', 'value1')),
         ]);
 
-        $result = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'value1'])), $policiesData);
+        $logger = null;
+
+        $result = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'value1'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsPermitUnlessDeny::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::DENY, $value);
 
-        $result = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'non-existing'])), $policiesData);
+        $result = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'non-existing'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsPermitUnlessDeny::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::PERMIT, $value);
@@ -245,11 +265,21 @@ class AlgorithmsTest extends TestCase
             (new Policy([$rule2], new RulesFirstApplicable()))->setTarget($this->target('key2', 'value2')),
         ]);
 
-        $result = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'value1'])), $policiesData);
+        $logger = null;
+
+        $result = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'value1'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $this->assertEquals(EvaluationEnum::DENY, $result[PoliciesOrSetsFirstApplicable::EVALUATION_VALUE]);
 
-        $result = $algorithm->callPolicyAlgorithm(new Context(new Request(['key2' => 'value2'])), $policiesData);
+        $result = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key2' => 'value2'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $this->assertEquals(EvaluationEnum::PERMIT, $result[PoliciesOrSetsFirstApplicable::EVALUATION_VALUE]);
     }
@@ -271,7 +301,13 @@ class AlgorithmsTest extends TestCase
             (new Policy([$rule2], new RulesFirstApplicable()))->setTarget($this->target('key1', 'value1')),
         ]);
 
-        $result = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'value1'])), $policiesData);
+        $logger = null;
+
+        $result = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'value1'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsPermitOverrides::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::PERMIT, $value);
@@ -295,8 +331,14 @@ class AlgorithmsTest extends TestCase
         $policy1 = (new Policy([$rule1], new RulesPermitOverrides()))->setTarget($this->target('key1', 'value1'));
         $policy2 = (new Policy([$rule2], new RulesPermitOverrides()))->setTarget($this->target('key1', 'value1'));
 
+        $logger = null;
+
         $policiesData = $algorithm->optimize([$policy1, $policy2]);
-        $result       = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'value1'])), $policiesData);
+        $result       = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'value1'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsPermitOverrides::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::INDETERMINATE_DENY_OR_PERMIT, $value);
@@ -304,7 +346,11 @@ class AlgorithmsTest extends TestCase
         // now we'll try to cover those policies in set
         $set          = new PolicySet([$policy1, $policy2], $algorithm);
         $policiesData = $algorithm->optimize([$set]);
-        $result       = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'value1'])), $policiesData);
+        $result       = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'value1'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsPermitOverrides::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::INDETERMINATE_DENY_OR_PERMIT, $value);
@@ -328,8 +374,14 @@ class AlgorithmsTest extends TestCase
         $policy1 = (new Policy([$rule1], new RulesDenyOverrides()))->setTarget($this->target('key1', 'value1'));
         $policy2 = (new Policy([$rule2], new RulesDenyOverrides()))->setTarget($this->target('key1', 'value1'));
 
+        $logger = null;
+
         $policiesData = $algorithm->optimize([$policy1, $policy2]);
-        $result       = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'value1'])), $policiesData);
+        $result       = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'value1'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsDenyOverrides::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::INDETERMINATE_DENY_OR_PERMIT, $value);
@@ -337,7 +389,11 @@ class AlgorithmsTest extends TestCase
         // now we'll try to cover those policies in set
         $set          = new PolicySet([$policy1, $policy2], $algorithm);
         $policiesData = $algorithm->optimize([$set]);
-        $result       = $algorithm->callPolicyAlgorithm(new Context(new Request(['key1' => 'value1'])), $policiesData);
+        $result       = $algorithm->callPolicyAlgorithm(
+            new Context(new Request(['key1' => 'value1'])),
+            $policiesData,
+            $logger
+        );
         // here we rely on knowledge if internal structure of the result (it's not intended for direct usage)
         $value = $result[PoliciesOrSetsDenyOverrides::EVALUATION_VALUE];
         $this->assertEquals(EvaluationEnum::INDETERMINATE_DENY_OR_PERMIT, $value);

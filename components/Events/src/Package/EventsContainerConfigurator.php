@@ -34,7 +34,7 @@ class EventsContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
-        $container[EventEmitterInterface::class] = function (PsrContainerInterface $container) {
+        $container[EventEmitterInterface::class] = function (PsrContainerInterface $container): EventEmitterInterface {
             $emitter   = new SimpleEventEmitter();
             $cacheData = $container->get(SettingsProviderInterface::class)->get(C::class);
             $emitter->setStaticSubscribers($cacheData);

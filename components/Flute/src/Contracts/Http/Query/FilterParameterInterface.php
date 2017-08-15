@@ -24,12 +24,12 @@ interface FilterParameterInterface
     /**
      * @return string|null
      */
-    public function getRelationshipName();
+    public function getRelationshipName(): ?string;
 
     /**
      * @return string|null
      */
-    public function getAttributeName();
+    public function getAttributeName(): ?string;
 
     /**
      * @return string
@@ -59,5 +59,5 @@ interface FilterParameterInterface
     /**
      * @return int|null
      */
-    public function getRelationshipType();
+    public function getRelationshipType(): ?int;
 }

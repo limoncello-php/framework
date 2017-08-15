@@ -279,7 +279,7 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function parseStaticMethod($mightBeCallable)
+    private function parseStaticMethod($mightBeCallable): ?ReflectionMethod
     {
         // static callable could be in form of 'ClassName::methodName' or ['ClassName', 'methodName']
         if (is_string($mightBeCallable) === true &&

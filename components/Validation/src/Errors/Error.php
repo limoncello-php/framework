@@ -39,7 +39,7 @@ class Error implements ErrorInterface
     private $code;
 
     /**
-     * @var mixed
+     * @var array|null
      */
     private $context;
 
@@ -47,9 +47,9 @@ class Error implements ErrorInterface
      * @param null|string $name
      * @param mixed       $value
      * @param int         $code
-     * @param mixed       $context
+     * @param array|null  $context
      */
-    public function __construct($name, $value, int $code, $context)
+    public function __construct(?string $name, $value, int $code, ?array $context)
     {
         $this->name    = $name;
         $this->value   = $value;
@@ -60,7 +60,7 @@ class Error implements ErrorInterface
     /**
      * @inheritdoc
      */
-    public function getParameterName()
+    public function getParameterName(): ?string
     {
         return $this->name;
     }
@@ -84,7 +84,7 @@ class Error implements ErrorInterface
     /**
      * @inheritdoc
      */
-    public function getMessageContext()
+    public function getMessageContext(): ?array
     {
         return $this->context;
     }

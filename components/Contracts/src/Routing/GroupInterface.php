@@ -39,12 +39,12 @@ interface GroupInterface
     /**
      * @return null|GroupInterface
      */
-    public function parentGroup();
+    public function parentGroup(): ?GroupInterface;
 
     /**
      * @return null|string
      */
-    public function getName();
+    public function getName(): ?string;
 
     /**
      * @return string
@@ -64,7 +64,7 @@ interface GroupInterface
     /**
      * @return callable|null
      */
-    public function getRequestFactory();
+    public function getRequestFactory(): ?callable;
 
     /**
      * @return Iterator

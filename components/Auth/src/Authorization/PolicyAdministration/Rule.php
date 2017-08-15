@@ -43,7 +43,7 @@ class Rule implements RuleInterface
     private $condition;
 
     /**
-     * @var bool
+     * @var MethodInterface|null
      */
     private $effect;
 
@@ -80,7 +80,7 @@ class Rule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -90,7 +90,7 @@ class Rule implements RuleInterface
      *
      * @return self
      */
-    public function setName(string $name = null): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -100,7 +100,7 @@ class Rule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function getTarget()
+    public function getTarget(): ?TargetInterface
     {
         return $this->target;
     }
@@ -110,7 +110,7 @@ class Rule implements RuleInterface
      *
      * @return self
      */
-    public function setTarget(TargetInterface $target = null): self
+    public function setTarget(?TargetInterface $target): self
     {
         $this->target = $target;
 
@@ -120,7 +120,7 @@ class Rule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function getCondition()
+    public function getCondition(): ?MethodInterface
     {
         return $this->condition;
     }
@@ -130,7 +130,7 @@ class Rule implements RuleInterface
      *
      * @return self
      */
-    public function setCondition(MethodInterface $condition = null): self
+    public function setCondition(?MethodInterface $condition): self
     {
         $this->condition = $condition;
 
@@ -140,7 +140,7 @@ class Rule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function effect()
+    public function effect(): ?MethodInterface
     {
         return $this->effect;
     }
@@ -150,7 +150,7 @@ class Rule implements RuleInterface
      *
      * @return self
      */
-    public function setEffect(MethodInterface $effect = null): self
+    public function setEffect(?MethodInterface $effect): self
     {
         $this->effect = $effect;
 

@@ -83,7 +83,7 @@ class PolicySet implements PolicySetInterface
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -93,7 +93,7 @@ class PolicySet implements PolicySetInterface
      *
      * @return self
      */
-    public function setName(string $name = null): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -103,7 +103,7 @@ class PolicySet implements PolicySetInterface
     /**
      * @inheritdoc
      */
-    public function getTarget()
+    public function getTarget(): ?TargetInterface
     {
         return $this->target;
     }
@@ -113,7 +113,7 @@ class PolicySet implements PolicySetInterface
      *
      * @return self
      */
-    public function setTarget(TargetInterface $target = null): self
+    public function setTarget(?TargetInterface $target): self
     {
         $this->target = $target;
 

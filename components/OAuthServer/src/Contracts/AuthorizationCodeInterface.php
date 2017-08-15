@@ -22,9 +22,9 @@
 interface AuthorizationCodeInterface
 {
     /**
-     * @return string|null
+     * @return string
      */
-    public function getCode();
+    public function getCode(): string;
 
     /**
      * @return string
@@ -34,7 +34,7 @@ interface AuthorizationCodeInterface
     /**
      * @return string|null
      */
-    public function getRedirectUriString();
+    public function getRedirectUriString(): ?string;
 
     /**
      * @return string[]

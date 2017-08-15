@@ -48,7 +48,7 @@ abstract class DatabaseItem
     /**
      * @inheritdoc
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): ?DateTimeInterface
     {
         if ($this->createdAtField === null &&
             $this->hasDynamicProperty(static::FIELD_CREATED_AT) === true &&
@@ -63,7 +63,7 @@ abstract class DatabaseItem
     /**
      * @inheritdoc
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         if ($this->updatedAtField === null &&
             $this->hasDynamicProperty(static::FIELD_UPDATED_AT) === true &&

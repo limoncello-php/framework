@@ -58,10 +58,11 @@ interface RedirectUriRepositoryInterface
      * @return void
      */
     public function update(RedirectUriInterface $redirectUri): void;
+
     /**
      * @param int $identifier
      *
      * @return void
      */
-    public function delete(int $identifier);
+    public function delete(int $identifier): void;
 }

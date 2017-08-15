@@ -45,7 +45,7 @@ class FileMigrationRunner extends BaseMigrationRunner
     /**
      * @inheritdoc
      */
-    public function migrate(ContainerInterface $container)
+    public function migrate(ContainerInterface $container): void
     {
         // read & remember classes to migrate...
         assert($container->has(FileSystemInterface::class) === true);

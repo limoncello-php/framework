@@ -27,7 +27,7 @@ interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthSe
     /**
      * @return int|null
      */
-    public function getIdentifier();
+    public function getIdentifier(): ?int;
 
     /**
      * @param int $identifier
@@ -65,14 +65,14 @@ interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthSe
     /**
      * @return string|null
      */
-    public function getType();
+    public function getType(): ?string;
 
     /**
      * @param string|null $uri
      *
      * @return TokenInterface
      */
-    public function setRedirectUriString(string $uri = null): TokenInterface;
+    public function setRedirectUriString(?string $uri): TokenInterface;
 
     /**
      * @return TokenInterface
@@ -104,33 +104,33 @@ interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthSe
      *
      * @return TokenInterface
      */
-    public function setCode(string $code = null): TokenInterface;
+    public function setCode(?string $code): TokenInterface;
 
     /**
      * @param string|null $value
      *
      * @return TokenInterface
      */
-    public function setValue(string $value = null): TokenInterface;
+    public function setValue(?string $value): TokenInterface;
 
     /**
      * @param string|null $type
      *
      * @return TokenInterface
      */
-    public function setType(string $type = null): TokenInterface;
+    public function setType(?string $type): TokenInterface;
 
     /**
      * @param string|null $refreshValue
      *
      * @return TokenInterface
      */
-    public function setRefreshValue(string $refreshValue = null): TokenInterface;
+    public function setRefreshValue(?string $refreshValue): TokenInterface;
 
     /**
      * @return DateTimeInterface|null
      */
-    public function getCodeCreatedAt();
+    public function getCodeCreatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $codeCreatedAt
@@ -142,7 +142,7 @@ interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthSe
     /**
      * @return DateTimeInterface|null
      */
-    public function getValueCreatedAt();
+    public function getValueCreatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $valueCreatedAt
@@ -154,7 +154,7 @@ interface TokenInterface extends AuthorizationCodeInterface, \Limoncello\OAuthSe
     /**
      * @return DateTimeInterface|null
      */
-    public function getRefreshCreatedAt();
+    public function getRefreshCreatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $refreshCreatedAt

@@ -113,7 +113,7 @@ class PaginatedData implements PaginatedDataInterface
     /**
      * @inheritdoc
      */
-    public function getOffset()
+    public function getOffset(): ?int
     {
         return $this->offset;
     }
@@ -131,7 +131,7 @@ class PaginatedData implements PaginatedDataInterface
     /**
      * @inheritdoc
      */
-    public function getLimit()
+    public function getLimit(): ?int
     {
         return $this->size;
     }

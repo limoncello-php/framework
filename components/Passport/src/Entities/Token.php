@@ -83,7 +83,7 @@ abstract class Token implements TokenInterface
     private $clientIdentifierField = '';
 
     /**
-     * @var int|null
+     * @var int|string|null
      */
     private $userIdentifierField;
 
@@ -171,7 +171,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getIdentifier()
+    public function getIdentifier(): ?int
     {
         return $this->identifierField;
     }
@@ -259,7 +259,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getRedirectUriString()
+    public function getRedirectUriString(): ?string
     {
         return $this->redirectUriString;
     }
@@ -267,7 +267,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function setRedirectUriString(string $uri = null): TokenInterface
+    public function setRedirectUriString(?string $uri): TokenInterface
     {
         $this->redirectUriString = $uri;
 
@@ -333,7 +333,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->codeField;
     }
@@ -341,7 +341,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function setCode(string $code = null): TokenInterface
+    public function setCode(?string $code): TokenInterface
     {
         $this->codeField = $code;
 
@@ -351,7 +351,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->valueField;
     }
@@ -359,7 +359,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function setValue(string $value = null): TokenInterface
+    public function setValue(?string $value): TokenInterface
     {
         $this->valueField = $value;
 
@@ -369,7 +369,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->typeField;
     }
@@ -377,7 +377,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function setType(string $type = null): TokenInterface
+    public function setType(?string $type): TokenInterface
     {
         $this->typeField = $type;
 
@@ -387,7 +387,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getRefreshValue()
+    public function getRefreshValue(): ?string
     {
         return $this->refreshValueField;
     }
@@ -395,7 +395,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function setRefreshValue(string $refreshValue = null): TokenInterface
+    public function setRefreshValue(?string $refreshValue): TokenInterface
     {
         $this->refreshValueField = $refreshValue;
 
@@ -405,7 +405,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getCodeCreatedAt()
+    public function getCodeCreatedAt(): ?DateTimeInterface
     {
         if ($this->codeCreatedAtField === null && ($codeCreatedAt = $this->{static::FIELD_CODE_CREATED_AT}) !== null) {
             $this->codeCreatedAtField = $this->parseDateTime($codeCreatedAt);
@@ -427,7 +427,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getValueCreatedAt()
+    public function getValueCreatedAt(): ?DateTimeInterface
     {
         if ($this->valueCreatedAtField === null &&
             ($tokenCreatedAt = $this->{static::FIELD_VALUE_CREATED_AT}) !== null
@@ -451,7 +451,7 @@ abstract class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getRefreshCreatedAt()
+    public function getRefreshCreatedAt(): ?DateTimeInterface
     {
         if ($this->refreshCreatedAtField === null &&
             ($tokenCreatedAt = $this->{static::FIELD_VALUE_CREATED_AT}) !== null

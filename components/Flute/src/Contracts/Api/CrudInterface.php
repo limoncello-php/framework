@@ -124,12 +124,12 @@ interface CrudInterface
      *
      * @return array|null
      */
-    public function readRow($index);
+    public function readRow($index): ?array;
 
     /**
      * @param FilterParameterCollection|null $filterParams
      *
      * @return int|null
      */
-    public function count(FilterParameterCollection $filterParams = null);
+    public function count(FilterParameterCollection $filterParams = null): ?int;
 }

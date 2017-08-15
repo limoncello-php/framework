@@ -175,7 +175,7 @@ abstract class PassportSettings implements SettingsInterface
     /**
      * @return null|callable (static)
      */
-    protected function getTokenCustomPropertiesProvider()
+    protected function getTokenCustomPropertiesProvider(): ?callable
     {
         return null;
     }

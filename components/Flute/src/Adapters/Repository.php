@@ -282,7 +282,7 @@ class Repository implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function applySorting(QueryBuilder $builder, string $modelClass, array $sortParams)
+    public function applySorting(QueryBuilder $builder, string $modelClass, array $sortParams): void
     {
         $table = $this->getTableName($modelClass);
         foreach ($sortParams as $sortParam) {
@@ -316,7 +316,7 @@ class Repository implements RepositoryInterface
         QueryBuilder $builder,
         string $modelClass,
         FilterParameterCollection $filterParams
-    ) {
+    ): void {
         if ($filterParams->count() <= 0) {
             return;
         }
@@ -620,7 +620,7 @@ class Repository implements RepositoryInterface
         string $field,
         string $operation,
         $params = null
-    ) {
+    ): void {
         switch ($operation) {
             case '=':
             case 'eq':
@@ -708,8 +708,10 @@ class Repository implements RepositoryInterface
      * @param string       $table
      * @param string       $column
      * @param string       $bindName
+     *
+     * @return void
      */
-    private function addWhereBind(QueryBuilder $builder, string $table, string $column, string $bindName)
+    private function addWhereBind(QueryBuilder $builder, string $table, string $column, string $bindName): void
     {
         $builder
             ->andWhere($this->buildColumnName($table, $column) . '=' . $bindName);

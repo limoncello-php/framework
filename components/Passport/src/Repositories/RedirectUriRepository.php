@@ -90,7 +90,7 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
     /**
      * @inheritdoc
      */
-    public function delete(int $identifier)
+    public function delete(int $identifier): void
     {
         $this->deleteResource($identifier);
     }

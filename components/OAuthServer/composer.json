@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.1.0",
         "psr/http-message": "^1.0"
     },
     "require-dev": {
@@ -40,6 +40,7 @@
         "test-unit-with-coverage": "phpdbg -qrr ./vendor/bin/phpunit --coverage-text",
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
+        "test-unit-php-7-2": "docker-compose run --rm cli_7_2_php php ./vendor/bin/phpunit",
         "test-unit-php-7-1": "docker-compose run --rm cli_7_1_php php ./vendor/bin/phpunit",
         "test-unit-php-7-0": "docker-compose run --rm cli_7_0_php php ./vendor/bin/phpunit",
         "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php -d hhvm.php7.all=1 ./vendor/bin/phpunit"

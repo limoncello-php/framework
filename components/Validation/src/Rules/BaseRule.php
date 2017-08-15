@@ -128,7 +128,7 @@ abstract class BaseRule implements RuleInterface
     /**
      * @inheritdoc
      */
-    public function getParent()
+    public function getParent(): ?RuleInterface
     {
         return $this->parent;
     }

@@ -177,7 +177,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function unbindScopes(int $identifier)
+    public function unbindScopes(int $identifier): void
     {
         $scheme = $this->getDatabaseScheme();
         $this->deleteBelongsToManyRelationshipIdentifiers(
@@ -190,7 +190,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function read(int $identifier)
+    public function read(int $identifier): ?TokenInterface
     {
         return $this->readResource($identifier);
     }
@@ -198,7 +198,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function readByCode(string $code, int $expirationInSeconds)
+    public function readByCode(string $code, int $expirationInSeconds): ?TokenInterface
     {
         $scheme = $this->getDatabaseScheme();
         return $this->readEnabledTokenByColumnWithExpirationCheck(
@@ -212,7 +212,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function readByValue(string $tokenValue, int $expirationInSeconds)
+    public function readByValue(string $tokenValue, int $expirationInSeconds): ?TokenInterface
     {
         $scheme = $this->getDatabaseScheme();
         return $this->readEnabledTokenByColumnWithExpirationCheck(
@@ -226,7 +226,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      */
-    public function readByRefresh(string $refreshValue, int $expirationInSeconds)
+    public function readByRefresh(string $refreshValue, int $expirationInSeconds): ?TokenInterface
     {
         $scheme = $this->getDatabaseScheme();
         return $this->readEnabledTokenByColumnWithExpirationCheck(
@@ -357,7 +357,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         int $expirationInSeconds,
         string $createdAtColumn,
         array $columns = ['*']
-    ) {
+    ): ?TokenInterface {
         $query = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
             $identifier,
             $column,

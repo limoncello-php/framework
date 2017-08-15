@@ -27,7 +27,7 @@ interface RedirectUriInterface
     /**
      * @return int|null
      */
-    public function getIdentifier();
+    public function getIdentifier(): ?int;
 
     /**
      * @param int $identifier
@@ -39,7 +39,7 @@ interface RedirectUriInterface
     /**
      * @return string|null
      */
-    public function getClientIdentifier();
+    public function getClientIdentifier(): ?string;
 
     /**
      * @param string $identifier
@@ -56,7 +56,7 @@ interface RedirectUriInterface
     /**
      * @return string|null
      */
-    public function getValue();
+    public function getValue(): ?string;
 
     /**
      * @param string $uri
@@ -66,9 +66,9 @@ interface RedirectUriInterface
     public function setValue(string $uri): RedirectUriInterface;
 
     /**
-     * @return RedirectUriInterface|null
+     * @return DateTimeInterface|null
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $createdAt
@@ -78,9 +78,9 @@ interface RedirectUriInterface
     public function setCreatedAt(DateTimeInterface $createdAt): RedirectUriInterface;
 
     /**
-     * @return RedirectUriInterface|null
+     * @return DateTimeInterface|null
      */
-    public function getUpdatedAt();
+    public function getUpdatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $createdAt

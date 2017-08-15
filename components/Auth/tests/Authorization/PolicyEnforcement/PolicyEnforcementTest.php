@@ -369,7 +369,14 @@ class PolicyEnforcementTest extends TestCase
             RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
-        $result = BasePolicyOrSetAlgorithm::evaluatePolicySet($context, TargetMatchEnum::INDETERMINATE, $encodedPolicy);
+        $logger = null;
+
+        $result = BasePolicyOrSetAlgorithm::evaluatePolicySet(
+            $context,
+            TargetMatchEnum::INDETERMINATE,
+            $encodedPolicy,
+            $logger
+        );
         $this->assertEquals([
             BasePolicyOrSetAlgorithm::EVALUATION_VALUE       => EvaluationEnum::NOT_APPLICABLE,
             BasePolicyOrSetAlgorithm::EVALUATION_OBLIGATIONS => [],
@@ -388,7 +395,14 @@ class PolicyEnforcementTest extends TestCase
             RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
-        $result = BasePolicyOrSetAlgorithm::evaluatePolicySet($context, TargetMatchEnum::NOT_MATCH, $encodedPolicy);
+        $logger = null;
+
+        $result = BasePolicyOrSetAlgorithm::evaluatePolicySet(
+            $context,
+            TargetMatchEnum::NOT_MATCH,
+            $encodedPolicy,
+            $logger
+        );
         $this->assertEquals([
             BasePolicyOrSetAlgorithm::EVALUATION_VALUE       => EvaluationEnum::NOT_APPLICABLE,
             BasePolicyOrSetAlgorithm::EVALUATION_OBLIGATIONS => [],

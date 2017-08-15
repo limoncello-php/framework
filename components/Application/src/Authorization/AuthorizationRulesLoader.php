@@ -120,7 +120,7 @@ class AuthorizationRulesLoader
      *
      * @return string|null
      */
-    private function getResourcesType(string $className)
+    private function getResourcesType(string $className): ?string
     {
         $resourceType = null;
         if (array_key_exists(ResourceAuthorizationRulesInterface::class, class_implements($className)) === true) {

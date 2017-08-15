@@ -124,7 +124,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     /**
      * @inheritdoc
      */
-    public function read(string $identifier)
+    public function read(string $identifier): ?ClientInterface
     {
         return $this->readResource($identifier);
     }

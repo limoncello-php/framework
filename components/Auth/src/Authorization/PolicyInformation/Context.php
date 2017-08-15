@@ -44,7 +44,7 @@ class Context extends Container implements ContextInterface
     /**
      * @inheritdoc
      */
-    public function has($key)
+    public function has($key): bool
     {
         return parent::has($key) === true || $this->getRequest()->has($key) === true;
     }

@@ -62,7 +62,7 @@ trait OAuthServerTrait
      * @link https://tools.ietf.org/html/rfc6749#section-4.1.1
      * @link https://tools.ietf.org/html/rfc6749#section-4.2.1
      */
-    protected function getResponseType(array $parameters)
+    protected function getResponseType(array $parameters): ?string
     {
         return array_key_exists('response_type', $parameters) === true ? $parameters['response_type'] : null;
     }
@@ -76,7 +76,7 @@ trait OAuthServerTrait
      * @link https://tools.ietf.org/html/rfc6749#section-4.3.2
      * @link https://tools.ietf.org/html/rfc6749#section-4.4.2
      */
-    protected function getGrantType(array $parameters)
+    protected function getGrantType(array $parameters): ?string
     {
         return array_key_exists('grant_type', $parameters) === true ? $parameters['grant_type'] : null;
     }
@@ -110,7 +110,7 @@ trait OAuthServerTrait
      *
      * @return string|null
      */
-    protected function selectValidRedirectUri(ClientInterface $client, string $redirectUri = null)
+    protected function selectValidRedirectUri(ClientInterface $client, string $redirectUri = null): ?string
     {
         $validUri = null;
         $uris     = $client->getRedirectUriStrings();

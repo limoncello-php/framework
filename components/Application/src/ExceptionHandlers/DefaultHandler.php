@@ -67,9 +67,11 @@ class DefaultHandler implements ExceptionHandlerInterface
      * @param SapiInterface       $sapi
      * @param ContainerInterface  $container
      *
+     * @return void
+     *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function handle(Throwable $exception, SapiInterface $sapi, ContainerInterface $container)
+    private function handle(Throwable $exception, SapiInterface $sapi, ContainerInterface $container): void
     {
         $message  = 'Internal Server Error';
 
@@ -140,7 +142,7 @@ class DefaultHandler implements ExceptionHandlerInterface
      *
      * @return void
      */
-    private function logException(Throwable $exception, ContainerInterface $container, string $message)
+    private function logException(Throwable $exception, ContainerInterface $container, string $message): void
     {
         if ($container->has(LoggerInterface::class) === true) {
             /** @var LoggerInterface $logger */

@@ -145,7 +145,7 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     /**
      * @return void
      */
-    private function checkInstancesAreProcessed()
+    private function checkInstancesAreProcessed(): void
     {
         $this->isProcessed === true ?: $this->processInstances();
     }
@@ -155,7 +155,7 @@ class InstanceSettingsProvider implements SettingsProviderInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function processInstances()
+    private function processInstances(): void
     {
         $preliminaryMap = [];
         foreach ($this->instances as $instance) {
@@ -210,7 +210,7 @@ class InstanceSettingsProvider implements SettingsProviderInterface
      *
      * @return SettingsInterface|null
      */
-    private function selectChildSettings(array $instanceList)
+    private function selectChildSettings(array $instanceList): ?SettingsInterface
     {
         $count = count($instanceList);
         assert($count > 1);
@@ -233,8 +233,10 @@ class InstanceSettingsProvider implements SettingsProviderInterface
      *
      * @return SettingsInterface|null
      */
-    private function selectChildSettingsAmongTwo(SettingsInterface $instance1, SettingsInterface $instance2)
-    {
+    private function selectChildSettingsAmongTwo(
+        SettingsInterface $instance1,
+        SettingsInterface $instance2
+    ) : ?SettingsInterface {
         return is_subclass_of($instance1, get_class($instance2)) === true ?
             $instance1 : (is_subclass_of($instance2, get_class($instance1)) === true ? $instance2 : null);
     }

@@ -58,7 +58,7 @@ class ModelsData implements ModelsDataInterface
     /**
      * @inheritdoc
      */
-    public function getRelationshipStorage()
+    public function getRelationshipStorage(): ?RelationshipStorageInterface
     {
         return $this->relationshipStorage;
     }

@@ -41,7 +41,7 @@ class RulesDenyOverrides extends BaseRuleAlgorithm
         ContextInterface $context,
         array $optimizedTargets,
         array $serializedRules,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         return static::evaluateDenyOverrides($context, $optimizedTargets, $serializedRules, $logger);
     }

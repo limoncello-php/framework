@@ -27,14 +27,14 @@ interface JsonSchemesInterface extends ContainerInterface
     /**
      * @return RelationshipStorageInterface|null
      */
-    public function getRelationshipStorage();
+    public function getRelationshipStorage(): ?RelationshipStorageInterface;
 
     /**
      * @param RelationshipStorageInterface|null $storage
      *
      * @return self
      */
-    public function setRelationshipStorage(RelationshipStorageInterface $storage = null): self;
+    public function setRelationshipStorage(?RelationshipStorageInterface $storage): self;
 
     /**
      * @param string $schemaClass
@@ -50,7 +50,7 @@ interface JsonSchemesInterface extends ContainerInterface
      *
      * @return SchemaInterface
      */
-    public function getModelRelationshipSchema($modelClass, $relationshipName);
+    public function getModelRelationshipSchema(string $modelClass, string $relationshipName): SchemaInterface;
 
     /**
      * @inheritdoc

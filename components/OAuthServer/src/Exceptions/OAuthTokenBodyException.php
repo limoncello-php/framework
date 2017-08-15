@@ -166,7 +166,7 @@ class OAuthTokenBodyException extends OAuthServerException
     /**
      * @return string|null
      */
-    public function getErrorUri()
+    public function getErrorUri(): ?string
     {
         return $this->errorUri;
     }

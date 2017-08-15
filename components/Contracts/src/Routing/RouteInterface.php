@@ -54,7 +54,7 @@ interface RouteInterface
     /**
      * @return null|string
      */
-    public function getName();
+    public function getName(): ?string;
 
     /**
      * @return callable[]
@@ -74,5 +74,5 @@ interface RouteInterface
     /**
      * @return callable|null
      */
-    public function getRequestFactory();
+    public function getRequestFactory(): ?callable;
 }

@@ -37,7 +37,7 @@ class AsymmetricPrivateEncryptPublicDecryptContainerConfigurator implements Cont
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
-        $container[EncryptInterface::class] = function (PsrContainerInterface $container) {
+        $container[EncryptInterface::class] = function (PsrContainerInterface $container): EncryptInterface {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
             $keyOrPath = $settings[C::KEY_PRIVATE_PATH_OR_KEY_VALUE] ?? null;
             if (empty($keyOrPath) === true) {
@@ -49,7 +49,7 @@ class AsymmetricPrivateEncryptPublicDecryptContainerConfigurator implements Cont
             return $crypt;
         };
 
-        $container[DecryptInterface::class] = function (PsrContainerInterface $container) {
+        $container[DecryptInterface::class] = function (PsrContainerInterface $container): DecryptInterface {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
             $keyOrPath = $settings[C::KEY_PUBLIC_PATH_OR_KEY_VALUE] ?? null;
             if (empty($keyOrPath) === true) {

@@ -41,7 +41,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         $params
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -60,7 +60,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         $params
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -79,7 +79,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         $params
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -98,7 +98,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         $params
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -117,7 +117,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         $params
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -136,7 +136,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         $params
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -155,7 +155,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         $params
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -174,7 +174,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         $params
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -193,7 +193,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         array $values
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -212,7 +212,7 @@ interface FilterOperationsInterface
         string $table,
         string $column,
         array $values
-    );
+    ): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -222,7 +222,7 @@ interface FilterOperationsInterface
      *
      * @return void
      */
-    public function applyIsNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column);
+    public function applyIsNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column): void;
 
     /**
      * @param QueryBuilder        $builder
@@ -232,5 +232,10 @@ interface FilterOperationsInterface
      *
      * @return void
      */
-    public function applyIsNotNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column);
+    public function applyIsNotNull(
+        QueryBuilder $builder,
+        CompositeExpression $link,
+        string $table,
+        string $column
+    ): void;
 }

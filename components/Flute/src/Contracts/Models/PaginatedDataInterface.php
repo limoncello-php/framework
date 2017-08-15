@@ -59,7 +59,7 @@ interface PaginatedDataInterface
     /**
      * @return int|null
      */
-    public function getOffset();
+    public function getOffset(): ?int;
 
     /**
      * @param int|null $offset
@@ -71,7 +71,7 @@ interface PaginatedDataInterface
     /**
      * @return int|null
      */
-    public function getLimit();
+    public function getLimit(): ?int;
 
     /**
      * @param int|null $size

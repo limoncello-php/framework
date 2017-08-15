@@ -102,7 +102,7 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
         ContextInterface $context,
         int $match,
         array $encodedItem,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         return static::evaluateRule($context, $match, $encodedItem, $logger);
     }

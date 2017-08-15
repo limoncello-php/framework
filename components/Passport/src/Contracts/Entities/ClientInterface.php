@@ -33,7 +33,7 @@ interface ClientInterface extends \Limoncello\OAuthServer\Contracts\ClientInterf
     /**
      * @return string|null
      */
-    public function getName();
+    public function getName(): ?string;
 
     /**
      * @param string $name
@@ -45,7 +45,7 @@ interface ClientInterface extends \Limoncello\OAuthServer\Contracts\ClientInterf
     /**
      * @return string|null
      */
-    public function getDescription();
+    public function getDescription(): ?string;
 
     /**
      * @param string|null $description
@@ -57,7 +57,7 @@ interface ClientInterface extends \Limoncello\OAuthServer\Contracts\ClientInterf
     /**
      * @return string|null
      */
-    public function getCredentials();
+    public function getCredentials(): ?string;
 
     /**
      * @param string $credentials
@@ -168,7 +168,7 @@ interface ClientInterface extends \Limoncello\OAuthServer\Contracts\ClientInterf
     /**
      * @return DateTimeInterface|null
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $createdAt
@@ -178,9 +178,9 @@ interface ClientInterface extends \Limoncello\OAuthServer\Contracts\ClientInterf
     public function setCreatedAt(DateTimeInterface $createdAt): ClientInterface;
 
     /**
-     * @return RedirectUriInterface|null
+     * @return DateTimeInterface|null
      */
-    public function getUpdatedAt();
+    public function getUpdatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $createdAt

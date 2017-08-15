@@ -44,7 +44,7 @@ class ComposerCommandProvider implements CommandProvider
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function setCommands(array $commands)
+    public static function setCommands(array $commands): void
     {
         assert(static::areCommands($commands) === true);
 

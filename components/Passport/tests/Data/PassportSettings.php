@@ -83,7 +83,7 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
     /**
      * @inheritdoc
      */
-    protected function getTokenCustomPropertiesProvider()
+    protected function getTokenCustomPropertiesProvider(): ?callable
     {
         assert(parent::getTokenCustomPropertiesProvider() === null);
 
@@ -111,7 +111,7 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
      *
      * @return null|array
      */
-    public static function validateScope(ContainerInterface $container, int $userId, array $scope = null)
+    public static function validateScope(ContainerInterface $container, int $userId, array $scope = null): ?array
     {
         assert($container || $userId || $scope);
 

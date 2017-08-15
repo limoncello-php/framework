@@ -93,7 +93,7 @@ class BasicClientAuthenticationTest extends TestCase
         $this->integrationMock
             ->shouldReceive('getClientRepository')->once()->withNoArgs()->andReturn($this->clientRepoMock);
         $this->clientRepoMock
-            ->shouldReceive('read')->once()->withAnyArgs()->andReturnNull();
+            ->shouldReceive('read')->once()->withAnyArgs()->andReturn(null);
 
         $this->determineClient(
             $this->integration,

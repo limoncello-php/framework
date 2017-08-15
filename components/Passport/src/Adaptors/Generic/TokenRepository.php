@@ -49,7 +49,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
-    public function read(int $identifier)
+    public function read(int $identifier): ?TokenInterface
     {
         $token = parent::read($identifier);
 
@@ -63,7 +63,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
-    public function readByCode(string $code, int $expirationInSeconds)
+    public function readByCode(string $code, int $expirationInSeconds): ?TokenInterface
     {
         $token = parent::readByCode($code, $expirationInSeconds);
         if ($token !== null) {
@@ -76,7 +76,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
-    public function readByValue(string $tokenValue, int $expirationInSeconds)
+    public function readByValue(string $tokenValue, int $expirationInSeconds): ?TokenInterface
     {
         $token = parent::readByValue($tokenValue, $expirationInSeconds);
         if ($token !== null) {
@@ -89,7 +89,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
-    public function readByRefresh(string $refreshValue, int $expirationInSeconds)
+    public function readByRefresh(string $refreshValue, int $expirationInSeconds): ?TokenInterface
     {
         $token = parent::readByRefresh($refreshValue, $expirationInSeconds);
         if ($token !== null) {
@@ -154,7 +154,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
-    public function readPassport(string $tokenValue, int $expirationInSeconds)
+    public function readPassport(string $tokenValue, int $expirationInSeconds): ?array
     {
         $statement = $this->createPassportDataQuery($tokenValue, $expirationInSeconds)->execute();
         $statement->setFetchMode(PDO::FETCH_ASSOC);

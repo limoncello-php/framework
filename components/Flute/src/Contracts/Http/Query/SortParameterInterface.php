@@ -39,7 +39,7 @@ interface SortParameterInterface
     /**
      * @return int|null
      */
-    public function getRelationshipType();
+    public function getRelationshipType(): ?int;
 
     /**
      * @return bool

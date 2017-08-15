@@ -59,7 +59,7 @@ trait PasswordGrantTrait
      *
      * @return string|null
      */
-    protected function passGetUserName(array $parameters)
+    protected function passGetUserName(array $parameters): ?string
     {
         return $this->passReadStringValue($parameters, 'username');
     }
@@ -69,7 +69,7 @@ trait PasswordGrantTrait
      *
      * @return string|null
      */
-    protected function passGetPassword(array $parameters)
+    protected function passGetPassword(array $parameters): ?string
     {
         return $this->passReadStringValue($parameters, 'password');
     }
@@ -79,7 +79,7 @@ trait PasswordGrantTrait
      *
      * @return string[]|null
      */
-    protected function passGetScope(array $parameters)
+    protected function passGetScope(array $parameters): ?array
     {
         $scope = $this->passReadStringValue($parameters, 'scope');
 
@@ -137,7 +137,7 @@ trait PasswordGrantTrait
      *
      * @return null|string
      */
-    private function passReadStringValue(array $parameters, string $name)
+    private function passReadStringValue(array $parameters, string $name): ?string
     {
         return array_key_exists($name, $parameters) === true && is_string($value = $parameters[$name]) === true ?
             $value : null;

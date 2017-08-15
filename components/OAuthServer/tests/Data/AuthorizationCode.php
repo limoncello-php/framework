@@ -107,7 +107,7 @@ class AuthorizationCode implements AuthorizationCodeInterface
     /**
      * @inheritdoc
      */
-    public function getRedirectUriString()
+    public function getRedirectUriString(): ?string
     {
         return $this->redirectUri;
     }

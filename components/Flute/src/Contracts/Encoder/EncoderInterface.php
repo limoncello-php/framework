@@ -25,7 +25,7 @@ interface EncoderInterface extends \Neomerx\JsonApi\Contracts\Encoder\EncoderInt
     /**
      * @param UriInterface $uri
      *
-     * @return void
+     * @return self
      */
-    public function forOriginalUri(UriInterface $uri);
+    public function forOriginalUri(UriInterface $uri): self;
 }

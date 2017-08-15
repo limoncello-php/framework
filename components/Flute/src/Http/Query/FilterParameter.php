@@ -82,7 +82,7 @@ class FilterParameter implements FilterParameterInterface
     /**
      * @inheritdoc
      */
-    public function getRelationshipName()
+    public function getRelationshipName(): ?string
     {
         return $this->relationshipName;
     }
@@ -90,7 +90,7 @@ class FilterParameter implements FilterParameterInterface
     /**
      * @inheritdoc
      */
-    public function getAttributeName()
+    public function getAttributeName(): ?string
     {
         return $this->attributeName;
     }
@@ -130,7 +130,7 @@ class FilterParameter implements FilterParameterInterface
     /**
      * @inheritdoc
      */
-    public function getRelationshipType()
+    public function getRelationshipType(): ?int
     {
         return $this->relationshipType;
     }

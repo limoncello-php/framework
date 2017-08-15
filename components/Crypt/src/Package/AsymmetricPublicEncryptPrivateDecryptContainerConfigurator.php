@@ -22,10 +22,10 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Crypt\Contracts\DecryptInterface;
 use Limoncello\Crypt\Contracts\EncryptInterface;
 use Limoncello\Crypt\Exceptions\CryptConfigurationException;
+use Limoncello\Crypt\Package\AsymmetricCryptSettings as C;
 use Limoncello\Crypt\PrivateKeyAsymmetricDecrypt;
 use Limoncello\Crypt\PublicKeyAsymmetricEncrypt;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Crypt\Package\AsymmetricCryptSettings as C;
 
 /**
  * @package Limoncello\Crypt
@@ -37,7 +37,7 @@ class AsymmetricPublicEncryptPrivateDecryptContainerConfigurator implements Cont
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
-        $container[EncryptInterface::class] = function (PsrContainerInterface $container) {
+        $container[EncryptInterface::class] = function (PsrContainerInterface $container): EncryptInterface {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
             $keyOrPath = $settings[C::KEY_PUBLIC_PATH_OR_KEY_VALUE] ?? null;
             if (empty($keyOrPath) === true) {
@@ -49,7 +49,7 @@ class AsymmetricPublicEncryptPrivateDecryptContainerConfigurator implements Cont
             return $crypt;
         };
 
-        $container[DecryptInterface::class] = function (PsrContainerInterface $container) {
+        $container[DecryptInterface::class] = function (PsrContainerInterface $container): DecryptInterface {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
             $keyOrPath = $settings[C::KEY_PRIVATE_PATH_OR_KEY_VALUE] ?? null;
             if (empty($keyOrPath) === true) {

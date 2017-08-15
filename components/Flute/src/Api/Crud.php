@@ -163,7 +163,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function count(FilterParameterCollection $filterParams = null)
+    public function count(FilterParameterCollection $filterParams = null): ?int
     {
         $modelClass = $this->getModelClass();
 
@@ -281,7 +281,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function readRow($index)
+    public function readRow($index): ?array
     {
         $modelClass = $this->getModelClass();
         $builder    = $this->getRepository()
@@ -429,7 +429,7 @@ class Crud implements CrudInterface
      *
      * @return void
      */
-    protected function inTransaction(Closure $closure)
+    protected function inTransaction(Closure $closure): void
     {
         $connection = $this->getRepository()->getConnection();
         $connection->beginTransaction();
@@ -486,7 +486,7 @@ class Crud implements CrudInterface
      *
      * @return array|null
      */
-    protected function fetchRow(QueryBuilder $builder, string $class)
+    protected function fetchRow(QueryBuilder $builder, string $class): ?array
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
@@ -530,7 +530,7 @@ class Crud implements CrudInterface
      *
      * @return array
      */
-    protected function fetchCollection(QueryBuilder $builder, string $class, $limit = null, $offset = null)
+    protected function fetchCollection(QueryBuilder $builder, string $class, $limit = null, $offset = null): array
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
@@ -772,7 +772,7 @@ class Crud implements CrudInterface
      *
      * @return void
      */
-    private function checkErrors(ErrorCollection $errors)
+    private function checkErrors(ErrorCollection $errors): void
     {
         if (empty($errors->getArrayCopy()) === false) {
             throw new E($errors);
@@ -839,7 +839,7 @@ class Crud implements CrudInterface
         ModelStorageInterface $deDup,
         string $parentsPath,
         array $childRelationships
-    ) {
+    ): void {
         $rootClass   = $classAtPath[static::$rootPath];
         $parentClass = $classAtPath[$parentsPath];
         $parents     = $modelsAtPath->get($parentsPath);

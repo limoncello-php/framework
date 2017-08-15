@@ -55,7 +55,7 @@ abstract class Scope extends DatabaseItem implements ScopeInterface
     /**
      * @inheritdoc
      */
-    public function getIdentifier()
+    public function getIdentifier(): ?string
     {
         return $this->identifierField;
     }
@@ -73,7 +73,7 @@ abstract class Scope extends DatabaseItem implements ScopeInterface
     /**
      * @inheritdoc
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->descriptionField;
     }

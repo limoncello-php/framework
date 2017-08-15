@@ -24,12 +24,12 @@ interface PolicyInterface
     /**
      * @return string|null
      */
-    public function getName();
+    public function getName(): ?string;
 
     /**
      * @return TargetInterface|null
      */
-    public function getTarget();
+    public function getTarget(): ?TargetInterface;
 
     /**
      * @return RuleInterface[]

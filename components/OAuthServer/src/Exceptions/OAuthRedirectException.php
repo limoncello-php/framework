@@ -168,7 +168,7 @@ abstract class OAuthRedirectException extends OAuthServerException
     /**
      * @return string|null
      */
-    public function getErrorUri()
+    public function getErrorUri(): ?string
     {
         return $this->errorUri;
     }
@@ -176,7 +176,7 @@ abstract class OAuthRedirectException extends OAuthServerException
     /**
      * @return null|string
      */
-    public function getState()
+    public function getState(): ?string
     {
         return $this->state;
     }

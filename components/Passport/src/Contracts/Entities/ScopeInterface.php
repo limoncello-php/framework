@@ -26,7 +26,7 @@ interface ScopeInterface
     /**
      * @return string|null
      */
-    public function getIdentifier();
+    public function getIdentifier(): ?string;
 
     /**
      * @param string $identifier
@@ -38,7 +38,7 @@ interface ScopeInterface
     /**
      * @return string|null
      */
-    public function getDescription();
+    public function getDescription(): ?string;
 
     /**
      * @param string|null $description
@@ -50,7 +50,7 @@ interface ScopeInterface
     /**
      * @return DateTimeInterface|null
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $createdAt
@@ -60,9 +60,9 @@ interface ScopeInterface
     public function setCreatedAt(DateTimeInterface $createdAt): ScopeInterface;
 
     /**
-     * @return RedirectUriInterface|null
+     * @return DateTimeInterface|null
      */
-    public function getUpdatedAt();
+    public function getUpdatedAt(): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface $createdAt

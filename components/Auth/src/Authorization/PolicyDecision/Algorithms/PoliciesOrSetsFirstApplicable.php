@@ -41,7 +41,7 @@ class PoliciesOrSetsFirstApplicable extends BasePolicyOrSetAlgorithm
         ContextInterface $context,
         array $optimizedTargets,
         array $encPoliciesOrSets,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         return self::evaluateFirstApplicable($context, $optimizedTargets, $encPoliciesOrSets, $logger);
     }

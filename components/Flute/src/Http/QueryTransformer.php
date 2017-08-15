@@ -129,8 +129,10 @@ class QueryTransformer
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function mapFilterParameters(ErrorCollection $errors, array $parameters = null)
-    {
+    protected function mapFilterParameters(
+        ErrorCollection $errors,
+        array $parameters = null
+    ): ?FilterParameterCollection {
         if ($parameters === null) {
             return null;
         }
@@ -172,7 +174,7 @@ class QueryTransformer
      *
      * @return null|SortParameterInterface[]
      */
-    protected function mapSortParameters(ErrorCollection $errors, array $parameters = null)
+    protected function mapSortParameters(ErrorCollection $errors, array $parameters = null): ?array
     {
         $sorts = null;
 
@@ -197,7 +199,7 @@ class QueryTransformer
      *
      * @return null|IncludeParameterInterface[]
      */
-    protected function mapIncludeParameters(ErrorCollection $errors, array $parameters = null)
+    protected function mapIncludeParameters(ErrorCollection $errors, array $parameters = null): ?array
     {
         $includes = null;
 
@@ -223,7 +225,7 @@ class QueryTransformer
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function mapFilterField(string $jsonName, $value)
+    protected function mapFilterField(string $jsonName, $value): ?FilterParameterInterface
     {
         $this->resetSchema();
 
@@ -272,7 +274,7 @@ class QueryTransformer
      *
      * @return SortParameterInterface|null
      */
-    protected function mapSortField(JsonLibrarySortParameterInterface $sortParameter)
+    protected function mapSortField(JsonLibrarySortParameterInterface $sortParameter): ?SortParameterInterface
     {
         $this->resetSchema();
 
@@ -300,7 +302,7 @@ class QueryTransformer
      *
      * @return IncludeParameterInterface|null
      */
-    protected function mapRelationshipsPath(string $path)
+    protected function mapRelationshipsPath(string $path): ?IncludeParameterInterface
     {
         $this->resetSchema();
 
@@ -525,7 +527,7 @@ class QueryTransformer
      *
      * @return void
      */
-    protected function setCurrentSchema(string $currentSchemaClass)
+    protected function setCurrentSchema(string $currentSchemaClass): void
     {
         $this->currentSchemaClass = $currentSchemaClass;
 
@@ -545,7 +547,7 @@ class QueryTransformer
     /**
      * @return void
      */
-    private function resetSchema()
+    private function resetSchema(): void
     {
         if ($this->isRootSchemaSet === false) {
             $this->setCurrentSchema($this->getSchemaClass());
@@ -559,7 +561,7 @@ class QueryTransformer
      *
      * @return void
      */
-    private function addQueryParamError(ErrorCollection $errors, string $name)
+    private function addQueryParamError(ErrorCollection $errors, string $name): void
     {
 
         $title = $this->getFluteMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ELEMENT);

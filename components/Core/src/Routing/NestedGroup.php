@@ -34,15 +34,7 @@ class NestedGroup extends BaseGroup
     /**
      * @inheritdoc
      */
-    public function parentGroup()
-    {
-        return parent::parentGroup();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getName()
+    public function getName(): ?string
     {
         $parentGroupName = $this->parentGroup()->getName();
         $selfName        = parent::getName();

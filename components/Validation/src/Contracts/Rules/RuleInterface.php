@@ -58,7 +58,7 @@ interface RuleInterface
     /**
      * @return RuleInterface|null
      */
-    public function getParent();
+    public function getParent(): ?RuleInterface;
 
     /**
      * @param RuleInterface $rule

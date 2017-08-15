@@ -42,5 +42,5 @@ interface PaginationStrategyInterface
      *
      * @return array [$offset, $limit]
      */
-    public function parseParameters(array $parameters = null): array;
+    public function parseParameters(?array $parameters): array;
 }

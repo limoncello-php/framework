@@ -63,7 +63,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         ServerRequestInterface $request,
         array $parameters,
         $realm = 'OAuth'
-    );
+    ): ?ClientInterface;
 
     /**
      * @var PassportServerIntegrationInterface
@@ -249,7 +249,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
     /**
      * @inheritdoc
      */
-    public function codeReadAuthenticationCode(string $code)
+    public function codeReadAuthenticationCode(string $code): ?AuthorizationCodeInterface
     {
         return $this->getIntegration()->getTokenRepository()
             ->readByCode($code, $this->getIntegration()->getCodeExpirationPeriod());

@@ -75,7 +75,7 @@ class AuthorizationException extends RuntimeException implements AuthorizationEx
     /**
      * @inheritdoc
      */
-    public function getResourceType()
+    public function getResourceType(): ?string
     {
         return $this->resourceType;
     }

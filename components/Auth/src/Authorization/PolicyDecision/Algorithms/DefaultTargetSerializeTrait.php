@@ -40,7 +40,7 @@ trait DefaultTargetSerializeTrait
     public static function evaluateTargets(
         ContextInterface $context,
         array $optimizedTargets,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): Generator {
         foreach ($optimizedTargets as $ruleId => $anyOf) {
             $match = static::evaluateTarget($context, $anyOf, $logger);
@@ -63,7 +63,7 @@ trait DefaultTargetSerializeTrait
     protected static function evaluateTarget(
         ContextInterface $context,
         array $target,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): int {
         /** @see http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html #7.11 (table 4) */
 
@@ -124,7 +124,7 @@ trait DefaultTargetSerializeTrait
      *
      * @return array
      */
-    protected static function encodeTarget(TargetInterface $target = null): array
+    protected static function encodeTarget(?TargetInterface $target): array
     {
         $name   = null;
         $anyOfs = null;

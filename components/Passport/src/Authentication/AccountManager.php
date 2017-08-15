@@ -53,7 +53,7 @@ class AccountManager implements PassportAccountManagerInterface
     /**
      * @inheritdoc
      */
-    public function getAccount()
+    public function getAccount(): ?AccountInterface
     {
         return $this->getPassport();
     }
@@ -61,7 +61,7 @@ class AccountManager implements PassportAccountManagerInterface
     /**
      * @inheritdoc
      */
-    public function getPassport()
+    public function getPassport(): ?PassportAccountInterface
     {
         return $this->account;
     }

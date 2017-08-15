@@ -102,7 +102,7 @@ class ApplicationCommand implements CommandInterface
      *
      * @return void
      */
-    protected function run(ContainerInterface $container, IoInterface $inOut)
+    protected function run(ContainerInterface $container, IoInterface $inOut): void
     {
         $action = $inOut->getArgument(static::ARG_ACTION);
         switch ($action) {
@@ -124,7 +124,7 @@ class ApplicationCommand implements CommandInterface
      *
      * @return void
      */
-    protected function executeClear(ContainerInterface $container, IoInterface $inOut)
+    protected function executeClear(ContainerInterface $container, IoInterface $inOut): void
     {
         assert($inOut);
 
@@ -149,7 +149,7 @@ class ApplicationCommand implements CommandInterface
      *
      * @return void
      */
-    protected function executeCache(ContainerInterface $container, IoInterface $inOut)
+    protected function executeCache(ContainerInterface $container, IoInterface $inOut): void
     {
         assert($inOut);
 

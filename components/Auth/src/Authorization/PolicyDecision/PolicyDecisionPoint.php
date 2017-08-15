@@ -81,7 +81,7 @@ class PolicyDecisionPoint implements PolicyDecisionPointInterface
     /**
      * @return LoggerInterface|null
      */
-    protected function getLogger()
+    protected function getLogger(): ?LoggerInterface
     {
         return $this->logger;
     }

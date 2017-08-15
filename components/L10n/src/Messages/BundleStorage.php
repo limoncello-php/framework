@@ -71,7 +71,7 @@ class BundleStorage implements BundleStorageInterface
     /**
      * @inheritdoc
      */
-    public function get(string $locale, string $namespace, string $key)
+    public function get(string $locale, string $namespace, string $key): ?array
     {
         $locale = $this->lookupLocale($this->getLocales(), $locale, $this->getDefaultLocale());
 

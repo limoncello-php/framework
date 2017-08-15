@@ -72,7 +72,7 @@ interface ClientRepositoryInterface
      *
      * @return ClientInterface|null
      */
-    public function read(string $identifier);
+    public function read(string $identifier): ?ClientInterface;
 
     /**
      * @param string $identifier

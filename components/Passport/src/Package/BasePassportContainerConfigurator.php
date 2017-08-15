@@ -43,7 +43,9 @@ abstract class BasePassportContainerConfigurator
     protected static function baseConfigureContainer(LimoncelloContainerInterface $container): void
     {
         $accountManager = null;
-        $factory        = function (PsrContainerInterface $container) use (&$accountManager) {
+        $factory        = function (
+            PsrContainerInterface $container
+        ) use (&$accountManager): PassportAccountManagerInterface {
             if ($accountManager === null) {
                 $accountManager = new AccountManager($container);
             }
@@ -53,13 +55,17 @@ abstract class BasePassportContainerConfigurator
         $container[AccountManagerInterface::class]         = $factory;
         $container[PassportAccountManagerInterface::class] = $factory;
 
-        $container[DatabaseSchemeInterface::class] = function (PsrContainerInterface $container) {
+        $container[DatabaseSchemeInterface::class] = function (
+            PsrContainerInterface $container
+        ): DatabaseSchemeInterface {
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
 
             return new DatabaseScheme($settings[C::KEY_USER_TABLE_NAME], $settings[C::KEY_USER_PRIMARY_KEY_NAME]);
         };
 
-        $container[PassportServerInterface::class] = function (PsrContainerInterface $container) {
+        $container[PassportServerInterface::class] = function (
+            PsrContainerInterface $container
+        ): PassportServerInterface {
             $integration    = $container->get(PassportServerIntegrationInterface::class);
             $passportServer = new PassportServer($integration);
 

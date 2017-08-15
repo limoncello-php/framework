@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Routing\GroupInterface;
+
 /**
  * @package Limoncello\Core
  */
@@ -44,9 +46,9 @@ class Group extends BaseGroup
     }
 
     /**
-     * @return null
+     * @inheritdoc
      */
-    public function parentGroup()
+    public function parentGroup(): ?GroupInterface
     {
         $group = parent::parentGroup();
 

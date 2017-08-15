@@ -24,12 +24,12 @@ use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Entities\Client;
 use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Package\PassportSettings as C;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
-use Limoncello\Passport\Package\PassportSettings as C;
 
 /**
  * @package Limoncello\Passport
@@ -126,7 +126,7 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
 
         /** @var callable|null $customPropProvider */
         $customPropProvider = $this->settings[C::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER] ?? null;
-        $wrapper = $customPropProvider !== null ?
+        $wrapper            = $customPropProvider !== null ?
             function (TokenInterface $token) use ($container, $customPropProvider): array {
                 return call_user_func($customPropProvider, $container, $token);
             } : null;
@@ -155,7 +155,7 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     /**
      * @inheritdoc
      */
-    public function verifyAllowedUserScope(int $userIdentity, array $scope = null)
+    public function verifyAllowedUserScope(int $userIdentity, array $scope = null): ?array
     {
         $validator   = $this->settings[C::KEY_USER_SCOPE_VALIDATOR];
         $nullOrScope = call_user_func($validator, $this->container, $userIdentity, $scope);

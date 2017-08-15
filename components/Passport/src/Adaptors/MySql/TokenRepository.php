@@ -47,7 +47,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
     /**
      * @inheritdoc
      */
-    public function readPassport(string $tokenValue, int $expirationInSeconds)
+    public function readPassport(string $tokenValue, int $expirationInSeconds): ?array
     {
         $scheme = $this->getDatabaseScheme();
         $query  = $this->getConnection()->createQueryBuilder();

@@ -54,7 +54,7 @@ class SortParameter implements SortParameterInterface
         JsonLibrarySortParameterInterface $sortParam,
         string $name,
         bool $isRelationship,
-        int $relationshipType = null
+        ?int $relationshipType
     ) {
         $this->libSortParam   = $sortParam;
         $this->name           = $name;
@@ -99,7 +99,7 @@ class SortParameter implements SortParameterInterface
     /**
      * @inheritdoc
      */
-    public function getRelationshipType()
+    public function getRelationshipType(): ?int
     {
         return $this->relationshipType;
     }

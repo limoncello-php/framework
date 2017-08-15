@@ -54,7 +54,7 @@ class DataOptionWrapper
     /**
      * @return string|null
      */
-    public function getShortcut()
+    public function getShortcut(): ?string
     {
         return $this->getData()[CommandInterface::OPTION_SHORTCUT] ?? null;
     }
@@ -70,7 +70,7 @@ class DataOptionWrapper
     /**
      * @return string|null
      */
-    public function getDefault()
+    public function getDefault(): ?string
     {
         $value = $this->getData()[CommandInterface::OPTION_DEFAULT] ?? null;
 
@@ -114,7 +114,7 @@ class DataOptionWrapper
     /**
      * @return int|null
      */
-    public function getMode()
+    public function getMode(): ?int
     {
         $mode = null;
 

@@ -76,7 +76,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
     private $attributes = [];
 
     /**
-     * @inheritdoc
+     * @return array
      */
     public function getData(): array
     {
@@ -97,13 +97,17 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
     }
 
     /**
-     * @inheritdoc
+     * @param array $data
+     *
+     * @return self
      */
-    public function setData(array $data)
+    public function setData(array $data): self
     {
         list($this->foreignKeys, $this->belongsToMany, $this->relationshipTypes,
             $this->reversedRelationships,$this->tableNames, $this->primaryKeys,
             $this->attributeTypes, $this->attributeLengths, $this->attributes, $this->reversedClasses) = $data;
+
+        return $this;
     }
 
     /**
@@ -379,7 +383,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
      *
      * @return void
      */
-    private function registerRelationshipType(int $type, string $class, string $name)
+    private function registerRelationshipType(int $type, string $class, string $name): void
     {
         assert(empty($class) === false && empty($name) === false);
         assert(
@@ -403,7 +407,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
         string $name,
         string $reverseClass,
         string $reverseName
-    ) {
+    ): void {
         assert(
             empty($class) === false &&
             empty($name) === false &&

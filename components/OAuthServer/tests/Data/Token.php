@@ -99,7 +99,7 @@ class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->tokenValue;
     }
@@ -107,7 +107,7 @@ class Token implements TokenInterface
     /**
      * @inheritdoc
      */
-    public function getRefreshValue()
+    public function getRefreshValue(): ?string
     {
         return $this->refreshValue;
     }

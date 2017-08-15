@@ -59,7 +59,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         $params
-    ) {
+    ): void {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'eq', $params);
     }
 
@@ -73,7 +73,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         $params
-    ) {
+    ): void {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'neq', $params);
     }
 
@@ -87,7 +87,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         $params
-    ) {
+    ): void {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'gt', $params);
     }
 
@@ -101,7 +101,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         $params
-    ) {
+    ): void {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'gte', $params);
     }
 
@@ -115,7 +115,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         $params
-    ) {
+    ): void {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'lt', $params);
     }
 
@@ -129,7 +129,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         $params
-    ) {
+    ): void {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'lte', $params);
     }
 
@@ -143,7 +143,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         $params
-    ) {
+    ): void {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'like', $params);
     }
 
@@ -157,7 +157,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         $params
-    ) {
+    ): void {
         $this->applyComparisonMethod($builder, $link, $errors, $table, $column, 'notLike', $params);
     }
 
@@ -171,7 +171,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         array $values
-    ) {
+    ): void {
         if ($this->isArrayOfScalars($values) === false) {
             $this->addInvalidQueryParameterError($errors, $column);
 
@@ -196,7 +196,7 @@ class FilterOperations implements FilterOperationsInterface
         string $table,
         string $column,
         array $values
-    ) {
+    ): void {
         if ($this->isArrayOfScalars($values) === false) {
             $this->addInvalidQueryParameterError($errors, $column);
 
@@ -214,7 +214,7 @@ class FilterOperations implements FilterOperationsInterface
     /**
      * @inheritdoc
      */
-    public function applyIsNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column)
+    public function applyIsNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column): void
     {
         $link->add($builder->expr()->isNull($this->getTableColumn($table, $column)));
     }
@@ -222,8 +222,12 @@ class FilterOperations implements FilterOperationsInterface
     /**
      * @inheritdoc
      */
-    public function applyIsNotNull(QueryBuilder $builder, CompositeExpression $link, string $table, string $column)
-    {
+    public function applyIsNotNull(
+        QueryBuilder $builder,
+        CompositeExpression $link,
+        string $table,
+        string $column
+    ): void {
         $link->add($builder->expr()->isNotNull($this->getTableColumn($table, $column)));
     }
 
@@ -248,7 +252,7 @@ class FilterOperations implements FilterOperationsInterface
         string $column,
         string $method,
         $params
-    ) {
+    ): void {
         // params could be in form of 1 value or array of values
 
         if (is_array($params) === true) {
@@ -275,7 +279,7 @@ class FilterOperations implements FilterOperationsInterface
      *
      * @return void
      */
-    protected function addInvalidQueryParameterError(ErrorCollection $errors, string $name)
+    protected function addInvalidQueryParameterError(ErrorCollection $errors, string $name): void
     {
         $errors->addQueryParameterError($name, $this->getInvalidParameterErrorMessage());
     }

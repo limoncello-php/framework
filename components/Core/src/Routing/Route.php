@@ -150,7 +150,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getRequestFactory()
+    public function getRequestFactory(): ?callable
     {
         if ($this->isUseGroupRequestFactory() === true) {
             return $this->getGroup()->getRequestFactory();
@@ -182,7 +182,7 @@ class Route implements RouteInterface
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): ?string
     {
         $result = $this->name !== null ? (string)$this->getGroup()->getName() . $this->name : null;
 

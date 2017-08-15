@@ -122,7 +122,7 @@ class DataCommand implements CommandInterface
      *
      * @return void
      */
-    protected function run(ContainerInterface $container, IoInterface $inOut)
+    protected function run(ContainerInterface $container, IoInterface $inOut): void
     {
         $arguments = $inOut->getArguments();
         $options   = $inOut->getOptions();

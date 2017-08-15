@@ -47,9 +47,7 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
     {
         $factory = new Factory($container);
 
-        $container[FactoryInterface::class] = function () use ($factory) {
-            return $factory;
-        };
+        $container[FactoryInterface::class] = $factory;
 
         $container[QueryParametersParserInterface::class] = function () use ($factory) {
             return $factory->getJsonApiFactory()->createQueryParametersParser();

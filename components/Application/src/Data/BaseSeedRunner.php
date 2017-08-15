@@ -71,7 +71,7 @@ abstract class BaseSeedRunner
      *
      * @return void
      */
-    public function run(ContainerInterface $container)
+    public function run(ContainerInterface $container): void
     {
         foreach ($this->getSeeds($container) as $seederClass) {
             $this->executeSeedInit($container, $seederClass);
@@ -124,7 +124,7 @@ abstract class BaseSeedRunner
      *
      * @return void
      */
-    protected function executeSeedInit(ContainerInterface $container, string $seedClass)
+    protected function executeSeedInit(ContainerInterface $container, string $seedClass): void
     {
         if ($this->seedInit !== null) {
             call_user_func($this->seedInit, $container, $seedClass);
@@ -136,7 +136,7 @@ abstract class BaseSeedRunner
      *
      * @return void
      */
-    private function createSeedsTable(AbstractSchemaManager $manager)
+    private function createSeedsTable(AbstractSchemaManager $manager): void
     {
         $table = new Table($this->getSeedsTable());
 
@@ -161,7 +161,7 @@ abstract class BaseSeedRunner
      *
      * @return array
      */
-    private function readSeeded($connection)
+    private function readSeeded(Connection $connection): array
     {
         $builder = $connection->createQueryBuilder();
         $seeded  = [];
@@ -189,7 +189,7 @@ abstract class BaseSeedRunner
      *
      * @return void
      */
-    private function saveSeed(Connection $connection, $class)
+    private function saveSeed(Connection $connection, string $class): void
     {
         $format = $connection->getSchemaManager()->getDatabasePlatform()->getDateTimeFormatString();
         $now    = (new DateTimeImmutable())->format($format);

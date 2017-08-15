@@ -54,7 +54,7 @@ class Target implements TargetInterface
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -64,7 +64,7 @@ class Target implements TargetInterface
      *
      * @return $this
      */
-    public function setName(string $name = null)
+    public function setName(?string $name)
     {
         $this->name = $name;
 

@@ -41,7 +41,7 @@ class PoliciesOrSetsDenyOverrides extends BasePolicyOrSetAlgorithm
         ContextInterface $context,
         array $optimizedTargets,
         array $encPoliciesOrSets,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         return static::evaluateDenyOverrides($context, $optimizedTargets, $encPoliciesOrSets, $logger);
     }

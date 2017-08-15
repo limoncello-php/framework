@@ -72,7 +72,7 @@ final class ProcedureBlock implements ProcedureBlockInterface
     /**
      * @inheritdoc
      */
-    public function getStartCallable()
+    public function getStartCallable(): ?callable
     {
         return $this->startCallable;
     }
@@ -88,7 +88,7 @@ final class ProcedureBlock implements ProcedureBlockInterface
     /**
      * @inheritdoc
      */
-    public function getEndCallable()
+    public function getEndCallable(): ?callable
     {
         return $this->endCallable;
     }

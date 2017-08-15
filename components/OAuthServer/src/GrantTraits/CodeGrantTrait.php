@@ -57,7 +57,7 @@ trait CodeGrantTrait
      *
      * @return string|null
      */
-    protected function codeGetClientId(array $parameters)
+    protected function codeGetClientId(array $parameters): ?string
     {
         return $this->codeReadStringValue($parameters, 'client_id');
     }
@@ -67,7 +67,7 @@ trait CodeGrantTrait
      *
      * @return string|null
      */
-    protected function codeGetRedirectUri(array $parameters)
+    protected function codeGetRedirectUri(array $parameters): ?string
     {
         return $this->codeReadStringValue($parameters, 'redirect_uri');
     }
@@ -77,7 +77,7 @@ trait CodeGrantTrait
      *
      * @return string[]|null
      */
-    protected function codeGetScope(array $parameters)
+    protected function codeGetScope(array $parameters): ?array
     {
         $scope = $this->codeReadStringValue($parameters, 'scope');
 
@@ -89,7 +89,7 @@ trait CodeGrantTrait
      *
      * @return string|null
      */
-    protected function codeGetState(array $parameters)
+    protected function codeGetState(array $parameters): ?string
     {
         return $this->codeReadStringValue($parameters, 'state');
     }
@@ -99,7 +99,7 @@ trait CodeGrantTrait
      *
      * @return string|null
      */
-    protected function codeGetCode(array $parameters)
+    protected function codeGetCode(array $parameters): ?string
     {
         return $this->codeReadStringValue($parameters, 'code');
     }
@@ -209,7 +209,7 @@ trait CodeGrantTrait
      *
      * @return null|string
      */
-    private function codeReadStringValue(array $parameters, string $name)
+    private function codeReadStringValue(array $parameters, string $name): ?string
     {
         return array_key_exists($name, $parameters) === true && is_string($value = $parameters[$name]) === true ?
             $value : null;

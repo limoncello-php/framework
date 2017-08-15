@@ -164,7 +164,7 @@ class Application extends \Limoncello\Core\Application\Application
     /**
      * @inheritdoc
      */
-    protected function setUpExceptionHandler(SapiInterface $sapi, PsrContainerInterface $container)
+    protected function setUpExceptionHandler(SapiInterface $sapi, PsrContainerInterface $container): void
     {
         error_reporting(E_ALL);
 
@@ -253,7 +253,7 @@ class Application extends \Limoncello\Core\Application\Application
      *
      * @return array|null
      */
-    protected function getLastError()
+    protected function getLastError(): ?array
     {
         return error_get_last();
     }

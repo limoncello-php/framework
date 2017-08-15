@@ -1,10 +1,9 @@
 language: php
 php:
-- 7.0
 - 7.1
 matrix:
   include:
-    - php: 7.0
+    - php: 7.1
       script:
       - phpdbg -qrr ./vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
       after_script:

@@ -73,7 +73,7 @@ abstract class Application implements ApplicationInterface
      *
      * @return void
      */
-    abstract protected function setUpExceptionHandler(SapiInterface $sapi, PsrContainerInterface $container);
+    abstract protected function setUpExceptionHandler(SapiInterface $sapi, PsrContainerInterface $container): void;
 
     /**
      * @inheritdoc
@@ -206,7 +206,7 @@ abstract class Application implements ApplicationInterface
     /**
      * @return RouterInterface|null
      */
-    protected function getRouter()
+    protected function getRouter(): ?RouterInterface
     {
         return $this->router;
     }

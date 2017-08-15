@@ -43,7 +43,7 @@ trait BasicClientAuthenticationTrait
         ServerRequestInterface $request,
         array $parameters,
         $realm = 'OAuth'
-    ) {
+    ): ?ClientInterface {
         // A client may use Basic authentication.
         //
         // Or

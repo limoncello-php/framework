@@ -61,9 +61,11 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     /**
      * @inheritdoc
      */
-    public function forOriginalUri(UriInterface $uri)
+    public function forOriginalUri(UriInterface $uri): EncoderInterface
     {
         $this->originalUri = $uri;
+        
+        return $this;
     }
 
     /**
@@ -130,7 +132,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
      *
      * @return void
      */
-    private function addPagingLinksIfNeeded(PaginatedDataInterface $data)
+    private function addPagingLinksIfNeeded(PaginatedDataInterface $data): void
     {
         if ($data->isCollection() === true &&
             (0 < $data->getOffset() || $data->hasMoreItems() === true) &&

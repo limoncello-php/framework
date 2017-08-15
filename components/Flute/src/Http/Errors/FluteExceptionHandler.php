@@ -78,9 +78,11 @@ class FluteExceptionHandler implements ExceptionHandlerInterface
      * @param SapiInterface       $sapi
      * @param ContainerInterface  $container
      *
+     * @return void
+     *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function handle($error, SapiInterface $sapi, ContainerInterface $container)
+    private function handle($error, SapiInterface $sapi, ContainerInterface $container): void
     {
         $message = 'Internal Server Error';
 
@@ -125,7 +127,7 @@ class FluteExceptionHandler implements ExceptionHandlerInterface
      *
      * @return void
      */
-    private function logError($error, ContainerInterface $container, $message)
+    private function logError($error, ContainerInterface $container, string $message): void
     {
         if (in_array(get_class($error), static::$ignoredErrorClasses) === false &&
             $container->has(LoggerInterface::class) === true

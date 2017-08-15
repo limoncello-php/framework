@@ -29,7 +29,7 @@ interface AuthorizationExceptionInterface extends LimoncelloExceptionInterface
     /**
      * @return string|null
      */
-    public function getResourceType();
+    public function getResourceType(): ?string;
 
     /**
      * @return string|int|null

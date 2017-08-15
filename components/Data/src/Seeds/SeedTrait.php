@@ -162,7 +162,7 @@ trait SeedTrait
      *
      * @return string|null
      */
-    protected function seedRowData(string $tableName, array $data)
+    protected function seedRowData(string $tableName, array $data): ?string
     {
         return $this->insertRow($tableName, $this->getConnection(), $data);
     }
@@ -173,7 +173,7 @@ trait SeedTrait
      *
      * @return string|null
      */
-    protected function seedModelData(string $modelClass, array $data)
+    protected function seedModelData(string $modelClass, array $data): ?string
     {
         return $this->seedRowData($this->getModelSchemes()->getTable($modelClass), $data);
     }
@@ -193,7 +193,7 @@ trait SeedTrait
      *
      * @return string|null
      */
-    private function insertRow($tableName, Connection $connection, array $data)
+    private function insertRow($tableName, Connection $connection, array $data): ?string
     {
         $quotedFields = [];
         foreach ($data as $column => $value) {

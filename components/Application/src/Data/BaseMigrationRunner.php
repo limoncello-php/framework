@@ -55,7 +55,7 @@ abstract class BaseMigrationRunner
      *
      * @return void
      */
-    public function migrate(ContainerInterface $container)
+    public function migrate(ContainerInterface $container): void
     {
         foreach ($this->getMigrations($container) as $class) {
             /** @var MigrationInterface $migration */
@@ -69,7 +69,7 @@ abstract class BaseMigrationRunner
      *
      * @return void
      */
-    public function rollback(ContainerInterface $container)
+    public function rollback(ContainerInterface $container): void
     {
         foreach ($this->getRollbacks($container) as $class) {
             /** @var MigrationInterface $migration */
@@ -144,7 +144,7 @@ abstract class BaseMigrationRunner
      *
      * @return void
      */
-    private function createMigrationsTable(AbstractSchemaManager $manager)
+    private function createMigrationsTable(AbstractSchemaManager $manager): void
     {
         $table = new Table(static::MIGRATIONS_TABLE);
 
@@ -197,7 +197,7 @@ abstract class BaseMigrationRunner
      *
      * @return void
      */
-    private function saveMigration(Connection $connection, string $class)
+    private function saveMigration(Connection $connection, string $class): void
     {
         $format = $connection->getSchemaManager()->getDatabasePlatform()->getDateTimeFormatString();
         $now    = (new DateTimeImmutable())->format($format);
@@ -213,7 +213,7 @@ abstract class BaseMigrationRunner
      *
      * @return void
      */
-    private function removeMigration(Connection $connection, int $index)
+    private function removeMigration(Connection $connection, int $index): void
     {
         $connection->delete(static::MIGRATIONS_TABLE, [static::MIGRATIONS_COLUMN_ID => $index]);
     }

@@ -118,7 +118,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function parentGroup()
+    public function parentGroup(): ?GroupInterface
     {
         return $this->parent;
     }
@@ -139,7 +139,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -167,7 +167,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function getRequestFactory()
+    public function getRequestFactory(): ?callable
     {
         if ($this->isRequestFactorySet() === true) {
             return $this->requestFactory;
@@ -380,7 +380,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @return null|string
      */
-    private function getParentUriPrefix()
+    private function getParentUriPrefix(): ?string
     {
         $parent = $this->parentGroup();
         $result = $parent === null ? null : $parent->getUriPrefix();

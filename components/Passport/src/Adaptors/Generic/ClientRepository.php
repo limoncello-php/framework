@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 
 /**
@@ -60,7 +61,7 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
     /**
      * @inheritdoc
      */
-    public function read(string $identifier)
+    public function read(string $identifier): ?ClientInterface
     {
         /** @var Client|null $client */
         $client = parent::read($identifier);
@@ -85,7 +86,7 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
      *
      * @return void
      */
-    private function addScopeAndRedirectUris(Client $client)
+    private function addScopeAndRedirectUris(Client $client): void
     {
         $client->setScopeIdentifiers($this->readScopeIdentifiers($client->getIdentifier()));
         $client->setRedirectUriStrings($this->readRedirectUriStrings($client->getIdentifier()));

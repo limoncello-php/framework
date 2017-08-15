@@ -37,9 +37,9 @@ trait HasMiddlewareTrait
     /**
      * @param callable[] $middleware
      *
-     * @return $this
+     * @return self
      */
-    public function setMiddleware(array $middleware)
+    public function setMiddleware(array $middleware): self
     {
         foreach ($middleware as $item) {
             $isValid = $this->checkPublicStaticCallable($item, [

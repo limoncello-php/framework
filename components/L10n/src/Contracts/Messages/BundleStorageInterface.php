@@ -48,7 +48,7 @@ interface BundleStorageInterface
      *
      * @return array|null
      */
-    public function get(string $locale, string $namespace, string $key);
+    public function get(string $locale, string $namespace, string $key): ?array;
 
     /**
      * @param string $locale

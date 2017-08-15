@@ -41,7 +41,7 @@ class PoliciesOrSetsPermitOverrides extends BasePolicyOrSetAlgorithm
         ContextInterface $context,
         array $optimizedTargets,
         array $encPoliciesOrSets,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         return static::evaluatePermitOverrides($context, $optimizedTargets, $encPoliciesOrSets, $logger);
     }

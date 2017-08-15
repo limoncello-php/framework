@@ -65,7 +65,7 @@ trait AuthorizationRulesTrait
      *
      * @return string|null
      */
-    protected static function reqGetResourceType(ContextInterface $context)
+    protected static function reqGetResourceType(ContextInterface $context): ?string
     {
         assert(static::reqHasResourceType($context));
 

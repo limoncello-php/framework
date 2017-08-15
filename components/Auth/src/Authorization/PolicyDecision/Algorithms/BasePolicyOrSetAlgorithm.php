@@ -48,7 +48,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
     public static function callPolicyAlgorithm(
         ContextInterface $context,
         array $policiesAndSetsData,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         return static::callAlgorithm(
             static::getCallable($policiesAndSetsData),
@@ -109,7 +109,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
         ContextInterface $context,
         int $match,
         array $encodedPolicy,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         assert(Encoder::isPolicy($encodedPolicy));
         assert($match !== TargetMatchEnum::NO_TARGET);
@@ -177,8 +177,8 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
         ContextInterface $context,
         int $match,
         array $encodedPolicySet,
-        LoggerInterface $logger = null
-    ) {
+        ?LoggerInterface $logger
+    ): array {
         assert(Encoder::isPolicySet($encodedPolicySet));
 
         /** @see http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html #7.13 (table 6) */
@@ -241,7 +241,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
         ContextInterface $context,
         int $match,
         array $encodedItem,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         $isSet = Encoder::isPolicySet($encodedItem);
 
@@ -258,7 +258,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private static function correctEvaluationOnIntermediateTarget(int $evaluation, LoggerInterface $logger = null): int
+    private static function correctEvaluationOnIntermediateTarget(int $evaluation, ?LoggerInterface $logger): int
     {
         /** @see http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html #7.14 (table 7) */
 
@@ -321,7 +321,7 @@ abstract class BasePolicyOrSetAlgorithm extends BaseAlgorithm implements PolicyC
      *
      * @return callable
      */
-    private static function getCallable(array $policiesAndSetsData)
+    private static function getCallable(array $policiesAndSetsData): callable
     {
         return $policiesAndSetsData[self::INDEX_CALLABLE];
     }

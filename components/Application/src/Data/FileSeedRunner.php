@@ -52,7 +52,7 @@ class FileSeedRunner extends BaseSeedRunner
     /**
      * @inheritdoc
      */
-    public function run(ContainerInterface $container)
+    public function run(ContainerInterface $container): void
     {
         // read & remember seed classes...
         assert($container->has(FileSystemInterface::class) === true);

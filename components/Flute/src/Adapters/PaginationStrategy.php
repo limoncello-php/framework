@@ -59,7 +59,7 @@ class PaginationStrategy implements PaginationStrategyInterface
     /**
      * @inheritdoc
      */
-    public function parseParameters(array $parameters = null): array
+    public function parseParameters(?array $parameters): array
     {
         if ($parameters === null) {
             return [0, $this->defaultPageLimit + 1];

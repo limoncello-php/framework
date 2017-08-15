@@ -132,7 +132,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         ContextInterface $context,
         array $optimizedTargets,
         array $encodedItems,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         foreach (static::evaluateTargets($context, $optimizedTargets, $logger) as $match => $itemId) {
             $encodedItem      = $encodedItems[$itemId];
@@ -161,7 +161,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         ContextInterface $context,
         array $optimizedTargets,
         array $encodedItems,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         foreach (static::evaluateTargets($context, $optimizedTargets, $logger) as $match => $itemId) {
             $encodedItem      = $encodedItems[$itemId];
@@ -190,7 +190,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         ContextInterface $context,
         array $optimizedTargets,
         array $encodedItems,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         foreach (static::evaluateTargets($context, $optimizedTargets, $logger) as $match => $itemId) {
             $encodedItem      = $encodedItems[$itemId];
@@ -223,7 +223,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         ContextInterface $context,
         array $optimizedTargets,
         array $encodedItems,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         $foundDeny          = false;
         $foundPermit        = false;
@@ -301,7 +301,7 @@ abstract class BaseAlgorithm implements BaseAlgorithmInterface
         ContextInterface $context,
         array $optimizedTargets,
         array $encodedItems,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger
     ): array {
         $foundDeny          = false;
         $foundPermit        = false;

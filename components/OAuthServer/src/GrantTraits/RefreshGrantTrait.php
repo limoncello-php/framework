@@ -56,7 +56,7 @@ trait RefreshGrantTrait
      *
      * @return string|null
      */
-    protected function refreshGetValue(array $parameters)
+    protected function refreshGetValue(array $parameters): ?string
     {
         return $this->refreshReadStringValue($parameters, 'refresh_token');
     }
@@ -66,7 +66,7 @@ trait RefreshGrantTrait
      *
      * @return string[]|null
      */
-    protected function refreshGetScope(array $parameters)
+    protected function refreshGetScope(array $parameters): ?array
     {
         $scope = $this->refreshReadStringValue($parameters, 'scope');
 
@@ -121,7 +121,7 @@ trait RefreshGrantTrait
      *
      * @return null|string
      */
-    private function refreshReadStringValue(array $parameters, string $name)
+    private function refreshReadStringValue(array $parameters, string $name): ?string
     {
         return array_key_exists($name, $parameters) === true && is_string($value = $parameters[$name]) === true ?
             $value : null;

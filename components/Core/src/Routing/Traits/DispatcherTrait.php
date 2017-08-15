@@ -30,7 +30,7 @@ trait DispatcherTrait
      *
      * @return bool
      */
-    protected function areCodeValid()
+    protected function areCodeValid(): bool
     {
         return
             Dispatcher::NOT_FOUND === DispatcherInterface::ROUTE_NOT_FOUND &&

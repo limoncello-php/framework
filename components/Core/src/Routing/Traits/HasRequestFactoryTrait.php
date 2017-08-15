@@ -37,9 +37,9 @@ trait HasRequestFactoryTrait
     /**
      * @param callable|null $requestFactory
      *
-     * @return $this
+     * @return self
      */
-    public function setRequestFactory(callable $requestFactory = null)
+    public function setRequestFactory(callable $requestFactory = null): self
     {
         $parameters = [SapiInterface::class, ContainerInterface::class];
         if ($requestFactory !== null &&
@@ -65,7 +65,7 @@ trait HasRequestFactoryTrait
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    protected function getDefaultRequestFactory()
+    protected function getDefaultRequestFactory(): callable
     {
         return Application::getDefaultRequestFactory();
     }

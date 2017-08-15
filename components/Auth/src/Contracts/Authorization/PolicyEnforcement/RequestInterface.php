@@ -26,7 +26,7 @@ interface RequestInterface
      *
      * @return bool
      */
-    public function has($key);
+    public function has($key): bool;
 
     /**
      * @param string|int $key

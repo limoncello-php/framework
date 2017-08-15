@@ -40,13 +40,15 @@ class PassportContainerConfigurator extends BasePassportContainerConfigurator im
     {
         static::baseConfigureContainer($container);
 
-        $container[PassportServerIntegrationInterface::class] = function (PsrContainerInterface $container) {
-            assert($container !== null);
-
+        $container[PassportServerIntegrationInterface::class] = function (
+            PsrContainerInterface $container
+        ): PassportServerIntegrationInterface {
             return new PassportServerIntegration($container);
         };
 
-        $container[TokenRepositoryInterface::class] = function (PsrContainerInterface $container) {
+        $container[TokenRepositoryInterface::class] = function (
+            PsrContainerInterface $container
+        ): TokenRepositoryInterface {
             $connection = $container->get(Connection::class);
             $scheme     = $container->get(DatabaseSchemeInterface::class);
 

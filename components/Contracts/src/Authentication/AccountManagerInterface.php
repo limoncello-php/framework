@@ -24,7 +24,7 @@ interface AccountManagerInterface
     /**
      * @return AccountInterface|null
      */
-    public function getAccount();
+    public function getAccount(): ?AccountInterface;
 
     /**
      * @param AccountInterface $account

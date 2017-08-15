@@ -37,16 +37,15 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
-        $container[ModelSchemeInfoInterface::class] = function (PsrContainerInterface $container) {
-            $settings = $container->get(SettingsProviderInterface::class)->get(DataSettings::class);
-            $data     = $settings[DataSettings::KEY_MODELS_SCHEME_INFO];
-            $schemes  = new ModelSchemeInfo();
-            $schemes->setData($data);
+        $container[ModelSchemeInfoInterface::class] =
+            function (PsrContainerInterface $container): ModelSchemeInfoInterface {
+                $settings = $container->get(SettingsProviderInterface::class)->get(DataSettings::class);
+                $data     = $settings[DataSettings::KEY_MODELS_SCHEME_INFO];
+    
+                return (new ModelSchemeInfo())->setData($data);
+            };
 
-            return $schemes;
-        };
-
-        $container[Connection::class] = function (PsrContainerInterface $container) {
+        $container[Connection::class] = function (PsrContainerInterface $container): Connection {
             $settings = $container->get(SettingsProviderInterface::class)->get(DoctrineSettings::class);
             $params   = array_filter([
                 'driver'   => $settings[DoctrineSettings::KEY_DRIVER] ?? null,

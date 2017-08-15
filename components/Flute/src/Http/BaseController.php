@@ -383,8 +383,10 @@ abstract class BaseController implements ControllerInterface
      *
      * @return JsonApiValidatorInterface
      */
-    protected static function createJsonApiValidator(ContainerInterface $container, string $rulesSetClass)
-    {
+    protected static function createJsonApiValidator(
+        ContainerInterface $container,
+        string $rulesSetClass
+    ): JsonApiValidatorInterface {
         /** @var JsonApiValidatorFactoryInterface $validatorFactory */
         $validatorFactory = $container->get(JsonApiValidatorFactoryInterface::class);
         $validator        = $validatorFactory->createValidator($rulesSetClass);

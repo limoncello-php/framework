@@ -34,9 +34,9 @@ trait HasConfiguratorsTrait
     /**
      * @param callable[] $configurators
      *
-     * @return $this
+     * @return self
      */
-    public function setConfigurators(array $configurators)
+    public function setConfigurators(array $configurators): self
     {
         foreach ($configurators as $configurator) {
             $isValid = $this->checkPublicStaticCallable($configurator, [LimoncelloContainerInterface::class]);

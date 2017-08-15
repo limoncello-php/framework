@@ -65,7 +65,7 @@ interface RouterInterface
      *
      * @return string|null
      */
-    public function getUriPath(string $routeName);
+    public function getUriPath(string $routeName): ?string;
 
     /**
      * Compose URL for named route.

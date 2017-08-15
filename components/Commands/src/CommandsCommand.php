@@ -122,7 +122,7 @@ class CommandsCommand extends BaseCommand
      *
      * @return void
      */
-    private function executeConnect(ContainerInterface $container, IoInterface $inOut)
+    private function executeConnect(ContainerInterface $container, IoInterface $inOut): void
     {
         assert($container->has(CommandStorageInterface::class));
         /** @var CommandStorageInterface $commandStorage */
@@ -168,7 +168,7 @@ EOT;
      *
      * @return void
      */
-    private function executeCreate(ContainerInterface $container, IoInterface $inOut)
+    private function executeCreate(ContainerInterface $container, IoInterface $inOut): void
     {
         $argClass = static::ARG_CLASS;
         if ($inOut->hasArgument($argClass) === false) {

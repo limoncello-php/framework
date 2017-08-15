@@ -41,9 +41,9 @@ class FilterParameterCollection implements IteratorAggregate, ArrayAccess, Seria
     private $isJoinWithAND = true;
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isWithAnd()
+    public function isWithAnd(): bool
     {
         return $this->isJoinWithAND;
     }

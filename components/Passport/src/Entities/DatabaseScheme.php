@@ -508,7 +508,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /**
      * @inheritdoc
      */
-    public function getUsersView()
+    public function getUsersView(): ?string
     {
         return static::VIEW_USERS;
     }
@@ -516,7 +516,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /**
      * @inheritdoc
      */
-    public function getUsersTable()
+    public function getUsersTable(): ?string
     {
         return $this->usersTableName;
     }
@@ -524,7 +524,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /**
      * @inheritdoc
      */
-    public function getUsersIdentityColumn()
+    public function getUsersIdentityColumn(): ?string
     {
         return $this->usersIdColumn;
     }
@@ -532,7 +532,7 @@ class DatabaseScheme implements DatabaseSchemeInterface
     /**
      * @inheritdoc
      */
-    public function getPassportView()
+    public function getPassportView(): ?string
     {
         return static::VIEW_PASSPORT;
     }

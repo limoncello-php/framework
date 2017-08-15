@@ -189,7 +189,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->nameField;
     }
@@ -207,7 +207,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->descriptionField;
     }
@@ -225,7 +225,7 @@ abstract class Client extends DatabaseItem implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getCredentials()
+    public function getCredentials(): ?string
     {
         return $this->credentialsField;
     }

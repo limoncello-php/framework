@@ -24,7 +24,7 @@ interface ErrorInterface
     /**
      * @return string|null
      */
-    public function getParameterName();
+    public function getParameterName(): ?string;
 
     /**
      * @return mixed
@@ -39,5 +39,5 @@ interface ErrorInterface
     /**
      * @return array|null
      */
-    public function getMessageContext();
+    public function getMessageContext(): ?array;
 }

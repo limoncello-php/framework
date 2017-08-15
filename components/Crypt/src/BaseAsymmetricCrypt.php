@@ -82,7 +82,7 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
     /**
      * @return int|null
      */
-    protected function getKeyBytes()
+    protected function getKeyBytes(): ?int
     {
         if ($this->keyBytes === null && $this->getKey() !== null) {
             $this->clearErrors();
@@ -97,7 +97,7 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
     /**
      * @return int|null
      */
-    protected function getEncryptChunkSize()
+    protected function getEncryptChunkSize(): ?int
     {
         $keyBytes = $this->getKeyBytes();
 
@@ -110,7 +110,7 @@ abstract class BaseAsymmetricCrypt extends BaseCrypt
     /**
      * @return int|null
      */
-    protected function getDecryptChunkSize()
+    protected function getDecryptChunkSize(): ?int
     {
         $keyBytes = $this->getKeyBytes();
         $result   = $keyBytes === null ? null : $keyBytes;

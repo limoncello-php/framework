@@ -39,10 +39,10 @@ interface TokenInterface
     /**
      * @return string|null
      */
-    public function getValue();
+    public function getValue(): ?string;
 
     /**
      * @return string|null
      */
-    public function getRefreshValue();
+    public function getRefreshValue(): ?string;
 }

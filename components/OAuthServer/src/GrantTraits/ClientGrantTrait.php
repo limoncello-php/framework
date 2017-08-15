@@ -57,7 +57,7 @@ trait ClientGrantTrait
      *
      * @return string[]|null
      */
-    protected function clientGetScope(array $parameters)
+    protected function clientGetScope(array $parameters): ?array
     {
         $scope = $this->clientReadStringValue($parameters, 'scope');
 
@@ -99,7 +99,7 @@ trait ClientGrantTrait
      *
      * @return null|string
      */
-    private function clientReadStringValue(array $parameters, string $name)
+    private function clientReadStringValue(array $parameters, string $name): ?string
     {
         return array_key_exists($name, $parameters) === true && is_string($value = $parameters[$name]) === true ?
             $value : null;
