@@ -37,4 +37,35 @@ abstract class Application
 
         ], PolicyAlgorithm::denyOverrides()))->setName('Application');
     }
+
+    /**
+     * @return PolicySetInterface
+     */
+    public static function getApplicationPolicyThatCouldBeOptimizedAsSwitch()
+    {
+        $postPolicies     = Posts::getPolicies();
+        $commentsPolicies = Comments::getPolicies();
+
+        // all post rules have targets that could be combined and replaced with switch
+        // comments rules cannot be replaced with switch
+
+        // both post and comments polices have targets that could be combined and replaced with switch
+        assert(
+            count($allOfs = $postPolicies->getTarget()->getAnyOf()->getAllOfs()) === 1 &&
+            count($allOfs[0]->getPairs()) === 1
+        );
+        assert(
+            count($allOfs = $commentsPolicies->getTarget()->getAnyOf()->getAllOfs()) === 1 &&
+            count($allOfs[0]->getPairs()) === 1
+        );
+
+        // thus we can check how optimization algorithm works with targets for Rules and Policies.
+
+        return (new PolicySet([
+
+            $postPolicies,
+            $commentsPolicies,
+
+        ], PolicyAlgorithm::firstApplicable()))->setName('Application');
+    }
 }

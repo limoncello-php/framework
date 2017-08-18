@@ -36,16 +36,48 @@ trait DefaultTargetSerializeTrait
      * @return Generator
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public static function evaluateTargets(
         ContextInterface $context,
         array $optimizedTargets,
         ?LoggerInterface $logger
     ): Generator {
-        foreach ($optimizedTargets as $ruleId => $anyOf) {
-            $match = static::evaluateTarget($context, $anyOf, $logger);
+        list($isOptimizedForSwitch, $data) = $optimizedTargets;
+        if ($isOptimizedForSwitch === true) {
+            assert(count($data) === 2);
+            list($contextKey, $valueRuleIdMap) = $data;
+            if ($context->has($contextKey) === true &&
+                array_key_exists($targetValue = $context->get($contextKey), $valueRuleIdMap) === true
+            ) {
+                $matchFound    = true;
+                $matchedRuleId = $valueRuleIdMap[$targetValue];
+            } else {
+                $matchFound = false;
+            }
 
-            yield $match => $ruleId;
+            // when we are here we already know if the targets has match.
+            // if match found we firstly yield matched rule ID and then the rest
+            // otherwise (no match) we just yield 'no match' for every rule ID.
+            if ($matchFound === true) {
+                assert(isset($matchedRuleId));
+                yield TargetMatchEnum::MATCH => $matchedRuleId;
+                foreach ($valueRuleIdMap as $value => $ruleId) {
+                    if ($ruleId !== $matchedRuleId) {
+                        yield TargetMatchEnum::NOT_MATCH => $ruleId;
+                    }
+                }
+            } else {
+                foreach ($valueRuleIdMap as $value => $ruleId) {
+                    yield TargetMatchEnum::NOT_MATCH => $ruleId;
+                }
+            }
+        } else {
+            foreach ($data as $ruleId => $anyOf) {
+                $match = static::evaluateTarget($context, $anyOf, $logger);
+
+                yield $match => $ruleId;
+            }
         }
     }
 
@@ -105,18 +137,26 @@ trait DefaultTargetSerializeTrait
     }
 
     /**
-     * @param array $targets
+     * @param TargetInterface[] $targets
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function optimizeTargets(array $targets): array
     {
-        $result = [];
-        foreach ($targets as $ruleId => $target) {
-            $result[$ruleId] = $this->encodeTarget($target);
+        if (($data = $this->tryToEncodeTargetsAsSwitch($targets)) !== null) {
+            $isOptimizedForSwitch = true;
+            assert(count($data) === 2); // context key and value => rule ID pairs.
+        } else {
+            $isOptimizedForSwitch = false;
+            $data = [];
+            foreach ($targets as $ruleId => $target) {
+                $data[$ruleId] = $this->encodeTarget($target);
+            }
         }
 
-        return $result;
+        return [$isOptimizedForSwitch, $data];
     }
 
     /**
@@ -141,5 +181,58 @@ trait DefaultTargetSerializeTrait
             Encoder::TARGET_NAME    => $name,
             Encoder::TARGET_ANY_OFS => $anyOfs,
         ];
+    }
+
+    /**
+     * @param TargetInterface[] $targets
+     *
+     * @return array|null
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function tryToEncodeTargetsAsSwitch(array $targets): ?array
+    {
+        $result = count($targets) > 1;
+
+        $contextKey  = null;
+        $valueRuleIdMap = [];
+
+        foreach ($targets as $ruleId => $nullableTarget) {
+            if ($result === true &&
+                $nullableTarget !== null &&
+                count($allOfs = $nullableTarget->getAnyOf()->getAllOfs()) === 1 &&
+                count($pairs = reset($allOfs)->getPairs()) === 1
+            ) {
+                $value = reset($pairs);
+                $key   = key($pairs);
+                assert($key !== null);
+                if ($contextKey === null) {
+                    $contextKey = $key;
+                }
+                if ($key !== $contextKey) {
+                    $result = false;
+                    break;
+                }
+                $valueRuleIdMap[$value] = $ruleId;
+            } else {
+                $result = false;
+                break;
+            }
+        }
+
+        $result = $result === true && count($valueRuleIdMap) === count($targets);
+
+        // if result === true we know the following
+        // - we have more than one target
+        // - every target is a really one key, value pair
+        // - in every such pair key is identical and every value is unique
+        //
+        // if so
+        // $contextKey - will have that identical key and $valueRuleIdMap will be an array of [unique_value => true]
+        // so later we can check if target matched by simply taking value from context by $contextKey and
+        // checking that value in $valueRuleIdMap (key existence).
+
+        return $result === true ? [$contextKey, $valueRuleIdMap] : null;
     }
 }

@@ -77,7 +77,7 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
         $resourceIdentity = null,
         array $extraParams = []
     ): void {
-        if ($this->isAllowed($action, $resourceType, $resourceIdentity) !== true) {
+        if ($this->isAllowed($action, $resourceType, $resourceIdentity, $extraParams) !== true) {
             throw new AuthorizationException($action, $resourceType, $resourceIdentity, $extraParams);
         }
     }

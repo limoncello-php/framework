@@ -77,7 +77,10 @@ class PolicyDecisionTest extends TestCase
 
         $this->assertTrue(is_callable($callable));
         $this->assertTrue(is_array($callable));
-        $this->assertCount(4, $targets);
+        $this->assertCount(2, $targets);
+        list($isSwitch, $targetsData) = $targets;
+        $this->assertFalse($isSwitch);
+        $this->assertCount(4, $targetsData);
         $this->assertCount(4, $rules);
 
         return [$callable, $targets, $rules];

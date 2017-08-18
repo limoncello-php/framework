@@ -100,14 +100,6 @@ class PolicyEnforcementTest extends TestCase
     }
 
     /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
      * Test authorization of operation without any additional parameters (e.g. 'send message').
      */
     public function testAuthorizeOperationFail()
@@ -470,6 +462,14 @@ class PolicyEnforcementTest extends TestCase
         parent::tearDown();
 
         fclose($this->getLogStream());
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->logger;
     }
 
     /**
