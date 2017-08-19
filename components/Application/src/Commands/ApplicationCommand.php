@@ -230,8 +230,16 @@ class ApplicationCommand implements CommandInterface
         string $className,
         string $methodName
     ): string {
-        $now     = date(DATE_RFC2822);
-        $data    = var_export($value, true);
+        $now  = date(DATE_RFC2822);
+        $data = var_export($value, true);
+
+        assert(
+            $data !== null,
+            'It seems the data are not exportable. It is likely to be caused by class instances ' .
+                'that do not implement ` __set_state` magic method required by `var_export`. ' .
+                'See http://php.net/manual/en/language.oop5.magic.php#object.set-state for more details.'
+        );
+
         $content = <<<EOT
 <?php namespace $namespace;
 
