@@ -43,4 +43,15 @@ interface ApplicationSettingsInterface extends SettingsInterface
 
     /** Settings key */
     const KEY_IS_DEBUG = self::KEY_COMMANDS_FILE_MASK + 1;
+    /** Settings key */
+    const KEY_ROUTES_PATH = self::KEY_IS_DEBUG + 1;
+
+    /** Settings key */
+    const KEY_CONTAINER_CONFIGURATORS_PATH = self::KEY_ROUTES_PATH + 1;
+
+    /** Settings key */
+    const KEY_EXCEPTION_DUMPER = self::KEY_CONTAINER_CONFIGURATORS_PATH + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_EXCEPTION_DUMPER + 1;
 }

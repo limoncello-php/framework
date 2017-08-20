@@ -18,8 +18,8 @@
 
 use Exception;
 use Limoncello\Application\ExceptionHandlers\DefaultHandler;
-use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;

@@ -1,0 +1,57 @@
+### Settings
+
+Settings are used to configure your application or components that your application is using. By default the settings are located in `settings` folder.
+
+#### Settings Modification
+
+Apart from the very obvious case when you need to modify a settings file which is already located in the settings folder there is a question 'How to modify 3rd party settings?'. All you need to do is to create a class that extends the 3rd party settings class and modify values returned by `get` method. Depending on the specific implementation it could done via overriding specific methods or `get` method itself. The framework is smart enough to understand that when a parent settings class is requested the new class should be returned instead.
+
+For example, if we want to enable logging in a 3rd party component the settings could be changed as below
+
+```php
+class SomeService extends SomeServiceSettings
+{
+    public function get(): array
+    {
+        $settings = parent::get();
+
+        $settings[static::KEY_LOG_IS_ENABLED] = false;
+
+        return $settings;
+    }
+}
+```
+
+#### Reading Settings
+
+Settings could be read from any part of the application with the following code snippet
+
+```php
+    /** @var \Psr\Container\ContainerInterface $container */
+    $container = ...;
+
+    /** @var \Limoncello\Contracts\Settings\SettingsProviderInterface $provider */
+    $provider = $container->get(SettingsProviderInterface::class);
+    
+    /** @var array $settings */
+    // any class that extends SomeServiceSettings would work as well
+    $settings = $provider->get(SomeServiceSettings::class); 
+```
+
+#### Custom Settings
+
+Custom settings could be created with a class implementing `SettingsInterface` placed in `settings` folder. It would be automatically read and made available from `SettingsProviderInterface`.
+
+```php
+class CustomService implements SettingsInterface
+{
+    public function get(): array
+    {
+        return [
+            // key => value
+        ];
+    }
+}
+```
+
+The array from `get` method should return only exportable types such as numbers, strings, booleans, and arrays including nested arrays. Some classes such as `DateTime` are also supported. See [here](http://php.net/manual/en/language.oop5.magic.php#object.set-state) for how to make a class exportable.
