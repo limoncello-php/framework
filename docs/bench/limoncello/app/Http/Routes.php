@@ -24,7 +24,7 @@ class Routes implements RoutesConfiguratorInterface
     /**
      * @inheritdoc
      */
-    public static function configureRoutes(GroupInterface $routes)
+    public static function configureRoutes(GroupInterface $routes): void
     {
         $routes
             ->get('/', HomeController::INDEX_HANDLER, HomeController::PARAMETERS);

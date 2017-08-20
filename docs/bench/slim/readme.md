@@ -11,7 +11,7 @@ $ composer build
 Start the server with
 
 ```bash
-$ php -S 0.0.0.0:8080 -t public public/index.php
+$ php -d zend.assertions=-1 -S 0.0.0.0:8080 -t public public/index.php
 ```
 
 and run the test bench in separate console
@@ -25,10 +25,10 @@ Results do vary slightly and one of the best results below
 Running 5s test @ http://127.0.0.1:8080/
   10 threads and 400 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   164.20ms  135.40ms   1.80s    96.98%
-    Req/Sec    89.99     32.80   290.00     72.78%
-  4467 requests in 5.05s, 850.65KB read
-  Socket errors: connect 0, read 0, write 0, timeout 11
-Requests/sec:    885.37
-Transfer/sec:    168.60KB
+    Latency   152.22ms  110.39ms   1.80s    97.45%
+    Req/Sec    94.87     45.58   252.00     63.75%
+  4608 requests in 5.03s, 0.86MB read
+  Socket errors: connect 0, read 0, write 0, timeout 7
+Requests/sec:    916.51
+Transfer/sec:    174.53KB
 ```
