@@ -2,17 +2,17 @@
 
 Performance was tested for the following PHP frameworks (alphabetical order)
 
-- Limoncello 0.6.7
-- Lumen 5.4.0
+- Limoncello 0.7.2
+- Lumen 5.4.27
 - Slim 3.8.1
 
 ### Results
 
 |               | RPS (more is better) |    %   |
 | ------------- |----------------------| -------|
-| Limoncello    |        1143,68       | 156,4% |
-| Slim          |        885,37        | 121,1% |
-| Lumen         |        731,26        | 100,0% |
+| Limoncello    |        1178,49       | 171,1% |
+| Slim          |        916,51        | 133,1% |
+| Lumen         |        688,82        | 100,0% |
 
 RPS - Requests per Second (more is better)
 
@@ -38,7 +38,7 @@ All known optimizations were applied to all frameworks including
 
 ### Methodology
 
-Single threaded built-in into PHP server was used. PHP version 7.1.5 (with OPcache).
+Single threaded built-in into PHP server was used. PHP version 7.1.8 (with OPcache).
 
 After an application were deployed and started it was manually checked in browser that it works fine. The page was reloaded a few times so PHP had enough opportunities to compile and optimize execution of the application. After a few seconds later stress load was started
 

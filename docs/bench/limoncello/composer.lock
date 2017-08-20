@@ -4,25 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5e8bad2564cd5880efa9c83e4355b805",
+    "content-hash": "9a59ce1e8143df78ad71200964fb10e2",
     "packages": [
         {
             "name": "doctrine/annotations",
-            "version": "v1.4.0",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "54cacc9b81758b14e3ce750f205a393d52339e97"
+                "reference": "5beebb01b025c94e93686b7a0ed3edae81fe3e7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/54cacc9b81758b14e3ce750f205a393d52339e97",
-                "reference": "54cacc9b81758b14e3ce750f205a393d52339e97",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/5beebb01b025c94e93686b7a0ed3edae81fe3e7f",
+                "reference": "5beebb01b025c94e93686b7a0ed3edae81fe3e7f",
                 "shasum": ""
             },
             "require": {
                 "doctrine/lexer": "1.*",
-                "php": "^5.6 || ^7.0"
+                "php": "^7.1"
             },
             "require-dev": {
                 "doctrine/cache": "1.*",
@@ -31,7 +31,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.4.x-dev"
+                    "dev-master": "1.5.x-dev"
                 }
             },
             "autoload": {
@@ -72,37 +72,41 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2017-02-24T16:22:25+00:00"
+            "time": "2017-07-22T10:58:02+00:00"
         },
         {
             "name": "doctrine/cache",
-            "version": "v1.6.1",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/cache.git",
-                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3"
+                "reference": "53d9518ffeb019c51d542ff60cb578f076d3ff16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/b6f544a20f4807e81f7044d31e679ccbb1866dc3",
-                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/53d9518ffeb019c51d542ff60cb578f076d3ff16",
+                "reference": "53d9518ffeb019c51d542ff60cb578f076d3ff16",
                 "shasum": ""
             },
             "require": {
-                "php": "~5.5|~7.0"
+                "php": "~7.1"
             },
             "conflict": {
                 "doctrine/common": ">2.2,<2.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8|~5.0",
-                "predis/predis": "~1.0",
-                "satooshi/php-coveralls": "~0.6"
+                "alcaeus/mongo-php-adapter": "^1.1",
+                "mongodb/mongodb": "^1.1",
+                "phpunit/phpunit": "^5.7",
+                "predis/predis": "~1.0"
+            },
+            "suggest": {
+                "alcaeus/mongo-php-adapter": "Required to use legacy MongoDB driver"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.6.x-dev"
+                    "dev-master": "1.7.x-dev"
                 }
             },
             "autoload": {
@@ -142,24 +146,24 @@
                 "cache",
                 "caching"
             ],
-            "time": "2016-10-29T11:16:17+00:00"
+            "time": "2017-07-22T13:00:15+00:00"
         },
         {
             "name": "doctrine/collections",
-            "version": "v1.4.0",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/collections.git",
-                "reference": "1a4fb7e902202c33cce8c55989b945612943c2ba"
+                "reference": "a01ee38fcd999f34d9bfbcee59dbda5105449cbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/collections/zipball/1a4fb7e902202c33cce8c55989b945612943c2ba",
-                "reference": "1a4fb7e902202c33cce8c55989b945612943c2ba",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/a01ee38fcd999f34d9bfbcee59dbda5105449cbf",
+                "reference": "a01ee38fcd999f34d9bfbcee59dbda5105449cbf",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.6 || ^7.0"
+                "php": "^7.1"
             },
             "require-dev": {
                 "doctrine/coding-standard": "~0.1@dev",
@@ -209,20 +213,20 @@
                 "collections",
                 "iterator"
             ],
-            "time": "2017-01-03T10:49:41+00:00"
+            "time": "2017-07-22T10:37:32+00:00"
         },
         {
             "name": "doctrine/common",
-            "version": "v2.7.2",
+            "version": "v2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/common.git",
-                "reference": "930297026c8009a567ac051fd545bf6124150347"
+                "reference": "ed349f953d443963c590b008b37b864b8a3c4b21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/common/zipball/930297026c8009a567ac051fd545bf6124150347",
-                "reference": "930297026c8009a567ac051fd545bf6124150347",
+                "url": "https://api.github.com/repos/doctrine/common/zipball/ed349f953d443963c590b008b37b864b8a3c4b21",
+                "reference": "ed349f953d443963c590b008b37b864b8a3c4b21",
                 "shasum": ""
             },
             "require": {
@@ -231,15 +235,15 @@
                 "doctrine/collections": "1.*",
                 "doctrine/inflector": "1.*",
                 "doctrine/lexer": "1.*",
-                "php": "~5.6|~7.0"
+                "php": "~7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.4.6"
+                "phpunit/phpunit": "^5.7"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.7.x-dev"
+                    "dev-master": "2.8.x-dev"
                 }
             },
             "autoload": {
@@ -282,28 +286,30 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2017-01-13T14:02:13+00:00"
+            "time": "2017-07-22T09:01:43+00:00"
         },
         {
             "name": "doctrine/dbal",
-            "version": "v2.5.12",
+            "version": "v2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "7b9e911f9d8b30d43b96853dab26898c710d8f44"
+                "reference": "1a086f853425b1f5349775ce57e45a772d2d2ba5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/7b9e911f9d8b30d43b96853dab26898c710d8f44",
-                "reference": "7b9e911f9d8b30d43b96853dab26898c710d8f44",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/1a086f853425b1f5349775ce57e45a772d2d2ba5",
+                "reference": "1a086f853425b1f5349775ce57e45a772d2d2ba5",
                 "shasum": ""
             },
             "require": {
-                "doctrine/common": ">=2.4,<2.8-dev",
-                "php": ">=5.3.2"
+                "doctrine/common": "^2.7.1",
+                "ext-pdo": "*",
+                "php": "^7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.*",
+                "phpunit/phpunit": "^5.4.6",
+                "phpunit/phpunit-mock-objects": "!=3.2.4,!=3.2.5",
                 "symfony/console": "2.*||^3.0"
             },
             "suggest": {
@@ -315,7 +321,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5.x-dev"
+                    "dev-master": "2.6.x-dev"
                 }
             },
             "autoload": {
@@ -353,37 +359,37 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2017-02-08T12:53:47+00:00"
+            "time": "2017-07-28T10:40:18+00:00"
         },
         {
             "name": "doctrine/inflector",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/inflector.git",
-                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae"
+                "reference": "e11d84c6e018beedd929cff5220969a3c6d1d462"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/inflector/zipball/90b2128806bfde671b6952ab8bea493942c1fdae",
-                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae",
+                "url": "https://api.github.com/repos/doctrine/inflector/zipball/e11d84c6e018beedd929cff5220969a3c6d1d462",
+                "reference": "e11d84c6e018beedd929cff5220969a3c6d1d462",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2"
+                "php": "^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.*"
+                "phpunit/phpunit": "^6.2"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "1.2.x-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Doctrine\\Common\\Inflector\\": "lib/"
+                "psr-4": {
+                    "Doctrine\\Common\\Inflector\\": "lib/Doctrine/Common/Inflector"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -420,7 +426,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2015-11-06T14:35:42+00:00"
+            "time": "2017-07-22T12:18:28+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -478,16 +484,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.1.8",
+            "version": "2.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3"
+                "reference": "ffbbd2c06c64b08fb47974eed5dbce4ca2bb0eec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3",
-                "reference": "f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/ffbbd2c06c64b08fb47974eed5dbce4ca2bb0eec",
+                "reference": "ffbbd2c06c64b08fb47974eed5dbce4ca2bb0eec",
                 "shasum": ""
             },
             "require": {
@@ -535,43 +541,44 @@
                 "whoops",
                 "zf2"
             ],
-            "time": "2017-03-07T09:04:45+00:00"
+            "time": "2017-08-03T18:23:40+00:00"
         },
         {
             "name": "limoncello-php/application",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/application.git",
-                "reference": "3aa5b434e38108b32059b4fd65b75b8d6104c2fd"
+                "reference": "cce0a8e511b7e1acdb36ac34632f965141c1d74f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/application/zipball/3aa5b434e38108b32059b4fd65b75b8d6104c2fd",
-                "reference": "3aa5b434e38108b32059b4fd65b75b8d6104c2fd",
+                "url": "https://api.github.com/repos/limoncello-php-dist/application/zipball/cce0a8e511b7e1acdb36ac34632f965141c1d74f",
+                "reference": "cce0a8e511b7e1acdb36ac34632f965141c1d74f",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "^2.5.0",
                 "filp/whoops": "^2.1",
-                "limoncello-php/auth": "self.version",
-                "limoncello-php/core": "self.version",
+                "limoncello-php/auth": "^0.7.0",
+                "limoncello-php/contracts": "^0.7.0",
+                "limoncello-php/core": "^0.7.0",
+                "limoncello-php/l10n": "^0.7.0",
                 "monolog/monolog": "^1.22",
                 "neomerx/cors-psr7": "^1.0.0",
-                "php": ">=7.0.0"
+                "php": ">=7.1.0"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.6",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.8"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -597,39 +604,38 @@
                 "psr-7",
                 "psr7"
             ],
-            "time": "2017-05-12T05:15:40+00:00"
+            "time": "2017-08-18T15:39:03+00:00"
         },
         {
             "name": "limoncello-php/auth",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/auth.git",
-                "reference": "c68bfbb059a449f76fef56dbe8503e9baaf1bd86"
+                "reference": "c43333d2abe213188e9dadb787ff71f427f2b6dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/auth/zipball/c68bfbb059a449f76fef56dbe8503e9baaf1bd86",
-                "reference": "c68bfbb059a449f76fef56dbe8503e9baaf1bd86",
+                "url": "https://api.github.com/repos/limoncello-php-dist/auth/zipball/c43333d2abe213188e9dadb787ff71f427f2b6dd",
+                "reference": "c43333d2abe213188e9dadb787ff71f427f2b6dd",
                 "shasum": ""
             },
             "require": {
-                "limoncello-php/container": "self.version",
-                "php": ">=7.0.0",
+                "limoncello-php/container": "^0.7.0",
+                "php": ">=7.1.0",
                 "psr/log": "^1.0"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4",
                 "monolog/monolog": "^1.21",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
                     "dev-develop": "0.7.x-dev"
                 }
             },
@@ -656,42 +662,41 @@
                 "framework",
                 "limoncello"
             ],
-            "time": "2017-05-11T07:17:30+00:00"
+            "time": "2017-08-18T15:39:03+00:00"
         },
         {
             "name": "limoncello-php/commands",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/commands.git",
-                "reference": "f1422b53fbb8c07e8799360463148c9f4ddd33c6"
+                "reference": "36b24e6fa8c0013d9cf5ebaee70fb84e73237da7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/commands/zipball/f1422b53fbb8c07e8799360463148c9f4ddd33c6",
-                "reference": "f1422b53fbb8c07e8799360463148c9f4ddd33c6",
+                "url": "https://api.github.com/repos/limoncello-php-dist/commands/zipball/36b24e6fa8c0013d9cf5ebaee70fb84e73237da7",
+                "reference": "36b24e6fa8c0013d9cf5ebaee70fb84e73237da7",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.1",
-                "limoncello-php/contracts": "self.version",
-                "php": ">=7.0.0"
+                "limoncello-php/contracts": "^0.7.0",
+                "php": ">=7.1.0"
             },
             "require-dev": {
-                "composer/composer": "^1.0.0",
+                "composer/composer": "^1.5.0",
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "composer-plugin",
             "extra": {
-                "class": "Limoncello\\Commands\\ComposerPlugin",
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
-                }
+                    "dev-develop": "0.8.x-dev"
+                },
+                "class": "Limoncello\\Commands\\ComposerPlugin"
             },
             "autoload": {
                 "psr-4": {
@@ -716,38 +721,37 @@
                 "framework",
                 "limoncello"
             ],
-            "time": "2017-05-12T05:15:40+00:00"
+            "time": "2017-08-15T23:35:47+00:00"
         },
         {
             "name": "limoncello-php/container",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/container.git",
-                "reference": "5a51622bba7a0c174fc2ff93a72d8075dde2b99d"
+                "reference": "d7d2c91d65dbf1a416182371f42102166d0681c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/container/zipball/5a51622bba7a0c174fc2ff93a72d8075dde2b99d",
-                "reference": "5a51622bba7a0c174fc2ff93a72d8075dde2b99d",
+                "url": "https://api.github.com/repos/limoncello-php-dist/container/zipball/d7d2c91d65dbf1a416182371f42102166d0681c8",
+                "reference": "d7d2c91d65dbf1a416182371f42102166d0681c8",
                 "shasum": ""
             },
             "require": {
-                "limoncello-php/contracts": "self.version",
-                "php": ">=7.0.0",
+                "limoncello-php/contracts": "^0.7.0",
+                "php": ">=7.1.0",
                 "pimple/pimple": "^3.0"
             },
             "require-dev": {
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -775,24 +779,24 @@
                 "limoncello",
                 "psr"
             ],
-            "time": "2017-05-11T07:17:30+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/contracts",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/contracts.git",
-                "reference": "d3062c1ec7eb10402e44cc7e776f9f5ca0dd6827"
+                "reference": "3e72537a4cc2dcdb4a82ed85c43fbf49c05450a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/contracts/zipball/d3062c1ec7eb10402e44cc7e776f9f5ca0dd6827",
-                "reference": "d3062c1ec7eb10402e44cc7e776f9f5ca0dd6827",
+                "url": "https://api.github.com/repos/limoncello-php-dist/contracts/zipball/3e72537a4cc2dcdb4a82ed85c43fbf49c05450a2",
+                "reference": "3e72537a4cc2dcdb4a82ed85c43fbf49c05450a2",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0.0",
+                "php": ">=7.1.0",
                 "psr/container": "^1.0",
                 "psr/http-message": "^1.0"
             },
@@ -803,8 +807,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -830,40 +833,39 @@
                 "interfaces",
                 "limoncello"
             ],
-            "time": "2017-05-12T05:15:40+00:00"
+            "time": "2017-08-15T21:02:47+00:00"
         },
         {
             "name": "limoncello-php/core",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/core.git",
-                "reference": "c543984a6aa0f016880d9b56be23fb1873f6b9f3"
+                "reference": "9f405c4b076977501f07a67459d2dfc6a9578473"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/core/zipball/c543984a6aa0f016880d9b56be23fb1873f6b9f3",
-                "reference": "c543984a6aa0f016880d9b56be23fb1873f6b9f3",
+                "url": "https://api.github.com/repos/limoncello-php-dist/core/zipball/9f405c4b076977501f07a67459d2dfc6a9578473",
+                "reference": "9f405c4b076977501f07a67459d2dfc6a9578473",
                 "shasum": ""
             },
             "require": {
-                "limoncello-php/contracts": "self.version",
+                "limoncello-php/contracts": "^0.7.0",
                 "nikic/fast-route": "^1.0",
-                "php": ">=7.0.0",
+                "php": ">=7.1.0",
                 "zendframework/zend-diactoros": "^1.3"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.6",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.8"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -889,38 +891,37 @@
                 "psr-7",
                 "psr7"
             ],
-            "time": "2017-05-11T07:17:30+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/crypt",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/crypt.git",
-                "reference": "550cd045ef18f63fef4228e2eedc7f5e76320f3f"
+                "reference": "e884a0569a954ac8854af7b20b1706d8c54fa827"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/crypt/zipball/550cd045ef18f63fef4228e2eedc7f5e76320f3f",
-                "reference": "550cd045ef18f63fef4228e2eedc7f5e76320f3f",
+                "url": "https://api.github.com/repos/limoncello-php-dist/crypt/zipball/e884a0569a954ac8854af7b20b1706d8c54fa827",
+                "reference": "e884a0569a954ac8854af7b20b1706d8c54fa827",
                 "shasum": ""
             },
             "require": {
-                "limoncello-php/contracts": "self.version",
-                "php": ">=7.0.0"
+                "limoncello-php/contracts": "^0.7.0",
+                "php": ">=7.1.0"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -945,39 +946,38 @@
                 "framework",
                 "limoncello"
             ],
-            "time": "2017-05-11T07:17:30+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/data",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/data.git",
-                "reference": "76e7aa7ce12f04ad9ba0bfb54feb9580207b9353"
+                "reference": "b3783034bb8bcaa6d5b171d11a22b5b1ec9a51b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/data/zipball/76e7aa7ce12f04ad9ba0bfb54feb9580207b9353",
-                "reference": "76e7aa7ce12f04ad9ba0bfb54feb9580207b9353",
+                "url": "https://api.github.com/repos/limoncello-php-dist/data/zipball/b3783034bb8bcaa6d5b171d11a22b5b1ec9a51b6",
+                "reference": "b3783034bb8bcaa6d5b171d11a22b5b1ec9a51b6",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "^2.5.0",
-                "limoncello-php/contracts": "self.version",
-                "php": ">=7.0.0"
+                "limoncello-php/contracts": "^0.7.0",
+                "php": ">=7.1.0"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -1004,38 +1004,38 @@
                 "migration",
                 "seed"
             ],
-            "time": "2017-05-11T07:17:30+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/events",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/events.git",
-                "reference": "0ad3b9bb329bae3c8adbbb09ed66fc5acf752cd8"
+                "reference": "ad0b27e7c059fc363d6f2f20b1d91606d96f6ec3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/events/zipball/0ad3b9bb329bae3c8adbbb09ed66fc5acf752cd8",
-                "reference": "0ad3b9bb329bae3c8adbbb09ed66fc5acf752cd8",
+                "url": "https://api.github.com/repos/limoncello-php-dist/events/zipball/ad0b27e7c059fc363d6f2f20b1d91606d96f6ec3",
+                "reference": "ad0b27e7c059fc363d6f2f20b1d91606d96f6ec3",
                 "shasum": ""
             },
             "require": {
-                "limoncello-php/contracts": "self.version",
-                "php": ">=7.0.0"
+                "limoncello-php/contracts": "^0.7.0",
+                "limoncello-php/core": "^0.7.0",
+                "php": ">=7.1.0"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -1060,49 +1060,51 @@
                 "framework",
                 "limoncello"
             ],
-            "time": "2017-05-11T07:17:30+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/flute",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/flute.git",
-                "reference": "f3dadeb09888ec5890a21a1d4a47f889736d7fb4"
+                "reference": "29d0400eb96791b850c97395f571f1a26ef2c822"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/flute/zipball/f3dadeb09888ec5890a21a1d4a47f889736d7fb4",
-                "reference": "f3dadeb09888ec5890a21a1d4a47f889736d7fb4",
+                "url": "https://api.github.com/repos/limoncello-php-dist/flute/zipball/29d0400eb96791b850c97395f571f1a26ef2c822",
+                "reference": "29d0400eb96791b850c97395f571f1a26ef2c822",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "^2.5.0",
-                "limoncello-php/contracts": "self.version",
-                "limoncello-php/validation": "self.version",
+                "ext-intl": "*",
+                "limoncello-php/contracts": "^0.7.0",
+                "limoncello-php/l10n": "^0.7.0",
+                "limoncello-php/validation": "^0.7.0",
                 "neomerx/json-api": "^1.0.0",
-                "php": ">=7.0.0",
-                "zendframework/zend-diactoros": "^1.3"
+                "php": ">=7.1.0",
+                "zendframework/zend-diactoros": "^1.4"
             },
             "require-dev": {
                 "fzaninotto/faker": "dev-master",
-                "limoncello-php/container": "self.version",
+                "limoncello-php/container": "^0.7.0",
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Limoncello\\Flute\\": "src/"
+                    "Limoncello\\Flute\\": "src/",
+                    "Limoncello\\Flute\\Resources\\Messages\\": "res/Messages"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1123,20 +1125,20 @@
                 "framework",
                 "limoncello"
             ],
-            "time": "2017-05-12T05:15:40+00:00"
+            "time": "2017-08-17T23:41:35+00:00"
         },
         {
             "name": "limoncello-php/framework",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php/framework.git",
-                "reference": "c7e5ceaf7984cb711a5a6e24f66bdb494b252c87"
+                "reference": "5cbd4049276874c5375e09f98b1da64c5913ba18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php/framework/zipball/c7e5ceaf7984cb711a5a6e24f66bdb494b252c87",
-                "reference": "c7e5ceaf7984cb711a5a6e24f66bdb494b252c87",
+                "url": "https://api.github.com/repos/limoncello-php/framework/zipball/5cbd4049276874c5375e09f98b1da64c5913ba18",
+                "reference": "5cbd4049276874c5375e09f98b1da64c5913ba18",
                 "shasum": ""
             },
             "require": {
@@ -1155,13 +1157,12 @@
                 "limoncello-php/passport": "self.version",
                 "limoncello-php/templates": "self.version",
                 "limoncello-php/validation": "self.version",
-                "php": ">=7.0.0"
+                "php": ">=7.1.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.5.x-dev",
-                    "dev-develop": "0.6.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1182,38 +1183,38 @@
                 "psr-7",
                 "psr7"
             ],
-            "time": "2017-05-12T05:15:40+00:00"
+            "time": "2017-08-18T15:39:03+00:00"
         },
         {
             "name": "limoncello-php/l10n",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/l10n.git",
-                "reference": "2018baac2e75fee666ddd9a82c9be3d7645d2f2b"
+                "reference": "4bfe65b6a35a8dab5b6ea5436cd2a7cbef755359"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/l10n/zipball/2018baac2e75fee666ddd9a82c9be3d7645d2f2b",
-                "reference": "2018baac2e75fee666ddd9a82c9be3d7645d2f2b",
+                "url": "https://api.github.com/repos/limoncello-php-dist/l10n/zipball/4bfe65b6a35a8dab5b6ea5436cd2a7cbef755359",
+                "reference": "4bfe65b6a35a8dab5b6ea5436cd2a7cbef755359",
                 "shasum": ""
             },
             "require": {
                 "ext-intl": "*",
-                "php": ">=7.0.0"
+                "limoncello-php/contracts": "^0.7.0",
+                "php": ">=7.1.0"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -1239,38 +1240,38 @@
                 "limoncello",
                 "localization"
             ],
-            "time": "2017-05-09T03:56:25+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/oauth-server",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/oauth-server.git",
-                "reference": "266f0d11df4d19c8f2bf117ba0acb0e5eeb55638"
+                "reference": "c135a2d614b3c5660baec0c8de8ffed96430266e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/oauth-server/zipball/266f0d11df4d19c8f2bf117ba0acb0e5eeb55638",
-                "reference": "266f0d11df4d19c8f2bf117ba0acb0e5eeb55638",
+                "url": "https://api.github.com/repos/limoncello-php-dist/oauth-server/zipball/c135a2d614b3c5660baec0c8de8ffed96430266e",
+                "reference": "c135a2d614b3c5660baec0c8de8ffed96430266e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0.0",
+                "php": ">=7.1.0",
                 "psr/http-message": "^1.0"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.7",
                 "phpmd/phpmd": "^2.6",
                 "phpunit/phpunit": "^5.7",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.7",
                 "zendframework/zend-diactoros": "^1.3"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -1298,43 +1299,44 @@
                 "psr7",
                 "server"
             ],
-            "time": "2017-05-09T03:56:25+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/passport",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/passport.git",
-                "reference": "1dc8a467802e7e00009511ff823bade0912365dc"
+                "reference": "739d013e3fcb9bdd992e27fd49be1f6af3cd8834"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/passport/zipball/1dc8a467802e7e00009511ff823bade0912365dc",
-                "reference": "1dc8a467802e7e00009511ff823bade0912365dc",
+                "url": "https://api.github.com/repos/limoncello-php-dist/passport/zipball/739d013e3fcb9bdd992e27fd49be1f6af3cd8834",
+                "reference": "739d013e3fcb9bdd992e27fd49be1f6af3cd8834",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "^2.5.0",
-                "limoncello-php/contracts": "self.version",
-                "limoncello-php/oauth-server": "self.version",
-                "php": ">=7.0.0",
+                "limoncello-php/contracts": "^0.7.0",
+                "limoncello-php/oauth-server": "^0.7.0",
+                "php": ">=7.1.0",
                 "psr/log": "^1.0",
                 "zendframework/zend-diactoros": "^1.3"
             },
             "require-dev": {
+                "limoncello-php/core": "^0.7.0",
                 "mockery/mockery": "^0.9.7",
                 "monolog/monolog": "^1.22",
                 "phpmd/phpmd": "^2.6",
                 "phpunit/phpunit": "^5.7",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.7",
                 "vlucas/phpdotenv": "^2.4"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -1363,39 +1365,38 @@
                 "psr-7",
                 "psr7"
             ],
-            "time": "2017-05-11T07:17:30+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/templates",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/templates.git",
-                "reference": "0ee0570a5f18b07c160bc45fe98ce6648ad66d7b"
+                "reference": "b9047e1064d0dd6d46fcb04e460aef23905b07f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/templates/zipball/0ee0570a5f18b07c160bc45fe98ce6648ad66d7b",
-                "reference": "0ee0570a5f18b07c160bc45fe98ce6648ad66d7b",
+                "url": "https://api.github.com/repos/limoncello-php-dist/templates/zipball/b9047e1064d0dd6d46fcb04e460aef23905b07f2",
+                "reference": "b9047e1064d0dd6d46fcb04e460aef23905b07f2",
                 "shasum": ""
             },
             "require": {
-                "limoncello-php/contracts": "self.version",
-                "php": ">=7.0.0",
+                "limoncello-php/contracts": "^0.7.0",
+                "php": ">=7.1.0",
                 "twig/twig": "^2.3"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -1420,38 +1421,36 @@
                 "limoncello",
                 "templates"
             ],
-            "time": "2017-05-12T05:15:40+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "limoncello-php/validation",
-            "version": "0.6.7",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/validation.git",
-                "reference": "90ec51b7fdb378bde32732a43efb588195583231"
+                "reference": "1a0b8c1bcef411c31b5d74e78c93d5908d176777"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/validation/zipball/90ec51b7fdb378bde32732a43efb588195583231",
-                "reference": "90ec51b7fdb378bde32732a43efb588195583231",
+                "url": "https://api.github.com/repos/limoncello-php-dist/validation/zipball/1a0b8c1bcef411c31b5d74e78c93d5908d176777",
+                "reference": "1a0b8c1bcef411c31b5d74e78c93d5908d176777",
                 "shasum": ""
             },
             "require": {
-                "ext-intl": "*",
-                "php": ">=7.0.0"
+                "limoncello-php/contracts": "^0.7.0",
+                "php": ">=7.1.0"
             },
             "require-dev": {
-                "mockery/mockery": "^0.9.4",
                 "phpmd/phpmd": "^2.4",
-                "phpunit/phpunit": "^5.0",
-                "scrutinizer/ocular": "^1.3",
+                "phpunit/phpunit": "^6.1",
+                "scrutinizer/ocular": "^1.4",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6.x-dev",
-                    "dev-develop": "0.7.x-dev"
+                    "dev-develop": "0.8.x-dev"
                 }
             },
             "autoload": {
@@ -1474,20 +1473,20 @@
             "keywords": [
                 "validation"
             ],
-            "time": "2017-05-09T03:56:25+00:00"
+            "time": "2017-08-15T22:56:28+00:00"
         },
         {
             "name": "monolog/monolog",
-            "version": "1.22.1",
+            "version": "1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "1e044bc4b34e91743943479f1be7a1d5eb93add0"
+                "reference": "fd8c787753b3a2ad11bc60c063cff1358a32a3b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/1e044bc4b34e91743943479f1be7a1d5eb93add0",
-                "reference": "1e044bc4b34e91743943479f1be7a1d5eb93add0",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/fd8c787753b3a2ad11bc60c063cff1358a32a3b4",
+                "reference": "fd8c787753b3a2ad11bc60c063cff1358a32a3b4",
                 "shasum": ""
             },
             "require": {
@@ -1508,7 +1507,7 @@
                 "phpunit/phpunit-mock-objects": "2.3.0",
                 "ruflin/elastica": ">=0.90 <3.0",
                 "sentry/sentry": "^0.13",
-                "swiftmailer/swiftmailer": "~5.3"
+                "swiftmailer/swiftmailer": "^5.3|^6.0"
             },
             "suggest": {
                 "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
@@ -1552,7 +1551,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2017-03-13T07:08:03+00:00"
+            "time": "2017-06-19T01:22:40+00:00"
         },
         {
             "name": "neomerx/cors-psr7",
@@ -1611,16 +1610,16 @@
         },
         {
             "name": "neomerx/json-api",
-            "version": "v1.0.1",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/neomerx/json-api.git",
-                "reference": "3a56655b206ef7a54d117ba8573d70566811bf06"
+                "reference": "152d43cb91543062977677bf955125a1f4e5dc4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/neomerx/json-api/zipball/3a56655b206ef7a54d117ba8573d70566811bf06",
-                "reference": "3a56655b206ef7a54d117ba8573d70566811bf06",
+                "url": "https://api.github.com/repos/neomerx/json-api/zipball/152d43cb91543062977677bf955125a1f4e5dc4b",
+                "reference": "152d43cb91543062977677bf955125a1f4e5dc4b",
                 "shasum": ""
             },
             "require": {
@@ -1662,7 +1661,7 @@
                 "jsonapi.org",
                 "neomerx"
             ],
-            "time": "2017-04-20T09:35:30+00:00"
+            "time": "2017-07-29T15:32:57+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -1709,25 +1708,29 @@
         },
         {
             "name": "pimple/pimple",
-            "version": "v3.0.2",
+            "version": "v3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silexphp/Pimple.git",
-                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a"
+                "reference": "4d45fb62d96418396ec58ba76e6f065bca16e10a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/a30f7d6e57565a2e1a316e1baf2a483f788b258a",
-                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/4d45fb62d96418396ec58ba76e6f065bca16e10a",
+                "reference": "4d45fb62d96418396ec58ba76e6f065bca16e10a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.3.0",
+                "psr/container": "^1.0"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "^3.2"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.0.x-dev"
+                    "dev-master": "3.2.x-dev"
                 }
             },
             "autoload": {
@@ -1751,7 +1754,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2015-09-11T15:10:35+00:00"
+            "time": "2017-07-23T07:32:15+00:00"
         },
         {
             "name": "psr/container",
@@ -1901,16 +1904,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.3.0",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4"
+                "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/e79d363049d1c2128f133a2667e4f4190904f7f4",
-                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
+                "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
                 "shasum": ""
             },
             "require": {
@@ -1922,7 +1925,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.3-dev"
+                    "dev-master": "1.5-dev"
                 }
             },
             "autoload": {
@@ -1956,20 +1959,20 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14T01:06:16+00:00"
+            "time": "2017-06-14T15:44:48+00:00"
         },
         {
             "name": "twig/twig",
-            "version": "v2.3.2",
+            "version": "v2.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "85e8372c451510165c04bf781295f9d922fa524b"
+                "reference": "eab7c3288ae6603d7d6f92b531626af2b162d1f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/85e8372c451510165c04bf781295f9d922fa524b",
-                "reference": "85e8372c451510165c04bf781295f9d922fa524b",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/eab7c3288ae6603d7d6f92b531626af2b162d1f2",
+                "reference": "eab7c3288ae6603d7d6f92b531626af2b162d1f2",
                 "shasum": ""
             },
             "require": {
@@ -1984,12 +1987,15 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.4-dev"
                 }
             },
             "autoload": {
                 "psr-0": {
                     "Twig_": "lib/"
+                },
+                "psr-4": {
+                    "Twig\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2019,7 +2025,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2017-04-21T00:13:02+00:00"
+            "time": "2017-06-07T18:47:58+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -2073,16 +2079,16 @@
         },
         {
             "name": "zendframework/zend-diactoros",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-diactoros.git",
-                "reference": "b03f285a333f51e58c95cce54109a4a9ed691436"
+                "reference": "424a840dc3bedcdeea510b42e056c77c2d6c4bef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/b03f285a333f51e58c95cce54109a4a9ed691436",
-                "reference": "b03f285a333f51e58c95cce54109a4a9ed691436",
+                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/424a840dc3bedcdeea510b42e056c77c2d6c4bef",
+                "reference": "424a840dc3bedcdeea510b42e056c77c2d6c4bef",
                 "shasum": ""
             },
             "require": {
@@ -2121,7 +2127,7 @@
                 "psr",
                 "psr-7"
             ],
-            "time": "2017-04-06T16:18:34+00:00"
+            "time": "2017-08-17T21:21:00+00:00"
         }
     ],
     "packages-dev": [],
@@ -2131,7 +2137,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0.0"
+        "php": ">=7.1.0"
     },
     "platform-dev": []
 }
