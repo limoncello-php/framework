@@ -493,7 +493,7 @@ class RulesTest extends TestCase
             'date'    => new stdClass(),
             'float'   => new stdClass(),
             'int'     => new stdClass(),
-            'numeric' => new stdClass(),
+            'numeric' => 'ABC',
             'string'  => new stdClass(),
         ];
 
