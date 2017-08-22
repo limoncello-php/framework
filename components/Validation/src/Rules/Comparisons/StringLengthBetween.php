@@ -36,7 +36,7 @@ final class StringLengthBetween extends BaseTwoValueComparision
             ContextKeys::STRING_LENGTH_MIN => $min,
             ContextKeys::STRING_LENGTH_MAX => $max,
         ];
-        parent::__construct($min, $min, ErrorCodes::STRING_LENGTH_BETWEEN, $errorContext);
+        parent::__construct($min, $max, ErrorCodes::STRING_LENGTH_BETWEEN, $errorContext);
     }
 
     /**

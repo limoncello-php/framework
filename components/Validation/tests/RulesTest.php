@@ -272,7 +272,7 @@ class RulesTest extends TestCase
         // Check with valid input
 
         $input = [
-            'string1' => '123',
+            'string1' => '1234',
             'string2' => '123',
             'string3' => '12345',
             'string4' => null,
@@ -285,7 +285,7 @@ class RulesTest extends TestCase
         $this->assertEmpty($errors);
         $this->assertEquals($input, $captures);
 
-        // Check with invalid input
+        // Check with invalid input 1
 
         $input = [
             'string1' => '12',
@@ -324,6 +324,22 @@ class RulesTest extends TestCase
         $this->assertEquals(
             ErrorCodes::STRING_REG_EXP,
             $this->findErrorByParamName('string6', $errors)->getMessageCode()
+        );
+
+        // Check with invalid input 2
+
+        $input = [
+            'string1' => '1234567',
+        ];
+
+        list($captures, $errors) = $this->validateArray($input, $rules);
+
+        $this->assertEmpty($captures);
+        $this->assertCount(1, $errors);
+
+        $this->assertEquals(
+            ErrorCodes::STRING_LENGTH_BETWEEN,
+            $this->findErrorByParamName('string1', $errors)->getMessageCode()
         );
     }
 
