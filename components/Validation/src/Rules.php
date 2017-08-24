@@ -57,6 +57,8 @@ class Rules
         success as public;
         fail as public;
         required as public;
+        enum as public;
+        filter as public;
     }
 
     use Types {

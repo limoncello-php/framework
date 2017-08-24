@@ -37,6 +37,7 @@ use Limoncello\Validation\Rules\Comparisons\StringLengthBetween;
 use Limoncello\Validation\Rules\Comparisons\StringLengthMax;
 use Limoncello\Validation\Rules\Comparisons\StringLengthMin;
 use Limoncello\Validation\Rules\Comparisons\StringRegExp;
+use Limoncello\Validation\Rules\Generic\AndOperator;
 use Limoncello\Validation\Rules\Generic\OrOperator;
 
 /**
@@ -45,127 +46,163 @@ use Limoncello\Validation\Rules\Generic\OrOperator;
 trait Comparisons
 {
     /**
-     * @param mixed $value
+     * @param mixed              $value
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function equals($value): RuleInterface
+    protected static function equals($value, RuleInterface $next = null): RuleInterface
     {
-        return $value instanceof DateTimeInterface ? new DateTimeEquals($value) : new ScalarEquals($value);
+        return $next === null ?
+            $value instanceof DateTimeInterface ? new DateTimeEquals($value) : new ScalarEquals($value) :
+            new AndOperator(static::equals($value), $next);
     }
 
     /**
-     * @param mixed $value
+     * @param mixed              $value
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function notEquals($value): RuleInterface
+    protected static function notEquals($value, RuleInterface $next = null): RuleInterface
     {
-        return $value instanceof DateTimeInterface ? new DateTimeNotEquals($value) : new ScalarNotEquals($value);
+        return $next === null ?
+            $value instanceof DateTimeInterface ? new DateTimeNotEquals($value) : new ScalarNotEquals($value) :
+            new AndOperator(static::notEquals($value), $next);
     }
 
     /**
-     * @param array $scalars
+     * @param array              $scalars
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function inValues(array $scalars): RuleInterface
+    protected static function inValues(array $scalars, RuleInterface $next = null): RuleInterface
     {
-        return new ScalarInValues($scalars);
+        return $next === null ? new ScalarInValues($scalars) : new AndOperator(static::inValues($scalars), $next);
     }
 
     /**
-     * @param mixed $value
+     * @param mixed              $value
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function lessThan($value): RuleInterface
+    protected static function lessThan($value, RuleInterface $next = null): RuleInterface
     {
-        return $value instanceof DateTimeInterface ? new DateTimeLessThan($value) : new NumericLessThan($value);
+        return $next === null ?
+            $value instanceof DateTimeInterface ? new DateTimeLessThan($value) : new NumericLessThan($value) :
+            new AndOperator(static::lessThan($value), $next);
     }
 
     /**
-     * @param mixed $value
+     * @param mixed              $value
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function lessOrEquals($value): RuleInterface
+    protected static function lessOrEquals($value, RuleInterface $next = null): RuleInterface
     {
-        return $value instanceof DateTimeInterface ? new DateTimeLessOrEquals($value) : new NumericLessOrEquals($value);
+        return $next === null ?
+            $value instanceof DateTimeInterface ? new DateTimeLessOrEquals($value) : new NumericLessOrEquals($value) :
+            new AndOperator(static::lessOrEquals($value), $next);
     }
 
     /**
-     * @param mixed $value
+     * @param mixed              $value
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function moreThan($value): RuleInterface
+    protected static function moreThan($value, RuleInterface $next = null): RuleInterface
     {
-        return $value instanceof DateTimeInterface ? new DateTimeMoreThan($value) : new NumericMoreThan($value);
+        return $next === null ?
+            $value instanceof DateTimeInterface ? new DateTimeMoreThan($value) : new NumericMoreThan($value) :
+            new AndOperator(static::moreThan($value), $next);
     }
 
     /**
-     * @param mixed $value
+     * @param mixed              $value
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function moreOrEquals($value): RuleInterface
+    protected static function moreOrEquals($value, RuleInterface $next = null): RuleInterface
     {
-        return $value instanceof DateTimeInterface ?
-            new DateTimeMoreOrEquals($value) : new NumericMoreOrEqualsThan($value);
+        return $next === null ?
+            ($value instanceof DateTimeInterface ?
+                new DateTimeMoreOrEquals($value) : new NumericMoreOrEqualsThan($value)) :
+            new AndOperator(static::moreOrEquals($value), $next);
     }
 
     /**
-     * @param mixed $lowerLimit
-     * @param mixed $upperLimit
+     * @param mixed              $lowerLimit
+     * @param mixed              $upperLimit
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function between($lowerLimit, $upperLimit): RuleInterface
+    protected static function between($lowerLimit, $upperLimit, RuleInterface $next = null): RuleInterface
     {
-        return ($lowerLimit instanceof DateTimeInterface && $upperLimit instanceof DateTimeInterface) ?
-            new DateTimeBetween($lowerLimit, $upperLimit) : new NumericBetween($lowerLimit, $upperLimit);
+        $areLimitsDates = $lowerLimit instanceof DateTimeInterface && $upperLimit instanceof DateTimeInterface;
+
+        return $next === null ?
+            ($areLimitsDates ?
+                new DateTimeBetween($lowerLimit, $upperLimit) : new NumericBetween($lowerLimit, $upperLimit)) :
+            new AndOperator(static::between($lowerLimit, $upperLimit), $next);
     }
 
     /**
-     * @param int $min
-     * @param int $max
+     * @param int                $min
+     * @param int                $max
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function stringLengthBetween(int $min, int $max): RuleInterface
+    protected static function stringLengthBetween(int $min, int $max, RuleInterface $next = null): RuleInterface
     {
-        return new StringLengthBetween($min, $max);
+        return $next === null ?
+            new StringLengthBetween($min, $max) :
+            new AndOperator(static::stringLengthBetween($min, $max), $next);
     }
 
     /**
-     * @param int $min
+     * @param int                $min
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function stringLengthMin(int $min): RuleInterface
+    protected static function stringLengthMin(int $min, RuleInterface $next = null): RuleInterface
     {
-        return new StringLengthMin($min);
+        return $next === null ?
+            new StringLengthMin($min) :
+            new AndOperator(static::stringLengthMin($min), $next);
     }
 
     /**
-     * @param int $max
+     * @param int                $max
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function stringLengthMax(int $max): RuleInterface
+    protected static function stringLengthMax(int $max, RuleInterface $next = null): RuleInterface
     {
-        return new StringLengthMax($max);
+        return $next === null ?
+            new StringLengthMax($max) :
+            new AndOperator(static::stringLengthMax($max), $next);
     }
 
     /**
-     * @param string $pattern
+     * @param string             $pattern
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function regexp(string $pattern): RuleInterface
+    protected static function regexp(string $pattern, RuleInterface $next = null): RuleInterface
     {
-        return new StringRegExp($pattern);
+        return $next === null ?
+            new StringRegExp($pattern) :
+            new AndOperator(static::regexp($pattern), $next);
     }
 
     /**

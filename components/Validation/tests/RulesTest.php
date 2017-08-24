@@ -471,6 +471,101 @@ class RulesTest extends TestCase
     /**
      * Test validator.
      */
+    public function testEnum(): void
+    {
+        $values = ['one', 'two', 'three'];
+
+        $rules = [
+            'value1' => v::enum($values),
+            'value2' => v::enum($values, v::equals('two')),
+        ];
+
+        // Check with valid input
+
+        $input = [
+            'value1' => 'one',
+            'value2' => 'two',
+        ];
+
+        list($captures, $errors) = $this->validateArray($input, $rules);
+
+        $this->assertEmpty($errors);
+        $this->assertCount(2, $captures);
+
+        // Check with invalid input
+
+        $input = [
+            'value1' => 'four',
+            'value2' => 'one',
+        ];
+
+        list($captures, $errors) = $this->validateArray($input, $rules);
+
+        $this->assertEmpty($captures);
+        $this->assertCount(2, $errors);
+
+        $this->assertEquals(
+            ErrorCodes::INVALID_VALUE,
+            $this->findErrorByParamName('value1', $errors)->getMessageCode()
+        );
+
+        $this->assertEquals(
+            ErrorCodes::SCALAR_EQUALS,
+            $this->findErrorByParamName('value2', $errors)->getMessageCode()
+        );
+    }
+
+    /**
+     * Test validator.
+     */
+    public function testFilter(): void
+    {
+        $rules = [
+            'value1' => v::filter(FILTER_VALIDATE_EMAIL),
+            'value2' => v::filter(FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        ];
+
+        // Check with valid input
+
+        $input = [
+            'value1' => 'bob@example.com',
+            'value2' => 'Hello WorldÆØÅ!',
+        ];
+
+        list($captures, $errors) = $this->validateArray($input, $rules);
+
+        $this->assertEmpty($errors);
+        $this->assertEquals([
+            'value1' => 'bob@example.com',
+            'value2' => 'Hello World!',
+        ], $captures);
+
+        // Check with invalid input
+
+        $input = [
+            'value1' => 'not_an_email',
+            'value2' => new stdClass(),
+        ];
+
+        list($captures, $errors) = $this->validateArray($input, $rules);
+
+        $this->assertEmpty($captures);
+        $this->assertCount(2, $errors);
+
+        $this->assertEquals(
+            ErrorCodes::INVALID_VALUE,
+            $this->findErrorByParamName('value1', $errors)->getMessageCode()
+        );
+
+        $this->assertEquals(
+            ErrorCodes::INVALID_VALUE,
+            $this->findErrorByParamName('value2', $errors)->getMessageCode()
+        );
+    }
+
+    /**
+     * Test validator.
+     */
     public function testTypes(): void
     {
         $rules = [

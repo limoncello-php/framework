@@ -32,72 +32,72 @@ use Limoncello\Validation\Rules\Types\AsString;
 trait Types
 {
     /**
-     * @param RuleInterface|null $rule
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function isArray(RuleInterface $rule = null): RuleInterface
+    protected static function isArray(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new AsArray() : new AndOperator(new AsArray(), $rule);
+        return $next === null ? new AsArray() : new AndOperator(new AsArray(), $next);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface $next
      *
      * @return RuleInterface
      */
-    protected static function isString(RuleInterface $rule = null): RuleInterface
+    protected static function isString(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new AsString() : new AndOperator(new AsString(), $rule);
+        return $next === null ? new AsString() : new AndOperator(new AsString(), $next);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface $next
      *
      * @return RuleInterface
      */
-    protected static function isBool(RuleInterface $rule = null): RuleInterface
+    protected static function isBool(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new AsBool() : new AndOperator(new AsBool(), $rule);
+        return $next === null ? new AsBool() : new AndOperator(new AsBool(), $next);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface $next
      *
      * @return RuleInterface
      */
-    protected static function isInt(RuleInterface $rule = null): RuleInterface
+    protected static function isInt(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new AsInt() : new AndOperator(new AsInt(), $rule);
+        return $next === null ? new AsInt() : new AndOperator(new AsInt(), $next);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface $next
      *
      * @return RuleInterface
      */
-    protected static function isFloat(RuleInterface $rule = null): RuleInterface
+    protected static function isFloat(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new AsFloat() : new AndOperator(new AsFloat(), $rule);
+        return $next === null ? new AsFloat() : new AndOperator(new AsFloat(), $next);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface $next
      *
      * @return RuleInterface
      */
-    protected static function isNumeric(RuleInterface $rule = null): RuleInterface
+    protected static function isNumeric(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new AsNumeric() : new AndOperator(new AsNumeric(), $rule);
+        return $next === null ? new AsNumeric() : new AndOperator(new AsNumeric(), $next);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface $next
      *
      * @return RuleInterface
      */
-    protected static function isDateTime(RuleInterface $rule = null): RuleInterface
+    protected static function isDateTime(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new AsDateTime() : new AndOperator(new AsDateTime(), $rule);
+        return $next === null ? new AsDateTime() : new AndOperator(new AsDateTime(), $next);
     }
 }

@@ -30,53 +30,53 @@ use Limoncello\Validation\Rules\Generic\AndOperator;
 trait Converters
 {
     /**
-     * @param RuleInterface|null $rule
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function stringToBool(RuleInterface $rule = null): RuleInterface
+    protected static function stringToBool(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new StringToBool() : new AndOperator(new StringToBool(), $rule);
+        return $next === null ? new StringToBool() : new AndOperator(new StringToBool(), $next);
     }
 
     /**
      * @param string             $format
-     * @param RuleInterface|null $rule
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function stringToDateTime(string $format, RuleInterface $rule = null): RuleInterface
+    protected static function stringToDateTime(string $format, RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new StringToDateTime($format) : new AndOperator(new StringToDateTime($format), $rule);
+        return $next === null ? new StringToDateTime($format) : new AndOperator(new StringToDateTime($format), $next);
     }
 
     /**
-     * @param RuleInterface|null $rule
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function stringToFloat(RuleInterface $rule = null): RuleInterface
+    protected static function stringToFloat(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new StringToFloat() : new AndOperator(new StringToFloat(), $rule);
+        return $next === null ? new StringToFloat() : new AndOperator(new StringToFloat(), $next);
     }
 
     /**
-     * @param RuleInterface|null $rule
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function stringToInt(RuleInterface $rule = null): RuleInterface
+    protected static function stringToInt(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new StringToInt() : new AndOperator(new StringToInt(), $rule);
+        return $next === null ? new StringToInt() : new AndOperator(new StringToInt(), $next);
     }
 
     /**
-     * @param RuleInterface|null $rule
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function stringArrayToIntArray(RuleInterface $rule = null): RuleInterface
+    protected static function stringArrayToIntArray(RuleInterface $next = null): RuleInterface
     {
-        return $rule === null ? new StringArrayToIntArray() : new AndOperator(new StringArrayToIntArray(), $rule);
+        return $next === null ? new StringArrayToIntArray() : new AndOperator(new StringArrayToIntArray(), $next);
     }
 }

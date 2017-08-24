@@ -19,7 +19,9 @@
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Rules\Generic\AndOperator;
+use Limoncello\Validation\Rules\Generic\Enum;
 use Limoncello\Validation\Rules\Generic\Fail;
+use Limoncello\Validation\Rules\Generic\Filter;
 use Limoncello\Validation\Rules\Generic\IfOperator;
 use Limoncello\Validation\Rules\Generic\OrOperator;
 use Limoncello\Validation\Rules\Generic\Required;
@@ -89,12 +91,36 @@ trait Generics
     }
 
     /**
+     * @param array              $values
+     * @param RuleInterface|null $next
+     *
+     * @return RuleInterface
+     */
+    protected static function enum(array $values, RuleInterface $next = null): RuleInterface
+    {
+        return $next === null ? new Enum($values) : new AndOperator(static::enum($values), $next);
+    }
+
+    /**
+     * @param int                $filterId
+     * @param mixed              $options
+     * @param RuleInterface|null $next
+     *
+     * @return RuleInterface
+     */
+    protected static function filter(int $filterId, $options = null, RuleInterface $next = null): RuleInterface
+    {
+        return $next === null ?
+            new Filter($filterId, $options) : new AndOperator(static::filter($filterId, $options), $next);
+    }
+
+    /**
      * @param RuleInterface $rule
      *
      * @return RuleInterface
      */
-    protected static function required(RuleInterface $rule): RuleInterface
+    protected static function required(RuleInterface $rule = null): RuleInterface
     {
-        return new Required($rule);
+        return $rule === null ? new Required(static::success()) : new Required($rule);
     }
 }
