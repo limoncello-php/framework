@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
@@ -41,7 +42,7 @@ use Psr\Container\ContainerInterface;
  */
 class Validator extends BaseValidator implements JsonApiValidatorInterface
 {
-    use RelationshipsTrait;
+    use RelationshipsTrait, HasContainerTrait;
 
     /**
      * Namespace for string resources.
@@ -65,11 +66,6 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
 
     /** Rule description index */
     const RULE_UNLISTED_RELATIONSHIP = self::RULE_UNLISTED_ATTRIBUTE + 1;
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
 
     /**
      * @var int
@@ -140,9 +136,10 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
         ContainerInterface $container,
         int $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
+        $this->setContainer($container);
+
         $ruleSet           = JsonApiRuleSerializer::extractRuleSet($name, $data);
         $this->blocks      = JsonApiRuleSerializer::extractBlocks($data);
-        $this->container   = $container;
         $this->idRule      = JsonApiRuleSerializer::getIdRule($ruleSet);
         $this->typeRule    = JsonApiRuleSerializer::getTypeRule($ruleSet);
         $this->errorStatus = $errorStatus;
@@ -175,11 +172,17 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
     {
         $this->reInitAggregatorsIfNeeded();
 
-        $this
-            ->validateType($input)
-            ->validateId($input)
-            ->validateAttributes($input)
-            ->validateRelationships($input);
+        if (is_array($input) === true) {
+            $this
+                ->validateType($input)
+                ->validateId($input)
+                ->validateAttributes($input)
+                ->validateRelationships($input);
+        } else {
+            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $details = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $this->getJsonApiErrorCollection()->addDataError($title, $details, $this->getErrorStatus());
+        }
 
         $hasNoErrors = $this->getJsonApiErrorCollection()->count() <= 0;
 
@@ -612,14 +615,6 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
     }
 
     /**
-     * @return ContainerInterface
-     */
-    protected function getContainer(): ContainerInterface
-    {
-        return $this->container;
-    }
-
-    /**
      * @return int
      */
     protected function getErrorStatus(): int
@@ -636,7 +631,7 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
     }
 
     /**
-     * @return Validator
+     * @return self
      */
     protected function enableIgnoreUnknowns(): self
     {
@@ -646,7 +641,7 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
     }
 
     /**
-     * @return Validator
+     * @return self
      */
     protected function disableIgnoreUnknowns(): self
     {

@@ -43,6 +43,7 @@ use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Container\ContainerInterface;
 use ReflectionMethod;
+use stdClass;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -477,6 +478,44 @@ EOT;
             $errors[2]->getSource()[Error::SOURCE_POINTER]
         );
         $this->assertEquals('Invalid JSON API relationship.', $errors[2]->getDetail());
+    }
+
+    /**
+     * Validation test.
+     */
+    public function testCaptureInvalidData5(): void
+    {
+        $input     = new stdClass();
+
+        $container = $this->createContainer();
+        $validator = $this->createValidator(
+            $container,
+            'some_rule_name',
+            v::equals(null),
+            v::equals('comments'),
+            [],
+            [],
+            []
+        );
+
+        $exception    = null;
+        $gotException = false;
+        try {
+            $validator->assert($input);
+        } catch (JsonApiException $exception) {
+            $gotException = true;
+        }
+        $this->assertTrue($gotException);
+
+        $this->assertEquals(422, $exception->getHttpCode());
+
+        /** @var Error[] $errors */
+        $errors = $exception->getErrors()->getArrayCopy();
+        $this->assertCount(1, $errors);
+
+        $this->assertEquals(422, $errors[0]->getStatus());
+        $this->assertEquals('/data', $errors[0]->getSource()[Error::SOURCE_POINTER]);
+        $this->assertEquals('The value is invalid.', $errors[0]->getDetail());
     }
 
     /**

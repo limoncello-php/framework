@@ -17,10 +17,11 @@
  */
 
 use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface;
+use LogicException;
 
 /**
  * @package Limoncello\Flute
  */
-class InvalidSchemeFactoryException extends \LogicException implements LimoncelloExceptionInterface
+class InvalidSchemeFactoryException extends LogicException implements LimoncelloExceptionInterface
 {
 }

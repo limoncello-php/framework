@@ -32,7 +32,7 @@ use Limoncello\Flute\Contracts\Validation\JsonApiValidatorInterface;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
 use Limoncello\Flute\Http\Traits\CreateResponsesTrait;
 use Limoncello\Flute\L10n\Messages;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
@@ -96,14 +96,9 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        assert(
-            empty(static::ON_CREATE_VALIDATION_RULES_SET_CLASS) === false,
-            'Validation rules set should be defined for class ' . static::class . '.'
-        );
-
-        $captures = static::createJsonApiValidator($container, static::ON_CREATE_VALIDATION_RULES_SET_CLASS)
-            ->assert(static::readJsonFromRequest($container, $request))
-            ->getJsonApiCaptures();
+        $validator = static::createOnCreateValidator($container);
+        $jsonData  = static::readJsonFromRequest($container, $request);
+        $captures  = $validator->assert($jsonData)->getJsonApiCaptures();
 
         list ($index, $attributes, $toMany) =
             static::mapSchemeDataToModelData($container, $captures, static::SCHEMA_CLASS);
@@ -151,27 +146,10 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        assert(
-            empty(static::ON_UPDATE_VALIDATION_RULES_SET_CLASS) === false,
-            'Validation rules set should be defined for class ' . static::class . '.'
-        );
-
-        $captures = static::createJsonApiValidator($container, static::ON_UPDATE_VALIDATION_RULES_SET_CLASS)
-            ->assert(static::readJsonFromRequest($container, $request))
-            ->getJsonApiCaptures();
-
-        // note we use non strict comparison so numbers could be compared to strings
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-        if ($captures[DocumentInterface::KEYWORD_ID] != $index) {
-            /** @var FactoryInterface $factory */
-            $factory = $container->get(FactoryInterface::class);
-            $errors  = $factory->createErrorCollection();
-            $errors->addDataIdError(
-                static::createMessageFormatter($container)->formatMessage(Messages::MSG_ERR_INVALID_ELEMENT)
-            );
-
-            throw new JsonApiException($errors);
-        }
+        $validator = static::createOnUpdateValidator($container);
+        $jsonData  = static::readJsonFromRequest($container, $request);
+        $jsonData  = static::normalizeIndexValueOnUpdate($routeParams, $container, $jsonData);
+        $captures  = $validator->assert($jsonData)->getJsonApiCaptures();
 
         list ($index, $attributes, $toMany) =
             static::mapSchemeDataToModelData($container, $captures, static::SCHEMA_CLASS);
@@ -312,6 +290,44 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
+     * @param array              $routeParams
+     * @param ContainerInterface $container
+     * @param array              $jsonData
+     *
+     * @return array
+     */
+    protected static function normalizeIndexValueOnUpdate(
+        array $routeParams,
+        ContainerInterface $container,
+        array $jsonData
+    ): array {
+        // check that index in data and URL are identical
+        $index         = $routeParams[static::ROUTE_KEY_INDEX];
+        $dataSection   = null;
+        $hasIndexValue =
+            array_key_exists(DI::KEYWORD_DATA, $jsonData) &&
+            array_key_exists(DI::KEYWORD_ID, ($dataSection = $jsonData[DI::KEYWORD_DATA]));
+        if ($hasIndexValue === true) {
+            assert($dataSection !== null);
+            if ($dataSection[DI::KEYWORD_ID] !== $index) {
+                /** @var FactoryInterface $factory */
+                $factory = $container->get(FactoryInterface::class);
+                $errors  = $factory->createErrorCollection();
+                $errors->addDataIdError(
+                    static::createMessageFormatter($container)->formatMessage(Messages::MSG_ERR_INVALID_ELEMENT)
+                );
+
+                throw new JsonApiException($errors);
+            }
+        } else {
+            // put the index to data for our convenience
+            $jsonData[DI::KEYWORD_DATA][DI::KEYWORD_ID] = $index;
+        }
+
+        return $jsonData;
+    }
+
+    /**
      * @param int|string             $parentIndex
      * @param string                 $relationshipName
      * @param int|string             $childIndex
@@ -379,6 +395,36 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * @param ContainerInterface $container
+     *
+     * @return JsonApiValidatorInterface
+     */
+    protected static function createOnCreateValidator(ContainerInterface $container): JsonApiValidatorInterface
+    {
+        assert(
+            empty(static::ON_CREATE_VALIDATION_RULES_SET_CLASS) === false,
+            'Validation rules set should be defined for class ' . static::class . '.'
+        );
+
+        return static::createJsonApiValidator($container, static::ON_CREATE_VALIDATION_RULES_SET_CLASS);
+    }
+
+    /**
+     * @param ContainerInterface $container
+     *
+     * @return JsonApiValidatorInterface
+     */
+    protected static function createOnUpdateValidator(ContainerInterface $container): JsonApiValidatorInterface
+    {
+        assert(
+            empty(static::ON_UPDATE_VALIDATION_RULES_SET_CLASS) === false,
+            'Validation rules set should be defined for class ' . static::class . '.'
+        );
+
+        return static::createJsonApiValidator($container, static::ON_UPDATE_VALIDATION_RULES_SET_CLASS);
+    }
+
+    /**
+     * @param ContainerInterface $container
      * @param string             $rulesSetClass
      *
      * @return JsonApiValidatorInterface
@@ -420,7 +466,7 @@ abstract class BaseController implements ControllerInterface
         $fields        = [];
         $toManyIndexes = [];
         foreach ($captures as $name => $value) {
-            if ($name === DocumentInterface::KEYWORD_ID) {
+            if ($name === DI::KEYWORD_ID) {
                 $index = $value;
             } elseif ($schemeClass::hasAttributeMapping($name) === true) {
                 $fieldName          = $schemeClass::getAttributeMapping($name);

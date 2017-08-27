@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Adapters\Repository;
@@ -51,21 +52,19 @@ use Psr\Container\ContainerInterface;
  */
 class Factory implements FactoryInterface
 {
+    use HasContainerTrait;
+
     /**
      * @var JsonApiFactoryInterface
      */
     private $jsonApiFactory = null;
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
 
     /**
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->setContainer($container);
     }
 
     /**
@@ -170,13 +169,5 @@ class Factory implements FactoryInterface
         $api = new $apiClass($this->getContainer());
 
         return $api;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer(): ContainerInterface
-    {
-        return $this->container;
     }
 }

@@ -30,6 +30,9 @@ class JsonApiDateTimeType extends DateTimeType
     /** Type name */
     const NAME = 'limoncelloDateTime';
 
+    /** DateTime format */
+    const JSON_API_FORMAT = DateBaseType::JSON_API_FORMAT;
+
     /**
      * @inheritdoc
      */
@@ -47,10 +50,20 @@ class JsonApiDateTimeType extends DateTimeType
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if (is_string($value) === false ||
-            ($dateTime = DateTime::createFromFormat(DateBaseType::JSON_API_FORMAT, $value)) === false
-        ) {
-            throw ConversionException::conversionFailed($value, $this->getName());
+        if ($value instanceof DateTimeInterface || $value === null) {
+            $dateTime = $value;
+        } elseif ($value instanceof JsonApiDateTime) {
+            $dateTime = $value->getValue();
+        } elseif (is_string($value) === true) {
+            if (($dateTime = DateTime::createFromFormat(self::JSON_API_FORMAT, $value)) === false) {
+                throw ConversionException::conversionFailed($value, $this->getName());
+            }
+        } else {
+            throw ConversionException::conversionFailedInvalidType(
+                $value,
+                DateTimeInterface::class,
+                [DateTimeInterface::class, JsonApiDateTime::class, 'string']
+            );
         }
 
         return parent::convertToDatabaseValue($dateTime, $platform);

@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\L10n\FormatterFactoryInterface;
+use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Http\JsonApiResponse;
-use Limoncello\Flute\Validation\Validator;
+use Limoncello\Flute\Validation\Traits\HasValidationFormatterTrait;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Psr\Container\ContainerInterface;
@@ -30,10 +30,7 @@ use Psr\Container\ContainerInterface;
  */
 class JsonApiErrorCollection extends ErrorCollection
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    use HasContainerTrait, HasValidationFormatterTrait;
 
     /**
      * @var int
@@ -53,7 +50,7 @@ class JsonApiErrorCollection extends ErrorCollection
         ContainerInterface $container,
         int $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
-        $this->container   = $container;
+        $this->setContainer($container);
         $this->errorStatus = $errorStatus;
     }
 
@@ -115,19 +112,9 @@ class JsonApiErrorCollection extends ErrorCollection
     private function getMessageFormatter(): FormatterInterface
     {
         if ($this->messageFormatter === null) {
-            /** @var FormatterFactoryInterface $factory */
-            $factory                = $this->getContainer()->get(FormatterFactoryInterface::class);
-            $this->messageFormatter = $factory->createFormatter(Validator::RESOURCES_NAMESPACE);
+            $this->messageFormatter = $this->createValidationFormatter();
         }
 
         return $this->messageFormatter;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    private function getContainer(): ContainerInterface
-    {
-        return $this->container;
     }
 }

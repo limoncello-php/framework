@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Flute\Contracts\Validation\ContextStorageInterface;
 use Limoncello\Validation\Execution\ContextStorage as BaseContextStorage;
 use Psr\Container\ContainerInterface;
@@ -25,10 +26,9 @@ use Psr\Container\ContainerInterface;
  */
 class ContextStorage extends BaseContextStorage implements ContextStorageInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    use HasContainerTrait {
+        getContainer as public;
+    }
 
     /**
      * @param ContainerInterface $container
@@ -37,7 +37,8 @@ class ContextStorage extends BaseContextStorage implements ContextStorageInterfa
     public function __construct(ContainerInterface $container, array $blocks)
     {
         parent::__construct($blocks);
-        $this->container = $container;
+
+        $this->setContainer($container);
     }
 
     /**

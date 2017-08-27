@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Resources\Messages\En;
+<?php namespace Limoncello\Flute\Validation\Traits;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,24 +16,27 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\L10n\MessageStorageInterface;
-use Limoncello\Flute\L10n\Messages;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
+use Limoncello\Contracts\L10n\FormatterInterface;
+use Limoncello\Flute\Validation\Validator;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Flute
+ *
+ * @method ContainerInterface getContainer()
  */
-class Generic implements MessageStorageInterface
+trait HasValidationFormatterTrait
 {
     /**
-     * @inheritdoc
+     * @return FormatterInterface
      */
-    public static function getMessages(): array
+    protected function createValidationFormatter(): FormatterInterface
     {
-        return [
-            Messages::MSG_ERR_INVALID_ELEMENT   => 'Invalid element.',
-            Messages::MSG_ERR_INVALID_PARAMETER => 'Invalid parameter.',
-            Messages::MSG_ERR_INVALID_OPERATION => 'Invalid operation.',
-            Messages::MSG_ERR_INVALID_ARGUMENT  => 'Invalid argument.',
-        ];
+        /** @var FormatterFactoryInterface $factory */
+        $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
+        $formatter = $factory->createFormatter(Validator::RESOURCES_NAMESPACE);
+
+        return $formatter;
     }
 }

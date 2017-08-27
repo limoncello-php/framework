@@ -54,6 +54,7 @@ use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Encoder\Parameters\SortParameter as JsonLibrarySortParameter;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PDO;
+use stdClass;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -142,6 +143,86 @@ class CrudTest extends TestCase
 
         // second delete does nothing (already deleted)
         $crud->delete($index);
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInputChecksForCreate()
+    {
+        $invalidIndex = new stdClass();
+
+        $this->createCrud(CommentsApi::class)->create($invalidIndex, []);
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInputChecksForUpdate()
+    {
+        $invalidIndex = new stdClass();
+
+        $this->createCrud(CommentsApi::class)->update($invalidIndex, []);
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInputChecksForReadDelete()
+    {
+        $invalidIndex = new stdClass();
+
+        $this->createCrud(CommentsApi::class)->delete($invalidIndex);
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInputChecksForRead()
+    {
+        $invalidIndex = new stdClass();
+
+        $this->createCrud(CommentsApi::class)->read($invalidIndex);
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInputChecksForReadRelationship()
+    {
+        $invalidIndex = new stdClass();
+
+        $this->createCrud(CommentsApi::class)->readRelationship($invalidIndex, Comment::REL_POST);
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInputChecksForReadRow()
+    {
+        $invalidIndex = new stdClass();
+
+        $this->createCrud(CommentsApi::class)->readRow($invalidIndex);
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInputChecksForHasInRelationship1()
+    {
+        $invalidIndex = new stdClass();
+
+        $this->createCrud(CommentsApi::class)->hasInRelationship($invalidIndex, Comment::REL_EMOTIONS, '1');
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInputChecksForHasInRelationship2()
+    {
+        $invalidIndex = new stdClass();
+
+        $this->createCrud(CommentsApi::class)->hasInRelationship('1', Comment::REL_EMOTIONS, $invalidIndex);
     }
 
     /**

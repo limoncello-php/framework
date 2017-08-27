@@ -18,6 +18,7 @@
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\L10n\Messages;
@@ -31,22 +32,19 @@ use Psr\Container\ContainerInterface;
  */
 class FilterOperations implements FilterOperationsInterface
 {
+    use HasContainerTrait;
+
     /**
      * @var string|null
      */
     private $errMsgInvalidParam = null;
 
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->setContainer($container);
     }
 
     /**
@@ -291,7 +289,7 @@ class FilterOperations implements FilterOperationsInterface
     {
         if ($this->errMsgInvalidParam === null) {
             /** @var FormatterFactoryInterface $formatterFactory */
-            $formatterFactory         = $this->container->get(FormatterFactoryInterface::class);
+            $formatterFactory         = $this->getContainer()->get(FormatterFactoryInterface::class);
             $formatter                = $formatterFactory->createFormatter(Messages::RESOURCES_NAMESPACE);
             $this->errMsgInvalidParam = $formatter->formatMessage(Messages::MSG_ERR_INVALID_PARAMETER);
         }

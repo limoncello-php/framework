@@ -226,7 +226,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTimeTypeToDatabaseConversions()
+    public function testJsonApiDateTimeTypeToDatabaseConversions1()
     {
         $type     = Type::getType(JsonApiDateTimeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -240,15 +240,61 @@ class DateTimeTypesTest extends TestCase
 
     /**
      * Test date conversions.
+     */
+    public function testJsonApiDateTimeTypeToDatabaseConversions2()
+    {
+        $type     = Type::getType(JsonApiDateTimeType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = new DateTime('2001-02-03 04:05:06');
+
+        /** @var string $phpValue */
+        $phpValue = $type->convertToDatabaseValue($jsonDate, $platform);
+        $this->assertEquals('2001-02-03 04:05:06', $phpValue);
+    }
+
+    /**
+     * Test date conversions.
+     */
+    public function testJsonApiDateTimeTypeToDatabaseConversions3()
+    {
+        /** @var JsonApiDateTimeType $type */
+        $type     = Type::getType(JsonApiDateTimeType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = new JsonApiDateTime(new DateTime('2001-02-03 04:05:06'));
+
+        /** @var string $phpValue */
+        $phpValue = $type->convertToDatabaseValue($jsonDate, $platform);
+        $this->assertEquals('2001-02-03 04:05:06', $phpValue);
+    }
+
+    /**
+     * Test date conversions.
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput()
+    public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput1()
     {
         $type     = Type::getType(JsonApiDateTimeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
 
         $jsonDate = 'XXX';
+
+        $type->convertToDatabaseValue($jsonDate, $platform);
+    }
+
+    /**
+     * Test date conversions.
+     *
+     * @expectedException \Doctrine\DBAL\Types\ConversionException
+     */
+    public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput2()
+    {
+        $type     = Type::getType(JsonApiDateTimeType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = new \stdClass();
 
         $type->convertToDatabaseValue($jsonDate, $platform);
     }

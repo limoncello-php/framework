@@ -23,8 +23,11 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 use Generator;
+use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
+use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
@@ -35,7 +38,9 @@ use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Models\TagStorageInterface;
+use Limoncello\Flute\Exceptions\InvalidArgumentException;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
+use Limoncello\Flute\L10n\Messages;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Exceptions\JsonApiException as E;
@@ -51,17 +56,19 @@ use Psr\Container\ContainerInterface;
  */
 class Crud implements CrudInterface
 {
-    /** Internal constant. Query param name. */
-    protected static $indexBind = ':index';
+    use HasContainerTrait;
 
     /** Internal constant. Query param name. */
-    protected static $childIndexBind = ':childIndex';
+    protected const INDEX_BIND = ':index';
+
+    /** Internal constant. Query param name. */
+    protected const CHILD_INDEX_BIND = ':childIndex';
 
     /** Internal constant. Path constant. */
-    protected static $rootPath = '';
+    protected const ROOT_PATH = '';
 
     /** Internal constant. Path constant. */
-    protected static $pathSeparator = DocumentInterface::PATH_SEPARATOR;
+    protected const PATH_SEPARATOR = DocumentInterface::PATH_SEPARATOR;
 
     /**
      * @var FactoryInterface
@@ -89,17 +96,12 @@ class Crud implements CrudInterface
     private $paginationStrategy;
 
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * @param ContainerInterface $container
      * @param string             $modelClass
      */
     public function __construct(ContainerInterface $container, string $modelClass)
     {
-        $this->container          = $container;
+        $this->setContainer($container);
 
         $this->factory            = $this->getContainer()->get(FactoryInterface::class);
         $this->modelClass         = $modelClass;
@@ -204,11 +206,17 @@ class Crud implements CrudInterface
      */
     public function readResource($index, FilterParameterCollection $filterParams = null)
     {
+        if ($index !== null && is_scalar($index) === false) {
+            throw new InvalidArgumentException(
+                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
+            );
+        }
+
         $modelClass = $this->getModelClass();
 
         $builder = $this->getRepository()
-            ->read($modelClass, static::$indexBind)
-            ->setParameter(static::$indexBind, $index);
+            ->read($modelClass, static::INDEX_BIND)
+            ->setParameter(static::INDEX_BIND, $index);
 
         $errors = $this->getFactory()->createErrorCollection();
         $filterParams === null ?: $this->getRepository()->applyFilters($errors, $builder, $modelClass, $filterParams);
@@ -231,18 +239,24 @@ class Crud implements CrudInterface
         array $sortParams = null,
         array $pagingParams = null
     ): PaginatedDataInterface {
+        if ($index !== null && is_scalar($index) === false) {
+            throw new InvalidArgumentException(
+                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
+            );
+        }
+
         $modelClass = $this->getModelClass();
 
         /** @var QueryBuilder $builder */
         list ($builder, $resultClass, $relationshipType) =
-            $this->getRepository()->readRelationship($modelClass, static::$indexBind, $name);
+            $this->getRepository()->readRelationship($modelClass, static::INDEX_BIND, $name);
 
         $errors = $this->getFactory()->createErrorCollection();
         $filterParams === null ?: $this->getRepository()->applyFilters($errors, $builder, $resultClass, $filterParams);
         $this->checkErrors($errors);
         $sortParams === null ?: $this->getRepository()->applySorting($builder, $resultClass, $sortParams);
 
-        $builder->setParameter(static::$indexBind, $index);
+        $builder->setParameter(static::INDEX_BIND, $index);
 
         $isCollection = $relationshipType === RelationshipTypes::HAS_MANY ||
             $relationshipType === RelationshipTypes::BELONGS_TO_MANY;
@@ -264,14 +278,25 @@ class Crud implements CrudInterface
      */
     public function hasInRelationship($parentId, string $name, $childId): bool
     {
+        if ($parentId !== null && is_scalar($parentId) === false) {
+            throw new InvalidArgumentException(
+                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
+            );
+        }
+        if ($childId !== null && is_scalar($childId) === false) {
+            throw new InvalidArgumentException(
+                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
+            );
+        }
+
         $modelClass = $this->getModelClass();
 
         /** @var QueryBuilder $builder */
-        list ($builder) =
-            $this->getRepository()->hasInRelationship($modelClass, static::$indexBind, $name, static::$childIndexBind);
+        list ($builder) = $this->getRepository()
+            ->hasInRelationship($modelClass, static::INDEX_BIND, $name, static::CHILD_INDEX_BIND);
 
-        $builder->setParameter(static::$indexBind, $parentId);
-        $builder->setParameter(static::$childIndexBind, $childId);
+        $builder->setParameter(static::INDEX_BIND, $parentId);
+        $builder->setParameter(static::CHILD_INDEX_BIND, $childId);
 
         $result = $builder->execute()->fetch();
 
@@ -283,10 +308,16 @@ class Crud implements CrudInterface
      */
     public function readRow($index): ?array
     {
+        if ($index !== null && is_scalar($index) === false) {
+            throw new InvalidArgumentException(
+                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
+            );
+        }
+
         $modelClass = $this->getModelClass();
         $builder    = $this->getRepository()
-            ->read($modelClass, static::$indexBind)
-            ->setParameter(static::$indexBind, $index);
+            ->read($modelClass, static::INDEX_BIND)
+            ->setParameter(static::INDEX_BIND, $index);
         $typedRow   = $this->fetchRow($builder, $modelClass);
 
         return $typedRow;
@@ -297,10 +328,16 @@ class Crud implements CrudInterface
      */
     public function delete($index): int
     {
+        if ($index !== null && is_scalar($index) === false) {
+            throw new InvalidArgumentException(
+                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
+            );
+        }
+
         $modelClass = $this->getModelClass();
 
         $builder = $this->builderOnDelete(
-            $this->getRepository()->delete($modelClass, static::$indexBind)->setParameter(static::$indexBind, $index)
+            $this->getRepository()->delete($modelClass, static::INDEX_BIND)->setParameter(static::INDEX_BIND, $index)
         );
 
         $deleted = $builder->execute();
@@ -313,6 +350,12 @@ class Crud implements CrudInterface
      */
     public function create($index, array $attributes, array $toMany = []): string
     {
+        if ($index !== null && is_scalar($index) === false) {
+            throw new InvalidArgumentException(
+                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
+            );
+        }
+
         $modelClass = $this->getModelClass();
 
         $allowedChanges = $this->filterAttributesOnCreate($modelClass, $attributes, $index);
@@ -345,6 +388,12 @@ class Crud implements CrudInterface
      */
     public function update($index, array $attributes, array $toMany = []): int
     {
+        if ($index !== null && is_scalar($index) === false) {
+            throw new InvalidArgumentException(
+                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
+            );
+        }
+
         $updated    = 0;
         $modelClass = $this->getModelClass();
 
@@ -374,14 +423,6 @@ class Crud implements CrudInterface
         });
 
         return (int)$updated;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer(): ContainerInterface
-    {
-        return $this->container;
     }
 
     /**
@@ -717,17 +758,17 @@ class Crud implements CrudInterface
                 foreach ($data->getData() as $model) {
                     $uniqueModel = $modelStorage->register($model);
                     if ($uniqueModel !== null) {
-                        $modelsAtPath->register($uniqueModel, static::$rootPath);
+                        $modelsAtPath->register($uniqueModel, static::ROOT_PATH);
                     }
                 }
             } else {
                 $model       = $data->getData();
                 $uniqueModel = $modelStorage->register($model);
                 if ($uniqueModel !== null) {
-                    $modelsAtPath->register($uniqueModel, static::$rootPath);
+                    $modelsAtPath->register($uniqueModel, static::ROOT_PATH);
                 }
             }
-            $classAtPath[static::$rootPath] = get_class($model);
+            $classAtPath[static::ROOT_PATH] = get_class($model);
 
             foreach ($this->getPaths($paths) as list ($parentPath, $childPaths)) {
                 $this->loadRelationshipsLayer(
@@ -794,11 +835,11 @@ class Crud implements CrudInterface
         $pathsDepths     = [];
         foreach ($paths as $path) {
             $parentDepth = 0;
-            $tmpPath     = static::$rootPath;
+            $tmpPath     = static::ROOT_PATH;
             foreach ($path->getPath() as $pathPiece) {
                 $parent                    = $tmpPath;
                 $tmpPath                   = empty($tmpPath) === true ?
-                    $pathPiece : $tmpPath . static::$pathSeparator . $pathPiece;
+                    $pathPiece : $tmpPath . static::PATH_SEPARATOR . $pathPiece;
                 $normalizedPaths[$tmpPath] = [$parent, $pathPiece];
                 $pathsDepths[$parent]      = $parentDepth++;
             }
@@ -840,7 +881,7 @@ class Crud implements CrudInterface
         string $parentsPath,
         array $childRelationships
     ): void {
-        $rootClass   = $classAtPath[static::$rootPath];
+        $rootClass   = $classAtPath[static::ROOT_PATH];
         $parentClass = $classAtPath[$parentsPath];
         $parents     = $modelsAtPath->get($parentsPath);
 
@@ -849,11 +890,11 @@ class Crud implements CrudInterface
         // $models.
 
         foreach ($childRelationships as $name) {
-            $childrenPath = $parentsPath !== static::$rootPath ? $parentsPath . static::$pathSeparator . $name : $name;
+            $childrenPath = $parentsPath !== static::ROOT_PATH ? $parentsPath . static::PATH_SEPARATOR . $name : $name;
 
             /** @var QueryBuilder $builder */
             list ($builder, $class, $relationshipType) =
-                $this->getRepository()->readRelationship($parentClass, static::$indexBind, $name);
+                $this->getRepository()->readRelationship($parentClass, static::INDEX_BIND, $name);
 
             $classAtPath[$childrenPath] = $class;
 
@@ -861,7 +902,7 @@ class Crud implements CrudInterface
                 case RelationshipTypes::BELONGS_TO:
                     $pkName = $this->getModelSchemes()->getPrimaryKey($parentClass);
                     foreach ($parents as $parent) {
-                        $builder->setParameter(static::$indexBind, $parent->{$pkName});
+                        $builder->setParameter(static::INDEX_BIND, $parent->{$pkName});
                         $child = $deDup->register($this->fetchSingle($builder, $class));
                         if ($child !== null) {
                             $modelsAtPath->register($child, $childrenPath);
@@ -876,7 +917,7 @@ class Crud implements CrudInterface
                     $builder->setFirstResult($queryOffset)->setMaxResults($queryLimit);
                     $pkName = $this->getModelSchemes()->getPrimaryKey($parentClass);
                     foreach ($parents as $parent) {
-                        $builder->setParameter(static::$indexBind, $parent->{$pkName});
+                        $builder->setParameter(static::INDEX_BIND, $parent->{$pkName});
                         list($children, $hasMore, $limit, $offset) =
                             $this->fetchCollection($builder, $class, $queryLimit, $queryOffset);
                         $deDupedChildren = [];
@@ -892,6 +933,20 @@ class Crud implements CrudInterface
                     break;
             }
         }
+    }
+
+    /**
+     * @param string             $namespace
+     *
+     * @return FormatterInterface
+     */
+    protected function createMessageFormatter(string $namespace = Messages::RESOURCES_NAMESPACE): FormatterInterface
+    {
+        /** @var FormatterFactoryInterface $factory */
+        $factory          = $this->getContainer()->get(FormatterFactoryInterface::class);
+        $messageFormatter = $factory->createFormatter($namespace);
+
+        return $messageFormatter;
     }
 
     /**

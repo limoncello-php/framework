@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorInterface;
@@ -28,17 +29,14 @@ use Psr\Container\ContainerInterface;
  */
 class JsonApiValidatorFactory implements JsonApiValidatorFactoryInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    use HasContainerTrait;
 
     /**
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->setContainer($container);
     }
 
     /**
@@ -54,13 +52,5 @@ class JsonApiValidatorFactory implements JsonApiValidatorFactoryInterface
         $validator = new Validator($class, $ruleSetsData, $this->getContainer());
 
         return $validator;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    private function getContainer(): ContainerInterface
-    {
-        return $this->container;
     }
 }

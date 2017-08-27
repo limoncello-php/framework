@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\L10n;
+<?php namespace Limoncello\Flute\Exceptions;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,25 +16,12 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface;
+use LogicException;
+
 /**
  * @package Limoncello\Flute
  */
-interface Messages
+class InvalidArgumentException extends LogicException implements LimoncelloExceptionInterface
 {
-    /**
-     * Namespace for string resources.
-     */
-    const RESOURCES_NAMESPACE = 'Limoncello.Flute';
-
-    /** Message id */
-    const MSG_ERR_INVALID_ELEMENT = 0;
-
-    /** Message id */
-    const MSG_ERR_INVALID_PARAMETER = self::MSG_ERR_INVALID_ELEMENT + 1;
-
-    /** Message id */
-    const MSG_ERR_INVALID_OPERATION = self::MSG_ERR_INVALID_PARAMETER + 1;
-
-    /** Message id */
-    const MSG_ERR_INVALID_ARGUMENT = self::MSG_ERR_INVALID_OPERATION + 1;
 }
