@@ -38,17 +38,17 @@ abstract class ValidatorWrapper implements JsonApiValidatorInterface
     /**
      * @var array
      */
-    private $wrapperCaptures = [];
+    private $wrapperCaptures;
 
     /**
      * @var array
      */
-    private $wrapperErrors = [];
+    private $wrapperErrors;
 
     /**
      * @var bool
      */
-    private $overrideNotReplace = true;
+    private $overrideNotReplace;
 
     /**
      * @param JsonApiValidatorInterface $validator
@@ -60,6 +60,8 @@ abstract class ValidatorWrapper implements JsonApiValidatorInterface
     ) {
         $this->validator     = $validator;
         $this->httpErrorCode = $httpErrorCode;
+
+        $this->initWrapper();
     }
 
     /**
@@ -94,6 +96,19 @@ abstract class ValidatorWrapper implements JsonApiValidatorInterface
     }
 
     /**
+     * @return self
+     */
+    protected function initWrapper(): self
+    {
+        $this->wrapperCaptures    = [];
+        $this->wrapperErrors      = [];
+        $this->overrideNotReplace = true;
+
+        return $this;
+    }
+
+
+    /**
      * @param array $wrapperCaptures
      *
      * @return self
@@ -124,6 +139,8 @@ abstract class ValidatorWrapper implements JsonApiValidatorInterface
      */
     protected function getWrapperCaptures(): array
     {
+        assert($this->wrapperCaptures !== null, 'Haven\'t you forgotten to call init function?');
+
         return $this->wrapperCaptures;
     }
 
@@ -132,6 +149,8 @@ abstract class ValidatorWrapper implements JsonApiValidatorInterface
      */
     protected function getWrapperErrors(): array
     {
+        assert($this->wrapperCaptures !== null, 'Haven\'t you forgotten to call init function?');
+
         return $this->wrapperErrors;
     }
 
@@ -142,15 +161,20 @@ abstract class ValidatorWrapper implements JsonApiValidatorInterface
      */
     protected function setWrapperErrors(array $wrapperErrors): self
     {
-        assert(call_user_func(function () use ($wrapperErrors) : bool {
-            $allAreErrors = true;
+        if (empty($wrapperErrors) === false) {
+            assert(call_user_func(function () use ($wrapperErrors) : bool {
+                $allAreErrors = true;
 
-            foreach ($wrapperErrors as $error) {
-                $allAreErrors = $allAreErrors === true && $error instanceof ErrorInterface;
-            }
+                foreach ($wrapperErrors as $error) {
+                    $allAreErrors = $allAreErrors === true && $error instanceof ErrorInterface;
+                }
 
-            return $allAreErrors;
-        }), 'All errors should implement ErrorInterface.');
+                return $allAreErrors;
+            }), 'All errors should implement ErrorInterface.');
+
+            // if we set errors then captures should not be shown
+            $this->setCaptureReplacements([]);
+        }
 
         $this->wrapperErrors = $wrapperErrors;
 

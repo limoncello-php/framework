@@ -135,6 +135,8 @@ EOT;
              */
             public function validate($jsonData): bool
             {
+                $this->initWrapper();
+
                 $result = $this->getWrappedValidator()->validate($jsonData);
                 if ($result === true) {
                     // extra validation rules
@@ -153,7 +155,6 @@ EOT;
                         $details = 'Dependency condition failed.';
                         $errors->addDataError($title, $details);
                         $this->setWrapperErrors($errors->getArrayCopy());
-                        $this->setCaptureReplacements([]);
                     } else {
                         // just for fun (and testing of changing captures) let's reverse the text value
                         $this->setWrapperCaptures(['text-attribute' => strrev($textValue)]);
