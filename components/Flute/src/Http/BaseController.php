@@ -295,6 +295,8 @@ abstract class BaseController implements ControllerInterface
      * @param array              $jsonData
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected static function normalizeIndexValueOnUpdate(
         array $routeParams,

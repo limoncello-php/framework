@@ -47,6 +47,7 @@ class JsonApiDateTimeType extends DateTimeType
      * @inheritdoc
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {

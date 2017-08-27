@@ -74,7 +74,6 @@ class ValidatorWrapperTest extends TestCase
         try {
             $wrapper->assert($this->createInput($text, $int));
         } catch (JsonApiException $exception) {
-
         }
         $this->assertNotNull($exception);
 

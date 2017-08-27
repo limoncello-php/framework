@@ -167,6 +167,8 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function validate($input): bool
     {
