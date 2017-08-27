@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Container\Container;
+use Limoncello\Container\Traits\HasContainerTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,7 +28,7 @@ class ContainerTest extends TestCase
     /**
      * Test `get` and `has` methods.
      */
-    public function testContainer()
+    public function testContainer(): void
     {
         $container = new Container();
 
@@ -42,8 +43,30 @@ class ContainerTest extends TestCase
     /**
      * @expectedException \Limoncello\Container\Exceptions\NotFoundException
      */
-    public function testNotFound()
+    public function testNotFound(): void
     {
         (new Container())->get('non-existing');
+    }
+
+    /**
+     * Test HasContainerTrait.
+     */
+    public function testHasContainerTrait(): void
+    {
+        $container = new Container();
+        $class     = new class
+        {
+            use HasContainerTrait {
+                getContainer as public;
+                setContainer as public;
+                hasContainer as public;
+            }
+        };
+
+        $this->assertFalse($class->hasContainer());
+
+        $class->setContainer($container);
+        $this->assertTrue($class->hasContainer());
+        $this->assertEquals($container, $class->getContainer());
     }
 }
