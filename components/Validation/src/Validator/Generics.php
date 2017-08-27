@@ -104,14 +104,20 @@ trait Generics
     /**
      * @param int                $filterId
      * @param mixed              $options
+     * @param int                $errorCode
      * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    protected static function filter(int $filterId, $options = null, RuleInterface $next = null): RuleInterface
-    {
-        return $next === null ?
-            new Filter($filterId, $options) : new AndOperator(static::filter($filterId, $options), $next);
+    protected static function filter(
+        int $filterId,
+        $options = null,
+        int $errorCode = ErrorCodes::INVALID_VALUE,
+        RuleInterface $next = null
+    ): RuleInterface {
+        $filterRule = new Filter($filterId, $options, $errorCode);
+
+        return $next === null ? $filterRule : new AndOperator($filterRule, $next);
     }
 
     /**

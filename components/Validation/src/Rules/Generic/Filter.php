@@ -39,6 +39,11 @@ final class Filter extends BaseRule
     const PROPERTY_FILTER_OPTIONS = self::PROPERTY_FILTER_ID + 1;
 
     /**
+     * Property key.
+     */
+    const PROPERTY_FILTER_ERROR_CODE = self::PROPERTY_FILTER_OPTIONS + 1;
+
+    /**
      * @var int
      */
     private $filterId;
@@ -49,15 +54,22 @@ final class Filter extends BaseRule
     private $filterOptions;
 
     /**
+     * @var int
+     */
+    private $errorCode;
+
+    /**
      * For filter ID and options see @link http://php.net/manual/en/filter.filters.php
      *
-     * @param int  $filterId
-     * @param null $options
+     * @param int   $filterId
+     * @param mixed $options
+     * @param int   $errorCode
      */
-    public function __construct(int $filterId, $options = null)
+    public function __construct(int $filterId, $options = null, int $errorCode = ErrorCodes::INVALID_VALUE)
     {
         $this->filterId      = $filterId;
         $this->filterOptions = $options;
+        $this->errorCode     = $errorCode;
     }
 
     /**
@@ -66,8 +78,9 @@ final class Filter extends BaseRule
     public function toBlock(): ExecutionBlockInterface
     {
         $properties = $this->getStandardProperties() + [
-                static::PROPERTY_FILTER_ID      => $this->getFilterId(),
-                static::PROPERTY_FILTER_OPTIONS => $this->getFilterOptions(),
+                static::PROPERTY_FILTER_ID         => $this->getFilterId(),
+                static::PROPERTY_FILTER_OPTIONS    => $this->getFilterOptions(),
+                static::PROPERTY_FILTER_ERROR_CODE => $this->getErrorCode(),
         ];
 
         return (new ProcedureBlock([self::class, 'execute']))->setProperties($properties);
@@ -87,12 +100,13 @@ final class Filter extends BaseRule
 
         $filterId      = $context->getProperties()->getProperty(static::PROPERTY_FILTER_ID);
         $filterOptions = $context->getProperties()->getProperty(static::PROPERTY_FILTER_OPTIONS);
+        $errorCode     = $context->getProperties()->getProperty(static::PROPERTY_FILTER_ERROR_CODE);
 
         $output = filter_var($value, $filterId, $filterOptions);
 
         return $output !== false ?
             BlockReplies::createSuccessReply($output) :
-            BlockReplies::createErrorReply($context, $value, ErrorCodes::INVALID_VALUE, [$filterId, $filterOptions]);
+            BlockReplies::createErrorReply($context, $value, $errorCode, [$filterId, $filterOptions]);
     }
 
     /**
@@ -109,5 +123,13 @@ final class Filter extends BaseRule
     private function getFilterOptions()
     {
         return $this->filterOptions;
+    }
+
+    /**
+     * @return int
+     */
+    private function getErrorCode(): int
+    {
+        return $this->errorCode;
     }
 }
