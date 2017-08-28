@@ -32,14 +32,14 @@ class PaginationStrategy implements PaginationStrategyInterface
     /**
      * @var int
      */
-    private $defaultPageLimit;
+    private $defaultPageSize;
 
     /**
-     * @param int $defaultPageLimit
+     * @param int $defaultPageSize
      */
-    public function __construct(int $defaultPageLimit = self::DEFAULT_LIMIT_SIZE)
+    public function __construct(int $defaultPageSize = self::DEFAULT_LIMIT_SIZE)
     {
-        $this->defaultPageLimit = $defaultPageLimit;
+        $this->defaultPageSize = $defaultPageSize;
     }
 
     /**
@@ -53,7 +53,7 @@ class PaginationStrategy implements PaginationStrategyInterface
 
         $offset = 0;
 
-        return [$offset, $this->defaultPageLimit + 1];
+        return [$offset, $this->defaultPageSize + 1];
     }
 
     /**
@@ -62,20 +62,25 @@ class PaginationStrategy implements PaginationStrategyInterface
     public function parseParameters(?array $parameters): array
     {
         if ($parameters === null) {
-            return [0, $this->defaultPageLimit + 1];
+            return [0, $this->defaultPageSize + 1];
         }
 
-        $limit = $this->getValue(
+        $offset = $this->getValue(
+            $parameters,
+            static::PARAM_PAGING_SKIP,
+            0,
+            0,
+            PHP_INT_MAX
+        );
+        $size   = $this->getValue(
             $parameters,
             static::PARAM_PAGING_SIZE,
             static::DEFAULT_LIMIT_SIZE,
             1,
-            static::MAX_LIMIT_SIZE
+            max($this->defaultPageSize, static::MAX_LIMIT_SIZE)
         );
 
-        $offset = $this->getValue($parameters, static::PARAM_PAGING_SKIP, 0, 0, PHP_INT_MAX);
-
-        return [$offset, $limit + 1];
+        return [$offset, $size + 1];
     }
 
     /**
@@ -92,9 +97,13 @@ class PaginationStrategy implements PaginationStrategyInterface
         $result = $default;
         if (isset($parameters[$key]) === true) {
             $value = $parameters[$key];
-            if (is_string($value) === true || is_int($value) === true) {
+            if (is_numeric($value) === true) {
                 $value = intval($value);
-                if ($min <= $value && $value <= $max) {
+                if ($value < $min) {
+                    $result = $min;
+                } elseif ($value > $max) {
+                    $result = $max;
+                } else {
                     $result = $value;
                 }
             }
