@@ -160,6 +160,7 @@ class RulesTest extends TestCase
             'scalar8'  => v::stringToInt(v::moreThan(5)),
             'scalar9'  => v::stringToInt(v::moreOrEquals(5)),
             'scalar10' => v::isString(v::inValues(['one', 'two', 'three'])),
+            'scalar11' => v::notEquals(null),
         ];
 
         // Check with valid input
@@ -175,6 +176,7 @@ class RulesTest extends TestCase
             'scalar8'  => '6',
             'scalar9'  => '5',
             'scalar10' => 'two',
+            'scalar11' => 'anything',
         ];
 
         list($captures, $errors) = $this->validateArray($input, $rules);
@@ -191,6 +193,7 @@ class RulesTest extends TestCase
             'scalar8'  => 6,
             'scalar9'  => 5,
             'scalar10' => 'two',
+            'scalar11' => 'anything',
         ], $captures);
 
         // Check with invalid input
@@ -206,12 +209,13 @@ class RulesTest extends TestCase
             'scalar8'  => '5',
             'scalar9'  => '4',
             'scalar10' => 'four',
+            'scalar11' => null,
         ];
 
         list($captures, $errors) = $this->validateArray($input, $rules);
 
         $this->assertEmpty($captures);
-        $this->assertCount(10, $errors);
+        $this->assertCount(11, $errors);
 
         $this->assertEquals(
             ErrorCodes::NUMERIC_BETWEEN,
@@ -252,6 +256,10 @@ class RulesTest extends TestCase
         $this->assertEquals(
             ErrorCodes::SCALAR_IN_VALUES,
             $this->findErrorByParamName('scalar10', $errors)->getMessageCode()
+        );
+        $this->assertEquals(
+            ErrorCodes::SCALAR_NOT_EQUALS,
+            $this->findErrorByParamName('scalar11', $errors)->getMessageCode()
         );
     }
 

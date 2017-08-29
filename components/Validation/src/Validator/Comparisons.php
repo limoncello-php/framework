@@ -25,6 +25,8 @@ use Limoncello\Validation\Rules\Comparisons\DateTimeLessThan;
 use Limoncello\Validation\Rules\Comparisons\DateTimeMoreOrEquals;
 use Limoncello\Validation\Rules\Comparisons\DateTimeMoreThan;
 use Limoncello\Validation\Rules\Comparisons\DateTimeNotEquals;
+use Limoncello\Validation\Rules\Comparisons\IsNotNull;
+use Limoncello\Validation\Rules\Comparisons\IsNull;
 use Limoncello\Validation\Rules\Comparisons\NumericBetween;
 use Limoncello\Validation\Rules\Comparisons\NumericLessOrEquals;
 use Limoncello\Validation\Rules\Comparisons\NumericLessThan;
@@ -53,9 +55,15 @@ trait Comparisons
      */
     protected static function equals($value, RuleInterface $next = null): RuleInterface
     {
-        return $next === null ?
-            $value instanceof DateTimeInterface ? new DateTimeEquals($value) : new ScalarEquals($value) :
-            new AndOperator(static::equals($value), $next);
+        if ($value === null) {
+            $rule = new IsNull();
+        } elseif ($value instanceof DateTimeInterface) {
+            $rule = new DateTimeEquals($value);
+        } else {
+            $rule = new ScalarEquals($value);
+        }
+
+        return $next === null ? $rule : new AndOperator(static::equals($value), $next);
     }
 
     /**
@@ -66,9 +74,15 @@ trait Comparisons
      */
     protected static function notEquals($value, RuleInterface $next = null): RuleInterface
     {
-        return $next === null ?
-            $value instanceof DateTimeInterface ? new DateTimeNotEquals($value) : new ScalarNotEquals($value) :
-            new AndOperator(static::notEquals($value), $next);
+        if ($value === null) {
+            $rule = new IsNotNull();
+        } elseif ($value instanceof DateTimeInterface) {
+            $rule = new DateTimeNotEquals($value);
+        } else {
+            $rule = new ScalarNotEquals($value);
+        }
+
+        return $next === null ? $rule : new AndOperator(static::notEquals($value), $next);
     }
 
     /**

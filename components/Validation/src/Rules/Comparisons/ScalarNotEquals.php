@@ -52,6 +52,6 @@ final class ScalarNotEquals extends BaseOneValueComparision
      */
     private static function isValidType($value): bool
     {
-        return is_scalar($value) === true || $value === null;
+        return is_scalar($value) === true;
     }
 }

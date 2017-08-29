@@ -23,15 +23,14 @@ use Limoncello\Validation\Contracts\Execution\ContextInterface;
 /**
  * @package Limoncello\Validation
  */
-final class ScalarEquals extends BaseOneValueComparision
+final class IsNull extends BaseOneValueComparision
 {
     /**
-     * @param mixed $value
+     * Constructor.
      */
-    public function __construct($value)
+    public function __construct()
     {
-        assert(static::isValidType($value) === true);
-        parent::__construct($value, ErrorCodes::SCALAR_EQUALS, [ContextKeys::SCALAR_VALUE => $value]);
+        parent::__construct(null, ErrorCodes::SCALAR_EQUALS, [ContextKeys::SCALAR_VALUE => null]);
     }
 
     /**
@@ -39,18 +38,8 @@ final class ScalarEquals extends BaseOneValueComparision
      */
     public static function compare($value, ContextInterface $context): bool
     {
-        $result = static::isValidType($value) === true && $value === static::readValue($context);
+        $result = $value === null;
 
         return $result;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    private static function isValidType($value): bool
-    {
-        return is_scalar($value) === true;
     }
 }
