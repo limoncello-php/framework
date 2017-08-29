@@ -258,7 +258,7 @@ class RulesTest extends TestCase
             $this->findErrorByParamName('scalar10', $errors)->getMessageCode()
         );
         $this->assertEquals(
-            ErrorCodes::SCALAR_NOT_EQUALS,
+            ErrorCodes::IS_NOT_NULL,
             $this->findErrorByParamName('scalar11', $errors)->getMessageCode()
         );
     }

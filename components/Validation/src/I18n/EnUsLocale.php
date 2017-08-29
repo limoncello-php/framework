@@ -57,5 +57,8 @@ interface EnUsLocale
         ErrorCodes::STRING_LENGTH_MIN     => 'The value should be at least {0} characters.',
         ErrorCodes::STRING_LENGTH_MAX     => 'The value should not be greater than {0} characters.',
         ErrorCodes::STRING_REG_EXP        => 'The value format is invalid.',
+
+        ErrorCodes::IS_NULL     => 'The value should be NULL.',
+        ErrorCodes::IS_NOT_NULL => 'The value should not be NULL.',
     ];
 }

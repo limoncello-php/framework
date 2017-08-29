@@ -111,8 +111,14 @@ interface ErrorCodes
     /** Message code */
     const STRING_REG_EXP = self::STRING_LENGTH_MAX + 1;
 
+    /** Message code */
+    const IS_NULL = self::STRING_REG_EXP + 1;
+
+    /** Message code */
+    const IS_NOT_NULL = self::IS_NULL + 1;
+
     // Special code for those who extend this enum
 
     /** Message code */
-    const LAST = self::STRING_REG_EXP;
+    const LAST = self::IS_NOT_NULL;
 }

@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 
@@ -30,7 +29,7 @@ final class IsNull extends BaseOneValueComparision
      */
     public function __construct()
     {
-        parent::__construct(null, ErrorCodes::SCALAR_EQUALS, [ContextKeys::SCALAR_VALUE => null]);
+        parent::__construct(null, ErrorCodes::IS_NULL);
     }
 
     /**
