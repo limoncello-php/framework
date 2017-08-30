@@ -63,6 +63,8 @@ class CrudTest extends TestCase
 {
     const DEFAULT_PAGE = 3;
 
+    const DEFAULT_MAX_PAGE = 100;
+
     /**
      * @var Connection
      */
@@ -751,8 +753,12 @@ class CrudTest extends TestCase
             $formatterFactory->createFormatter(Messages::RESOURCES_NAMESPACE)
         );
 
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(self::DEFAULT_PAGE);
-        $crud                                          = new $class($container);
+        $container[PaginationStrategyInterface::class] = new PaginationStrategy(
+            self::DEFAULT_PAGE,
+            self::DEFAULT_MAX_PAGE
+        );
+
+        $crud = new $class($container);
 
         return $crud;
     }

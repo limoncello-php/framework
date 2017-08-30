@@ -45,11 +45,17 @@ abstract class FluteSettings implements SettingsInterface
     /** Config key */
     const KEY_VALIDATION_RULE_SETS_DATA = self::KEY_MODEL_TO_SCHEME_MAP + 1;
 
-    /** Config key */
+    /**@deprecated use KEY_DEFAULT_PAGING_SIZE instead */
     const KEY_RELATIONSHIP_PAGING_SIZE = self::KEY_VALIDATION_RULE_SETS_DATA + 1;
 
     /** Config key */
-    const KEY_JSON_ENCODE_OPTIONS = self::KEY_RELATIONSHIP_PAGING_SIZE + 1;
+    const KEY_DEFAULT_PAGING_SIZE = self::KEY_RELATIONSHIP_PAGING_SIZE;
+
+    /** Config key */
+    const KEY_MAX_PAGING_SIZE = self::KEY_DEFAULT_PAGING_SIZE + 1;
+
+    /** Config key */
+    const KEY_JSON_ENCODE_OPTIONS = self::KEY_MAX_PAGING_SIZE + 1;
 
     /** Config key */
     const KEY_JSON_ENCODE_DEPTH = self::KEY_JSON_ENCODE_OPTIONS + 1;
@@ -76,7 +82,8 @@ abstract class FluteSettings implements SettingsInterface
         return [
             static::KEY_MODEL_TO_SCHEME_MAP       => $this->createModelToSchemeMap(),
             static::KEY_VALIDATION_RULE_SETS_DATA => $this->createRulesSetData(),
-            static::KEY_RELATIONSHIP_PAGING_SIZE  => 20,
+            static::KEY_DEFAULT_PAGING_SIZE       => 20,
+            static::KEY_MAX_PAGING_SIZE           => 100,
             static::KEY_JSON_ENCODE_OPTIONS       => $jsonOptions,
             static::KEY_JSON_ENCODE_DEPTH         => 512,
             static::KEY_IS_SHOW_VERSION           => false,

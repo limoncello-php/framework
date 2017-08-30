@@ -318,7 +318,7 @@ class ControllerTest extends TestCase
         /** @var ServerRequestInterface $request */
 
         // replace paging strategy to get paginated results in the relationship
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(3);
+        $container[PaginationStrategyInterface::class] = new PaginationStrategy(3, 100);
 
         $response = BoardsController::index($routeParams, $container, $request);
         $this->assertNotNull($response);
@@ -394,7 +394,7 @@ class ControllerTest extends TestCase
         /** @var ServerRequestInterface $request */
 
         // replace paging strategy to get paginated results in the relationship
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(3);
+        $container[PaginationStrategyInterface::class] = new PaginationStrategy(3, 100);
 
         $response = CommentsController::readUser($routeParams, $container, $request);
         $this->assertNotNull($response);
@@ -1134,7 +1134,7 @@ EOT;
             ->getJsonSchemes($factory, $modelSchemes, $storage);
         $container[Connection::class]                  = $connection = $this->initDb();
         $container[FilterOperationsInterface::class]   = $filterOperations = new FilterOperations($container);
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(10);
+        $container[PaginationStrategyInterface::class] = new PaginationStrategy(10, 100);
         $container[RepositoryInterface::class]         = $repository = $factory->createRepository(
             $connection,
             $modelSchemes,

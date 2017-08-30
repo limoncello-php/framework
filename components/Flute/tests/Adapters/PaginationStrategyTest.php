@@ -29,31 +29,30 @@ class PaginationStrategyTest extends TestCase
      */
     public function testParsingWithDefaultLessThanMaxLimitSize(): void
     {
-        $this->assertLessThan(PS::MAX_LIMIT_SIZE, $defaultPageSize = 30);
-        $strategy = new PS($defaultPageSize);
+        $strategy = new PS($defaultPageSize = 30, $maxPageSize = 100);
 
         $skip = 0;
-        $this->assertLessThan(PS::MAX_LIMIT_SIZE, $size = 40);
+        $size = 40;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
         $this->assertEquals([$skip, $size + 1], $parsed);
 
         $skip = -1;
-        $this->assertLessThan(PS::MAX_LIMIT_SIZE, $size = 40);
+        $size = 40;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
         $this->assertEquals([0, $size + 1], $parsed);
 
-        $this->assertGreaterThan(PS::MAX_LIMIT_SIZE, $skip = 200);
-        $this->assertLessThan(PS::MAX_LIMIT_SIZE, $size = 40);
+        $skip = 200;
+        $size = 40;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
         $this->assertEquals([$skip, $size + 1], $parsed);
 
         $skip = 0;
-        $this->assertGreaterThan(PS::MAX_LIMIT_SIZE, $size = 200);
+        $size = 200;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
-        $this->assertEquals([$skip, PS::MAX_LIMIT_SIZE + 1], $parsed);
+        $this->assertEquals([$skip, $maxPageSize + 1], $parsed);
 
-        $skip = 0;
-        $size = -200;
+        $skip   = 0;
+        $size   = -200;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
         $this->assertEquals([$skip, 1 + 1], $parsed);
     }
@@ -63,26 +62,25 @@ class PaginationStrategyTest extends TestCase
      */
     public function testParsingWithDefaultGreaterThanMaxLimitSize(): void
     {
-        $this->assertGreaterThan(PS::MAX_LIMIT_SIZE, $defaultPageSize = 200);
-        $strategy = new PS($defaultPageSize);
+        $strategy = new PS($defaultPageSize = 200, $maxPageSize = 100);
 
         $skip = 0;
-        $this->assertLessThan(PS::MAX_LIMIT_SIZE, $size = 40);
+        $size = 40;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
         $this->assertEquals([$skip, $size + 1], $parsed);
 
         $skip = -1;
-        $this->assertLessThan(PS::MAX_LIMIT_SIZE, $size = 40);
+        $size = 40;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
         $this->assertEquals([0, $size + 1], $parsed);
 
-        $this->assertGreaterThan(PS::MAX_LIMIT_SIZE, $skip = 200);
-        $this->assertLessThan(PS::MAX_LIMIT_SIZE, $size = 40);
+        $skip = 200;
+        $size = 40;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
         $this->assertEquals([$skip, $size + 1], $parsed);
 
         $skip = 0;
-        $this->assertGreaterThan(PS::MAX_LIMIT_SIZE, $size = 200);
+        $size = 200;
         $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
         $this->assertEquals([$skip, $defaultPageSize + 1], $parsed);
     }

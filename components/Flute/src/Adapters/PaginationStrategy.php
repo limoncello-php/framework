@@ -23,10 +23,10 @@ use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
  */
 class PaginationStrategy implements PaginationStrategyInterface
 {
-    /** Paging constant */
+    /**@deprecated Paging constant */
     const DEFAULT_LIMIT_SIZE = 20;
 
-    /** Paging constant */
+    /**@deprecated Paging constant */
     const MAX_LIMIT_SIZE = 100;
 
     /**
@@ -35,11 +35,20 @@ class PaginationStrategy implements PaginationStrategyInterface
     private $defaultPageSize;
 
     /**
-     * @param int $defaultPageSize
+     * @var int
      */
-    public function __construct(int $defaultPageSize = self::DEFAULT_LIMIT_SIZE)
+    private $maxPageSize;
+
+    /**
+     * @param int $defaultPageSize
+     * @param int $maxPageSize
+     */
+    public function __construct(int $defaultPageSize, int $maxPageSize)
     {
+        assert($defaultPageSize > 0 && $maxPageSize > 0);
+
         $this->defaultPageSize = $defaultPageSize;
+        $this->maxPageSize     = $maxPageSize;
     }
 
     /**
@@ -49,11 +58,11 @@ class PaginationStrategy implements PaginationStrategyInterface
     {
         // input parameters are ignored (same paging params for all)
         // feel free to change it in child classes
-        $rootClass && $class && $path && $relationshipName ?: null;
+        assert($rootClass || $class || $path || $relationshipName);
 
         $offset = 0;
 
-        return [$offset, $this->defaultPageSize + 1];
+        return [$offset, $this->getDefaultPageSize() + 1];
     }
 
     /**
@@ -62,7 +71,7 @@ class PaginationStrategy implements PaginationStrategyInterface
     public function parseParameters(?array $parameters): array
     {
         if ($parameters === null) {
-            return [0, $this->defaultPageSize + 1];
+            return [0, $this->getDefaultPageSize() + 1];
         }
 
         $offset = $this->getValue(
@@ -75,9 +84,9 @@ class PaginationStrategy implements PaginationStrategyInterface
         $size   = $this->getValue(
             $parameters,
             static::PARAM_PAGING_SIZE,
-            static::DEFAULT_LIMIT_SIZE,
+            $this->getDefaultPageSize(),
             1,
-            max($this->defaultPageSize, static::MAX_LIMIT_SIZE)
+            max($this->getDefaultPageSize(), $this->getMaxPageSize())
         );
 
         return [$offset, $size + 1];
@@ -110,5 +119,21 @@ class PaginationStrategy implements PaginationStrategyInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultPageSize(): int
+    {
+        return $this->defaultPageSize;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxPageSize(): int
+    {
+        return $this->maxPageSize;
     }
 }

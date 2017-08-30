@@ -98,7 +98,10 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
         $container[PaginationStrategyInterface::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
 
-            return new PaginationStrategy($settings[FluteSettings::KEY_RELATIONSHIP_PAGING_SIZE]);
+            return new PaginationStrategy(
+                $settings[FluteSettings::KEY_DEFAULT_PAGING_SIZE],
+                $settings[FluteSettings::KEY_MAX_PAGING_SIZE]
+            );
         };
 
         $container[JsonApiValidatorFactoryInterface::class] = function (PsrContainerInterface $container) {
