@@ -23,6 +23,7 @@ use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Types\DateJsonApiStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
 use Limoncello\Flute\Types\JsonApiDateTimeType;
+use Limoncello\Flute\Types\JsonApiDateType;
 use Limoncello\Flute\Validation\Execution\JsonApiValidatorFactory;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
@@ -115,6 +116,9 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
         }
         if (Type::hasType(JsonApiDateTimeType::NAME) === false) {
             Type::addType(JsonApiDateTimeType::NAME, JsonApiDateTimeType::class);
+        }
+        if (Type::hasType(JsonApiDateType::NAME) === false) {
+            Type::addType(JsonApiDateType::NAME, JsonApiDateType::class);
         }
     }
 

@@ -25,6 +25,7 @@ use Limoncello\Flute\Types\DateTimeJsonApiNativeType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
 use Limoncello\Flute\Types\JsonApiDateTime;
 use Limoncello\Flute\Types\JsonApiDateTimeType;
+use Limoncello\Flute\Types\JsonApiDateType;
 use Limoncello\Tests\Flute\TestCase;
 
 /**
@@ -56,6 +57,9 @@ class DateTimeTypesTest extends TestCase
         }
         if (Type::hasType(JsonApiDateTimeType::NAME) === false) {
             Type::addType(JsonApiDateTimeType::NAME, JsonApiDateTimeType::class);
+        }
+        if (Type::hasType(JsonApiDateType::NAME) === false) {
+            Type::addType(JsonApiDateType::NAME, JsonApiDateType::class);
         }
     }
 
@@ -292,6 +296,100 @@ class DateTimeTypesTest extends TestCase
     public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput2()
     {
         $type     = Type::getType(JsonApiDateTimeType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = new \stdClass();
+
+        $type->convertToDatabaseValue($jsonDate, $platform);
+    }
+
+    /**
+     * Test date conversions.
+     */
+    public function testJsonApiDateTypeConversions()
+    {
+        $type     = Type::getType(JsonApiDateType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = '2001-02-03';
+
+        /** @var JsonApiDateTime $phpValue */
+        $phpValue = $type->convertToPHPValue($jsonDate, $platform);
+        $this->assertEquals(981158400, $phpValue->getValue()->getTimestamp());
+        $this->assertEquals('2001-02-03T00:00:00+0000', $phpValue->jsonSerialize());
+    }
+
+    /**
+     * Test date conversions.
+     */
+    public function testJsonApiDateTypeToDatabaseConversions1()
+    {
+        /** @var JsonApiDateType $type */
+        $type     = Type::getType(JsonApiDateType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = '2001-02-03T04:05:06+0000';
+
+        /** @var string $phpValue */
+        $phpValue = $type->convertToDatabaseValue($jsonDate, $platform);
+        $this->assertEquals('2001-02-03', $phpValue);
+    }
+
+    /**
+     * Test date conversions.
+     */
+    public function testJsonApiDateTypeToDatabaseConversions2()
+    {
+        /** @var JsonApiDateType $type */
+        $type     = Type::getType(JsonApiDateType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = new DateTime('2001-02-03 04:05:06');
+
+        /** @var string $phpValue */
+        $phpValue = $type->convertToDatabaseValue($jsonDate, $platform);
+        $this->assertEquals('2001-02-03', $phpValue);
+    }
+
+    /**
+     * Test date conversions.
+     */
+    public function testJsonApiDateTypeToDatabaseConversions3()
+    {
+        /** @var JsonApiDateType $type */
+        $type     = Type::getType(JsonApiDateType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = new JsonApiDateTime(new DateTime('2001-02-03'));
+
+        /** @var string $phpValue */
+        $phpValue = $type->convertToDatabaseValue($jsonDate, $platform);
+        $this->assertEquals('2001-02-03', $phpValue);
+    }
+
+    /**
+     * Test date conversions.
+     *
+     * @expectedException \Doctrine\DBAL\Types\ConversionException
+     */
+    public function testJsonApiDateTypeToDatabaseConversionsInvalidInput1()
+    {
+        $type     = Type::getType(JsonApiDateType::NAME);
+        $platform = $this->createConnection()->getDatabasePlatform();
+
+        $jsonDate = 'XXX';
+
+        $type->convertToDatabaseValue($jsonDate, $platform);
+    }
+
+    /**
+     * Test date conversions.
+     *
+     * @expectedException \Doctrine\DBAL\Types\ConversionException
+     */
+    public function testJsonApiDateTypeToDatabaseConversionsInvalidInput2()
+    {
+        $type     = Type::getType(JsonApiDateType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
 
         $jsonDate = new \stdClass();

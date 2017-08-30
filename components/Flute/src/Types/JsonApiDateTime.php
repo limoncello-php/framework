@@ -43,7 +43,7 @@ class JsonApiDateTime implements JsonSerializable
      * @param DateTimeInterface $value
      * @param string            $format
      */
-    public function __construct(DateTimeInterface $value, string $format = DateBaseType::JSON_API_FORMAT)
+    public function __construct(DateTimeInterface $value, string $format = JsonApiDateTimeType::JSON_API_FORMAT)
     {
         $this->value  = $value;
         $this->format = $format;
