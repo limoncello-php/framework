@@ -63,9 +63,9 @@ class CustomValidator extends BaseValidator
         $this->validateArrayImplementation($input, $this->getCaptures(), $this->getErrors());
         $this->markAggregatorsAsDirty();
 
-        $hasErrors = $this->getErrors()->count() > 0;
+        $isOk = $this->getErrors()->count() <= 0;
 
-        return $hasErrors;
+        return $isOk;
     }
 
     /**
