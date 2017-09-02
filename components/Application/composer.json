@@ -19,10 +19,10 @@
         "doctrine/dbal": "^2.5.0",
         "monolog/monolog": "^1.22",
         "neomerx/cors-psr7": "^1.0.0",
-        "limoncello-php/contracts": "^0.7.0",
-        "limoncello-php/core": "^0.7.0",
-        "limoncello-php/auth": "^0.7.0",
-        "limoncello-php/l10n": "^0.7.0"
+        "limoncello-php/contracts": "^0.8.0",
+        "limoncello-php/core": "^0.8.0",
+        "limoncello-php/auth": "^0.8.0",
+        "limoncello-php/l10n": "^0.8.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.8",
