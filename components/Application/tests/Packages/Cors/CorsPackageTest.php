@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Application\Packages\Cors\CorsContainerConfigurator;
 use Limoncello\Application\Packages\Cors\CorsProvider;
 use Limoncello\Application\Packages\Cors\CorsSettings as C;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
 use Mockery\Mock;
@@ -63,6 +62,5 @@ class CorsPackageTest extends TestCase
         CorsContainerConfigurator::configureContainer($container);
 
         $this->assertNotNull($container->get(AnalyzerInterface::class));
-        $this->assertNotNull($container->get(CorsStorageInterface::class));
     }
 }

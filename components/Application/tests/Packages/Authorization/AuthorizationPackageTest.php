@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Application\Packages\Authorization\AuthorizationContainerConfigurator;
 use Limoncello\Application\Packages\Authorization\AuthorizationProvider;
 use Limoncello\Application\Packages\Authorization\AuthorizationSettings as C;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
 use Limoncello\Contracts\Authorization\AuthorizationManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;

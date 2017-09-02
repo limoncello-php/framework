@@ -2,10 +2,11 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
-use Limoncello\Contracts\Exceptions\ExceptionHandlerInterface;
+use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Adapters\FilterOperations;
@@ -18,7 +19,7 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\Http\Errors\FluteExceptionHandler;
+use Limoncello\Flute\Http\Errors\FluteThrowableHandler;
 use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Types\DateJsonApiStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
@@ -28,6 +29,7 @@ use Limoncello\Flute\Validation\Execution\JsonApiValidatorFactory;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package Limoncello\Flute
@@ -132,8 +134,28 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configureExceptionHandler(LimoncelloContainerInterface $container)
     {
-        $container[ExceptionHandlerInterface::class] = function () {
-            return new FluteExceptionHandler();
+        $container[ThrowableHandlerInterface::class] = function (PsrContainerInterface $container) {
+            $appSettings   = $container->get(SettingsProviderInterface::class)->get(A::class);
+            $fluteSettings = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
+
+            $isLogEnabled = $appSettings[A::KEY_IS_LOG_ENABLED];
+            $isDebug      = $appSettings[A::KEY_IS_DEBUG];
+
+            $ignoredErrorClasses   = $fluteSettings[FluteSettings::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS];
+            $httpCodeForUnexpected = $fluteSettings[FluteSettings::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE];
+
+            /** @var EncoderInterface $encoder */
+            $encoder = $container->get(EncoderInterface::class);
+
+            $handler = new FluteThrowableHandler($encoder, $ignoredErrorClasses, $httpCodeForUnexpected, $isDebug);
+
+            if ($isLogEnabled === true && $container->has(LoggerInterface::class) === true) {
+                /** @var LoggerInterface $logger */
+                $logger = $container->get(LoggerInterface::class);
+                $handler->setLogger($logger);
+            }
+
+            return $handler;
         };
     }
 }

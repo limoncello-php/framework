@@ -18,9 +18,11 @@
 
 use Limoncello\Application\Packages\Application\ApplicationContainerConfigurator;
 use Limoncello\Application\Packages\Application\ApplicationProvider;
-use Limoncello\Application\Packages\Application\ApplicationSettings as S;
+use Limoncello\Application\Packages\Application\WhoopsContainerConfigurator;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface as S;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
+use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
 use Mockery;
@@ -56,6 +58,7 @@ class ApplicationPackageTest extends TestCase
         $provider->shouldReceive('get')->once()->with(S::class)->andReturn($this->getApplicationSettings()->get());
 
         ApplicationContainerConfigurator::configureContainer($container);
+        WhoopsContainerConfigurator::configureContainer($container);
 
         /** @var CommandStorageInterface $storage */
         $this->assertNotNull($storage = $container->get(CommandStorageInterface::class));
@@ -63,6 +66,8 @@ class ApplicationPackageTest extends TestCase
         foreach ($storage->getAll() as $class) {
             $this->assertTrue($storage->has($class));
         }
+
+        $this->assertNotNull($container->get(ThrowableHandlerInterface::class));
     }
 
     /**
@@ -70,7 +75,7 @@ class ApplicationPackageTest extends TestCase
      */
     private function getApplicationSettings(): S
     {
-        return new class extends S
+        return new class implements S
         {
             /**
              * @return array

@@ -17,15 +17,16 @@
  */
 
 use Exception;
-use Limoncello\Application\ExceptionHandlers\DefaultHandler;
+use Limoncello\Application\ExceptionHandlers\WhoopsThrowableHandler;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
-use Limoncello\Contracts\Core\SapiInterface;
+use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -39,17 +40,12 @@ class ExceptionHandlersTest extends TestCase
      */
     public function testDefaultExceptionHandler()
     {
-        $handler = new DefaultHandler();
+        $handler = new WhoopsThrowableHandler();
 
-        $exception = new Exception();
-        try {
-            $handler->handleException($exception, $this->createSapi(), $this->createContainer(true));
-        } catch (Exception $exception) {
-            //echo $exception->getMessage() . PHP_EOL;
-        }
-
-        // Mockery will do checks when the test finished
-        $this->assertTrue(true);
+        $response = $handler->createResponse(new Exception('Error for HTML'), $this->createContainer(true));
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertEquals(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
+        $this->assertStringStartsWith('<!DOCTYPE html>', (string)$response->getBody());
     }
 
     /**
@@ -57,27 +53,25 @@ class ExceptionHandlersTest extends TestCase
      */
     public function testDefaultExceptionHandlerDebugDisabled()
     {
-        $handler = new DefaultHandler();
+        $handler = new WhoopsThrowableHandler();
 
-        $handler->handleException(new Exception(), $this->createSapi(), $this->createContainer(false));
-
-        // Mockery will do checks when the test finished
-        $this->assertTrue(true);
+        $response = $handler->createResponse(new Exception('Error for Text'), $this->createContainer(false));
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertEquals(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
+        $this->assertEquals('Internal Server Error', (string)$response->getBody());
     }
 
     /**
-     * @return SapiInterface
+     * Test handler.
      */
-    private function createSapi(): SapiInterface
+    public function testFaultyLoggerOnError()
     {
-        /** @var Mock $sapi */
-        $sapi = Mockery::mock(SapiInterface::class);
+        $handler = new WhoopsThrowableHandler();
 
-        $sapi->shouldReceive('handleResponse')->once()->withAnyArgs()->andReturnUndefined();
-
-        /** @var SapiInterface $sapi */
-
-        return $sapi;
+        $response = $handler->createResponse(new Exception(), $this->createContainerWithFaultyLogger());
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertEquals(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
+        $this->assertStringStartsWith('<!DOCTYPE html>', (string)$response->getBody());
     }
 
     /**
@@ -99,6 +93,29 @@ class ExceptionHandlersTest extends TestCase
             A::KEY_APP_NAME         => 'Test App',
             A::KEY_EXCEPTION_DUMPER => [self::class, 'exceptionDumper'],
         ]);
+
+        return $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    private function createContainerWithFaultyLogger(): ContainerInterface
+    {
+        /** @var Container $container */
+        $container = $this->createContainer(true);
+
+        $container[LoggerInterface::class] = new class extends AbstractLogger implements LoggerInterface
+        {
+            /**
+             * @inheritdoc
+             */
+            public function log($level, $message, array $context = [])
+            {
+                // emulate such error as no permission to write logs to disk.
+                throw new Exception();
+            }
+        };
 
         return $container;
     }

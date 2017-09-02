@@ -18,7 +18,6 @@
 
 use Closure;
 use Limoncello\Contracts\Application\MiddlewareInterface;
-use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
 use Neomerx\Cors\Contracts\AnalysisResultInterface;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
 use Psr\Container\ContainerInterface;
@@ -56,8 +55,6 @@ class CorsMiddleware implements MiddlewareInterface
                 // actual CORS request
                 $corsHeaders = $analysis->getResponseHeaders();
 
-                self::rememberCorsHeaders($container, $corsHeaders);
-
                 /** @var ResponseInterface $response */
                 $response = $next($request);
 
@@ -69,13 +66,8 @@ class CorsMiddleware implements MiddlewareInterface
                 return $response;
 
             case AnalysisResultInterface::TYPE_PRE_FLIGHT_REQUEST:
-                $corsHeaders = $analysis->getResponseHeaders();
-
                 // return 200 HTTP with $corsHeaders
-                return new EmptyResponse(200, $corsHeaders);
-
-            case AnalysisResultInterface::ERR_NO_HOST_HEADER:
-                return static::getErrorNoHostHeaderResponse($analysis);
+                return new EmptyResponse(200, $analysis->getResponseHeaders());
 
             case AnalysisResultInterface::ERR_ORIGIN_NOT_ALLOWED:
                 return static::getErrorOriginNotAllowedResponse($analysis);
@@ -86,8 +78,10 @@ class CorsMiddleware implements MiddlewareInterface
             case AnalysisResultInterface::ERR_HEADERS_NOT_SUPPORTED:
                 return static::getErrorHeadersNotSupportedResponse($analysis);
 
+            case AnalysisResultInterface::ERR_NO_HOST_HEADER:
             default:
-                return new EmptyResponse(400);
+                assert($analysis->getRequestType() === AnalysisResultInterface::ERR_NO_HOST_HEADER);
+                return static::getErrorNoHostHeaderResponse($analysis);
         }
     }
 
@@ -99,7 +93,8 @@ class CorsMiddleware implements MiddlewareInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected static function getErrorNoHostHeaderResponse(
-        /** @noinspection PhpUnusedParameterInspection */ AnalysisResultInterface $analysis
+        /** @noinspection PhpUnusedParameterInspection */
+        AnalysisResultInterface $analysis
     ): ResponseInterface {
         return new EmptyResponse(400);
     }
@@ -112,7 +107,8 @@ class CorsMiddleware implements MiddlewareInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected static function getErrorOriginNotAllowedResponse(
-        /** @noinspection PhpUnusedParameterInspection */ AnalysisResultInterface $analysis
+        /** @noinspection PhpUnusedParameterInspection */
+        AnalysisResultInterface $analysis
     ): ResponseInterface {
         return new EmptyResponse(400);
     }
@@ -125,7 +121,8 @@ class CorsMiddleware implements MiddlewareInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected static function getErrorMethodNotSupportedResponse(
-        /** @noinspection PhpUnusedParameterInspection */ AnalysisResultInterface $analysis
+        /** @noinspection PhpUnusedParameterInspection */
+        AnalysisResultInterface $analysis
     ): ResponseInterface {
         return new EmptyResponse(400);
     }
@@ -138,23 +135,10 @@ class CorsMiddleware implements MiddlewareInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected static function getErrorHeadersNotSupportedResponse(
-        /** @noinspection PhpUnusedParameterInspection */ AnalysisResultInterface $analysis
+        /** @noinspection PhpUnusedParameterInspection */
+        AnalysisResultInterface $analysis
     ): ResponseInterface {
         return new EmptyResponse(400);
     }
 
-    /**
-     * @param ContainerInterface $container
-     * @param array              $headers
-     *
-     * @return void
-     */
-    private static function rememberCorsHeaders(ContainerInterface $container, array $headers)
-    {
-        if ($container->has(CorsStorageInterface::class) === true) {
-            /** @var CorsStorageInterface $storage */
-            $storage = $container->get(CorsStorageInterface::class);
-            $storage->setHeaders($headers);
-        }
-    }
 }

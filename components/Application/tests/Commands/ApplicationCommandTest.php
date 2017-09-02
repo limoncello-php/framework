@@ -18,7 +18,6 @@
 
 use Limoncello\Application\Commands\ApplicationCommand;
 use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
-use Limoncello\Application\Packages\Application\ApplicationSettings;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface;
 use Limoncello\Contracts\Commands\IoInterface;
@@ -77,8 +76,8 @@ class ApplicationCommandTest extends TestCase
         $container[CacheSettingsProviderInterface::class] = $providerMock;
         $providerMock->shouldReceive('get')->once()->with(ApplicationSettingsInterface::class)
             ->andReturn([
-                ApplicationSettings::KEY_CACHE_FOLDER   => '/some/path',
-                ApplicationSettings::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
+                ApplicationSettingsInterface::KEY_CACHE_FOLDER   => '/some/path',
+                ApplicationSettingsInterface::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
             ]);
         $providerMock->shouldReceive('serialize')->once()->withNoArgs()->andReturn(['some' => 'cache']);
         /** @var Mock $fsMock */
@@ -111,8 +110,8 @@ class ApplicationCommandTest extends TestCase
         $container[CacheSettingsProviderInterface::class] = $providerMock;
         $providerMock->shouldReceive('get')->once()->with(ApplicationSettingsInterface::class)
             ->andReturn([
-                ApplicationSettings::KEY_CACHE_FOLDER   => '/some/path',
-                ApplicationSettings::KEY_CACHE_CALLABLE => '', // <-- invalid value
+                ApplicationSettingsInterface::KEY_CACHE_FOLDER   => '/some/path',
+                ApplicationSettingsInterface::KEY_CACHE_CALLABLE => '', // <-- invalid value
             ]);
 
         $inOut = $this->createInOutMock(ApplicationCommand::ARG_ACTION, ApplicationCommand::ACTION_CREATE_CACHE);
@@ -139,8 +138,8 @@ class ApplicationCommandTest extends TestCase
         $container[CacheSettingsProviderInterface::class] = $providerMock;
         $providerMock->shouldReceive('get')->once()->with(ApplicationSettingsInterface::class)
             ->andReturn([
-                ApplicationSettings::KEY_CACHE_FOLDER   => '/some/path',
-                ApplicationSettings::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
+                ApplicationSettingsInterface::KEY_CACHE_FOLDER   => '/some/path',
+                ApplicationSettingsInterface::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
             ]);
         /** @var Mock $fsMock */
         $container[FileSystemInterface::class] = $fsMock = Mockery::mock(FileSystemInterface::class);
@@ -217,8 +216,8 @@ class ApplicationCommandTest extends TestCase
         $container[CacheSettingsProviderInterface::class] = $providerMock;
         $providerMock->shouldReceive('get')->once()->with(ApplicationSettingsInterface::class)
             ->andReturn([
-                ApplicationSettings::KEY_CACHE_FOLDER   => '/some/path',
-                ApplicationSettings::KEY_CACHE_CALLABLE => '', // <-- invalid value
+                ApplicationSettingsInterface::KEY_CACHE_FOLDER   => '/some/path',
+                ApplicationSettingsInterface::KEY_CACHE_CALLABLE => '', // <-- invalid value
             ]);
         /** @var Mock $fsMock */
         $container[FileSystemInterface::class] = $fsMock = Mockery::mock(FileSystemInterface::class);

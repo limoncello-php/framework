@@ -27,7 +27,19 @@ interface ApplicationSettingsInterface extends SettingsInterface
     const KEY_APP_NAME = 0;
 
     /** Settings key */
-    const KEY_PROVIDER_CLASSES = self::KEY_APP_NAME + 1;
+    const KEY_APP_ORIGIN_SCHEME = self::KEY_APP_NAME + 1;
+
+    /** Settings key */
+    const KEY_APP_ORIGIN_HOST = self::KEY_APP_ORIGIN_SCHEME + 1;
+
+    /** Settings key */
+    const KEY_APP_ORIGIN_PORT = self::KEY_APP_ORIGIN_HOST + 1;
+
+    /** Settings key */
+    const KEY_APP_ORIGIN_URI = self::KEY_APP_ORIGIN_PORT + 1;
+
+    /** Settings key */
+    const KEY_PROVIDER_CLASSES = self::KEY_APP_ORIGIN_URI + 1;
 
     /** Settings key */
     const KEY_CACHE_FOLDER = self::KEY_PROVIDER_CLASSES + 1;
@@ -43,8 +55,12 @@ interface ApplicationSettingsInterface extends SettingsInterface
 
     /** Settings key */
     const KEY_IS_DEBUG = self::KEY_COMMANDS_FILE_MASK + 1;
+
     /** Settings key */
-    const KEY_ROUTES_PATH = self::KEY_IS_DEBUG + 1;
+    const KEY_IS_LOG_ENABLED = self::KEY_IS_DEBUG + 1;
+
+    /** Settings key */
+    const KEY_ROUTES_PATH = self::KEY_IS_LOG_ENABLED + 1;
 
     /** Settings key */
     const KEY_CONTAINER_CONFIGURATORS_PATH = self::KEY_ROUTES_PATH + 1;

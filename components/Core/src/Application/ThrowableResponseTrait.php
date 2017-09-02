@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Packages\Cors;
+<?php namespace Limoncello\Core\Application;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,32 +16,34 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
+use Throwable;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Core
  */
-class CorsStorage implements CorsStorageInterface
+trait ThrowableResponseTrait
 {
     /**
-     * @var array
+     * @var Throwable
      */
-    private $headers = [];
+    private $throwable;
 
     /**
-     * @inheritdoc
+     * @return Throwable
      */
-    public function getHeaders(): array
+    public function getThrowable(): Throwable
     {
-        return $this->headers;
+        return $this->throwable;
     }
 
     /**
-     * @inheritdoc
+     * @param Throwable $throwable
+     *
+     * @return self
      */
-    public function setHeaders(array $headers): CorsStorageInterface
+    protected function setThrowable(Throwable $throwable): self
     {
-        $this->headers = $headers;
+        $this->throwable = $throwable;
 
         return $this;
     }

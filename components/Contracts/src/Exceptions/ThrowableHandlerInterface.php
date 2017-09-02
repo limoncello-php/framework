@@ -16,39 +16,20 @@
  * limitations under the License.
  */
 
-use Exception;
-use Limoncello\Contracts\Core\SapiInterface;
+use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Psr\Container\ContainerInterface;
 use Throwable;
 
 /**
  * @package Limoncello\Contracts
  */
-interface ExceptionHandlerInterface
+interface ThrowableHandlerInterface
 {
     /**
-     * @param Exception          $exception
-     * @param SapiInterface      $sapi
-     * @param ContainerInterface $container
-     *
-     * @return void
-     */
-    public function handleException(Exception $exception, SapiInterface $sapi, ContainerInterface $container): void;
-
-    /**
      * @param Throwable          $throwable
-     * @param SapiInterface      $sapi
      * @param ContainerInterface $container
      *
-     * @return void
+     * @return ThrowableResponseInterface
      */
-    public function handleThrowable(Throwable $throwable, SapiInterface $sapi, ContainerInterface $container): void;
-
-    /**
-     * @param array              $error
-     * @param ContainerInterface $container
-     *
-     * @return void
-     */
-    public function handleFatal(array $error, ContainerInterface $container): void;
+    public function createResponse(Throwable $throwable, ContainerInterface $container): ThrowableResponseInterface;
 }

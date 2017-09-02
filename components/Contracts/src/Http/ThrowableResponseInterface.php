@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Application\Packages\Cors;
+<?php namespace Limoncello\Contracts\Http;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,25 +16,16 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Packages\Cors\CorsStorage;
-use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Throwable;
 
 /**
- * @package Limoncello\Tests\Application
+ * @package Limoncello\Contracts
  */
-class CorsStorageTest extends TestCase
+interface ThrowableResponseInterface extends ResponseInterface
 {
     /**
-     * Test methods.
+     * @return Throwable
      */
-    public function testHasSetGet()
-    {
-        $storage = new CorsStorage();
-
-        $headers = ['key' => 'value'];
-        $this->assertNotEquals($headers, $storage->getHeaders());
-
-        $storage->setHeaders($headers);
-        $this->assertEquals($headers, $storage->getHeaders());
-    }
+    public function getThrowable(): Throwable;
 }

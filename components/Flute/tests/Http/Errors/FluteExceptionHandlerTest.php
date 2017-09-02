@@ -18,15 +18,9 @@
 
 use Exception;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface;
-use Limoncello\Contracts\Core\SapiInterface;
-use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
-use Limoncello\Flute\Http\Errors\FluteExceptionHandler;
-use Limoncello\Flute\Package\FluteSettings;
-use Limoncello\Tests\Flute\Data\Package\Flute;
-use Limoncello\Tests\Flute\Data\Package\SettingsProvider;
+use Limoncello\Flute\Http\Errors\FluteThrowableHandler;
 use Limoncello\Tests\Flute\TestCase;
 use Mockery;
 use Mockery\Mock;
@@ -42,108 +36,65 @@ class FluteExceptionHandlerTest extends TestCase
     /**
      * Test Exception handler.
      */
-    public function testExceptionHandler()
+    public function testHandlerWithNonJsonException()
     {
-        $handler = new FluteExceptionHandler();
-
-        $container = new Container();
-        $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
-            ApplicationSettingsInterface::class => [
-                ApplicationSettingsInterface::KEY_IS_DEBUG => true,
-            ],
-        ]);
-        $container[LoggerInterface::class] = new NullLogger();
         /** @var Mock $encoderMock */
-        /** @var Mock $corsStorageMock */
-        $container[EncoderInterface::class] = $encoderMock = Mockery::mock(EncoderInterface::class);
-        $container[CorsStorageInterface::class] = $corsStorageMock = Mockery::mock(CorsStorageInterface::class);
-
+        $encoderMock = Mockery::mock(EncoderInterface::class);
         $encoderMock->shouldReceive('encodeErrors')->once()->withAnyArgs()->andReturn('error_info');
-        $corsStorageMock->shouldReceive('getHeaders')->once()->withNoArgs()->andReturn(['some' => 'cors_headers']);
+        /** @var EncoderInterface $encoderMock */
 
-        /** @var Mock $sapi */
-        $sapi = Mockery::mock(SapiInterface::class);
-        $sapi->shouldReceive('handleResponse')->once()->withAnyArgs()->andReturnSelf();
+        $isDebug = true;
 
-        /** @var SapiInterface $sapi */
+        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug);
+        $handler->setLogger(new NullLogger());
 
-        $handler->handleException(new Exception(), $sapi, $container);
-
-        // Mock will do the checks when test finishes
-        $this->assertTrue(true);
+        $response = $handler->createResponse(new Exception(), new Container());
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertNotNull($response->getThrowable());
     }
 
     /**
      * Test Exception handler.
      */
-    public function testExceptionHandlerWithoutCorsHeaders()
+    public function testHandlerWithJsonException()
     {
-        $handler = new FluteExceptionHandler();
-
-        $container = new Container();
-        $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
-            ApplicationSettingsInterface::class => [
-                ApplicationSettingsInterface::KEY_IS_DEBUG => true,
-            ],
-        ]);
-        $container[LoggerInterface::class] = new NullLogger();
         /** @var Mock $encoderMock */
-        $container[EncoderInterface::class] = $encoderMock = Mockery::mock(EncoderInterface::class);
-
+        $encoderMock = Mockery::mock(EncoderInterface::class);
         $encoderMock->shouldReceive('encodeErrors')->once()->withAnyArgs()->andReturn('error_info');
+        /** @var EncoderInterface $encoderMock */
 
-        /** @var Mock $sapi */
-        $sapi = Mockery::mock(SapiInterface::class);
-        $sapi->shouldReceive('handleResponse')->once()->withAnyArgs()->andReturnSelf();
+        $isDebug = true;
 
-        /** @var SapiInterface $sapi */
+        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug);
+        $handler->setLogger(new NullLogger());
 
-        $handler->handleException(new Exception(), $sapi, $container);
-
-        // Mock will do the checks when test finishes
-        $this->assertTrue(true);
+        $response = $handler->createResponse(new JsonApiException([]), new Container());
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertNotNull($response->getThrowable());
     }
 
     /**
-     * Test Throwable handler.
+     * Test Exception handler.
      */
-    public function testThrowableHandler()
+    public function testHandlerWithFaultyLogger()
     {
-        $handler = new FluteExceptionHandler();
-
-        $container = new Container();
-        $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
-            ApplicationSettingsInterface::class => [
-                ApplicationSettingsInterface::KEY_IS_DEBUG => true,
-            ],
-        ]);
         /** @var Mock $encoderMock */
-        /** @var Mock $corsStorageMock */
-        $container[EncoderInterface::class] = $encoderMock = Mockery::mock(EncoderInterface::class);
-        $container[CorsStorageInterface::class] = $corsStorageMock = Mockery::mock(CorsStorageInterface::class);
-
+        $encoderMock = Mockery::mock(EncoderInterface::class);
         $encoderMock->shouldReceive('encodeErrors')->once()->withAnyArgs()->andReturn('error_info');
-        $corsStorageMock->shouldReceive('getHeaders')->once()->withNoArgs()->andReturn(['some' => 'cors_headers']);
+        /** @var EncoderInterface $encoderMock */
 
-        /** @var Mock $sapi */
-        $sapi = Mockery::mock(SapiInterface::class);
-        $sapi->shouldReceive('handleResponse')->once()->withAnyArgs()->andReturnSelf();
+        $isDebug = true;
 
-        /** @var SapiInterface $sapi */
+        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug);
+        /** @var Mock $logger */
+        $logger = Mockery::mock(LoggerInterface::class);
+        $logger->shouldReceive('error')->once()->withAnyArgs()->andThrow(new Exception('From logger'));
+        /** @var LoggerInterface $logger */
+        $handler->setLogger($logger);
 
-        $handler->handleThrowable(new JsonApiException([]), $sapi, $container);
-
-        $handler->handleFatal([
-            'message' => 'some message',
-            'type'    => 0,
-            'file'    => __FILE__,
-            'line'    => __LINE__,
-        ], $container);
-
-        // Mock will do the checks when test finishes
-        $this->assertTrue(true);
+        $response = $handler->createResponse(new Exception('Original Error'), new Container());
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertNotNull($response->getThrowable());
+        $this->assertEquals('Original Error', $response->getThrowable()->getMessage());
     }
 }

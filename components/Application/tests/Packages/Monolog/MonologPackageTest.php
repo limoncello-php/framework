@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Application\Packages\Monolog\MonologFileContainerConfigurator;
 use Limoncello\Application\Packages\Monolog\MonologFileProvider;
 use Limoncello\Application\Packages\Monolog\MonologFileSettings as C;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
 use Mockery\Mock;

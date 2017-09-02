@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Application\Packages\Monolog\MonologFileSettings as C;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;

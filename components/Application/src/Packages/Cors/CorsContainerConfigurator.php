@@ -16,16 +16,15 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Packages\Cors\CorsSettings as C;
+use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
-use Limoncello\Application\Packages\Application\ApplicationSettings as A;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Neomerx\Cors\Analyzer;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
 use Neomerx\Cors\Strategies\Settings;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Packages\Cors\CorsSettings as C;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -52,10 +51,6 @@ class CorsContainerConfigurator implements ContainerConfiguratorInterface
             }
 
             return $analyzer;
-        };
-
-        $container[CorsStorageInterface::class] = function () {
-            return new CorsStorage();
         };
     }
 }

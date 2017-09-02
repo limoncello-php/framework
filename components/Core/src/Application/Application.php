@@ -20,6 +20,8 @@ use Closure;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Core\ApplicationInterface;
 use Limoncello\Contracts\Core\SapiInterface;
+use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
+use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Contracts\CoreSettingsInterface;
@@ -30,7 +32,9 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 use Zend\Diactoros\Response\EmptyResponse;
+use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
 
 /**
@@ -44,6 +48,9 @@ abstract class Application implements ApplicationInterface
 
     /** Method name for default request factory. */
     const FACTORY_METHOD = 'defaultRequestFactory';
+
+    /** HTTP error code for default error response. */
+    protected const DEFAULT_HTTP_ERROR_CODE = 500;
 
     /**
      * @var SapiInterface|null
@@ -64,16 +71,6 @@ abstract class Application implements ApplicationInterface
      * @return LimoncelloContainerInterface
      */
     abstract protected function createContainerInstance(): LimoncelloContainerInterface;
-
-    /**
-     * Exception handler should not use container before actual error occurs.
-     *
-     * @param SapiInterface         $sapi
-     * @param PsrContainerInterface $container
-     *
-     * @return void
-     */
-    abstract protected function setUpExceptionHandler(SapiInterface $sapi, PsrContainerInterface $container): void;
 
     /**
      * @inheritdoc
@@ -97,53 +94,57 @@ abstract class Application implements ApplicationInterface
             throw new LogicException('SAPI not set.');
         }
 
-        $container = $this->createContainerInstance();
+        $container = null;
 
-        $this->setUpExceptionHandler($this->sapi, $container);
+        try {
+            $container = $this->createContainerInstance();
 
-        $settingsProvider = $this->createSettingsProvider();
-        $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
+            $settingsProvider = $this->createSettingsProvider();
+            $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
 
-        $coreSettings = $settingsProvider->get(CoreSettingsInterface::class);
+            $coreSettings = $settingsProvider->get(CoreSettingsInterface::class);
 
-        // match route from `Request` to handler, route container configurators/middleware, etc
-        list($matchCode, $allowedMethods, $handlerParams, $handler,
-            $routeMiddleware, $routeConfigurators, $requestFactory) = $this->initRouter($coreSettings)
+            // match route from `Request` to handler, route container configurators/middleware, etc
+            list($matchCode, $allowedMethods, $handlerParams, $handler,
+                $routeMiddleware, $routeConfigurators, $requestFactory) = $this->initRouter($coreSettings)
                 ->match($this->sapi->getMethod(), $this->sapi->getUri()->getPath());
 
-        // configure container
-        $globalConfigurators = BaseCoreSettings::getGlobalConfiguratorsFromData($coreSettings);
-        $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
+            // configure container
+            $globalConfigurators = BaseCoreSettings::getGlobalConfiguratorsFromData($coreSettings);
+            $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
 
-        // build pipeline for handling `Request`: global middleware -> route middleware -> handler (e.g. controller)
+            // build pipeline for handling `Request`: global middleware -> route middleware -> handler (e.g. controller)
 
-        // select terminal handler
-        switch ($matchCode) {
-            case RouterInterface::MATCH_FOUND:
-                $handler = $this->createTerminalHandler($handler, $handlerParams, $container);
-                break;
-            case RouterInterface::MATCH_METHOD_NOT_ALLOWED:
-                $handler = $this->createMethodNotAllowedTerminalHandler($allowedMethods);
-                break;
-            default:
-                assert($matchCode === RouterInterface::MATCH_NOT_FOUND);
-                $handler = $this->createNotFoundTerminalHandler();
-                break;
+            // select terminal handler
+            switch ($matchCode) {
+                case RouterInterface::MATCH_FOUND:
+                    $handler = $this->createTerminalHandler($handler, $handlerParams, $container);
+                    break;
+                case RouterInterface::MATCH_METHOD_NOT_ALLOWED:
+                    $handler = $this->createMethodNotAllowedTerminalHandler($allowedMethods);
+                    break;
+                default:
+                    assert($matchCode === RouterInterface::MATCH_NOT_FOUND);
+                    $handler = $this->createNotFoundTerminalHandler();
+                    break;
+            }
+
+            $globalMiddleware = BaseCoreSettings::getGlobalMiddlewareFromData($coreSettings);
+            $hasMiddleware    = empty($globalMiddleware) === false || empty($routeMiddleware) === false;
+
+            $handler = $hasMiddleware === true ?
+                $this->addMiddlewareChain($handler, $container, $globalMiddleware, $routeMiddleware) : $handler;
+
+            $request = $requestFactory === null && $hasMiddleware === false && $matchCode === RouterInterface::MATCH_FOUND ?
+                null :
+                $this->createRequest($this->sapi, $container, $requestFactory ?? static::getDefaultRequestFactory());
+
+            // Execute the pipeline by sending `Request` down all middleware (global then route's then
+            // terminal handler in `Controller` and back) and then send `Response` to SAPI
+            $this->sapi->handleResponse($this->handleRequest($handler, $request));
+        } catch (Throwable $throwable) {
+            $this->sapi->handleResponse($this->handleThrowable($throwable, $container));
         }
-
-        $globalMiddleware = BaseCoreSettings::getGlobalMiddlewareFromData($coreSettings);
-        $hasMiddleware    = empty($globalMiddleware) === false || empty($routeMiddleware) === false;
-
-        $handler = $hasMiddleware === true ?
-            $this->addMiddlewareChain($handler, $container, $globalMiddleware, $routeMiddleware) : $handler;
-
-        $request = $requestFactory === null && $hasMiddleware === false && $matchCode === RouterInterface::MATCH_FOUND ?
-            null :
-            $this->createRequest($this->sapi, $container, $requestFactory ?? static::getDefaultRequestFactory());
-
-        // Execute the pipeline by sending `Request` down all middleware (global then route's then
-        // terminal handler in `Controller` and back) and then send `Response` to SAPI
-        $this->sapi->handleResponse($this->handleRequest($handler, $request));
     }
 
     /**
@@ -191,6 +192,27 @@ abstract class Application implements ApplicationInterface
     }
 
     /**
+     * @param Throwable                  $throwable
+     * @param null|PsrContainerInterface $container
+     *
+     * @return ThrowableResponseInterface
+     */
+    protected function handleThrowable(
+        Throwable $throwable,
+        ?PsrContainerInterface $container
+    ): ThrowableResponseInterface {
+        if ($container !== null && $container->has(ThrowableHandlerInterface::class) === true) {
+            /** @var ThrowableHandlerInterface $handler */
+            $handler  = $container->get(ThrowableHandlerInterface::class);
+            $response = $handler->createResponse($throwable, $container);
+        } else {
+            $response = $this->createDefaultThrowableResponse($throwable);
+        }
+
+        return $response;
+    }
+
+    /**
      * @param int   $status
      * @param array $headers
      *
@@ -199,6 +221,32 @@ abstract class Application implements ApplicationInterface
     protected function createEmptyResponse($status = 204, array $headers = []): ResponseInterface
     {
         $response = new EmptyResponse($status, $headers);
+
+        return $response;
+    }
+
+    /**
+     * @param Throwable $throwable
+     *
+     * @return ThrowableResponseInterface
+     */
+    protected function createDefaultThrowableResponse(Throwable $throwable): ThrowableResponseInterface
+    {
+        $status   = static::DEFAULT_HTTP_ERROR_CODE;
+        $response = new class ($throwable, $status) extends TextResponse implements ThrowableResponseInterface
+        {
+            use ThrowableResponseTrait;
+
+            /**
+             * @param Throwable $throwable
+             * @param int       $status
+             */
+            public function __construct(Throwable $throwable, int $status)
+            {
+                parent::__construct((string)$throwable, $status);
+                $this->setThrowable($throwable);
+            }
+        };
 
         return $response;
     }
@@ -347,8 +395,16 @@ abstract class Application implements ApplicationInterface
         array $handlerParams,
         PsrContainerInterface $container
     ): Closure {
-        return function (ServerRequestInterface $request = null) use ($handler, $handlerParams, $container) {
-            return $this->callHandler($handler, $handlerParams, $container, $request);
+        return function (ServerRequestInterface $request = null) use (
+            $handler,
+            $handlerParams,
+            $container
+        ): ResponseInterface {
+            try {
+                return $this->callHandler($handler, $handlerParams, $container, $request);
+            } catch (Throwable $throwable) {
+                return $this->handleThrowable($throwable, $container);
+            }
         };
     }
 
@@ -360,7 +416,7 @@ abstract class Application implements ApplicationInterface
     private function createMethodNotAllowedTerminalHandler(array $allowedMethods): Closure
     {
         // 405 Method Not Allowed
-        return function () use ($allowedMethods) {
+        return function () use ($allowedMethods): ResponseInterface {
             return $this->createEmptyResponse(405, ['Accept' => implode(',', $allowedMethods)]);
         };
     }
@@ -371,7 +427,7 @@ abstract class Application implements ApplicationInterface
     private function createNotFoundTerminalHandler(): Closure
     {
         // 404 Not Found
-        return function () {
+        return function (): ResponseInterface {
             return $this->createEmptyResponse(404);
         };
     }

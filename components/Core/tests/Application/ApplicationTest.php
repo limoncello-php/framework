@@ -17,14 +17,19 @@
  */
 
 use Closure;
+use Exception;
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
+use Limoncello\Container\Container;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Core\SapiInterface;
+use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
+use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Application;
 use Limoncello\Core\Application\Sapi;
+use Limoncello\Core\Application\ThrowableResponseTrait;
 use Limoncello\Core\Contracts\CoreSettingsInterface;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 use Limoncello\Core\Routing\Group;
@@ -38,6 +43,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use ReflectionMethod;
+use Throwable;
 use Zend\Diactoros\Response\EmitterInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequestFactory;
@@ -81,6 +87,11 @@ class ApplicationTest extends TestCase
     private static $isRequestFactoryCalled;
 
     /**
+     * @var bool
+     */
+    private static $isHomeIndexCalled;
+
+    /**
      * Set up tests.
      */
     protected function setUp()
@@ -93,6 +104,7 @@ class ApplicationTest extends TestCase
         self::$isGlobalMiddleware2Called  = false;
         self::$isRouteMiddlewareCalled    = false;
         self::$isRequestFactoryCalled     = false;
+        self::$isHomeIndexCalled          = false;
     }
 
     /**
@@ -115,6 +127,7 @@ class ApplicationTest extends TestCase
         $this->assertTrue(self::$isGlobalMiddleware1Called);
         $this->assertFalse(self::$isRouteMiddlewareCalled);
         $this->assertFalse(self::$isRequestFactoryCalled);
+        $this->assertTrue(self::$isHomeIndexCalled);
     }
 
     /**
@@ -217,9 +230,87 @@ class ApplicationTest extends TestCase
     }
 
     /**
+     * Test error handling.
+     */
+    public function testErrorHandling()
+    {
+        $execute = function (string $uri): ResponseInterface {
+            $container = new Container();
+            /** @var Application $app */
+            list($app, $sapi) = $this->createApp('GET', $uri, $this->getRoutesDataForErrorsTesting(), [], $container);
+            $app->run();
+            $response = $sapi->{self::FIELD_RESPONSE};
+
+            return $response;
+        };
+
+        /** @var ThrowableResponseInterface $response */
+        $response = $execute('/throwable-exception-without-handler');
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertInstanceOf(Throwable::class, $response->getThrowable());
+        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertStringStartsWith(
+            'Exception: The handler emulates an error in a Controller.',
+            $this->getText($response->getBody())
+        );
+
+        $response = $execute('/throwable-error-without-handler');
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertStringStartsWith(
+            'ParseError: syntax error',
+            $this->getText($response->getBody())
+        );
+
+        $response = $execute('/throwable-exception-with-handler');
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertStringStartsWith(
+            'Handled by error handler. Exception: The handler emulates an error in a Controller.',
+            $this->getText($response->getBody())
+        );
+
+        $response = $execute('/throwable-error-with-handler');
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertStringStartsWith(
+            'Handled by error handler. ParseError: syntax error',
+            $this->getText($response->getBody())
+        );
+    }
+
+    /**
      * Test page.
      */
-    public function testGetRouter()
+    public function testHomeIndexFaultyMiddleware()
+    {
+        /** @var Application $app */
+        /** @var SapiInterface $sapi */
+        $faultyMiddleware = [self::class, 'faultyMiddlewareItem'];
+        $container        = new Container();
+        list($app, $sapi) = $this
+            ->createApp('GET', '/', $this->getRoutesData(), [$faultyMiddleware], $container);
+        $app->run();
+
+        /** @var ResponseInterface $response */
+        $response = $sapi->{self::FIELD_RESPONSE};
+        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertStringStartsWith(
+            'Exception: Oops! We got an error in middleware.',
+            (string)$response->getBody()
+        );
+
+        $this->assertTrue(self::$isGlobalConfiguratorCalled);
+        $this->assertFalse(self::$isHomeIndexCalled);
+        $this->assertFalse(self::$isRouteConfiguratorCalled);
+        $this->assertFalse(self::$isRouteMiddlewareCalled);
+        $this->assertFalse(self::$isRequestFactoryCalled);
+    }
+
+    /**
+     * Test page.
+     */
+    public function testGetRouter(): void
     {
         /** @var Application $app */
         list($app) = $this->createApp('GET', '/', $this->getRoutesData());
@@ -231,19 +322,24 @@ class ApplicationTest extends TestCase
     }
 
     /**
-     * @param string $method
-     * @param string $uri
-     * @param array  $routesData
-     * @param array  $globalMiddleware
+     * @param string                            $method
+     * @param string                            $uri
+     * @param array                             $routesData
+     * @param array|null                        $globalMiddleware
+     * @param LimoncelloContainerInterface|null $container
      *
      * @return array
      */
     private function createApp(
-        $method,
-        $uri,
+        string $method,
+        string $uri,
         array $routesData,
-        array $globalMiddleware = [[self::class, 'globalMiddlewareItem1'], [self::class, 'globalMiddlewareItem2']]
-    ) {
+        array $globalMiddleware = null,
+        LimoncelloContainerInterface $container = null
+    ): array {
+        $globalMiddleware = $globalMiddleware ??
+            [[self::class, 'globalMiddlewareItem1'], [self::class, 'globalMiddlewareItem2']];
+
         $coreSettings = (new CoreSettings())
             ->setRouterParameters([
                 CoreSettings::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
@@ -256,10 +352,12 @@ class ApplicationTest extends TestCase
         $settings = Mockery::mock(SettingsProviderInterface::class);
         $settings->shouldReceive('get')->once()->with(CoreSettingsInterface::class)->andReturn($coreSettings->get());
 
-        /** @var Mock $container */
-        $container = Mockery::mock(LimoncelloContainerInterface::class);
-        $container->shouldReceive('offsetSet')->once()
-            ->with(SettingsProviderInterface::class, $settings)->andReturnUndefined();
+        if ($container === null) {
+            /** @var Mock $container */
+            $container = Mockery::mock(LimoncelloContainerInterface::class);
+            $container->shouldReceive('offsetSet')->once()
+                ->with(SettingsProviderInterface::class, $settings)->andReturnUndefined();
+        }
 
         $server['REQUEST_URI']    = $uri;
         $server['REQUEST_METHOD'] = $method;
@@ -277,7 +375,6 @@ class ApplicationTest extends TestCase
 
         $app->shouldReceive('createSettingsProvider')->once()->withAnyArgs()->andReturn($settings);
         $app->shouldReceive('createContainerInstance')->zeroOrMoreTimes()->withNoArgs()->andReturn($container);
-        $app->shouldReceive('setUpExceptionHandler')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
 
         /** @var Application $app */
         /** @var SapiInterface $sapi */
@@ -317,6 +414,29 @@ class ApplicationTest extends TestCase
             GroupInterface::PARAM_CONTAINER_CONFIGURATORS => [self::class . '::createPostConfigurator'],
             GroupInterface::PARAM_REQUEST_FACTORY         => null,
         ]))->get('/', [self::class, 'homeIndexNoRequest']);
+
+        $router     = new Router(GroupCountBasedGenerator::class, GroupCountBasedDispatcher::class);
+        $routesData = $router->getCachedRoutes($group);
+
+        return $routesData;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRoutesDataForErrorsTesting()
+    {
+        $group = (new Group())
+            ->group('', function (GroupInterface $group): void {
+                $group->get('throwable-exception-with-handler', self::class . '::handlerThatThrowsException');
+                $group->get('throwable-error-with-handler', self::class . '::handlerThatProducesError');
+            }, [
+                GroupInterface::PARAM_CONTAINER_CONFIGURATORS => [self::class . '::configureErrorHandler'],
+            ])
+            ->group('', function (GroupInterface $group): void {
+                $group->get('throwable-exception-without-handler', self::class . '::handlerThatThrowsException');
+                $group->get('throwable-error-without-handler', self::class . '::handlerThatProducesError');
+            });
 
         $router     = new Router(GroupCountBasedGenerator::class, GroupCountBasedDispatcher::class);
         $routesData = $router->getCachedRoutes($group);
@@ -382,6 +502,21 @@ class ApplicationTest extends TestCase
     /**
      * @param ServerRequestInterface $request
      * @param Closure                $next
+     *
+     * @return ResponseInterface
+     *
+     * @throws Exception
+     */
+    public static function faultyMiddlewareItem(ServerRequestInterface $request, Closure $next): ResponseInterface
+    {
+        assert($request || $next);
+
+        throw new Exception('Oops! We got an error in middleware.');
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param Closure                $next
      * @param PsrContainerInterface  $container
      *
      * @return ResponseInterface
@@ -431,6 +566,45 @@ class ApplicationTest extends TestCase
     }
 
     /**
+     * Container configurator.
+     *
+     * @param LimoncelloContainerInterface $container
+     *
+     * @return void
+     */
+    public static function configureErrorHandler(LimoncelloContainerInterface $container)
+    {
+        $container[ThrowableHandlerInterface::class] = new class implements ThrowableHandlerInterface
+        {
+            /**
+             * @inheritdoc
+             */
+            public function createResponse(
+                Throwable $throwable,
+                PsrContainerInterface $container
+            ): ThrowableResponseInterface {
+                $response = new class ($throwable) extends TextResponse implements ThrowableResponseInterface
+                {
+                    use ThrowableResponseTrait;
+
+                    /**
+                     * @param Throwable $throwable
+                     * @param int       $status
+                     */
+                    public function __construct(Throwable $throwable, $status = 500)
+                    {
+                        $text = 'Handled by error handler. ' . (string)$throwable;
+                        parent::__construct($text, $status);
+                        $this->setThrowable($throwable);
+                    }
+                };
+
+                return $response;
+            }
+        };
+    }
+
+    /**
      * @param array                       $params
      * @param PsrContainerInterface       $container
      * @param ServerRequestInterface|null $request
@@ -446,7 +620,59 @@ class ApplicationTest extends TestCase
 
         $params && $request && $container ?: null;
 
+        self::$isHomeIndexCalled = true;
+
         return new TextResponse('home index');
+    }
+
+    /**
+     * @param array                       $params
+     * @param PsrContainerInterface       $container
+     * @param ServerRequestInterface|null $request
+     *
+     * @return ResponseInterface
+     *
+     * @throws Exception
+     */
+    public static function handlerThatThrowsException(
+        array $params,
+        PsrContainerInterface $container,
+        ServerRequestInterface $request = null
+    ): ResponseInterface {
+        $params && $request && $container ?: null;
+
+        throw new Exception('The handler emulates an error in a Controller.');
+    }
+
+    /**
+     * @param array                       $params
+     * @param PsrContainerInterface       $container
+     * @param ServerRequestInterface|null $request
+     *
+     * @return ResponseInterface
+     *
+     * @throws Exception
+     */
+    public static function handlerThatProducesError(
+        array $params,
+        PsrContainerInterface $container,
+        ServerRequestInterface $request = null
+    ): ResponseInterface {
+        $params && $request && $container ?: null;
+
+        // it will produce PHP syntax error and that's exactly what
+        // we need to test how handler deals with such kind of problems.
+        $invalidPhp = <<<EOT
+<?php
+
+syntax error
+EOT;
+
+        eval($invalidPhp);
+
+        assert(false, 'Unreachable line of code');
+
+        return new TextResponse('Unreachable line of code');
     }
 
     /**

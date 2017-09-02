@@ -18,9 +18,7 @@
 
 use Closure;
 use Limoncello\Application\Packages\Cors\CorsMiddleware;
-use Limoncello\Application\Packages\Cors\CorsStorage;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Http\Cors\CorsStorageInterface;
 use Mockery;
 use Mockery\Mock;
 use Neomerx\Cors\Contracts\AnalysisResultInterface;
@@ -74,10 +72,9 @@ class CorsMiddlewareTest extends TestCase
 
         $this->analyzer = $analyzer;
 
-        $container = new Container();
+        $container                           = new Container();
         $container[AnalyzerInterface::class] = $this->analyzer;
-        $container[CorsStorageInterface::class] = new CorsStorage();
-        $this->container = $container;
+        $this->container                     = $container;
 
         $this->request = Mockery::mock(ServerRequestInterface::class);
 
@@ -178,18 +175,6 @@ class CorsMiddlewareTest extends TestCase
     {
         $this->analysis->shouldReceive('getRequestType')->once()->withNoArgs()
             ->andReturn(AnalysisResultInterface::ERR_HEADERS_NOT_SUPPORTED);
-
-        $response = CorsMiddleware::handle($this->request, $this->next, $this->container);
-        $this->assertNotNull($response);
-        $this->assertEquals(400, $response->getStatusCode());
-    }
-
-    /**
-     * Test CORS.
-     */
-    public function testOtherErrorRequest()
-    {
-        $this->analysis->shouldReceive('getRequestType')->once()->withNoArgs()->andReturn(-1);
 
         $response = CorsMiddleware::handle($this->request, $this->next, $this->container);
         $this->assertNotNull($response);
