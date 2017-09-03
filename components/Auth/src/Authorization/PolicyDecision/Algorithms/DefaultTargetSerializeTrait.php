@@ -105,7 +105,7 @@ trait DefaultTargetSerializeTrait
         $name   = $logger === null ? null : Encoder::targetName($target);
 
         if ($anyOfs === null) {
-            $logger === null ?: $logger->info("Target '$name' matches anything.");
+            $logger === null ?: $logger->debug("Target '$name' matches anything.");
 
             return TargetMatchEnum::NO_TARGET;
         }
@@ -121,7 +121,7 @@ trait DefaultTargetSerializeTrait
                     }
                 }
                 if ($isAllOfApplicable === true) {
-                    $logger === null ?: $logger->info("Target '$name' matches.");
+                    $logger === null ?: $logger->debug("Target '$name' matches.");
 
                     return TargetMatchEnum::MATCH;
                 }

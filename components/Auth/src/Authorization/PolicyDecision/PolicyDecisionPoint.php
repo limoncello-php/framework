@@ -59,13 +59,13 @@ class PolicyDecisionPoint implements PolicyDecisionPointInterface
         $set = $this->getEncodePolicySet();
 
         $name = Encoder::policySetName($set);
-        $logger === null ?: $logger->info("Policy Decision Point evaluates '$name' policy set.");
+        $logger === null ?: $logger->debug("Policy Decision Point evaluates '$name' policy set.");
 
         $target = Encoder::policySetTarget($set);
         $match  = $this->evaluateTarget($context, $target, $logger);
         $result = BasePolicyOrSetAlgorithm::evaluateItem($context, $match, $this->getEncodePolicySet(), $logger);
 
-        $logger === null ?: $logger->info("Policy Decision Point evaluated '$name' policy set.");
+        $logger === null ?: $logger->debug("Policy Decision Point evaluated '$name' policy set.");
 
         return $result;
     }
