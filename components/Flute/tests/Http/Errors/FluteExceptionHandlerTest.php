@@ -20,7 +20,8 @@ use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
-use Limoncello\Flute\Http\Errors\FluteThrowableHandler;
+use Limoncello\Flute\Http\ThrowableHandlers\FluteThrowableHandler;
+use Limoncello\Tests\Flute\Data\Exceptions\JsonApiThrowableConverter;
 use Limoncello\Tests\Flute\TestCase;
 use Mockery;
 use Mockery\Mock;
@@ -45,7 +46,8 @@ class FluteExceptionHandlerTest extends TestCase
 
         $isDebug = true;
 
-        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug);
+        $throwableConverterClass = null;
+        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug, $throwableConverterClass);
         $handler->setLogger(new NullLogger());
 
         $response = $handler->createResponse(new Exception(), new Container());
@@ -65,7 +67,8 @@ class FluteExceptionHandlerTest extends TestCase
 
         $isDebug = true;
 
-        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug);
+        $throwableConverterClass = null;
+        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug, $throwableConverterClass);
         $handler->setLogger(new NullLogger());
 
         $response = $handler->createResponse(new JsonApiException([]), new Container());
@@ -85,7 +88,8 @@ class FluteExceptionHandlerTest extends TestCase
 
         $isDebug = true;
 
-        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug);
+        $throwableConverterClass = null;
+        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug, $throwableConverterClass);
         /** @var Mock $logger */
         $logger = Mockery::mock(LoggerInterface::class);
         $logger->shouldReceive('error')->once()->withAnyArgs()->andThrow(new Exception('From logger'));
@@ -96,5 +100,49 @@ class FluteExceptionHandlerTest extends TestCase
         $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
         $this->assertNotNull($response->getThrowable());
         $this->assertEquals('Original Error', $response->getThrowable()->getMessage());
+    }
+
+    /**
+     * Test Exception handler.
+     */
+    public function testHandlerWithNonJsonExceptionAndConverter()
+    {
+        /** @var Mock $encoderMock */
+        $encoderMock = Mockery::mock(EncoderInterface::class);
+        $encoderMock->shouldReceive('encodeErrors')->once()->withAnyArgs()->andReturn('error_info');
+        /** @var EncoderInterface $encoderMock */
+
+        $isDebug = true;
+
+        JsonApiThrowableConverter::setShouldThrow(false);
+        $throwableConverterClass = JsonApiThrowableConverter::class;
+        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug, $throwableConverterClass);
+        $handler->setLogger(new NullLogger());
+
+        $response = $handler->createResponse(new Exception(), new Container());
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertInstanceOf(JsonApiException::class, $response->getThrowable());
+    }
+
+    /**
+     * Test Exception handler.
+     */
+    public function testHandlerWithNonJsonExceptionAndFaultyConverter()
+    {
+        /** @var Mock $encoderMock */
+        $encoderMock = Mockery::mock(EncoderInterface::class);
+        $encoderMock->shouldReceive('encodeErrors')->once()->withAnyArgs()->andReturn('error_info');
+        /** @var EncoderInterface $encoderMock */
+
+        $isDebug = true;
+
+        JsonApiThrowableConverter::setShouldThrow(true);
+        $throwableConverterClass = JsonApiThrowableConverter::class;
+        $handler = new FluteThrowableHandler($encoderMock, [], 500, $isDebug, $throwableConverterClass);
+        $handler->setLogger(new NullLogger());
+
+        $response = $handler->createResponse($exception = new Exception(), new Container());
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertSame($exception, $response->getThrowable());
     }
 }

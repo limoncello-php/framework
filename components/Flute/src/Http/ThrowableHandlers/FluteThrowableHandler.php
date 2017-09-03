@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Http\Errors;
+<?php namespace Limoncello\Flute\Http\ThrowableHandlers;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -20,6 +20,7 @@ use Exception;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
+use Limoncello\Flute\Contracts\Exceptions\JsonApiThrowableConverterInterface as ConverterInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
@@ -60,36 +61,66 @@ class FluteThrowableHandler implements ThrowableHandlerInterface
     private $encoder;
 
     /**
+     * @var string|null
+     */
+    private $throwableConverter;
+
+    /**
      * @param EncoderInterface $encoder
-     * @param array            $doNotLogClassesAsKeys
-     * @param int              $httpCodeForUnexpected
+     * @param array            $noLogClassesAsKeys
+     * @param int              $codeForUnexpected
      * @param bool             $isDebug
+     * @param null|string      $converterClass
      */
     public function __construct(
         EncoderInterface $encoder,
-        array $doNotLogClassesAsKeys,
-        int $httpCodeForUnexpected,
-        bool $isDebug
+        array $noLogClassesAsKeys,
+        int $codeForUnexpected,
+        bool $isDebug,
+        ?string $converterClass
     ) {
-        $this->doNotLogClassesAsKeys = $doNotLogClassesAsKeys;
-        $this->httpCodeForUnexpected = $httpCodeForUnexpected;
+        assert(
+            $converterClass === null ||
+            array_key_exists(ConverterInterface::class, class_implements($converterClass)) === true
+        );
+
+        $this->doNotLogClassesAsKeys = $noLogClassesAsKeys;
+        $this->httpCodeForUnexpected = $codeForUnexpected;
         $this->isDebug               = $isDebug;
         $this->encoder               = $encoder;
+        $this->throwableConverter    = $converterClass;
     }
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function createResponse(Throwable $throwable, ContainerInterface $container): ThrowableResponseInterface
     {
         unset($container);
 
-        $message = 'Internal Server Error';
+        $message            = 'Internal Server Error';
+        $isJsonApiException = $throwable instanceof JsonApiException;
 
         $this->logError($throwable, $message);
 
+        // if exception converter is specified it will be used to convert throwable to JsonApiException
+        if ($isJsonApiException === false && $this->throwableConverter !== null) {
+            try {
+                /** @var ConverterInterface $converterClass */
+                $converterClass = $this->throwableConverter;
+                if (($converted = $converterClass::convert($throwable)) !== null) {
+                    assert($converted instanceof JsonApiException);
+                    $throwable          = $converted;
+                    $isJsonApiException = true;
+                }
+            } catch (Throwable $ignored) {
+            }
+        }
+
         // compose JSON API Error with appropriate level of details
-        if ($throwable instanceof JsonApiException) {
+        if ($isJsonApiException === true) {
             /** @var JsonApiException $throwable */
             $errors   = $throwable->getErrors();
             $httpCode = $throwable->getHttpCode();
@@ -154,8 +185,11 @@ class FluteThrowableHandler implements ThrowableHandlerInterface
      *
      * @return ThrowableResponseInterface
      */
-    private function createThrowableJsonApiResponse(Throwable $throwable, string $content, int $status): ThrowableResponseInterface
-    {
+    private function createThrowableJsonApiResponse(
+        Throwable $throwable,
+        string $content,
+        int $status
+    ): ThrowableResponseInterface {
         return new class ($throwable, $content, $status) extends JsonApiResponse implements ThrowableResponseInterface
         {
             /**

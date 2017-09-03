@@ -100,6 +100,8 @@ class PaginationStrategy implements PaginationStrategyInterface
      * @param int    $max
      *
      * @return int
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function getValue(array $parameters, string $key, int $default, int $min, int $max): int
     {

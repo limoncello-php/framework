@@ -19,7 +19,7 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\Http\Errors\FluteThrowableHandler;
+use Limoncello\Flute\Http\ThrowableHandlers\FluteThrowableHandler;
 use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Types\DateJsonApiStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
@@ -141,13 +141,21 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             $isLogEnabled = $appSettings[A::KEY_IS_LOG_ENABLED];
             $isDebug      = $appSettings[A::KEY_IS_DEBUG];
 
-            $ignoredErrorClasses   = $fluteSettings[FluteSettings::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS];
-            $httpCodeForUnexpected = $fluteSettings[FluteSettings::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE];
+            $ignoredErrorClasses = $fluteSettings[FluteSettings::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS];
+            $codeForUnexpected   = $fluteSettings[FluteSettings::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE];
+            $throwableConverter  =
+                $fluteSettings[FluteSettings::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER] ?? null;
 
             /** @var EncoderInterface $encoder */
             $encoder = $container->get(EncoderInterface::class);
 
-            $handler = new FluteThrowableHandler($encoder, $ignoredErrorClasses, $httpCodeForUnexpected, $isDebug);
+            $handler = new FluteThrowableHandler(
+                $encoder,
+                $ignoredErrorClasses,
+                $codeForUnexpected,
+                $isDebug,
+                $throwableConverter
+            );
 
             if ($isLogEnabled === true && $container->has(LoggerInterface::class) === true) {
                 /** @var LoggerInterface $logger */

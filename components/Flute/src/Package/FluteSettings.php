@@ -47,7 +47,10 @@ abstract class FluteSettings implements SettingsInterface
     const KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE = self::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS + 1;
 
     /** Config key */
-    const KEY_MODEL_TO_SCHEME_MAP = self::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE + 1;
+    const KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER = self::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE + 1;
+
+    /** Config key */
+    const KEY_MODEL_TO_SCHEME_MAP = self::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER + 1;
 
     /** Config key */
     const KEY_VALIDATION_RULE_SETS_DATA = self::KEY_MODEL_TO_SCHEME_MAP + 1;
@@ -84,17 +87,18 @@ abstract class FluteSettings implements SettingsInterface
         $jsonOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES;
 
         return [
-            static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS => array_flip($this->getDoNotLogExceptionsList()),
-            static::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE  => 500,
-            static::KEY_MODEL_TO_SCHEME_MAP                 => $this->createModelToSchemeMap(),
-            static::KEY_VALIDATION_RULE_SETS_DATA           => $this->createRulesSetData(),
-            static::KEY_DEFAULT_PAGING_SIZE                 => 20,
-            static::KEY_MAX_PAGING_SIZE                     => 100,
-            static::KEY_JSON_ENCODE_OPTIONS                 => $jsonOptions,
-            static::KEY_JSON_ENCODE_DEPTH                   => 512,
-            static::KEY_IS_SHOW_VERSION                     => false,
-            static::KEY_META                                => null,
-            static::KEY_URI_PREFIX                          => null,
+            static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS       => array_flip($this->getDoNotLogExceptionsList()),
+            static::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER => null,
+            static::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE        => 500,
+            static::KEY_MODEL_TO_SCHEME_MAP                       => $this->createModelToSchemeMap(),
+            static::KEY_VALIDATION_RULE_SETS_DATA                 => $this->createRulesSetData(),
+            static::KEY_DEFAULT_PAGING_SIZE                       => 20,
+            static::KEY_MAX_PAGING_SIZE                           => 100,
+            static::KEY_JSON_ENCODE_OPTIONS                       => $jsonOptions,
+            static::KEY_JSON_ENCODE_DEPTH                         => 512,
+            static::KEY_IS_SHOW_VERSION                           => false,
+            static::KEY_META                                      => null,
+            static::KEY_URI_PREFIX                                => null,
         ];
     }
 
