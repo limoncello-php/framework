@@ -64,7 +64,7 @@ interface CodeIntegrationInterface extends IntegrationInterface
      *
      * @return AuthorizationCodeInterface|null
      */
-    public function codeReadAuthenticationCode(string $code);
+    public function codeReadAuthenticationCode(string $code): ?AuthorizationCodeInterface;
 
     /**
      * Revoke all tokens issued based on the input authorization code.

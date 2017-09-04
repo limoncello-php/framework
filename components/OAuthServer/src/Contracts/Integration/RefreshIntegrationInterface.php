@@ -57,5 +57,5 @@ interface RefreshIntegrationInterface extends IntegrationInterface
      *
      * @link https://tools.ietf.org/html/rfc6749#section-6
      */
-    public function readTokenByRefreshValue(string $refreshValue);
+    public function readTokenByRefreshValue(string $refreshValue): ?TokenInterface;
 }

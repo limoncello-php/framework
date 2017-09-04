@@ -218,7 +218,7 @@ class SampleServer extends BaseAuthorizationServer
     /**
      * @inheritdoc
      */
-    public function codeReadAuthenticationCode(string $code)
+    public function codeReadAuthenticationCode(string $code): ?AuthorizationCodeInterface
     {
         // As out server do not actually implement storing auth codes we will emulate it.
         $result = null;
@@ -294,8 +294,8 @@ class SampleServer extends BaseAuthorizationServer
      * @inheritdoc
      */
     public function passValidateCredentialsAndCreateAccessTokenResponse(
-        $userName,
-        $password,
+        string $userName,
+        string $password,
         ClientInterface $client = null,
         bool $isScopeModified = false,
         array $scope = null,
@@ -373,7 +373,7 @@ class SampleServer extends BaseAuthorizationServer
     /**
      * @inheritdoc
      */
-    public function readTokenByRefreshValue(string $refreshValue)
+    public function readTokenByRefreshValue(string $refreshValue): ?TokenInterface
     {
         return $this->getRepository()->readTokenByRefreshValue($refreshValue);
     }

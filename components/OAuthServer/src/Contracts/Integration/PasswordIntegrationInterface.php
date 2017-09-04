@@ -53,8 +53,8 @@ interface PasswordIntegrationInterface extends IntegrationInterface
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function passValidateCredentialsAndCreateAccessTokenResponse(
-        $userName,
-        $password,
+        string $userName,
+        string $password,
         ClientInterface $client = null,
         bool $isScopeModified = false,
         array $scope = null,
