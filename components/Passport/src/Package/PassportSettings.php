@@ -30,10 +30,10 @@ abstract class PassportSettings implements SettingsInterface
     use CheckCallableTrait;
 
     /** Config key */
-    const KEY_ENABLE_LOGS = 0;
+    const KEY_IS_LOG_ENABLED = 0;
 
     /** Config key */
-    const KEY_APPROVAL_URI_STRING = self::KEY_ENABLE_LOGS + 1;
+    const KEY_APPROVAL_URI_STRING = self::KEY_IS_LOG_ENABLED + 1;
 
     /** Config key */
     const KEY_ERROR_URI_STRING = self::KEY_APPROVAL_URI_STRING + 1;
@@ -157,7 +157,7 @@ abstract class PassportSettings implements SettingsInterface
         ));
 
         return [
-            static::KEY_ENABLE_LOGS                          => false,
+            static::KEY_IS_LOG_ENABLED                       => false,
             static::KEY_APPROVAL_URI_STRING                  => $this->getApprovalUri(),
             static::KEY_ERROR_URI_STRING                     => $this->getErrorUri(),
             static::KEY_DEFAULT_CLIENT_ID                    => $this->getDefaultClientId(),

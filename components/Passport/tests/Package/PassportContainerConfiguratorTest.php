@@ -117,13 +117,13 @@ class PassportContainerConfiguratorTest extends TestCase
         {
             private $values = [
                 C::class => [
-                    C::KEY_ENABLE_LOGS                          => true,
-                    C::KEY_USER_TABLE_NAME                      => 'users',
-                    C::KEY_USER_PRIMARY_KEY_NAME                => 'id_user',
-                    C::KEY_DEFAULT_CLIENT_ID                    => T::TEST_DEFAULT_CLIENT_ID,
-                    C::KEY_APPROVAL_URI_STRING                  => T::TEST_APPROVAL_URI,
-                    C::KEY_ERROR_URI_STRING                     => T::TEST_ERROR_URI,
-                    C::KEY_CODE_EXPIRATION_TIME_IN_SECONDS      => 3600,
+                    C::KEY_IS_LOG_ENABLED                  => true,
+                    C::KEY_USER_TABLE_NAME                 => 'users',
+                    C::KEY_USER_PRIMARY_KEY_NAME           => 'id_user',
+                    C::KEY_DEFAULT_CLIENT_ID               => T::TEST_DEFAULT_CLIENT_ID,
+                    C::KEY_APPROVAL_URI_STRING             => T::TEST_APPROVAL_URI,
+                    C::KEY_ERROR_URI_STRING                => T::TEST_ERROR_URI,
+                    C::KEY_CODE_EXPIRATION_TIME_IN_SECONDS => 3600,
                     C::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS     => 3600,
                     C::KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH => true,
                     C::KEY_USER_CREDENTIALS_VALIDATOR           => [T::class, 'userValidator'],

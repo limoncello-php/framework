@@ -25,6 +25,7 @@ use Limoncello\Passport\Package\PassportSettings as S;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Zend\Diactoros\Response\EmptyResponse;
 
 /**
@@ -58,7 +59,20 @@ class PassportMiddleware implements MiddlewareInterface
             try {
                 $accountManager->setAccountWithTokenValue($tokenValue);
             } catch (AuthenticationException $exception) {
+                if (($logger = static::getLoggerIfEnabled($container)) !== null) {
+                    $logger->info(
+                        'Passport authentication failed for a given Bearer token value.',
+                        ['token' => $tokenValue]
+                    );
+                }
+
                 return static::createAuthenticationFailedResponse($container);
+            }
+        } else {
+            if (($logger = static::getLoggerIfEnabled($container)) !== null) {
+                $logger->debug(
+                    'No Bearer token for Passport authentication. The request is not authenticated.'
+                );
             }
         }
 
@@ -83,5 +97,22 @@ class PassportMiddleware implements MiddlewareInterface
         $response = $factory === null ? new EmptyResponse(401) : call_user_func($factory);
 
         return $response;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     *
+     * @return null|LoggerInterface
+     */
+    protected static function getLoggerIfEnabled(ContainerInterface $container): ?LoggerInterface
+    {
+        $logger = null;
+        if ($container->has(LoggerInterface::class) === true &&
+            $container->get(SettingsProviderInterface::class)->get(S::class)[S::KEY_IS_LOG_ENABLED] === true
+        ) {
+            $logger = $container->get(LoggerInterface::class);
+        }
+
+        return $logger;
     }
 }

@@ -26,12 +26,15 @@ use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Exceptions\AuthenticationException;
 use Psr\Container\ContainerInterface;
 use Limoncello\Passport\Package\PassportSettings as S;
+use Psr\Log\LoggerAwareTrait;
 
 /**
  * @package Limoncello\Passport
  */
 class AccountManager implements PassportAccountManagerInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var ContainerInterface
      */
@@ -95,6 +98,8 @@ class AccountManager implements PassportAccountManagerInterface
         $scheme  = $this->getContainer()->get(DatabaseSchemeInterface::class);
         $account = new PassportAccount($scheme, $properties);
         $this->setAccount($account);
+
+        $this->logger === null ?: $this->logger->info('Passport account is set for a given token value.');
 
         return $account;
     }

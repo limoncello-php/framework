@@ -111,7 +111,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
                 default:
                     // @link https://tools.ietf.org/html/rfc6749#section-3.1.1 ->
                     // @link https://tools.ietf.org/html/rfc6749#section-4.1.2.1
-                    $this->logDebug('Unsupported response type in request.', ['response_type' => $responseType]);
+                    $this->logInfo('Unsupported response type in request.', ['response_type' => $responseType]);
                     $errorCode = OAuthCodeRedirectException::ERROR_UNSUPPORTED_RESPONSE_TYPE;
                     throw new OAuthCodeRedirectException($errorCode, $redirectUri);
             }
@@ -143,7 +143,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
                 case GrantTypes::CLIENT_CREDENTIALS:
                     $this->logDebug('Handling client credentials grant.');
                     if ($determinedClient === null) {
-                        $this->logDebug('Client identification failed.');
+                        $this->logInfo('Client identification failed.');
                         throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
                     }
                     $response = $this->clientIssueToken($parameters, $determinedClient);
@@ -151,13 +151,13 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
                 case GrantTypes::REFRESH_TOKEN:
                     $this->logDebug('Handling refresh token grant.');
                     if ($determinedClient === null) {
-                        $this->logDebug('Client identification failed.');
+                        $this->logInfo('Client identification failed.');
                         throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
                     }
                     $response = $this->refreshIssueToken($parameters, $determinedClient);
                     break;
                 default:
-                    $this->logDebug('Unknown grant type.', ['grant_type' => $grantType]);
+                    $this->logInfo('Unknown grant type.', ['grant_type' => $grantType]);
                     throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNSUPPORTED_GRANT_TYPE);
             }
         } catch (OAuthTokenBodyException $exception) {
@@ -176,7 +176,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         if ($code->getRedirectUriString() === null ||
             in_array($code->getRedirectUriString(), $client->getRedirectUriStrings()) === false
         ) {
-            $this->logDebug(
+            $this->logInfo(
                 'Code has invalid redirect URI which do not match any redirect URI for its client.',
                 ['id' => $code->getIdentifier()]
             );
@@ -202,7 +202,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         if ($token->getRedirectUriString() === null ||
             in_array($token->getRedirectUriString(), $client->getRedirectUriStrings()) === false
         ) {
-            $this->logDebug(
+            $this->logInfo(
                 'Token has invalid redirect URI which do not match any redirect URI for its client.',
                 ['id' => $token->getIdentifier()]
             );
@@ -271,6 +271,8 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
 
         $response = $this->createBodyTokenResponse($updatedToken, $tokenExpiresIn);
 
+        $this->logInfo('Authorization code successfully exchanged for a token (code grant).');
+
         return $response;
     }
 
@@ -284,7 +286,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         /** @var TokenInterface $code */
 
         $identifier = $code->getIdentifier();
-        $this->logDebug('Revoking token.', ['token_id' => $identifier]);
+        $this->logInfo('Revoking token.', ['token_id' => $identifier]);
         $this->getIntegration()->getTokenRepository()->disable($identifier);
     }
 
@@ -301,8 +303,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         string $state = null,
         array $extraParameters = []
     ): ResponseInterface {
-        $this->logDebug('Asking resource owner for scope approval (implicit grant).');
-        return $this->getIntegration()->createAskResourceOwnerForApprovalResponse(
+        $response = $this->getIntegration()->createAskResourceOwnerForApprovalResponse(
             ResponseTypes::IMPLICIT,
             $client,
             $redirectUri,
@@ -311,6 +312,10 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
             $state,
             $extraParameters
         );
+
+        $this->logInfo('Created response asking resource owner for scope approval (implicit grant).');
+
+        return $response;
     }
 
     /** @noinspection PhpTooManyParametersInspection
@@ -319,8 +324,8 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function passValidateCredentialsAndCreateAccessTokenResponse(
-        $userName,
-        $password,
+        string $userName,
+        string $password,
         ClientInterface $client = null,
         bool $isScopeModified = false,
         array $scope = null,
@@ -333,7 +338,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_GRANT);
         }
         assert(is_int($userIdentifier) === true);
-        $this->logDebug('User authenticated with provided username and password.', ['username' => $userName]);
+        $this->logInfo('User authenticated with provided username and password.', ['username' => $userName]);
 
         $changedScopeOrNull = $this->getIntegration()->verifyAllowedUserScope($userIdentifier, $scope);
         if ($changedScopeOrNull !== null) {
@@ -406,7 +411,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      *
      * @return TokenInterface|null
      */
-    public function readTokenByRefreshValue(string $refreshValue)
+    public function readTokenByRefreshValue(string $refreshValue): ?\Limoncello\OAuthServer\Contracts\TokenInterface
     {
         return $this->getIntegration()->getTokenRepository()->readByRefresh(
             $refreshValue,
@@ -689,6 +694,19 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
     {
         if ($this->logger !== null) {
             $this->logger->debug($message, $context);
+        }
+    }
+
+    /**
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    protected function logInfo(string $message, array $context = []): void
+    {
+        if ($this->logger !== null) {
+            $this->logger->info($message, $context);
         }
     }
 

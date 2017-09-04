@@ -48,6 +48,9 @@ abstract class BasePassportContainerConfigurator
         ) use (&$accountManager): PassportAccountManagerInterface {
             if ($accountManager === null) {
                 $accountManager = new AccountManager($container);
+                if (($logger = static::getLoggerIfEnabled($container)) !== null) {
+                    $accountManager->setLogger($logger);
+                }
             }
 
             return $accountManager;
@@ -69,13 +72,27 @@ abstract class BasePassportContainerConfigurator
             $integration    = $container->get(PassportServerIntegrationInterface::class);
             $passportServer = new PassportServer($integration);
 
-            $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
-            if ($settings[C::KEY_ENABLE_LOGS] === true && $container->has(LoggerInterface::class) === true) {
-                $logger = $container->get(LoggerInterface::class);
+            if (($logger = static::getLoggerIfEnabled($container)) !== null) {
                 $passportServer->setLogger($logger);
             }
 
             return $passportServer;
         };
+    }
+
+    /**
+     * @param PsrContainerInterface $container
+     *
+     * @return null|LoggerInterface
+     */
+    protected static function getLoggerIfEnabled(PsrContainerInterface $container): ?LoggerInterface
+    {
+        $logger   = null;
+        $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
+        if ($settings[C::KEY_IS_LOG_ENABLED] === true && $container->has(LoggerInterface::class) === true) {
+            $logger = $container->get(LoggerInterface::class);
+        }
+
+        return $logger;
     }
 }

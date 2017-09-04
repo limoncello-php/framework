@@ -21,11 +21,13 @@ use Limoncello\Passport\Authentication\PassportMiddleware;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
 use Limoncello\Passport\Exceptions\AuthenticationException;
-use Limoncello\Passport\Package\PassportSettings;
 use Limoncello\Tests\Passport\Data\TestContainer;
+use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest;
 use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 
@@ -64,10 +66,12 @@ class PassportMiddlewareTest extends TestCase
      */
     public function testHandleWithMalformedToken()
     {
-        $request    = (new ServerRequest())->withHeader('Authorization', 'Bearer ');
-        $nextCalled = false;
-        $container  = new TestContainer();
-        $next       = function () use (&$nextCalled) {
+        $request                                     = (new ServerRequest())->withHeader('Authorization', 'Bearer ');
+        $nextCalled                                  = false;
+        $container                                   = new TestContainer();
+        $container[LoggerInterface::class]           = new NullLogger();
+        $container[SettingsProviderInterface::class] = PassportContainerConfiguratorTest::createSettingsProvider();
+        $next                                        = function () use (&$nextCalled) {
             $nextCalled = true;
 
             return new Response();
@@ -84,10 +88,12 @@ class PassportMiddlewareTest extends TestCase
      */
     public function testHandleWithInvalidToken()
     {
-        $request    = (new ServerRequest())->withHeader('Authorization', 'Bearer XXX');
-        $nextCalled = false;
-        $container  = new TestContainer();
-        $next       = function () use (&$nextCalled) {
+        $request                                     = (new ServerRequest())->withHeader('Authorization', 'Bearer XXX');
+        $nextCalled                                  = false;
+        $container                                   = new TestContainer();
+        $container[LoggerInterface::class]           = new NullLogger();
+        $container[SettingsProviderInterface::class] = PassportContainerConfiguratorTest::createSettingsProvider();
+        $next                                        = function () use (&$nextCalled) {
             $nextCalled = true;
 
             return new Response();
@@ -97,10 +103,6 @@ class PassportMiddlewareTest extends TestCase
             Mockery::mock(PassportAccountManagerInterface::class);
         $managerMock->shouldReceive('setAccountWithTokenValue')
             ->once()->withAnyArgs()->andThrow(AuthenticationException::class);
-
-        /** @var Mock $providerMock */
-        $container[SettingsProviderInterface::class] = $providerMock = Mockery::mock(SettingsProviderInterface::class);
-        $providerMock->shouldReceive('get')->once()->with(PassportSettings::class)->andReturn([]);
 
         $response = PassportMiddleware::handle($request, $next, $container);
 
