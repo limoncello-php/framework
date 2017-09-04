@@ -17,7 +17,6 @@
  */
 
 use Limoncello\Application\Packages\Cors\CorsSettings as C;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
@@ -41,11 +40,10 @@ class CorsContainerConfigurator implements ContainerConfiguratorInterface
     {
         $container[AnalyzerInterface::class] = function (PsrContainerInterface $container) {
             $settingsProvider = $container->get(SettingsProviderInterface::class);
-            $appSettings      = $settingsProvider->get(A::class);
             $corsSettings     = $settingsProvider->get(C::class);
             $analyzer         = Analyzer::instance(new Settings($corsSettings));
 
-            if ($appSettings[A::KEY_IS_DEBUG] === true && $container->has(LoggerInterface::class)) {
+            if ($corsSettings[C::KEY_LOG_IS_ENABLED] === true && $container->has(LoggerInterface::class)) {
                 $logger = $container->get(LoggerInterface::class);
                 $analyzer->setLogger($logger);
             }

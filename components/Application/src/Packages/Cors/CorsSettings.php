@@ -25,7 +25,10 @@ use Neomerx\Cors\Strategies\Settings;
 class CorsSettings extends Settings implements SettingsInterface
 {
     /** Settings key */
-    const KEY_LAST = self::KEY_IS_CHECK_HOST + 10;
+    const KEY_LOG_IS_ENABLED = self::KEY_IS_CHECK_HOST + 10;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_LOG_IS_ENABLED;
 
     /**
      * @inheritdoc
@@ -33,6 +36,8 @@ class CorsSettings extends Settings implements SettingsInterface
     public function get(): array
     {
         $defaults = (new Settings())->getDefaultSettings();
+
+        $defaults[static::KEY_LOG_IS_ENABLED] = false;
 
         return $defaults;
     }
