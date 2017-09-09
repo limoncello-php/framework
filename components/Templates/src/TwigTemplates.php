@@ -33,13 +33,15 @@ class TwigTemplates implements TemplatesInterface
     /**
      * @param string      $templatesFolder
      * @param null|string $cacheFolder
+     * @param bool        $isDebug
      */
-    public function __construct(string $templatesFolder, string $cacheFolder = null)
+    public function __construct(string $templatesFolder, string $cacheFolder = null, $isDebug = false)
     {
         // For Twig options see http://twig.sensiolabs.org/doc/api.html
         $options = [
+            'debug'       => $isDebug,
             'cache'       => $cacheFolder === null ? false : $cacheFolder,
-            'auto_reload' => false,
+            'auto_reload' => $isDebug,
         ];
 
         $this->twig = new Twig_Environment(new Twig_Loader_Filesystem($templatesFolder), $options);

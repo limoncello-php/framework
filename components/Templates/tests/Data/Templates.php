@@ -36,6 +36,7 @@ class Templates extends TemplatesSettings
         $templateNames   = $this->getTemplateNames($templatesFolder);
 
         return [
+            static::KEY_IS_DEBUG         => true,
             static::KEY_TEMPLATES_FOLDER => $templatesFolder,
             static::KEY_CACHE_FOLDER     => $cacheFolder,
             static::KEY_TEMPLATES_LIST   => $templateNames,

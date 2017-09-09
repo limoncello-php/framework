@@ -32,7 +32,10 @@ abstract class TemplatesSettings implements SettingsInterface
     const KEY_CACHE_FOLDER = self::KEY_TEMPLATES_FOLDER + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_CACHE_FOLDER + 1;
+    const KEY_IS_DEBUG = self::KEY_CACHE_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_IS_DEBUG;
 
     /**
      * @param string $templatesFolder
