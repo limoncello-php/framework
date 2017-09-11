@@ -179,21 +179,21 @@ class PassportServerTest extends TestCase
     /**
      * Test client grant with invalid client.
      */
-    public function testRefreshTokenInvalidClient()
-    {
-        $noClientIdRequest = $this->createServerRequest([
-            'grant_type' => GrantTypes::REFRESH_TOKEN
-
-            // note no client_id
-        ]);
-        $response = $this->createPassportServer()->postCreateToken($noClientIdRequest);
-        $this->assertEquals(400, $response->getStatusCode());
-        $error = json_decode((string)$response->getBody());
-        $this->assertTrue(property_exists($error, 'error'));
-        $this->assertEquals(OAuthTokenBodyException::ERROR_INVALID_CLIENT, $error->error);
-
-        $this->assertNotEmpty($this->getLogs());
-    }
+//    public function testRefreshTokenInvalidClient()
+//    {
+//        $noClientIdRequest = $this->createServerRequest([
+//            'grant_type' => GrantTypes::REFRESH_TOKEN
+//
+//            // note no client_id
+//        ]);
+//        $response = $this->createPassportServer()->postCreateToken($noClientIdRequest);
+//        $this->assertEquals(400, $response->getStatusCode());
+//        $error = json_decode((string)$response->getBody());
+//        $this->assertTrue(property_exists($error, 'error'));
+//        $this->assertEquals(OAuthTokenBodyException::ERROR_INVALID_CLIENT, $error->error);
+//
+//        $this->assertNotEmpty($this->getLogs());
+//    }
 
     /**
      * Test implicit grant.

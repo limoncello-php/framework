@@ -24,7 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * @package Limoncello\OAuthServer
  *
- * @link https://tools.ietf.org/html/rfc6749#section-6
+ * @link    https://tools.ietf.org/html/rfc6749#section-6
  */
 trait RefreshGrantTrait
 {
@@ -74,23 +74,40 @@ trait RefreshGrantTrait
     }
 
     /**
-     * @param string[]        $parameters
-     * @param ClientInterface $determinedClient
+     * @param string[]             $parameters
+     * @param ClientInterface|null $determinedClient
      *
      * @return ResponseInterface
      */
-    protected function refreshIssueToken(array $parameters, ClientInterface $determinedClient): ResponseInterface
+    protected function refreshIssueToken(array $parameters, ?ClientInterface $determinedClient): ResponseInterface
     {
-        if ($determinedClient->isRefreshGrantEnabled() === false) {
-            throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
-        }
-
         if (($refreshValue = $this->refreshGetValue($parameters)) === null) {
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_REQUEST);
         }
 
         if (($token = $this->refreshGetIntegration()->readTokenByRefreshValue($refreshValue)) === null) {
             throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_GRANT);
+        }
+
+        $clientIdFromToken = $token->getClientIdentifier();
+        if ($determinedClient === null) {
+            $isClientFromToken = true;
+            $determinedClient  = $this->refreshGetIntegration()->readClientByIdentifier($clientIdFromToken);
+        } else {
+            $isClientFromToken = false;
+        }
+
+        // if client didn't provided authentication (but had to) or
+        // client associated with the token do not match provided client credentials we throw an exception
+        if (($isClientFromToken === true &&
+                ($determinedClient->isConfidential() === true || $determinedClient->hasCredentials() === true)) ||
+            $determinedClient->getIdentifier() !== $clientIdFromToken
+        ) {
+            throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
+        }
+
+        if ($determinedClient->isRefreshGrantEnabled() === false) {
+            throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT);
         }
 
         $isScopeModified = false;

@@ -150,10 +150,6 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
                     break;
                 case GrantTypes::REFRESH_TOKEN:
                     $this->logDebug('Handling refresh token grant.');
-                    if ($determinedClient === null) {
-                        $this->logInfo('Client identification failed.');
-                        throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
-                    }
                     $response = $this->refreshIssueToken($parameters, $determinedClient);
                     break;
                 default:
@@ -172,7 +168,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      */
     public function createCodeResponse(TokenInterface $code, string $state = null): ResponseInterface
     {
-        $client = $this->getIntegration()->getClientRepository()->read($code->getClientIdentifier());
+        $client = $this->readClientByIdentifier($code->getClientIdentifier());
         if ($code->getRedirectUriString() === null ||
             in_array($code->getRedirectUriString(), $client->getRedirectUriStrings()) === false
         ) {
@@ -198,7 +194,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
      */
     public function createTokenResponse(TokenInterface $token, string $state = null): ResponseInterface
     {
-        $client = $this->getIntegration()->getClientRepository()->read($token->getClientIdentifier());
+        $client = $this->readClientByIdentifier($token->getClientIdentifier());
         if ($token->getRedirectUriString() === null ||
             in_array($token->getRedirectUriString(), $client->getRedirectUriStrings()) === false
         ) {
@@ -372,7 +368,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
 
         assert(is_string($defaultClientId) === true && empty($defaultClientId) === false);
 
-        $defaultClient   = $this->getIntegration()->getClientRepository()->read($defaultClientId);
+        $defaultClient   = $this->readClientByIdentifier($defaultClientId);
 
         assert($defaultClient !== null);
 
@@ -458,6 +454,14 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
     }
 
     /**
+     * @inheritdoc
+     */
+    public function readClientByIdentifier(string $clientIdentifier): ?ClientInterface
+    {
+        return $this->getIntegration()->getClientRepository()->read($clientIdentifier);
+    }
+
+    /**
      * @param string|null $clientId
      * @param string|null $redirectFromQuery
      *
@@ -471,7 +475,7 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
         $validRedirectUri = null;
 
         if ($clientId !== null &&
-            ($client = $this->getIntegration()->getClientRepository()->read($clientId)) !== null
+            ($client = $this->readClientByIdentifier($clientId)) !== null
         ) {
             $validRedirectUri = $this->selectValidRedirectUri($client, $redirectFromQuery);
             if ($validRedirectUri === null) {

@@ -113,10 +113,11 @@ class RefreshTokenTest extends ServerTestCase
     /**
      * Test with client where 'refresh grant' is disabled.
      */
-    public function testUnauthorizedClient()
+    public function testClientWithDisabledRefreshGrant()
     {
         $client = $this->createDefaultClient()->disableRefreshGrant();
-        $server = new SampleServer($this->createClientRepositoryMock($client));
+        $token  = $this->createToken($client);
+        $server = new SampleServer($this->createClientRepositoryMock($client, $token));
 
         $refreshValue = SampleServer::TEST_REFRESH_TOKEN;
 
@@ -125,6 +126,43 @@ class RefreshTokenTest extends ServerTestCase
         $response = $server->postCreateToken($request);
 
         $errorCode = OAuthTokenBodyException::ERROR_UNAUTHORIZED_CLIENT;
+        $this->validateBodyResponse($response, 400, $this->getExpectedBodyTokenError($errorCode));
+    }
+
+    /**
+     * Test refresh token without provided client auth/id (for public client).
+     */
+    public function testRefreshWithoutGivenClientId()
+    {
+        $client = $this->createDefaultClient()->enableRefreshGrant()->setPublic();
+        $token  = $this->createToken($client);
+        $server = new SampleServer($this->createClientRepositoryMock($client, $token));
+
+        $refreshValue = SampleServer::TEST_REFRESH_TOKEN;
+
+        $scope    = SampleServer::TEST_SCOPES[0];
+        $request  = $this->createTokenRequest($refreshValue, $scope);
+        $response = $server->postCreateToken($request);
+
+        $this->validateBodyResponse($response, 200, $this->getExpectedScopeBodyToken($scope));
+    }
+
+    /**
+     * Test refresh token without provided client auth/id (for confidential client).
+     */
+    public function testRefreshWithoutGivenClientIdForConfidentialClient()
+    {
+        $client = $this->createDefaultClient()->enableRefreshGrant()->setConfidential();
+        $token  = $this->createToken($client);
+        $server = new SampleServer($this->createClientRepositoryMock($client, $token));
+
+        $refreshValue = SampleServer::TEST_REFRESH_TOKEN;
+
+        $scope    = null;
+        $request  = $this->createTokenRequest($refreshValue, $scope);
+        $response = $server->postCreateToken($request);
+
+        $errorCode = OAuthTokenBodyException::ERROR_INVALID_CLIENT;
         $this->validateBodyResponse($response, 400, $this->getExpectedBodyTokenError($errorCode));
     }
 

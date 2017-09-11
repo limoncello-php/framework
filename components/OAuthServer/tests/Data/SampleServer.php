@@ -173,9 +173,6 @@ class SampleServer extends BaseAuthorizationServer
                     $response = $this->clientIssueToken($parameters, $determinedClient);
                     break;
                 case GrantTypes::REFRESH_TOKEN:
-                    if ($determinedClient === null) {
-                        throw new OAuthTokenBodyException(OAuthTokenBodyException::ERROR_INVALID_CLIENT);
-                    }
                     $response = $this->refreshIssueToken($parameters, $determinedClient);
                     break;
                 default:
@@ -376,6 +373,14 @@ class SampleServer extends BaseAuthorizationServer
     public function readTokenByRefreshValue(string $refreshValue): ?TokenInterface
     {
         return $this->getRepository()->readTokenByRefreshValue($refreshValue);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readClientByIdentifier(string $clientIdentifier): ?ClientInterface
+    {
+        return $this->getRepository()->readClient($clientIdentifier);
     }
 
     /**
