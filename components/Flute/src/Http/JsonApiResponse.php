@@ -17,7 +17,6 @@
  */
 
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
-use Psr\Http\Message\StreamInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\InjectContentTypeTrait;
 use Zend\Diactoros\Stream;
@@ -39,18 +38,6 @@ class JsonApiResponse extends Response
      */
     public function __construct(string $content = null, int $status = 200, array $headers = [])
     {
-        $headers = $this->injectContentType(MediaTypeInterface::JSON_API_MEDIA_TYPE, $headers);
-
-        parent::__construct($this->createBody($content), $status, $headers);
-    }
-
-    /**
-     * @param string|null $content
-     *
-     * @return StreamInterface
-     */
-    protected function createBody(string $content = null): StreamInterface
-    {
         $body = new Stream('php://temp', 'wb+');
 
         if ($content !== null) {
@@ -58,6 +45,10 @@ class JsonApiResponse extends Response
             $body->rewind();
         }
 
-        return $body;
+        // inject content-type even when there is no content otherwise
+        // it would be set to 'text/html' by PHP/Web server/Browser
+        $headers = $this->injectContentType(MediaTypeInterface::JSON_API_MEDIA_TYPE, $headers);
+
+        parent::__construct($body, $status, $headers);
     }
 }
