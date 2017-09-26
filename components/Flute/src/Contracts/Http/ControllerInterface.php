@@ -16,92 +16,15 @@
  * limitations under the License.
  */
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerCreateInterface as CCI;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerDeleteInterface as CDI;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerIndexInterface as CII;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerReadInterface as CRI;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerUpdateInterface as CUI;
 
 /**
  * @package Limoncello\Flute
  */
-interface ControllerInterface
+interface ControllerInterface extends CII, CCI, CRI, CUI, CDI
 {
-    /** Handler's method name (could be used in routing table) */
-    const METHOD_INDEX = 'index';
-
-    /** Handler's method name (could be used in routing table) */
-    const METHOD_CREATE = 'create';
-
-    /** Handler's method name (could be used in routing table) */
-    const METHOD_READ = 'read';
-
-    /** Handler's method name (could be used in routing table) */
-    const METHOD_UPDATE = 'update';
-
-    /** Handler's method name (could be used in routing table) */
-    const METHOD_DELETE = 'delete';
-
-    /**
-     * @param array                  $routeParams
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
-    public static function index(
-        array $routeParams,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): ResponseInterface;
-
-    /**
-     * @param array                  $routeParams
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
-    public static function create(
-        array $routeParams,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): ResponseInterface;
-
-    /**
-     * @param array                  $routeParams
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
-    public static function read(
-        array $routeParams,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): ResponseInterface;
-
-    /**
-     * @param array                  $routeParams
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
-    public static function update(
-        array $routeParams,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): ResponseInterface;
-
-    /**
-     * @param array                  $routeParams
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
-    public static function delete(
-        array $routeParams,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): ResponseInterface;
 }
