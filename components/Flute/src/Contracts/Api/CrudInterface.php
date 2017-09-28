@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Http\Query\IncludeParameterInterface;
+use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
 
@@ -25,10 +27,10 @@ use Limoncello\Flute\Http\Query\FilterParameterCollection;
 interface CrudInterface
 {
     /**
-     * @param FilterParameterCollection|null $filterParams
-     * @param array|null                     $sortParams
-     * @param array|null                     $includePaths
-     * @param array|null                     $pagingParams
+     * @param FilterParameterCollection|null   $filterParams
+     * @param SortParameterInterface[]|null    $sortParams
+     * @param IncludeParameterInterface[]|null $includePaths
+     * @param int[]|null                       $pagingParams
      *
      * @return ModelsDataInterface
      */

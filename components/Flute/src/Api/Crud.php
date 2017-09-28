@@ -834,6 +834,7 @@ class Crud implements CrudInterface
         $normalizedPaths = [];
         $pathsDepths     = [];
         foreach ($paths as $path) {
+            assert($path instanceof IncludeParameterInterface);
             $parentDepth = 0;
             $tmpPath     = static::ROOT_PATH;
             foreach ($path->getPath() as $pathPiece) {

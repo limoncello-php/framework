@@ -286,6 +286,7 @@ class Repository implements RepositoryInterface
     {
         $table = $this->getTableName($modelClass);
         foreach ($sortParams as $sortParam) {
+            assert($sortParam instanceof SortParameterInterface);
             /** @var SortParameterInterface $sortParam */
             $column = null;
             if ($sortParam->isRelationship() === false) {
