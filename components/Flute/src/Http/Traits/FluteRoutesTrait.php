@@ -53,7 +53,33 @@ trait FluteRoutesTrait
         assert(array_key_exists(SchemaInterface::class, class_implements($schemeClass)) === true);
         $type = $schemeClass::TYPE;
 
-        return static::controller($group, $type, $controllerClass);
+        $indexSlug = '/{' . BaseController::ROUTE_KEY_INDEX . '}';
+        $params    = function ($method) use ($type) {
+            return [RouteInterface::PARAM_NAME => $type . '_' . $method];
+        };
+        $handler   = function ($method) use ($controllerClass) {
+            return [$controllerClass, $method];
+        };
+
+        // if the class implements any of CRUD methods a corresponding route will be added
+        $classInterfaces = class_implements($controllerClass);
+        if (in_array(ControllerIndexInterface::class, $classInterfaces) === true) {
+            $group->get($type, $handler(CI::METHOD_INDEX), $params(CI::METHOD_INDEX));
+        }
+        if (in_array(ControllerCreateInterface::class, $classInterfaces) === true) {
+            $group->post($type, $handler(CI::METHOD_CREATE), $params(CI::METHOD_CREATE));
+        }
+        if (in_array(ControllerReadInterface::class, $classInterfaces) === true) {
+            $group->get($type . $indexSlug, $handler(CI::METHOD_READ), $params(CI::METHOD_READ));
+        }
+        if (in_array(ControllerUpdateInterface::class, $classInterfaces) === true) {
+            $group->patch($type . $indexSlug, $handler(CI::METHOD_UPDATE), $params(CI::METHOD_UPDATE));
+        }
+        if (in_array(ControllerDeleteInterface::class, $classInterfaces) === true) {
+            $group->delete($type . $indexSlug, $handler(CI::METHOD_DELETE), $params(CI::METHOD_DELETE));
+        }
+
+        return $group;
     }
 
     /**
@@ -65,15 +91,16 @@ trait FluteRoutesTrait
      */
     protected static function controller(GroupInterface $group, string $subUri, string $controllerClass): GroupInterface
     {
-        $indexSlug = '/{' . BaseController::ROUTE_KEY_INDEX . '}';
-        $params    = function ($method) use ($subUri) {
+        $slugged = $subUri . '/{' . BaseController::ROUTE_KEY_INDEX . '}';
+        $params  = function ($method) use ($subUri) {
             return [RouteInterface::PARAM_NAME => $subUri . '_' . $method];
         };
-        $handler   = function ($method) use ($controllerClass) {
+        $handler = function ($method) use ($controllerClass) {
             return [$controllerClass, $method];
         };
 
         // if the class implements any of CRUD methods a corresponding route will be added
+        // as HTML forms do not support methods other than GET/POST we use POST and special URI for update and delete.
         $classInterfaces = class_implements($controllerClass);
         if (in_array(ControllerIndexInterface::class, $classInterfaces) === true) {
             $group->get($subUri, $handler(CI::METHOD_INDEX), $params(CI::METHOD_INDEX));
@@ -82,13 +109,15 @@ trait FluteRoutesTrait
             $group->post($subUri, $handler(CI::METHOD_CREATE), $params(CI::METHOD_CREATE));
         }
         if (in_array(ControllerReadInterface::class, $classInterfaces) === true) {
-            $group->get($subUri . $indexSlug, $handler(CI::METHOD_READ), $params(CI::METHOD_READ));
+            $group->get($slugged, $handler(CI::METHOD_READ), $params(CI::METHOD_READ));
         }
         if (in_array(ControllerUpdateInterface::class, $classInterfaces) === true) {
-            $group->patch($subUri . $indexSlug, $handler(CI::METHOD_UPDATE), $params(CI::METHOD_UPDATE));
+            $updateUri = $slugged . '/' . CI::METHOD_UPDATE;
+            $group->post($updateUri, $handler(CI::METHOD_UPDATE), $params(CI::METHOD_UPDATE));
         }
         if (in_array(ControllerDeleteInterface::class, $classInterfaces) === true) {
-            $group->delete($subUri . $indexSlug, $handler(CI::METHOD_DELETE), $params(CI::METHOD_DELETE));
+            $deleteUri = $slugged . '/' . CI::METHOD_DELETE;
+            $group->post($deleteUri, $handler(CI::METHOD_DELETE), $params(CI::METHOD_DELETE));
         }
 
         return $group;
@@ -114,12 +143,12 @@ trait FluteRoutesTrait
 
         /** @var SchemaInterface $schemaClass */
         assert(array_key_exists(SchemaInterface::class, class_implements($schemaClass)) === true);
-        $subUri      = $schemaClass::TYPE;
+        $subUri = $schemaClass::TYPE;
 
         /** @var string $controllerClass */
         /** @var string $schemaClass */
 
-        $resourceIdUri = $subUri . '/{' . BaseController::ROUTE_KEY_INDEX . '}/';
+        $resourceIdUri = $subUri . '/{' . CI::ROUTE_KEY_INDEX . '}/';
         $selfUri       = $resourceIdUri . DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $relationshipName;
 
         return $group

@@ -27,4 +27,6 @@ use Limoncello\Flute\Contracts\Http\Controller\ControllerUpdateInterface as CUI;
  */
 interface ControllerInterface extends CII, CCI, CRI, CUI, CDI
 {
+    /** URI key used in routing table */
+    const ROUTE_KEY_INDEX = 'idx';
 }

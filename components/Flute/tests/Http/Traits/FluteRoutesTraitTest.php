@@ -34,6 +34,25 @@ class FluteRoutesTraitTest extends TestCase
     /**
      * Test helper method.
      */
+    public function testControllerMethod()
+    {
+        /** @var Mock $group */
+        $group = Mockery::mock(GroupInterface::class);
+
+        $group->shouldReceive('get')->twice()->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('post')->times(3)->withAnyArgs()->andReturnSelf();
+
+        /** @var GroupInterface $group */
+
+        $this->controller($group, '/categories', CategoriesController::class);
+
+        // mockery will do checks when the test finished
+        $this->assertTrue(true);
+    }
+
+    /**
+     * Test helper method.
+     */
     public function testResourceMethod()
     {
         /** @var Mock $group */

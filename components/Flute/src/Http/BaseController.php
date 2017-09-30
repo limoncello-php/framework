@@ -62,9 +62,6 @@ abstract class BaseController implements ControllerInterface
     /** JSON API validation rules set class */
     const ON_UPDATE_VALIDATION_RULES_SET_CLASS = null;
 
-    /** URI key used in routing table */
-    const ROUTE_KEY_INDEX = 'idx';
-
     /**
      * @inheritdoc
      */
