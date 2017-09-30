@@ -131,7 +131,7 @@ class Crud implements CrudInterface
         list($offset, $limit) = $this->getPaginationStrategy()->parseParameters($pagingParams);
         $builder->setFirstResult($offset)->setMaxResults($limit);
 
-        $data = $this->fetchCollectionData($this->builderOnIndex($builder), $modelClass, $limit, $offset);
+        $data = $this->fetchCollectionData($this->builderOnIndex($builder), $modelClass);
 
         $relationships = null;
         if ($data->getData() !== null && $includePaths !== null) {
@@ -264,8 +264,7 @@ class Crud implements CrudInterface
         if ($isCollection == true) {
             list($offset, $limit) = $this->getPaginationStrategy()->parseParameters($pagingParams);
             $builder->setFirstResult($offset)->setMaxResults($limit);
-            $data = $this
-                ->fetchCollectionData($this->builderOnReadRelationship($builder), $resultClass, $limit, $offset);
+            $data = $this->fetchCollectionData($this->builderOnReadRelationship($builder), $resultClass);
         } else {
             $data = $this->fetchSingleData($this->builderOnReadRelationship($builder), $resultClass);
         }
@@ -498,18 +497,12 @@ class Crud implements CrudInterface
     /**
      * @param QueryBuilder $builder
      * @param string       $class
-     * @param int          $limit
-     * @param int          $offset
      *
      * @return PaginatedDataInterface
      */
-    protected function fetchCollectionData(
-        QueryBuilder $builder,
-        string $class,
-        int $limit,
-        int $offset
-    ): PaginatedDataInterface {
-        list($models, $hasMore, $limit, $offset) = $this->fetchCollection($builder, $class, $limit, $offset);
+    protected function fetchCollectionData(QueryBuilder $builder, string $class): PaginatedDataInterface
+    {
+        list($models, $hasMore, $limit, $offset) = $this->fetchCollection($builder, $class);
 
         $data = $this->getFactory()
             ->createPaginatedData($models)
@@ -552,7 +545,7 @@ class Crud implements CrudInterface
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
-        $platform = $builder->getConnection()->getDatabasePlatform();
+        $platform  = $builder->getConnection()->getDatabasePlatform();
         $typeNames = $this->getModelSchemes()->getAttributeTypes($class);
 
         $model = null;
@@ -564,18 +557,16 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param QueryBuilder    $builder
-     * @param string          $class
-     * @param int|string|null $offset
-     * @param int|string|null $limit
+     * @param QueryBuilder $builder
+     * @param string       $class
      *
      * @return array
      */
-    protected function fetchCollection(QueryBuilder $builder, string $class, $limit = null, $offset = null): array
+    protected function fetchCollection(QueryBuilder $builder, string $class): array
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
-        $platform = $builder->getConnection()->getDatabasePlatform();
+        $platform  = $builder->getConnection()->getDatabasePlatform();
         $typeNames = $this->getModelSchemes()->getAttributeTypes($class);
 
         $models = [];
@@ -583,7 +574,7 @@ class Crud implements CrudInterface
             $models[] = $this->readInstanceFromAssoc($class, $attributes, $typeNames, $platform);
         }
 
-        return $this->normalizePagingParams($models, $limit, $offset);
+        return $this->normalizePagingParams($models, $builder->getMaxResults(), $builder->getFirstResult());
     }
 
     /**
@@ -598,7 +589,7 @@ class Crud implements CrudInterface
         $allowedAttributes = array_flip($this->getModelSchemes()->getAttributes($modelClass));
         $allowedChanges    = array_intersect_key($attributes, $allowedAttributes);
         if ($index !== null) {
-            $pkName = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
+            $pkName                  = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
             $allowedChanges[$pkName] = $index;
         }
 
@@ -798,9 +789,10 @@ class Crud implements CrudInterface
     {
         if ($limit !== null) {
             $hasMore = count($models) >= $limit;
-            $limit   = $hasMore === true ? $limit - 1 : null;
-            $offset  = $limit === null && $hasMore === false ? null : $offset;
-            $hasMore === false ?: array_pop($models);
+            if ($hasMore === true) {
+                array_pop($models);
+            }
+            $limit = $limit - 1;
         } else {
             $hasMore = false;
         }
@@ -920,7 +912,7 @@ class Crud implements CrudInterface
                     foreach ($parents as $parent) {
                         $builder->setParameter(static::INDEX_BIND, $parent->{$pkName});
                         list($children, $hasMore, $limit, $offset) =
-                            $this->fetchCollection($builder, $class, $queryLimit, $queryOffset);
+                            $this->fetchCollection($builder, $class);
                         $deDupedChildren = [];
                         foreach ($children as $child) {
                             $child = $deDup->register($child);
@@ -937,7 +929,7 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param string             $namespace
+     * @param string $namespace
      *
      * @return FormatterInterface
      */

@@ -293,8 +293,8 @@ class CrudTest extends TestCase
         $emotions = $relationships->getRelationship($comment, Comment::REL_EMOTIONS);
         $this->assertCount(2, $emotions->getData());
         $this->assertFalse($emotions->hasMoreItems());
-        $this->assertSame(null, $emotions->getOffset());
-        $this->assertSame(null, $emotions->getLimit());
+        $this->assertSame(0, $emotions->getOffset());
+        $this->assertSame(self::DEFAULT_PAGE, $emotions->getLimit());
     }
 
     /**
@@ -348,8 +348,8 @@ class CrudTest extends TestCase
         $emotions = $relationships->getRelationship($comment, Comment::REL_EMOTIONS);
         $this->assertCount(2, $emotions->getData());
         $this->assertFalse($emotions->hasMoreItems());
-        $this->assertSame(null, $emotions->getOffset());
-        $this->assertSame(null, $emotions->getLimit());
+        $this->assertSame(0, $emotions->getOffset());
+        $this->assertSame(self::DEFAULT_PAGE, $emotions->getLimit());
     }
 
     /**
@@ -413,15 +413,15 @@ class CrudTest extends TestCase
         $emotions = $relationships->getRelationship($comments[1], Comment::REL_EMOTIONS);
         $this->assertCount(1, $emotions->getData());
         $this->assertFalse($emotions->hasMoreItems());
-        $this->assertSame(null, $emotions->getOffset());
-        $this->assertSame(null, $emotions->getLimit());
+        $this->assertSame(0, $emotions->getOffset());
+        $this->assertSame(self::DEFAULT_PAGE, $emotions->getLimit());
 
         $comment  = $comments[2];
         $emotions = $relationships->getRelationship($comment, Comment::REL_EMOTIONS);
         $this->assertCount(1, $emotions->getData());
         $this->assertFalse($emotions->hasMoreItems());
-        $this->assertSame(null, $emotions->getOffset());
-        $this->assertSame(null, $emotions->getLimit());
+        $this->assertSame(0, $emotions->getOffset());
+        $this->assertSame(self::DEFAULT_PAGE, $emotions->getLimit());
 
         $this->assertNotNull($post = $relationships->getRelationship($comment, Comment::REL_POST)->getData());
         $this->assertNotNull($user = $relationships->getRelationship($post, Post::REL_USER)->getData());
