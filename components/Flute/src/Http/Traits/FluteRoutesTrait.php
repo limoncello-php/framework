@@ -53,7 +53,7 @@ trait FluteRoutesTrait
         assert(array_key_exists(SchemaInterface::class, class_implements($schemeClass)) === true);
         $type = $schemeClass::TYPE;
 
-        $indexSlug = '/{' . BaseController::ROUTE_KEY_INDEX . '}';
+        $indexSlug = '/{' . CI::ROUTE_KEY_INDEX . '}';
         $params    = function ($method) use ($type) {
             return [RouteInterface::PARAM_NAME => $type . '_' . $method];
         };
@@ -91,7 +91,7 @@ trait FluteRoutesTrait
      */
     protected static function controller(GroupInterface $group, string $subUri, string $controllerClass): GroupInterface
     {
-        $slugged = $subUri . '/{' . BaseController::ROUTE_KEY_INDEX . '}';
+        $slugged = $subUri . '/{' . CI::ROUTE_KEY_INDEX . '}';
         $params  = function ($method) use ($subUri) {
             return [RouteInterface::PARAM_NAME => $subUri . '_' . $method];
         };
