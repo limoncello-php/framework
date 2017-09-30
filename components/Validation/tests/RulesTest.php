@@ -25,7 +25,7 @@ use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Errors\ErrorAggregator;
 use Limoncello\Validation\Execution\ContextStorage;
 use Limoncello\Validation\Rules as v;
-use Limoncello\Validation\Validator;
+use Limoncello\Validation\SingleValidator;
 use Limoncello\Validation\Validator\ArrayValidation;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -683,7 +683,7 @@ class RulesTest extends TestCase
         $dbExistRule = v::isString(v::stringToInt(
             v::ifX([static::class, 'emulateDbRequest'], v::success(), v::fail())
         ));
-        $validator   = Validator::validator($dbExistRule);
+        $validator   = SingleValidator::validator($dbExistRule);
 
         // no error
         $this->assertTrue($validator->validate('5'));

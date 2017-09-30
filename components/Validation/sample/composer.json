@@ -5,7 +5,7 @@
         }
     },
     "require": {
-        "limoncello-php/validation": "^0.7.0",
+        "limoncello-php/validation": "^0.8.0",
         "ext-intl" : "*"
     }
 }

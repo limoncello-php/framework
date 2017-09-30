@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
+use Limoncello\Validation\ArrayValidator as vv;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Rules as v;
-use Limoncello\Validation\Validator;
+use Limoncello\Validation\Rules as r;
+use Limoncello\Validation\SingleValidator as v;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,7 +32,7 @@ class ValidatorTest extends TestCase
      */
     public function testBasicValidatorMethods(): void
     {
-        $validator = Validator::validator(v::isBool(v::success())->setName('value')->enableCapture());
+        $validator = v::validator(r::isBool(r::success())->setName('value')->enableCapture());
 
         $this->assertTrue($validator->validate(false));
         $this->assertEmpty($validator->getErrors());
@@ -46,7 +47,7 @@ class ValidatorTest extends TestCase
      */
     public function testBasicValidatorCaptureWithoutName(): void
     {
-        $validator = Validator::validator(v::isBool(v::success())->enableCapture());
+        $validator = v::validator(r::isBool(r::success())->enableCapture());
 
         $this->assertTrue($validator->validate(false));
         $this->assertEmpty($validator->getErrors());
@@ -60,17 +61,30 @@ class ValidatorTest extends TestCase
     {
         // allows either int > 5 OR `true`
         // it could be written shorter but we need some testing/coverage for the methods.
-        $rule = v::orX(
-            v::ifX([static::class, 'customCondition'], v::success(), v::fail()),
-            v::andX(v::isBool(v::success()), v::equals(true))
+        $rule = r::orX(
+            r::ifX([static::class, 'customCondition'], r::success(), r::fail()),
+            r::andX(r::isBool(r::success()), r::equals(true))
         )->setName('value')->enableCapture();
 
-        $validator = Validator::validator($rule);
+        $validator = v::validator($rule);
 
         $this->assertTrue($validator->validate(6));
         $this->assertTrue($validator->validate(true));
         $this->assertFalse($validator->validate(5));
         $this->assertFalse($validator->validate(false));
+    }
+
+    /**
+     * Test validation for array values.
+     */
+    public function testArrayValidator(): void
+    {
+        $validator = vv::validator([
+            'value1' => r::isString(),
+        ]);
+
+        $this->assertTrue($validator->validate(['value1' => 'I am a string']));
+        $this->assertFalse($validator->validate(['value1' => false]));
     }
 
     /**

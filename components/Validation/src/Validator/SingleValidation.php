@@ -64,7 +64,7 @@ trait SingleValidation
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private function validateImplementation(
+    private function validateSingleImplementation(
         $input,
         CaptureAggregatorInterface $captures,
         ErrorAggregatorInterface $errors

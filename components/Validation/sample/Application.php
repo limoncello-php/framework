@@ -18,14 +18,14 @@
 
 use DateTime;
 use DateTimeInterface;
+use Limoncello\Validation\ArrayValidator as vv;
 use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
-use Limoncello\Validation\Validator;
+use Limoncello\Validation\SingleValidator as v;
 use MessageFormatter;
 use Sample\Validation\CustomErrorMessages;
-use Sample\Validation\CustomRules as v;
-use Sample\Validation\CustomValidator as vv;
+use Sample\Validation\CustomRules as r;
 
 /**
  * @package Sample
@@ -50,22 +50,22 @@ class Application
      */
     public function run(): void
     {
-        $this->showBasicUsage();
+        $this->showSingleValueValidation();
 
-        $this->showAdvancedUsageWithCustomValidator();
+        $this->showArrayValuesValidation();
     }
 
     /**
-     * Shows basic usage with built-in rules.
+     * Shows single value validation with built-in rules.
      */
-    private function showBasicUsage(): void
+    private function showSingleValueValidation(): void
     {
         $this->console('Basic usage sample.' . PHP_EOL);
         $this->console('===================' . PHP_EOL);
 
         // Let's build a rule that validates an input to be either `null` or a string from 5 to 10 characters.
-        $validator = Validator::validator(
-            v::nullable(v::isString(v::stringLengthBetween(5, 10)))
+        $validator = v::validator(
+            r::nullable(r::isString(r::stringLengthBetween(5, 10)))
         );
 
         // let's try validation with valid input
@@ -97,8 +97,8 @@ class Application
         // - data capture so you don't need to parse the input second time after validation
         $fromDate  = new DateTime('2001-02-03');
         $toDate    = new DateTime('2001-04-05');
-        $validator = Validator::validator(
-            v::isString(v::stringToDateTime(DATE_ATOM, v::between($fromDate, $toDate)))
+        $validator = v::validator(
+            r::isString(r::stringToDateTime(DATE_ATOM, r::between($fromDate, $toDate)))
                 ->setName('my_date')->enableCapture()
         );
         $input     = '2001-03-04T05:06:07+08:00';
@@ -126,9 +126,9 @@ class Application
     }
 
     /**
-     * Shows advanced usage with custom validation rules and workflow.
+     * Shows validation for array values with custom rules.
      */
-    private function showAdvancedUsageWithCustomValidator(): void
+    private function showArrayValuesValidation(): void
     {
         $this->console('Advanced usage sample.' . PHP_EOL);
         $this->console('===================' . PHP_EOL);
@@ -139,10 +139,10 @@ class Application
         // - `last_name` could be either `null` or if given it must be a string with length from 1 to 255 characters
         // - `payment_plan` must be a valid index for data in database (we will emulate request to database)
         $validator = vv::validator([
-            'email'        => v::isEmail(),
-            'first_name'   => v::isRequiredString(255),
-            'last_name'    => v::isNullOrNonEmptyString(255),
-            'payment_plan' => v::isExistingPaymentPlan(),
+            'email'        => r::isEmail(),
+            'first_name'   => r::isRequiredString(255),
+            'last_name'    => r::isNullOrNonEmptyString(255),
+            'payment_plan' => r::isExistingPaymentPlan(),
         ]);
 
         // Check with invalid data

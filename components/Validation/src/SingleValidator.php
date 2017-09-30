@@ -1,4 +1,4 @@
-<?php namespace Sample\Validation;
+<?php namespace Limoncello\Validation;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -18,41 +18,44 @@
 
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Limoncello\Validation\Contracts\ValidatorInterface;
 use Limoncello\Validation\Execution\ContextStorage;
-use Limoncello\Validation\Validator\ArrayValidation;
 use Limoncello\Validation\Validator\BaseValidator;
+use Limoncello\Validation\Validator\SingleValidation;
 
 /**
- * @package Sample
+ * @package Limoncello\Validation
  */
-class CustomValidator extends BaseValidator
+class SingleValidator extends BaseValidator
 {
-    use ArrayValidation;
+    use SingleValidation;
 
     /**
-     * @param RuleInterface[] $rules
+     * @param RuleInterface $rule
      */
-    public function __construct(array $rules)
+    public function __construct(RuleInterface $rule)
     {
         parent::__construct();
 
-        $this->setRules($rules);
+        $this->setRule($rule);
     }
 
     /**
-     * @param RuleInterface[] $rules
+     * @param RuleInterface $rule
      *
-     * @return self
+     * @return ValidatorInterface
      */
-    public static function validator(array $rules): self
+    public static function validator(RuleInterface $rule): ValidatorInterface
     {
-        $validator = new static ($rules);
+        $validator = new static ($rule);
 
         return $validator;
     }
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function validate($input): bool
     {
@@ -60,12 +63,12 @@ class CustomValidator extends BaseValidator
             $this->resetAggregators();
         }
 
-        $this->validateArrayImplementation($input, $this->getCaptures(), $this->getErrors());
+        $this->validateSingleImplementation($input, $this->getCaptures(), $this->getErrors());
         $this->markAggregatorsAsDirty();
 
-        $isOk = $this->getErrors()->count() <= 0;
+        $noErrors = $this->getErrors()->count() <= 0;
 
-        return $isOk;
+        return $noErrors;
     }
 
     /**
@@ -78,8 +81,6 @@ class CustomValidator extends BaseValidator
      */
     protected function createContextStorageFromBlocks(array $blocks): ContextStorageInterface
     {
-        $context = new ContextStorage($blocks);
-
-        return $context;
+        return new ContextStorage($blocks);
     }
 }

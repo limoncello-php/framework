@@ -18,44 +18,41 @@
 
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
-use Limoncello\Validation\Contracts\ValidatorInterface;
 use Limoncello\Validation\Execution\ContextStorage;
+use Limoncello\Validation\Validator\ArrayValidation;
 use Limoncello\Validation\Validator\BaseValidator;
-use Limoncello\Validation\Validator\SingleValidation;
 
 /**
  * @package Limoncello\Validation
  */
-class Validator extends BaseValidator
+class ArrayValidator extends BaseValidator
 {
-    use SingleValidation;
+    use ArrayValidation;
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface[] $rules
      */
-    public function __construct(RuleInterface $rule)
+    public function __construct(array $rules)
     {
         parent::__construct();
 
-        $this->setRule($rule);
+        $this->setRules($rules);
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface[] $rules
      *
-     * @return ValidatorInterface
+     * @return self
      */
-    public static function validator(RuleInterface $rule): ValidatorInterface
+    public static function validator(array $rules): self
     {
-        $validator = new static ($rule);
+        $validator = new static ($rules);
 
         return $validator;
     }
 
     /**
      * @inheritdoc
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function validate($input): bool
     {
@@ -63,15 +60,18 @@ class Validator extends BaseValidator
             $this->resetAggregators();
         }
 
-        $this->validateImplementation($input, $this->getCaptures(), $this->getErrors());
+        $this->validateArrayImplementation($input, $this->getCaptures(), $this->getErrors());
         $this->markAggregatorsAsDirty();
 
-        $noErrors = $this->getErrors()->count() <= 0;
+        $isOk = $this->getErrors()->count() <= 0;
 
-        return $noErrors;
+        return $isOk;
     }
 
     /**
+     * During validation you can pass to rules your custom context which might have any additional
+     * resources needed by your rules (extra properties, database connection settings, container, and etc).
+     *
      * @param array $blocks
      *
      * @return ContextStorageInterface
