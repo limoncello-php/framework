@@ -70,15 +70,13 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        /** @var QueryParametersParserInterface $queryParser */
-        $queryParser    = $container->get(QueryParametersParserInterface::class);
-        $encodingParams = $queryParser->parse($request);
+        $schemeParams = self::parseQueryParameters($container, $request);
 
         list ($filters, $sorts, $includes, $paging) =
-            static::mapQueryParameters($container, $encodingParams, static::SCHEMA_CLASS);
-
+            static::mapSchemeToModelParameters($container, $schemeParams, static::SCHEMA_CLASS);
         $modelData = static::createApi($container)->index($filters, $sorts, $includes, $paging);
-        $responses = static::createResponses($container, $request, $encodingParams);
+
+        $responses = static::createResponses($container, $request, $schemeParams);
         $response  = $modelData->getPaginatedData()->getData() === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($modelData);
 
@@ -93,8 +91,8 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $validator = static::createOnCreateValidator($container);
         $jsonData  = static::readJsonFromRequest($container, $request);
+        $validator = static::createOnCreateValidator($container);
         $captures  = $validator->assert($jsonData)->getJsonApiCaptures();
 
         list ($index, $attributes, $toMany) =
@@ -117,16 +115,15 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        /** @var QueryParametersParserInterface $queryParser */
-        $queryParser    = $container->get(QueryParametersParserInterface::class);
-        $encodingParams = $queryParser->parse($request);
+        $schemeParams = self::parseQueryParameters($container, $request);
 
-        list ($filters, , $includes) = static::mapQueryParameters($container, $encodingParams, static::SCHEMA_CLASS);
+        list ($filters, , $includes) =
+            static::mapSchemeToModelParameters($container, $schemeParams, static::SCHEMA_CLASS);
 
         $index    = $routeParams[static::ROUTE_KEY_INDEX];
         $response = static::readImpl(
             static::createApi($container),
-            static::createResponses($container, $request, $encodingParams),
+            static::createResponses($container, $request, $schemeParams),
             $index,
             $filters,
             $includes
@@ -143,9 +140,12 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
+        $jsonData  = static::normalizeIndexValueOnUpdate(
+            $routeParams,
+            $container,
+            static::readJsonFromRequest($container, $request)
+        );
         $validator = static::createOnUpdateValidator($container);
-        $jsonData  = static::readJsonFromRequest($container, $request);
-        $jsonData  = static::normalizeIndexValueOnUpdate($routeParams, $container, $jsonData);
         $captures  = $validator->assert($jsonData)->getJsonApiCaptures();
 
         list ($index, $attributes, $toMany) =
@@ -182,12 +182,10 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        /** @var PaginatedDataInterface $relData */
-        /** @var EncodingParametersInterface $encodingParams */
-        list ($relData, $encodingParams) = self::readRelationshipData($index, $relationshipName, $container, $request);
-
-        $responses = static::createResponses($container, $request, $encodingParams);
-        $response  = $relData->getData() === null ?
+        $schemeParams = self::parseQueryParameters($container, $request);
+        $relData      = self::readRelationshipData($index, $relationshipName, $container, $schemeParams);
+        $responses    = static::createResponses($container, $request, $schemeParams);
+        $response     = $relData->getData() === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($relData);
 
         return $response;
@@ -207,12 +205,10 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        /** @var PaginatedDataInterface $relData */
-        /** @var EncodingParametersInterface $encodingParams */
-        list ($relData, $encodingParams) = self::readRelationshipData($index, $relationshipName, $container, $request);
-
-        $responses = static::createResponses($container, $request, $encodingParams);
-        $response  = $relData->getData() === null ?
+        $schemeParams = self::parseQueryParameters($container, $request);
+        $relData      = self::readRelationshipData($index, $relationshipName, $container, $schemeParams);
+        $responses    = static::createResponses($container, $request, $schemeParams);
+        $response     = $relData->getData() === null ?
             $responses->getCodeResponse(404) : $responses->getIdentifiersResponse($relData);
 
         return $response;
@@ -240,7 +236,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @return array
      */
-    protected static function mapQueryParameters(
+    protected static function mapSchemeToModelParameters(
         ContainerInterface $container,
         EncodingParametersInterface $parameters,
         string $schemaClass
@@ -511,35 +507,48 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param string                 $index
-     * @param string                 $relationshipName
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
+     * @param string                      $index
+     * @param string                      $relationshipName
+     * @param ContainerInterface          $container
+     * @param EncodingParametersInterface $encodingParams
      *
-     * @return array [PaginatedDataInterface, EncodingParametersInterface]
+     * @return PaginatedDataInterface
      */
     private static function readRelationshipData(
         string $index,
         string $relationshipName,
         ContainerInterface $container,
-        ServerRequestInterface $request
-    ): array {
-        /** @var QueryParametersParserInterface $queryParser */
-        $queryParser    = $container->get(QueryParametersParserInterface::class);
-        $encodingParams = $queryParser->parse($request);
-
+        EncodingParametersInterface $encodingParams
+    ): PaginatedDataInterface {
         /** @var JsonSchemesInterface $jsonSchemes */
         $jsonSchemes  = $container->get(JsonSchemesInterface::class);
         $targetSchema = $jsonSchemes->getRelationshipSchema(static::SCHEMA_CLASS, $relationshipName);
         list ($filters, $sorts, , $paging) =
-            static::mapQueryParameters($container, $encodingParams, get_class($targetSchema));
+            static::mapSchemeToModelParameters($container, $encodingParams, get_class($targetSchema));
 
         /** @var SchemaInterface $schemaClass */
         $schemaClass  = static::SCHEMA_CLASS;
         $modelRelName = $schemaClass::getRelationshipMapping($relationshipName);
         $relData      = self::createApi($container)->readRelationship($index, $modelRelName, $filters, $sorts, $paging);
 
-        return [$relData, $encodingParams];
+        return $relData;
+    }
+
+    /**
+     * @param ContainerInterface     $container
+     * @param ServerRequestInterface $request
+     *
+     * @return EncodingParametersInterface
+     */
+    private static function parseQueryParameters(
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): EncodingParametersInterface {
+        /** @var QueryParametersParserInterface $queryParser */
+        $queryParser    = $container->get(QueryParametersParserInterface::class);
+        $encodingParams = $queryParser->parse($request);
+
+        return $encodingParams;
     }
 
     /**

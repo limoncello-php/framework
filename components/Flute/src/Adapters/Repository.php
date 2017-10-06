@@ -468,7 +468,7 @@ class Repository implements RepositoryInterface
                     $errors,
                     $builder,
                     $whereLink,
-                    $filterParam,
+                    $filterParam->getOriginalName(),
                     $filterTable,
                     $filterColumn,
                     $lcOp,
@@ -598,14 +598,14 @@ class Repository implements RepositoryInterface
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param ErrorCollection          $errors
-     * @param QueryBuilder             $builder
-     * @param CompositeExpression      $link
-     * @param FilterParameterInterface $filterParam
-     * @param string                   $table
-     * @param string                   $field
-     * @param string                   $operation
-     * @param array|string|null        $params
+     * @param ErrorCollection     $errors
+     * @param QueryBuilder        $builder
+     * @param CompositeExpression $link
+     * @param string              $originalName
+     * @param string              $table
+     * @param string              $field
+     * @param string              $operation
+     * @param array|string|null   $params
      *
      * @return void
      *
@@ -616,7 +616,7 @@ class Repository implements RepositoryInterface
         ErrorCollection $errors,
         QueryBuilder $builder,
         CompositeExpression $link,
-        FilterParameterInterface $filterParam,
+        string $originalName,
         string $table,
         string $field,
         string $operation,
@@ -683,7 +683,7 @@ class Repository implements RepositoryInterface
                 break;
             default:
                 $errMsg = $this->getFluteMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_OPERATION);
-                $errors->addQueryParameterError($filterParam->getOriginalName(), $errMsg, $operation);
+                $errors->addQueryParameterError($originalName, $errMsg, $operation);
                 break;
         }
     }

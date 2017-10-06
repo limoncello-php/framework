@@ -92,7 +92,9 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     public function getModelRelationshipSchema(string $modelClass, string $relationshipName): SchemaInterface
     {
         $reverseModelClass = $this->getModelSchemes()->getReverseModelClass($modelClass, $relationshipName);
-        $targetSchema      = $this->getSchemaByType($reverseModelClass);
+
+        /** @var SchemaInterface $targetSchema */
+        $targetSchema = $this->getSchemaByType($reverseModelClass);
 
         return $targetSchema;
     }

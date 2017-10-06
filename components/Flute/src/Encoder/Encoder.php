@@ -157,6 +157,8 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
      */
     private function createLinkClosure(int $pageSize): Closure
     {
+        assert ($pageSize > 0);
+
         parse_str($this->getOriginalUri()->getQuery(), $queryParams);
 
         return function ($offset) use ($pageSize, $queryParams) {

@@ -62,7 +62,7 @@ class PaginationStrategy implements PaginationStrategyInterface
 
         $offset = 0;
 
-        return [$offset, $this->getDefaultPageSize() + 1];
+        return [$offset, $this->getDefaultPageSize()];
     }
 
     /**
@@ -71,7 +71,7 @@ class PaginationStrategy implements PaginationStrategyInterface
     public function parseParameters(?array $parameters): array
     {
         if ($parameters === null) {
-            return [0, $this->getDefaultPageSize() + 1];
+            return [0, $this->getDefaultPageSize()];
         }
 
         $offset = $this->getValue(
@@ -89,7 +89,7 @@ class PaginationStrategy implements PaginationStrategyInterface
             max($this->getDefaultPageSize(), $this->getMaxPageSize())
         );
 
-        return [$offset, $size + 1];
+        return [$offset, $size];
     }
 
     /**

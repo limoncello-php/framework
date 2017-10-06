@@ -27,7 +27,6 @@ use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
-use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
@@ -129,16 +128,12 @@ class Crud implements CrudInterface
         $sortParams === null ?: $this->getRepository()->applySorting($builder, $modelClass, $sortParams);
 
         list($offset, $limit) = $this->getPaginationStrategy()->parseParameters($pagingParams);
-        $builder->setFirstResult($offset)->setMaxResults($limit);
+        $builder->setFirstResult($offset)->setMaxResults($limit + 1);
 
         $data = $this->fetchCollectionData($this->builderOnIndex($builder), $modelClass);
 
-        $relationships = null;
-        if ($data->getData() !== null && $includePaths !== null) {
-            $relationships = $this->readRelationships($data, $includePaths);
-        }
-
-        $result = $this->getFactory()->createModelsData($data, $relationships);
+        $relationships = $this->readRelationships($data, $includePaths);
+        $result        = $this->getFactory()->createModelsData($data, $relationships);
 
         return $result;
     }
@@ -191,12 +186,8 @@ class Crud implements CrudInterface
         $model = $this->readResource($index, $filterParams);
         $data  = $this->getFactory()->createPaginatedData($model);
 
-        $relationships = null;
-        if ($data->getData() !== null && $includePaths !== null) {
-            $relationships = $this->readRelationships($data, $includePaths);
-        }
-
-        $result = $this->getFactory()->createModelsData($data, $relationships);
+        $relationships = $this->readRelationships($data, $includePaths);
+        $result        = $this->getFactory()->createModelsData($data, $relationships);
 
         return $result;
     }
@@ -207,9 +198,7 @@ class Crud implements CrudInterface
     public function readResource($index, FilterParameterCollection $filterParams = null)
     {
         if ($index !== null && is_scalar($index) === false) {
-            throw new InvalidArgumentException(
-                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
-            );
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
         }
 
         $modelClass = $this->getModelClass();
@@ -240,9 +229,7 @@ class Crud implements CrudInterface
         array $pagingParams = null
     ): PaginatedDataInterface {
         if ($index !== null && is_scalar($index) === false) {
-            throw new InvalidArgumentException(
-                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
-            );
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
         }
 
         $modelClass = $this->getModelClass();
@@ -263,7 +250,7 @@ class Crud implements CrudInterface
 
         if ($isCollection == true) {
             list($offset, $limit) = $this->getPaginationStrategy()->parseParameters($pagingParams);
-            $builder->setFirstResult($offset)->setMaxResults($limit);
+            $builder->setFirstResult($offset)->setMaxResults($limit + 1);
             $data = $this->fetchCollectionData($this->builderOnReadRelationship($builder), $resultClass);
         } else {
             $data = $this->fetchSingleData($this->builderOnReadRelationship($builder), $resultClass);
@@ -278,14 +265,10 @@ class Crud implements CrudInterface
     public function hasInRelationship($parentId, string $name, $childId): bool
     {
         if ($parentId !== null && is_scalar($parentId) === false) {
-            throw new InvalidArgumentException(
-                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
-            );
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
         }
         if ($childId !== null && is_scalar($childId) === false) {
-            throw new InvalidArgumentException(
-                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
-            );
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
         }
 
         $modelClass = $this->getModelClass();
@@ -308,9 +291,7 @@ class Crud implements CrudInterface
     public function readRow($index): ?array
     {
         if ($index !== null && is_scalar($index) === false) {
-            throw new InvalidArgumentException(
-                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
-            );
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
         }
 
         $modelClass = $this->getModelClass();
@@ -328,9 +309,7 @@ class Crud implements CrudInterface
     public function delete($index): int
     {
         if ($index !== null && is_scalar($index) === false) {
-            throw new InvalidArgumentException(
-                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
-            );
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
         }
 
         $modelClass = $this->getModelClass();
@@ -350,9 +329,7 @@ class Crud implements CrudInterface
     public function create($index, array $attributes, array $toMany = []): string
     {
         if ($index !== null && is_scalar($index) === false) {
-            throw new InvalidArgumentException(
-                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
-            );
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
         }
 
         $modelClass = $this->getModelClass();
@@ -388,9 +365,7 @@ class Crud implements CrudInterface
     public function update($index, array $attributes, array $toMany = []): int
     {
         if ($index !== null && is_scalar($index) === false) {
-            throw new InvalidArgumentException(
-                $this->createMessageFormatter()->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT)
-            );
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
         }
 
         $updated    = 0;
@@ -726,18 +701,19 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param PaginatedDataInterface      $data
-     * @param IncludeParameterInterface[] $paths
+     * @param PaginatedDataInterface           $data
+     * @param IncludeParameterInterface[]|null $paths
      *
-     * @return RelationshipStorageInterface
+     * @return RelationshipStorageInterface|null
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function readRelationships(PaginatedDataInterface $data, array $paths): RelationshipStorageInterface
+    protected function readRelationships(PaginatedDataInterface $data, ?array $paths): ?RelationshipStorageInterface
     {
-        $result = $this->getFactory()->createRelationshipStorage();
+        $result = null;
 
         if (empty($data->getData()) === false && empty($paths) === false) {
+            $result       = $this->getFactory()->createRelationshipStorage();
             $modelStorage = $this->getFactory()->createModelStorage($this->getModelSchemes());
             $modelsAtPath = $this->getFactory()->createTagStorage();
 
@@ -777,42 +753,6 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param array           $models
-     * @param int|string|null $offset
-     * @param int|string|null $limit
-     *
-     * @return array
-     *
-     * @SuppressWarnings(PHPMD.ElseExpression)
-     */
-    private function normalizePagingParams(array $models, $limit, $offset): array
-    {
-        if ($limit !== null) {
-            $hasMore = count($models) >= $limit;
-            if ($hasMore === true) {
-                array_pop($models);
-            }
-            $limit = $limit - 1;
-        } else {
-            $hasMore = false;
-        }
-
-        return [$models, $hasMore, $limit, $offset];
-    }
-
-    /**
-     * @param ErrorCollection $errors
-     *
-     * @return void
-     */
-    private function checkErrors(ErrorCollection $errors): void
-    {
-        if (empty($errors->getArrayCopy()) === false) {
-            throw new E($errors);
-        }
-    }
-
-    /**
      * @param IncludeParameterInterface[] $paths
      *
      * @return Generator
@@ -848,7 +788,7 @@ class Crud implements CrudInterface
         // And finally sort by path depth and yield parent with its children. Top level paths first then deeper ones.
         asort($pathsDepths, SORT_NUMERIC);
         foreach ($pathsDepths as $parent => $depth) {
-            $depth ?: null; // suppress unused
+            assert($depth !== null); // suppress unused
             $childPaths = $parentWithChildren[$parent];
             yield [$parent, $childPaths];
         }
@@ -866,7 +806,7 @@ class Crud implements CrudInterface
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function loadRelationshipsLayer(
+    private function loadRelationshipsLayer(
         RelationshipStorageInterface $result,
         TagStorageInterface $modelsAtPath,
         ArrayObject $classAtPath,
@@ -907,7 +847,7 @@ class Crud implements CrudInterface
                 case RelationshipTypes::BELONGS_TO_MANY:
                     list ($queryOffset, $queryLimit) = $this->getPaginationStrategy()
                         ->getParameters($rootClass, $parentClass, $parentsPath, $name);
-                    $builder->setFirstResult($queryOffset)->setMaxResults($queryLimit);
+                    $builder->setFirstResult($queryOffset)->setMaxResults($queryLimit + 1);
                     $pkName = $this->getModelSchemes()->getPrimaryKey($parentClass);
                     foreach ($parents as $parent) {
                         $builder->setParameter(static::INDEX_BIND, $parent->{$pkName});
@@ -929,17 +869,54 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param string $namespace
+     * @param array           $models
+     * @param int|string|null $offset
+     * @param int|string|null $limit
      *
-     * @return FormatterInterface
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function createMessageFormatter(string $namespace = Messages::RESOURCES_NAMESPACE): FormatterInterface
+    private function normalizePagingParams(array $models, $limit, $offset): array
+    {
+        if ($limit !== null) {
+            $hasMore = count($models) >= $limit;
+            if ($hasMore === true) {
+                array_pop($models);
+            }
+            $limit = $limit - 1;
+        } else {
+            $hasMore = false;
+        }
+
+        return [$models, $hasMore, $limit, $offset];
+    }
+
+    /**
+     * @param ErrorCollection $errors
+     *
+     * @return void
+     */
+    private function checkErrors(ErrorCollection $errors): void
+    {
+        if (empty($errors->getArrayCopy()) === false) {
+            throw new E($errors);
+        }
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return string
+     */
+    private function getMessage(string $message): string
     {
         /** @var FormatterFactoryInterface $factory */
-        $factory          = $this->getContainer()->get(FormatterFactoryInterface::class);
-        $messageFormatter = $factory->createFormatter($namespace);
+        $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
+        $formatter = $factory->createFormatter(Messages::RESOURCES_NAMESPACE);
+        $result    = $formatter->formatMessage($message);
 
-        return $messageFormatter;
+        return $result;
     }
 
     /**
