@@ -86,11 +86,12 @@ final class ExistInDbTableMultipleWithDoctrine extends BaseRule
         $count = 0;
 
         if (is_array($values) === true && empty($values) === false) {
+            $tableName    = $context->getProperties()->getProperty(self::PROPERTY_TABLE_NAME);
+            $primaryName  = $context->getProperties()->getProperty(self::PROPERTY_PRIMARY_NAME);
+
             /** @var Connection $connection */
             $connection   = $context->getContainer()->get(Connection::class);
             $builder      = $connection->createQueryBuilder();
-            $tableName    = $context->getProperties()->getProperty(self::PROPERTY_TABLE_NAME);
-            $primaryName  = $context->getProperties()->getProperty(self::PROPERTY_PRIMARY_NAME);
             $placeholders = [];
             foreach ($values as $value) {
                 $placeholders[] = $builder->createPositionalParameter($value);

@@ -86,11 +86,12 @@ final class ExistInDbTableSingleWithDoctrine extends BaseRule
         $count = 0;
 
         if (is_scalar($value) === true) {
+            $tableName   = $context->getProperties()->getProperty(self::PROPERTY_TABLE_NAME);
+            $primaryName = $context->getProperties()->getProperty(self::PROPERTY_PRIMARY_NAME);
+
             /** @var Connection $connection */
             $connection  = $context->getContainer()->get(Connection::class);
             $builder     = $connection->createQueryBuilder();
-            $tableName   = $context->getProperties()->getProperty(self::PROPERTY_TABLE_NAME);
-            $primaryName = $context->getProperties()->getProperty(self::PROPERTY_PRIMARY_NAME);
             $statement   = $builder
                 ->select('count(*)')
                 ->from($tableName)
