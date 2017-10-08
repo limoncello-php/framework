@@ -125,20 +125,48 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
                 $hasRelData = $this->hasRelationship($model, $modelRelName);
                 $relType    = $this->getModelSchemes()->getRelationshipType($modelClass, $modelRelName);
 
+                $isShowAsLink = false;
+
                 // there is a case for `to-1` relationship when we can return identity resource (type + id)
                 if ($relType === RelationshipTypes::BELONGS_TO) {
                     if ($isRelToBeIncluded === true && $hasRelData === true) {
                         $relationships[$jsonRelName] = [static::DATA => $model->{$modelRelName}];
+                        continue;
                     } else {
-                        $relationships[$jsonRelName] =
-                            $this->getRelationshipIdentityRepresentation($model, $jsonRelName, $modelRelName);
+                        $schema = $this->getModelSchemes();
+
+                        $class  = get_class($model);
+                        $fkName = $schema->getForeignKey($class, $modelRelName);
+
+                        $isShowAsLink = property_exists($model, $fkName) === false;
+
+                        if ($isShowAsLink === false) {
+
+                            // show as identity (type, id)
+
+                            $identity       = null;
+                            $reversePkValue = $model->{$fkName};
+                            if ($reversePkValue !== null) {
+                                $reverseClass  = $schema->getReverseModelClass($class, $modelRelName);
+                                $reversePkName = $schema->getPrimaryKey($reverseClass);
+
+                                $identity                   = new $reverseClass;
+                                $identity->{$reversePkName} = $reversePkValue;
+                            }
+
+                            $relationships[$jsonRelName] = [
+                                static::DATA  => $identity,
+                                static::LINKS => $this->getRelationshipLinks($model, $jsonRelName),
+                            ];
+                            continue;
+                        }
+
+                        // the relationship will be shown as a link
                     }
-                    continue;
                 }
 
                 // if our storage do not have any data for this relationship or relationship would not
                 // be included we return it as link
-                $isShowAsLink = false;
                 if ($hasRelData === false ||
                     ($isRelToBeIncluded === false && $relType !== RelationshipTypes::BELONGS_TO)
                 ) {
@@ -150,7 +178,9 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
                     continue;
                 }
 
-                $relUri  = $this->getRelationshipSelfUrl($model, $jsonRelName);
+                // if we are here this is a `to-Many` relationship and we have to show data and got the data
+
+                $relUri                      = $this->getRelationshipSelfUrl($model, $jsonRelName);
                 $relationships[$jsonRelName] = $this->getRelationshipDescription($model->{$modelRelName}, $relUri);
             }
         }
@@ -183,7 +213,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
                 PaginationStrategyInterface::PARAM_PAGING_SKIP => $offset,
                 PaginationStrategyInterface::PARAM_PAGING_SIZE => $data->getLimit(),
             ];
-            $fullUrl = $uri . '?' . http_build_query($paramsWithPaging);
+            $fullUrl          = $uri . '?' . http_build_query($paramsWithPaging);
 
             return $fullUrl;
         };
@@ -193,33 +223,13 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
         // It looks like relationship can only hold first data rows so we might need `next` link but never `prev`
 
         if ($data->hasMoreItems() === true) {
-            $offset = $data->getOffset() + $data->getLimit();
+            $offset                                 = $data->getOffset() + $data->getLimit();
             $links[DocumentInterface::KEYWORD_NEXT] = $this->createLink($buildUrl($offset));
         }
 
         return [
             static::DATA  => $data->getData(),
             static::LINKS => $links,
-        ];
-    }
-
-    /**
-     * @param mixed  $model
-     * @param string $jsonRelationship
-     * @param string $modelRelationship
-     *
-     * @return array
-     */
-    protected function getRelationshipIdentityRepresentation(
-        $model,
-        string $jsonRelationship,
-        string $modelRelationship
-    ): array {
-        $identity = $this->getIdentity($model, $modelRelationship);
-
-        return [
-            static::DATA  => $identity,
-            static::LINKS => $this->getRelationshipLinks($model, $jsonRelationship),
         ];
     }
 
@@ -254,32 +264,6 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
         }
 
         return $links;
-    }
-
-    /**
-     * @param mixed  $model
-     * @param string $modelRelName
-     *
-     * @return mixed
-     */
-    protected function getIdentity($model, string $modelRelName)
-    {
-        $schema = $this->getModelSchemes();
-
-        $class          = get_class($model);
-        $fkName         = $schema->getForeignKey($class, $modelRelName);
-        $reversePkValue = $model->{$fkName};
-        if ($reversePkValue === null) {
-            return null;
-        }
-
-        $reverseClass  = $schema->getReverseModelClass($class, $modelRelName);
-        $reversePkName = $schema->getPrimaryKey($reverseClass);
-
-        $model = new $reverseClass;
-        $model->{$reversePkName} = $reversePkValue;
-
-        return $model;
     }
 
     /**
