@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-use Limoncello\Container\Container;
-use Limoncello\Flute\Factory as FluteFactory;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\TestCase;
@@ -41,9 +39,8 @@ class SchemaTest extends TestCase
     {
         parent::setUp();
 
-        $factory      = new FluteFactory(new Container());
         $modelSchemes = $this->getModelSchemes();
-        $this->schema = new PostSchema(new Factory(), $this->getJsonSchemes($factory, $modelSchemes), $modelSchemes);
+        $this->schema = new PostSchema(new Factory(), $modelSchemes);
     }
 
     /**
@@ -51,8 +48,8 @@ class SchemaTest extends TestCase
      */
     public function testEncodeNullToOneRelationship()
     {
-        $post = new Post();
-        $post->{Post::FIELD_ID}  = '1';
+        $post                          = new Post();
+        $post->{Post::FIELD_ID}        = '1';
         $post->{Post::FIELD_ID_USER}   = null;
         $post->{Post::FIELD_ID_EDITOR} = null;
         $post->{Post::FIELD_ID_BOARD}  = null;

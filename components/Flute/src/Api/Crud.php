@@ -30,12 +30,10 @@ use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
-use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\IncludeParameterInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
-use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Models\TagStorageInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
@@ -117,7 +115,7 @@ class Crud implements CrudInterface
         array $sortParams = null,
         array $includePaths = null,
         array $pagingParams = null
-    ): ModelsDataInterface {
+    ): PaginatedDataInterface {
         $modelClass = $this->getModelClass();
 
         $builder = $this->getRepository()->index($modelClass);
@@ -132,10 +130,9 @@ class Crud implements CrudInterface
 
         $data = $this->fetchCollectionData($this->builderOnIndex($builder), $modelClass);
 
-        $relationships = $this->readRelationships($data, $includePaths);
-        $result        = $this->getFactory()->createModelsData($data, $relationships);
+        $this->loadRelationships($data, $includePaths);
 
-        return $result;
+        return $data;
     }
 
     /**
@@ -182,14 +179,13 @@ class Crud implements CrudInterface
         $index,
         FilterParameterCollection $filterParams = null,
         array $includePaths = null
-    ): ModelsDataInterface {
+    ): PaginatedDataInterface {
         $model = $this->readResource($index, $filterParams);
         $data  = $this->getFactory()->createPaginatedData($model);
 
-        $relationships = $this->readRelationships($data, $includePaths);
-        $result        = $this->getFactory()->createModelsData($data, $relationships);
+        $this->loadRelationships($data, $includePaths);
 
-        return $result;
+        return $data;
     }
 
     /**
@@ -704,16 +700,13 @@ class Crud implements CrudInterface
      * @param PaginatedDataInterface           $data
      * @param IncludeParameterInterface[]|null $paths
      *
-     * @return RelationshipStorageInterface|null
+     * @return void
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function readRelationships(PaginatedDataInterface $data, ?array $paths): ?RelationshipStorageInterface
+    protected function loadRelationships(PaginatedDataInterface $data, ?array $paths): void
     {
-        $result = null;
-
         if (empty($data->getData()) === false && empty($paths) === false) {
-            $result       = $this->getFactory()->createRelationshipStorage();
             $modelStorage = $this->getFactory()->createModelStorage($this->getModelSchemes());
             $modelsAtPath = $this->getFactory()->createTagStorage();
 
@@ -739,7 +732,6 @@ class Crud implements CrudInterface
 
             foreach ($this->getPaths($paths) as list ($parentPath, $childPaths)) {
                 $this->loadRelationshipsLayer(
-                    $result,
                     $modelsAtPath,
                     $classAtPath,
                     $modelStorage,
@@ -748,8 +740,6 @@ class Crud implements CrudInterface
                 );
             }
         }
-
-        return $result;
     }
 
     /**
@@ -795,19 +785,17 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param RelationshipStorageInterface $result
-     * @param TagStorageInterface          $modelsAtPath
-     * @param ArrayObject                  $classAtPath
-     * @param ModelStorageInterface        $deDup
-     * @param string                       $parentsPath
-     * @param array                        $childRelationships
+     * @param TagStorageInterface   $modelsAtPath
+     * @param ArrayObject           $classAtPath
+     * @param ModelStorageInterface $deDup
+     * @param string                $parentsPath
+     * @param array                 $childRelationships
      *
      * @return void
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadRelationshipsLayer(
-        RelationshipStorageInterface $result,
         TagStorageInterface $modelsAtPath,
         ArrayObject $classAtPath,
         ModelStorageInterface $deDup,
@@ -840,7 +828,7 @@ class Crud implements CrudInterface
                         if ($child !== null) {
                             $modelsAtPath->register($child, $childrenPath);
                         }
-                        $result->addToOneRelationship($parent, $name, $child);
+                        $parent->{$name} = $child;
                     }
                     break;
                 case RelationshipTypes::HAS_MANY:
@@ -861,7 +849,14 @@ class Crud implements CrudInterface
                                 $deDupedChildren[] = $child;
                             }
                         }
-                        $result->addToManyRelationship($parent, $name, $deDupedChildren, $hasMore, $offset, $limit);
+
+                        $paginated = $this->factory->createPaginatedData($deDupedChildren)
+                            ->markAsCollection()
+                            ->setOffset($offset)
+                            ->setLimit($limit);
+                        $hasMore === true ? $paginated->markHasMoreItems() : $paginated->markHasNoMoreItems();
+
+                        $parent->{$name} = $paginated;
                     }
                     break;
             }

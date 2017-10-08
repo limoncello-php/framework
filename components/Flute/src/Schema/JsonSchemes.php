@@ -17,7 +17,6 @@
  */
 
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
-use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Exceptions\InvalidSchemeFactoryException;
@@ -29,11 +28,6 @@ use Neomerx\JsonApi\Schema\Container;
  */
 class JsonSchemes extends Container implements JsonSchemesInterface
 {
-    /**
-     * @var RelationshipStorageInterface|null
-     */
-    private $relationshipStorage;
-
     /**
      * @var ModelSchemeInfoInterface
      */
@@ -48,24 +42,6 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     {
         parent::__construct($factory, $schemas);
         $this->modelSchemes = $modelSchemes;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getRelationshipStorage(): ?RelationshipStorageInterface
-    {
-        return $this->relationshipStorage;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setRelationshipStorage(?RelationshipStorageInterface $storage): JsonSchemesInterface
-    {
-        $this->relationshipStorage = $storage;
-
-        return $this;
     }
 
     /**
@@ -129,7 +105,7 @@ class JsonSchemes extends Container implements JsonSchemesInterface
      */
     protected function createSchemaFromClassName($className)
     {
-        $schema = new $className($this->getFactory(), $this, $this->getModelSchemes());
+        $schema = new $className($this->getFactory(), $this->getModelSchemes());
 
         return $schema;
     }

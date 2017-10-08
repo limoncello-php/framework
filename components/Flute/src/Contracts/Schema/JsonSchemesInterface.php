@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 
 /**
@@ -24,18 +23,6 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
  */
 interface JsonSchemesInterface extends ContainerInterface
 {
-    /**
-     * @return RelationshipStorageInterface|null
-     */
-    public function getRelationshipStorage(): ?RelationshipStorageInterface;
-
-    /**
-     * @param RelationshipStorageInterface|null $storage
-     *
-     * @return self
-     */
-    public function setRelationshipStorage(?RelationshipStorageInterface $storage): self;
-
     /**
      * @param string $schemaClass
      * @param string $relationshipName

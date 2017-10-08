@@ -28,6 +28,7 @@ use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
+use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\FilterParameter;
 use Limoncello\Flute\Http\Query\FilterParameterCollection;
@@ -90,7 +91,7 @@ class CrudTest extends TestCase
 
         $this->assertNotNull($index = $crud->create(null, $attributes));
         $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($model = $data->getPaginatedData()->getData());
+        $this->assertNotNull($model = $data->getData());
 
         /** @var Post $model */
 
@@ -101,12 +102,12 @@ class CrudTest extends TestCase
         $this->assertNotEmpty($index = $model->{Post::FIELD_ID});
 
         $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($data->getPaginatedData()->getData());
+        $this->assertNotNull($data->getData());
 
         $crud->delete($index);
 
         $this->assertNotNull($data = $crud->read($index));
-        $this->assertNull($data->getPaginatedData()->getData());
+        $this->assertNull($data->getData());
 
         // second delete does nothing (already deleted)
         $crud->delete($index);
@@ -128,7 +129,7 @@ class CrudTest extends TestCase
         $this->assertNotNull($index = $crud->create($pk, $attributes, []));
         $this->assertEquals($pk, $index);
         $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($model = $data->getPaginatedData()->getData());
+        $this->assertNotNull($model = $data->getData());
 
         /** @var StringPKModel $model */
 
@@ -136,12 +137,12 @@ class CrudTest extends TestCase
         $this->assertEquals($name, $model->{StringPKModel::FIELD_NAME});
 
         $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($data->getPaginatedData()->getData());
+        $this->assertNotNull($data->getData());
 
         $crud->delete($index);
 
         $this->assertNotNull($data = $crud->read($index));
-        $this->assertNull($data->getPaginatedData()->getData());
+        $this->assertNull($data->getData());
 
         // second delete does nothing (already deleted)
         $crud->delete($index);
@@ -248,7 +249,7 @@ class CrudTest extends TestCase
 
         $this->assertNotNull($index = $crud->create(null, $attributes, $toMany));
         $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($model = $data->getPaginatedData()->getData());
+        $this->assertNotNull($model = $data->getData());
 
         /** @var Comment $model */
 
@@ -280,17 +281,17 @@ class CrudTest extends TestCase
             new IncludeParameter(CommentSchema::REL_EMOTIONS, [Comment::REL_EMOTIONS]),
         ];
         $this->assertNotNull($data = $crud->read($index, null, $includePaths));
-        $this->assertNotNull($comment = $data->getPaginatedData()->getData());
-        $this->assertNotEmpty($relationships = $data->getRelationshipStorage());
+        $this->assertNotNull($comment = $data->getData());
         $this->assertEquals(
             $userId,
-            $relationships->getRelationship($comment, Comment::REL_USER)->getData()->{User::FIELD_ID}
+            $comment->{Comment::REL_USER}->{User::FIELD_ID}
         );
         $this->assertEquals(
             $postId,
-            $relationships->getRelationship($comment, Comment::REL_POST)->getData()->{Post::FIELD_ID}
+            $comment->{Comment::REL_POST}->{Post::FIELD_ID}
         );
-        $emotions = $relationships->getRelationship($comment, Comment::REL_EMOTIONS);
+        /** @var PaginatedDataInterface $emotions */
+        $emotions = $comment->{Comment::REL_EMOTIONS};
         $this->assertCount(2, $emotions->getData());
         $this->assertFalse($emotions->hasMoreItems());
         $this->assertSame(0, $emotions->getOffset());
@@ -319,7 +320,7 @@ class CrudTest extends TestCase
 
         $changedRecords = $crud->update($commentId, $attributes, $toMany);
         $this->assertEquals(3, $changedRecords);
-        $this->assertNotNull($data = $crud->read($commentId)->getPaginatedData());
+        $this->assertNotNull($data = $crud->read($commentId));
         $this->assertNotNull($model = $data->getData());
 
         /** @var Comment $model */
@@ -335,17 +336,17 @@ class CrudTest extends TestCase
             new IncludeParameter(CommentSchema::REL_EMOTIONS, [Comment::REL_EMOTIONS]),
         ];
         $this->assertNotNull($data = $crud->read($index, null, $includePaths));
-        $this->assertNotNull($comment = $data->getPaginatedData()->getData());
-        $this->assertNotEmpty($relationships = $data->getRelationshipStorage());
+        $this->assertNotNull($comment = $data->getData());
         $this->assertEquals(
             $userId,
-            $relationships->getRelationship($comment, Comment::REL_USER)->getData()->{User::FIELD_ID}
+            $comment->{Comment::REL_USER}->{User::FIELD_ID}
         );
         $this->assertEquals(
             $postId,
-            $relationships->getRelationship($comment, Comment::REL_POST)->getData()->{Post::FIELD_ID}
+            $comment->{Comment::REL_POST}->{Post::FIELD_ID}
         );
-        $emotions = $relationships->getRelationship($comment, Comment::REL_EMOTIONS);
+        /** @var PaginatedDataInterface $emotions */
+        $emotions = $comment->{Comment::REL_EMOTIONS};
         $this->assertCount(2, $emotions->getData());
         $this->assertFalse($emotions->hasMoreItems());
         $this->assertSame(0, $emotions->getOffset());
@@ -382,15 +383,15 @@ class CrudTest extends TestCase
         ];
         $data         = $crud->read($index, null, $includePaths);
         $this->assertNotNull($data);
-        $this->assertNotNull($model = $data->getPaginatedData()->getData());
-        $this->assertFalse($data->getPaginatedData()->isCollection());
-        $this->assertNotEmpty($relationships = $data->getRelationshipStorage());
+        $this->assertNotNull($model = $data->getData());
+        $this->assertFalse($data->isCollection());
 
-        $board = $relationships->getRelationship($model, Post::REL_BOARD)->getData();
+        $board = $model->{Post::REL_BOARD};
         $this->assertEquals(Board::class, get_class($board));
         $this->assertEquals($model->{Post::FIELD_ID_BOARD}, $board->{Board::FIELD_ID});
 
-        $commentsRel = $relationships->getRelationship($model, Post::REL_COMMENTS);
+        /** @var PaginatedDataInterface $commentsRel */
+        $commentsRel = $model->{Post::REL_COMMENTS};
         $comments    = $commentsRel->getData();
         $hasMore     = $commentsRel->hasMoreItems();
         $offset      = $commentsRel->getOffset();
@@ -404,31 +405,32 @@ class CrudTest extends TestCase
         $this->assertEquals(0, $offset);
         $this->assertEquals(self::DEFAULT_PAGE, $limit);
 
-        $emotions = $relationships->getRelationship($comments[0], Comment::REL_EMOTIONS);
+        /** @var PaginatedDataInterface $emotions */
+        $emotions = $comments[0]->{Comment::REL_EMOTIONS};
         $this->assertCount(3, $emotions->getData());
         $this->assertTrue($emotions->hasMoreItems());
         $this->assertEquals(0, $emotions->getOffset());
         $this->assertEquals(self::DEFAULT_PAGE, $emotions->getLimit());
 
-        $emotions = $relationships->getRelationship($comments[1], Comment::REL_EMOTIONS);
+        $emotions = $comments[1]->{Comment::REL_EMOTIONS};
         $this->assertCount(1, $emotions->getData());
         $this->assertFalse($emotions->hasMoreItems());
         $this->assertSame(0, $emotions->getOffset());
         $this->assertSame(self::DEFAULT_PAGE, $emotions->getLimit());
 
         $comment  = $comments[2];
-        $emotions = $relationships->getRelationship($comment, Comment::REL_EMOTIONS);
+        $emotions = $comment->{Comment::REL_EMOTIONS};
         $this->assertCount(1, $emotions->getData());
         $this->assertFalse($emotions->hasMoreItems());
         $this->assertSame(0, $emotions->getOffset());
         $this->assertSame(self::DEFAULT_PAGE, $emotions->getLimit());
 
-        $this->assertNotNull($post = $relationships->getRelationship($comment, Comment::REL_POST)->getData());
-        $this->assertNotNull($user = $relationships->getRelationship($post, Post::REL_USER)->getData());
+        $this->assertNotNull($post = $comment->{Comment::REL_POST});
+        $this->assertNotNull($user = $post->{Post::REL_USER});
 
         // check no data for relationships we didn't asked to download
-        $this->assertFalse($relationships->hasRelationship($user, User::REL_ROLE));
-        $this->assertFalse($relationships->hasRelationship($user, User::REL_COMMENTS));
+        $this->assertFalse(property_exists($user, User::REL_ROLE));
+        $this->assertFalse(property_exists($user, User::REL_COMMENTS));
     }
 
     /**
@@ -454,9 +456,9 @@ class CrudTest extends TestCase
         $data = $crud->read($index, null, $includePaths);
 
         $this->assertNotNull($data);
-        $this->assertNotNull($model = $data->getPaginatedData()->getData());
-        $this->assertFalse($data->getPaginatedData()->isCollection());
-        $this->assertNull($data->getRelationshipStorage()->getRelationship($model, Post::REL_EDITOR)->getData());
+        $this->assertNotNull($model = $data->getData());
+        $this->assertFalse($data->isCollection());
+        $this->assertNull($model->{Post::REL_EDITOR});
     }
 
     /**
@@ -500,13 +502,13 @@ class CrudTest extends TestCase
 
         $data = $crud->index($filteringParameters, $sortParameters, $includePaths, $pagingParameters);
 
-        $this->assertNotEmpty($data->getPaginatedData()->getData());
-        $this->assertCount($pagingSize, $data->getPaginatedData()->getData());
-        $this->assertEquals(20, $data->getPaginatedData()->getData()[0]->{Post::FIELD_ID});
-        $this->assertEquals(9, $data->getPaginatedData()->getData()[1]->{Post::FIELD_ID});
-        $this->assertTrue($data->getPaginatedData()->isCollection());
-        $this->assertEquals($pagingOffset, $data->getPaginatedData()->getOffset());
-        $this->assertEquals($pagingSize, $data->getPaginatedData()->getLimit());
+        $this->assertNotEmpty($data->getData());
+        $this->assertCount($pagingSize, $data->getData());
+        $this->assertEquals(20, $data->getData()[0]->{Post::FIELD_ID});
+        $this->assertEquals(9, $data->getData()[1]->{Post::FIELD_ID});
+        $this->assertTrue($data->isCollection());
+        $this->assertEquals($pagingOffset, $data->getOffset());
+        $this->assertEquals($pagingSize, $data->getLimit());
 
         return [$data, $filteringParameters, $sortParameters, $includePaths, $pagingParameters];
     }
@@ -533,7 +535,7 @@ class CrudTest extends TestCase
 
         $data = $crud->index($filteringParameters, null, null, $pagingParameters);
 
-        $this->assertCount(6, $data->getPaginatedData()->getData());
+        $this->assertCount(6, $data->getData());
     }
 
     /**
@@ -548,7 +550,7 @@ class CrudTest extends TestCase
 
         $data = $crud->index();
 
-        $this->assertNotEmpty($comments = $data->getPaginatedData()->getData());
+        $this->assertNotEmpty($comments = $data->getData());
         foreach ($comments as $comment) {
             $this->assertEquals($expectedUserId, $comment->{Comment::FIELD_ID_USER});
         }
@@ -628,7 +630,7 @@ class CrudTest extends TestCase
         );
 
         $data  = $crud->index($filteringParameters);
-        $users = $data->getPaginatedData()->getData();
+        $users = $data->getData();
         $this->assertNotEmpty($users);
 
         /** @noinspection SqlDialectInspection */
@@ -653,10 +655,10 @@ class CrudTest extends TestCase
 
         $data = $crud->index($filteringParameters);
 
-        $this->assertNotEmpty($data->getPaginatedData()->getData());
-        $this->assertCount(1, $data->getPaginatedData()->getData());
-        $this->assertEquals($index, $data->getPaginatedData()->getData()[0]->{Post::FIELD_ID});
-        $this->assertTrue($data->getPaginatedData()->isCollection());
+        $this->assertNotEmpty($data->getData());
+        $this->assertCount(1, $data->getData());
+        $this->assertEquals($index, $data->getData()[0]->{Post::FIELD_ID});
+        $this->assertTrue($data->isCollection());
     }
 
     /**

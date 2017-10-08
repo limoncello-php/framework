@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
@@ -145,10 +144,6 @@ class Responses extends JsonApiResponses
      */
     protected function getResourceLocationUrl($resource)
     {
-        if ($resource instanceof ModelsDataInterface) {
-            $resource = $resource->getPaginatedData();
-        }
-
         if ($resource instanceof PaginatedDataInterface) {
             $resource = $resource->getData();
         }

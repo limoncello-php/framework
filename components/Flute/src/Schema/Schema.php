@@ -20,7 +20,6 @@ use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
@@ -32,9 +31,6 @@ use Neomerx\JsonApi\Schema\SchemaProvider;
  */
 abstract class Schema extends SchemaProvider implements SchemaInterface
 {
-    /** @var JsonSchemesInterface  */
-    private $jsonSchemes;
-
     /**
      * @var ModelSchemeInfoInterface
      */
@@ -42,20 +38,15 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
 
     /**
      * @param FactoryInterface         $factory
-     * @param JsonSchemesInterface     $jsonSchemes
      * @param ModelSchemeInfoInterface $modelSchemes
      */
-    public function __construct(
-        FactoryInterface $factory,
-        JsonSchemesInterface $jsonSchemes,
-        ModelSchemeInfoInterface $modelSchemes
-    ) {
+    public function __construct(FactoryInterface $factory, ModelSchemeInfoInterface $modelSchemes)
+    {
         /** @noinspection PhpUndefinedFieldInspection */
         $this->resourceType = static::TYPE;
 
         parent::__construct($factory);
 
-        $this->jsonSchemes  = $jsonSchemes;
         $this->modelSchemes = $modelSchemes;
     }
 
@@ -135,12 +126,13 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
                 $relType    = $this->getModelSchemes()->getRelationshipType($modelClass, $modelRelName);
 
                 // there is a case for `to-1` relationship when we can return identity resource (type + id)
-                if ($relType === RelationshipTypes::BELONGS_TO &&
-                    $isRelToBeIncluded === false &&
-                    $hasRelData === false
-                ) {
-                    $relationships[$jsonRelName] =
-                        $this->getRelationshipIdentityRepresentation($model, $jsonRelName, $modelRelName);
+                if ($relType === RelationshipTypes::BELONGS_TO) {
+                    if ($isRelToBeIncluded === true && $hasRelData === true) {
+                        $relationships[$jsonRelName] = [static::DATA => $model->{$modelRelName}];
+                    } else {
+                        $relationships[$jsonRelName] =
+                            $this->getRelationshipIdentityRepresentation($model, $jsonRelName, $modelRelName);
+                    }
                     continue;
                 }
 
@@ -158,21 +150,12 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
                     continue;
                 }
 
-                $relData = $this->getJsonSchemes()->getRelationshipStorage()->getRelationship($model, $modelRelName);
                 $relUri  = $this->getRelationshipSelfUrl($model, $jsonRelName);
-                $relationships[$jsonRelName] = $this->getRelationshipDescription($relData, $relUri);
+                $relationships[$jsonRelName] = $this->getRelationshipDescription($model->{$modelRelName}, $relUri);
             }
         }
 
         return $relationships;
-    }
-
-    /**
-     * @return JsonSchemesInterface
-     */
-    protected function getJsonSchemes(): JsonSchemesInterface
-    {
-        return $this->jsonSchemes;
     }
 
     /**
@@ -347,8 +330,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      */
     private function hasRelationship($model, string $name): bool
     {
-        $relationships   = $this->getJsonSchemes()->getRelationshipStorage();
-        $hasRelationship = ($relationships !== null && $relationships->hasRelationship($model, $name) === true);
+        $hasRelationship = property_exists($model, $name);
 
         return $hasRelationship;
     }

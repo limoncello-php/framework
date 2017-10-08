@@ -32,14 +32,14 @@ interface CrudInterface
      * @param IncludeParameterInterface[]|null $includePaths
      * @param int[]|null                       $pagingParams
      *
-     * @return ModelsDataInterface
+     * @return PaginatedDataInterface
      */
     public function index(
         FilterParameterCollection $filterParams = null,
         array $sortParams = null,
         array $includePaths = null,
         array $pagingParams = null
-    ): ModelsDataInterface;
+    ): PaginatedDataInterface;
 
     /**
      * @param FilterParameterCollection|null $filterParams
@@ -54,13 +54,13 @@ interface CrudInterface
      * @param FilterParameterCollection|null $filterParams
      * @param array|null                     $includePaths
      *
-     * @return ModelsDataInterface
+     * @return PaginatedDataInterface
      */
     public function read(
         $index,
         FilterParameterCollection $filterParams = null,
         array $includePaths = null
-    ): ModelsDataInterface;
+    ): PaginatedDataInterface;
 
     /**
      * @param int|string                     $index

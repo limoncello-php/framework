@@ -77,7 +77,7 @@ abstract class BaseController implements ControllerInterface
         $modelData = static::createApi($container)->index($filters, $sorts, $includes, $paging);
 
         $responses = static::createResponses($container, $request, $schemeParams);
-        $response  = $modelData->getPaginatedData()->getData() === null ?
+        $response  = $modelData->getData() === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($modelData);
 
         return $response;
@@ -500,7 +500,7 @@ abstract class BaseController implements ControllerInterface
         array $includes = null
     ) {
         $modelData = $api->read($index, $filters, $includes);
-        $response  = $modelData->getPaginatedData()->getData() === null ?
+        $response  = $modelData->getData() === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($modelData);
 
         return $response;

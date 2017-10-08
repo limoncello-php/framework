@@ -22,7 +22,6 @@ use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
-use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Tests\Flute\Data\Migrations\Runner as MigrationRunner;
@@ -210,19 +209,14 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param Factory                           $factory
-     * @param ModelSchemeInfoInterface          $modelSchemes
-     * @param RelationshipStorageInterface|null $storage
+     * @param Factory                  $factory
+     * @param ModelSchemeInfoInterface $modelSchemes
      *
      * @return JsonSchemesInterface
      */
-    protected function getJsonSchemes(
-        Factory $factory,
-        ModelSchemeInfoInterface $modelSchemes,
-        RelationshipStorageInterface $storage = null
-    ) {
+    protected function getJsonSchemes(Factory $factory, ModelSchemeInfoInterface $modelSchemes)
+    {
         $schemes = $factory->createJsonSchemes($this->getSchemeMap(), $modelSchemes);
-        $storage === null ?: $schemes->setRelationshipStorage($storage);
 
         return $schemes;
     }

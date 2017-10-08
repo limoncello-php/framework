@@ -18,15 +18,11 @@
 
 use Closure;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
-use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -35,28 +31,9 @@ use Psr\Http\Message\UriInterface;
 class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterface
 {
     /**
-     * @var JsonSchemesInterface
-     */
-    private $schemesContainer;
-
-    /**
      * @var UriInterface
      */
     private $originalUri;
-
-    /**
-     * @param FactoryInterface     $factory
-     * @param JsonSchemesInterface $container
-     * @param EncoderOptions|null  $encoderOptions
-     */
-    public function __construct(
-        FactoryInterface $factory,
-        JsonSchemesInterface $container,
-        EncoderOptions $encoderOptions = null
-    ) {
-        parent::__construct($factory, $container, $encoderOptions);
-        $this->schemesContainer = $container;
-    }
 
     /**
      * @inheritdoc
@@ -64,7 +41,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     public function forOriginalUri(UriInterface $uri): EncoderInterface
     {
         $this->originalUri = $uri;
-        
+
         return $this;
     }
 
@@ -74,6 +51,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     public function encodeData($data, EncodingParametersInterface $parameters = null)
     {
         $data = $this->handleRelationshipStorageAndPagingData($data);
+
         return parent::encodeData($data, $parameters);
     }
 
@@ -83,15 +61,8 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     public function encodeIdentifiers($data, EncodingParametersInterface $parameters = null)
     {
         $data = $this->handleRelationshipStorageAndPagingData($data);
-        return parent::encodeIdentifiers($data, $parameters);
-    }
 
-    /**
-     * @return JsonSchemesInterface
-     */
-    protected function getSchemesContainer(): JsonSchemesInterface
-    {
-        return $this->schemesContainer;
+        return parent::encodeIdentifiers($data, $parameters);
     }
 
     /**
@@ -109,13 +80,6 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
      */
     private function handleRelationshipStorageAndPagingData($data)
     {
-        if ($data instanceof ModelsDataInterface) {
-            /** @var ModelsDataInterface $data */
-            $storage = $data->getRelationshipStorage();
-            $storage === null ?: $this->getSchemesContainer()->setRelationshipStorage($storage);
-            $data = $data->getPaginatedData();
-        }
-
         if ($data instanceof PaginatedDataInterface) {
             /** @var PaginatedDataInterface $data */
             $this->addPagingLinksIfNeeded($data);
@@ -157,7 +121,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
      */
     private function createLinkClosure(int $pageSize): Closure
     {
-        assert ($pageSize > 0);
+        assert($pageSize > 0);
 
         parse_str($this->getOriginalUri()->getQuery(), $queryParams);
 
@@ -166,11 +130,11 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
                 QueryParametersParserInterface::PARAM_PAGE => [
                     PaginationStrategyInterface::PARAM_PAGING_SKIP => $offset,
                     PaginationStrategyInterface::PARAM_PAGING_SIZE => $pageSize,
-                ]
+                ],
             ]);
-            $newUri  = $this->getOriginalUri()->withQuery(http_build_query($paramsWithPaging));
-            $fullUrl = (string)$newUri;
-            $link    = $this->getFactory()->createLink($fullUrl, null, true);
+            $newUri           = $this->getOriginalUri()->withQuery(http_build_query($paramsWithPaging));
+            $fullUrl          = (string)$newUri;
+            $link             = $this->getFactory()->createLink($fullUrl, null, true);
 
             return $link;
         };

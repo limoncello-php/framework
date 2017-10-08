@@ -28,7 +28,6 @@ use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
@@ -1128,10 +1127,9 @@ EOT;
         $container[QueryParametersParserInterface::class] = $factory
             ->getJsonApiFactory()->createQueryParametersParser();
         $container[ModelSchemeInfoInterface::class]       = $modelSchemes = $this->getModelSchemes();
-        /** @var RelationshipStorageInterface $storage */
-        $storage                                       = null;
-        $container[JsonSchemesInterface::class]        = $jsonSchemes = $this
-            ->getJsonSchemes($factory, $modelSchemes, $storage);
+
+        $container[JsonSchemesInterface::class] = $jsonSchemes = $this->getJsonSchemes($factory, $modelSchemes);
+
         $container[Connection::class]                  = $connection = $this->initDb();
         $container[FilterOperationsInterface::class]   = $filterOperations = new FilterOperations($container);
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(10, 100);

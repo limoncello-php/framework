@@ -21,21 +21,17 @@ use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Adapters\Repository;
-use Limoncello\Flute\Api\ModelsData;
 use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
-use Limoncello\Flute\Contracts\Api\ModelsDataInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
-use Limoncello\Flute\Contracts\Models\RelationshipStorageInterface;
 use Limoncello\Flute\Contracts\Models\TagStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Encoder\Encoder;
 use Limoncello\Flute\Models\ModelStorage;
 use Limoncello\Flute\Models\PaginatedData;
-use Limoncello\Flute\Models\RelationshipStorage;
 use Limoncello\Flute\Models\TagStorage;
 use Limoncello\Flute\Schema\JsonSchemes;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as JsonApiFactoryInterface;
@@ -100,14 +96,6 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createRelationshipStorage(): RelationshipStorageInterface
-    {
-        return new RelationshipStorage($this);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function createModelStorage(ModelSchemeInfoInterface $modelSchemes): ModelStorageInterface
     {
         return new ModelStorage($modelSchemes);
@@ -119,16 +107,6 @@ class Factory implements FactoryInterface
     public function createTagStorage(): TagStorageInterface
     {
         return new TagStorage();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function createModelsData(
-        PaginatedDataInterface $paginatedData,
-        RelationshipStorageInterface $relationshipStorage = null
-    ): ModelsDataInterface {
-        return new ModelsData($paginatedData, $relationshipStorage);
     }
 
     /**
