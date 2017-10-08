@@ -23,23 +23,17 @@ use Limoncello\Templates\Package\TemplatesSettings;
  */
 class Templates extends TemplatesSettings
 {
-    /** Settings key */
-    const KEY_TEMPLATES_LIST = self::KEY_LAST + 1;
-
     /**
      * @inheritdoc
      */
-    public function get(): array
+    protected function getSettings(): array
     {
-        $templatesFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, 'Templates']);
-        $cacheFolder     = implode(DIRECTORY_SEPARATOR, [__DIR__, 'Cache']);
-        $templateNames   = $this->getTemplateNames($templatesFolder);
-
         return [
-            static::KEY_IS_DEBUG         => true,
-            static::KEY_TEMPLATES_FOLDER => $templatesFolder,
-            static::KEY_CACHE_FOLDER     => $cacheFolder,
-            static::KEY_TEMPLATES_LIST   => $templateNames,
-        ];
+
+                static::KEY_IS_DEBUG         => true,
+                static::KEY_TEMPLATES_FOLDER => implode(DIRECTORY_SEPARATOR, [__DIR__, 'Templates']),
+                static::KEY_CACHE_FOLDER     => implode(DIRECTORY_SEPARATOR, [__DIR__, 'Cache']),
+
+            ] + parent::getSettings();
     }
 }

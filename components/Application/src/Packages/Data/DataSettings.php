@@ -29,56 +29,89 @@ use Psr\Container\ContainerInterface;
  */
 abstract class DataSettings implements SettingsInterface
 {
-    /** Settings key */
-    const KEY_MIGRATIONS_PATH = 0;
+    use ClassIsTrait, CheckCallableTrait;
 
     /** Settings key */
-    const KEY_SEEDS_PATH = self::KEY_MIGRATIONS_PATH + 1;
+    const KEY_MODELS_FOLDER = 0;
 
     /** Settings key */
-    const KEY_SEED_INIT = self::KEY_SEEDS_PATH + 1;
+    const KEY_MODELS_FILE_MASK = self::KEY_MODELS_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_MIGRATIONS_FOLDER = self::KEY_MODELS_FILE_MASK + 1;
+
+    /** Settings key */
+    const KEY_MIGRATIONS_LIST_FILE = self::KEY_MIGRATIONS_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_SEEDS_FOLDER = self::KEY_MIGRATIONS_LIST_FILE + 1;
+
+    /** Settings key */
+    const KEY_SEEDS_LIST_FILE = self::KEY_SEEDS_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_SEED_INIT = self::KEY_SEEDS_LIST_FILE + 1;
 
     /** Settings key */
     const KEY_MODELS_SCHEME_INFO = self::KEY_SEED_INIT + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_MODELS_SCHEME_INFO + 1;
-
-    use ClassIsTrait, CheckCallableTrait;
-
-    /**
-     * @return string
-     */
-    abstract protected function getModelsPath(): string;
-
-    /**
-     * @return string
-     */
-    abstract protected function getMigrationsPath(): string;
-
-    /**
-     * @return string
-     */
-    abstract protected function getSeedsPath(): string;
-
-    /**
-     * @return callable|null
-     */
-    abstract protected function getSeedInit();
+    const KEY_LAST = self::KEY_MODELS_SCHEME_INFO;
 
     /**
      * @inheritdoc
      */
-    public function get(): array
+    final public function get(): array
     {
-        $seedInit = $this->getSeedInit();
-        assert($this->checkPublicStaticCallable($seedInit, [ContainerInterface::class, 'string']));
+        $defaults = $this->getSettings();
 
+        $modelsFolder       = $defaults[static::KEY_MODELS_FOLDER] ?? null;
+        $modelsFileMask     = $defaults[static::KEY_MODELS_FILE_MASK] ?? null;
+        $migrationsFolder   = $defaults[static::KEY_MIGRATIONS_FOLDER] ?? null;
+        $migrationsListFile = $defaults[static::KEY_MIGRATIONS_LIST_FILE] ?? null;
+        $seedsFolder        = $defaults[static::KEY_SEEDS_FOLDER] ?? null;
+        $seedsListFile      = $defaults[static::KEY_SEEDS_LIST_FILE] ?? null;
+
+        assert(
+            $modelsFolder !== null && empty(glob($modelsFolder)) === false,
+            "Invalid Models folder `$modelsFolder`."
+        );
+        assert(empty($modelsFileMask) === false, "Invalid Models file mask `$modelsFileMask`.");
+        assert(
+            $migrationsFolder !== null && empty(glob($migrationsFolder)) === false,
+            "Invalid Migrations folder `$migrationsFolder`."
+        );
+        assert(file_exists($migrationsListFile) === true, "Invalid Migrations file `$migrationsListFile`.");
+        assert(
+            $seedsFolder !== null && empty(glob($seedsFolder)) === false,
+            "Invalid Seeds folder `$seedsFolder`."
+        );
+        assert(file_exists($seedsListFile) === true, "Invalid Seeds file `$seedsListFile`.");
+
+        $modelsPath = $modelsFolder . DIRECTORY_SEPARATOR . $modelsFileMask;
+
+        $seedInit = $defaults[static::KEY_SEED_INIT] ?? null;
+        assert(
+            (
+                $seedInit === null ||
+                $this->checkPublicStaticCallable($seedInit, [ContainerInterface::class, 'string']) === true
+            ),
+            'Seed init should be either `null` or static callable.'
+        );
+
+        $defaults[static::KEY_MODELS_SCHEME_INFO] = $this->getModelsSchemeInfo($modelsPath);
+
+        return $defaults;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
+    {
         return [
-            static::KEY_MIGRATIONS_PATH    => $this->getMigrationsPath(),
-            static::KEY_SEEDS_PATH         => $this->getSeedsPath(),
-            static::KEY_MODELS_SCHEME_INFO => $this->getModelsSchemeInfo($this->getModelsPath()),
-            static::KEY_SEED_INIT          => $seedInit,
+            static::KEY_MODELS_FILE_MASK => '*.php',
+            static::KEY_SEED_INIT        => null,
         ];
     }
 

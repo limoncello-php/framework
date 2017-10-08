@@ -51,7 +51,7 @@ class AuthorizationPackageTest extends TestCase
 
         /** @var Mock $provider */
         $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
-        $container[LoggerInterface::class] = new NullLogger();
+        $container[LoggerInterface::class]           = new NullLogger();
         $provider->shouldReceive('get')->once()->with(A::class)->andReturn([
             A::KEY_IS_DEBUG => true,
         ]);
@@ -72,9 +72,13 @@ class AuthorizationPackageTest extends TestCase
             /**
              * @inheritdoc
              */
-            protected function getPoliciesPath(): string
+            protected function getSettings(): array
             {
-                return implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Authorization', '*.php']);
+                $policiesFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Authorization']);
+
+                return [
+                        static::KEY_POLICIES_FOLDER => $policiesFolder,
+                    ] + parent::getSettings();
             }
         };
     }

@@ -35,11 +35,24 @@ class Flute extends FluteSettings
     private $validationRuleSets;
 
     /**
+     * @var string
+     */
+    private $schemesPath;
+
+    /**
+     * @var string
+     */
+    private $validatorsPath;
+
+    /**
      * @param string[] $modelToSchemeMap
      * @param string[] $validationRuleSets
      */
     public function __construct(array $modelToSchemeMap = [], array $validationRuleSets = [])
     {
+        $this->schemesPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Schemes']);
+        $this->validatorsPath = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', '**']);
+
         $this->modelToSchemeMap   = $modelToSchemeMap;
         $this->validationRuleSets = $validationRuleSets;
     }
@@ -47,17 +60,12 @@ class Flute extends FluteSettings
     /**
      * @inheritdoc
      */
-    protected function getSchemesPath(): string
+    protected function getSettings(): array
     {
-        return 'whatever_schemes';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getRuleSetsPath(): string
-    {
-        return 'whatever_rule_sets';
+        return parent::getSettings() + [
+                static::KEY_SCHEMES_FOLDER    => $this->schemesPath,
+                static::KEY_VALIDATORS_FOLDER => $this->validatorsPath,
+            ];
     }
 
     /**
@@ -65,12 +73,15 @@ class Flute extends FluteSettings
      */
     protected function selectClasses(string $path, string $implementClassName): Generator
     {
-        if ($path === 'whatever_schemes') {
+        $schemesFileMask    = parent::getSettings()[static::KEY_SCHEMES_FILE_MASK];
+        $validatorsFileMask = parent::getSettings()[static::KEY_SCHEMES_FILE_MASK];
+
+        if ($path === $this->schemesPath . DIRECTORY_SEPARATOR . $schemesFileMask) {
             foreach ($this->getModelToSchemeMap() as $schemeClass) {
                 yield $schemeClass;
             }
         } else {
-            assert($path === 'whatever_rule_sets');
+            assert($path === $this->validatorsPath . DIRECTORY_SEPARATOR . $validatorsFileMask);
             foreach ($this->getValidationRuleSets() as $ruleSet) {
                 yield $ruleSet;
             }

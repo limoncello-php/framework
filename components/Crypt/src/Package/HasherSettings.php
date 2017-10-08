@@ -35,7 +35,15 @@ class HasherSettings implements SettingsInterface
     /**
      * @inheritdoc
      */
-    public function get(): array
+    final public function get(): array
+    {
+        return $this->getSettings();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
     {
         return [
             /** @see http://php.net/manual/en/password.constants.php */

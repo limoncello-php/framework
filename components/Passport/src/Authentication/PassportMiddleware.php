@@ -90,7 +90,7 @@ class PassportMiddleware implements MiddlewareInterface
         /** @var SettingsProviderInterface $provider */
         $provider = $container->get(SettingsProviderInterface::class);
         $settings = $provider->get(S::class);
-        $factory  = $settings[S::KEY_FAILED_AUTHENTICATION_FACTORY] ?? null;
+        $factory  = $settings[S::KEY_FAILED_CUSTOM_UNAUTHENTICATED_FACTORY] ?? null;
 
         assert($factory === null || is_callable($factory) === true);
 

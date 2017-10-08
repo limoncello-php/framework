@@ -18,8 +18,8 @@
 
 use Limoncello\Application\Packages\L10n\L10nContainerConfigurator;
 use Limoncello\Application\Packages\L10n\L10nProvider;
-use Limoncello\Application\Packages\L10n\L10nSettings as C;
 use Limoncello\Application\Packages\L10n\L10nSettings;
+use Limoncello\Application\Packages\L10n\L10nSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
@@ -69,17 +69,13 @@ class L10nPackageTest extends TestCase
             /**
              * @inheritdoc
              */
-            protected function getDefaultLocale(): string
+            protected function getSettings(): array
             {
-                return 'en';
-            }
+                $localesFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'L10n']);
 
-            /**
-             * @inheritdoc
-             */
-            protected function getLocalesPath(): string
-            {
-                return implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'L10n']);
+                return [
+                        static::KEY_LOCALES_FOLDER => $localesFolder,
+                    ] + parent::getSettings();
             }
         };
 

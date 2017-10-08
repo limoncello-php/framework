@@ -36,7 +36,7 @@ class EventsContainerConfigurator implements ContainerConfiguratorInterface
     {
         $container[EventEmitterInterface::class] = function (PsrContainerInterface $container): EventEmitterInterface {
             $emitter   = new SimpleEventEmitter();
-            $cacheData = $container->get(SettingsProviderInterface::class)->get(C::class);
+            $cacheData = $container->get(SettingsProviderInterface::class)->get(C::class)[C::KEY_CACHED_DATA];
             $emitter->setStaticSubscribers($cacheData);
 
             return $emitter;

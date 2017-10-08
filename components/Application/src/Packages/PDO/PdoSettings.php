@@ -17,11 +17,12 @@
  */
 
 use Limoncello\Contracts\Settings\SettingsInterface;
+use PDO;
 
 /**
  * @package Limoncello\Application
  */
-abstract class PdoSettings implements SettingsInterface
+class PdoSettings implements SettingsInterface
 {
     /** Settings key */
     const KEY_USER_NAME = 0;
@@ -36,5 +37,30 @@ abstract class PdoSettings implements SettingsInterface
     const KEY_OPTIONS = self::KEY_CONNECTION_STRING + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_OPTIONS + 1;
+    const KEY_LAST = self::KEY_OPTIONS;
+
+    /**
+     * @inheritdoc
+     */
+    final public function get(): array
+    {
+        $defaults = $this->getSettings();
+
+        $connectionString = $defaults[static::KEY_CONNECTION_STRING] ?? null;
+        assert(empty($connectionString) === false, "Invalid connection string `$connectionString`.");
+
+        return $defaults;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
+    {
+        return [
+            static::KEY_OPTIONS => [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            ],
+        ];
+    }
 }

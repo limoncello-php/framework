@@ -81,6 +81,6 @@ class PackageTest extends TestCase
 
         $this->assertNotEmpty($settings[Templates::KEY_CACHE_FOLDER]);
         $this->assertNotEmpty($settings[Templates::KEY_TEMPLATES_FOLDER]);
-        $this->assertEquals(['test.html.twig'], $settings[Templates::KEY_TEMPLATES_LIST]);
+        $this->assertEquals(['Samples/en/test.html.twig'], $settings[Templates::KEY_TEMPLATES_LIST]);
     }
 }

@@ -21,7 +21,7 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 /**
  * @package Limoncello\Application
  */
-abstract class DoctrineSettings implements SettingsInterface
+class DoctrineSettings implements SettingsInterface
 {
     /** Settings key */
     const KEY_USER_NAME = 0;
@@ -57,5 +57,29 @@ abstract class DoctrineSettings implements SettingsInterface
     const KEY_PATH = self::KEY_EXTRA + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_PATH + 1;
+    const KEY_LAST = self::KEY_PATH;
+
+    /**
+     * @inheritdoc
+     */
+    final public function get(): array
+    {
+        $defaults = $this->getSettings();
+
+        $pathToDbFile = $defaults[static::KEY_PATH] ?? null;
+        assert(
+            ($pathToDbFile === null || file_exists($pathToDbFile) === true),
+            "Invalid database file `$pathToDbFile`."
+        );
+
+        return $defaults;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
+    {
+        return [];
+    }
 }

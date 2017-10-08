@@ -83,33 +83,20 @@ class DataPackageTest extends TestCase
             /**
              * @inheritdoc
              */
-            protected function getModelsPath(): string
+            protected function getSettings(): array
             {
-                return implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Models', '*.php']);
-            }
+                $modelsFolder     = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Models']);
+                $migrationsFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Migrations']);
+                $seedsFolder      = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Seeds']);
 
-            /**
-             * @inheritdoc
-             */
-            protected function getMigrationsPath(): string
-            {
-                return '/some/path';
-            }
-
-            /**
-             * @inheritdoc
-             */
-            protected function getSeedsPath(): string
-            {
-                return '/some/path';
-            }
-
-            /**
-             * @inheritdoc
-             */
-            protected function getSeedInit()
-            {
-                return [DataPackageTest::class, 'initSeeder'];
+                return [
+                        static::KEY_MODELS_FOLDER        => $modelsFolder,
+                        static::KEY_MIGRATIONS_FOLDER    => $migrationsFolder,
+                        static::KEY_MIGRATIONS_LIST_FILE => $migrationsFolder . DIRECTORY_SEPARATOR . 'migrations.php',
+                        static::KEY_SEEDS_FOLDER         => $seedsFolder,
+                        static::KEY_SEEDS_LIST_FILE      => $seedsFolder . DIRECTORY_SEPARATOR . 'seeds.php',
+                        static::KEY_SEED_INIT            => [DataPackageTest::class, 'initSeeder'],
+                    ] + parent::getSettings();
             }
         };
     }

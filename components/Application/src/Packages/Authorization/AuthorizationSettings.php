@@ -27,30 +27,60 @@ abstract class AuthorizationSettings implements SettingsInterface
     /** Settings key */
     const KEY_LOG_IS_ENABLED = 0;
 
-    /** Settings key */
-    const KEY_POLICIES_DATA = self::KEY_LOG_IS_ENABLED + 1;
-
-    /** Settings key */
-    const KEY_LAST = self::KEY_POLICIES_DATA + 1;
-
-    /** Top level policy set name (used in logging) */
-    const POLICIES_NAME = 'Application';
-
     /**
-     * @return string
+     * Settings key
+     *
+     * Top level policy set name (used in logging).
      */
-    abstract protected function getPoliciesPath(): string;
+    const KEY_TOP_POLICY_NAME = self::KEY_LOG_IS_ENABLED + 1;
+
+    /** Settings key */
+    const KEY_POLICIES_FOLDER = self::KEY_TOP_POLICY_NAME + 1;
+
+    /** Settings key */
+    const KEY_POLICIES_FILE_MASK = self::KEY_POLICIES_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_POLICIES_DATA = self::KEY_POLICIES_FILE_MASK + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_POLICIES_DATA;
 
     /**
      * @inheritdoc
      */
-    public function get(): array
+    final public function get(): array
     {
-        $loader = (new AuthorizationRulesLoader($this->getPoliciesPath(), static::POLICIES_NAME));
+        $defaults = $this->getSettings();
 
+        $policiesFolder   = $defaults[static::KEY_POLICIES_FOLDER] ?? null;
+        $policiesFileMask = $defaults[static::KEY_POLICIES_FILE_MASK] ?? null;
+
+        assert(
+            $policiesFolder !== null && empty(glob($policiesFolder)) === false,
+            "Invalid Policies folder `$policiesFolder`."
+        );
+        assert(empty($policiesFileMask) === false, "Invalid Policies file mask `$policiesFileMask`.");
+        $policiesPath = $policiesFolder . DIRECTORY_SEPARATOR . $policiesFileMask;
+
+        $topPolicyName = $defaults[static::KEY_TOP_POLICY_NAME];
+
+        $loader = (new AuthorizationRulesLoader($policiesPath, $topPolicyName));
+
+        return $defaults + [
+                static::KEY_POLICIES_DATA => $loader->getRulesData(),
+            ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
+    {
         return [
-            static::KEY_LOG_IS_ENABLED => true,
-            static::KEY_POLICIES_DATA  => $loader->getRulesData(),
+            static::KEY_LOG_IS_ENABLED     => true,
+            static::KEY_TOP_POLICY_NAME    => 'Application',
+            static::KEY_POLICIES_FILE_MASK => '*.php',
         ];
     }
 }

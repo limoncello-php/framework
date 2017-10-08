@@ -67,7 +67,7 @@ class DataCommandTest extends TestCase
     public function testInvalidAction()
     {
         $container = $this->createContainerWithDataSettings([
-            DataSettings::KEY_MIGRATIONS_PATH => '/some/path',
+            DataSettings::KEY_MIGRATIONS_FOLDER => '/some/path',
         ]);
         $inOut = $this->createInOutMock(
             [
@@ -91,7 +91,7 @@ class DataCommandTest extends TestCase
     public function testMigrate()
     {
         $container = $this->createContainerWithDataSettings([
-            DataSettings::KEY_MIGRATIONS_PATH => '/some/path',
+            DataSettings::KEY_MIGRATIONS_FOLDER => '/some/path',
         ]);
         $inOut = $this->createInOutMock([
             DataCommand::ARG_ACTION => DataCommand::ACTION_MIGRATE,
@@ -117,7 +117,7 @@ class DataCommandTest extends TestCase
     public function testRollback()
     {
         $container = $this->createContainerWithDataSettings([
-            DataSettings::KEY_MIGRATIONS_PATH => '/some/path',
+            DataSettings::KEY_MIGRATIONS_FOLDER => '/some/path',
         ]);
         $inOut = $this->createInOutMock([
             DataCommand::ARG_ACTION => DataCommand::ACTION_ROLLBACK,
@@ -143,7 +143,7 @@ class DataCommandTest extends TestCase
     public function testSeed()
     {
         $container = $this->createContainerWithDataSettings([
-            DataSettings::KEY_MIGRATIONS_PATH => '/some/path',
+            DataSettings::KEY_MIGRATIONS_FOLDER => '/some/path',
         ]);
         $inOut = $this->createInOutMock([
             DataCommand::ARG_ACTION => DataCommand::ACTION_SEED,

@@ -16,44 +16,94 @@
  * limitations under the License.
  */
 
-use GlobIterator;
 use Limoncello\Contracts\Settings\SettingsInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use SplFileInfo;
 
 /**
  * @package Limoncello\Templates
  */
-abstract class TemplatesSettings implements SettingsInterface
+class TemplatesSettings implements SettingsInterface
 {
     /** Settings key */
     const KEY_TEMPLATES_FOLDER = 0;
 
     /** Settings key */
-    const KEY_CACHE_FOLDER = self::KEY_TEMPLATES_FOLDER + 1;
+    const KEY_TEMPLATES_FILE_MASK = self::KEY_TEMPLATES_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_CACHE_FOLDER = self::KEY_TEMPLATES_FILE_MASK + 1;
 
     /** Settings key */
     const KEY_IS_DEBUG = self::KEY_CACHE_FOLDER + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_IS_DEBUG;
+    const KEY_TEMPLATES_LIST = self::KEY_IS_DEBUG + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_TEMPLATES_LIST;
+
+    /**
+     * @inheritdoc
+     */
+    final public function get(): array
+    {
+        $defaults = $this->getSettings();
+
+        $templatesFolder   = $defaults[static::KEY_TEMPLATES_FOLDER] ?? null;
+        $templatesFileMask = $defaults[static::KEY_TEMPLATES_FILE_MASK] ?? null;
+        $cacheFolder       = $defaults[static::KEY_CACHE_FOLDER] ?? null;
+
+        assert(
+            $templatesFolder !== null && empty(glob($templatesFolder)) === false,
+            "Invalid Templates folder `$templatesFolder`."
+        );
+        assert(empty($templatesFileMask) === false, "Invalid Templates file mask `$templatesFileMask`.");
+        assert(
+            $cacheFolder !== null && empty(glob($cacheFolder)) === false,
+            "Invalid Cache folder `$cacheFolder`."
+        );
+
+        return $defaults + [
+                static::KEY_TEMPLATES_LIST => $this->getTemplateNames($templatesFolder, $templatesFileMask),
+            ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
+    {
+        return [
+            static::KEY_IS_DEBUG            => false,
+            static::KEY_TEMPLATES_FILE_MASK => '*.twig',
+        ];
+    }
 
     /**
      * @param string $templatesFolder
+     * @param string $templatesFileMask
      *
-     * @return string[]
+     * @return array
      */
-    public static function getTemplateNames(string $templatesFolder): array
+    private function getTemplateNames(string $templatesFolder, string $templatesFileMask): array
     {
-        assert(is_dir($templatesFolder) === true);
+        $templatesFolder = realpath($templatesFolder);
 
-        return iterator_to_array(call_user_func(function () use ($templatesFolder) {
-            $globIterator = new GlobIterator(
-                $templatesFolder . DIRECTORY_SEPARATOR . '*.html.twig',
-                GlobIterator::SKIP_DOTS | GlobIterator::CURRENT_AS_FILEINFO
-            );
-            foreach ($globIterator as $fileInfo) {
-                /** @var SplFileInfo $fileInfo */
-                yield $fileInfo->getFilename();
+        return iterator_to_array(call_user_func(function () use ($templatesFolder, $templatesFileMask) {
+            $flags    =
+                RecursiveDirectoryIterator::SKIP_DOTS |
+                RecursiveDirectoryIterator::FOLLOW_SYMLINKS |
+                RecursiveDirectoryIterator::CURRENT_AS_FILEINFO;
+            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($templatesFolder, $flags));
+            foreach ($iterator as $found) {
+                /** @var SplFileInfo $found */
+                if ($found->isFile() === true) {
+                    $fullFileName = $found->getPath() . DIRECTORY_SEPARATOR . $found->getFilename();
+                    $templateName = str_replace($templatesFolder . DIRECTORY_SEPARATOR, '', $fullFileName);
+                    yield $templateName;
+                }
             }
         }));
     }

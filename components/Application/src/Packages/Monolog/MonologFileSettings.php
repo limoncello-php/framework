@@ -17,11 +17,12 @@
  */
 
 use Limoncello\Contracts\Settings\SettingsInterface;
+use Monolog\Logger;
 
 /**
  * @package Limoncello\Application
  */
-abstract class MonologFileSettings implements SettingsInterface
+class MonologFileSettings implements SettingsInterface
 {
     /** Settings key */
     const KEY_IS_ENABLED = 0;
@@ -30,8 +31,46 @@ abstract class MonologFileSettings implements SettingsInterface
     const KEY_LOG_PATH = self::KEY_IS_ENABLED + 1;
 
     /** Settings key */
-    const KEY_LOG_LEVEL = self::KEY_LOG_PATH + 1;
+    const KEY_LOG_FOLDER = self::KEY_LOG_PATH + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_LOG_LEVEL + 1;
+    const KEY_LOG_FILE = self::KEY_LOG_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_LOG_LEVEL = self::KEY_LOG_FILE + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_LOG_LEVEL;
+
+    /**
+     * @inheritdoc
+     */
+    final public function get(): array
+    {
+        $defaults = $this->getSettings();
+
+        $logFolder = $defaults[static::KEY_LOG_FOLDER] ?? null;
+        $logFile   = $defaults[static::KEY_LOG_FILE] ?? null;
+        assert(
+            $logFolder !== null && empty(glob($logFolder)) === false,
+            "Invalid Logs folder `$logFolder`."
+        );
+        assert(empty($logFile) === false, "Invalid Logs file name `$logFile`.");
+
+        $logPath = $logFolder . DIRECTORY_SEPARATOR . $logFile;
+
+        return $defaults + [static::KEY_LOG_PATH => $logPath];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
+    {
+        return [
+            static::KEY_IS_ENABLED => false,
+            static::KEY_LOG_LEVEL  => Logger::DEBUG,
+            static::KEY_LOG_FILE   => 'limoncello.log',
+        ];
+    }
 }

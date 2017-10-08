@@ -22,8 +22,50 @@ use Neomerx\Cors\Strategies\Settings;
 /**
  * @package Limoncello\Application
  */
-class CorsSettings extends Settings implements SettingsInterface
+class CorsSettings implements SettingsInterface
 {
+    /** @see Settings */
+    const VALUE_ALLOW_ORIGIN_ALL = Settings::VALUE_ALLOW_ORIGIN_ALL;
+
+    /** @see Settings */
+    const KEY_SERVER_ORIGIN = Settings::KEY_SERVER_ORIGIN;
+
+    /** @see Settings */
+    const KEY_SERVER_ORIGIN_SCHEME = Settings::KEY_SERVER_ORIGIN_SCHEME;
+
+    /** @see Settings */
+    const KEY_SERVER_ORIGIN_HOST = Settings::KEY_SERVER_ORIGIN_HOST;
+
+    /** @see Settings */
+    const KEY_SERVER_ORIGIN_PORT = Settings::KEY_SERVER_ORIGIN_PORT;
+
+    /** @see Settings */
+    const KEY_ALLOWED_ORIGINS = Settings::KEY_ALLOWED_ORIGINS;
+
+    /** @see Settings */
+    const KEY_ALLOWED_METHODS = Settings::KEY_ALLOWED_METHODS;
+
+    /** @see Settings */
+    const KEY_ALLOWED_HEADERS = Settings::KEY_ALLOWED_HEADERS;
+
+    /** @see Settings */
+    const KEY_EXPOSED_HEADERS = Settings::KEY_EXPOSED_HEADERS;
+
+    /** @see Settings */
+    const KEY_IS_USING_CREDENTIALS = Settings::KEY_IS_USING_CREDENTIALS;
+
+    /** @see Settings */
+    const KEY_FLIGHT_CACHE_MAX_AGE = Settings::KEY_FLIGHT_CACHE_MAX_AGE;
+
+    /** @see Settings */
+    const KEY_IS_FORCE_ADD_METHODS = Settings::KEY_IS_FORCE_ADD_METHODS;
+
+    /** @see Settings */
+    const KEY_IS_FORCE_ADD_HEADERS = Settings::KEY_IS_FORCE_ADD_HEADERS;
+
+    /** @see Settings */
+    const KEY_IS_CHECK_HOST = Settings::KEY_IS_CHECK_HOST;
+
     /** Settings key */
     const KEY_LOG_IS_ENABLED = self::KEY_IS_CHECK_HOST + 10;
 
@@ -33,9 +75,27 @@ class CorsSettings extends Settings implements SettingsInterface
     /**
      * @inheritdoc
      */
-    public function get(): array
+    final public function get(): array
     {
-        $defaults = (new Settings())->getDefaultSettings();
+        return $this->getSettings();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSettings(): array
+    {
+        // Settings do not provide any public methods to get default settings so we use this trick
+        $defaults = (new class extends Settings
+        {
+            /**
+             * @return array
+             */
+            public function getHiddenDefaults(): array
+            {
+                return $this->getDefaultSettings();
+            }
+        })->getHiddenDefaults();
 
         $defaults[static::KEY_LOG_IS_ENABLED] = false;
 

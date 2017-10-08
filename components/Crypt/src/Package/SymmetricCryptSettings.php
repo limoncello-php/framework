@@ -21,13 +21,8 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 /**
  * @package Limoncello\Crypt
  */
-abstract class SymmetricCryptSettings implements SettingsInterface
+class SymmetricCryptSettings implements SettingsInterface
 {
-    /**
-     * @return string
-     */
-    abstract protected function getPassword(): string;
-
     /** Default crypt method */
     const DEFAULT_METHOD = 'aes-256-ctr';
 
@@ -88,11 +83,23 @@ abstract class SymmetricCryptSettings implements SettingsInterface
     /**
      * @inheritdoc
      */
-    public function get(): array
+    final public function get(): array
+    {
+        $defaults = $this->getSettings();
+
+        $password = $defaults[static::KEY_PASSWORD] ?? null;
+        assert(empty($password) === false, "Password cannot be empty.");
+
+        return $defaults;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
     {
         return [
             static::KEY_METHOD             => static::DEFAULT_METHOD,
-            static::KEY_PASSWORD           => $this->getPassword(),
             static::KEY_IV                 => static::DEFAULT_IV,
             static::KEY_USE_ZERO_PADDING   => false,
             static::KEY_USE_AUTHENTICATION => false,

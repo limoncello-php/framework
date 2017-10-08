@@ -94,7 +94,7 @@ class TemplatesCommand implements CommandInterface
      */
     public static function execute(ContainerInterface $container, IoInterface $inOut): void
     {
-        $action    = $inOut->getArgument(static::ARG_ACTION);
+        $action = $inOut->getArgument(static::ARG_ACTION);
         switch ($action) {
             case static::ACTION_CREATE_CACHE:
                 (new self())->executeCache($container);
@@ -134,12 +134,13 @@ class TemplatesCommand implements CommandInterface
      */
     protected function executeCache(ContainerInterface $container): void
     {
-        $settings        = $this->getTemplatesSettings($container);
-        $cacheFolder     = $settings[TemplatesSettings::KEY_CACHE_FOLDER];
-        $templatesFolder = $settings[TemplatesSettings::KEY_TEMPLATES_FOLDER];
-        $templates       = TemplatesSettings::getTemplateNames($templatesFolder);
-        $templateEngine  = $this->createCachingTemplateEngine($templatesFolder, $cacheFolder);
+        $settings = $this->getTemplatesSettings($container);
 
+        $cacheFolder     = $settings[TemplatesSettings::KEY_CACHE_FOLDER];
+        $templates       = $settings[TemplatesSettings::KEY_TEMPLATES_LIST];
+        $templatesFolder = $settings[TemplatesSettings::KEY_TEMPLATES_FOLDER];
+
+        $templateEngine = $this->createCachingTemplateEngine($templatesFolder, $cacheFolder);
         foreach ($templates as $templateName) {
             // it will write template to cache
             $templateEngine->getTwig()->resolveTemplate($templateName);
@@ -158,6 +159,7 @@ class TemplatesCommand implements CommandInterface
 
         return $templates;
     }
+
     /**
      * @param ContainerInterface $container
      *

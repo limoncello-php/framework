@@ -18,6 +18,7 @@
 
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface;
+use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Crypt\Contracts\DecryptInterface;
 use Limoncello\Crypt\Contracts\EncryptInterface;
@@ -157,21 +158,14 @@ class PackageTest extends TestCase
             /**
              * @inheritdoc
              */
-            protected function getPassword(): string
+            protected function getSettings(): array
             {
-                return 'secret';
-            }
+                return [
 
-            /**
-             * @inheritdoc
-             */
-            public function get(): array
-            {
-                $defaults = parent::get();
+                        static::KEY_PASSWORD           => 'secret',
+                        static::KEY_USE_AUTHENTICATION => true,
 
-                $defaults[self::KEY_USE_AUTHENTICATION] = true;
-
-                return $defaults;
+                    ] + parent::getSettings();
             }
         };
         $this->addSettings($container, SymmetricCryptSettings::class, $settings->get());
@@ -209,10 +203,9 @@ class PackageTest extends TestCase
      */
     private function addAsymmetricCryptSettingsProvider(ContainerInterface $container): self
     {
-        return $this->addSettings($container, AsymmetricCryptSettings::class, [
-            AsymmetricCryptSettings::KEY_PUBLIC_PATH_OR_KEY_VALUE  => $this->getPathToPublicKey(),
-            AsymmetricCryptSettings::KEY_PRIVATE_PATH_OR_KEY_VALUE => $this->getPathToPrivateKey(),
-        ]);
+        $settings = $this->getAsymmetricSettings($this->getPathToPublicKey(), $this->getPathToPrivateKey());
+
+        return $this->addSettings($container, AsymmetricCryptSettings::class, $settings->get());
     }
 
     /**
@@ -226,6 +219,51 @@ class PackageTest extends TestCase
             AsymmetricCryptSettings::KEY_PUBLIC_PATH_OR_KEY_VALUE  => null,
             AsymmetricCryptSettings::KEY_PRIVATE_PATH_OR_KEY_VALUE => null,
         ]);
+    }
+
+    /**
+     * @param string $publicValue
+     * @param string $privateValue
+     *
+     * @return SettingsInterface
+     */
+    private function getAsymmetricSettings(string $publicValue, string $privateValue): SettingsInterface
+    {
+        return new class ($publicValue, $privateValue) extends AsymmetricCryptSettings
+        {
+            /**
+             * @var string
+             */
+            private $publicValue;
+
+            /**
+             * @var string
+             */
+            private $privateValue;
+
+            /**
+             * @param string $publicValue
+             * @param string $privateValue
+             */
+            public function __construct(string $publicValue, string $privateValue)
+            {
+                $this->publicValue  = $publicValue;
+                $this->privateValue = $privateValue;
+            }
+
+            /**
+             * @inheritdoc
+             */
+            protected function getSettings(): array
+            {
+                return [
+
+                        static::KEY_PUBLIC_PATH_OR_KEY_VALUE  => $this->publicValue,
+                        static::KEY_PRIVATE_PATH_OR_KEY_VALUE => $this->privateValue,
+
+                    ] + parent::getSettings();
+            }
+        };
     }
 
     /**

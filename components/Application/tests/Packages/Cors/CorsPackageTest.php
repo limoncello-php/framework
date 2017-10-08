@@ -57,7 +57,9 @@ class CorsPackageTest extends TestCase
         $provider->shouldReceive('get')->once()->with(A::class)->andReturn([
             A::KEY_IS_DEBUG => true,
         ]);
-        $provider->shouldReceive('get')->once()->with(C::class)->andReturn((new C())->get());
+        $corsConfig = (new C())->get();
+        $corsConfig[C::KEY_LOG_IS_ENABLED] = true;
+        $provider->shouldReceive('get')->once()->with(C::class)->andReturn($corsConfig);
 
         CorsContainerConfigurator::configureContainer($container);
 

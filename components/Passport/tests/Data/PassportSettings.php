@@ -18,6 +18,8 @@
 
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\Response\EmptyResponse;
 
 /**
  * @package Limoncello\Tests\Templates
@@ -27,67 +29,21 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
     /**
      * @inheritdoc
      */
-    protected function getApprovalUri(): string
+    protected function getSettings(): array
     {
-        return '/approve-uri';
-    }
+        return [
 
-    /**
-     * @inheritdoc
-     */
-    protected function getErrorUri(): string
-    {
-        return '/error-uri';
-    }
+                static::KEY_APPROVAL_URI_STRING                   => '/approve-uri',
+                static::KEY_ERROR_URI_STRING                      => '/error-uri',
+                static::KEY_DEFAULT_CLIENT_ID                     => 'default_client_id',
+                static::KEY_USER_TABLE_NAME                       => 'user_table',
+                static::KEY_USER_PRIMARY_KEY_NAME                 => 'id_user',
+                static::KEY_USER_CREDENTIALS_VALIDATOR            => [static::class, 'validateUser'],
+                static::KEY_USER_SCOPE_VALIDATOR                  => [static::class, 'validateScope'],
+                static::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER      => [self::class, 'tokenCustomPropertiesProvider'],
+                static::KEY_FAILED_CUSTOM_UNAUTHENTICATED_FACTORY => [self::class, 'customUnAuthFactory'],
 
-    /**
-     * @inheritdoc
-     */
-    protected function getDefaultClientId(): string
-    {
-        return 'default_client_id';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getUserTableName(): string
-    {
-        return 'user_table';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getUserPrimaryKeyName(): string
-    {
-        return 'id_user';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getUserCredentialsValidator(): callable
-    {
-        return [static::class, 'validateUser'];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getUserScopeValidator(): callable
-    {
-        return [static::class, 'validateScope'];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getTokenCustomPropertiesProvider(): ?callable
-    {
-        assert(parent::getTokenCustomPropertiesProvider() === null);
-
-        return [self::class,  'tokenCustomPropertiesProvider'];
+            ] + parent::getSettings();
     }
 
     /**
@@ -131,5 +87,13 @@ class PassportSettings extends \Limoncello\Passport\Package\PassportSettings
         return [
             'user_id' => $token->getUserIdentifier(),
         ];
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public static function customUnAuthFactory(): ResponseInterface
+    {
+        return new EmptyResponse(401);
     }
 }

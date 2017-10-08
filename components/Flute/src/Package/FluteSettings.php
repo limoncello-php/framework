@@ -13,26 +13,6 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
 abstract class FluteSettings implements SettingsInterface
 {
     /**
-     * By default it checks that all Schemes have unique resource types. That's a legit case
-     * to have multiple Schemes for a same resource type however it's more likely that developer
-     * just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
-     * to set it to `false`.
-     *
-     * @var bool
-     */
-    protected $requireUniqueTypes = true;
-
-    /**
-     * @return string
-     */
-    abstract protected function getSchemesPath(): string;
-
-    /**
-     * @return string
-     */
-    abstract protected function getRuleSetsPath(): string;
-
-    /**
      * @param string $path
      * @param string $implementClassName
      *
@@ -41,10 +21,36 @@ abstract class FluteSettings implements SettingsInterface
     abstract protected function selectClasses(string $path, string $implementClassName): Generator;
 
     /** Config key */
-    const KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS = 0;
+    const KEY_DO_NOT_LOG_EXCEPTIONS_LIST = 0;
 
     /** Config key */
-    const KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE = self::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS + 1;
+    const KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS = self::KEY_DO_NOT_LOG_EXCEPTIONS_LIST + 1;
+
+    /** Config key
+     *
+     * By default it checks that all Schemes have unique resource types. That's a legit case
+     * to have multiple Schemes for a same resource type however it's more likely that developer
+     * just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
+     * to set it to `false`.
+     *
+     * Default: true
+     */
+    const KEY_SCHEMES_REQUIRE_UNIQUE_TYPES = self::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS + 1;
+
+    /** Config key */
+    const KEY_SCHEMES_FOLDER = self::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES + 1;
+
+    /** Config key */
+    const KEY_SCHEMES_FILE_MASK = self::KEY_SCHEMES_FOLDER + 1;
+
+    /** Config key */
+    const KEY_VALIDATORS_FOLDER = self::KEY_SCHEMES_FILE_MASK + 1;
+
+    /** Config key */
+    const KEY_VALIDATORS_FILE_MASK = self::KEY_VALIDATORS_FOLDER + 1;
+
+    /** Config key */
+    const KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE = self::KEY_VALIDATORS_FILE_MASK + 1;
 
     /** Config key */
     const KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER = self::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE + 1;
@@ -82,16 +88,56 @@ abstract class FluteSettings implements SettingsInterface
     /**
      * @return array
      */
-    public function get(): array
+    final public function get(): array
+    {
+        $defaults = $this->getSettings();
+
+        $schemesFolder      = $defaults[static::KEY_SCHEMES_FOLDER] ?? null;
+        $schemesFileMask    = $defaults[static::KEY_SCHEMES_FILE_MASK] ?? null;
+        $validatorsFolder   = $defaults[static::KEY_VALIDATORS_FOLDER] ?? null;
+        $validatorsFileMask = $defaults[static::KEY_VALIDATORS_FILE_MASK] ?? null;
+
+        assert(
+            $schemesFolder !== null && empty(glob($schemesFolder)) === false,
+            "Invalid Schemes folder `$schemesFolder`."
+        );
+        assert(empty($schemesFileMask) === false, "Invalid Schemes file mask `$schemesFileMask`.");
+        assert(
+            $validatorsFolder !== null && empty(glob($validatorsFolder)) === false,
+            "Invalid Validators folder `$validatorsFolder`."
+        );
+        assert(empty($validatorsFileMask) === false, "Invalid Validators file mask `$validatorsFileMask`.");
+
+        $schemesPath    = $schemesFolder . DIRECTORY_SEPARATOR . $schemesFileMask;
+        $validatorsPath = $validatorsFolder . DIRECTORY_SEPARATOR . $validatorsFileMask;
+
+        $requireUniqueTypes = $defaults[static::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES] ?? true;
+
+        $doNotLogExceptions = $defaults[static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST] ?? [];
+        unset($defaults[static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST]);
+
+        return $defaults + [
+                static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS => array_flip($doNotLogExceptions),
+
+                static::KEY_MODEL_TO_SCHEME_MAP => $this->createModelToSchemeMap($schemesPath, $requireUniqueTypes),
+
+                static::KEY_VALIDATION_RULE_SETS_DATA => $this->createValidationRulesSetData($validatorsPath),
+            ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
     {
         $jsonOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES;
 
         return [
-            static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS       => array_flip($this->getDoNotLogExceptionsList()),
+            static::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES              => true,
+            static::KEY_SCHEMES_FILE_MASK                         => '*.php',
+            static::KEY_VALIDATORS_FILE_MASK                      => '*.php',
             static::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER => null,
             static::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE        => 500,
-            static::KEY_MODEL_TO_SCHEME_MAP                       => $this->createModelToSchemeMap(),
-            static::KEY_VALIDATION_RULE_SETS_DATA                 => $this->createRulesSetData(),
             static::KEY_DEFAULT_PAGING_SIZE                       => 20,
             static::KEY_MAX_PAGING_SIZE                           => 100,
             static::KEY_JSON_ENCODE_OPTIONS                       => $jsonOptions,
@@ -99,27 +145,24 @@ abstract class FluteSettings implements SettingsInterface
             static::KEY_IS_SHOW_VERSION                           => false,
             static::KEY_META                                      => null,
             static::KEY_URI_PREFIX                                => null,
+
+            static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST => [
+                JsonApiException::class,
+            ],
         ];
     }
 
     /**
-     * @return string[]
-     */
-    protected function getDoNotLogExceptionsList(): array
-    {
-        return [
-            JsonApiException::class,
-        ];
-    }
-
-    /**
+     * @param string $schemesPath
+     * @param bool   $requireUniqueTypes
+     *
      * @return array
      */
-    private function createModelToSchemeMap(): array
+    private function createModelToSchemeMap(string $schemesPath, bool $requireUniqueTypes): array
     {
         $map   = [];
         $types = [];
-        foreach ($this->selectClasses($this->getSchemesPath(), SchemaInterface::class) as $schemeClass) {
+        foreach ($this->selectClasses($schemesPath, SchemaInterface::class) as $schemeClass) {
             assert(
                 is_string($schemeClass) &&
                 class_exists($schemeClass) &&
@@ -137,7 +180,7 @@ abstract class FluteSettings implements SettingsInterface
             // just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
             // to set to turn off this check.
             assert(
-                $this->requireUniqueTypes === false || array_key_exists($resourceType, $types) === false,
+                $requireUniqueTypes === false || array_key_exists($resourceType, $types) === false,
                 "Are you sure it's not an error to use resource type `$resourceType` more than once?"
             );
             $types[$resourceType] = true;
@@ -149,12 +192,14 @@ abstract class FluteSettings implements SettingsInterface
     }
 
     /**
+     * @param string $validatorsPath
+     *
      * @return array
      */
-    private function createRulesSetData(): array
+    private function createValidationRulesSetData(string $validatorsPath): array
     {
         $serializer = new JsonApiRuleSerializer();
-        foreach ($this->selectClasses($this->getRuleSetsPath(), JsonApiRuleSetInterface::class) as $setClass) {
+        foreach ($this->selectClasses($validatorsPath, JsonApiRuleSetInterface::class) as $setClass) {
             /** @var string $setName */
             $setName = $setClass;
             assert(

@@ -22,18 +22,15 @@
 class EventSettings extends \Limoncello\Events\Package\EventSettings
 {
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function getEventsFolder(): string
+    protected function getSettings(): array
     {
-        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'Events', '*.php']);
-    }
+        return [
 
-    /**
-     * @return string
-     */
-    protected function getSubscribersFolder(): string
-    {
-        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'Subscribers', '*.php']);
+                static::KEY_EVENTS_FOLDER      => implode(DIRECTORY_SEPARATOR, [__DIR__, 'Events']),
+                static::KEY_SUBSCRIBERS_FOLDER => implode(DIRECTORY_SEPARATOR, [__DIR__, 'Subscribers']),
+
+            ] + parent::getSettings();
     }
 }

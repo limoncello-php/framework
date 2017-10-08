@@ -32,36 +32,58 @@ abstract class EventSettings implements SettingsInterface
 {
     use ClassIsTrait;
 
-    /**
-     * @return string
-     */
-    abstract protected function getEventsFolder(): string;
-
-    /**
-     * @return string
-     */
-    abstract protected function getSubscribersFolder(): string;
-
     /** Settings key */
     const KEY_EVENTS_FOLDER = 0;
 
     /** Settings key */
-    const KEY_SUBSCRIBERS_FOLDER = self::KEY_EVENTS_FOLDER + 1;
+    const KEY_EVENTS_FILE_MASK = self::KEY_EVENTS_FOLDER + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_SUBSCRIBERS_FOLDER + 1;
+    const KEY_SUBSCRIBERS_FOLDER = self::KEY_EVENTS_FILE_MASK + 1;
+
+    /** Settings key */
+    const KEY_SUBSCRIBERS_FILE_MASK = self::KEY_SUBSCRIBERS_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_CACHED_DATA = self::KEY_SUBSCRIBERS_FILE_MASK + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_CACHED_DATA;
 
     /**
      * @return array
      */
     final public function get(): array
     {
+        $defaults = $this->getSettings();
+
+        $eventsFolder = $defaults[static::KEY_EVENTS_FOLDER] ?? null;
+        assert(
+            $eventsFolder !== null && empty(glob($eventsFolder)) === false,
+            "Invalid Events folder `$eventsFolder`."
+        );
+
+        $eventsFileMask = $defaults[static::KEY_EVENTS_FILE_MASK] ?? null;
+        assert(empty($eventsFileMask) === false, "Invalid Events file mask `$eventsFileMask`.");
+
+        $subscribersFolder = $defaults[static::KEY_SUBSCRIBERS_FOLDER] ?? null;
+        assert(
+            $subscribersFolder !== null && empty(glob($subscribersFolder)) === false,
+            "Invalid Subscribers folder `$subscribersFolder`."
+        );
+
+        $subscribersFileMask = $defaults[static::KEY_SUBSCRIBERS_FILE_MASK] ?? null;
+        assert(empty($subscribersFileMask) === false, "Invalid Subscribers file mask `$subscribersFileMask`.");
+
+        $eventsPath      = $eventsFolder . DIRECTORY_SEPARATOR . $eventsFileMask;
+        $subscribersPath = $subscribersFolder . DIRECTORY_SEPARATOR . $subscribersFileMask;
+
         $emitter        = new SimpleEventEmitter();
         $eventClasses   = iterator_to_array(
-            $this->selectClasses($this->getEventsFolder(), EventInterface::class)
+            $this->selectClasses($eventsPath, EventInterface::class)
         );
         $handlerClasses = iterator_to_array(
-            $this->selectClasses($this->getSubscribersFolder(), EventHandlerInterface::class)
+            $this->selectClasses($subscribersPath, EventHandlerInterface::class)
         );
         foreach ($this->getEventSubscribers($eventClasses, $handlerClasses) as $eventClass => $subscriber) {
             $emitter->subscribe($eventClass, $subscriber);
@@ -69,7 +91,18 @@ abstract class EventSettings implements SettingsInterface
 
         $cacheData = $emitter->getStaticSubscribers();
 
-        return $cacheData;
+        return $defaults + [static::KEY_CACHED_DATA => $cacheData];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
+    {
+        return [
+            static::KEY_EVENTS_FILE_MASK      => '*.php',
+            static::KEY_SUBSCRIBERS_FILE_MASK => '*.php',
+        ];
     }
 
     /**

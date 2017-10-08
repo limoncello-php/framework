@@ -28,32 +28,43 @@ abstract class L10nSettings implements SettingsInterface
     const KEY_DEFAULT_LOCALE = 0;
 
     /** Settings key */
-    const KEY_LOCALES_DATA = self::KEY_DEFAULT_LOCALE + 1;
+    const KEY_LOCALES_FOLDER = self::KEY_DEFAULT_LOCALE + 1;
+
+    /** Settings key */
+    const KEY_LOCALES_DATA = self::KEY_LOCALES_FOLDER + 1;
 
     /** Settings key */
     const KEY_LAST = self::KEY_LOCALES_DATA;
 
     /**
-     * @return string
-     */
-    abstract protected function getDefaultLocale(): string;
-
-    /**
-     * @return string
-     */
-    abstract protected function getLocalesPath(): string;
-
-    /**
      * @inheritdoc
      */
-    public function get(): array
+    final public function get(): array
     {
-        $defaultLocale = $this->getDefaultLocale();
-        $loader        = (new FileBundleEncoder($this->getLocalesPath()));
+        $defaults = $this->getSettings();
 
+        $defaultLocale = $defaults[static::KEY_DEFAULT_LOCALE] ?? null;
+        assert(empty($defaultLocale) === false, "Invalid default locale `$defaultLocale`.");
+
+        $localesFolder = $defaults[static::KEY_LOCALES_FOLDER] ?? null;
+        assert(
+            $localesFolder !== null && empty(glob($localesFolder)) === false,
+            "Invalid Locales folder `$localesFolder`."
+        );
+
+
+        return $defaults + [
+                static::KEY_LOCALES_DATA => (new FileBundleEncoder($localesFolder))->getStorageData($defaultLocale),
+            ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSettings(): array
+    {
         return [
-            static::KEY_DEFAULT_LOCALE => $defaultLocale,
-            static::KEY_LOCALES_DATA   => $loader->getStorageData($defaultLocale),
+            static::KEY_DEFAULT_LOCALE => 'en',
         ];
     }
 }
