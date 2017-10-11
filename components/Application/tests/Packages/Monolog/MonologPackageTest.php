@@ -35,7 +35,7 @@ class MonologPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(MonologFileProvider::getContainerConfigurators());
     }
@@ -43,7 +43,7 @@ class MonologPackageTest extends TestCase
     /**
      * Test container configurator.
      */
-    public function testContainerConfigurator()
+    public function testContainerConfigurator(): void
     {
         $container = new Container();
 
@@ -60,5 +60,34 @@ class MonologPackageTest extends TestCase
         MonologFileContainerConfigurator::configureContainer($container);
 
         $this->assertNotNull($container->get(LoggerInterface::class));
+    }
+
+    /**
+     * Test settings.
+     */
+    public function testSettings(): void
+    {
+        $this->assertNotEmpty($this->getSettings()->get());
+    }
+
+    /**
+     * @return C
+     */
+    private function getSettings(): C
+    {
+        return new class extends C
+        {
+            /**
+             * @inheritdoc
+             */
+            protected function getSettings(): array
+            {
+                return [
+
+                    C::KEY_LOG_FOLDER => __DIR__,
+
+                    ] + parent::getSettings();
+            }
+        };
     }
 }

@@ -21,6 +21,7 @@ use Limoncello\Application\Packages\Data\DataContainerConfigurator;
 use Limoncello\Application\Packages\Data\DataProvider;
 use Limoncello\Application\Packages\Data\DataSettings;
 use Limoncello\Application\Packages\Data\DataSettings as C;
+use Limoncello\Application\Packages\Data\DoctrineSettings;
 use Limoncello\Application\Packages\Data\DoctrineSettings as S;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
@@ -69,8 +70,8 @@ class DataPackageTest extends TestCase
      */
     public function testSettings()
     {
-        $this->assertNotNull($settings = $this->getDataSettings());
-        $this->assertNotEmpty($settings->get());
+        $this->assertNotEmpty($this->getDataSettings()->get());
+        $this->assertNotEmpty($this->getDoctrineSettings()->get());
     }
 
     /**
@@ -96,6 +97,29 @@ class DataPackageTest extends TestCase
                         static::KEY_SEEDS_FOLDER         => $seedsFolder,
                         static::KEY_SEEDS_LIST_FILE      => $seedsFolder . DIRECTORY_SEPARATOR . 'seeds.php',
                         static::KEY_SEED_INIT            => [DataPackageTest::class, 'initSeeder'],
+                    ] + parent::getSettings();
+            }
+        };
+    }
+
+    /**
+     * @return DoctrineSettings
+     */
+    private function getDoctrineSettings(): DoctrineSettings
+    {
+        return new class extends DoctrineSettings
+        {
+            /**
+             * @inheritdoc
+             */
+            protected function getSettings(): array
+            {
+                $dbFile = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Seeds', 'dummy.sqlite']);
+
+                return [
+
+                        static::KEY_PATH => $dbFile,
+
                     ] + parent::getSettings();
             }
         };

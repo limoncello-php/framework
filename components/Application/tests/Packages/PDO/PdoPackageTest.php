@@ -19,6 +19,7 @@
 use Limoncello\Application\Packages\PDO\PdoContainerConfigurator;
 use Limoncello\Application\Packages\PDO\PdoProvider;
 use Limoncello\Application\Packages\PDO\PdoSettings as C;
+use Limoncello\Application\Packages\PDO\PdoSettings;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
@@ -34,15 +35,23 @@ class PdoPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(PdoProvider::getContainerConfigurators());
     }
 
     /**
+     * Test settings.
+     */
+    public function testSettings(): void
+    {
+        $this->assertNotEmpty($this->createSettings()->get());
+    }
+
+    /**
      * Test container configurator.
      */
-    public function testContainerConfigurator()
+    public function testContainerConfigurator(): void
     {
         $container = new Container();
 
@@ -55,5 +64,26 @@ class PdoPackageTest extends TestCase
         PdoContainerConfigurator::configureContainer($container);
 
         $this->assertNotNull($container->get(PDO::class));
+    }
+
+    /**
+     * @return PdoSettings
+     */
+    private function createSettings():PdoSettings
+    {
+        return new class extends PdoSettings
+        {
+            /**
+             * @inheritdoc
+             */
+            protected function getSettings(): array
+            {
+                return [
+
+                    self::KEY_CONNECTION_STRING => 'some connection string',
+
+                    ] + parent::getSettings();
+            }
+        };
     }
 }
