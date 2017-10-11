@@ -36,7 +36,10 @@ class TemplatesSettings implements SettingsInterface
     const KEY_CACHE_FOLDER = self::KEY_TEMPLATES_FILE_MASK + 1;
 
     /** Settings key */
-    const KEY_IS_DEBUG = self::KEY_CACHE_FOLDER + 1;
+    const KEY_APP_ROOT_FOLDER = self::KEY_CACHE_FOLDER + 1;
+
+    /** Settings key */
+    const KEY_IS_DEBUG = self::KEY_APP_ROOT_FOLDER + 1;
 
     /** Settings key */
     const KEY_TEMPLATES_LIST = self::KEY_IS_DEBUG + 1;
@@ -54,6 +57,7 @@ class TemplatesSettings implements SettingsInterface
         $templatesFolder   = $defaults[static::KEY_TEMPLATES_FOLDER] ?? null;
         $templatesFileMask = $defaults[static::KEY_TEMPLATES_FILE_MASK] ?? null;
         $cacheFolder       = $defaults[static::KEY_CACHE_FOLDER] ?? null;
+        $appRootFolder     = $defaults[static::KEY_APP_ROOT_FOLDER] ?? null;
 
         assert(
             $templatesFolder !== null && empty(glob($templatesFolder)) === false,
@@ -64,9 +68,21 @@ class TemplatesSettings implements SettingsInterface
             $cacheFolder !== null && empty(glob($cacheFolder)) === false,
             "Invalid Cache folder `$cacheFolder`."
         );
+        assert(
+            $appRootFolder !== null && empty(glob($appRootFolder)) === false,
+            "Invalid App root folder `$appRootFolder`."
+        );
+
+        $realTemplatesFolder = realpath($templatesFolder);
+        $realCacheFolder     = realpath($cacheFolder);
+        $realAppRootFolder   = realpath($appRootFolder);
+
+        $defaults[static::KEY_TEMPLATES_FOLDER] = $realTemplatesFolder;
+        $defaults[static::KEY_CACHE_FOLDER]     = $realCacheFolder;
+        $defaults[static::KEY_APP_ROOT_FOLDER]  = $realAppRootFolder;
 
         return $defaults + [
-                static::KEY_TEMPLATES_LIST => $this->getTemplateNames($templatesFolder, $templatesFileMask),
+                static::KEY_TEMPLATES_LIST => $this->getTemplateNames($realTemplatesFolder, $templatesFileMask),
             ];
     }
 
@@ -89,8 +105,6 @@ class TemplatesSettings implements SettingsInterface
      */
     private function getTemplateNames(string $templatesFolder, string $templatesFileMask): array
     {
-        $templatesFolder = realpath($templatesFolder);
-
         return iterator_to_array(call_user_func(function () use ($templatesFolder, $templatesFileMask) {
             $flags    =
                 RecursiveDirectoryIterator::SKIP_DOTS |
@@ -99,7 +113,7 @@ class TemplatesSettings implements SettingsInterface
             $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($templatesFolder, $flags));
             foreach ($iterator as $found) {
                 /** @var SplFileInfo $found */
-                if ($found->isFile() === true) {
+                if ($found->isFile() === true && fnmatch($templatesFileMask, $found->getFilename()) === true) {
                     $fullFileName = $found->getPath() . DIRECTORY_SEPARATOR . $found->getFilename();
                     $templateName = str_replace($templatesFolder . DIRECTORY_SEPARATOR, '', $fullFileName);
                     yield $templateName;

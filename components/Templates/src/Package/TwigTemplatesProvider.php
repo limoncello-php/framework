@@ -23,7 +23,7 @@ use Limoncello\Templates\Commands\TemplatesCommand;
 /**
  * @package Limoncello\Templates
  */
-class TemplatesProvider implements ProvidesContainerConfiguratorsInterface, ProvidesCommandsInterface
+class TwigTemplatesProvider implements ProvidesContainerConfiguratorsInterface, ProvidesCommandsInterface
 {
     /**
      * @inheritdoc
@@ -31,7 +31,7 @@ class TemplatesProvider implements ProvidesContainerConfiguratorsInterface, Prov
     public static function getContainerConfigurators(): array
     {
         return [
-            TemplatesContainerConfigurator::class,
+            TwigTemplatesContainerConfigurator::class,
         ];
     }
 

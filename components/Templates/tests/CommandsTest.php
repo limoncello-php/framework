@@ -21,15 +21,13 @@ use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Templates\Commands\TemplatesCommand;
+use Limoncello\Templates\Contracts\TemplatesCacheInterface;
 use Limoncello\Templates\Package\TemplatesSettings;
-use Limoncello\Templates\TwigTemplates;
 use Limoncello\Tests\Templates\Data\Templates;
 use Limoncello\Tests\Templates\Data\TestContainer;
 use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
-use Twig_Environment;
 
 /**
  * @package Limoncello\Tests\Templates
@@ -77,18 +75,13 @@ class CommandsTest extends TestCase
         $this
             ->addSettingsProvider($container);
 
-        /** @var Mock $command */
-        $command = Mockery::mock(TemplatesCommand::class . '[createCachingTemplateEngine]');
-        $command->shouldAllowMockingProtectedMethods();
-        /** @var Mock $tplMock */
-        $tplMock = Mockery::mock(TwigTemplates::class);
-        $command->shouldReceive('createCachingTemplateEngine')->zeroOrMoreTimes()->withAnyArgs()->andReturn($tplMock);
-        /** @var Mock $twigMock */
-        $twigMock = Mockery::mock(Twig_Environment::class);
-        $tplMock->shouldReceive('getTwig')->zeroOrMoreTimes()->withNoArgs()->andReturn($twigMock);
-        $twigMock->shouldReceive('resolveTemplate')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
+        /** @var Mock $cacheMock */
+        $cacheMock = Mockery::mock(TemplatesCacheInterface::class);
+        $cacheMock->shouldReceive('cache')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
 
-        /** @var TemplatesCommand $command */
+        $container[TemplatesCacheInterface::class] = $cacheMock;
+
+        $command = new TemplatesCommand();
 
         $this->assertNotEmpty($command::getName());
         $this->assertNotEmpty($command::getDescription());
@@ -117,22 +110,6 @@ class CommandsTest extends TestCase
 
         // Mockery will do checks when the test finished
         $this->assertTrue(true);
-    }
-
-    /**
-     * Test internal factory method.
-     */
-    public function testCreateCachingTemplateEngine()
-    {
-        $settings        = (new Templates())->get();
-        $templatesFolder = $settings[Templates::KEY_TEMPLATES_FOLDER];
-        $cacheFolder     = $settings[Templates::KEY_CACHE_FOLDER];
-
-        $method = new ReflectionMethod(TemplatesCommand::class, 'createCachingTemplateEngine');
-        $method->setAccessible(true);
-        $result = $method->invoke(new TemplatesCommand(), $templatesFolder, $cacheFolder);
-
-        $this->assertTrue($result instanceof TwigTemplates);
     }
 
     /**

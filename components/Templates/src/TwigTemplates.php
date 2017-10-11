@@ -17,13 +17,14 @@
  */
 
 use Limoncello\Contracts\Templates\TemplatesInterface;
+use Limoncello\Templates\Contracts\TemplatesCacheInterface;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
 
 /**
  * @package Limoncello\Templates
  */
-class TwigTemplates implements TemplatesInterface
+class TwigTemplates implements TemplatesInterface, TemplatesCacheInterface
 {
     /**
      * @var Twig_Environment
@@ -31,11 +32,12 @@ class TwigTemplates implements TemplatesInterface
     private $twig;
 
     /**
+     * @param string      $appRootFolder
      * @param string      $templatesFolder
      * @param null|string $cacheFolder
      * @param bool        $isDebug
      */
-    public function __construct(string $templatesFolder, string $cacheFolder = null, $isDebug = false)
+    public function __construct(string $appRootFolder, string $templatesFolder, ?string $cacheFolder, bool $isDebug)
     {
         // For Twig options see http://twig.sensiolabs.org/doc/api.html
         $options = [
@@ -44,7 +46,7 @@ class TwigTemplates implements TemplatesInterface
             'auto_reload' => $isDebug,
         ];
 
-        $this->twig = new Twig_Environment(new Twig_Loader_Filesystem($templatesFolder), $options);
+        $this->twig = new Twig_Environment(new Twig_Loader_Filesystem($templatesFolder, $appRootFolder), $options);
     }
 
     /**
@@ -61,5 +63,13 @@ class TwigTemplates implements TemplatesInterface
     public function render(string $name, array $context = []): string
     {
         return $this->getTwig()->render($name, $context);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function cache(string $name): void
+    {
+        $this->getTwig()->resolveTemplate($name);
     }
 }

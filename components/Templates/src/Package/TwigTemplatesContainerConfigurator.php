@@ -20,29 +20,36 @@ use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Contracts\Templates\TemplatesInterface;
+use Limoncello\Templates\Contracts\TemplatesCacheInterface;
+use Limoncello\Templates\Package\TemplatesSettings as C;
 use Limoncello\Templates\TwigTemplates;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Templates\Package\TemplatesSettings as C;
 
 /**
  * @package Limoncello\Templates
  */
-class TemplatesContainerConfigurator implements ContainerConfiguratorInterface
+class TwigTemplatesContainerConfigurator implements ContainerConfiguratorInterface
 {
     /**
      * @inheritdoc
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
-        $container[TemplatesInterface::class] = function (PsrContainerInterface $container) {
+        $container[TemplatesInterface::class] = function (PsrContainerInterface $container): TemplatesInterface {
             $settings  = $container->get(SettingsProviderInterface::class)->get(C::class);
             $templates = new TwigTemplates(
+                $settings[C::KEY_APP_ROOT_FOLDER],
                 $settings[C::KEY_TEMPLATES_FOLDER],
                 $settings[C::KEY_CACHE_FOLDER] ?? null,
                 $settings[C::KEY_IS_DEBUG] ?? false
             );
 
             return $templates;
+        };
+
+        $container[TemplatesCacheInterface::class] =
+            function (PsrContainerInterface $container): TemplatesCacheInterface {
+                return $container->get(TemplatesInterface::class);
         };
     }
 }

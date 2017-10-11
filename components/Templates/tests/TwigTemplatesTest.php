@@ -46,6 +46,8 @@ class TwigTemplatesTest extends TestCase
         $templates = Mockery::mock(TwigTemplates::class . '[]', [
             __DIR__,
             __DIR__,
+            __DIR__,
+            false,
         ]);
 
         $this->assertNotNull($templates);
@@ -61,6 +63,8 @@ class TwigTemplatesTest extends TestCase
         $templates = Mockery::mock(TwigTemplates::class . '[]', [
             __DIR__,
             __DIR__,
+            __DIR__,
+            false,
         ]);
 
         $this->assertNotNull($templates->getTwig());
@@ -75,6 +79,8 @@ class TwigTemplatesTest extends TestCase
         $templates = Mockery::mock(TwigTemplates::class . '[getTwig]', [
             __DIR__,
             __DIR__,
+            __DIR__,
+            false,
         ]);
 
         /** @var Mock $twig */
@@ -88,5 +94,33 @@ class TwigTemplatesTest extends TestCase
         /** @var TwigTemplates $templates */
 
         $this->assertNotNull($templates->render($templateName, $templateContext));
+    }
+
+    /**
+     * Test render.
+     */
+    public function testCache()
+    {
+        /** @var Mock $templates */
+        $templates = Mockery::mock(TwigTemplates::class . '[getTwig]', [
+            __DIR__,
+            __DIR__,
+            __DIR__,
+            false,
+        ]);
+
+        /** @var Mock $twig */
+        $twig = Mockery::mock(Twig_Environment::class);
+
+        $templateName = 'some_template_name';
+        $templates->shouldReceive('getTwig')->once()->withNoArgs()->andReturn($twig);
+        $twig->shouldReceive('resolveTemplate')->once()->with($templateName)->andReturnSelf();
+
+        /** @var TwigTemplates $templates */
+
+        $templates->cache($templateName);
+
+        // mocks does the checks
+        $this->assertTrue(true);
     }
 }

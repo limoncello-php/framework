@@ -33,6 +33,7 @@ class Templates extends TemplatesSettings
                 static::KEY_IS_DEBUG         => true,
                 static::KEY_TEMPLATES_FOLDER => implode(DIRECTORY_SEPARATOR, [__DIR__, 'Templates']),
                 static::KEY_CACHE_FOLDER     => implode(DIRECTORY_SEPARATOR, [__DIR__, 'Cache']),
+                static::KEY_APP_ROOT_FOLDER  => implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..']),
 
             ] + parent::getSettings();
     }

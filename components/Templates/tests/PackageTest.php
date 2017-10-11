@@ -18,8 +18,9 @@
 
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Contracts\Templates\TemplatesInterface;
-use Limoncello\Templates\Package\TemplatesContainerConfigurator;
-use Limoncello\Templates\Package\TemplatesProvider;
+use Limoncello\Templates\Contracts\TemplatesCacheInterface;
+use Limoncello\Templates\Package\TwigTemplatesContainerConfigurator;
+use Limoncello\Templates\Package\TwigTemplatesProvider;
 use Limoncello\Templates\Package\TemplatesSettings;
 use Limoncello\Tests\Templates\Data\Templates;
 use Limoncello\Tests\Templates\Data\TestContainer;
@@ -57,10 +58,13 @@ class PackageTest extends TestCase
 
         $container[SettingsProviderInterface::class] = $settingsMock;
 
-        TemplatesContainerConfigurator::configureContainer($container);
+        TwigTemplatesContainerConfigurator::configureContainer($container);
 
         $this->assertTrue($container->has(TemplatesInterface::class));
         $this->assertNotNull($container->get(TemplatesInterface::class));
+
+        $this->assertTrue($container->has(TemplatesCacheInterface::class));
+        $this->assertNotNull($container->get(TemplatesCacheInterface::class));
     }
 
     /**
@@ -68,8 +72,8 @@ class PackageTest extends TestCase
      */
     public function testTemplateProvider()
     {
-        $this->assertNotEmpty(TemplatesProvider::getContainerConfigurators());
-        $this->assertNotEmpty(TemplatesProvider::getCommands());
+        $this->assertNotEmpty(TwigTemplatesProvider::getContainerConfigurators());
+        $this->assertNotEmpty(TwigTemplatesProvider::getCommands());
     }
 
     /**

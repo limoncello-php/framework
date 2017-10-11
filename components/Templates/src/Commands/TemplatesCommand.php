@@ -20,8 +20,8 @@ use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Templates\Contracts\TemplatesCacheInterface;
 use Limoncello\Templates\Package\TemplatesSettings;
-use Limoncello\Templates\TwigTemplates;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -134,30 +134,16 @@ class TemplatesCommand implements CommandInterface
      */
     protected function executeCache(ContainerInterface $container): void
     {
-        $settings = $this->getTemplatesSettings($container);
+        /** @var TemplatesCacheInterface $cache */
+        $cache = $container->get(TemplatesCacheInterface::class);
 
-        $cacheFolder     = $settings[TemplatesSettings::KEY_CACHE_FOLDER];
-        $templates       = $settings[TemplatesSettings::KEY_TEMPLATES_LIST];
-        $templatesFolder = $settings[TemplatesSettings::KEY_TEMPLATES_FOLDER];
+        $settings  = $this->getTemplatesSettings($container);
+        $templates = $settings[TemplatesSettings::KEY_TEMPLATES_LIST];
 
-        $templateEngine = $this->createCachingTemplateEngine($templatesFolder, $cacheFolder);
         foreach ($templates as $templateName) {
             // it will write template to cache
-            $templateEngine->getTwig()->resolveTemplate($templateName);
+            $cache->cache($templateName);
         }
-    }
-
-    /**
-     * @param string $templatesFolder
-     * @param string $cacheFolder
-     *
-     * @return TwigTemplates
-     */
-    protected function createCachingTemplateEngine(string $templatesFolder, string $cacheFolder): TwigTemplates
-    {
-        $templates = new TwigTemplates($templatesFolder, $cacheFolder);
-
-        return $templates;
     }
 
     /**
