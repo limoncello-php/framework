@@ -18,7 +18,6 @@
 
 use Limoncello\Application\Packages\Cookies\CookieContainerConfigurator;
 use Limoncello\Application\Packages\Cookies\CookieProvider;
-use Limoncello\Application\Packages\Cookies\CookieSettings;
 use Limoncello\Application\Packages\Cookies\CookieSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
@@ -64,24 +63,5 @@ class CookiesPackageTest extends TestCase
         CookieContainerConfigurator::configureContainer($container);
 
         $this->assertNotNull($container->get(CookieJarInterface::class));
-
-$foo = new class Cookies extends CookieSettings
-{
-    /**
-     * @inheritdoc
-     */
-    protected function getSettings(): array
-    {
-        return [
-
-                static::KEY_DEFAULT_PATH                                => '',
-                static::KEY_DEFAULT_DOMAIN                              => '',
-                static::KEY_DEFAULT_IS_SEND_ONLY_OVER_SECURE_CONNECTION => true,
-                static::KEY_DEFAULT_IS_ACCESSIBLE_ONLY_THROUGH_HTTP     => true,
-                static::KEY_DEFAULT_IS_RAW                              => false,
-
-            ] + parent::getSettings();
-    }
-};
     }
 }
