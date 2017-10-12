@@ -140,5 +140,4 @@ class CorsMiddleware implements MiddlewareInterface
     ): ResponseInterface {
         return new EmptyResponse(400);
     }
-
 }
