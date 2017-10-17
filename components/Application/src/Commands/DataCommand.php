@@ -135,15 +135,15 @@ class DataCommand implements CommandInterface
         $action = $arguments[static::ARG_ACTION];
         switch ($action) {
             case static::ACTION_MIGRATE:
-                $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
+                $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_LIST_FILE] ?? '';
                 $this->createMigrationRunner($path)->migrate($container);
                 break;
             case static::ACTION_ROLLBACK:
-                $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_PATH] ?? '';
+                $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_LIST_FILE] ?? '';
                 $this->createMigrationRunner($path)->rollback($container);
                 break;
             case static::ACTION_SEED:
-                $path     = $path !== false ? $path : $settings[DataSettings::KEY_SEEDS_PATH] ?? '';
+                $path     = $path !== false ? $path : $settings[DataSettings::KEY_SEEDS_LIST_FILE] ?? '';
                 $seedInit = $settings[DataSettings::KEY_SEED_INIT] ?? null;
                 $this->createSeedRunner($path, $seedInit)->run($container);
                 break;
