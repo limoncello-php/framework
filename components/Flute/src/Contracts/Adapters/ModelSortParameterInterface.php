@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Contracts\Http\Query;
+<?php namespace Limoncello\Flute\Contracts\Adapters;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -19,25 +19,15 @@
 /**
  * @package Limoncello\Flute
  */
-interface SortParameterInterface
+interface ModelSortParameterInterface
 {
     /**
-     * @return AttributeInterface
+     * @return string
      */
-    public function getAttribute(): AttributeInterface;
-
-    /**
-     * @return RelationshipInterface|null
-     */
-    public function getRelationship(): ?RelationshipInterface;
+    public function getColumnName(): string;
 
     /**
      * @return bool
      */
-    public function isAsc(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isDesc(): bool;
+    public function isAscending(): bool;
 }

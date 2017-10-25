@@ -23,11 +23,11 @@ use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
-use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
+use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
+use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Package\FluteContainerConfigurator;
@@ -36,7 +36,6 @@ use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Package\Flute;
 use Limoncello\Tests\Flute\Data\Package\SettingsProvider;
 use Limoncello\Tests\Flute\TestCase;
-use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -54,6 +53,7 @@ class FluteContainerConfiguratorTest extends TestCase
 
         $container[SettingsProviderInterface::class] = new SettingsProvider([
             FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
+
             ApplicationSettingsInterface::class => [
                 ApplicationSettingsInterface::KEY_IS_LOG_ENABLED => true,
                 ApplicationSettingsInterface::KEY_IS_DEBUG       => true,
@@ -68,12 +68,11 @@ class FluteContainerConfiguratorTest extends TestCase
         FluteContainerConfigurator::configureExceptionHandler($container);
 
         $this->assertNotNull($container->get(FactoryInterface::class));
-        $this->assertNotNull($container->get(QueryParametersParserInterface::class));
-        $this->assertNotNull($container->get(FilterOperationsInterface::class));
         $this->assertNotNull($container->get(ThrowableHandlerInterface::class));
         $this->assertNotNull($container->get(JsonSchemesInterface::class));
         $this->assertNotNull($container->get(EncoderInterface::class));
-        $this->assertNotNull($container->get(RepositoryInterface::class));
+        $this->assertNotNull($container->get(QueryParserInterface::class));
+        $this->assertNotNull($container->get(ParametersMapperInterface::class));
         $this->assertNotNull($container->get(PaginationStrategyInterface::class));
         $this->assertNotNull($container->get(JsonApiValidatorFactoryInterface::class));
     }

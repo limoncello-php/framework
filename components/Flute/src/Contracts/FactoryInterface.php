@@ -18,9 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
-use Limoncello\Contracts\L10n\FormatterInterface;
-use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
-use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
+use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
@@ -41,6 +39,19 @@ interface FactoryInterface
     public function createErrorCollection(): ErrorCollection;
 
     /**
+     * @param Connection               $connection
+     * @param string                   $modelClass
+     * @param ModelSchemeInfoInterface $modelSchemes
+     *
+     * @return ModelQueryBuilder
+     */
+    public function createModelQueryBuilder(
+        Connection $connection,
+        string $modelClass,
+        ModelSchemeInfoInterface $modelSchemes
+    ): ModelQueryBuilder;
+
+    /**
      * @param ModelSchemeInfoInterface $modelSchemes
      *
      * @return ModelStorageInterface
@@ -51,21 +62,6 @@ interface FactoryInterface
      * @return TagStorageInterface
      */
     public function createTagStorage(): TagStorageInterface;
-
-    /**
-     * @param Connection                $connection
-     * @param ModelSchemeInfoInterface  $modelSchemes
-     * @param FilterOperationsInterface $filterOperations
-     * @param FormatterInterface        $fluteMsgFormatter
-     *
-     * @return RepositoryInterface
-     */
-    public function createRepository(
-        Connection $connection,
-        ModelSchemeInfoInterface $modelSchemes,
-        FilterOperationsInterface $filterOperations,
-        FormatterInterface $fluteMsgFormatter
-    ): RepositoryInterface;
 
     /**
      * @param array                    $schemes
@@ -98,5 +94,5 @@ interface FactoryInterface
      *
      * @return CrudInterface
      */
-    public function createApi(string $apiClass);
+    public function createApi(string $apiClass): CrudInterface;
 }

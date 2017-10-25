@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Http\Query\AttributeInterface;
+use Limoncello\Flute\Contracts\Http\Query\RelationshipInterface;
 use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface as JsonLibrarySortParameterInterface;
 
 /**
  * @package Limoncello\Flute
@@ -25,82 +26,64 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface as JsonL
 class SortParameter implements SortParameterInterface
 {
     /**
-     * @var JsonLibrarySortParameterInterface
+     * @var AttributeInterface
      */
-    private $libSortParam;
+    private $attribute;
 
     /**
-     * @var string
+     * @var RelationshipInterface|null
      */
-    private $name;
+    private $relationship;
 
     /**
      * @var bool
      */
-    private $isRelationship;
+    private $isAsc;
 
     /**
-     * @var int|null
-     */
-    private $relationshipType = null;
-
-    /**
-     * @param JsonLibrarySortParameterInterface $sortParam
-     * @param string                            $name
-     * @param bool                              $isRelationship
-     * @param int|null                          $relationshipType
+     * @param AttributeInterface         $attribute
+     * @param bool                       $isAsc
+     * @param RelationshipInterface|null $relationship
      */
     public function __construct(
-        JsonLibrarySortParameterInterface $sortParam,
-        string $name,
-        bool $isRelationship,
-        ?int $relationshipType
+        AttributeInterface $attribute,
+        bool $isAsc,
+        RelationshipInterface $relationship = null
     ) {
-        $this->libSortParam   = $sortParam;
-        $this->name           = $name;
-        $this->isRelationship = $isRelationship;
-        if ($isRelationship === true) {
-            $this->relationshipType = $relationshipType;
-        }
+        $this->attribute    = $attribute;
+        $this->relationship = $relationship;
+        $this->isAsc        = $isAsc;
     }
 
     /**
      * @inheritdoc
      */
-    public function getName(): string
+    public function getAttribute(): AttributeInterface
     {
-        return $this->name;
+        return $this->attribute;
     }
 
     /**
      * @inheritdoc
      */
-    public function getOriginalName(): string
+    public function getRelationship(): ?RelationshipInterface
     {
-        return $this->libSortParam->getField();
+        return $this->relationship;
     }
 
     /**
      * @inheritdoc
      */
-    public function isAscending(): bool
+    public function isAsc(): bool
     {
-        return $this->libSortParam->isAscending();
+        return $this->isAsc;
     }
 
     /**
      * @inheritdoc
      */
-    public function isRelationship(): bool
+    public function isDesc(): bool
     {
-        return $this->isRelationship;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getRelationshipType(): ?int
-    {
-        return $this->relationshipType;
+        return !$this->isAsc;
     }
 }

@@ -42,6 +42,7 @@ class BoardSchema extends BaseSchema
     {
         return [
             self::SCHEMA_ATTRIBUTES => [
+                self::RESOURCE_ID     => Model::FIELD_ID,
                 self::ATTR_TITLE      => Model::FIELD_TITLE,
                 self::ATTR_CREATED_AT => Model::FIELD_CREATED_AT,
                 self::ATTR_UPDATED_AT => Model::FIELD_UPDATED_AT,

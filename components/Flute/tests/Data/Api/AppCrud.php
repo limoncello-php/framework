@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Api\Crud;
 use Limoncello\Tests\Flute\Data\Models\Model;
 use Psr\Container\ContainerInterface;
@@ -40,35 +40,35 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnCreate(string $modelClass, array $attributes, string $index = null): array
+    protected function filterAttributesOnCreate(?string $index, iterable $attributes): iterable
     {
-        $allowedChanges = parent::filterAttributesOnCreate($modelClass, $attributes, $index);
+        foreach (parent::filterAttributesOnCreate($index, $attributes) as $attribute => $value) {
+            yield $attribute => $value;
+        }
 
-        $allowedChanges[Model::FIELD_CREATED_AT] = date('Y-m-d H:i:s');
-
-        return $allowedChanges;
+        yield Model::FIELD_CREATED_AT => $this->now();
     }
 
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnUpdate(string $modelClass, array $attributes): array
+    protected function filterAttributesOnUpdate(iterable $attributes): iterable
     {
-        $allowedChanges = parent::filterAttributesOnUpdate($modelClass, $attributes);
+        foreach (parent::filterAttributesOnUpdate($attributes) as $attribute => $value) {
+            yield $attribute => $value;
+        }
 
-        $allowedChanges[Model::FIELD_UPDATED_AT] = date('Y-m-d H:i:s');
-
-        return $allowedChanges;
+        yield Model::FIELD_UPDATED_AT => $this->now();
     }
 
     /**
      * @inheritdoc
      */
-    protected function builderSaveRelationshipOnCreate($relationshipName, QueryBuilder $builder): QueryBuilder
+    protected function builderSaveRelationshipOnCreate($relationshipName, ModelQueryBuilder $builder): ModelQueryBuilder
     {
         $builder = parent::builderSaveRelationshipOnCreate($relationshipName, $builder);
 
-        $builder->setValue(Model::FIELD_CREATED_AT, $builder->createNamedParameter(date('Y-m-d H:i:s')));
+        $builder->setValue(Model::FIELD_CREATED_AT, $builder->createNamedParameter($this->now()));
 
         return $builder;
     }
@@ -76,12 +76,20 @@ abstract class AppCrud extends Crud
     /**
      * @inheritdoc
      */
-    protected function builderSaveRelationshipOnUpdate($relationshipName, QueryBuilder $builder): QueryBuilder
+    protected function builderSaveRelationshipOnUpdate($relationshipName, ModelQueryBuilder $builder): ModelQueryBuilder
     {
         $builder = parent::builderSaveRelationshipOnUpdate($relationshipName, $builder);
 
-        $builder->setValue(Model::FIELD_CREATED_AT, $builder->createNamedParameter(date('Y-m-d H:i:s')));
+        $builder->setValue(Model::FIELD_CREATED_AT, $builder->createNamedParameter($this->now()));
 
         return $builder;
+    }
+
+    /**
+     * @return string
+     */
+    private function now(): string
+    {
+        return date('Y-m-d H:i:s');
     }
 }

@@ -18,19 +18,12 @@
 
 use Limoncello\Flute\Schema\Schema;
 use Limoncello\Tests\Flute\Data\Models\Model;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
 /**
  * @package Limoncello\Tests\Flute
  */
 abstract class BaseSchema extends Schema
 {
-    /** Attribute name */
-    const RESOURCE_ID = DocumentInterface::KEYWORD_ID;
-
-    /** Attribute name */
-    const RESOURCE_TYPE = DocumentInterface::KEYWORD_TYPE;
-
     /** Attribute name */
     const ATTR_CREATED_AT = 'created-at-attribute';
 

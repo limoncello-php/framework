@@ -19,22 +19,14 @@
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
-use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
-use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
-use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
+use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\Http\Query\FilterParameter;
-use Limoncello\Flute\Http\Query\FilterParameterCollection;
-use Limoncello\Flute\Http\Query\IncludeParameter;
-use Limoncello\Flute\Http\Query\SortParameter;
-use Limoncello\Flute\L10n\Messages;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Api\PostsApi;
 use Limoncello\Tests\Flute\Data\Api\StringPKModelApi;
@@ -46,14 +38,7 @@ use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
 use Limoncello\Tests\Flute\Data\Models\User;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
-use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\TestCase;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Encoder\Parameters\SortParameter as JsonLibrarySortParameter;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PDO;
 use stdClass;
 
@@ -86,12 +71,12 @@ class CrudTest extends TestCase
             Post::FIELD_ID_BOARD => $boardId,
             Post::FIELD_ID_USER  => $userId,
         ];
+        $toMany     = [];
 
         $crud = $this->createCrud(PostsApi::class);
 
-        $this->assertNotNull($index = $crud->create(null, $attributes));
-        $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($model = $data->getData());
+        $this->assertNotNull($index = $crud->create(null, $attributes, $toMany));
+        $this->assertNotNull($model = $crud->withIndexFilter($index)->fetchResource()->getData());
 
         /** @var Post $model */
 
@@ -101,16 +86,14 @@ class CrudTest extends TestCase
         $this->assertEquals($text, $model->{Post::FIELD_TEXT});
         $this->assertNotEmpty($index = $model->{Post::FIELD_ID});
 
-        $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($data->getData());
+        $this->assertNotNull($crud->withIndexFilter($index)->fetchResource()->getData());
 
-        $crud->delete($index);
+        $crud->withIndexFilter($index)->delete();
 
-        $this->assertNotNull($data = $crud->read($index));
-        $this->assertNull($data->getData());
+        $this->assertNull($crud->withIndexFilter($index)->fetchResource()->getData());
 
         // second delete does nothing (already deleted)
-        $crud->delete($index);
+        $crud->withIndexFilter($index)->delete();
     }
 
     /**
@@ -128,24 +111,21 @@ class CrudTest extends TestCase
 
         $this->assertNotNull($index = $crud->create($pk, $attributes, []));
         $this->assertEquals($pk, $index);
-        $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($model = $data->getData());
+        $this->assertNotNull($model = $crud->withIndexFilter($index)->fetchResource()->getData());
 
         /** @var StringPKModel $model */
 
         $this->assertEquals($pk, $model->{StringPKModel::FIELD_ID});
         $this->assertEquals($name, $model->{StringPKModel::FIELD_NAME});
 
-        $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($data->getData());
+        $this->assertNotNull($crud->withIndexFilter($index)->fetchResource()->getData());
 
-        $crud->delete($index);
+        $crud->withIndexFilter($index)->delete();
 
-        $this->assertNotNull($data = $crud->read($index));
-        $this->assertNull($data->getData());
+        $this->assertNull($crud->withIndexFilter($index)->fetchResource()->getData());
 
         // second delete does nothing (already deleted)
-        $crud->delete($index);
+        $crud->withIndexFilter($index)->delete();
     }
 
     /**
@@ -155,7 +135,7 @@ class CrudTest extends TestCase
     {
         $invalidIndex = new stdClass();
 
-        $this->createCrud(CommentsApi::class)->create($invalidIndex, []);
+        $this->createCrud(CommentsApi::class)->create($invalidIndex, [], []);
     }
 
     /**
@@ -165,7 +145,7 @@ class CrudTest extends TestCase
     {
         $invalidIndex = new stdClass();
 
-        $this->createCrud(CommentsApi::class)->update($invalidIndex, []);
+        $this->createCrud(CommentsApi::class)->update($invalidIndex, [], []);
     }
 
     /**
@@ -175,7 +155,7 @@ class CrudTest extends TestCase
     {
         $invalidIndex = new stdClass();
 
-        $this->createCrud(CommentsApi::class)->delete($invalidIndex);
+        $this->createCrud(CommentsApi::class)->withIndexFilter($invalidIndex)->delete();
     }
 
     /**
@@ -185,17 +165,7 @@ class CrudTest extends TestCase
     {
         $invalidIndex = new stdClass();
 
-        $this->createCrud(CommentsApi::class)->read($invalidIndex);
-    }
-
-    /**
-     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
-     */
-    public function testInputChecksForReadRelationship()
-    {
-        $invalidIndex = new stdClass();
-
-        $this->createCrud(CommentsApi::class)->readRelationship($invalidIndex, Comment::REL_POST);
+        $this->createCrud(CommentsApi::class)->withIndexFilter($invalidIndex)->fetchResource()->getData();
     }
 
     /**
@@ -205,7 +175,7 @@ class CrudTest extends TestCase
     {
         $invalidIndex = new stdClass();
 
-        $this->createCrud(CommentsApi::class)->readRow($invalidIndex);
+        $this->createCrud(CommentsApi::class)->withIndexFilter($invalidIndex)->fetchResource()->getData();
     }
 
     /**
@@ -248,8 +218,7 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(CommentsApi::class);
 
         $this->assertNotNull($index = $crud->create(null, $attributes, $toMany));
-        $this->assertNotNull($data = $crud->read($index));
-        $this->assertNotNull($model = $data->getData());
+        $this->assertNotNull($model = $crud->withIndexFilter($index)->fetchResource()->getData());
 
         /** @var Comment $model */
 
@@ -276,12 +245,13 @@ class CrudTest extends TestCase
 
         // same checks but this time via API
         $includePaths = [
-            new IncludeParameter(CommentSchema::REL_USER, [Comment::REL_USER]),
-            new IncludeParameter(CommentSchema::REL_POST, [Comment::REL_POST]),
-            new IncludeParameter(CommentSchema::REL_EMOTIONS, [Comment::REL_EMOTIONS]),
+            [Comment::REL_USER],
+            [Comment::REL_POST],
+            [Comment::REL_EMOTIONS],
         ];
-        $this->assertNotNull($data = $crud->read($index, null, $includePaths));
-        $this->assertNotNull($comment = $data->getData());
+        $this->assertNotNull(
+            $comment = $crud->withIncludes($includePaths)->withIndexFilter($index)->fetchResource()->getData()
+        );
         $this->assertEquals(
             $userId,
             $comment->{Comment::REL_USER}->{User::FIELD_ID}
@@ -304,7 +274,7 @@ class CrudTest extends TestCase
     public function testUpdateCommentsWithEmotions()
     {
         $commentId  = 1;
-        $userId     = 2;
+        $userId     = 1;
         $postId     = 3;
         $text       = 'Some text';
         $attributes = [
@@ -320,23 +290,23 @@ class CrudTest extends TestCase
 
         $changedRecords = $crud->update($commentId, $attributes, $toMany);
         $this->assertEquals(3, $changedRecords);
-        $this->assertNotNull($data = $crud->read($commentId));
-        $this->assertNotNull($model = $data->getData());
+        $this->assertNotNull($model = $crud->withIndexFilter($commentId)->fetchResource()->getData());
 
         /** @var Comment $model */
 
         $this->assertEquals($userId, $model->{Comment::FIELD_ID_USER});
         $this->assertEquals($postId, $model->{Comment::FIELD_ID_POST});
         $this->assertEquals($text, $model->{Comment::FIELD_TEXT});
-        $this->assertNotEmpty($index = $model->{Comment::FIELD_ID});
+        $this->assertEquals($commentId, $model->{Comment::FIELD_ID});
 
         $includePaths = [
-            new IncludeParameter(CommentSchema::REL_USER, [Comment::REL_USER]),
-            new IncludeParameter(CommentSchema::REL_POST, [Comment::REL_POST]),
-            new IncludeParameter(CommentSchema::REL_EMOTIONS, [Comment::REL_EMOTIONS]),
+            [Comment::REL_USER],
+            [Comment::REL_POST],
+            [Comment::REL_EMOTIONS],
         ];
-        $this->assertNotNull($data = $crud->read($index, null, $includePaths));
-        $this->assertNotNull($comment = $data->getData());
+        $this->assertNotNull(
+            $comment = $crud->withIncludes($includePaths)->withIndexFilter($commentId)->fetchResource()->getData()
+        );
         $this->assertEquals(
             $userId,
             $comment->{Comment::REL_USER}->{User::FIELD_ID}
@@ -359,7 +329,7 @@ class CrudTest extends TestCase
     public function testDeleteResourceWithConstraints()
     {
         $crud = $this->createCrud(PostsApi::class);
-        $crud->delete(1);
+        $crud->withIndexFilter(1)->delete();
     }
 
     /**
@@ -370,21 +340,15 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(PostsApi::class);
 
         $index        = 18;
-        $s            = DocumentInterface::PATH_SEPARATOR;
-        $jsonPath1    = PostSchema::REL_COMMENTS . $s . CommentSchema::REL_EMOTIONS;
-        $modelPath1   = [Post::REL_COMMENTS, Comment::REL_EMOTIONS];
-        $jsonPath2    = PostSchema::REL_COMMENTS . $s . CommentSchema::REL_POST . $s . PostSchema::REL_USER;
-        $modelPath2   = [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER];
         $includePaths = [
-            new IncludeParameter(PostSchema::REL_BOARD, [Post::REL_BOARD]),
-            new IncludeParameter(PostSchema::REL_COMMENTS, [Post::REL_COMMENTS]),
-            new IncludeParameter($jsonPath1, $modelPath1),
-            new IncludeParameter($jsonPath2, $modelPath2),
+            [Post::REL_BOARD],
+            [Post::REL_COMMENTS],
+            [Post::REL_COMMENTS, Comment::REL_EMOTIONS],
+            [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER],
         ];
-        $data         = $crud->read($index, null, $includePaths);
-        $this->assertNotNull($data);
-        $this->assertNotNull($model = $data->getData());
-        $this->assertFalse($data->isCollection());
+        $this->assertNotNull(
+            $model = $crud->withIncludes($includePaths)->withIndexFilter($index)->fetchResource()->getData()
+        );
 
         $board = $model->{Post::REL_BOARD};
         $this->assertEquals(Board::class, get_class($board));
@@ -450,14 +414,12 @@ class CrudTest extends TestCase
         $this->assertNull($idEditor);
 
         $includePaths = [
-            new IncludeParameter(PostSchema::REL_EDITOR, [Post::REL_EDITOR]),
+            [Post::REL_EDITOR],
         ];
 
-        $data = $crud->read($index, null, $includePaths);
-
-        $this->assertNotNull($data);
-        $this->assertNotNull($model = $data->getData());
-        $this->assertFalse($data->isCollection());
+        $this->assertNotNull(
+            $model = $crud->withIncludes($includePaths)->withIndexFilter($index)->fetchResource()->getData()
+        );
         $this->assertNull($model->{Post::REL_EDITOR});
     }
 
@@ -467,40 +429,36 @@ class CrudTest extends TestCase
     public function testIndex()
     {
         $crud = $this->createCrud(PostsApi::class);
-        $s    = DocumentInterface::PATH_SEPARATOR;
 
-        $jsonPath1    = PostSchema::REL_COMMENTS . $s . CommentSchema::REL_EMOTIONS;
-        $modelPath1   = [Post::REL_COMMENTS, Comment::REL_EMOTIONS];
-        $jsonPath2    = PostSchema::REL_COMMENTS . $s . CommentSchema::REL_POST . $s . PostSchema::REL_USER;
-        $modelPath2   = [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER];
         $includePaths = [
-            new IncludeParameter(PostSchema::REL_BOARD, [Post::REL_BOARD]),
-            new IncludeParameter(PostSchema::REL_COMMENTS, [Post::REL_COMMENTS]),
-            new IncludeParameter($jsonPath1, $modelPath1),
-            new IncludeParameter($jsonPath2, $modelPath2),
+            [Post::REL_BOARD],
+            [Post::REL_COMMENTS],
+            [Post::REL_COMMENTS, Comment::REL_EMOTIONS],
+            [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER],
         ];
 
-        $relType1            = RelationshipTypes::BELONGS_TO;
-        $sortParameters      = [
-            $this->createSortParameter(PostSchema::REL_BOARD, Post::REL_BOARD, false, true, $relType1),
-            $this->createSortParameter(PostSchema::ATTR_TITLE, Post::FIELD_TITLE, true),
+        $sortParameters = [
+            Post::FIELD_ID_BOARD => false,
+            Post::FIELD_TITLE    => true,
         ];
-        $pagingOffset        = 1;
-        $pagingSize          = 2;
-        $pagingParameters    = [
-            PaginationStrategyInterface::PARAM_PAGING_SKIP => $pagingOffset,
-            PaginationStrategyInterface::PARAM_PAGING_SIZE => $pagingSize,
+        $pagingOffset   = 1;
+        $pagingSize     = 2;
+        $filters        = [
+            Post::FIELD_TITLE   => [
+                FilterParameterInterface::OPERATION_LIKE => ['%'],
+            ],
+            Post::FIELD_ID_USER => [
+                FilterParameterInterface::OPERATION_LESS_THAN => ['5'],
+            ],
         ];
-        $relType2            = RelationshipTypes::BELONGS_TO;
-        $filteringParameters = new FilterParameterCollection();
-        $filteringParameters->add(
-            new FilterParameter(PostSchema::ATTR_TITLE, null, Post::FIELD_TITLE, ['like' => ['%', '%']])
-        );
-        $filteringParameters->add(
-            new FilterParameter(PostSchema::REL_USER, Post::REL_USER, null, ['lt' => '5'], $relType2)
-        );
 
-        $data = $crud->index($filteringParameters, $sortParameters, $includePaths, $pagingParameters);
+        $data = $crud
+            ->withFilters($filters)
+            ->combineWithAnd()
+            ->withSorts($sortParameters)
+            ->withIncludes($includePaths)
+            ->withPaging($pagingOffset, $pagingSize)
+            ->index();
 
         $this->assertNotEmpty($data->getData());
         $this->assertCount($pagingSize, $data->getData());
@@ -509,31 +467,24 @@ class CrudTest extends TestCase
         $this->assertTrue($data->isCollection());
         $this->assertEquals($pagingOffset, $data->getOffset());
         $this->assertEquals($pagingSize, $data->getLimit());
-
-        return [$data, $filteringParameters, $sortParameters, $includePaths, $pagingParameters];
     }
 
     /**
      * Test index.
      */
-    public function testIndexDefaultFilteringOperationOnRelationship()
+    public function testIndexFilterOperationOnRelationship()
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $pagingOffset     = 0;
-        $pagingSize       = 20;
-        $pagingParameters = [
-            PaginationStrategyInterface::PARAM_PAGING_SKIP => $pagingOffset,
-            PaginationStrategyInterface::PARAM_PAGING_SIZE => $pagingSize,
+        $pagingOffset = 0;
+        $pagingSize   = 20;
+        $filters      = [
+            Post::FIELD_ID_USER => [
+                FilterParameterInterface::OPERATION_IN => [2, 4],
+            ],
         ];
 
-        $filteringParameters = new FilterParameterCollection();
-        $value               = '2,4';
-        $filteringParameters->add(
-            new FilterParameter(PostSchema::REL_USER, Post::REL_USER, null, $value, RelationshipTypes::BELONGS_TO)
-        );
-
-        $data = $crud->index($filteringParameters, null, null, $pagingParameters);
+        $data = $crud->withFilters($filters)->withPaging($pagingOffset, $pagingSize)->index();
 
         $this->assertCount(6, $data->getData());
     }
@@ -557,56 +508,36 @@ class CrudTest extends TestCase
     }
 
     /**
-     * Test index.
-     */
-    public function testIndexResources()
-    {
-        // check that API returns comments from only specific user (as configured in Comments API)
-        $expectedUserId = 1;
-
-        $crud = $this->createCrud(CommentsApi::class);
-
-        $this->assertNotEmpty($comments = $crud->indexResources());
-        $this->assertCount(20, $comments);
-        foreach ($comments as $comment) {
-            $this->assertEquals($expectedUserId, $comment->{Comment::FIELD_ID_USER});
-        }
-    }
-
-    /**
      * Test read relationship.
      */
     public function testReadRelationship()
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $relType1         = RelationshipTypes::BELONGS_TO;
-        $sortParameters   = [
-            $this->createSortParameter(CommentSchema::REL_USER, Comment::REL_USER, false, true, $relType1),
-            $this->createSortParameter(CommentSchema::ATTR_TEXT, Comment::FIELD_TEXT, true),
+        $pagingOffset   = 1;
+        $pagingSize     = 2;
+        $postFilters    = [
+            Post::FIELD_ID => [
+                FilterParameterInterface::OPERATION_EQUALS => [1],
+            ],
         ];
-        $pagingOffset     = 1;
-        $pagingSize       = 2;
-        $pagingParameters = [
-            PaginationStrategyInterface::PARAM_PAGING_SKIP => $pagingOffset,
-            PaginationStrategyInterface::PARAM_PAGING_SIZE => $pagingSize,
+        $commentFilters = [
+            Comment::FIELD_ID_USER => [
+                FilterParameterInterface::OPERATION_LESS_THAN => [5],
+            ],
+            Comment::FIELD_TEXT    => [
+                FilterParameterInterface::OPERATION_LIKE => ['%'],
+            ],
         ];
-        $relType2         = RelationshipTypes::BELONGS_TO;
-        $filterParameters = new FilterParameterCollection();
-        $filterParameters->add(
-            new FilterParameter(CommentSchema::REL_USER, Comment::REL_USER, null, ['lt' => '5'], $relType2)
-        );
-        $filterParameters->add(
-            new FilterParameter(CommentSchema::ATTR_TEXT, null, Comment::FIELD_TEXT, ['like' => '%'])
-        );
+        $commentSorts   = [
+            Comment::FIELD_ID_USER => false,
+            Comment::FIELD_TEXT    => true,
+        ];
 
-        $data = $crud->readRelationship(
-            1,
-            Post::REL_COMMENTS,
-            $filterParameters,
-            $sortParameters,
-            $pagingParameters
-        );
+        $data = $crud
+            ->withFilters($postFilters)
+            ->withPaging($pagingOffset, $pagingSize)
+            ->readRelationship(Post::REL_COMMENTS, $commentFilters, $commentSorts);
 
         $this->assertNotEmpty($data->getData());
         $this->assertCount($pagingSize, $data->getData());
@@ -624,12 +555,13 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(UsersApi::class);
 
-        $filteringParameters = new FilterParameterCollection();
-        $filteringParameters->add(
-            new FilterParameter(UserSchema::ATTR_IS_ACTIVE, null, User::FIELD_IS_ACTIVE, ['eq' => '1'])
-        );
+        $filters = [
+            User::FIELD_IS_ACTIVE => [
+                FilterParameterInterface::OPERATION_EQUALS => [true],
+            ],
+        ];
 
-        $data  = $crud->index($filteringParameters);
+        $data  = $crud->withFilters($filters)->index();
         $users = $data->getData();
         $this->assertNotEmpty($users);
 
@@ -647,47 +579,19 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $index               = 2;
-        $filteringParameters = new FilterParameterCollection();
-        $filteringParameters->add(
-            new FilterParameter(PostSchema::RESOURCE_ID, null, Post::FIELD_ID, ['eq' => $index])
-        );
+        $index   = 2;
+        $filters = [
+            Post::FIELD_ID => [
+                FilterParameterInterface::OPERATION_EQUALS => [$index],
+            ],
+        ];
 
-        $data = $crud->index($filteringParameters);
+        $data = $crud->withFilters($filters)->index();
 
         $this->assertNotEmpty($data->getData());
         $this->assertCount(1, $data->getData());
         $this->assertEquals($index, $data->getData()[0]->{Post::FIELD_ID});
         $this->assertTrue($data->isCollection());
-    }
-
-    /**
-     * Test index
-     */
-    public function testIndexWithInvalidPrimaryFilters()
-    {
-        $crud = $this->createCrud(PostsApi::class);
-
-        $relType             = RelationshipTypes::BELONGS_TO;
-        $filteringParameters = new FilterParameterCollection();
-        $filteringParameters->add(
-            new FilterParameter(PostSchema::REL_USER, Post::REL_USER, null, ['CCC' => '5'], $relType)
-        );
-
-        $exception = null;
-        $gotError  = false;
-        try {
-            $crud->index($filteringParameters);
-        } catch (JsonApiException $exception) {
-            $gotError = true;
-        }
-
-        $this->assertTrue($gotError);
-        $errors = $exception->getErrors();
-        $this->assertCount(1, $errors);
-
-        $this->assertEquals('user-relationship', $errors[0]->getSource()[ErrorInterface::SOURCE_PARAMETER]);
-        $this->assertEquals('ccc', $errors[0]->getDetail());
     }
 
     /**
@@ -697,7 +601,7 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $row = $crud->readRow(1);
+        $row = $crud->withIndexFilter(1)->fetchRow();
 
         $this->assertTrue(is_int($row[Post::FIELD_ID_BOARD]));
         $this->assertTrue(is_string($row[Post::FIELD_TEXT]));
@@ -710,16 +614,16 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $filteringParameters = new FilterParameterCollection();
-        $filteringParameters->add(
-            new FilterParameter(PostSchema::ATTR_TITLE, null, Post::FIELD_TITLE, ['like' => ['%', '%']])
-        );
-        $relationshipType = RelationshipTypes::BELONGS_TO;
-        $filteringParameters->add(
-            new FilterParameter(PostSchema::REL_USER, Post::REL_USER, null, ['lt' => '5'], $relationshipType)
-        );
+        $filters = [
+            Post::FIELD_ID_USER => [
+                FilterParameterInterface::OPERATION_LESS_THAN => ['5'],
+            ],
+            Post::FIELD_TITLE   => [
+                FilterParameterInterface::OPERATION_LIKE => ['%'],
+            ],
+        ];
 
-        $result = $crud->count($filteringParameters);
+        $result = $crud->withFilters($filters)->count();
 
         $this->assertEquals(14, $result);
     }
@@ -748,12 +652,6 @@ class CrudTest extends TestCase
         $container[Connection::class]                = $this->connection = $this->initDb();
         $container[FactoryInterface::class]          = $factory = new Factory($container);
         $container[ModelSchemeInfoInterface::class]  = $modelSchemes = $this->getModelSchemes();
-        $container[RepositoryInterface::class]       = $factory->createRepository(
-            $this->connection,
-            $modelSchemes,
-            new FilterOperations($container),
-            $formatterFactory->createFormatter(Messages::RESOURCES_NAMESPACE)
-        );
 
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(
             self::DEFAULT_PAGE,
@@ -763,27 +661,5 @@ class CrudTest extends TestCase
         $crud = new $class($container);
 
         return $crud;
-    }
-
-    /**
-     * @param string   $originalName
-     * @param string   $name
-     * @param bool     $isAscending
-     * @param bool     $isRelationship
-     * @param null|int $relationshipType
-     *
-     * @return SortParameterInterface
-     */
-    private function createSortParameter(
-        $originalName,
-        $name,
-        $isAscending,
-        $isRelationship = false,
-        $relationshipType = null
-    ) {
-        $sortParam = new JsonLibrarySortParameter($originalName, $isAscending);
-        $result    = new SortParameter($sortParam, $name, $isRelationship, $relationshipType);
-
-        return $result;
     }
 }

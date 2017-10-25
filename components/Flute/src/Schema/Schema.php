@@ -99,6 +99,10 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
         $mappings   = static::getMappings();
         if (array_key_exists(static::SCHEMA_ATTRIBUTES, $mappings) === true) {
             $attrMappings = $mappings[static::SCHEMA_ATTRIBUTES];
+
+            // `id` is a `special` attribute and cannot be included in JSON API resource
+            unset($attrMappings[static::RESOURCE_ID]);
+
             foreach ($attrMappings as $jsonAttrName => $modelAttrName) {
                 $attributes[$jsonAttrName] = isset($model->{$modelAttrName}) === true ? $model->{$modelAttrName} : null;
             }
@@ -111,6 +115,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      * @inheritdoc
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function getRelationships($model, $isPrimary, array $includeRelationships)
     {
@@ -141,7 +146,6 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
                         $isShowAsLink = property_exists($model, $fkName) === false;
 
                         if ($isShowAsLink === false) {
-
                             // show as identity (type, id)
 
                             $identity       = null;

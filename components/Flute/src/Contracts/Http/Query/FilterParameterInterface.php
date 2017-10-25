@@ -21,43 +21,57 @@
  */
 interface FilterParameterInterface
 {
-    /**
-     * @return string|null
-     */
-    public function getRelationshipName(): ?string;
+    /** Filter operation */
+    public const OPERATION_EQUALS = 0;
+
+    /** Filter operation */
+    public const OPERATION_NOT_EQUALS = self::OPERATION_EQUALS + 1;
+
+    /** Filter operation */
+    public const OPERATION_LESS_THAN = self::OPERATION_NOT_EQUALS + 1;
+
+    /** Filter operation */
+    public const OPERATION_LESS_OR_EQUALS = self::OPERATION_LESS_THAN + 1;
+
+    /** Filter operation */
+    public const OPERATION_GREATER_THAN = self::OPERATION_LESS_OR_EQUALS + 1;
+
+    /** Filter operation */
+    public const OPERATION_GREATER_OR_EQUALS = self::OPERATION_GREATER_THAN + 1;
+
+    /** Filter operation */
+    public const OPERATION_LIKE = self::OPERATION_GREATER_OR_EQUALS + 1;
+
+    /** Filter operation */
+    public const OPERATION_NOT_LIKE = self::OPERATION_LIKE + 1;
+
+    /** Filter operation */
+    public const OPERATION_IN = self::OPERATION_NOT_LIKE + 1;
+
+    /** Filter operation */
+    public const OPERATION_NOT_IN = self::OPERATION_IN + 1;
+
+    /** Filter operation */
+    public const OPERATION_IS_NULL = self::OPERATION_NOT_IN + 1;
+
+    /** Filter operation */
+    public const OPERATION_IS_NOT_NULL = self::OPERATION_IS_NULL + 1;
+
+    /** Filter operation */
+    public const OPERATION_LAST = self::OPERATION_IS_NOT_NULL;
 
     /**
-     * @return string|null
+     * @return AttributeInterface
      */
-    public function getAttributeName(): ?string;
+    public function getAttribute(): AttributeInterface;
 
     /**
-     * @return string
+     * @return RelationshipInterface|null
      */
-    public function getOriginalName(): string;
+    public function getRelationship(): ?RelationshipInterface;
 
     /**
-     * @return mixed
+     * @return iterable
      */
-    public function getValue();
-
-    /**
-     * @return bool
-     */
-    public function isForAttribute(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isForRelationship(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isForAttributeInRelationship(): bool;
-
-    /**
-     * @return int|null
-     */
-    public function getRelationshipType(): ?int;
+    public function getOperationsWithArguments(): iterable;
 }

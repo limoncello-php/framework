@@ -47,6 +47,25 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     /**
      * @inheritdoc
      */
+    public function hasRelationshipSchema(string $schemaClass, string $relationshipName): bool
+    {
+        assert(
+            class_exists($schemaClass) === true &&
+            in_array(SchemaInterface::class, class_implements($schemaClass)) === true
+        );
+
+        /** @var SchemaInterface $schemaClass */
+
+        $hasRel = $schemaClass::getMappings()[SchemaInterface::SCHEMA_RELATIONSHIPS][$relationshipName] ?? false;
+
+        assert($hasRel === false || $this->getRelationshipSchema($schemaClass, $relationshipName) !== null);
+
+        return $hasRel !== false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getRelationshipSchema(string $schemaClass, string $relationshipName): SchemaInterface
     {
         assert(

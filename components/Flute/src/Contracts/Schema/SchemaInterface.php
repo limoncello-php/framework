@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaProviderInterface;
 
 /**
@@ -28,6 +29,12 @@ interface SchemaInterface extends SchemaProviderInterface
 
     /** Model class name */
     const MODEL = null;
+
+    /** Attribute name */
+    const RESOURCE_ID = DocumentInterface::KEYWORD_ID;
+
+    /** Attribute name */
+    const RESOURCE_TYPE = DocumentInterface::KEYWORD_TYPE;
 
     /** Mapping key */
     const SCHEMA_ATTRIBUTES = 0;

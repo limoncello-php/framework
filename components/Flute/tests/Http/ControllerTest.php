@@ -21,17 +21,17 @@ use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Flute\Adapters\FilterOperations;
 use Limoncello\Flute\Adapters\PaginationStrategy;
-use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
-use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
+use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
+use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\L10n\Messages;
+use Limoncello\Flute\Http\Query\ParametersMapper;
+use Limoncello\Flute\Http\Query\QueryParser;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\Execution\JsonApiValidatorFactory;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
@@ -59,6 +59,7 @@ use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Uri;
 
@@ -146,13 +147,13 @@ class ControllerTest extends TestCase
         $queryParams = [
             'filter'  => [
                 CommentSchema::RESOURCE_ID => [
-                    'in' => ['10', '11', '15', '17', '21'],
+                    'in' => '10,11,15,17,21',
                 ],
                 CommentSchema::ATTR_TEXT   => [
                     'like' => '%',
                 ],
                 CommentSchema::REL_POST    => [
-                    'in' => ['8', '11', '15'],
+                    'in' => '8,11,15',
                 ],
             ],
             'sort'    => CommentSchema::REL_POST,
@@ -195,7 +196,7 @@ class ControllerTest extends TestCase
             'filter' => [
                 'or' => [
                     CommentSchema::RESOURCE_ID => [
-                        'in' => ['10', '11',],
+                        'in' => '10,11',
                     ],
                     // ID 11 has 'quo' in 'text' and we will check it won't be returned twice
                     CommentSchema::ATTR_TEXT   => [
@@ -242,7 +243,7 @@ class ControllerTest extends TestCase
             'filter' => [
                 'or'  => [
                     CommentSchema::RESOURCE_ID => [
-                        'in' => ['10', '11',],
+                        'in' => '10,11',
                     ],
                 ],
                 'xxx' => 'only one top-level element is allowed if AND/OR is used',
@@ -264,7 +265,7 @@ class ControllerTest extends TestCase
 
         $errors = $exception->getErrors();
         $this->assertCount(1, $errors);
-        $this->assertEquals(['parameter' => 'xxx'], $errors[0]->getSource());
+        $this->assertEquals(['parameter' => 'filter'], $errors[0]->getSource());
     }
 
     /**
@@ -274,7 +275,11 @@ class ControllerTest extends TestCase
     {
         $routeParams = [];
         $queryParams = [
-            'filter'  => ['aaa' => ['in' => ['10', '11']]],
+            'filter'  => [
+                'aaa' => [
+                    'in' => '10,11',
+                ],
+            ],
             'sort'    => 'bbb',
             'include' => 'ccc',
         ];
@@ -292,10 +297,8 @@ class ControllerTest extends TestCase
         }
         $this->assertNotNull($exception);
 
-        $this->assertCount(3, $errors = $exception->getErrors());
+        $this->assertCount(1, $errors = $exception->getErrors());
         $this->assertEquals(['parameter' => 'aaa'], $errors[0]->getSource());
-        $this->assertEquals(['parameter' => 'bbb'], $errors[1]->getSource());
-        $this->assertEquals(['parameter' => 'ccc'], $errors[2]->getSource());
     }
 
     /**
@@ -459,10 +462,10 @@ class ControllerTest extends TestCase
         $queryParams = [
             'filter' => [
                 CommentSchema::RESOURCE_ID  => [
-                    'in' => ['2', '3', '4'],
+                    'in' => '2,3,4',
                 ],
                 CommentSchema::REL_EMOTIONS => [
-                    'in' => ['2', '3', '4'],
+                    'in' => '2,3,4',
                 ],
             ],
         ];
@@ -557,7 +560,7 @@ EOT;
      */
     public function testReadWithoutParameters()
     {
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => '2'];
+        $routeParams = [CommentsController::ROUTE_KEY_INDEX => '10'];
         $container   = $this->createContainer();
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
@@ -574,11 +577,11 @@ EOT;
         $resource = json_decode($body, true)[DocumentInterface::KEYWORD_DATA];
 
         $this->assertEquals('comments', $resource['type']);
-        $this->assertEquals('2', $resource['id']);
+        $this->assertEquals('10', $resource['id']);
         $this->assertEquals([
-            'user-relationship'     => ['data' => ['type' => 'users', 'id' => '5']],
-            'post-relationship'     => ['data' => ['type' => 'posts', 'id' => '18']],
-            'emotions-relationship' => ['links' => ['self' => '/comments/2/relationships/emotions-relationship']],
+            'user-relationship'     => ['data' => ['type' => 'users', 'id' => '1']],
+            'post-relationship'     => ['data' => ['type' => 'posts', 'id' => '1']],
+            'emotions-relationship' => ['links' => ['self' => '/comments/10/relationships/emotions-relationship']],
         ], $resource['relationships']);
     }
 
@@ -588,7 +591,7 @@ EOT;
     public function testUpdate()
     {
         $text      = 'Some comment text';
-        $index     = '1';
+        $index     = '10';
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -822,10 +825,10 @@ EOT;
 
         $this->assertCount(4, $resource[DocumentInterface::KEYWORD_DATA]);
         // manually checked that emotions should have these ids and sorted by name in ascending order.
-        $this->assertEquals('4', $resource['data'][0]['id']);
-        $this->assertEquals('5', $resource['data'][1]['id']);
-        $this->assertEquals('3', $resource['data'][2]['id']);
-        $this->assertEquals('2', $resource['data'][3]['id']);
+        $this->assertEquals('2', $resource['data'][0]['id']);
+        $this->assertEquals('3', $resource['data'][1]['id']);
+        $this->assertEquals('4', $resource['data'][2]['id']);
+        $this->assertEquals('5', $resource['data'][3]['id']);
     }
 
     /**
@@ -856,10 +859,10 @@ EOT;
 
         $this->assertCount(4, $resource[DocumentInterface::KEYWORD_DATA]);
         // manually checked that emotions should have these ids and sorted by name in ascending order.
-        $this->assertEquals('4', $resource['data'][0]['id']);
-        $this->assertEquals('5', $resource['data'][1]['id']);
-        $this->assertEquals('3', $resource['data'][2]['id']);
-        $this->assertEquals('2', $resource['data'][3]['id']);
+        $this->assertEquals('2', $resource['data'][0]['id']);
+        $this->assertEquals('3', $resource['data'][1]['id']);
+        $this->assertEquals('4', $resource['data'][2]['id']);
+        $this->assertEquals('5', $resource['data'][3]['id']);
 
         // check we have only IDs in response (no attributes)
         $this->assertArrayNotHasKey(DocumentInterface::KEYWORD_ATTRIBUTES, $resource['data'][0]);
@@ -1049,7 +1052,7 @@ EOT;
         $queryParams = [
             'filter' => [
                 CommentSchema::REL_POST . '.' . PostSchema::ATTR_TEXT => [
-                    'like' => ["%$seldomWord%"],
+                    'like' => "%$seldomWord%",
                 ],
             ],
         ];
@@ -1084,7 +1087,7 @@ EOT;
         $queryParams = [
             'filter' => [
                 CommentSchema::REL_EMOTIONS . '.' . EmotionSchema::ATTR_NAME => [
-                    'like' => ["%$seldomWord%"],
+                    'like' => "%$seldomWord%",
                 ],
             ],
         ];
@@ -1130,15 +1133,16 @@ EOT;
 
         $container[JsonSchemesInterface::class] = $jsonSchemes = $this->getJsonSchemes($factory, $modelSchemes);
 
+        $container[QueryParserInterface::class] = function (PsrContainerInterface $container) {
+            return new QueryParser($container->get(PaginationStrategyInterface::class));
+        };
+
+        $container[ParametersMapperInterface::class] = function (PsrContainerInterface $container) {
+            return new ParametersMapper($container->get(JsonSchemesInterface::class));
+        };
+
         $container[Connection::class]                  = $connection = $this->initDb();
-        $container[FilterOperationsInterface::class]   = $filterOperations = new FilterOperations($container);
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(10, 100);
-        $container[RepositoryInterface::class]         = $repository = $factory->createRepository(
-            $connection,
-            $modelSchemes,
-            $filterOperations,
-            $formatterFactory->createFormatter(Messages::RESOURCES_NAMESPACE)
-        );
         $container[SettingsProviderInterface::class]   = new SettingsProvider([
             FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
         ]);

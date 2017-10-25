@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Limoncello\Flute\Adapters\ModelQueryBuilder;
+use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 
 /**
@@ -34,7 +35,7 @@ class CommentsApi extends AppCrud
     /**
      * @inheritdoc
      */
-    protected function builderOnIndex(QueryBuilder $builder): QueryBuilder
+    protected function builderOnIndex(ModelQueryBuilder $builder): ModelQueryBuilder
     {
         $builder = parent::builderOnIndex($builder);
 
@@ -42,11 +43,12 @@ class CommentsApi extends AppCrud
             // suppose we want to limit API `index` method to only comments of current user
             // we can extend builder here
 
-            $table     = Comment::TABLE_NAME;
-            $column    = Comment::FIELD_ID_USER;
             $curUserId = 1;
-
-            $builder->andWhere("`$table`.`$column` = " . $builder->createNamedParameter($curUserId));
+            $builder->addFiltersWithAndToAlias([
+                Comment::FIELD_ID_USER => [
+                    FilterParameterInterface::OPERATION_EQUALS => [$curUserId],
+                ],
+            ]);
         }
 
         return $builder;
@@ -55,13 +57,19 @@ class CommentsApi extends AppCrud
     /**
      * @inheritdoc
      */
-    public function create($index, array $attributes, array $toMany = []): string
+    public function create($index, iterable $attributes, iterable $toMany): string
     {
         // suppose we want to create comments using current user as an author.
-        $curUserId = 1;
+        $updatedAttributes = function () use ($attributes) {
+            $curUserId = 1;
+            foreach ($attributes as $attribute => $value) {
+                if ($attribute !== Comment::FIELD_ID_USER) {
+                    yield $attribute => $value;
+                }
+            }
+            yield Comment::FIELD_ID_USER => $curUserId;
+        };
 
-        $attributes[Comment::FIELD_ID_USER] = $curUserId;
-
-        return parent::create($index, $attributes, $toMany);
+        return parent::create($index, $updatedAttributes(), $toMany);
     }
 }

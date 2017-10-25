@@ -60,6 +60,7 @@ class CommentSchema extends BaseSchema
     {
         return [
             self::SCHEMA_ATTRIBUTES => [
+                self::RESOURCE_ID     => Model::FIELD_ID,
                 self::ATTR_TEXT       => Model::FIELD_TEXT,
                 self::ATTR_INT        => Model::FIELD_INT,
                 self::ATTR_FLOAT      => Model::FIELD_FLOAT,

@@ -16,18 +16,25 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Schema\SchemaInterface;
+
 /**
  * @package Limoncello\Flute
  */
-interface IncludeParameterInterface
+interface AttributeInterface
 {
     /**
-     * @return string[]
+     * @return string
      */
-    public function getPath(): array;
+    public function getNameInScheme(): string;
 
     /**
      * @return string
      */
-    public function getOriginalPath(): string;
+    public function getNameInModel(): string;
+
+    /**
+     * @return SchemaInterface
+     */
+    public function getScheme(): SchemaInterface;
 }

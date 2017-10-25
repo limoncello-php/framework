@@ -19,10 +19,8 @@
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
-use Limoncello\Contracts\L10n\FormatterInterface;
-use Limoncello\Flute\Adapters\Repository;
-use Limoncello\Flute\Contracts\Adapters\FilterOperationsInterface;
-use Limoncello\Flute\Contracts\Adapters\RepositoryInterface;
+use Limoncello\Flute\Adapters\ModelQueryBuilder;
+use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
@@ -76,6 +74,17 @@ class Factory implements FactoryInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function createModelQueryBuilder(
+        Connection $connection,
+        string $modelClass,
+        ModelSchemeInfoInterface $modelSchemes
+    ): ModelQueryBuilder {
+        return new ModelQueryBuilder($connection, $modelClass, $modelSchemes);
+    }
+
+    /**
      * @param mixed $data
      *
      * @return PaginatedDataInterface
@@ -112,18 +121,6 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createRepository(
-        Connection $connection,
-        ModelSchemeInfoInterface $modelSchemes,
-        FilterOperationsInterface $filterOperations,
-        FormatterInterface $fluteMsgFormatter
-    ): RepositoryInterface {
-        return new Repository($connection, $modelSchemes, $filterOperations, $fluteMsgFormatter);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function createJsonSchemes(array $schemes, ModelSchemeInfoInterface $modelSchemes): JsonSchemesInterface
     {
         return new JsonSchemes($this->getJsonApiFactory(), $schemes, $modelSchemes);
@@ -142,7 +139,7 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createApi(string $apiClass)
+    public function createApi(string $apiClass): CrudInterface
     {
         $api = new $apiClass($this->getContainer());
 

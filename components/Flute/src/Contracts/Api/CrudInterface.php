@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Http\Query\IncludeParameterInterface;
-use Limoncello\Flute\Contracts\Http\Query\SortParameterInterface;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
-use Limoncello\Flute\Http\Query\FilterParameterCollection;
 
 /**
  * @package Limoncello\Flute
@@ -27,89 +25,145 @@ use Limoncello\Flute\Http\Query\FilterParameterCollection;
 interface CrudInterface
 {
     /**
-     * @param FilterParameterCollection|null   $filterParams
-     * @param SortParameterInterface[]|null    $sortParams
-     * @param IncludeParameterInterface[]|null $includePaths
-     * @param int[]|null                       $pagingParams
+     * @return self
+     */
+    public function combineWithAnd(): self;
+
+    /**
+     * @return self
+     */
+    public function combineWithOr(): self;
+
+    /**
+     * @param iterable $filterParameters
+     *
+     * @return self
+     */
+    public function withFilters(iterable $filterParameters): self;
+
+    /**
+     * @param string|int $index
+     *
+     * @return self
+     */
+    public function withIndexFilter($index): self;
+
+    /**
+     * @param iterable $sortingParameters
+     *
+     * @return self
+     */
+    public function withSorts(iterable $sortingParameters): self;
+
+    /**
+     * @param iterable $includePaths
+     *
+     * @return self
+     */
+    public function withIncludes(iterable $includePaths): self;
+
+    /**
+     * @param int $offset
+     * @param int $limit
+     *
+     * @return self
+     */
+    public function withPaging(int $offset, int $limit): self;
+
+    /**
+     * @param string   $name
+     * @param iterable $filters
+     *
+     * @return CrudInterface
+     */
+    public function withRelationshipFilters(string $name, iterable $filters): self;
+
+    /**
+     * @param string   $name
+     * @param iterable $sorts
+     *
+     * @return CrudInterface
+     */
+    public function withRelationshipSorts(string $name, iterable $sorts): self;
+
+    /**
+     * @return QueryBuilder
+     */
+    public function getIndexBuilder(): QueryBuilder;
+
+    /**
+     * @return QueryBuilder
+     */
+    public function getDeleteBuilder(): QueryBuilder;
+
+    /**
+     * @param QueryBuilder|null $builder
+     * @param string|null       $modelClass
      *
      * @return PaginatedDataInterface
      */
-    public function index(
-        FilterParameterCollection $filterParams = null,
-        array $sortParams = null,
-        array $includePaths = null,
-        array $pagingParams = null
-    ): PaginatedDataInterface;
+    public function fetchResources(QueryBuilder $builder = null, string $modelClass = null): PaginatedDataInterface;
 
     /**
-     * @param FilterParameterCollection|null $filterParams
-     * @param array|null                     $sortParams
-     *
-     * @return array
-     */
-    public function indexResources(FilterParameterCollection $filterParams = null, array $sortParams = null): array;
-
-    /**
-     * @param int|string                     $index
-     * @param FilterParameterCollection|null $filterParams
-     * @param array|null                     $includePaths
+     * @param QueryBuilder|null $builder
+     * @param string|null       $modelClass
      *
      * @return PaginatedDataInterface
      */
-    public function read(
-        $index,
-        FilterParameterCollection $filterParams = null,
-        array $includePaths = null
-    ): PaginatedDataInterface;
+    public function fetchResource(QueryBuilder $builder = null, string $modelClass = null): PaginatedDataInterface;
 
     /**
-     * @param int|string                     $index
-     * @param FilterParameterCollection|null $filterParams
+     * @param QueryBuilder|null $builder
+     * @param string|null       $modelClass
      *
-     * @return mixed|null
+     * @return array|null
      */
-    public function readResource($index, FilterParameterCollection $filterParams = null);
+    public function fetchRow(QueryBuilder $builder = null, string $modelClass = null): ?array;
 
     /**
-     * @param int|string $index
-     *
+     * @return PaginatedDataInterface
+     */
+    public function index(): PaginatedDataInterface;
+
+    /**
+     * @return int|null
+     */
+    public function count(): ?int;
+
+    /**
      * @return int
      */
-    public function delete($index): int;
+    public function delete(): int;
 
     /**
      * @param null|string $index
-     * @param array       $attributes
-     * @param array       $toMany
+     * @param iterable    $attributes
+     * @param iterable    $toMany
      *
      * @return string
      */
-    public function create($index, array $attributes, array $toMany = []): string;
+    public function create($index, iterable $attributes, iterable $toMany): string;
 
     /**
      * @param int|string $index
-     * @param array      $attributes
-     * @param array      $toMany
+     * @param iterable   $attributes
+     * @param iterable   $toMany
      *
      * @return int
      */
-    public function update($index, array $attributes, array $toMany = []): int;
+    public function update($index, iterable $attributes, iterable $toMany): int;
 
     /**
-     * @param int|string                     $index
-     * @param string                         $relationshipName
-     * @param FilterParameterCollection|null $filterParams
-     * @param array|null                     $sortParams
-     * @param array|null                     $pagingParams
+     * @param string        $name
+     * @param iterable|null $relationshipFilters
+     * @param iterable|null $relationshipSorts
      *
      * @return PaginatedDataInterface
      */
     public function readRelationship(
-        $index,
-        string $relationshipName,
-        FilterParameterCollection $filterParams = null,
-        array $sortParams = null,
-        array $pagingParams = null
+        string $name,
+        iterable $relationshipFilters = null,
+        iterable $relationshipSorts = null
     ): PaginatedDataInterface;
 
     /**
@@ -120,18 +174,4 @@ interface CrudInterface
      * @return bool
      */
     public function hasInRelationship($parentId, string $name, $childId): bool;
-
-    /**
-     * @param int|string $index
-     *
-     * @return array|null
-     */
-    public function readRow($index): ?array;
-
-    /**
-     * @param FilterParameterCollection|null $filterParams
-     *
-     * @return int|null
-     */
-    public function count(FilterParameterCollection $filterParams = null): ?int;
 }

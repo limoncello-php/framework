@@ -28,13 +28,12 @@ class StringPKModelApi extends AppCrud
     /**
      * @inheritdoc
      */
-    protected function filterAttributesOnCreate(string $modelClass, array $attributes, string $index = null): array
+    protected function filterAttributesOnCreate(?string $index, iterable $attributes): iterable
     {
-        $allowedChanges = parent::filterAttributesOnCreate($modelClass, $attributes, $index);
-
-        // unset created_at as we don't have such column
-        unset($allowedChanges[StringPKModel::FIELD_CREATED_AT]);
-
-        return $allowedChanges;
+        foreach (parent::filterAttributesOnCreate($index, $attributes) as $attribute => $value) {
+            if ($attribute !== StringPKModel::FIELD_CREATED_AT) {
+                yield $attribute => $value;
+            }
+        }
     }
 }

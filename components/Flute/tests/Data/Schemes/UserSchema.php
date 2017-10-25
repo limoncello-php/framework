@@ -63,6 +63,7 @@ class UserSchema extends BaseSchema
     {
         return [
             self::SCHEMA_ATTRIBUTES => [
+                self::RESOURCE_ID     => Model::FIELD_ID,
                 self::ATTR_TITLE      => Model::FIELD_TITLE,
                 self::ATTR_FIRST_NAME => Model::FIELD_FIRST_NAME,
                 self::ATTR_LAST_NAME  => Model::FIELD_LAST_NAME,

@@ -45,6 +45,7 @@ class CategorySchema extends BaseSchema
     {
         return [
             self::SCHEMA_ATTRIBUTES => [
+                self::RESOURCE_ID     => Model::FIELD_ID,
                 self::ATTR_NAME       => Model::FIELD_NAME,
                 self::ATTR_CREATED_AT => Model::FIELD_CREATED_AT,
                 self::ATTR_UPDATED_AT => Model::FIELD_UPDATED_AT,

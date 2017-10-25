@@ -27,6 +27,14 @@ interface JsonSchemesInterface extends ContainerInterface
      * @param string $schemaClass
      * @param string $relationshipName
      *
+     * @return bool
+     */
+    public function hasRelationshipSchema(string $schemaClass, string $relationshipName): bool;
+
+    /**
+     * @param string $schemaClass
+     * @param string $relationshipName
+     *
      * @return SchemaInterface
      */
     public function getRelationshipSchema(string $schemaClass, string $relationshipName): SchemaInterface;

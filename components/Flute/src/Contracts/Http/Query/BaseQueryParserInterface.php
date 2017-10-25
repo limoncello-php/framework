@@ -19,25 +19,29 @@
 /**
  * @package Limoncello\Flute
  */
-interface SortParameterInterface
+interface BaseQueryParserInterface
 {
-    /**
-     * @return AttributeInterface
-     */
-    public function getAttribute(): AttributeInterface;
+    /** Parameter name */
+    public const PARAM_INCLUDE = 'include';
+
+    /** Parameter name */
+    public const PARAM_FIELDS = 'fields';
+
+    /** Parameter name */
+    public const PARAM_SORT = 'sort';
 
     /**
-     * @return RelationshipInterface|null
+     * @return iterable
      */
-    public function getRelationship(): ?RelationshipInterface;
+    public function getIncludes(): iterable;
 
     /**
-     * @return bool
+     * @return iterable
      */
-    public function isAsc(): bool;
+    public function getFields(): iterable;
 
     /**
-     * @return bool
+     * @return iterable
      */
-    public function isDesc(): bool;
+    public function getSorts(): iterable;
 }

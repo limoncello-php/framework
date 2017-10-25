@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Http\Query;
+<?php namespace Limoncello\Flute\Contracts\Http\Query;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,46 +16,30 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Http\Query\IncludeParameterInterface;
+use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 
 /**
  * @package Limoncello\Flute
  */
-class IncludeParameter implements IncludeParameterInterface
+interface RelationshipInterface
 {
     /**
-     * @var array
+     * @return string
      */
-    private $path;
+    public function getNameInScheme(): string;
 
     /**
-     * @var string
+     * @return string
      */
-    private $originalPath;
+    public function getNameInModel(): string;
 
     /**
-     * @param string $originalPath
-     * @param array  $path
+     * @return SchemaInterface
      */
-    public function __construct(string $originalPath, array $path)
-    {
-        $this->originalPath = $originalPath;
-        $this->path         = $path;
-    }
+    public function getFromSchema(): SchemaInterface;
 
     /**
-     * @inheritdoc
+     * @return SchemaInterface
      */
-    public function getOriginalPath(): string
-    {
-        return $this->originalPath;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPath(): array
-    {
-        return $this->path;
-    }
+    public function getToSchema(): SchemaInterface;
 }

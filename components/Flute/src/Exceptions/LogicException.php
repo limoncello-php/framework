@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Contracts\Http\Query;
+<?php namespace Limoncello\Flute\Exceptions;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,28 +16,11 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Exceptions\LimoncelloExceptionInterface;
+
 /**
  * @package Limoncello\Flute
  */
-interface SortParameterInterface
+class LogicException extends \LogicException implements LimoncelloExceptionInterface
 {
-    /**
-     * @return AttributeInterface
-     */
-    public function getAttribute(): AttributeInterface;
-
-    /**
-     * @return RelationshipInterface|null
-     */
-    public function getRelationship(): ?RelationshipInterface;
-
-    /**
-     * @return bool
-     */
-    public function isAsc(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isDesc(): bool;
 }

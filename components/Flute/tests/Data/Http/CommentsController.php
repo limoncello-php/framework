@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Tests\Flute\Data\Api\CommentsApi as Api;
+use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\RuleSets\CreateCommentRuleSet;
 use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateCommentRuleSet;
@@ -55,7 +56,7 @@ class CommentsController extends BaseController
     ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
-        return static::readRelationship($index, Schema::REL_EMOTIONS, $container, $request);
+        return static::readRelationship($index, Comment::REL_EMOTIONS, $container, $request);
     }
 
     /**
@@ -72,7 +73,7 @@ class CommentsController extends BaseController
     ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
-        return static::readRelationshipIdentifiers($index, Schema::REL_EMOTIONS, $container, $request);
+        return static::readRelationshipIdentifiers($index, Comment::REL_EMOTIONS, $container, $request);
     }
 
     /**
@@ -89,7 +90,7 @@ class CommentsController extends BaseController
     ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
-        return static::readRelationship($index, Schema::REL_USER, $container, $request);
+        return static::readRelationship($index, Comment::REL_USER, $container, $request);
     }
 
     /**
@@ -106,6 +107,6 @@ class CommentsController extends BaseController
     ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
-        return static::readRelationship($index, Schema::REL_POST, $container, $request);
+        return static::readRelationship($index, Comment::REL_POST, $container, $request);
     }
 }

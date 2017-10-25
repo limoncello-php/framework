@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Http\Query\AttributeInterface;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
+use Limoncello\Flute\Contracts\Http\Query\RelationshipInterface;
 
 /**
  * @package Limoncello\Flute
@@ -24,114 +26,56 @@ use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 class FilterParameter implements FilterParameterInterface
 {
     /**
-     * @var string
+     * @var AttributeInterface
      */
-    private $originalName;
+    private $attribute;
 
     /**
-     * @var string|null
+     * @var RelationshipInterface|null
      */
-    private $relationshipName;
+    private $relationship;
 
     /**
-     * @var string|null
+     * @var iterable
      */
-    private $attributeName;
+    private $operationsWithArguments;
 
     /**
-     * @var mixed
-     */
-    private $value;
-
-    /**
-     * @var int|null
-     */
-    private $relationshipType = null;
-
-    /**
-     * @param string      $originalName
-     * @param string|null $relationshipName
-     * @param string|null $attributeName
-     * @param mixed       $value
-     * @param int|null    $relationshipType
+     * @param AttributeInterface         $attribute
+     * @param iterable                   $operationsWithArgs
+     * @param RelationshipInterface|null $relationship
      */
     public function __construct(
-        string $originalName,
-        string $relationshipName = null,
-        string $attributeName = null,
-        $value = null,
-        int $relationshipType = null
+        AttributeInterface $attribute,
+        iterable $operationsWithArgs,
+        RelationshipInterface $relationship = null
     ) {
-        $this->originalName     = $originalName;
-        $this->relationshipName = $relationshipName;
-        $this->attributeName    = $attributeName;
-        $this->value            = $value;
-        if ($relationshipName !== null) {
-            $this->relationshipType = $relationshipType;
-        }
+        $this->attribute               = $attribute;
+        $this->relationship            = $relationship;
+        $this->operationsWithArguments = $operationsWithArgs;
     }
 
     /**
      * @inheritdoc
      */
-    public function getOriginalName(): string
+    public function getAttribute(): AttributeInterface
     {
-        return $this->originalName;
+        return $this->attribute;
     }
 
     /**
      * @inheritdoc
      */
-    public function getRelationshipName(): ?string
+    public function getRelationship(): ?RelationshipInterface
     {
-        return $this->relationshipName;
+        return $this->relationship;
     }
 
     /**
      * @inheritdoc
      */
-    public function getAttributeName(): ?string
+    public function getOperationsWithArguments(): iterable
     {
-        return $this->attributeName;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isForAttribute(): bool
-    {
-        return $this->getAttributeName() !== null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isForRelationship(): bool
-    {
-        return $this->getRelationshipName() !== null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isForAttributeInRelationship(): bool
-    {
-        return $this->isForAttribute() === true && $this->isForRelationship() === true;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getRelationshipType(): ?int
-    {
-        return $this->relationshipType;
+        return $this->operationsWithArguments;
     }
 }
