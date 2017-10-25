@@ -126,6 +126,13 @@ interface CrudInterface
     public function index(): PaginatedDataInterface;
 
     /**
+     * @param null|string $index
+     *
+     * @return PaginatedDataInterface
+     */
+    public function read($index): PaginatedDataInterface;
+
+    /**
      * @return int|null
      */
     public function count(): ?int;
@@ -134,6 +141,13 @@ interface CrudInterface
      * @return int
      */
     public function delete(): int;
+
+    /**
+     * @param null|string $index
+     *
+     * @return bool
+     */
+    public function remove($index): bool;
 
     /**
      * @param null|string $index
@@ -160,7 +174,22 @@ interface CrudInterface
      *
      * @return PaginatedDataInterface
      */
+    public function indexRelationship(
+        string $name,
+        iterable $relationshipFilters = null,
+        iterable $relationshipSorts = null
+    ): PaginatedDataInterface;
+
+    /**
+     * @param int|string    $index
+     * @param string        $name
+     * @param iterable|null $relationshipFilters
+     * @param iterable|null $relationshipSorts
+     *
+     * @return PaginatedDataInterface
+     */
     public function readRelationship(
+        $index,
         string $name,
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null

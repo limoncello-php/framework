@@ -24,7 +24,6 @@ use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\ControllerInterface;
-use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
@@ -33,7 +32,6 @@ use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorInterface;
 use Limoncello\Flute\Http\Traits\CreateResponsesTrait;
 use Limoncello\Flute\L10n\Messages;
-use Limoncello\Tests\Flute\Data\Models\Model;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
@@ -100,7 +98,7 @@ abstract class BaseController implements ControllerInterface
 
         $api   = static::createApi($container);
         $index = $api->create($index, $attributes, $toMany);
-        $data  = $api->withIndexFilter($index)->fetchResource()->getData();
+        $data  = $api->read($index)->getData();
 
         $response = static::createResponses($container, $request)->getCreatedResponse($data);
 
@@ -490,7 +488,7 @@ abstract class BaseController implements ControllerInterface
         ResponsesInterface $responses,
         $index
     ) {
-        $modelData = $api->withIndexFilter($index)->fetchResource()->getData();
+        $modelData = $api->read($index)->getData();
         $response  = $modelData === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($modelData);
 
@@ -511,17 +509,12 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         QueryParserInterface $parser
     ): PaginatedDataInterface {
-        /** @var SchemaInterface $schemaClass */
-        $schemaClass = static::SCHEMA_CLASS;
-        /** @var Model $modelClass */
-        $modelClass = $schemaClass::MODEL;
-
         $mapper = static::createParameterMapper($container);
         $api    = static::createApi($container);
 
-        $relData    = $mapper->applyQueryParameters($parser, $api)
-            ->withFilters([$modelClass::FIELD_ID => [FilterParameterInterface::OPERATION_EQUALS => [$index]]])
-            ->readRelationship($relationshipName);
+        $relData = $mapper
+            ->applyQueryParameters($parser, $api)
+            ->readRelationship($index, $relationshipName);
 
         return $relData;
     }
@@ -565,7 +558,7 @@ abstract class BaseController implements ControllerInterface
         ServerRequestInterface $request,
         CrudInterface $api
     ): ResponseInterface {
-        $api->withIndexFilter($index)->delete();
+        $api->remove($index);
         $response = static::createResponses($container, $request)->getCodeResponse(204);
 
         return $response;

@@ -728,6 +728,19 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
+    public function read($index): PaginatedDataInterface
+    {
+        $this->withIndexFilter($index);
+
+        $builder = $this->getIndexModelBuilder();
+        $data    = $this->fetchResource($builder, $builder->getModelClass());
+
+        return $data;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function count(): ?int
     {
         $builder = $this
@@ -794,7 +807,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function readRelationship(
+    public function indexRelationship(
         string $name,
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
@@ -811,6 +824,18 @@ class Crud implements CrudInterface
             $this->fetchResources($builder, $modelClass) : $this->fetchResource($builder, $modelClass);
 
         return $data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readRelationship(
+        $index,
+        string $name,
+        iterable $relationshipFilters = null,
+        iterable $relationshipSorts = null
+    ): PaginatedDataInterface {
+        return $this->withIndexFilter($index)->indexRelationship($name, $relationshipFilters, $relationshipSorts);
     }
 
     /**
@@ -835,7 +860,7 @@ class Crud implements CrudInterface
             ->clearBuilderParameters()
             ->clearFetchParameters()
             ->withFilters($parentFilters)
-            ->readRelationship($name, $childFilters);
+            ->indexRelationship($name, $childFilters);
 
         $has = empty($data->getData()) === false;
 
@@ -852,6 +877,14 @@ class Crud implements CrudInterface
         $this->clearFetchParameters();
 
         return (int)$deleted;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function remove($index): bool
+    {
+        return $this->withIndexFilter($index)->delete() > 0;
     }
 
     /**

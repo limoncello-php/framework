@@ -76,7 +76,7 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(PostsApi::class);
 
         $this->assertNotNull($index = $crud->create(null, $attributes, $toMany));
-        $this->assertNotNull($model = $crud->withIndexFilter($index)->fetchResource()->getData());
+        $this->assertNotNull($model = $crud->read($index)->getData());
 
         /** @var Post $model */
 
@@ -86,14 +86,14 @@ class CrudTest extends TestCase
         $this->assertEquals($text, $model->{Post::FIELD_TEXT});
         $this->assertNotEmpty($index = $model->{Post::FIELD_ID});
 
-        $this->assertNotNull($crud->withIndexFilter($index)->fetchResource()->getData());
+        $this->assertNotNull($crud->read($index)->getData());
 
-        $crud->withIndexFilter($index)->delete();
+        $crud->remove($index);
 
-        $this->assertNull($crud->withIndexFilter($index)->fetchResource()->getData());
+        $this->assertNull($crud->read($index)->getData());
 
         // second delete does nothing (already deleted)
-        $crud->withIndexFilter($index)->delete();
+        $crud->remove($index);
     }
 
     /**
@@ -111,21 +111,21 @@ class CrudTest extends TestCase
 
         $this->assertNotNull($index = $crud->create($pk, $attributes, []));
         $this->assertEquals($pk, $index);
-        $this->assertNotNull($model = $crud->withIndexFilter($index)->fetchResource()->getData());
+        $this->assertNotNull($model = $crud->read($index)->getData());
 
         /** @var StringPKModel $model */
 
         $this->assertEquals($pk, $model->{StringPKModel::FIELD_ID});
         $this->assertEquals($name, $model->{StringPKModel::FIELD_NAME});
 
-        $this->assertNotNull($crud->withIndexFilter($index)->fetchResource()->getData());
+        $this->assertNotNull($crud->read($index)->getData());
 
-        $crud->withIndexFilter($index)->delete();
+        $crud->remove($index);
 
-        $this->assertNull($crud->withIndexFilter($index)->fetchResource()->getData());
+        $this->assertNull($crud->read($index)->getData());
 
         // second delete does nothing (already deleted)
-        $crud->withIndexFilter($index)->delete();
+        $crud->remove($index);
     }
 
     /**
@@ -155,7 +155,7 @@ class CrudTest extends TestCase
     {
         $invalidIndex = new stdClass();
 
-        $this->createCrud(CommentsApi::class)->withIndexFilter($invalidIndex)->delete();
+        $this->createCrud(CommentsApi::class)->remove($invalidIndex);
     }
 
     /**
@@ -165,7 +165,7 @@ class CrudTest extends TestCase
     {
         $invalidIndex = new stdClass();
 
-        $this->createCrud(CommentsApi::class)->withIndexFilter($invalidIndex)->fetchResource()->getData();
+        $this->createCrud(CommentsApi::class)->read($invalidIndex)->getData();
     }
 
     /**
@@ -175,7 +175,7 @@ class CrudTest extends TestCase
     {
         $invalidIndex = new stdClass();
 
-        $this->createCrud(CommentsApi::class)->withIndexFilter($invalidIndex)->fetchResource()->getData();
+        $this->createCrud(CommentsApi::class)->read($invalidIndex)->getData();
     }
 
     /**
@@ -218,7 +218,7 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(CommentsApi::class);
 
         $this->assertNotNull($index = $crud->create(null, $attributes, $toMany));
-        $this->assertNotNull($model = $crud->withIndexFilter($index)->fetchResource()->getData());
+        $this->assertNotNull($model = $crud->read($index)->getData());
 
         /** @var Comment $model */
 
@@ -250,7 +250,7 @@ class CrudTest extends TestCase
             [Comment::REL_EMOTIONS],
         ];
         $this->assertNotNull(
-            $comment = $crud->withIncludes($includePaths)->withIndexFilter($index)->fetchResource()->getData()
+            $comment = $crud->withIncludes($includePaths)->read($index)->getData()
         );
         $this->assertEquals(
             $userId,
@@ -290,7 +290,7 @@ class CrudTest extends TestCase
 
         $changedRecords = $crud->update($commentId, $attributes, $toMany);
         $this->assertEquals(3, $changedRecords);
-        $this->assertNotNull($model = $crud->withIndexFilter($commentId)->fetchResource()->getData());
+        $this->assertNotNull($model = $crud->read($commentId)->getData());
 
         /** @var Comment $model */
 
@@ -305,7 +305,7 @@ class CrudTest extends TestCase
             [Comment::REL_EMOTIONS],
         ];
         $this->assertNotNull(
-            $comment = $crud->withIncludes($includePaths)->withIndexFilter($commentId)->fetchResource()->getData()
+            $comment = $crud->withIncludes($includePaths)->read($commentId)->getData()
         );
         $this->assertEquals(
             $userId,
@@ -329,7 +329,7 @@ class CrudTest extends TestCase
     public function testDeleteResourceWithConstraints()
     {
         $crud = $this->createCrud(PostsApi::class);
-        $crud->withIndexFilter(1)->delete();
+        $crud->remove(1);
     }
 
     /**
@@ -347,7 +347,7 @@ class CrudTest extends TestCase
             [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER],
         ];
         $this->assertNotNull(
-            $model = $crud->withIncludes($includePaths)->withIndexFilter($index)->fetchResource()->getData()
+            $model = $crud->withIncludes($includePaths)->read($index)->getData()
         );
 
         $board = $model->{Post::REL_BOARD};
@@ -418,7 +418,7 @@ class CrudTest extends TestCase
         ];
 
         $this->assertNotNull(
-            $model = $crud->withIncludes($includePaths)->withIndexFilter($index)->fetchResource()->getData()
+            $model = $crud->withIncludes($includePaths)->read($index)->getData()
         );
         $this->assertNull($model->{Post::REL_EDITOR});
     }
@@ -537,7 +537,7 @@ class CrudTest extends TestCase
         $data = $crud
             ->withFilters($postFilters)
             ->withPaging($pagingOffset, $pagingSize)
-            ->readRelationship(Post::REL_COMMENTS, $commentFilters, $commentSorts);
+            ->indexRelationship(Post::REL_COMMENTS, $commentFilters, $commentSorts);
 
         $this->assertNotEmpty($data->getData());
         $this->assertCount($pagingSize, $data->getData());
