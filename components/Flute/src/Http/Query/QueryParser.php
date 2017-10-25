@@ -57,6 +57,21 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
     private $pagingLimit;
 
     /**
+     * @var string[]|null
+     */
+    private $allowedFilterFields;
+
+    /**
+     * @var string[]|null
+     */
+    private $allowedSortFields;
+
+    /**
+     * @var string[]|null
+     */
+    private $allowedIncludePaths;
+
+    /**
      * @param PaginationStrategyInterface $paginationStrategy
      * @param string[]|null               $messages
      */
@@ -73,10 +88,128 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
     /**
      * @inheritdoc
      */
+    public function withAllowedFilterFields(array $fields): QueryParserInterface
+    {
+        // debug check all fields are strings
+        assert((function () use ($fields) {
+                $allAreStrings = !empty($fields);
+                foreach ($fields as $field) {
+                    $allAreStrings = $allAreStrings === true && is_string($field) === true && empty($field) === false;
+                }
+
+                return $allAreStrings;
+            })() === true);
+
+        $this->allowedFilterFields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withAllAllowedFilterFields(): QueryParserInterface
+    {
+        $this->allowedFilterFields = null;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withNoAllowedFilterFields(): QueryParserInterface
+    {
+        $this->allowedFilterFields = [];
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withAllowedSortFields(array $fields): QueryParserInterface
+    {
+        // debug check all fields are strings
+        assert((function () use ($fields) {
+                $allAreStrings = !empty($fields);
+                foreach ($fields as $field) {
+                    $allAreStrings = $allAreStrings === true && is_string($field) === true && empty($field) === false;
+                }
+
+                return $allAreStrings;
+            })() === true);
+
+        $this->allowedSortFields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withAllAllowedSortFields(): QueryParserInterface
+    {
+        $this->allowedSortFields = null;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withNoAllowedSortFields(): QueryParserInterface
+    {
+        $this->allowedSortFields = [];
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withAllowedIncludePaths(array $paths): QueryParserInterface
+    {
+        // debug check all fields are strings
+        assert((function () use ($paths) {
+                $allAreStrings = !empty($paths);
+                foreach ($paths as $path) {
+                    $allAreStrings = $allAreStrings === true && is_string($path) === true && empty($path) === false;
+                }
+
+                return $allAreStrings;
+            })() === true);
+
+        $this->allowedIncludePaths = $paths;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withAllAllowedIncludePaths(): QueryParserInterface
+    {
+        $this->allowedIncludePaths = null;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withNoAllowedIncludePaths(): QueryParserInterface
+    {
+        $this->allowedIncludePaths = [];
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function parse(array $parameters): QueryParserInterface
     {
-        $this->clear();
-
         parent::setParameters($parameters);
 
         $this->parsePagingParameters()->parseFilterLink();
@@ -104,7 +237,33 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
                 throw new JsonApiException($this->createParameterError(static::PARAM_FILTER));
             }
 
-            yield $field => $this->parseOperationsAndArguments(static::PARAM_FILTER, $operationsWithArgs);
+            if ($this->allowedFilterFields === null || in_array($field, $this->allowedFilterFields) === true) {
+                yield $field => $this->parseOperationsAndArguments(static::PARAM_FILTER, $operationsWithArgs);
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSorts(): iterable
+    {
+        foreach (parent::getSorts() as $field => $isAsc) {
+            if ($this->allowedSortFields === null || in_array($field, $this->allowedSortFields) === true) {
+                yield $field => $isAsc;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIncludes(): iterable
+    {
+        foreach (parent::getIncludes() as $path => $split) {
+            if ($this->allowedIncludePaths === null || in_array($path, $this->allowedIncludePaths) === true) {
+                yield $path => $split;
+            }
         }
     }
 
@@ -256,6 +415,8 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
         $this->areFiltersWithAnd = true;
         $this->pagingOffset      = null;
         $this->pagingLimit       = null;
+
+        $this->withNoAllowedFilterFields()->withNoAllowedSortFields()->withNoAllowedIncludePaths();
 
         return $this;
     }

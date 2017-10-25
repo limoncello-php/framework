@@ -60,4 +60,55 @@ interface QueryParserInterface extends BaseQueryParserInterface
      * @return EncodingParametersInterface
      */
     public function createEncodingParameters(): EncodingParametersInterface;
+
+    /**
+     * @param array $fields
+     *
+     * @return self
+     */
+    public function withAllowedFilterFields(array $fields): self;
+
+    /**
+     * @return self
+     */
+    public function withAllAllowedFilterFields(): self;
+
+    /**
+     * @return self
+     */
+    public function withNoAllowedFilterFields(): self;
+
+    /**
+     * @param array $fields
+     *
+     * @return self
+     */
+    public function withAllowedSortFields(array $fields): self;
+
+    /**
+     * @return self
+     */
+    public function withAllAllowedSortFields(): self;
+
+    /**
+     * @return self
+     */
+    public function withNoAllowedSortFields(): self;
+
+    /**
+     * @param array $paths
+     *
+     * @return self
+     */
+    public function withAllowedIncludePaths(array $paths): self;
+
+    /**
+     * @return self
+     */
+    public function withAllAllowedIncludePaths(): self;
+
+    /**
+     * @return self
+     */
+    public function withNoAllowedIncludePaths(): self;
 }

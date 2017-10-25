@@ -283,22 +283,24 @@ class ControllerTest extends TestCase
             'sort'    => 'bbb',
             'include' => 'ccc',
         ];
+        $uri         = new Uri('http://localhost.local/comments?' . http_build_query($queryParams));
         $container   = $this->createContainer();
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn($uri);
 
         /** @var ServerRequestInterface $request */
 
-        $exception = null;
-        try {
-            CommentsController::index($routeParams, $container, $request);
-        } catch (JsonApiException $exception) {
-        }
-        $this->assertNotNull($exception);
+        $response = BoardsController::index($routeParams, $container, $request);
+        $this->assertNotNull($response);
+        $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertCount(1, $errors = $exception->getErrors());
-        $this->assertEquals(['parameter' => 'aaa'], $errors[0]->getSource());
+        // invalid params are ignored so it will not have any effect.
+        $body      = (string)($response->getBody());
+        $resources = json_decode($body, true);
+        // manually checked without any filters it will have same amount of results.
+        $this->assertCount(5, $resources[DocumentInterface::KEYWORD_DATA]);
     }
 
     /**
@@ -1060,7 +1062,7 @@ EOT;
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
-        $uri = new Uri('http://localhost.local/comments/relationships/post?' . http_build_query($queryParams));
+        $uri = new Uri('http://localhost.local/comments?' . http_build_query($queryParams));
         $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn($uri);
 
         /** @var ServerRequestInterface $request */
@@ -1095,7 +1097,7 @@ EOT;
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
-        $uri = new Uri('http://localhost.local/comments/relationships/emotions?' . http_build_query($queryParams));
+        $uri = new Uri('http://localhost.local/comments?' . http_build_query($queryParams));
         $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn($uri);
 
         /** @var ServerRequestInterface $request */

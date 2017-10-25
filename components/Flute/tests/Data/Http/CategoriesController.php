@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Tests\Flute\Data\Api\CategoriesApi as Api;
 use Limoncello\Tests\Flute\Data\Schemes\CategorySchema as Schema;
 use Psr\Container\ContainerInterface;
@@ -48,5 +49,41 @@ class CategoriesController extends BaseController
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
         return static::readRelationship($index, Schema::REL_CHILDREN, $container, $request);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function configureOnIndexParser(QueryParserInterface $parser): QueryParserInterface
+    {
+        $parser = parent::configureOnIndexParser($parser);
+
+        self::configureParser($parser);
+
+        return $parser;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function configureOnReadParser(QueryParserInterface $parser): QueryParserInterface
+    {
+        $parser = parent::configureOnReadParser($parser);
+
+        self::configureParser($parser);
+
+        return $parser;
+    }
+
+    /**
+     * @param QueryParserInterface $parser
+     */
+    private static function configureParser(QueryParserInterface $parser): void
+    {
+        $parser
+            ->withAllowedIncludePaths([
+                Schema::REL_PARENT,
+                Schema::REL_CHILDREN,
+            ]);
     }
 }

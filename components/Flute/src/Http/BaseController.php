@@ -68,7 +68,9 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $parser = static::createQueryParser($container)->parse($request->getQueryParams());
+        // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
+        $parser = static::configureOnIndexParser(static::createQueryParser($container))
+            ->parse($request->getQueryParams());
         $mapper = static::createParameterMapper($container);
         $api    = static::createApi($container);
 
@@ -113,12 +115,13 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
-        $parser = static::createQueryParser($container)->parse($request->getQueryParams());
+        // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
+        $parser = static::configureOnReadParser(static::createQueryParser($container))
+            ->parse($request->getQueryParams());
         $mapper = static::createParameterMapper($container);
         $api    = static::createApi($container);
 
+        $index    = $routeParams[static::ROUTE_KEY_INDEX];
         $response = static::readImpl(
             $mapper->applyQueryParameters($parser, $api),
             static::createResponses($container, $request, $parser->createEncodingParameters()),
@@ -178,7 +181,12 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $parser    = static::createQueryParser($container)->parse($request->getQueryParams());
+        // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
+        $parser = static::configureOnReadRelationshipParser(
+            $relationshipName,
+            static::createQueryParser($container))->parse($request->getQueryParams()
+        );
+
         $relData   = static::readRelationshipData($index, $relationshipName, $container, $parser);
         $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
         $response  = $relData->getData() === null ?
@@ -201,7 +209,12 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $parser    = static::createQueryParser($container)->parse($request->getQueryParams());
+        // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
+        $parser = static::configureOnReadRelationshipIdentifiersParser(
+            $relationshipName,
+            static::createQueryParser($container)
+        )->parse($request->getQueryParams());
+
         $relData   = static::readRelationshipData($index, $relationshipName, $container, $parser);
         $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
         $response  = $relData->getData() === null ?
@@ -409,6 +422,57 @@ abstract class BaseController implements ControllerInterface
     protected static function createQueryParser(ContainerInterface $container): QueryParserInterface
     {
         return $container->get(QueryParserInterface::class);
+    }
+
+    /**
+     * @param QueryParserInterface $parser
+     *
+     * @return QueryParserInterface
+     */
+    protected static function configureOnIndexParser(QueryParserInterface $parser): QueryParserInterface
+    {
+        return $parser;
+    }
+
+    /**
+     * @param QueryParserInterface $parser
+     *
+     * @return QueryParserInterface
+     */
+    protected static function configureOnReadParser(QueryParserInterface $parser): QueryParserInterface
+    {
+        return $parser;
+    }
+
+    /**
+     * @param string               $name
+     * @param QueryParserInterface $parser
+     *
+     * @return QueryParserInterface
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected static function configureOnReadRelationshipParser(/** @noinspection PhpUnusedParameterInspection */
+        string $name,
+        QueryParserInterface $parser
+    ): QueryParserInterface {
+        return $parser;
+    }
+
+    /**
+     * @param string               $name
+     * @param QueryParserInterface $parser
+     *
+     * @return QueryParserInterface
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected static function configureOnReadRelationshipIdentifiersParser(
+        /** @noinspection PhpUnusedParameterInspection */
+        string $name,
+        QueryParserInterface $parser
+    ): QueryParserInterface {
+        return $parser;
     }
 
     /**

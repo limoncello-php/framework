@@ -219,8 +219,11 @@ class QueryParserTest extends TestCase
      */
     private function createParser(array $queryParameters): QueryParserInterface
     {
-        $parser = new QueryParser(new PaginationStrategy(20, 100));
-        $parser->parse($queryParameters);
+        $parser = (new QueryParser(new PaginationStrategy(20, 100)))
+            ->withAllAllowedFilterFields()
+            ->withAllAllowedSortFields()
+            ->withAllAllowedIncludePaths()
+            ->parse($queryParameters);
 
         return $parser;
     }

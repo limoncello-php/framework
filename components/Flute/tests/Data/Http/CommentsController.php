@@ -16,9 +16,12 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi as Api;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema as Schema;
+use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
+use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\Data\Validation\RuleSets\CreateCommentRuleSet;
 use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateCommentRuleSet;
 use Psr\Container\ContainerInterface;
@@ -108,5 +111,51 @@ class CommentsController extends BaseController
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
         return static::readRelationship($index, Comment::REL_POST, $container, $request);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function configureOnIndexParser(QueryParserInterface $parser): QueryParserInterface
+    {
+        $parser = parent::configureOnIndexParser($parser);
+
+        self::configureParser($parser);
+
+        return $parser;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function configureOnReadParser(QueryParserInterface $parser): QueryParserInterface
+    {
+        $parser = parent::configureOnReadParser($parser);
+
+        self::configureParser($parser);
+
+        return $parser;
+    }
+
+    /**
+     * @param QueryParserInterface $parser
+     */
+    private static function configureParser(QueryParserInterface $parser): void
+    {
+        $parser
+            ->withAllowedFilterFields([
+                Schema::RESOURCE_ID,
+                Schema::ATTR_TEXT,
+                Schema::REL_POST,
+                Schema::REL_POST . '.' . PostSchema::ATTR_TEXT,
+                Schema::REL_EMOTIONS . '.' . EmotionSchema::ATTR_NAME,
+            ])
+            ->withAllowedSortFields([
+                Schema::RESOURCE_ID,
+                Schema::REL_POST,
+            ])
+            ->withAllowedIncludePaths([
+                Schema::REL_USER,
+            ]);
     }
 }
