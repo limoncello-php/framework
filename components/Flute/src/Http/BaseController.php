@@ -33,7 +33,6 @@ use Limoncello\Flute\Contracts\Validation\JsonApiValidatorInterface;
 use Limoncello\Flute\Http\Traits\CreateResponsesTrait;
 use Limoncello\Flute\L10n\Messages;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
-use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -91,15 +90,8 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $jsonData  = static::readJsonFromRequest($container, $request);
-        $validator = static::createOnCreateValidator($container);
-        $captures  = $validator->assert($jsonData)->getJsonApiCaptures();
+        list ($index, $api) = static::createImpl($container, $request);
 
-        list ($index, $attributes, $toMany) =
-            static::mapSchemeDataToModelData($container, $captures, static::SCHEMA_CLASS);
-
-        $api   = static::createApi($container);
-        $index = $api->create($index, $attributes, $toMany);
         $data  = $api->read($index)->getData();
 
         $response = static::createResponses($container, $request)->getCreatedResponse($data);
@@ -119,14 +111,13 @@ abstract class BaseController implements ControllerInterface
         $parser = static::configureOnReadParser(static::createQueryParser($container))
             ->parse($request->getQueryParams());
         $mapper = static::createParameterMapper($container);
-        $api    = static::createApi($container);
 
-        $index    = $routeParams[static::ROUTE_KEY_INDEX];
-        $response = static::readImpl(
-            $mapper->applyQueryParameters($parser, $api),
-            static::createResponses($container, $request, $parser->createEncodingParameters()),
-            $index
-        );
+        $index     = $routeParams[static::ROUTE_KEY_INDEX];
+        $modelData = $mapper->applyQueryParameters($parser, static::createApi($container))->read($index)->getData();
+
+        $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
+        $response  = $modelData === null ?
+            $responses->getCodeResponse(404) : $responses->getContentResponse($modelData);
 
         return $response;
     }
@@ -139,19 +130,17 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $jsonData  = static::normalizeIndexValueOnUpdate(
-            $routeParams,
-            $container,
-            static::readJsonFromRequest($container, $request)
-        );
-        $validator = static::createOnUpdateValidator($container);
-        $captures  = $validator->assert($jsonData)->getJsonApiCaptures();
+        list ($updated, $index, $api) = static::updateImpl($routeParams, $container, $request);
 
-        list ($index, $attributes, $toMany) =
-            static::mapSchemeDataToModelData($container, $captures, static::SCHEMA_CLASS);
-        $api = static::createApi($container);
+        $responses = static::createResponses($container, $request);
+        if ($updated > 0) {
+            $modelData = $api->read($index)->getData();
+            $response  = $responses->getContentResponse($modelData);
+        } else {
+            $response = $responses->getCodeResponse(404);
+        }
 
-        return static::updateImpl($index, $attributes, $toMany, $container, $request, $api);
+        return $response;
     }
 
     /**
@@ -162,9 +151,11 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
+        static::createApi($container)->remove($routeParams[static::ROUTE_KEY_INDEX]);
 
-        return static::deleteImpl($index, $container, $request, static::createApi($container));
+        $response = static::createResponses($container, $request)->getCodeResponse(204);
+
+        return $response;
     }
 
     /**
@@ -329,7 +320,10 @@ abstract class BaseController implements ControllerInterface
 
         $childApi = static::createApi($container, $childApiClass);
 
-        return static::deleteImpl($childIndex, $container, $request, $childApi);
+        $childApi->remove($childIndex);
+        $response = static::createResponses($container, $request)->getCodeResponse(204);
+
+        return $response;
     }
 
     /** @noinspection PhpTooManyParametersInspection
@@ -354,17 +348,25 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        /** @var SchemaInterface $schemaClass */
-        $schemaClass  = static::SCHEMA_CLASS;
-        $modelRelName = $schemaClass::getRelationshipMapping($relationshipName);
-        $hasChild     = static::createApi($container)->hasInRelationship($parentIndex, $modelRelName, $childIndex);
-        if ($hasChild === false) {
-            return static::createResponses($container, $request)->getCodeResponse(404);
+        list ($updated, $childApi) = static::updateInRelationshipImpl(
+            $parentIndex,
+            $relationshipName,
+            $childIndex,
+            $attributes,
+            $toMany,
+            $childApiClass,
+            $container
+        );
+
+        $responses = static::createResponses($container, $request);
+        if ($updated > 0) {
+            $modelData = $childApi->read($childIndex)->getData();
+            $response  = $responses->getContentResponse($modelData);
+        } else {
+            $response = $responses->getCodeResponse(404);
         }
 
-        $childApi = static::createApi($container, $childApiClass);
-
-        return static::updateImpl($childIndex, $attributes, $toMany, $container, $request, $childApi);
+        return $response;
     }
 
     /**
@@ -541,25 +543,6 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param CrudInterface      $api
-     * @param ResponsesInterface $responses
-     * @param string|int         $index
-     *
-     * @return mixed
-     */
-    private static function readImpl(
-        CrudInterface $api,
-        ResponsesInterface $responses,
-        $index
-    ) {
-        $modelData = $api->read($index)->getData();
-        $response  = $modelData === null ?
-            $responses->getCodeResponse(404) : $responses->getContentResponse($modelData);
-
-        return $response;
-    }
-
-    /**
      * @param string               $index
      * @param string               $relationshipName
      * @param ContainerInterface   $container
@@ -584,48 +567,90 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param string|int             $index
-     * @param array                  $attributes
-     * @param array                  $toMany
      * @param ContainerInterface     $container
      * @param ServerRequestInterface $request
-     * @param CrudInterface          $api
      *
-     * @return ResponseInterface
+     * @return array
      */
-    private static function updateImpl(
-        $index,
-        array $attributes,
-        array $toMany,
+    protected static function createImpl(
         ContainerInterface $container,
-        ServerRequestInterface $request,
-        CrudInterface $api
-    ): ResponseInterface {
-        $api->update($index, $attributes, $toMany);
+        ServerRequestInterface $request
+    ): array {
+        $jsonData  = static::readJsonFromRequest($container, $request);
+        $validator = static::createOnCreateValidator($container);
+        $captures  = $validator->assert($jsonData)->getJsonApiCaptures();
 
-        $response = static::readImpl($api, static::createResponses($container, $request), $index);
+        list ($index, $attributes, $toMany) =
+            static::mapSchemeDataToModelData($container, $captures, static::SCHEMA_CLASS);
 
-        return $response;
+        $api   = static::createApi($container);
+        $index = $api->create($index, $attributes, $toMany);
+
+        return [$index, $api];
     }
 
     /**
-     * @param string|int             $index
+     * @param array                  $routeParams
      * @param ContainerInterface     $container
      * @param ServerRequestInterface $request
-     * @param CrudInterface          $api
      *
-     * @return ResponseInterface
+     * @return array [int $updated, string $index, CrudInterface $api]
      */
-    private static function deleteImpl(
-        $index,
+    protected static function updateImpl(
+        array $routeParams,
         ContainerInterface $container,
-        ServerRequestInterface $request,
-        CrudInterface $api
-    ): ResponseInterface {
-        $api->remove($index);
-        $response = static::createResponses($container, $request)->getCodeResponse(204);
+        ServerRequestInterface $request
+    ): array {
+        $jsonData  = static::normalizeIndexValueOnUpdate(
+            $routeParams,
+            $container,
+            static::readJsonFromRequest($container, $request)
+        );
+        $validator = static::createOnUpdateValidator($container);
+        $captures  = $validator->assert($jsonData)->getJsonApiCaptures();
 
-        return $response;
+        list ($index, $attributes, $toMany) =
+            static::mapSchemeDataToModelData($container, $captures, static::SCHEMA_CLASS);
+        $api = static::createApi($container);
+
+        $updated = $api->update($index, $attributes, $toMany);
+
+        return [$updated, $index, $api];
+    }
+
+    /**
+     * @param                        $parentIndex
+     * @param string                 $relationshipName
+     * @param                        $childIndex
+     * @param array                  $attributes
+     * @param array                  $toMany
+     * @param string                 $childApiClass
+     * @param ContainerInterface     $container
+     *
+     * @return array
+     */
+    private static function updateInRelationshipImpl(
+        $parentIndex,
+        string $relationshipName,
+        $childIndex,
+        array $attributes,
+        array $toMany,
+        string $childApiClass,
+        ContainerInterface $container
+    ): array {
+        /** @var SchemaInterface $schemaClass */
+        $schemaClass  = static::SCHEMA_CLASS;
+        $modelRelName = $schemaClass::getRelationshipMapping($relationshipName);
+        $hasChild     = static::createApi($container)->hasInRelationship($parentIndex, $modelRelName, $childIndex);
+        if ($hasChild === false) {
+            return [0, null];
+        }
+
+        $childApi = static::createApi($container, $childApiClass);
+
+        $updated = $childApi->update($childIndex, $attributes, $toMany);
+
+        return [$updated, $childApi];
     }
 
     /**
