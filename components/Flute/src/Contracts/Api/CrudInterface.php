@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Closure;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 
@@ -203,4 +204,9 @@ interface CrudInterface
      * @return bool
      */
     public function hasInRelationship($parentId, string $name, $childId): bool;
+
+    /**
+     * @param Closure $closure
+     */
+    public function inTransaction(Closure $closure): void;
 }

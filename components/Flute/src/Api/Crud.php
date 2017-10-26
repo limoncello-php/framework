@@ -325,7 +325,7 @@ class Crud implements CrudInterface
     /**
      * @return Connection
      */
-    private function getConnection(): Connection
+    protected function getConnection(): Connection
     {
         return $this->connection;
     }
@@ -905,7 +905,7 @@ class Crud implements CrudInterface
 
         $this->clearBuilderParameters()->clearFetchParameters();
 
-        $this->inTransaction($saveMain->getConnection(), function () use ($saveMain, $toMany, &$index) {
+        $this->inTransaction(function () use ($saveMain, $toMany, &$index) {
             $saveMain->execute();
 
             // if no index given will use last insert ID as index
@@ -955,7 +955,7 @@ class Crud implements CrudInterface
 
         $this->clearBuilderParameters()->clearFetchParameters();
 
-        $this->inTransaction($saveMain->getConnection(), function () use ($saveMain, $toMany, $index, &$updated) {
+        $this->inTransaction(function () use ($saveMain, $toMany, $index, &$updated) {
             $updated = $saveMain->execute();
 
             foreach ($toMany as $relationshipName => $secondaryIds) {
@@ -1016,13 +1016,13 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param Connection $connection
-     * @param Closure    $closure
+     * @param Closure $closure
      *
      * @return void
      */
-    protected function inTransaction(Connection $connection, Closure $closure): void
+    public function inTransaction(Closure $closure): void
     {
+        $connection = $this->getConnection();
         $connection->beginTransaction();
         try {
             $isOk = ($closure() === false ? null : true);
