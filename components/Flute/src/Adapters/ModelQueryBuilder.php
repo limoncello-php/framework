@@ -131,22 +131,13 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function createModel(iterable $attributes): self
     {
+        $this->insert($this->quoteTableName($this->getMainTableName()));
+
         $valuesAsParams = [];
-        $dbPlatform     = $this->getConnection()->getDatabasePlatform();
-        $types          = $this->getModelSchemes()->getAttributeTypes($this->getModelClass());
-
-        foreach ($attributes as $column => $value) {
-            assert(is_string($column) && $this->getModelSchemes()->hasAttributeType($this->getModelClass(), $column));
-
-            $type                          = Type::getType($types[$column]);
-            $pdoValue                      = $type->convertToDatabaseValue($value, $dbPlatform);
-            $quotedColumn                  = $this->quoteColumnName($column);
-            $valuesAsParams[$quotedColumn] = $this->createNamedParameter($pdoValue, $type->getBindingType());
+        foreach ($this->bindAttributes($this->getModelClass(), $attributes) as $quotedColumn => $parameterName) {
+            $valuesAsParams[$quotedColumn] = $parameterName;
         }
-
-        $this
-            ->insert($this->quoteTableName($this->getMainTableName()))
-            ->values($valuesAsParams);
+        $this->values($valuesAsParams);
 
         return $this;
     }
@@ -160,20 +151,39 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function updateModels(iterable $attributes): self
     {
-        $dbPlatform = $this->getConnection()->getDatabasePlatform();
-        $types      = $this->getModelSchemes()->getAttributeTypes($this->getModelClass());
-
         $this->update($this->quoteTableName($this->getMainTableName()));
-        foreach ($attributes as $column => $value) {
-            assert(is_string($column) && $this->getModelSchemes()->hasAttributeType($this->getModelClass(), $column));
 
-            $type         = Type::getType($types[$column]);
-            $pdoValue     = $type->convertToDatabaseValue($value, $dbPlatform);
-            $quotedColumn = $this->quoteColumnName($column);
-            $this->set($quotedColumn, $this->createNamedParameter($pdoValue, $type->getBindingType()));
+        foreach ($this->bindAttributes($this->getModelClass(), $attributes) as $quotedColumn => $parameterName) {
+            $this->set($quotedColumn, $parameterName);
         }
 
         return $this;
+    }
+
+    /**
+     * @param string   $modelClass
+     * @param iterable $attributes
+     *
+     * @return iterable
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function bindAttributes(string $modelClass, iterable $attributes): iterable
+    {
+        $dbPlatform = $this->getConnection()->getDatabasePlatform();
+        $types      = $this->getModelSchemes()->getAttributeTypes($modelClass);
+
+        foreach ($attributes as $column => $value) {
+            assert(is_string($column) && $this->getModelSchemes()->hasAttributeType($this->getModelClass(), $column));
+
+            $quotedColumn  = $this->quoteColumnName($column);
+
+            $type          = Type::getType($types[$column]);
+            $pdoValue      = $type->convertToDatabaseValue($value, $dbPlatform);
+            $parameterName = $this->createNamedParameter($pdoValue, $type->getBindingType());
+
+            yield $quotedColumn => $parameterName;
+        }
     }
 
     /**
