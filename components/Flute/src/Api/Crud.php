@@ -335,7 +335,7 @@ class Crud implements CrudInterface
      *
      * @return ModelQueryBuilder
      */
-    private function createBuilder(string $modelClass): ModelQueryBuilder
+    protected function createBuilder(string $modelClass): ModelQueryBuilder
     {
         return $this->createBuilderFromConnection($this->getConnection(), $modelClass);
     }
