@@ -101,7 +101,7 @@ class ModelQueryBuilder extends QueryBuilder
     {
         $columns = [];
         foreach ($this->getModelSchemes()->getAttributes($this->getModelClass()) as $column) {
-            $columns[] = $this->buildColumnName($this->getMainAlias(), $column);
+            $columns[] = $this->getQuotedMainAliasColumn($column);
         }
 
         $this->select($columns);
@@ -302,7 +302,7 @@ class ModelQueryBuilder extends QueryBuilder
     {
         // emulate SELECT DISTINCT with grouping by primary key
         $primaryColumn = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
-        $this->addGroupBy($this->buildColumnName($this->getMainAlias(), $primaryColumn));
+        $this->addGroupBy($this->getQuotedMainAliasColumn($primaryColumn));
 
         return $this;
     }
@@ -338,7 +338,7 @@ class ModelQueryBuilder extends QueryBuilder
     {
         foreach ($sortParameters as $columnName => $isAsc) {
             assert(is_string($columnName) === true && is_bool($isAsc) === true);
-            $fullColumnName = $this->buildColumnName($this->getMainAlias(), $columnName);
+            $fullColumnName = $this->getQuotedMainAliasColumn($columnName);
             assert($this->getModelSchemes()->hasAttributeType($this->getModelClass(), $columnName));
             $this->addOrderBy($fullColumnName, $isAsc === true ? 'ASC' : 'DESC');
         }
@@ -686,6 +686,26 @@ class ModelQueryBuilder extends QueryBuilder
     private function buildColumnName(string $table, string $column): string
     {
         return "`$table`.`$column`";
+    }
+
+    /**
+     * @param string $column
+     *
+     * @return string
+     */
+    public function getQuotedMainTableColumn(string $column): string
+    {
+        return $this->buildColumnName($this->getMainTableName(), $column);
+    }
+
+    /**
+     * @param string $column
+     *
+     * @return string
+     */
+    public function getQuotedMainAliasColumn(string $column): string
+    {
+        return $this->buildColumnName($this->getMainAlias(), $column);
     }
 
     /**
