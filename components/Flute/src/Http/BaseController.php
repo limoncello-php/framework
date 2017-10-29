@@ -92,7 +92,8 @@ abstract class BaseController implements ControllerInterface
     ): ResponseInterface {
         list ($index, $api) = static::createImpl($container, $request);
 
-        $data  = $api->read($index)->getData();
+        $data = $api->read($index);
+        assert(!($data instanceof PaginatedDataInterface));
 
         $response = static::createResponses($container, $request)->getCreatedResponse($data);
 
@@ -113,7 +114,8 @@ abstract class BaseController implements ControllerInterface
         $mapper = static::createParameterMapper($container);
 
         $index     = $routeParams[static::ROUTE_KEY_INDEX];
-        $modelData = $mapper->applyQueryParameters($parser, static::createApi($container))->read($index)->getData();
+        $modelData = $mapper->applyQueryParameters($parser, static::createApi($container))->read($index);
+        assert(!($modelData instanceof PaginatedDataInterface));
 
         $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
         $response  = $modelData === null ?
@@ -134,7 +136,8 @@ abstract class BaseController implements ControllerInterface
 
         $responses = static::createResponses($container, $request);
         if ($updated > 0) {
-            $modelData = $api->read($index)->getData();
+            $modelData = $api->read($index);
+            assert(!($modelData instanceof PaginatedDataInterface));
             $response  = $responses->getContentResponse($modelData);
         } else {
             $response = $responses->getCodeResponse(404);
@@ -180,7 +183,7 @@ abstract class BaseController implements ControllerInterface
 
         $relData   = static::readRelationshipData($index, $relationshipName, $container, $parser);
         $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
-        $response  = $relData->getData() === null ?
+        $response  = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null) ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($relData);
 
         return $response;
@@ -348,6 +351,7 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
+        /** @var CrudInterface $childApi */
         list ($updated, $childApi) = static::updateInRelationshipImpl(
             $parentIndex,
             $relationshipName,
@@ -360,7 +364,8 @@ abstract class BaseController implements ControllerInterface
 
         $responses = static::createResponses($container, $request);
         if ($updated > 0) {
-            $modelData = $childApi->read($childIndex)->getData();
+            $modelData = $childApi->read($childIndex);
+            assert(!($modelData instanceof PaginatedDataInterface));
             $response  = $responses->getContentResponse($modelData);
         } else {
             $response = $responses->getCodeResponse(404);
@@ -548,14 +553,14 @@ abstract class BaseController implements ControllerInterface
      * @param ContainerInterface   $container
      * @param QueryParserInterface $parser
      *
-     * @return PaginatedDataInterface
+     * @return PaginatedDataInterface|mixed|null
      */
     private static function readRelationshipData(
         string $index,
         string $relationshipName,
         ContainerInterface $container,
         QueryParserInterface $parser
-    ): PaginatedDataInterface {
+    ) {
         $mapper = static::createParameterMapper($container);
         $api    = static::createApi($container);
 

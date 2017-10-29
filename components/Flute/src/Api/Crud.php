@@ -116,6 +116,11 @@ class Crud implements CrudInterface
     private $pagingOffset = null;
 
     /**
+     * @var bool
+     */
+    private $isFetchTyped;
+
+    /**
      * @var int|null
      */
     private $pagingLimit = null;
@@ -300,6 +305,26 @@ class Crud implements CrudInterface
     }
 
     /**
+     * @return self
+     */
+    public function shouldBeTyped(): self
+    {
+        $this->isFetchTyped = true;
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function shouldBeUntyped(): self
+    {
+        $this->isFetchTyped = false;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     private function hasPaging(): bool
@@ -321,6 +346,14 @@ class Crud implements CrudInterface
     private function getPagingLimit(): int
     {
         return $this->pagingLimit;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isFetchTyped(): bool
+    {
+        return $this->isFetchTyped;
     }
 
     /**
@@ -357,7 +390,7 @@ class Crud implements CrudInterface
      *
      * @return Crud
      */
-    private function applyAliasFilters(ModelQueryBuilder $builder): self
+    public function applyAliasFilters(ModelQueryBuilder $builder): self
     {
         if ($this->hasFilters() === true) {
             $filters = $this->getFilters();
@@ -373,7 +406,7 @@ class Crud implements CrudInterface
      *
      * @return self
      */
-    private function applyTableFilters(ModelQueryBuilder $builder): self
+    public function applyTableFilters(ModelQueryBuilder $builder): self
     {
         if ($this->hasFilters() === true) {
             $filters = $this->getFilters();
@@ -389,7 +422,7 @@ class Crud implements CrudInterface
      *
      * @return self
      */
-    private function applyRelationshipFiltersAndSorts(ModelQueryBuilder $builder): self
+    protected function applyRelationshipFiltersAndSorts(ModelQueryBuilder $builder): self
     {
         // While joining tables we select distinct rows. This flag used to apply `distinct` no more than once.
         $distinctApplied = false;
@@ -416,7 +449,7 @@ class Crud implements CrudInterface
      *
      * @return self
      */
-    private function applySorts(ModelQueryBuilder $builder): self
+    protected function applySorts(ModelQueryBuilder $builder): self
     {
         if ($this->hasSorts() === true) {
             $builder->addSorts($this->getSorts());
@@ -430,7 +463,7 @@ class Crud implements CrudInterface
      *
      * @return self
      */
-    private function applyPaging(ModelQueryBuilder $builder): self
+    protected function applyPaging(ModelQueryBuilder $builder): self
     {
         if ($this->hasPaging() === true) {
             $builder->setFirstResult($this->getPagingOffset());
@@ -443,7 +476,7 @@ class Crud implements CrudInterface
     /**
      * @return self
      */
-    private function clearBuilderParameters(): self
+    protected function clearBuilderParameters(): self
     {
         $this->filterParameters   = null;
         $this->areFiltersWithAnd  = true;
@@ -461,6 +494,7 @@ class Crud implements CrudInterface
     private function clearFetchParameters(): self
     {
         $this->includePaths = null;
+        $this->shouldBeTyped();
 
         return $this;
     }
@@ -571,15 +605,19 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param PaginatedDataInterface $data
+     * @param PaginatedDataInterface|mixed|null $data
      *
      * @return void
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function loadRelationships(PaginatedDataInterface $data): void
+    private function loadRelationships($data): void
     {
-        if (empty($data->getData()) === false && $this->hasIncludes() === true) {
+        $isPaginated = $data instanceof PaginatedDataInterface;
+        $hasData     = ($isPaginated === true && empty($data->getData()) === false) ||
+            ($isPaginated === false && $data !== null);
+
+        if ($hasData === true && $this->hasIncludes() === true) {
             $modelStorage = $this->getFactory()->createModelStorage($this->getModelSchemes());
             $modelsAtPath = $this->getFactory()->createTagStorage();
 
@@ -587,7 +625,7 @@ class Crud implements CrudInterface
             $classAtPath = new ArrayObject();
 
             $model = null;
-            if ($data->isCollection() === true) {
+            if ($isPaginated === true) {
                 foreach ($data->getData() as $model) {
                     $uniqueModel = $modelStorage->register($model);
                     if ($uniqueModel !== null) {
@@ -595,7 +633,7 @@ class Crud implements CrudInterface
                     }
                 }
             } else {
-                $model       = $data->getData();
+                $model       = $data;
                 $uniqueModel = $modelStorage->register($model);
                 if ($uniqueModel !== null) {
                     $modelsAtPath->register($uniqueModel, static::ROOT_PATH);
@@ -745,7 +783,7 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function read($index): PaginatedDataInterface
+    public function read($index)
     {
         $this->withIndexFilter($index);
 
@@ -830,7 +868,7 @@ class Crud implements CrudInterface
         string $name,
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
-    ): PaginatedDataInterface {
+    ) {
         // depending on the relationship type we expect the result to be either single resource or a collection
         $relationshipType = $this->getModelSchemes()->getRelationshipType($this->getModelClass(), $name);
         $isExpectMany     = $relationshipType === RelationshipTypes::HAS_MANY ||
@@ -882,7 +920,7 @@ class Crud implements CrudInterface
         string $name,
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
-    ): PaginatedDataInterface {
+    ) {
         return $this->withIndexFilter($index)->indexRelationship($name, $relationshipFilters, $relationshipSorts);
     }
 
@@ -1097,11 +1135,9 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function fetchResource(QueryBuilder $builder, string $modelClass): PaginatedDataInterface
+    public function fetchResource(QueryBuilder $builder, string $modelClass)
     {
-        $data = $this->getFactory()->createPaginatedData(
-            $this->fetchResourceWithoutRelationships($builder, $modelClass)
-        )->markAsSingleItem();
+        $data = $this->fetchResourceWithoutRelationships($builder, $modelClass);
 
         if ($this->hasIncludes() === true) {
             $this->loadRelationships($data);
@@ -1116,14 +1152,19 @@ class Crud implements CrudInterface
      */
     public function fetchRow(QueryBuilder $builder, string $modelClass): ?array
     {
+        $model = null;
+
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
-        $platform  = $builder->getConnection()->getDatabasePlatform();
-        $typeNames = $this->getModelSchemes()->getAttributeTypes($modelClass);
 
-        $model = null;
         if (($attributes = $statement->fetch()) !== false) {
-            $model = $this->readRowFromAssoc($attributes, $typeNames, $platform);
+            if ($this->isFetchTyped() === true) {
+                $platform  = $builder->getConnection()->getDatabasePlatform();
+                $typeNames = $this->getModelSchemes()->getAttributeTypes($modelClass);
+                $model     = $this->readRowFromAssoc($attributes, $typeNames, $platform);
+            } else {
+                $model = $attributes;
+            }
         }
 
         $this->clearFetchParameters();
@@ -1138,18 +1179,54 @@ class Crud implements CrudInterface
     {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
-        $platform = $builder->getConnection()->getDatabasePlatform();
-        $typeName = $this->getModelSchemes()->getAttributeTypes($modelClass)[$columnName];
-        $type     = Type::getType($typeName);
 
-        while (($attributes = $statement->fetch()) !== false) {
-            $value     = $attributes[$columnName];
-            $converted = $type->convertToPHPValue($value, $platform);
+        if ($this->isFetchTyped() === true) {
+            $platform = $builder->getConnection()->getDatabasePlatform();
+            $typeName = $this->getModelSchemes()->getAttributeTypes($modelClass)[$columnName];
+            $type     = Type::getType($typeName);
+            while (($attributes = $statement->fetch()) !== false) {
+                $value     = $attributes[$columnName];
+                $converted = $type->convertToPHPValue($value, $platform);
 
-            yield $converted;
+                yield $converted;
+            }
+        } else {
+            while (($attributes = $statement->fetch()) !== false) {
+                $value = $attributes[$columnName];
+
+                yield $value;
+            }
         }
 
         $this->clearFetchParameters();
+    }
+
+    /**
+     * @param QueryBuilder $builder
+     * @param string       $modelClass
+     *
+     * @return mixed|null
+     */
+    private function fetchResourceWithoutRelationships(QueryBuilder $builder, string $modelClass)
+    {
+        $model     = null;
+        $statement = $builder->execute();
+
+        if ($this->isFetchTyped() === true) {
+            $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
+            if (($attributes = $statement->fetch()) !== false) {
+                $platform  = $builder->getConnection()->getDatabasePlatform();
+                $typeNames = $this->getModelSchemes()->getAttributeTypes($modelClass);
+                $model     = $this->readResourceFromAssoc($modelClass, $attributes, $typeNames, $platform);
+            }
+        } else {
+            $statement->setFetchMode(PDOConnection::FETCH_CLASS, $modelClass);
+            if (($fetched = $statement->fetch()) !== false) {
+                $model = $fetched;
+            }
+        }
+
+        return $model;
     }
 
     /**
@@ -1179,48 +1256,39 @@ class Crud implements CrudInterface
      * @param QueryBuilder $builder
      * @param string       $modelClass
      *
-     * @return mixed|null
-     */
-    protected function fetchResourceWithoutRelationships(QueryBuilder $builder, string $modelClass)
-    {
-        $statement = $builder->execute();
-        $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
-        $platform  = $builder->getConnection()->getDatabasePlatform();
-        $typeNames = $this->getModelSchemes()->getAttributeTypes($modelClass);
-
-        $model = null;
-        if (($attributes = $statement->fetch()) !== false) {
-            $model = $this->readResourceFromAssoc($modelClass, $attributes, $typeNames, $platform);
-        }
-
-        return $model;
-    }
-
-    /**
-     * @param QueryBuilder $builder
-     * @param string       $modelClass
-     *
      * @return array
      */
-    protected function fetchResourceCollection(QueryBuilder $builder, string $modelClass): array
+    private function fetchResourceCollection(QueryBuilder $builder, string $modelClass): array
     {
-        $platform  = $builder->getConnection()->getDatabasePlatform();
-        $typeNames = $this->getModelSchemes()->getAttributeTypes($modelClass);
-
         $statement = $builder->execute();
-        $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
 
         $models           = [];
         $counter          = 0;
         $hasMoreThanLimit = false;
         $limit            = $builder->getMaxResults() !== null ? $builder->getMaxResults() - 1 : null;
-        while (($attributes = $statement->fetch()) !== false) {
-            $counter++;
-            if ($limit !== null && $counter > $limit) {
-                $hasMoreThanLimit = true;
-                break;
+
+        if ($this->isFetchTyped() === true) {
+            $platform  = $builder->getConnection()->getDatabasePlatform();
+            $typeNames = $this->getModelSchemes()->getAttributeTypes($modelClass);
+            $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
+            while (($attributes = $statement->fetch()) !== false) {
+                $counter++;
+                if ($limit !== null && $counter > $limit) {
+                    $hasMoreThanLimit = true;
+                    break;
+                }
+                $models[] = $this->readResourceFromAssoc($modelClass, $attributes, $typeNames, $platform);
             }
-            $models[] = $this->readResourceFromAssoc($modelClass, $attributes, $typeNames, $platform);
+        } else {
+            $statement->setFetchMode(PDOConnection::FETCH_CLASS, $modelClass);
+            while (($fetched = $statement->fetch()) !== false) {
+                $counter++;
+                if ($limit !== null && $counter > $limit) {
+                    $hasMoreThanLimit = true;
+                    break;
+                }
+                $models[] = $fetched;
+            }
         }
 
         return [$models, $hasMoreThanLimit, $limit, $builder->getFirstResult()];

@@ -17,11 +17,11 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Adapters\PaginationStrategy;
+use Limoncello\Flute\Api\Crud;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
@@ -36,6 +36,7 @@ use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
+use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
 use Limoncello\Tests\Flute\Data\Models\User;
@@ -77,7 +78,7 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(PostsApi::class);
 
         $this->assertNotNull($index = $crud->create(null, $attributes, $toMany));
-        $this->assertNotNull($model = $crud->read($index)->getData());
+        $this->assertNotNull($model = $crud->read($index));
 
         /** @var Post $model */
 
@@ -87,11 +88,11 @@ class CrudTest extends TestCase
         $this->assertEquals($text, $model->{Post::FIELD_TEXT});
         $this->assertNotEmpty($index = $model->{Post::FIELD_ID});
 
-        $this->assertNotNull($crud->read($index)->getData());
+        $this->assertNotNull($crud->read($index));
 
         $crud->remove($index);
 
-        $this->assertNull($crud->read($index)->getData());
+        $this->assertNull($crud->read($index));
 
         // second delete does nothing (already deleted)
         $crud->remove($index);
@@ -112,18 +113,18 @@ class CrudTest extends TestCase
 
         $this->assertNotNull($index = $crud->create($pk, $attributes, []));
         $this->assertEquals($pk, $index);
-        $this->assertNotNull($model = $crud->read($index)->getData());
+        $this->assertNotNull($model = $crud->read($index));
 
         /** @var StringPKModel $model */
 
         $this->assertEquals($pk, $model->{StringPKModel::FIELD_ID});
         $this->assertEquals($name, $model->{StringPKModel::FIELD_NAME});
 
-        $this->assertNotNull($crud->read($index)->getData());
+        $this->assertNotNull($crud->read($index));
 
         $crud->remove($index);
 
-        $this->assertNull($crud->read($index)->getData());
+        $this->assertNull($crud->read($index));
 
         // second delete does nothing (already deleted)
         $crud->remove($index);
@@ -219,7 +220,7 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(CommentsApi::class);
 
         $this->assertNotNull($index = $crud->create(null, $attributes, $toMany));
-        $this->assertNotNull($model = $crud->read($index)->getData());
+        $this->assertNotNull($model = $crud->read($index));
 
         /** @var Comment $model */
 
@@ -251,7 +252,7 @@ class CrudTest extends TestCase
             [Comment::REL_EMOTIONS],
         ];
         $this->assertNotNull(
-            $comment = $crud->withIncludes($includePaths)->read($index)->getData()
+            $comment = $crud->withIncludes($includePaths)->read($index)
         );
         $this->assertEquals(
             $userId,
@@ -291,7 +292,7 @@ class CrudTest extends TestCase
 
         $changedRecords = $crud->update($commentId, $attributes, $toMany);
         $this->assertEquals(3, $changedRecords);
-        $this->assertNotNull($model = $crud->read($commentId)->getData());
+        $this->assertNotNull($model = $crud->read($commentId));
 
         /** @var Comment $model */
 
@@ -306,7 +307,7 @@ class CrudTest extends TestCase
             [Comment::REL_EMOTIONS],
         ];
         $this->assertNotNull(
-            $comment = $crud->withIncludes($includePaths)->read($commentId)->getData()
+            $comment = $crud->withIncludes($includePaths)->read($commentId)
         );
         $this->assertEquals(
             $userId,
@@ -348,7 +349,7 @@ class CrudTest extends TestCase
             [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER],
         ];
         $this->assertNotNull(
-            $model = $crud->withIncludes($includePaths)->read($index)->getData()
+            $model = $crud->withIncludes($includePaths)->read($index)
         );
 
         $board = $model->{Post::REL_BOARD};
@@ -399,6 +400,78 @@ class CrudTest extends TestCase
     }
 
     /**
+     * Check 'read' with included paths.
+     */
+    public function testUntypedReadWithIncludes()
+    {
+        /** @var Crud $crud */
+        $crud = $this->createCrud(PostsApi::class);
+        $this->assertTrue($crud instanceof Crud);
+
+        $index        = 18;
+        $includePaths = [
+            [Post::REL_BOARD],
+            [Post::REL_COMMENTS],
+            [Post::REL_COMMENTS, Comment::REL_EMOTIONS],
+            [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER],
+        ];
+        $this->assertNotNull(
+            $model = $crud->shouldBeUntyped()->withIncludes($includePaths)->read($index)
+        );
+
+        $this->assertSame((string)$index, $model->{Post::FIELD_ID});
+        $this->assertTrue(is_string($model->{Post::FIELD_CREATED_AT}));
+
+        $board = $model->{Post::REL_BOARD};
+        $this->assertEquals(Board::class, get_class($board));
+        $this->assertEquals($model->{Post::FIELD_ID_BOARD}, $board->{Board::FIELD_ID});
+
+        /** @var PaginatedDataInterface $commentsRel */
+        $commentsRel = $model->{Post::REL_COMMENTS};
+        $comments    = $commentsRel->getData();
+        $hasMore     = $commentsRel->hasMoreItems();
+        $offset      = $commentsRel->getOffset();
+        $limit       = $commentsRel->getLimit();
+        $this->assertNotEmpty($comments);
+        $this->assertCount(3, $comments);
+        $this->assertEquals(Comment::class, get_class($comments[0]));
+        $this->assertEquals($index, $comments[0]->{Comment::FIELD_ID_POST});
+        $this->assertTrue($hasMore);
+        $this->assertCount(self::DEFAULT_PAGE, $comments);
+        $this->assertEquals(0, $offset);
+        $this->assertEquals(self::DEFAULT_PAGE, $limit);
+        $this->assertTrue(is_string($comments[0]->{Comment::FIELD_CREATED_AT}));
+
+        /** @var PaginatedDataInterface $emotions */
+        $emotions = $comments[0]->{Comment::REL_EMOTIONS};
+        $this->assertCount(3, $emotions->getData());
+        $this->assertTrue($emotions->hasMoreItems());
+        $this->assertEquals(0, $emotions->getOffset());
+        $this->assertEquals(self::DEFAULT_PAGE, $emotions->getLimit());
+        $this->assertTrue(is_string($emotions->getData()[0]->{Emotion::FIELD_CREATED_AT}));
+
+        $emotions = $comments[1]->{Comment::REL_EMOTIONS};
+        $this->assertCount(1, $emotions->getData());
+        $this->assertFalse($emotions->hasMoreItems());
+        $this->assertSame(0, $emotions->getOffset());
+        $this->assertSame(self::DEFAULT_PAGE, $emotions->getLimit());
+
+        $comment  = $comments[2];
+        $emotions = $comment->{Comment::REL_EMOTIONS};
+        $this->assertCount(1, $emotions->getData());
+        $this->assertFalse($emotions->hasMoreItems());
+        $this->assertSame(0, $emotions->getOffset());
+        $this->assertSame(self::DEFAULT_PAGE, $emotions->getLimit());
+
+        $this->assertNotNull($post = $comment->{Comment::REL_POST});
+        $this->assertNotNull($user = $post->{Post::REL_USER});
+
+        // check no data for relationships we didn't asked to download
+        $this->assertFalse(property_exists($user, User::REL_ROLE));
+        $this->assertFalse(property_exists($user, User::REL_COMMENTS));
+    }
+
+    /**
      * Check 'read' with included paths where could be nulls.
      */
     public function testReadWithNullableInclude()
@@ -419,7 +492,7 @@ class CrudTest extends TestCase
         ];
 
         $this->assertNotNull(
-            $model = $crud->withIncludes($includePaths)->read($index)->getData()
+            $model = $crud->withIncludes($includePaths)->read($index)
         );
         $this->assertNull($model->{Post::REL_EDITOR});
     }
@@ -647,6 +720,22 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      */
+    public function testReadUntypedRow()
+    {
+        /** @var Crud $crud */
+        $crud = $this->createCrud(PostsApi::class);
+        $this->assertTrue($crud instanceof Crud);
+
+        $builder = $crud->shouldBeUntyped()->withIndexFilter(1)->createIndexBuilder();
+        $row     = $crud->fetchRow($builder, Post::class);
+
+        $this->assertTrue(is_string($row[Post::FIELD_ID_BOARD]));
+        $this->assertTrue(is_string($row[Post::FIELD_CREATED_AT]));
+    }
+
+    /**
+     * Test read typed row.
+     */
     public function testReadColumn()
     {
         $crud = $this->createCrud(PostsApi::class);
@@ -664,6 +753,31 @@ class CrudTest extends TestCase
             ->indexIdentities();
 
         $this->assertEquals([8, 7, 6, 5], $column);
+    }
+
+    /**
+     * Test read typed row.
+     */
+    public function testReadUntypedColumn()
+    {
+        /** @var Crud $crud */
+        $crud = $this->createCrud(PostsApi::class);
+        $this->assertTrue($crud instanceof Crud);
+
+        $column = $crud
+            ->shouldBeUntyped()
+            ->withFilters([
+                Post::FIELD_ID => [
+                    FilterParameterInterface::OPERATION_GREATER_OR_EQUALS => [5],
+                    FilterParameterInterface::OPERATION_LESS_OR_EQUALS    => [8],
+                ],
+            ])
+            ->withSorts([
+                Post::FIELD_ID => false,
+            ])
+            ->indexIdentities();
+
+        $this->assertSame(['8', '7', '6', '5'], $column);
     }
 
     /**
@@ -720,21 +834,5 @@ class CrudTest extends TestCase
         $crud = new $class($container);
 
         return $crud;
-    }
-
-    /**
-     * @param iterable $iterable
-     *
-     * @return array
-     */
-    private function iterableToArray(iterable $iterable): array
-    {
-        $result = [];
-
-        foreach ($iterable as $key => $value) {
-            $result[$key] = $value instanceof Generator ? $this->iterableToArray($value) : $value;
-        }
-
-        return $result;
     }
 }

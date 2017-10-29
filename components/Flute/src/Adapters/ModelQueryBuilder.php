@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Closure;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -52,6 +53,11 @@ class ModelQueryBuilder extends QueryBuilder
     private $mainAlias;
 
     /**
+     * @var Closure
+     */
+    private $columnMapper;
+
+    /**
      * @var ModelSchemeInfoInterface
      */
     private $modelSchemes;
@@ -82,6 +88,8 @@ class ModelQueryBuilder extends QueryBuilder
 
         $this->mainTableName = $this->getModelSchemes()->getTable($this->getModelClass());
         $this->mainAlias     = $this->createAlias($this->getMainTableName());
+
+        $this->setColumnToDatabaseMapper(Closure::fromCallable([$this, 'getQuotedMainAliasColumn']));
     }
 
     /**
@@ -105,11 +113,24 @@ class ModelQueryBuilder extends QueryBuilder
             $columns === null ? $this->getModelSchemes()->getAttributes($this->getModelClass()) : $columns;
 
         $quotedColumns = [];
+        $columnMapper  = $this->getColumnToDatabaseMapper();
         foreach ($selectedColumns as $column) {
-            $quotedColumns[] = $this->getQuotedMainAliasColumn($column);
+            $quotedColumns[] = call_user_func($columnMapper, $column);
         }
 
         $this->select($quotedColumns);
+
+        return $this;
+    }
+
+    /**
+     * @param Closure $columnMapper
+     *
+     * @return self
+     */
+    public function setColumnToDatabaseMapper(Closure $columnMapper): self
+    {
+        $this->columnMapper = $columnMapper;
 
         return $this;
     }
@@ -809,6 +830,14 @@ class ModelQueryBuilder extends QueryBuilder
         }
 
         return $names;
+    }
+
+    /**
+     * @return Closure
+     */
+    private function getColumnToDatabaseMapper(): Closure
+    {
+        return $this->columnMapper;
     }
 
     /**

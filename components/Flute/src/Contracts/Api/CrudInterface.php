@@ -111,9 +111,9 @@ interface CrudInterface
      * @param QueryBuilder|null $builder
      * @param string|null       $modelClass
      *
-     * @return PaginatedDataInterface
+     * @return mixed|null
      */
-    public function fetchResource(QueryBuilder $builder, string $modelClass): PaginatedDataInterface;
+    public function fetchResource(QueryBuilder $builder, string $modelClass);
 
     /**
      * @param QueryBuilder $builder
@@ -145,9 +145,9 @@ interface CrudInterface
     /**
      * @param null|string $index
      *
-     * @return PaginatedDataInterface
+     * @return mixed|null
      */
-    public function read($index): PaginatedDataInterface;
+    public function read($index);
 
     /**
      * @return int|null
@@ -189,13 +189,13 @@ interface CrudInterface
      * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
      *
-     * @return PaginatedDataInterface
+     * @return PaginatedDataInterface|mixed|null
      */
     public function indexRelationship(
         string $name,
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
-    ): PaginatedDataInterface;
+    );
 
     /**
      * @param string        $name
@@ -216,14 +216,14 @@ interface CrudInterface
      * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
      *
-     * @return PaginatedDataInterface
+     * @return PaginatedDataInterface|mixed|null
      */
     public function readRelationship(
         $index,
         string $name,
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
-    ): PaginatedDataInterface;
+    );
 
     /**
      * @param int|string $parentId
