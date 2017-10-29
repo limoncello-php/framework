@@ -115,7 +115,7 @@ class ModelQueryBuilder extends QueryBuilder
         $quotedColumns = [];
         $columnMapper  = $this->getColumnToDatabaseMapper();
         foreach ($selectedColumns as $column) {
-            $quotedColumns[] = call_user_func($columnMapper, $column);
+            $quotedColumns[] = call_user_func($columnMapper, $column, $this);
         }
 
         $this->select($quotedColumns);

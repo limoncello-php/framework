@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
+use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Api\Crud;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
@@ -731,6 +732,35 @@ class CrudTest extends TestCase
 
         $this->assertTrue(is_string($row[Post::FIELD_ID_BOARD]));
         $this->assertTrue(is_string($row[Post::FIELD_CREATED_AT]));
+    }
+
+    /**
+     * Test read typed row.
+     */
+    public function testReadUntypedModelWithCustomColumnBuilder()
+    {
+        /** @var Crud $crud */
+        $crud = $this->createCrud(PostsApi::class);
+        $this->assertTrue($crud instanceof Crud);
+
+        $model = $crud
+            ->shouldBeUntyped()
+            ->withColumnMapper(function (string $columnName, ModelQueryBuilder $builder): string {
+                // a bit naive implementation but fine for testing purposes
+                $quotedColumnName = $builder->getQuotedMainAliasColumn($columnName);
+                $dateTimeColumns = [Post::FIELD_CREATED_AT, Post::FIELD_UPDATED_AT, Post::FIELD_DELETED_AT];
+                if (in_array($columnName, $dateTimeColumns) === true) {
+                    // emulate output datetime in JSON API as 2015-05-22T14:56:29.000Z
+                    // this function is specific for SQLite
+                    return "strftime('%Y-%m-%dT%H:%M:%fZ', $quotedColumnName) as $columnName";
+                }
+
+                return $columnName;
+            })
+            ->read(1);
+
+        $this->assertTrue(is_string($model->{Post::FIELD_ID_BOARD}));
+        $this->assertRegExp('/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/', $model->{Post::FIELD_CREATED_AT});
     }
 
     /**

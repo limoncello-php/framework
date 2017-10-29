@@ -116,6 +116,11 @@ class Crud implements CrudInterface
     private $pagingOffset = null;
 
     /**
+     * @var Closure|null
+     */
+    private $columnMapper = null;
+
+    /**
      * @var bool
      */
     private $isFetchTyped;
@@ -146,6 +151,18 @@ class Crud implements CrudInterface
         $this->connection         = $this->getContainer()->get(Connection::class);
 
         $this->clearBuilderParameters()->clearFetchParameters();
+    }
+
+    /**
+     * @param Closure $mapper
+     *
+     * @return self
+     */
+    public function withColumnMapper(Closure $mapper): self
+    {
+        $this->columnMapper = $mapper;
+
+        return $this;
     }
 
     /**
@@ -215,6 +232,22 @@ class Crud implements CrudInterface
         $this->areFiltersWithAnd = false;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasColumnMapper(): bool
+    {
+        return $this->columnMapper !== null;
+    }
+
+    /**
+     * @return Closure
+     */
+    private function getColumnMapper(): Closure
+    {
+        return $this->columnMapper;
     }
 
     /**
@@ -390,7 +423,21 @@ class Crud implements CrudInterface
      *
      * @return Crud
      */
-    public function applyAliasFilters(ModelQueryBuilder $builder): self
+    protected function applyColumnMapper(ModelQueryBuilder $builder): self
+    {
+        if ($this->hasColumnMapper() === true) {
+            $builder->setColumnToDatabaseMapper($this->getColumnMapper());
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ModelQueryBuilder $builder
+     *
+     * @return Crud
+     */
+    protected function applyAliasFilters(ModelQueryBuilder $builder): self
     {
         if ($this->hasFilters() === true) {
             $filters = $this->getFilters();
@@ -406,7 +453,7 @@ class Crud implements CrudInterface
      *
      * @return self
      */
-    public function applyTableFilters(ModelQueryBuilder $builder): self
+    protected function applyTableFilters(ModelQueryBuilder $builder): self
     {
         if ($this->hasFilters() === true) {
             $filters = $this->getFilters();
@@ -478,6 +525,7 @@ class Crud implements CrudInterface
      */
     protected function clearBuilderParameters(): self
     {
+        $this->columnMapper       = null;
         $this->filterParameters   = null;
         $this->areFiltersWithAnd  = true;
         $this->sortingParameters  = null;
@@ -719,8 +767,12 @@ class Crud implements CrudInterface
      */
     protected function createIndexModelBuilder(iterable $columns = null): ModelQueryBuilder
     {
-        $builder = $this
-            ->createBuilder($this->getModelClass())
+        $builder = $this->createBuilder($this->getModelClass());
+
+        $this
+            ->applyColumnMapper($builder);
+
+        $builder
             ->selectModelColumns($columns)
             ->fromModelTable();
 
