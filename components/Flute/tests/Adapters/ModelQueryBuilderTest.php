@@ -62,7 +62,7 @@ class ModelQueryBuilderTest extends TestCase
             User::FIELD_FIRST_NAME => false,
         ];
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable()
             ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
 
@@ -98,7 +98,7 @@ class ModelQueryBuilderTest extends TestCase
 
         // select all posts which has comments ID between 1 and 2.
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable()
             ->addRelationshipFiltersAndSortsWithAnd(Post::REL_COMMENTS, $filters, $sorts);
 
@@ -134,7 +134,7 @@ class ModelQueryBuilderTest extends TestCase
 
         // select all posts which has comments ID between 1 and 2.
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable()
             ->addRelationshipFiltersAndSortsWithOr(Post::REL_COMMENTS, $filters, $sorts);
 
@@ -170,7 +170,7 @@ class ModelQueryBuilderTest extends TestCase
 
         // select all comments with emotion ID=1
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable()
             ->addRelationshipFiltersAndSortsWithAnd(Comment::REL_EMOTIONS, $filters, $sorts);
 
@@ -208,7 +208,7 @@ class ModelQueryBuilderTest extends TestCase
         ];
 
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable()
             ->addFiltersWithAndToAlias($filters)
             ->addSorts($sorts);
@@ -230,7 +230,7 @@ class ModelQueryBuilderTest extends TestCase
         $builder = $this->createModelQueryBuilder(Board::class);
 
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable();
         $expected =
             'SELECT `boards1`.`id_board`, `boards1`.`title`, `boards1`.`created_at`, ' .
@@ -264,7 +264,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $builder = $this->createModelQueryBuilder(Board::class);
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable()
             ->addFiltersWithAndToAlias($filters);
 
@@ -316,7 +316,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $builder = $this->createModelQueryBuilder(Board::class);
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable()
             ->addFiltersWithOrToAlias($filters);
 
@@ -349,7 +349,7 @@ class ModelQueryBuilderTest extends TestCase
             ],
         ];
         $builder
-            ->selectModelFields()
+            ->selectModelColumns()
             ->fromModelTable()
             ->addFiltersWithAndToAlias($filters);
     }

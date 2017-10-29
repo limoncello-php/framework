@@ -95,16 +95,21 @@ class ModelQueryBuilder extends QueryBuilder
     /**
      * Select all fields associated with model.
      *
+     * @param iterable|null $columns
+     *
      * @return self
      */
-    public function selectModelFields(): self
+    public function selectModelColumns(iterable $columns = null): self
     {
-        $columns = [];
-        foreach ($this->getModelSchemes()->getAttributes($this->getModelClass()) as $column) {
-            $columns[] = $this->getQuotedMainAliasColumn($column);
+        $selectedColumns =
+            $columns === null ? $this->getModelSchemes()->getAttributes($this->getModelClass()) : $columns;
+
+        $quotedColumns = [];
+        foreach ($selectedColumns as $column) {
+            $quotedColumns[] = $this->getQuotedMainAliasColumn($column);
         }
 
-        $this->select($columns);
+        $this->select($quotedColumns);
 
         return $this;
     }

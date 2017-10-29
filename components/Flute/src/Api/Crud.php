@@ -23,6 +23,7 @@ use Doctrine\DBAL\Driver\PDOConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
+use Generator;
 use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
@@ -660,9 +661,9 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function createIndexBuilder(): QueryBuilder
+    public function createIndexBuilder(iterable $columns = null): QueryBuilder
     {
-        return $this->createIndexModelBuilder();
+        return $this->createIndexModelBuilder($columns);
     }
 
     /**
@@ -674,13 +675,15 @@ class Crud implements CrudInterface
     }
 
     /**
+     * @param iterable|null $columns
+     *
      * @return ModelQueryBuilder
      */
-    protected function createIndexModelBuilder(): ModelQueryBuilder
+    protected function createIndexModelBuilder(iterable $columns = null): ModelQueryBuilder
     {
         $builder = $this
             ->createBuilder($this->getModelClass())
-            ->selectModelFields()
+            ->selectModelColumns($columns)
             ->fromModelTable();
 
         $this
@@ -728,6 +731,20 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
+    public function indexIdentities(): array
+    {
+        $pkName  = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
+        $builder = $this->createIndexModelBuilder([$pkName]);
+        /** @var Generator $data */
+        $data   = $this->fetchColumn($builder, $builder->getModelClass(), $pkName);
+        $result = iterator_to_array($data);
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function read($index): PaginatedDataInterface
     {
         $this->withIndexFilter($index);
@@ -761,13 +778,15 @@ class Crud implements CrudInterface
      * @param string        $relationshipName
      * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
+     * @param iterable|null $columns
      *
      * @return ModelQueryBuilder
      */
     public function createReadRelationshipBuilder(
         string $relationshipName,
         iterable $relationshipFilters = null,
-        iterable $relationshipSorts = null
+        iterable $relationshipSorts = null,
+        iterable $columns = null
     ): ModelQueryBuilder {
         // as we read data from a relationship our main table and model would be the table/model in the relationship
         // so 'root' model(s) will be located in the reverse relationship.
@@ -777,7 +796,7 @@ class Crud implements CrudInterface
 
         $builder = $this
             ->createBuilder($targetModelClass)
-            ->selectModelFields()
+            ->selectModelColumns($columns)
             ->fromModelTable();
 
         // 'root' filters would be applied to the data in the reverse relationship ...
@@ -824,6 +843,35 @@ class Crud implements CrudInterface
             $this->fetchResources($builder, $modelClass) : $this->fetchResource($builder, $modelClass);
 
         return $data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function indexRelationshipIdentities(
+        string $name,
+        iterable $relationshipFilters = null,
+        iterable $relationshipSorts = null
+    ): array {
+        // depending on the relationship type we expect the result to be either single resource or a collection
+        $relationshipType = $this->getModelSchemes()->getRelationshipType($this->getModelClass(), $name);
+        $isExpectMany     = $relationshipType === RelationshipTypes::HAS_MANY ||
+            $relationshipType === RelationshipTypes::BELONGS_TO_MANY;
+        if ($isExpectMany === false) {
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
+        }
+
+        list ($targetModelClass) = $this->getModelSchemes()->getReverseRelationship($this->getModelClass(), $name);
+        $targetPk = $this->getModelSchemes()->getPrimaryKey($targetModelClass);
+
+        $builder = $this->createReadRelationshipBuilder($name, $relationshipFilters, $relationshipSorts, [$targetPk]);
+
+        $modelClass = $builder->getModelClass();
+        /** @var Generator $data */
+        $data   = $this->fetchColumn($builder, $modelClass, $targetPk);
+        $result = iterator_to_array($data);
+
+        return $result;
     }
 
     /**
@@ -1034,15 +1082,8 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function fetchResources(
-        QueryBuilder $builder = null,
-        string $modelClass = null
-    ): PaginatedDataInterface {
-        if ($builder === null && $modelClass === null) {
-            $builder    = $this->createIndexModelBuilder();
-            $modelClass = $builder->getModelClass();
-        }
-
+    public function fetchResources(QueryBuilder $builder, string $modelClass): PaginatedDataInterface
+    {
         $data = $this->fetchPaginatedResourcesWithoutRelationships($builder, $modelClass);
 
         if ($this->hasIncludes() === true) {
@@ -1056,15 +1097,8 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function fetchResource(
-        QueryBuilder $builder = null,
-        string $modelClass = null
-    ): PaginatedDataInterface {
-        if ($builder === null && $modelClass === null) {
-            $builder    = $this->createIndexModelBuilder();
-            $modelClass = $builder->getModelClass();
-        }
-
+    public function fetchResource(QueryBuilder $builder, string $modelClass): PaginatedDataInterface
+    {
         $data = $this->getFactory()->createPaginatedData(
             $this->fetchResourceWithoutRelationships($builder, $modelClass)
         )->markAsSingleItem();
@@ -1080,15 +1114,8 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function fetchRow(
-        QueryBuilder $builder = null,
-        string $modelClass = null
-    ): ?array {
-        if ($builder === null && $modelClass === null) {
-            $builder    = $this->createIndexModelBuilder();
-            $modelClass = $builder->getModelClass();
-        }
-
+    public function fetchRow(QueryBuilder $builder, string $modelClass): ?array
+    {
         $statement = $builder->execute();
         $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
         $platform  = $builder->getConnection()->getDatabasePlatform();
@@ -1102,6 +1129,27 @@ class Crud implements CrudInterface
         $this->clearFetchParameters();
 
         return $model;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function fetchColumn(QueryBuilder $builder, string $modelClass, string $columnName): iterable
+    {
+        $statement = $builder->execute();
+        $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
+        $platform = $builder->getConnection()->getDatabasePlatform();
+        $typeName = $this->getModelSchemes()->getAttributeTypes($modelClass)[$columnName];
+        $type     = Type::getType($typeName);
+
+        while (($attributes = $statement->fetch()) !== false) {
+            $value     = $attributes[$columnName];
+            $converted = $type->convertToPHPValue($value, $platform);
+
+            yield $converted;
+        }
+
+        $this->clearFetchParameters();
     }
 
     /**
@@ -1251,7 +1299,7 @@ class Crud implements CrudInterface
 
             $builder = $this
                 ->createBuilder($targetModelClass)
-                ->selectModelFields()
+                ->selectModelColumns()
                 ->fromModelTable();
 
             $classAtPath[$childrenPath] = $targetModelClass;

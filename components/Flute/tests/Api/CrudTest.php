@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
@@ -549,6 +550,41 @@ class CrudTest extends TestCase
     }
 
     /**
+     * Test read relationship.
+     */
+    public function testReadRelationshipIdentities()
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        $pagingOffset   = 1;
+        $pagingSize     = 2;
+        $postFilters    = [
+            Post::FIELD_ID => [
+                FilterParameterInterface::OPERATION_EQUALS => [1],
+            ],
+        ];
+        $commentFilters = [
+            Comment::FIELD_ID_USER => [
+                FilterParameterInterface::OPERATION_LESS_THAN => [5],
+            ],
+            Comment::FIELD_TEXT    => [
+                FilterParameterInterface::OPERATION_LIKE => ['%'],
+            ],
+        ];
+        $commentSorts   = [
+            Comment::FIELD_ID_USER => false,
+            Comment::FIELD_TEXT    => true,
+        ];
+
+        $data = $crud
+            ->withFilters($postFilters)
+            ->withPaging($pagingOffset, $pagingSize)
+            ->indexRelationshipIdentities(Post::REL_COMMENTS, $commentFilters, $commentSorts);
+
+        $this->assertEquals([9, 85, 83], $data);
+    }
+
+    /**
      * Test index.
      */
     public function testIndexWithFilterByBooleanColumn()
@@ -601,10 +637,33 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $row = $crud->withIndexFilter(1)->fetchRow();
+        $builder = $crud->withIndexFilter(1)->createIndexBuilder();
+        $row     = $crud->fetchRow($builder, Post::class);
 
         $this->assertTrue(is_int($row[Post::FIELD_ID_BOARD]));
         $this->assertTrue(is_string($row[Post::FIELD_TEXT]));
+    }
+
+    /**
+     * Test read typed row.
+     */
+    public function testReadColumn()
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        $column = $crud
+            ->withFilters([
+                Post::FIELD_ID => [
+                    FilterParameterInterface::OPERATION_GREATER_OR_EQUALS => [5],
+                    FilterParameterInterface::OPERATION_LESS_OR_EQUALS    => [8],
+                ],
+            ])
+            ->withSorts([
+                Post::FIELD_ID => false,
+            ])
+            ->indexIdentities();
+
+        $this->assertEquals([8, 7, 6, 5], $column);
     }
 
     /**
@@ -661,5 +720,21 @@ class CrudTest extends TestCase
         $crud = new $class($container);
 
         return $crud;
+    }
+
+    /**
+     * @param iterable $iterable
+     *
+     * @return array
+     */
+    private function iterableToArray(iterable $iterable): array
+    {
+        $result = [];
+
+        foreach ($iterable as $key => $value) {
+            $result[$key] = $value instanceof Generator ? $this->iterableToArray($value) : $value;
+        }
+
+        return $result;
     }
 }

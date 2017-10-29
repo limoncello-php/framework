@@ -88,9 +88,11 @@ interface CrudInterface
     public function withRelationshipSorts(string $name, iterable $sorts): self;
 
     /**
+     * @param iterable|null $columns
+     *
      * @return QueryBuilder
      */
-    public function createIndexBuilder(): QueryBuilder;
+    public function createIndexBuilder(iterable $columns = null): QueryBuilder;
 
     /**
      * @return QueryBuilder
@@ -98,12 +100,12 @@ interface CrudInterface
     public function createDeleteBuilder(): QueryBuilder;
 
     /**
-     * @param QueryBuilder|null $builder
-     * @param string|null       $modelClass
+     * @param QueryBuilder $builder
+     * @param string       $modelClass
      *
      * @return PaginatedDataInterface
      */
-    public function fetchResources(QueryBuilder $builder = null, string $modelClass = null): PaginatedDataInterface;
+    public function fetchResources(QueryBuilder $builder, string $modelClass): PaginatedDataInterface;
 
     /**
      * @param QueryBuilder|null $builder
@@ -111,20 +113,34 @@ interface CrudInterface
      *
      * @return PaginatedDataInterface
      */
-    public function fetchResource(QueryBuilder $builder = null, string $modelClass = null): PaginatedDataInterface;
+    public function fetchResource(QueryBuilder $builder, string $modelClass): PaginatedDataInterface;
 
     /**
-     * @param QueryBuilder|null $builder
-     * @param string|null       $modelClass
+     * @param QueryBuilder $builder
+     * @param string       $modelClass
      *
      * @return array|null
      */
-    public function fetchRow(QueryBuilder $builder = null, string $modelClass = null): ?array;
+    public function fetchRow(QueryBuilder $builder, string $modelClass): ?array;
+
+    /**
+     * @param QueryBuilder $builder
+     * @param string       $modelClass
+     * @param string       $columnName
+     *
+     * @return iterable
+     */
+    public function fetchColumn(QueryBuilder $builder, string $modelClass, string $columnName): iterable;
 
     /**
      * @return PaginatedDataInterface
      */
     public function index(): PaginatedDataInterface;
+
+    /**
+     * @return array
+     */
+    public function indexIdentities(): array;
 
     /**
      * @param null|string $index
@@ -180,6 +196,19 @@ interface CrudInterface
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
     ): PaginatedDataInterface;
+
+    /**
+     * @param string        $name
+     * @param iterable|null $relationshipFilters
+     * @param iterable|null $relationshipSorts
+     *
+     * @return array
+     */
+    public function indexRelationshipIdentities(
+        string $name,
+        iterable $relationshipFilters = null,
+        iterable $relationshipSorts = null
+    ): array;
 
     /**
      * @param int|string    $index
