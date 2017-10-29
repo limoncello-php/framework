@@ -115,7 +115,7 @@ trait DatabaseSchemeMigrationTrait
 CREATE OR REPLACE VIEW {$view} AS
     SELECT
       t.*,
-      GROUP_CONCAT(DISTINCT s.{$intermediateScopeId} SEPARATOR ' ') AS {$scopes}
+      GROUP_CONCAT(DISTINCT s.{$intermediateScopeId} ORDER BY s.{$intermediateScopeId} ASC SEPARATOR ' ') AS {$scopes}
     FROM {$tokens} AS t
       LEFT JOIN {$intermediate} AS s ON t.{$tokensTokenId} = s.{$intermediateTokenId}
     GROUP BY t.{$tokensTokenId};
@@ -202,8 +202,8 @@ EOT;
 CREATE VIEW {$view} AS
     SELECT
       c.*,
-      GROUP_CONCAT(DISTINCT s.{$scopesScopeId} SEPARATOR ' ') AS {$scopes},
-      GROUP_CONCAT(DISTINCT u.{$urisValue} SEPARATOR ' ')     AS {$redirectUris}
+      GROUP_CONCAT(DISTINCT s.{$scopesScopeId} ORDER BY s.{$scopesScopeId} ASC SEPARATOR ' ') AS {$scopes},
+      GROUP_CONCAT(DISTINCT u.{$urisValue}     ORDER BY u.{$urisValue} ASC SEPARATOR ' ')     AS {$redirectUris}
     FROM {$clients} AS c
       LEFT JOIN {$clientsScopes} AS s ON c.{$clientsClientId} = s.{$clScopesClientId}
       LEFT JOIN {$clientsUris}   AS u ON c.{$clientsClientId} = u.{$clUrisClientId}
