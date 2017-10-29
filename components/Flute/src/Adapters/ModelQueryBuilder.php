@@ -820,7 +820,12 @@ class ModelQueryBuilder extends QueryBuilder
         } elseif (is_bool($value)) {
             $type = PDO::PARAM_BOOL;
         } else {
-            assert(is_string($value), "Only strings, booleans, integers and nulls are supported.");
+            assert(
+                $value !== null,
+                'It seems you are trying to use `null` with =, >, <, or etc operator. ' .
+                'Use `is null` or `not null` instead.'
+            );
+            assert(is_string($value), "Only strings, booleans and integers are supported.");
             $type = PDO::PARAM_STR;
         }
 

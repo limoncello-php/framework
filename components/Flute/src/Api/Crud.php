@@ -660,23 +660,23 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function getIndexBuilder(): QueryBuilder
+    public function createIndexBuilder(): QueryBuilder
     {
-        return $this->getIndexModelBuilder();
+        return $this->createIndexModelBuilder();
     }
 
     /**
      * @inheritdoc
      */
-    public function getDeleteBuilder(): QueryBuilder
+    public function createDeleteBuilder(): QueryBuilder
     {
-        return $this->getDeleteModelBuilder();
+        return $this->createDeleteModelBuilder();
     }
 
     /**
      * @return ModelQueryBuilder
      */
-    protected function getIndexModelBuilder(): ModelQueryBuilder
+    protected function createIndexModelBuilder(): ModelQueryBuilder
     {
         $builder = $this
             ->createBuilder($this->getModelClass())
@@ -699,7 +699,7 @@ class Crud implements CrudInterface
     /**
      * @return ModelQueryBuilder
      */
-    protected function getDeleteModelBuilder(): ModelQueryBuilder
+    protected function createDeleteModelBuilder(): ModelQueryBuilder
     {
         $builder = $this
             ->createBuilder($this->getModelClass())
@@ -719,7 +719,7 @@ class Crud implements CrudInterface
      */
     public function index(): PaginatedDataInterface
     {
-        $builder = $this->getIndexModelBuilder();
+        $builder = $this->createIndexModelBuilder();
         $data    = $this->fetchResources($builder, $builder->getModelClass());
 
         return $data;
@@ -732,7 +732,7 @@ class Crud implements CrudInterface
     {
         $this->withIndexFilter($index);
 
-        $builder = $this->getIndexModelBuilder();
+        $builder = $this->createIndexModelBuilder();
         $data    = $this->fetchResource($builder, $builder->getModelClass());
 
         return $data;
@@ -872,7 +872,7 @@ class Crud implements CrudInterface
      */
     public function delete(): int
     {
-        $deleted = $this->getDeleteModelBuilder()->execute();
+        $deleted = $this->createDeleteModelBuilder()->execute();
 
         $this->clearFetchParameters();
 
@@ -1039,7 +1039,7 @@ class Crud implements CrudInterface
         string $modelClass = null
     ): PaginatedDataInterface {
         if ($builder === null && $modelClass === null) {
-            $builder    = $this->getIndexModelBuilder();
+            $builder    = $this->createIndexModelBuilder();
             $modelClass = $builder->getModelClass();
         }
 
@@ -1061,7 +1061,7 @@ class Crud implements CrudInterface
         string $modelClass = null
     ): PaginatedDataInterface {
         if ($builder === null && $modelClass === null) {
-            $builder    = $this->getIndexModelBuilder();
+            $builder    = $this->createIndexModelBuilder();
             $modelClass = $builder->getModelClass();
         }
 
@@ -1085,7 +1085,7 @@ class Crud implements CrudInterface
         string $modelClass = null
     ): ?array {
         if ($builder === null && $modelClass === null) {
-            $builder    = $this->getIndexModelBuilder();
+            $builder    = $this->createIndexModelBuilder();
             $modelClass = $builder->getModelClass();
         }
 

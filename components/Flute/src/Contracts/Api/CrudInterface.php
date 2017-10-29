@@ -90,12 +90,12 @@ interface CrudInterface
     /**
      * @return QueryBuilder
      */
-    public function getIndexBuilder(): QueryBuilder;
+    public function createIndexBuilder(): QueryBuilder;
 
     /**
      * @return QueryBuilder
      */
-    public function getDeleteBuilder(): QueryBuilder;
+    public function createDeleteBuilder(): QueryBuilder;
 
     /**
      * @param QueryBuilder|null $builder

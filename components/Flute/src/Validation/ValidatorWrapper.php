@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorInterface;
+use Limoncello\Flute\Http\JsonApiResponse;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
@@ -56,7 +57,7 @@ abstract class ValidatorWrapper implements JsonApiValidatorInterface
      */
     public function __construct(
         JsonApiValidatorInterface $validator,
-        int $httpErrorCode = JsonApiException::DEFAULT_HTTP_CODE
+        int $httpErrorCode = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
         $this->validator     = $validator;
         $this->httpErrorCode = $httpErrorCode;
