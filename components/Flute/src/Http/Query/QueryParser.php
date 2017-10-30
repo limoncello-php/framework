@@ -19,9 +19,9 @@
 use Generator;
 use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
+use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
  * @package Limoncello\Flute
@@ -91,14 +91,16 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
     public function withAllowedFilterFields(array $fields): QueryParserInterface
     {
         // debug check all fields are strings
-        assert((function () use ($fields) {
+        assert(
+            (function () use ($fields) {
                 $allAreStrings = !empty($fields);
                 foreach ($fields as $field) {
                     $allAreStrings = $allAreStrings === true && is_string($field) === true && empty($field) === false;
                 }
 
                 return $allAreStrings;
-            })() === true);
+            })() === true
+        );
 
         $this->allowedFilterFields = $fields;
 
@@ -131,14 +133,16 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
     public function withAllowedSortFields(array $fields): QueryParserInterface
     {
         // debug check all fields are strings
-        assert((function () use ($fields) {
+        assert(
+            (function () use ($fields) {
                 $allAreStrings = !empty($fields);
                 foreach ($fields as $field) {
                     $allAreStrings = $allAreStrings === true && is_string($field) === true && empty($field) === false;
                 }
 
                 return $allAreStrings;
-            })() === true);
+            })() === true
+        );
 
         $this->allowedSortFields = $fields;
 
@@ -171,14 +175,16 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
     public function withAllowedIncludePaths(array $paths): QueryParserInterface
     {
         // debug check all fields are strings
-        assert((function () use ($paths) {
+        assert(
+            (function () use ($paths) {
                 $allAreStrings = !empty($paths);
                 foreach ($paths as $path) {
                     $allAreStrings = $allAreStrings === true && is_string($path) === true && empty($path) === false;
                 }
 
                 return $allAreStrings;
-            })() === true);
+            })() === true
+        );
 
         $this->allowedIncludePaths = $paths;
 
@@ -234,7 +240,7 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
             if (is_string($field) === false || empty($field) === true ||
                 is_array($operationsWithArgs) === false || empty($operationsWithArgs) === true
             ) {
-                throw new JsonApiException($this->createParameterError(static::PARAM_FILTER));
+                throw new InvalidQueryParametersException($this->createParameterError(static::PARAM_FILTER));
             }
 
             if ($this->allowedFilterFields === null || in_array($field, $this->allowedFilterFields) === true) {
@@ -328,7 +334,7 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
 
         $filterSection = $this->getParameters()[static::PARAM_FILTER];
         if (is_array($filterSection) === false || empty($filterSection) === true) {
-            throw new JsonApiException($this->createParameterError(static::PARAM_FILTER));
+            throw new InvalidQueryParametersException($this->createParameterError(static::PARAM_FILTER));
         }
 
         $isWithAnd = true;
@@ -342,7 +348,7 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
                 empty($filterSection = $filterSection[$firstKey]) === true ||
                 is_array($filterSection) === false
             ) {
-                throw new JsonApiException($this->createParameterError(static::PARAM_FILTER));
+                throw new InvalidQueryParametersException($this->createParameterError(static::PARAM_FILTER));
             } else {
                 $this->setFilterParameters($filterSection);
                 if ($hasOr === true) {
@@ -436,7 +442,7 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
             ) {
                 $title = static::MSG_ERR_INVALID_OPERATION_ARGUMENTS;
                 $error = $this->createQueryError($parameterName, $title);
-                throw new JsonApiException($error);
+                throw new InvalidQueryParametersException($error);
             }
 
             yield $operationName => $this->splitCommaSeparatedStringAndCheckNoEmpties($parameterName, $arguments);

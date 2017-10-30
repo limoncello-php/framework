@@ -76,6 +76,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param Connection               $connection
      * @param string                   $modelClass
      * @param ModelSchemeInfoInterface $modelSchemes
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function __construct(Connection $connection, string $modelClass, ModelSchemeInfoInterface $modelSchemes)
     {

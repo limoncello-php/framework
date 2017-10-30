@@ -144,10 +144,8 @@ class Responses extends JsonApiResponses
      */
     protected function getResourceLocationUrl($resource)
     {
-        if ($resource instanceof PaginatedDataInterface) {
-            $resource = $resource->getData();
-        }
-
-        return parent::getResourceLocationUrl($resource);
+        return parent::getResourceLocationUrl(
+            $resource instanceof PaginatedDataInterface ? $resource->getData() : $resource
+        );
     }
 }

@@ -41,6 +41,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * @package Limoncello\Flute
  *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 abstract class BaseController implements ControllerInterface
@@ -68,8 +69,9 @@ abstract class BaseController implements ControllerInterface
         ServerRequestInterface $request
     ): ResponseInterface {
         // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
-        $parser = static::configureOnIndexParser(static::createQueryParser($container))
-            ->parse($request->getQueryParams());
+        $parser = static::configureOnIndexParser(
+            static::createQueryParser($container)
+        )->parse($request->getQueryParams());
         $mapper = static::createParameterMapper($container);
         $api    = static::createApi($container);
 
@@ -109,8 +111,9 @@ abstract class BaseController implements ControllerInterface
         ServerRequestInterface $request
     ): ResponseInterface {
         // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
-        $parser = static::configureOnReadParser(static::createQueryParser($container))
-            ->parse($request->getQueryParams());
+        $parser = static::configureOnReadParser(
+            static::createQueryParser($container)
+        )->parse($request->getQueryParams());
         $mapper = static::createParameterMapper($container);
 
         $index     = $routeParams[static::ROUTE_KEY_INDEX];
@@ -138,12 +141,11 @@ abstract class BaseController implements ControllerInterface
         if ($updated > 0) {
             $modelData = $api->read($index);
             assert(!($modelData instanceof PaginatedDataInterface));
-            $response  = $responses->getContentResponse($modelData);
-        } else {
-            $response = $responses->getCodeResponse(404);
+
+            return $responses->getContentResponse($modelData);
         }
 
-        return $response;
+        return $responses->getCodeResponse(404);
     }
 
     /**
@@ -178,8 +180,8 @@ abstract class BaseController implements ControllerInterface
         // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
         $parser = static::configureOnReadRelationshipParser(
             $relationshipName,
-            static::createQueryParser($container))->parse($request->getQueryParams()
-        );
+            static::createQueryParser($container)
+        )->parse($request->getQueryParams());
 
         $relData   = static::readRelationshipData($index, $relationshipName, $container, $parser);
         $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
@@ -366,12 +368,11 @@ abstract class BaseController implements ControllerInterface
         if ($updated > 0) {
             $modelData = $childApi->read($childIndex);
             assert(!($modelData instanceof PaginatedDataInterface));
-            $response  = $responses->getContentResponse($modelData);
-        } else {
-            $response = $responses->getCodeResponse(404);
+
+            return $responses->getContentResponse($modelData);
         }
 
-        return $response;
+        return $responses->getCodeResponse(404);
     }
 
     /**
@@ -459,8 +460,8 @@ abstract class BaseController implements ControllerInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected static function configureOnReadRelationshipParser(/** @noinspection PhpUnusedParameterInspection */
-        string $name,
+    protected static function configureOnReadRelationshipParser(
+        /** @noinspection PhpUnusedParameterInspection */ string $name,
         QueryParserInterface $parser
     ): QueryParserInterface {
         return $parser;
@@ -475,8 +476,7 @@ abstract class BaseController implements ControllerInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected static function configureOnReadRelationshipIdentifiersParser(
-        /** @noinspection PhpUnusedParameterInspection */
-        string $name,
+        /** @noinspection PhpUnusedParameterInspection */ string $name,
         QueryParserInterface $parser
     ): QueryParserInterface {
         return $parser;

@@ -83,7 +83,7 @@ abstract class FluteSettings implements SettingsInterface
     const KEY_URI_PREFIX = self::KEY_META + 1;
 
     /** Config key */
-    const KEY_LAST = self::KEY_URI_PREFIX + 1;
+    protected const KEY_LAST = self::KEY_URI_PREFIX + 1;
 
     /**
      * @return array

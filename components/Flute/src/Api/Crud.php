@@ -1010,7 +1010,7 @@ class Crud implements CrudInterface
      */
     public function delete(): int
     {
-        $deleted = $this->createDeleteModelBuilder()->execute();
+        $deleted = $this->createDeleteBuilder()->execute();
 
         $this->clearFetchParameters();
 

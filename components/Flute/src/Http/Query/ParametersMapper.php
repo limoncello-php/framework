@@ -25,9 +25,9 @@ use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Http\Query\RelationshipInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
+use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
 use Limoncello\Flute\Exceptions\LogicException;
 use Neomerx\JsonApi\Document\Error;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
  * @package Limoncello\Flute
@@ -260,7 +260,7 @@ class ParametersMapper implements ParametersMapperInterface
                 }
 
                 $error = $this->createQueryError(static::MSG_PARAM_INCLUDE, static::MSG_ERR_INVALID_FIELD);
-                throw new JsonApiException($error);
+                throw new InvalidQueryParametersException($error);
             }
         };
 
@@ -401,7 +401,7 @@ class ParametersMapper implements ParametersMapperInterface
         }
 
         $error = $this->createQueryError($field, static::MSG_ERR_INVALID_FIELD);
-        throw new JsonApiException($error);
+        throw new InvalidQueryParametersException($error);
     }
 
     /**
@@ -469,7 +469,7 @@ class ParametersMapper implements ParametersMapperInterface
                     break;
                 default:
                     $error = $this->createQueryError($parameterName, static::MSG_ERR_INVALID_OPERATION);
-                    throw new JsonApiException($error);
+                    throw new InvalidQueryParametersException($error);
             }
 
             yield $operation => $arguments;
