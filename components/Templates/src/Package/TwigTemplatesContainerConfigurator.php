@@ -41,7 +41,8 @@ class TwigTemplatesContainerConfigurator implements ContainerConfiguratorInterfa
                 $settings[C::KEY_APP_ROOT_FOLDER],
                 $settings[C::KEY_TEMPLATES_FOLDER],
                 $settings[C::KEY_CACHE_FOLDER] ?? null,
-                $settings[C::KEY_IS_DEBUG] ?? false
+                $settings[C::KEY_IS_DEBUG] ?? false,
+                $settings[C::KEY_IS_AUTO_RELOAD] ?? false
             );
 
             return $templates;

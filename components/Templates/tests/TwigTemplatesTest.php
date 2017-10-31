@@ -48,6 +48,7 @@ class TwigTemplatesTest extends TestCase
             __DIR__,
             __DIR__,
             false,
+            false,
         ]);
 
         $this->assertNotNull($templates);
@@ -65,6 +66,7 @@ class TwigTemplatesTest extends TestCase
             __DIR__,
             __DIR__,
             false,
+            false,
         ]);
 
         $this->assertNotNull($templates->getTwig());
@@ -80,6 +82,7 @@ class TwigTemplatesTest extends TestCase
             __DIR__,
             __DIR__,
             __DIR__,
+            false,
             false,
         ]);
 
@@ -106,6 +109,7 @@ class TwigTemplatesTest extends TestCase
             __DIR__,
             __DIR__,
             __DIR__,
+            false,
             false,
         ]);
 

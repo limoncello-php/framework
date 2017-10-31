@@ -42,10 +42,13 @@ class TemplatesSettings implements SettingsInterface
     const KEY_IS_DEBUG = self::KEY_APP_ROOT_FOLDER + 1;
 
     /** Settings key */
-    const KEY_TEMPLATES_LIST = self::KEY_IS_DEBUG + 1;
+    const KEY_IS_AUTO_RELOAD = self::KEY_IS_DEBUG + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_TEMPLATES_LIST;
+    const KEY_TEMPLATES_LIST = self::KEY_IS_AUTO_RELOAD + 1;
+
+    /** Settings key */
+    protected const KEY_LAST = self::KEY_TEMPLATES_LIST;
 
     /**
      * @inheritdoc
@@ -93,6 +96,7 @@ class TemplatesSettings implements SettingsInterface
     {
         return [
             static::KEY_IS_DEBUG            => false,
+            static::KEY_IS_AUTO_RELOAD      => false,
             static::KEY_TEMPLATES_FILE_MASK => '*.twig',
         ];
     }
