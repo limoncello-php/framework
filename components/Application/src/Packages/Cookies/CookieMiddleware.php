@@ -64,7 +64,7 @@ class CookieMiddleware implements MiddlewareInterface
                 //
                 // Notice constants are used with `static::`. Their values can and will be replaced in tests.
                 $setCookieFunction =
-                    $cookie->getIsNotRaw() === true ? static::SET_COOKIE_CALLABLE : static::SET_RAW_COOKIE_CALLABLE;
+                    $cookie->isNotRaw() === true ? static::SET_COOKIE_CALLABLE : static::SET_RAW_COOKIE_CALLABLE;
 
                 call_user_func(
                     $setCookieFunction,
@@ -73,8 +73,8 @@ class CookieMiddleware implements MiddlewareInterface
                     $cookie->getExpiresAtUnixTime(),
                     $cookie->getPath(),
                     $cookie->getDomain(),
-                    $cookie->getSendOnlyOverSecureConnection(),
-                    $cookie->getAccessibleOnlyThroughHttp()
+                    $cookie->isSendOnlyOverSecureConnection(),
+                    $cookie->isAccessibleOnlyThroughHttp()
                 );
             }
         }

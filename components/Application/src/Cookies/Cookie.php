@@ -200,7 +200,7 @@ class Cookie implements CookieInterface
     /**
      * @inheritdoc
      */
-    public function getSendOnlyOverSecureConnection(): bool
+    public function isSendOnlyOverSecureConnection(): bool
     {
         return $this->isSecure;
     }
@@ -218,7 +218,7 @@ class Cookie implements CookieInterface
     /**
      * @inheritdoc
      */
-    public function getSendOverAnyConnection(): bool
+    public function isSendOverAnyConnection(): bool
     {
         return !$this->isSecure;
     }
@@ -236,7 +236,7 @@ class Cookie implements CookieInterface
     /**
      * @inheritdoc
      */
-    public function getAccessibleOnlyThroughHttp(): bool
+    public function isAccessibleOnlyThroughHttp(): bool
     {
         return $this->isHttpOnly;
     }
@@ -254,7 +254,7 @@ class Cookie implements CookieInterface
     /**
      * @inheritdoc
      */
-    public function getAccessibleThroughHttpAndScripts(): bool
+    public function isAccessibleThroughHttpAndScripts(): bool
     {
         return !$this->isHttpOnly;
     }
@@ -272,7 +272,7 @@ class Cookie implements CookieInterface
     /**
      * @inheritdoc
      */
-    public function getIsRaw(): bool
+    public function isRaw(): bool
     {
         return $this->isRaw;
     }
@@ -290,7 +290,7 @@ class Cookie implements CookieInterface
     /**
      * @inheritdoc
      */
-    public function getIsNotRaw(): bool
+    public function isNotRaw(): bool
     {
         return !$this->isRaw;
     }

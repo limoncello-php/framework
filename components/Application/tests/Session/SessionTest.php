@@ -20,11 +20,9 @@ use ArrayIterator;
 use Limoncello\Application\Contracts\Session\SessionFunctionsInterface;
 use Limoncello\Application\Session\Session;
 use Limoncello\Application\Session\SessionFunctions;
-use Limoncello\Contracts\Session\SessionInterface;
 use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Application
@@ -103,27 +101,32 @@ class SessionTest extends TestCase
             function ($key, $value) use ($testKey, $testValue) {
                 $this->assertSame($testKey, $key);
                 $this->assertSame($testValue, $value);
-            });
+            }
+        );
         $functions->shouldReceive('getRetrieveCallable')->once()->withNoArgs()->andReturn(
             function ($key) use ($testKey, $testValue) {
                 $this->assertSame($testKey, $key);
 
                 return $testValue;
-            });
+            }
+        );
         $functions->shouldReceive('getHasCallable')->once()->withNoArgs()->andReturn(
             function ($key) use ($testKey, $testValue) {
                 $this->assertSame($testKey, $key);
 
                 return true;
-            });
+            }
+        );
         $functions->shouldReceive('getDeleteCallable')->once()->withNoArgs()->andReturn(
             function ($key) use ($testKey, $testValue) {
                 $this->assertSame($testKey, $key);
-            });
+            }
+        );
         $functions->shouldReceive('getIteratorCallable')->once()->withNoArgs()->andReturn(
             function () use ($testKey, $testValue) {
                 return new ArrayIterator([$testKey => $testValue]);
-            });
+            }
+        );
 
         /** @var SessionFunctionsInterface $functions */
 

@@ -52,6 +52,8 @@ trait Comparisons
      * @param RuleInterface|null $next
      *
      * @return RuleInterface
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected static function equals($value, RuleInterface $next = null): RuleInterface
     {
@@ -71,6 +73,8 @@ trait Comparisons
      * @param RuleInterface|null $next
      *
      * @return RuleInterface
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected static function notEquals($value, RuleInterface $next = null): RuleInterface
     {

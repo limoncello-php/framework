@@ -158,6 +158,8 @@ class CookieJar implements CookieJarInterface
 
     /**
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     protected function getDefaultIsSecure(): bool
     {
@@ -166,6 +168,8 @@ class CookieJar implements CookieJarInterface
 
     /**
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     protected function getDefaultIsHttpOnly(): bool
     {
@@ -174,6 +178,8 @@ class CookieJar implements CookieJarInterface
 
     /**
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     protected function getDefaultIsRaw(): bool
     {

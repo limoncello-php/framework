@@ -39,6 +39,8 @@ class PassportMiddleware implements MiddlewareInterface
      * @param ContainerInterface     $container
      *
      * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public static function handle(
         ServerRequestInterface $request,

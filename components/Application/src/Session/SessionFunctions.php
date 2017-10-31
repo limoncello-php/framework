@@ -22,6 +22,11 @@ use Limoncello\Application\Contracts\Session\SessionFunctionsInterface;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.Superglobals)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class SessionFunctions implements SessionFunctionsInterface
 {

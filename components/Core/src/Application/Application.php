@@ -135,7 +135,8 @@ abstract class Application implements ApplicationInterface
             $handler = $hasMiddleware === true ?
                 $this->addMiddlewareChain($handler, $container, $globalMiddleware, $routeMiddleware) : $handler;
 
-            $request = $requestFactory === null && $hasMiddleware === false && $matchCode === RouterInterface::MATCH_FOUND ?
+            $request =
+                $requestFactory === null && $hasMiddleware === false && $matchCode === RouterInterface::MATCH_FOUND ?
                 null :
                 $this->createRequest($this->sapi, $container, $requestFactory ?? static::getDefaultRequestFactory());
 

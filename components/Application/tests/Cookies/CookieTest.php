@@ -48,24 +48,24 @@ class CookieTest extends TestCase
         $this->assertEquals($expire, $cookie->getExpiresAtUnixTime());
         $this->assertEquals($path, $cookie->getPath());
         $this->assertEquals($domain, $cookie->getDomain());
-        $this->assertEquals($isSecure, $cookie->getSendOnlyOverSecureConnection());
-        $this->assertEquals(!$isSecure, $cookie->getSendOverAnyConnection());
-        $this->assertEquals($isHttpOnly, $cookie->getAccessibleOnlyThroughHttp());
-        $this->assertEquals(!$isHttpOnly, $cookie->getAccessibleThroughHttpAndScripts());
-        $this->assertEquals($isRaw, $cookie->getIsRaw());
-        $this->assertEquals(!$isRaw, $cookie->getIsNotRaw());
+        $this->assertEquals($isSecure, $cookie->isSendOnlyOverSecureConnection());
+        $this->assertEquals(!$isSecure, $cookie->isSendOverAnyConnection());
+        $this->assertEquals($isHttpOnly, $cookie->isAccessibleOnlyThroughHttp());
+        $this->assertEquals(!$isHttpOnly, $cookie->isAccessibleThroughHttpAndScripts());
+        $this->assertEquals($isRaw, $cookie->isRaw());
+        $this->assertEquals(!$isRaw, $cookie->isNotRaw());
 
         $isSecure ? $cookie->setSendOverAnyConnection() : $cookie->setSendOnlyOverSecureConnection();
-        $this->assertEquals(!$isSecure, $cookie->getSendOnlyOverSecureConnection());
-        $this->assertEquals($isSecure, $cookie->getSendOverAnyConnection());
+        $this->assertEquals(!$isSecure, $cookie->isSendOnlyOverSecureConnection());
+        $this->assertEquals($isSecure, $cookie->isSendOverAnyConnection());
 
         $isHttpOnly ? $cookie->setAccessibleThroughHttpAndScripts() : $cookie->setAccessibleOnlyThroughHttp();
-        $this->assertEquals(!$isHttpOnly, $cookie->getAccessibleOnlyThroughHttp());
-        $this->assertEquals($isHttpOnly, $cookie->getAccessibleThroughHttpAndScripts());
+        $this->assertEquals(!$isHttpOnly, $cookie->isAccessibleOnlyThroughHttp());
+        $this->assertEquals($isHttpOnly, $cookie->isAccessibleThroughHttpAndScripts());
 
         $isRaw ? $cookie->setAsNotRaw() : $cookie->setAsRaw();
-        $this->assertEquals(!$isRaw, $cookie->getIsRaw());
-        $this->assertEquals($isRaw, $cookie->getIsNotRaw());
+        $this->assertEquals(!$isRaw, $cookie->isRaw());
+        $this->assertEquals($isRaw, $cookie->isNotRaw());
 
         $cookie->setExpiresInSeconds(10);
         $this->assertEquals(time() + 10, $cookie->getExpiresAtUnixTime());

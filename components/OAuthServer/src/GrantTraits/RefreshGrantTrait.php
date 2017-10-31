@@ -78,6 +78,10 @@ trait RefreshGrantTrait
      * @param ClientInterface|null $determinedClient
      *
      * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function refreshIssueToken(array $parameters, ?ClientInterface $determinedClient): ResponseInterface
     {

@@ -50,6 +50,6 @@ class TwigTemplatesContainerConfigurator implements ContainerConfiguratorInterfa
         $container[TemplatesCacheInterface::class] =
             function (PsrContainerInterface $container): TemplatesCacheInterface {
                 return $container->get(TemplatesInterface::class);
-        };
+            };
     }
 }

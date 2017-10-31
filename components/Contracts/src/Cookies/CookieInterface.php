@@ -93,7 +93,7 @@ interface CookieInterface
     /**
      * @return bool
      */
-    public function getSendOnlyOverSecureConnection(): bool;
+    public function isSendOnlyOverSecureConnection(): bool;
 
     /**
      * @return self
@@ -103,7 +103,7 @@ interface CookieInterface
     /**
      * @return bool
      */
-    public function getSendOverAnyConnection(): bool;
+    public function isSendOverAnyConnection(): bool;
 
     /**
      * @return self
@@ -113,7 +113,7 @@ interface CookieInterface
     /**
      * @return bool
      */
-    public function getAccessibleOnlyThroughHttp(): bool;
+    public function isAccessibleOnlyThroughHttp(): bool;
 
     /**
      * @return self
@@ -123,7 +123,7 @@ interface CookieInterface
     /**
      * @return bool
      */
-    public function getAccessibleThroughHttpAndScripts(): bool;
+    public function isAccessibleThroughHttpAndScripts(): bool;
 
     /**
      * @return self
@@ -133,7 +133,7 @@ interface CookieInterface
     /**
      * @return bool
      */
-    public function getIsRaw(): bool;
+    public function isRaw(): bool;
 
     /**
      * @return self
@@ -143,7 +143,7 @@ interface CookieInterface
     /**
      * @return bool
      */
-    public function getIsNotRaw(): bool;
+    public function isNotRaw(): bool;
 
     /**
      * @return self
