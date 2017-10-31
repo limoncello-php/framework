@@ -28,7 +28,7 @@ class TagStorageTest extends TestCase
     /**
      * Test storage.
      */
-    public function testStorage()
+    public function testStorage(): void
     {
         $storage = new TagStorage();
 

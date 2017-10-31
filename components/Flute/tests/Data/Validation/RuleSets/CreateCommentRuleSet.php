@@ -24,7 +24,7 @@ use Limoncello\Tests\Flute\Data\Validation\AppRules as v;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 
 /**
- * @package Limoncello\Tests\Flute\Data\Validation\RuleSets
+ * @package Limoncello\Tests\Flute
  */
 class CreateCommentRuleSet implements JsonApiRuleSetInterface
 {

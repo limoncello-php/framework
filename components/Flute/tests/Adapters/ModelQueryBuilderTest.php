@@ -195,7 +195,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test builder.
      */
-    public function testRead()
+    public function testRead(): void
     {
         $builder = $this->createModelQueryBuilder(Board::class);
         $filters = [
@@ -225,7 +225,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test builder.
      */
-    public function testIndex()
+    public function testIndex(): void
     {
         $builder = $this->createModelQueryBuilder(Board::class);
 
@@ -243,7 +243,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test builder.
      */
-    public function testIndexWithFilters()
+    public function testIndexWithFilters(): void
     {
         $filters = [
             Board::FIELD_TITLE => [
@@ -305,7 +305,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test builder.
      */
-    public function testIndexWithFiltersJoinedWithOR()
+    public function testIndexWithFiltersJoinedWithOR(): void
     {
         $filters = [
             Board::FIELD_TITLE => [
@@ -338,7 +338,7 @@ class ModelQueryBuilderTest extends TestCase
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
-    public function testReadWithInvalidParam()
+    public function testReadWithInvalidParam(): void
     {
         $builder = $this->createModelQueryBuilder(Board::class);
 
@@ -354,270 +354,47 @@ class ModelQueryBuilderTest extends TestCase
             ->addFiltersWithAndToAlias($filters);
     }
 
-//
-//    /**
-//     * Test builder.
-//     */
-//    public function testCreate()
-//    {
-//        $attributes = [
-//            Board::FIELD_ID    => 123,
-//            Board::FIELD_TITLE => 'aaa',
-//        ];
-//
-//        $this->assertNotNull($builder = $this->builder->create(Board::class, $attributes));
-//
-//        /** @noinspection SqlDialectInspection */
-//        $expected = 'INSERT INTO `boards` (`id_board`, `title`) VALUES(:dcValue1, :dcValue2)';
-//
-//        $this->assertEquals($expected, $builder->getSQL());
-//        $this->assertEquals([
-//            'dcValue1' => '123',
-//            'dcValue2' => 'aaa',
-//        ], $builder->getParameters());
-//    }
-//
-//    /**
-//     * Test builder.
-//     */
-//    public function testUpdate()
-//    {
-//        $updated = [
-//            Board::FIELD_TITLE      => 'bbb',
-//            Board::FIELD_UPDATED_AT => '2000-01-02', // in real app it will be read-only and auto set
-//            Board::FIELD_DELETED_AT => null,         // again, not realistic but we need to check `null`
-//        ];
-//
-//        $this->assertNotNull($builder = $this->builder->update(Board::class, 123, $updated));
-//
-//        /** @noinspection SqlDialectInspection */
-//        $expected =
-//            'UPDATE `boards` SET `title` = :dcValue1, `updated_at` = :dcValue2, `deleted_at` = :dcValue3 ' .
-//            'WHERE `boards`.`id_board`=:dcValue4';
-//
-//        $this->assertEquals($expected, $builder->getSQL());
-//        $this->assertEquals([
-//            'dcValue1' => 'bbb',
-//            'dcValue2' => '2000-01-02',
-//            'dcValue3' => null,
-//            'dcValue4' => '123',
-//        ], $builder->getParameters());
-//        $this->assertNull($builder->getParameters()['dcValue3']);
-//    }
-//
-//    /**
-//     * Test builder.
-//     */
-//    public function testDelete()
-//    {
-//        $indexBind = ':index';
-//        $this->assertNotNull($builder = $this->builder->delete(Board::class, $indexBind));
-//
-//        /** @noinspection SqlDialectInspection */
-//        $expected = 'DELETE FROM `boards` WHERE `boards`.`id_board`=' . $indexBind;
-//
-//        $this->assertEquals($expected, $builder->getSQL());
-//    }
-//
-//    /**
-//     * Test builder.
-//     */
-//    public function testSaveToMany()
-//    {
-//        $indexBind      = ':index';
-//        $otherIndexBind = ':otherIndex';
-//
-//        $this->assertNotNull($builder = $this->builder->createToManyRelationship(
-//            Comment::class,
-//            $indexBind,
-//            Comment::REL_EMOTIONS,
-//            $otherIndexBind
-//        ));
-//
-//        /** @noinspection SqlDialectInspection */
-//        $expected =
-//            "INSERT INTO `comments_emotions` (`id_comment_fk`, `id_emotion_fk`) " .
-//            "VALUES($indexBind, $otherIndexBind)";
-//
-//        $this->assertEquals($expected, $builder->getSQL());
-//    }
-//
-//    /**
-//     * Test builder.
-//     */
-//    public function testCleanToMany()
-//    {
-//        $indexBind = ':index';
-//
-//        $this->assertNotNull($builder = $this->builder->cleanToManyRelationship(
-//            Comment::class,
-//            $indexBind,
-//            Comment::REL_EMOTIONS
-//        ));
-//
-//        /** @noinspection SqlDialectInspection */
-//        $expected = "DELETE FROM `comments_emotions` WHERE `comments_emotions`.`id_comment_fk`=$indexBind";
-//
-//        $this->assertEquals($expected, $builder->getSQL());
-//    }
-//
-//    /**
-//     * Test builder.
-//     */
-//    public function testHasInRelationship()
-//    {
-//        $indexBind      = ':index';
-//        $childIndexBind = ':childIndex';
-//
-//        /** @var QueryBuilder $builder */
-//        list($builder, $targetClass, $relType) = $this->builder->hasInRelationship(
-//            Post::class,
-//            $indexBind,
-//            Post::REL_COMMENTS,
-//            $childIndexBind
-//        );
-//        $this->assertNotNull($builder);
-//        $this->assertEquals(Comment::class, $targetClass);
-//        $this->assertEquals(RelationshipTypes::HAS_MANY, $relType);
-//
-//        $expected =
-//            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-//            '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-//            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-//            '`comments`.`deleted_at` ' .
-//            'FROM `comments` ' .
-//            "WHERE (`comments`.`id_post_fk`=$indexBind) AND (`comments`.`id_comment`=$childIndexBind)";
-//
-//        $this->assertEquals($expected, $builder->getSQL());
-//    }
-//
-//    /**
-//     * Test builder.
-//     */
-//    public function testCount()
-//    {
-//        $this->assertNotNull($builder = $this->builder->count(Board::class));
-//
-//        $expected = 'SELECT COUNT(*) FROM `boards`';
-//
-//        $this->assertEquals($expected, $builder->getSQL());
-//    }
-//
-//    /**
-//     * Test filtering by attributes in relationship.
-//     */
-//    public function testFilterBelongsToRelationshipAttribute()
-//    {
-//        $this->migrateDatabase($this->connection);
-//
-//        $value        = [
-//            'like' => '%ss%',
-//        ];
-//        $sep          = DocumentInterface::PATH_SEPARATOR;
-//        $filterParams = new FilterParameterCollection();
-//        $filterParams->add(new FilterParameter(
-//            CommentSchema::REL_POST . $sep . PostSchema::ATTR_TEXT,
-//            Comment::REL_POST,
-//            Post::FIELD_TEXT,
-//            $value,
-//            RelationshipTypes::BELONGS_TO
-//        ));
-//
-//        $errors  = new ErrorCollection();
-//        $builder = $this->builder->index(Comment::class);
-//
-//        $this->builder->applyFilters($errors, $builder, Comment::class, $filterParams);
-//        $this->assertEmpty($errors);
-//
-//        $expected =
-//            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-//            '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-//            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-//            '`comments`.`deleted_at`' .
-//            " FROM `comments` INNER JOIN `posts` posts1 ON `comments`.`id_post_fk`=`posts1`.`id_post`" .
-//            " WHERE `posts1`.`text` LIKE :dcValue1 GROUP BY `comments`.`id_comment`";
-//
-//        $sql = $builder->getSQL();
-//        $this->assertEquals($expected, $sql);
-//    }
-//
-//    /**
-//     * Test filtering by attributes in relationship.
-//     */
-//    public function testFilterHasManyRelationshipAttribute()
-//    {
-//        $this->migrateDatabase($this->connection);
-//
-//        $value        = [
-//            'like' => '%ss%',
-//        ];
-//        $sep          = DocumentInterface::PATH_SEPARATOR;
-//        $filterParams = new FilterParameterCollection();
-//        $filterParams->add(new FilterParameter(
-//            PostSchema::REL_COMMENTS . $sep . CommentSchema::ATTR_TEXT,
-//            Post::REL_COMMENTS,
-//            Comment::FIELD_TEXT,
-//            $value,
-//            RelationshipTypes::HAS_MANY
-//        ));
-//
-//        $errors  = new ErrorCollection();
-//        $builder = $this->builder->index(Post::class);
-//
-//        $this->builder->applyFilters($errors, $builder, Post::class, $filterParams);
-//        $this->assertEmpty($errors);
-//
-//        $expected =
-//            "SELECT `posts`.`id_post`, `posts`.`id_board_fk`, `posts`.`id_user_fk`, `posts`.`id_editor_fk`," .
-//            " `posts`.`title`, `posts`.`text`, `posts`.`created_at`, `posts`.`updated_at`, `posts`.`deleted_at`" .
-//            " FROM `posts` INNER JOIN `comments` comments1 ON `posts`.`id_post`=`comments1`.`id_post_fk`" .
-//            " WHERE `comments1`.`text` LIKE :dcValue1 GROUP BY `posts`.`id_post`";
-//
-//        $sql = $builder->getSQL();
-//        $this->assertEquals($expected, $sql);
-//    }
-//
-//    /**
-//     * Test filtering by attributes in relationship.
-//     */
-//    public function testFilterBelongsToManyRelationshipAttribute()
-//    {
-//        $this->migrateDatabase($this->connection);
-//
-//        $value        = [
-//            'like' => '%ss%',
-//        ];
-//        $sep          = DocumentInterface::PATH_SEPARATOR;
-//        $filterParams = new FilterParameterCollection();
-//        $filterParams->add(new FilterParameter(
-//            CommentSchema::REL_EMOTIONS . $sep . EmotionSchema::ATTR_NAME,
-//            Comment::REL_EMOTIONS,
-//            Emotion::FIELD_NAME,
-//            $value,
-//            RelationshipTypes::BELONGS_TO_MANY
-//        ));
-//
-//        $errors  = new ErrorCollection();
-//        $builder = $this->builder->index(Comment::class);
-//
-//        $this->builder->applyFilters($errors, $builder, Comment::class, $filterParams);
-//        $this->assertEmpty($errors);
-//
-//        $expected =
-//            'SELECT `comments`.`id_comment`, `comments`.`id_post_fk`, `comments`.`id_user_fk`, ' .
-//            '`comments`.`text`, `comments`.`int_value`, `comments`.`float_value`, `comments`.`bool_value`, ' .
-//            '`comments`.`datetime_value`, `comments`.`created_at`, `comments`.`updated_at`, ' .
-//            '`comments`.`deleted_at`' .
-//            " FROM `comments`" .
-//            " INNER JOIN `comments_emotions` comments_emotions1 ON" .
-//            " `comments`.`id_comment`=`comments_emotions1`.`id_comment_fk`" .
-//            " INNER JOIN `emotions` emotions2 ON `comments_emotions1`.`id_emotion_fk`=`emotions2`.`id_emotion`" .
-//            " WHERE `emotions2`.`name` LIKE :dcValue1" .
-//            " GROUP BY `comments`.`id_comment`";
-//
-//        $sql = $builder->getSQL();
-//        $this->assertEquals($expected, $sql);
-//    }
+    /**
+     * Test update with OR condition.
+     */
+    public function testUpdateWithOrCondition(): void
+    {
+        $filters = [
+            Board::FIELD_ID => [
+                FilterParameterInterface::OPERATION_GREATER_OR_EQUALS => [1],
+                FilterParameterInterface::OPERATION_LESS_OR_EQUALS    => [5],
+            ],
+        ];
+
+        $builder = $this->createModelQueryBuilder(Board::class);
+        $builder
+            ->addFiltersWithOrToTable($filters)
+            ->updateModels([
+                Board::FIELD_TITLE => 'New title',
+            ]);
+
+        $expected =
+            'UPDATE `boards` SET `title` = :dcValue3 '.
+            'WHERE (`boards`.`id_board` >= :dcValue1) OR (`boards`.`id_board` <= :dcValue2)';
+
+        $this->assertEquals($expected, $builder->getSQL());
+        $this->assertEquals([
+            'dcValue1' => 1,
+            'dcValue2' => 5,
+            'dcValue3' => 'New title',
+        ], $builder->getParameters());
+    }
+
+    /**
+     * Test building quoted column names.
+     */
+    public function testBuildingQuotedColumns(): void
+    {
+        $builder = $this->createModelQueryBuilder(Board::class);
+
+        $this->assertEquals('`boards`.`title`', $builder->getQuotedMainTableColumn(Board::FIELD_TITLE));
+        $this->assertEquals('`boards1`.`title`', $builder->getQuotedMainAliasColumn(Board::FIELD_TITLE));
+    }
 
     /**
      * @param string $modelClass

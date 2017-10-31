@@ -36,7 +36,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -66,7 +66,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testDefaultNativeConversions()
+    public function testDefaultNativeConversions(): void
     {
         $type     = Type::getType(DateTimeDefaultNativeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -99,7 +99,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testDefaultStringConversions()
+    public function testDefaultStringConversions(): void
     {
         $type     = Type::getType(DateTimeDefaultStringType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -122,7 +122,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiNativeConversions()
+    public function testJsonApiNativeConversions(): void
     {
         $type     = Type::getType(DateTimeJsonApiNativeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -147,7 +147,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiStringConversions()
+    public function testJsonApiStringConversions(): void
     {
         $type     = Type::getType(DateTimeJsonApiStringType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -172,7 +172,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testInvalidValueForDefaultNativeConversions()
+    public function testInvalidValueForDefaultNativeConversions(): void
     {
         $type     = Type::getType(DateTimeDefaultNativeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -188,7 +188,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiStringDateConversions()
+    public function testJsonApiStringDateConversions(): void
     {
         $type     = Type::getType(DateJsonApiStringType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -214,7 +214,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTimeTypeConversions()
+    public function testJsonApiDateTimeTypeConversions(): void
     {
         $type     = Type::getType(JsonApiDateTimeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -230,7 +230,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTimeTypeToDatabaseConversions1()
+    public function testJsonApiDateTimeTypeToDatabaseConversions1(): void
     {
         $type     = Type::getType(JsonApiDateTimeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -245,7 +245,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTimeTypeToDatabaseConversions2()
+    public function testJsonApiDateTimeTypeToDatabaseConversions2(): void
     {
         $type     = Type::getType(JsonApiDateTimeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -260,7 +260,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTimeTypeToDatabaseConversions3()
+    public function testJsonApiDateTimeTypeToDatabaseConversions3(): void
     {
         /** @var JsonApiDateTimeType $type */
         $type     = Type::getType(JsonApiDateTimeType::NAME);
@@ -278,7 +278,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput1()
+    public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput1(): void
     {
         $type     = Type::getType(JsonApiDateTimeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -293,7 +293,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput2()
+    public function testJsonApiDateTimeTypeToDatabaseConversionsInvalidInput2(): void
     {
         $type     = Type::getType(JsonApiDateTimeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -306,7 +306,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTypeConversions()
+    public function testJsonApiDateTypeConversions(): void
     {
         $type     = Type::getType(JsonApiDateType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -322,7 +322,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTypeToDatabaseConversions1()
+    public function testJsonApiDateTypeToDatabaseConversions1(): void
     {
         /** @var JsonApiDateType $type */
         $type     = Type::getType(JsonApiDateType::NAME);
@@ -338,7 +338,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTypeToDatabaseConversions2()
+    public function testJsonApiDateTypeToDatabaseConversions2(): void
     {
         /** @var JsonApiDateType $type */
         $type     = Type::getType(JsonApiDateType::NAME);
@@ -354,7 +354,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      */
-    public function testJsonApiDateTypeToDatabaseConversions3()
+    public function testJsonApiDateTypeToDatabaseConversions3(): void
     {
         /** @var JsonApiDateType $type */
         $type     = Type::getType(JsonApiDateType::NAME);
@@ -372,7 +372,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testJsonApiDateTypeToDatabaseConversionsInvalidInput1()
+    public function testJsonApiDateTypeToDatabaseConversionsInvalidInput1(): void
     {
         $type     = Type::getType(JsonApiDateType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -387,7 +387,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testJsonApiDateTypeToDatabaseConversionsInvalidInput2()
+    public function testJsonApiDateTypeToDatabaseConversionsInvalidInput2(): void
     {
         $type     = Type::getType(JsonApiDateType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -402,7 +402,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testInvalidValueForJsonApiStringDateConversions()
+    public function testInvalidValueForJsonApiStringDateConversions(): void
     {
         $type     = Type::getType(DateJsonApiStringType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
@@ -420,7 +420,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testDefaultStringConversionsInvalidValue()
+    public function testDefaultStringConversionsInvalidValue(): void
     {
         Type::getType(DateTimeDefaultStringType::NAME)->convertToDatabaseValue(
             '2001-02-03 04:05:06', // invalid format
@@ -433,7 +433,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testJsonApiNativeConversionsInvalidValue()
+    public function testJsonApiNativeConversionsInvalidValue(): void
     {
         Type::getType(DateTimeJsonApiNativeType::NAME)->convertToPHPValue(
             '2001-02-03 04:05:06', // invalid format
@@ -446,7 +446,7 @@ class DateTimeTypesTest extends TestCase
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
      */
-    public function testJsonApiStringConversionsInvalidValue()
+    public function testJsonApiStringConversionsInvalidValue(): void
     {
         Type::getType(DateTimeJsonApiStringType::NAME)->convertToDatabaseValue(
             '2001-02-03 04:05:06', // invalid format

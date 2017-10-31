@@ -71,4 +71,12 @@ class AppRules extends Rules
     {
         return static::existAll(Emotion::TABLE_NAME, Emotion::FIELD_ID);
     }
+
+    /**
+     * @return RuleInterface
+     */
+    public static function userIdWithoutCheckInDatabase()
+    {
+        return static::stringToInt();
+    }
 }

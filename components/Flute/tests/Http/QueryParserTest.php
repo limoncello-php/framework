@@ -213,6 +213,59 @@ class QueryParserTest extends TestCase
     }
 
     /**
+     * Test query.
+     *
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidQueryParametersException
+     */
+    public function testGetFiltersWithInvalidValues1(): void
+    {
+        $queryParameters = [
+            QueryParserInterface::PARAM_FILTER => [
+                BoardSchema::RESOURCE_ID => 'cannot be string',
+            ],
+        ];
+
+        $this->iterableToArray($this->createParser($queryParameters)->getFilters());
+    }
+
+    /**
+     * Test query.
+     *
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidQueryParametersException
+     */
+    public function testGetFiltersWithInvalidValues2(): void
+    {
+        $queryParameters = [
+            QueryParserInterface::PARAM_FILTER => [
+                BoardSchema::RESOURCE_ID => [
+                    'in' => ['must be string but not array'],
+                ],
+            ],
+        ];
+
+        $this->iterableToArray($this->createParser($queryParameters)->getFilters());
+    }
+
+    /**
+     * Test create EncodingParameters.
+     */
+    public function testCreateEncodingParametersForInputGenerator(): void
+    {
+        $generator = function () {
+            yield 'some_value';
+        };
+
+        $queryParameters = [
+            QueryParserInterface::PARAM_FIELDS => [
+                'posts' => $generator(),
+            ],
+        ];
+
+        $parameters = $this->createParser($queryParameters)->createEncodingParameters();
+        $this->assertEquals(['some_value'], $parameters->getFieldSet('posts'));
+    }
+
+    /**
      * @param array $queryParameters
      *
      * @return QueryParserInterface

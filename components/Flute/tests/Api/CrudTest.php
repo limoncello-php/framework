@@ -62,7 +62,7 @@ class CrudTest extends TestCase
     /**
      * Test create read and delete newly created resource.
      */
-    public function testCreateReadAndDeletePost()
+    public function testCreateReadAndDeletePost(): void
     {
         $userId     = 1;
         $boardId    = 2;
@@ -102,7 +102,7 @@ class CrudTest extends TestCase
     /**
      * Test create read and delete newly created resource with string primary key.
      */
-    public function testCreateReadAndDeleteStringPKModel()
+    public function testCreateReadAndDeleteStringPKModel(): void
     {
         $pk         = 'new_pk_value';
         $name       = 'Some title';
@@ -134,7 +134,7 @@ class CrudTest extends TestCase
     /**
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
-    public function testInputChecksForCreate()
+    public function testInputChecksForCreate(): void
     {
         $invalidIndex = new stdClass();
 
@@ -144,7 +144,7 @@ class CrudTest extends TestCase
     /**
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
-    public function testInputChecksForUpdate()
+    public function testInputChecksForUpdate(): void
     {
         $invalidIndex = new stdClass();
 
@@ -154,7 +154,7 @@ class CrudTest extends TestCase
     /**
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
-    public function testInputChecksForReadDelete()
+    public function testInputChecksForReadDelete(): void
     {
         $invalidIndex = new stdClass();
 
@@ -164,7 +164,7 @@ class CrudTest extends TestCase
     /**
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
-    public function testInputChecksForRead()
+    public function testInputChecksForRead(): void
     {
         $invalidIndex = new stdClass();
 
@@ -174,7 +174,7 @@ class CrudTest extends TestCase
     /**
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
-    public function testInputChecksForReadRow()
+    public function testInputChecksForReadRow(): void
     {
         $invalidIndex = new stdClass();
 
@@ -184,7 +184,7 @@ class CrudTest extends TestCase
     /**
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
-    public function testInputChecksForHasInRelationship1()
+    public function testInputChecksForHasInRelationship1(): void
     {
         $invalidIndex = new stdClass();
 
@@ -194,7 +194,7 @@ class CrudTest extends TestCase
     /**
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
-    public function testInputChecksForHasInRelationship2()
+    public function testInputChecksForHasInRelationship2(): void
     {
         $invalidIndex = new stdClass();
 
@@ -204,7 +204,7 @@ class CrudTest extends TestCase
     /**
      * Test create resource with to-many (belongs-to-many relationships).
      */
-    public function testCreateCommentsWithEmotions()
+    public function testCreateCommentsWithEmotions(): void
     {
         $userId     = 1;
         $postId     = 2;
@@ -274,7 +274,7 @@ class CrudTest extends TestCase
     /**
      * Test update resource with to-many (belongs-to-many relationships).
      */
-    public function testUpdateCommentsWithEmotions()
+    public function testUpdateCommentsWithEmotions(): void
     {
         $commentId  = 1;
         $userId     = 1;
@@ -329,7 +329,7 @@ class CrudTest extends TestCase
     /**
      * @expectedException \Doctrine\DBAL\Exception\DriverException
      */
-    public function testDeleteResourceWithConstraints()
+    public function testDeleteResourceWithConstraints(): void
     {
         $crud = $this->createCrud(PostsApi::class);
         $crud->remove(1);
@@ -338,7 +338,7 @@ class CrudTest extends TestCase
     /**
      * Check 'read' with included paths.
      */
-    public function testReadWithIncludes()
+    public function testReadWithIncludes(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -403,7 +403,7 @@ class CrudTest extends TestCase
     /**
      * Check 'read' with included paths.
      */
-    public function testUntypedReadWithIncludes()
+    public function testUntypedReadWithIncludes(): void
     {
         /** @var Crud $crud */
         $crud = $this->createCrud(PostsApi::class);
@@ -475,7 +475,7 @@ class CrudTest extends TestCase
     /**
      * Check 'read' with included paths where could be nulls.
      */
-    public function testReadWithNullableInclude()
+    public function testReadWithNullableInclude(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -501,7 +501,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      */
-    public function testIndex()
+    public function testIndex(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -547,7 +547,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      */
-    public function testIndexFilterOperationOnRelationship()
+    public function testIndexFilterOperationOnRelationship(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -567,7 +567,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      */
-    public function testCommentsIndex()
+    public function testCommentsIndex(): void
     {
         // check that API returns comments from only specific user (as configured in Comments API)
         $expectedUserId = 1;
@@ -585,7 +585,7 @@ class CrudTest extends TestCase
     /**
      * Test read relationship.
      */
-    public function testReadRelationship()
+    public function testReadRelationship(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -626,7 +626,45 @@ class CrudTest extends TestCase
     /**
      * Test read relationship.
      */
-    public function testReadRelationshipIdentities()
+    public function testReadRelationshipWithOrFilters(): void
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        // will select all comments for Posts with ID 1 or 2...
+        $postFilters    = [
+            Post::FIELD_ID => [
+                FilterParameterInterface::OPERATION_EQUALS => [1],
+                FilterParameterInterface::OPERATION_IN     => [2],
+            ],
+        ];
+        // ... where comments have user ID 1 or 2 as an author and ...
+        $commentFilters = [
+            Comment::FIELD_ID_USER => [
+                FilterParameterInterface::OPERATION_IN => [1, 2],
+            ],
+        ];
+        // ... sort them by parent post ID
+        $commentSorts   = [
+            Comment::FIELD_ID_POST => true,
+        ];
+
+        $data = $crud
+            ->combineWithOr()
+            ->withFilters($postFilters)
+            ->indexRelationship(Post::REL_COMMENTS, $commentFilters, $commentSorts);
+
+        $this->assertNotEmpty($comments = $data->getData());
+        $this->assertCount(3, $comments);
+        $this->assertEquals(10, $data->getData()[0]->{Comment::FIELD_ID});
+        $this->assertEquals(83, $data->getData()[1]->{Comment::FIELD_ID});
+        $this->assertEquals(31, $data->getData()[2]->{Comment::FIELD_ID});
+        $this->assertTrue($data->isCollection());
+    }
+
+    /**
+     * Test read relationship.
+     */
+    public function testReadRelationshipIdentities(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -659,9 +697,19 @@ class CrudTest extends TestCase
     }
 
     /**
+     * Test read relationship.
+     *
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testReadRelationshipIdentitiesForBelongsToRelationship(): void
+    {
+        $this->createCrud(PostsApi::class)->indexRelationshipIdentities(Post::REL_USER);
+    }
+
+    /**
      * Test index.
      */
-    public function testIndexWithFilterByBooleanColumn()
+    public function testIndexWithFilterByBooleanColumn(): void
     {
         $crud = $this->createCrud(UsersApi::class);
 
@@ -685,7 +733,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      */
-    public function testIndexWithEqualsOperator()
+    public function testIndexWithEqualsOperator(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -707,7 +755,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      */
-    public function testReadRow()
+    public function testReadRow(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -721,7 +769,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      */
-    public function testReadUntypedRow()
+    public function testReadUntypedRow(): void
     {
         /** @var Crud $crud */
         $crud = $this->createCrud(PostsApi::class);
@@ -737,7 +785,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      */
-    public function testReadUntypedModelWithCustomColumnBuilder()
+    public function testReadUntypedModelWithCustomColumnBuilder(): void
     {
         /** @var Crud $crud */
         $crud = $this->createCrud(PostsApi::class);
@@ -766,7 +814,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      */
-    public function testReadColumn()
+    public function testReadColumn(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -788,7 +836,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      */
-    public function testReadUntypedColumn()
+    public function testReadUntypedColumn(): void
     {
         /** @var Crud $crud */
         $crud = $this->createCrud(PostsApi::class);
@@ -813,7 +861,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      */
-    public function testCount()
+    public function testCount(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -834,7 +882,7 @@ class CrudTest extends TestCase
     /**
      * Test check resource exists in relationship.
      */
-    public function testHasInRelationship()
+    public function testHasInRelationship(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -847,7 +895,7 @@ class CrudTest extends TestCase
      *
      * @return CrudInterface
      */
-    private function createCrud($class)
+    private function createCrud(string $class): CrudInterface
     {
         $container = new Container();
 

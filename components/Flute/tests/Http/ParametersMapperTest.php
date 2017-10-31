@@ -21,6 +21,7 @@ use Limoncello\Container\Container;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Http\Query\RelationshipInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
@@ -40,7 +41,7 @@ class ParametersMapperTest extends TestCase
     /**
      * Test query.
      */
-    public function testGetFilters(): void
+    public function testGetFiltersForVariousFieldTypes(): void
     {
         $filterParameters = [
             BoardSchema::RESOURCE_ID                              => [
@@ -106,6 +107,99 @@ class ParametersMapperTest extends TestCase
         $this->assertEquals([
             FilterParameterInterface::OPERATION_NOT_LIKE => ['not_like%'],
         ], $this->iterableToArray($filter->getOperationsWithArguments()));
+    }
+
+    /**
+     * Test query.
+     */
+    public function testGetFiltersForVariousOperations(): void
+    {
+        $filterParameters = [
+            BoardSchema::RESOURCE_ID => [
+                'equals'            => ['1'],
+                'not-equals'        => ['1'],
+                'less-than'         => ['1'],
+                'less-or-equals'    => ['1'],
+                'greater-than'      => ['1'],
+                'greater-or-equals' => ['1'],
+                'like'              => ['1'],
+                'not-like'          => ['1'],
+                'in'                => ['1', '2'],
+                'not-in'            => ['1', '2'],
+                'is-null'           => [],
+                'not-null'          => [],
+            ],
+        ];
+
+        $mapper = $this->createMapper(BoardSchema::class)->withFilters($filterParameters);
+
+        /** @var FilterParameterInterface[] $filters */
+        $filters = $this->iterableToArray($mapper->getMappedFilters());
+        $this->assertCount(1, $filters);
+
+        $filter = reset($filters);
+        $this->assertNull($filter->getRelationship());
+        $this->assertNotNull($filter->getAttribute());
+        $this->assertEquals(BoardSchema::RESOURCE_ID, $filter->getAttribute()->getNameInScheme());
+        $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals([
+            FilterParameterInterface::OPERATION_EQUALS            => ['1'],
+            FilterParameterInterface::OPERATION_NOT_EQUALS        => ['1'],
+            FilterParameterInterface::OPERATION_LESS_THAN         => ['1'],
+            FilterParameterInterface::OPERATION_LESS_OR_EQUALS    => ['1'],
+            FilterParameterInterface::OPERATION_GREATER_THAN      => ['1'],
+            FilterParameterInterface::OPERATION_GREATER_OR_EQUALS => ['1'],
+            FilterParameterInterface::OPERATION_LIKE              => ['1'],
+            FilterParameterInterface::OPERATION_NOT_LIKE          => ['1'],
+            FilterParameterInterface::OPERATION_IN                => ['1', '2'],
+            FilterParameterInterface::OPERATION_NOT_IN            => ['1', '2'],
+            FilterParameterInterface::OPERATION_IS_NULL           => [],
+            FilterParameterInterface::OPERATION_IS_NOT_NULL       => [],
+        ], $this->iterableToArray($filter->getOperationsWithArguments()));
+    }
+
+    /**
+     * Test query.
+     *
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidQueryParametersException
+     */
+    public function testGetFiltersForUnknownOperation(): void
+    {
+        $filterParameters = [
+            BoardSchema::RESOURCE_ID => [
+                'non-existing-operation' => [],
+            ],
+        ];
+
+        $mapper = $this->createMapper(BoardSchema::class)->withFilters($filterParameters);
+
+        /** @var FilterParameterInterface[] $filters */
+        $filters = $this->iterableToArray($mapper->getMappedFilters());
+        $this->assertCount(1, $filters);
+
+        $filter = reset($filters);
+        $this->iterableToArray($filter->getOperationsWithArguments());
+    }
+
+    /**
+     * Test query.
+     *
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidQueryParametersException
+     */
+    public function testGetFiltersForUnknownField(): void
+    {
+        $filterParameters = [
+            'non_existing_field' => ['equals' => ['1']],
+        ];
+
+        $mapper = $this->createMapper(BoardSchema::class)->withFilters($filterParameters);
+
+        /** @var FilterParameterInterface[] $filters */
+        $filters = $this->iterableToArray($mapper->getMappedFilters());
+        $this->assertCount(1, $filters);
+
+        $filter = reset($filters);
+        $this->iterableToArray($filter->getOperationsWithArguments());
     }
 
     /**
@@ -199,6 +293,31 @@ class ParametersMapperTest extends TestCase
     }
 
     /**
+     * Test query.
+     *
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidQueryParametersException
+     */
+    public function testIncludesWithInvalidPaths(): void
+    {
+        $path1 = [BoardSchema::REL_POSTS . 'XXX']; // invalid path
+
+        $includeParameters = [$path1];
+
+        $mapper = $this->createMapper(BoardSchema::class)->withIncludes($includeParameters);
+        $this->iterableToArray($mapper->getMappedIncludes());
+    }
+
+    /**
+     * @expectedException \Limoncello\Flute\Exceptions\LogicException
+     */
+    public function testUsageWhenNoRootSchemeSet(): void
+    {
+        $includes = (new ParametersMapper($this->createDefaultJsonSchemes()))->getMappedIncludes();
+
+        $this->iterableToArray($includes);
+    }
+
+    /**
      * @param string $schemaClass
      *
      * @return ParametersMapperInterface
@@ -206,11 +325,19 @@ class ParametersMapperTest extends TestCase
     private function createMapper(string $schemaClass): ParametersMapperInterface
     {
         assert(in_array(SchemaInterface::class, class_implements($schemaClass)));
+
         /** @var SchemaInterface $schemaClass */
 
-        $schemes = $this->getJsonSchemes(new Factory(new Container()), $this->getModelSchemes());
+        return (new ParametersMapper($this->createDefaultJsonSchemes()))
+            ->selectRootSchemeByResourceType($schemaClass::TYPE);
+    }
 
-        return (new ParametersMapper($schemes))->selectRootSchemeByResourceType($schemaClass::TYPE);
+    /**
+     * @return JsonSchemesInterface
+     */
+    private function createDefaultJsonSchemes(): JsonSchemesInterface
+    {
+        return $this->getJsonSchemes(new Factory(new Container()), $this->getModelSchemes());
     }
 
     /**

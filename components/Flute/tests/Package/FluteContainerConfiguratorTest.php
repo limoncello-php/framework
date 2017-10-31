@@ -47,7 +47,7 @@ class FluteContainerConfiguratorTest extends TestCase
     /**
      * Test configurator.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $container = new Container();
 

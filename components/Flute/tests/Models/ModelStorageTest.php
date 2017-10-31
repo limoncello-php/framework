@@ -30,7 +30,7 @@ class ModelStorageTest extends TestCase
     /**
      * Test storage.
      */
-    public function testStorage()
+    public function testStorage(): void
     {
         $storage = new ModelStorage($this->createSchemaStorage());
 
@@ -53,7 +53,7 @@ class ModelStorageTest extends TestCase
     /**
      * @return ModelSchemeInfoInterface
      */
-    private function createSchemaStorage()
+    private function createSchemaStorage(): ModelSchemeInfoInterface
     {
         $storage = new ModelSchemes();
         $storage->registerClass(Post::class, Post::TABLE_NAME, Post::FIELD_ID, [], []);

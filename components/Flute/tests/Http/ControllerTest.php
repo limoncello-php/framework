@@ -71,7 +71,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIndexWithoutParameters()
+    public function testIndexWithoutParameters(): void
     {
         $routeParams = [];
         $container   = $this->createContainer();
@@ -99,7 +99,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIndexSortByIdDesc()
+    public function testIndexSortByIdDesc(): void
     {
         $routeParams = [];
         $container   = $this->createContainer();
@@ -141,7 +141,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIndexWithParameters()
+    public function testIndexWithParameters(): void
     {
         $routeParams = [];
         $queryParams = [
@@ -189,7 +189,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIndexWithParametersJoinedByOR()
+    public function testIndexWithParametersJoinedByOR(): void
     {
         $routeParams = [];
         $queryParams = [
@@ -236,7 +236,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIndexWithParametersWithInvalidJoinParam()
+    public function testIndexWithParametersWithInvalidJoinParam(): void
     {
         $routeParams = [];
         $queryParams = [
@@ -271,7 +271,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIndexWithInvalidParameters()
+    public function testIndexWithInvalidParameters(): void
     {
         $routeParams = [];
         $queryParams = [
@@ -306,7 +306,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testPaginationInRelationship()
+    public function testPaginationInRelationship(): void
     {
         $routeParams = [];
         $queryParams = [
@@ -348,7 +348,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIncludeNullableRelationshipToItself()
+    public function testIncludeNullableRelationshipToItself(): void
     {
         $routeParams = [];
         $queryParams = [
@@ -384,7 +384,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testReadToOneRelationship()
+    public function testReadToOneRelationship(): void
     {
         $routeParams = [CommentsController::ROUTE_KEY_INDEX => '2'];
         $queryParams = [];
@@ -414,7 +414,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIndexWithHasManyFilter()
+    public function testIndexWithHasManyFilter(): void
     {
         $routeParams = [];
         $queryParams = [
@@ -457,7 +457,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testIndexWithBelongsToManyFilter()
+    public function testIndexWithBelongsToManyFilter(): void
     {
         $routeParams = [];
         // comments with ID 2 and 4 have more than 1 emotions. We will check that only distinct rows to be returned.
@@ -503,7 +503,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      */
-    public function testCreate()
+    public function testCreate(): void
     {
         $text      = 'Some comment text';
         $jsonInput = <<<EOT
@@ -560,7 +560,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testReadWithoutParameters()
+    public function testReadWithoutParameters(): void
     {
         $routeParams = [CommentsController::ROUTE_KEY_INDEX => '10'];
         $container   = $this->createContainer();
@@ -590,7 +590,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $text      = 'Some comment text';
         $index     = '10';
@@ -657,7 +657,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testUpdateNonExistingItem()
+    public function testUpdateNonExistingItem(): void
     {
         $text      = 'Some comment text';
         $index     = '-1';
@@ -696,7 +696,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testUpdateNonMatchingIndexes()
+    public function testUpdateNonMatchingIndexes(): void
     {
         $text      = 'Some comment text';
         $index1    = '1';
@@ -736,7 +736,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testSendInvalidInput()
+    public function testSendInvalidInput(): void
     {
         $index     = '1';
         $jsonInput = '{';
@@ -762,7 +762,39 @@ EOT;
     /**
      * Controller test.
      */
-    public function testDelete()
+    public function testUpdateForNonExistingItem(): void
+    {
+        $text      = 'Some comment text';
+        $index     = '99999999'; // non-existing
+        $jsonInput = <<<EOT
+        {
+            "data" : {
+                "type"  : "users",
+                "id"    : "$index",
+                "attributes" : {
+                    "first-name-attribute" : "$text"
+                }
+            }
+        }
+EOT;
+
+        $routeParams = [UsersController::ROUTE_KEY_INDEX => $index];
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri('http://localhost.local/comments'));
+
+        /** @var ServerRequestInterface $request */
+
+        $response = UsersController::update($routeParams, $this->createContainer(), $request);
+
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+
+    /**
+     * Controller test.
+     */
+    public function testDelete(): void
     {
         $tableName = Comment::TABLE_NAME;
         $idColumn  = Comment::FIELD_ID;
@@ -802,7 +834,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testReadRelationship()
+    public function testReadRelationship(): void
     {
         $index       = '2';
         $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index];
@@ -836,7 +868,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testReadRelationshipIdentifiers()
+    public function testReadRelationshipIdentifiers(): void
     {
         $index       = '2';
         $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index];
@@ -876,7 +908,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testUpdateInRelationship()
+    public function testUpdateInRelationship(): void
     {
         $tableName = Comment::TABLE_NAME;
         $idColumn  = Comment::FIELD_ID;
@@ -941,7 +973,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testUpdateNonBelongingInRelationship()
+    public function testUpdateNonBelongingInRelationship(): void
     {
         $tableName    = Comment::TABLE_NAME;
         $idColumn     = Comment::FIELD_ID;
@@ -998,7 +1030,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testDeleteInRelationship()
+    public function testDeleteInRelationship(): void
     {
         $tableName = Comment::TABLE_NAME;
         $idColumn  = Comment::FIELD_ID;
@@ -1048,7 +1080,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testFilterBelongsToRelationship()
+    public function testFilterBelongsToRelationship(): void
     {
         $seldomWord  = 'perspiciatis';
         $queryParams = [
@@ -1083,7 +1115,7 @@ EOT;
     /**
      * Controller test.
      */
-    public function testFilterBelongsToManyRelationship()
+    public function testFilterBelongsToManyRelationship(): void
     {
         $seldomWord  = 'nostrum';
         $queryParams = [

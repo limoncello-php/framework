@@ -37,7 +37,7 @@ class FluteExceptionHandlerTest extends TestCase
     /**
      * Test Exception handler.
      */
-    public function testHandlerWithNonJsonException()
+    public function testHandlerWithNonJsonException(): void
     {
         /** @var Mock $encoderMock */
         $encoderMock = Mockery::mock(EncoderInterface::class);
@@ -58,7 +58,7 @@ class FluteExceptionHandlerTest extends TestCase
     /**
      * Test Exception handler.
      */
-    public function testHandlerWithJsonException()
+    public function testHandlerWithJsonException(): void
     {
         /** @var Mock $encoderMock */
         $encoderMock = Mockery::mock(EncoderInterface::class);
@@ -79,7 +79,7 @@ class FluteExceptionHandlerTest extends TestCase
     /**
      * Test Exception handler.
      */
-    public function testHandlerWithFaultyLogger()
+    public function testHandlerWithFaultyLogger(): void
     {
         /** @var Mock $encoderMock */
         $encoderMock = Mockery::mock(EncoderInterface::class);
@@ -105,7 +105,7 @@ class FluteExceptionHandlerTest extends TestCase
     /**
      * Test Exception handler.
      */
-    public function testHandlerWithNonJsonExceptionAndConverter()
+    public function testHandlerWithNonJsonExceptionAndConverter(): void
     {
         /** @var Mock $encoderMock */
         $encoderMock = Mockery::mock(EncoderInterface::class);
@@ -127,7 +127,7 @@ class FluteExceptionHandlerTest extends TestCase
     /**
      * Test Exception handler.
      */
-    public function testHandlerWithNonJsonExceptionAndFaultyConverter()
+    public function testHandlerWithNonJsonExceptionAndFaultyConverter(): void
     {
         /** @var Mock $encoderMock */
         $encoderMock = Mockery::mock(EncoderInterface::class);

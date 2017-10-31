@@ -19,6 +19,7 @@
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Tests\Flute\Data\Api\UsersApi as Api;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema as Schema;
+use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateUserMinimalRuleSet;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,6 +34,9 @@ class UsersController extends BaseController
 
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
+
+    /** JSON API validation rules set class */
+    const ON_UPDATE_VALIDATION_RULES_SET_CLASS = UpdateUserMinimalRuleSet::class;
 
     /**
      * @param array                  $routeParams

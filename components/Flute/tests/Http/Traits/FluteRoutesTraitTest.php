@@ -34,7 +34,7 @@ class FluteRoutesTraitTest extends TestCase
     /**
      * Test helper method.
      */
-    public function testControllerMethod()
+    public function testControllerMethod(): void
     {
         /** @var Mock $group */
         $group = Mockery::mock(GroupInterface::class);
@@ -53,7 +53,7 @@ class FluteRoutesTraitTest extends TestCase
     /**
      * Test helper method.
      */
-    public function testResourceMethod()
+    public function testResourceMethod(): void
     {
         /** @var Mock $group */
         $group = Mockery::mock(GroupInterface::class);
@@ -74,7 +74,7 @@ class FluteRoutesTraitTest extends TestCase
     /**
      * Test helper method.
      */
-    public function testRelationshipMethod()
+    public function testRelationshipMethod(): void
     {
         /** @var Mock $group */
         $group = Mockery::mock(GroupInterface::class);

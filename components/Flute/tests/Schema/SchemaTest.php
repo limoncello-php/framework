@@ -35,7 +35,7 @@ class SchemaTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ class SchemaTest extends TestCase
     /**
      * Relationship test.
      */
-    public function testEncodeNullToOneRelationship()
+    public function testEncodeNullToOneRelationship(): void
     {
         $post                          = new Post();
         $post->{Post::FIELD_ID}        = '1';

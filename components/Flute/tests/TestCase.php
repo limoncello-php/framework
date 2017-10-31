@@ -45,6 +45,7 @@ use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Limoncello\Tests\Flute\Data\Validation\RuleSets\CreateCommentRuleSet;
 use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateUserMinimalRuleSet;
 use Mockery;
 
 /**
@@ -245,6 +246,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         return [
             CreateCommentRuleSet::class,
             UpdateCommentRuleSet::class,
+            UpdateUserMinimalRuleSet::class,
         ];
     }
 }

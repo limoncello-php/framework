@@ -17,16 +17,16 @@
  */
 
 use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema as Schema;
-use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
+use Limoncello\Tests\Flute\Data\Schemes\UserSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\AppRules as v;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 
 /**
  * @package Limoncello\Tests\Flute
+ *
+ * Special minimal rule set for testing library code. It does not check user data fully.
  */
-class UpdateCommentRuleSet implements JsonApiRuleSetInterface
+class UpdateUserMinimalRuleSet implements JsonApiRuleSetInterface
 {
     /**
      * @inheritdoc
@@ -41,7 +41,7 @@ class UpdateCommentRuleSet implements JsonApiRuleSetInterface
      */
     public static function getIdRule(): RuleInterface
     {
-        return v::commentId();
+        return v::userIdWithoutCheckInDatabase();
     }
 
     /**
@@ -50,7 +50,7 @@ class UpdateCommentRuleSet implements JsonApiRuleSetInterface
     public static function getAttributeRules(): array
     {
         return [
-            Schema::ATTR_TEXT => v::isString(),
+            Schema::ATTR_FIRST_NAME => v::isString(),
         ];
     }
 
@@ -60,7 +60,6 @@ class UpdateCommentRuleSet implements JsonApiRuleSetInterface
     public static function getToOneRelationshipRules(): array
     {
         return [
-            Schema::REL_POST => v::toOneRelationship(PostSchema::TYPE, v::stringToInt(v::postId())),
         ];
     }
 
@@ -70,8 +69,6 @@ class UpdateCommentRuleSet implements JsonApiRuleSetInterface
     public static function getToManyRelationshipRules(): array
     {
         return [
-            Schema::REL_EMOTIONS =>
-                v::toManyRelationship(EmotionSchema::TYPE, v::stringArrayToIntArray(v::emotionIds())),
         ];
     }
 }
