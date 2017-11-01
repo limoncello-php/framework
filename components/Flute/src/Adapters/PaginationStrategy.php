@@ -23,12 +23,6 @@ use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
  */
 class PaginationStrategy implements PaginationStrategyInterface
 {
-    /**@deprecated Paging constant */
-    const DEFAULT_LIMIT_SIZE = 20;
-
-    /**@deprecated Paging constant */
-    const MAX_LIMIT_SIZE = 100;
-
     /**
      * @var int
      */
