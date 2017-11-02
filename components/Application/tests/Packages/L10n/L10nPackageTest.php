@@ -18,7 +18,6 @@
 
 use Limoncello\Application\Packages\L10n\L10nContainerConfigurator;
 use Limoncello\Application\Packages\L10n\L10nProvider;
-use Limoncello\Application\Packages\L10n\L10nSettings;
 use Limoncello\Application\Packages\L10n\L10nSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
@@ -64,7 +63,7 @@ class L10nPackageTest extends TestCase
      */
     private function getSettings(): array
     {
-        $settings = new class extends L10nSettings
+        $settings = new class extends C
         {
             /**
              * @inheritdoc
