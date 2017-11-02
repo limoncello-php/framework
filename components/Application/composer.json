@@ -22,7 +22,8 @@
         "limoncello-php/contracts": "^0.8.0",
         "limoncello-php/core": "^0.8.0",
         "limoncello-php/auth": "^0.8.0",
-        "limoncello-php/l10n": "^0.8.0"
+        "limoncello-php/l10n": "^0.8.0",
+        "limoncello-php/validation": "^0.8.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.8",
