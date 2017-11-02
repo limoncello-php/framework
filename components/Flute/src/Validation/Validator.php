@@ -323,8 +323,8 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
             } else {
                 // execute main validation block(s)
                 foreach ($attributes as $name => $value) {
-                    if ($this->hasAttributeIndex($name) === true) {
-                        $this->executeBlock($value, $this->getAttributeIndex($name));
+                    if (($index = $this->getAttributeIndex($name)) !== null) {
+                        $this->executeBlock($value, $index);
                     } elseif ($this->isIgnoreUnknowns() === false) {
                         $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
                         $details = $this->formatMessage(ErrorCodes::UNKNOWN_ATTRIBUTE);
@@ -753,31 +753,16 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
     /**
      * @param string $name
      *
-     * @return int
+     * @return int|null
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private function getAttributeIndex(string $name): int
+    private function getAttributeIndex(string $name): ?int
     {
         $indexes = JsonApiRuleSerializer::getRulesIndexes($this->getAttributeRules());
-        $index   = $indexes[$name];
+        $index   = $indexes[$name] ?? null;
 
         return $index;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return bool
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    private function hasAttributeIndex(string $name): bool
-    {
-        $indexes      = JsonApiRuleSerializer::getRulesIndexes($this->getAttributeRules());
-        $hasAttribute = array_key_exists($name, $indexes);
-
-        return $hasAttribute;
     }
 
     /**
