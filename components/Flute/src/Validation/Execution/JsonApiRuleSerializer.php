@@ -343,7 +343,7 @@ class JsonApiRuleSerializer
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function getBlocks(array $serializedRules): array
+    protected static function getBlocks(array $serializedRules): array
     {
         $blocks = BlockSerializer::unserializeBlocks($serializedRules);
 
