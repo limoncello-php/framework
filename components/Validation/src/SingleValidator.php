@@ -63,10 +63,10 @@ class SingleValidator extends BaseValidator
             $this->resetAggregators();
         }
 
-        $this->validateSingleImplementation($input, $this->getCaptures(), $this->getErrors());
+        $this->validateSingleImplementation($input, $this->getCaptureAggregator(), $this->getErrorAggregator());
         $this->markAggregatorsAsDirty();
 
-        $noErrors = $this->getErrors()->count() <= 0;
+        $noErrors = $this->getErrorAggregator()->count() <= 0;
 
         return $noErrors;
     }

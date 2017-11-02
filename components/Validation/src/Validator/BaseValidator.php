@@ -53,15 +53,31 @@ abstract class BaseValidator implements ValidatorInterface
     /**
      * @inheritdoc
      */
-    public function getCaptures(): CaptureAggregatorInterface
+    public function getCaptures(): array
     {
-        return $this->captures;
+        return $this->getCaptureAggregator()->get();
     }
 
     /**
      * @inheritdoc
      */
-    public function getErrors(): ErrorAggregatorInterface
+    public function getErrors(): array
+    {
+        return $this->getErrorAggregator()->get();
+    }
+
+    /**
+     * @return CaptureAggregatorInterface
+     */
+    protected function getCaptureAggregator(): CaptureAggregatorInterface
+    {
+        return $this->captures;
+    }
+
+    /**
+     * @return ErrorAggregatorInterface
+     */
+    protected function getErrorAggregator(): ErrorAggregatorInterface
     {
         return $this->errors;
     }

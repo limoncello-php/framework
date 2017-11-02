@@ -60,10 +60,10 @@ class ArrayValidator extends BaseValidator
             $this->resetAggregators();
         }
 
-        $this->validateArrayImplementation($input, $this->getCaptures(), $this->getErrors());
+        $this->validateArrayImplementation($input, $this->getCaptureAggregator(), $this->getErrorAggregator());
         $this->markAggregatorsAsDirty();
 
-        $isOk = $this->getErrors()->count() <= 0;
+        $isOk = $this->getErrorAggregator()->count() <= 0;
 
         return $isOk;
     }

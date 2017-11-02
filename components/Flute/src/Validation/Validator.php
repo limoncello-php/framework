@@ -204,7 +204,7 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      */
     public function getJsonApiCaptures(): array
     {
-        return $this->getCaptures()->get();
+        return $this->getCaptures();
     }
 
     /**
@@ -250,13 +250,13 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
         $ends = JsonApiRuleSerializer::getRuleEndIndexes($this->getTypeRule());
         $this->executeEnds($ends);
 
-        if (count($this->getErrors()) > 0) {
+        if (count($this->getErrorAggregator()) > 0) {
             $title = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-            foreach ($this->getErrors()->get() as $error) {
+            foreach ($this->getErrorAggregator()->get() as $error) {
                 $this->getJsonApiErrorCollection()
                     ->addDataTypeError($title, $this->getMessage($error), $this->getErrorStatus());
             }
-            $this->getErrors()->clear();
+            $this->getErrorAggregator()->clear();
         }
 
         return $this;
@@ -287,13 +287,13 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
         $ends = JsonApiRuleSerializer::getRuleEndIndexes($this->getIdRule());
         $this->executeEnds($ends);
 
-        if (count($this->getErrors()) > 0) {
+        if (count($this->getErrorAggregator()) > 0) {
             $title = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-            foreach ($this->getErrors()->get() as $error) {
+            foreach ($this->getErrorAggregator()->get() as $error) {
                 $this->getJsonApiErrorCollection()
                     ->addDataIdError($title, $this->getMessage($error), $this->getErrorStatus());
             }
-            $this->getErrors()->clear();
+            $this->getErrorAggregator()->clear();
         }
 
         return $this;
@@ -339,11 +339,11 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
         $ends = JsonApiRuleSerializer::getRulesEndIndexes($this->getAttributeRules());
         $this->executeEnds($ends);
 
-        if (count($this->getErrors()) > 0) {
-            foreach ($this->getErrors()->get() as $error) {
+        if (count($this->getErrorAggregator()) > 0) {
+            foreach ($this->getErrorAggregator()->get() as $error) {
                 $this->getJsonApiErrorCollection()->addValidationAttributeError($error);
             }
-            $this->getErrors()->clear();
+            $this->getErrorAggregator()->clear();
         }
 
         return $this;
@@ -403,11 +403,11 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
         );
         $this->executeEnds($ends);
 
-        if (count($this->getErrors()) > 0) {
-            foreach ($this->getErrors()->get() as $error) {
+        if (count($this->getErrorAggregator()) > 0) {
+            foreach ($this->getErrorAggregator()->get() as $error) {
                 $this->getJsonApiErrorCollection()->addValidationRelationshipError($error);
             }
-            $this->getErrors()->clear();
+            $this->getErrorAggregator()->clear();
         }
 
         return $this;
@@ -525,8 +525,8 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
             $index,
             $this->getBlocks(),
             $this->getContextStorage(),
-            $this->getCaptures(),
-            $this->getErrors()
+            $this->getCaptureAggregator(),
+            $this->getErrorAggregator()
         );
     }
 
@@ -539,7 +539,12 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      */
     private function executeStarts(array $indexes): void
     {
-        BlockInterpreter::executeStarts($indexes, $this->getBlocks(), $this->getContextStorage(), $this->getErrors());
+        BlockInterpreter::executeStarts(
+            $indexes,
+            $this->getBlocks(),
+            $this->getContextStorage(),
+            $this->getErrorAggregator()
+        );
     }
 
     /**
@@ -551,7 +556,12 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      */
     private function executeEnds(array $indexes): void
     {
-        BlockInterpreter::executeEnds($indexes, $this->getBlocks(), $this->getContextStorage(), $this->getErrors());
+        BlockInterpreter::executeEnds(
+            $indexes,
+            $this->getBlocks(),
+            $this->getContextStorage(),
+            $this->getErrorAggregator()
+        );
     }
 
     /**

@@ -51,7 +51,7 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($validator->validate(false));
         $this->assertEmpty($validator->getErrors());
-        $this->assertEquals(['' => false], $validator->getCaptures()->get());
+        $this->assertEquals(['' => false], $validator->getCaptures());
     }
 
     /**

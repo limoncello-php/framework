@@ -19,8 +19,6 @@
 use DateTime;
 use DateTimeInterface;
 use Limoncello\Validation\ArrayValidator as vv;
-use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
-use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\SingleValidator as v;
 use MessageFormatter;
@@ -104,7 +102,7 @@ class Application
         $input     = '2001-03-04T05:06:07+08:00';
         if ($validator->validate($input) === true) {
             $this->console("Validation OK for `$input`." . PHP_EOL);
-            $myDate = $validator->getCaptures()->get()['my_date'];
+            $myDate = $validator->getCaptures()['my_date'];
             // note that captured date is already DateTime
             assert($myDate instanceof DateTimeInterface);
         } else {
@@ -194,15 +192,15 @@ class Application
     }
 
     /**
-     * @param ErrorAggregatorInterface $errors
+     * @param ErrorInterface[] $errors
      *
      * @return void
      */
-    private function printErrors(ErrorAggregatorInterface $errors): void
+    private function printErrors(array $errors): void
     {
         $hasErrors = false;
 
-        foreach ($errors->get() as $error) {
+        foreach ($errors as $error) {
             $hasErrors = true;
             $this->printError($error);
         }
@@ -230,15 +228,15 @@ class Application
     }
 
     /**
-     * @param CaptureAggregatorInterface $captures
+     * @param array $captures
      *
      * @return void
      */
-    private function printCaptures(CaptureAggregatorInterface $captures): void
+    private function printCaptures(array $captures): void
     {
         $hasCaptures = false;
 
-        foreach ($captures->get() as $name => $value) {
+        foreach ($captures as $name => $value) {
             $hasCaptures = true;
             $type        = gettype($value);
             $this->console("`$name` = `$value` ($type)" . PHP_EOL);
