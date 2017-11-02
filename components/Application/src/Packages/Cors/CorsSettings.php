@@ -70,7 +70,7 @@ class CorsSettings implements SettingsInterface
     const KEY_LOG_IS_ENABLED = self::KEY_IS_CHECK_HOST + 10;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_LOG_IS_ENABLED;
+    protected const KEY_LAST = self::KEY_LOG_IS_ENABLED;
 
     /**
      * @inheritdoc

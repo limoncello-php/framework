@@ -34,7 +34,7 @@ abstract class L10nSettings implements SettingsInterface
     const KEY_LOCALES_DATA = self::KEY_LOCALES_FOLDER + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_LOCALES_DATA;
+    protected const KEY_LAST = self::KEY_LOCALES_DATA;
 
     /**
      * @inheritdoc

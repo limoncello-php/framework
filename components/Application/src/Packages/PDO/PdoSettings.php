@@ -37,7 +37,7 @@ class PdoSettings implements SettingsInterface
     const KEY_OPTIONS = self::KEY_CONNECTION_STRING + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_OPTIONS;
+    protected const KEY_LAST = self::KEY_OPTIONS;
 
     /**
      * @inheritdoc

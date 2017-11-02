@@ -40,7 +40,7 @@ class MonologFileSettings implements SettingsInterface
     const KEY_LOG_LEVEL = self::KEY_LOG_FILE + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_LOG_LEVEL;
+    protected const KEY_LAST = self::KEY_LOG_LEVEL;
 
     /**
      * @inheritdoc

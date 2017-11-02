@@ -57,7 +57,7 @@ class DoctrineSettings implements SettingsInterface
     const KEY_PATH = self::KEY_EXTRA + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_PATH;
+    protected const KEY_LAST = self::KEY_PATH;
 
     /**
      * @inheritdoc

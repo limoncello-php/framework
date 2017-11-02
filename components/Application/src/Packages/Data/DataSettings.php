@@ -56,7 +56,7 @@ abstract class DataSettings implements SettingsInterface
     const KEY_MODELS_SCHEME_INFO = self::KEY_SEED_INIT + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_MODELS_SCHEME_INFO;
+    protected const KEY_LAST = self::KEY_MODELS_SCHEME_INFO;
 
     /**
      * @inheritdoc

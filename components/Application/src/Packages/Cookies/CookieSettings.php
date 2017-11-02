@@ -39,7 +39,7 @@ class CookieSettings implements SettingsInterface
     const KEY_DEFAULT_IS_RAW = self::KEY_DEFAULT_IS_ACCESSIBLE_ONLY_THROUGH_HTTP + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_DEFAULT_IS_RAW;
+    protected const KEY_LAST = self::KEY_DEFAULT_IS_RAW;
 
     /**
      * @inheritdoc
