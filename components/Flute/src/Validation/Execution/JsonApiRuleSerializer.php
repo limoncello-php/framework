@@ -27,47 +27,47 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 class JsonApiRuleSerializer
 {
     /** Serialized indexes key */
-    const SERIALIZED_RULE_SETS = 0;
+    protected const SERIALIZED_RULE_SETS = 0;
 
     /** Serialized rules key */
-    const SERIALIZED_BLOCKS = self::SERIALIZED_RULE_SETS + 1;
+    protected const SERIALIZED_BLOCKS = self::SERIALIZED_RULE_SETS + 1;
 
     /** Index key */
-    const ID_SERIALIZED = 0;
+    protected const ID_SERIALIZED = 0;
 
     /** Index key */
-    const TYPE_SERIALIZED = self::ID_SERIALIZED + 1;
+    protected const TYPE_SERIALIZED = self::ID_SERIALIZED + 1;
 
     /** Index key */
-    const ATTRIBUTES_SERIALIZED = self::TYPE_SERIALIZED + 1;
+    protected const ATTRIBUTES_SERIALIZED = self::TYPE_SERIALIZED + 1;
 
     /** Index key */
-    const TO_ONE_SERIALIZED = self::ATTRIBUTES_SERIALIZED + 1;
+    protected const TO_ONE_SERIALIZED = self::ATTRIBUTES_SERIALIZED + 1;
 
     /** Index key */
-    const TO_MANY_SERIALIZED = self::TO_ONE_SERIALIZED + 1;
+    protected const TO_MANY_SERIALIZED = self::TO_ONE_SERIALIZED + 1;
 
     // Single rule serialization keys
 
     /** Index key */
-    const SINGLE_RULE_INDEX = 0;
+    protected const SINGLE_RULE_INDEX = 0;
 
     /** Index key */
-    const SINGLE_RULE_START_INDEXES = self::SINGLE_RULE_INDEX + 1;
+    protected const SINGLE_RULE_START_INDEXES = self::SINGLE_RULE_INDEX + 1;
 
     /** Index key */
-    const SINGLE_RULE_END_INDEXES = self::SINGLE_RULE_START_INDEXES + 1;
+    protected const SINGLE_RULE_END_INDEXES = self::SINGLE_RULE_START_INDEXES + 1;
 
     // Rules array serialization keys
 
     /** Index key */
-    const RULES_ARRAY_INDEXES = 0;
+    protected const RULES_ARRAY_INDEXES = 0;
 
     /** Index key */
-    const RULES_ARRAY_START_INDEXES = self::RULES_ARRAY_INDEXES + 1;
+    protected const RULES_ARRAY_START_INDEXES = self::RULES_ARRAY_INDEXES + 1;
 
     /** Index key */
-    const RULES_ARRAY_END_INDEXES = self::RULES_ARRAY_START_INDEXES + 1;
+    protected const RULES_ARRAY_END_INDEXES = self::RULES_ARRAY_START_INDEXES + 1;
 
     /**
      * @var BlockSerializerInterface
