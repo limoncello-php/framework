@@ -214,6 +214,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
         $this->assertEquals(['name' => 'whatever'], $captures->get());
         $this->assertEmpty($errors->get());
+
+        $this->assertNull($context->getContainer());
     }
 
     /**

@@ -19,6 +19,7 @@
 use Limoncello\Validation\Contracts\Execution\BlockPropertiesInterface;
 use Limoncello\Validation\Contracts\Execution\BlockStateInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Validation
@@ -41,11 +42,18 @@ class ContextStorage implements ContextStorageInterface, BlockStateInterface, Bl
     private $blocks;
 
     /**
-     * @param $blocks
+     * @var null|ContainerInterface
      */
-    public function __construct(array $blocks)
+    private $container;
+
+    /**
+     * @param array                   $blocks
+     * @param ContainerInterface|null $container
+     */
+    public function __construct(array $blocks, ContainerInterface $container = null)
     {
         $this->blocks = $blocks;
+        $this->container = $container;
     }
 
     /**
@@ -62,6 +70,14 @@ class ContextStorage implements ContextStorageInterface, BlockStateInterface, Bl
     public function getProperties(): BlockPropertiesInterface
     {
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
     }
 
     /**

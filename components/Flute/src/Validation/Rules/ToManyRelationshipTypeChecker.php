@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Validation\ContextInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Validation\Blocks\ProcedureBlock;
 use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
+use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Execution\BlockReplies;
 use Limoncello\Validation\Rules\BaseRule;
 

@@ -18,7 +18,6 @@
 
 use Generator;
 use Limoncello\Application\Contracts\Validation\FormValidatorFactoryInterface;
-use Limoncello\Application\FormValidation\Execution\ContextStorage;
 use Limoncello\Application\Packages\FormValidation\FormValidationContainerConfigurator;
 use Limoncello\Application\Packages\FormValidation\FormValidationSettings;
 use Limoncello\Application\Packages\FormValidation\FormValidationSettings as C;
@@ -74,20 +73,6 @@ class ValidatorTest extends TestCase
         $this->assertNotNull($validator = $factory->createValidator(CommentCreate::class));
 
         $validator->validate('not array');
-    }
-
-    /**
-     * @return void
-     */
-    public function testContext(): void
-    {
-        $container = $this->createContainer();
-        $dummyBlocks = [];
-
-        $context = new ContextStorage($container, $dummyBlocks);
-
-        // just for coverage
-        $this->assertSame($container, $context->getContainer());
     }
 
     /**

@@ -22,13 +22,13 @@ use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
-use Limoncello\Flute\Validation\Execution\ContextStorage;
 use Limoncello\Flute\Validation\Execution\JsonApiErrorCollection;
 use Limoncello\Flute\Validation\Execution\JsonApiRuleSerializer;
 use Limoncello\Flute\Validation\Rules\RelationshipsTrait;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Execution\BlockInterpreter;
+use Limoncello\Validation\Execution\ContextStorage;
 use Limoncello\Validation\Validator\BaseValidator;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
@@ -607,7 +607,7 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      */
     protected function createContextStorage(): ContextStorageInterface
     {
-        return new ContextStorage($this->getContainer(), $this->getBlocks());
+        return new ContextStorage($this->getBlocks(), $this->getContainer());
     }
 
     /**

@@ -18,7 +18,6 @@
 
 use Limoncello\Application\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Application\Exceptions\InvalidArgumentException;
-use Limoncello\Application\FormValidation\Execution\ContextStorage;
 use Limoncello\Application\FormValidation\Execution\FormRuleSerializer;
 use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\L10n\FormatterInterface;
@@ -27,6 +26,7 @@ use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Errors\Error;
 use Limoncello\Validation\Execution\BlockInterpreter;
+use Limoncello\Validation\Execution\ContextStorage;
 use Limoncello\Validation\Validator\BaseValidator;
 use Psr\Container\ContainerInterface;
 
@@ -187,7 +187,7 @@ class Validator extends BaseValidator implements FormValidatorInterface
      */
     protected function createContextStorage(): ContextStorageInterface
     {
-        return new ContextStorage($this->getContainer(), $this->getBlocks());
+        return new ContextStorage($this->getBlocks(), $this->getContainer());
     }
 
     /**

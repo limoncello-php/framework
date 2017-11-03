@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Psr\Container\ContainerInterface;
+
 /**
  * @package Limoncello\Validation
  */
@@ -35,4 +37,9 @@ interface ContextInterface
      * @return BlockPropertiesInterface
      */
     public function getProperties(): BlockPropertiesInterface;
+
+    /**
+     * @return null|ContainerInterface
+     */
+    public function getContainer(): ?ContainerInterface;
 }
