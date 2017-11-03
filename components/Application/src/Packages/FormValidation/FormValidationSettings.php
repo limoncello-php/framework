@@ -19,6 +19,7 @@
 use Generator;
 use Limoncello\Application\Contracts\Validation\FormRuleSetInterface;
 use Limoncello\Application\FormValidation\Execution\FormRuleSerializer;
+use Limoncello\Application\FormValidation\Validator;
 use Limoncello\Contracts\Settings\SettingsInterface;
 
 /**
@@ -43,8 +44,11 @@ abstract class FormValidationSettings implements SettingsInterface
     /** Config key */
     const KEY_VALIDATION_RULE_SETS_DATA = self::KEY_VALIDATORS_FILE_MASK + 1;
 
+    /** Config key */
+    const KEY_MESSAGES_NAMESPACE = self::KEY_VALIDATION_RULE_SETS_DATA + 1;
+
     /** Settings key */
-    protected const KEY_LAST = self::KEY_VALIDATION_RULE_SETS_DATA;
+    protected const KEY_LAST = self::KEY_MESSAGES_NAMESPACE;
 
     /**
      * @inheritdoc
@@ -62,6 +66,13 @@ abstract class FormValidationSettings implements SettingsInterface
             "Invalid Validators folder `$validatorsFolder`."
         );
 
+        $messagesNamespace = $defaults[static::KEY_MESSAGES_NAMESPACE] ?? null;
+        assert(
+            !empty($messagesNamespace),
+            'Localization namespace have to be specified. ' .
+            'Otherwise it is not possible to convert validation errors to string representation.'
+        );
+
 
         return $defaults + [
                 static::KEY_VALIDATION_RULE_SETS_DATA => $this->createValidationRulesSetData($validatorsPath),
@@ -75,6 +86,7 @@ abstract class FormValidationSettings implements SettingsInterface
     {
         return [
             static::KEY_VALIDATORS_FILE_MASK => '*.php',
+            static::KEY_MESSAGES_NAMESPACE   => Validator::RESOURCES_NAMESPACE,
         ];
     }
 

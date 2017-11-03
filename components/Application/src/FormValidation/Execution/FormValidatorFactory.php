@@ -21,6 +21,7 @@ use Limoncello\Application\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Application\FormValidation\Validator;
 use Limoncello\Application\Packages\FormValidation\FormValidationSettings as S;
 use Limoncello\Container\Traits\HasContainerTrait;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 
@@ -45,11 +46,16 @@ class FormValidatorFactory implements FormValidatorFactoryInterface
     public function createValidator(string $class): FormValidatorInterface
     {
         /** @var SettingsProviderInterface $settingsProvider */
-        $settingsProvider = $this->getContainer()->get(SettingsProviderInterface::class);
-        $settings         = $settingsProvider->get(S::class);
-        $ruleSetsData     = $settings[S::KEY_VALIDATION_RULE_SETS_DATA];
+        $settingsProvider  = $this->getContainer()->get(SettingsProviderInterface::class);
+        $settings          = $settingsProvider->get(S::class);
+        $ruleSetsData      = $settings[S::KEY_VALIDATION_RULE_SETS_DATA];
+        $messagesNamespace = $settings[S::KEY_MESSAGES_NAMESPACE];
 
-        $validator = new Validator($class, $ruleSetsData, $this->getContainer());
+        /** @var FormatterFactoryInterface $formatterFactory */
+        $formatterFactory = $this->getContainer()->get(FormatterFactoryInterface::class);
+        $formatter        = $formatterFactory->createFormatter($messagesNamespace);
+
+        $validator = new Validator($class, $ruleSetsData, $this->getContainer(), $formatter);
 
         return $validator;
     }

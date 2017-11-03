@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Contracts\Validation;
+<?php namespace Limoncello\Application\Resources\Messages\En;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,17 +16,24 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\ValidatorInterface;
+use Limoncello\Contracts\L10n\MessageStorageInterface;
+use Limoncello\Validation\I18n\EnUsLocale;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Flute
  */
-interface FormValidatorInterface extends ValidatorInterface
+class Validation implements MessageStorageInterface
 {
     /**
-     * Get error messages in format $attributeName => $message.
-     *
-     * @return iterable
+     * @inheritdoc
      */
-    public function getMessages(): iterable;
+    public static function getMessages(): array
+    {
+        return
+            EnUsLocale::MESSAGES + [
+
+                // no custom validation messages
+
+            ];
+    }
 }

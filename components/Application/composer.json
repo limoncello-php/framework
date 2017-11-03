@@ -34,7 +34,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Limoncello\\Application\\": "src/"
+            "Limoncello\\Application\\": "src/",
+            "Limoncello\\Application\\Resources\\Messages\\": "res/Messages"
         }
     },
     "autoload-dev": {

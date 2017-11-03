@@ -21,7 +21,9 @@ use Limoncello\Application\Exceptions\InvalidArgumentException;
 use Limoncello\Application\FormValidation\Execution\ContextStorage;
 use Limoncello\Application\FormValidation\Execution\FormRuleSerializer;
 use Limoncello\Container\Traits\HasContainerTrait;
+use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
+use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Errors\Error;
 use Limoncello\Validation\Execution\BlockInterpreter;
@@ -41,7 +43,7 @@ class Validator extends BaseValidator implements FormValidatorInterface
     /**
      * Namespace for string resources.
      */
-    const RESOURCES_NAMESPACE = 'Limoncello.Flute.Validation';
+    const RESOURCES_NAMESPACE = 'Limoncello.Application.Validation';
 
     /** Rule description index */
     const RULE_INDEX = 0;
@@ -67,6 +69,11 @@ class Validator extends BaseValidator implements FormValidatorInterface
     private $contextStorage;
 
     /**
+     * @var FormatterInterface
+     */
+    private $messageFormatter;
+
+    /**
      * @var array
      */
     private $blocks;
@@ -80,13 +87,19 @@ class Validator extends BaseValidator implements FormValidatorInterface
      * @param string             $name
      * @param array              $data
      * @param ContainerInterface $container
+     * @param FormatterInterface $messageFormatter
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function __construct(string $name, array $data, ContainerInterface $container)
-    {
+    public function __construct(
+        string $name,
+        array $data,
+        ContainerInterface $container,
+        FormatterInterface $messageFormatter
+    ) {
         $this
             ->setContainer($container)
+            ->setMessageFormatter($messageFormatter)
             ->setBlocks(FormRuleSerializer::extractBlocks($data))
             ->setAttributeRules(FormRuleSerializer::getAttributeRules($name, $data));
 
@@ -116,6 +129,20 @@ class Validator extends BaseValidator implements FormValidatorInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getMessages(): iterable
+    {
+        $formatter = $this->getMessageFormatter();
+        foreach ($this->getErrors() as $error) {
+            /** @var ErrorInterface $error */
+            $message = $formatter->formatMessage($error->getMessageCode(), $error->getMessageContext() ?? []);
+
+            yield $error->getParameterName() => $message;
+        }
+    }
+
+    /**
      * @return BaseValidator
      */
     protected function resetAggregators(): BaseValidator
@@ -133,6 +160,26 @@ class Validator extends BaseValidator implements FormValidatorInterface
     protected function getContextStorage(): ContextStorageInterface
     {
         return $this->contextStorage;
+    }
+
+    /**
+     * @return FormatterInterface
+     */
+    protected function getMessageFormatter(): FormatterInterface
+    {
+        return $this->messageFormatter;
+    }
+
+    /**
+     * @param FormatterInterface $messageFormatter
+     *
+     * @return self
+     */
+    private function setMessageFormatter(FormatterInterface $messageFormatter): self
+    {
+        $this->messageFormatter = $messageFormatter;
+
+        return $this;
     }
 
     /**

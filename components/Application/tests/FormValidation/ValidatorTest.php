@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
+use Generator;
 use Limoncello\Application\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Application\FormValidation\Execution\ContextStorage;
 use Limoncello\Application\Packages\FormValidation\FormValidationContainerConfigurator;
 use Limoncello\Application\Packages\FormValidation\FormValidationSettings;
 use Limoncello\Application\Packages\FormValidation\FormValidationSettings as C;
+use Limoncello\Application\Packages\L10n\L10nContainerConfigurator;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
@@ -30,6 +32,7 @@ use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Limoncello\Application\Packages\L10n\L10nSettings as S;
 
 /**
  * @package Limoncello\Tests\Application
@@ -50,6 +53,10 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($validator->validate([Comment::FIELD_TEXT => 'some text']));
         $this->assertFalse($validator->validate([Comment::FIELD_TEXT => false]));
+        $this->assertEquals(
+            [Comment::FIELD_TEXT => 'The value should be a string.'],
+            $this->iterableToArray($validator->getMessages())
+        );
     }
 
     /**
@@ -92,9 +99,11 @@ class ValidatorTest extends TestCase
 
         /** @var Mock $provider */
         $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
-        $provider->shouldReceive('get')->once()->with(C::class)->andReturn($this->getSettings());
+        $provider->shouldReceive('get')->once()->with(C::class)->andReturn($this->getValidationSettings());
+        $provider->shouldReceive('get')->once()->with(S::class)->andReturn($this->getL10nSettings());
 
         FormValidationContainerConfigurator::configureContainer($container);
+        L10nContainerConfigurator::configureContainer($container);
 
         return $container;
     }
@@ -102,7 +111,7 @@ class ValidatorTest extends TestCase
     /**
      * @return array
      */
-    private function getSettings(): array
+    private function getValidationSettings(): array
     {
         $settings = new class extends FormValidationSettings
         {
@@ -116,7 +125,7 @@ class ValidatorTest extends TestCase
                 $validatorsFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'FormValidators']);
 
                 return [
-                        static::KEY_VALIDATORS_FOLDER => $validatorsFolder,
+                        static::KEY_VALIDATORS_FOLDER  => $validatorsFolder,
                     ] + parent::getSettings();
             }
         };
@@ -124,5 +133,40 @@ class ValidatorTest extends TestCase
         $result = $settings->get();
 
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    private function getL10nSettings(): array
+    {
+        $settings = new class extends S
+        {
+            /**
+             * @inheritdoc
+             */
+            protected function getSettings(): array
+            {
+                $localesFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'L10n']);
+
+                return [
+                        static::KEY_LOCALES_FOLDER => $localesFolder,
+                    ] + parent::getSettings();
+            }
+        };
+
+        $result = $settings->get();
+
+        return $result;
+    }
+
+    /**
+     * @param iterable $iterable
+     *
+     * @return array
+     */
+    private function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof Generator ? iterator_to_array($iterable) : $iterable;
     }
 }

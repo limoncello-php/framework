@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Contracts\Validation;
+<?php
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,17 +16,6 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\ValidatorInterface;
+use Limoncello\Application\Resources\Messages\En\Validation;
 
-/**
- * @package Limoncello\Application
- */
-interface FormValidatorInterface extends ValidatorInterface
-{
-    /**
-     * Get error messages in format $attributeName => $message.
-     *
-     * @return iterable
-     */
-    public function getMessages(): iterable;
-}
+return Validation::getMessages();

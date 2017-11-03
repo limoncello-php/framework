@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\FormValidation\Validator;
+use Limoncello\Application\Resources\Messages\En\Validation;
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
+use Limoncello\Contracts\Provider\ProvidesMessageResourcesInterface;
 
 /**
  * @package Limoncello\Application
  */
-class FormValidationProvider implements ProvidesContainerConfiguratorsInterface
+class FormValidationProvider implements ProvidesContainerConfiguratorsInterface, ProvidesMessageResourcesInterface
 {
     /**
      * @inheritdoc
@@ -30,6 +33,16 @@ class FormValidationProvider implements ProvidesContainerConfiguratorsInterface
     {
         return [
             FormValidationContainerConfigurator::class,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getMessageDescriptions(): array
+    {
+        return [
+            ['en', Validator::RESOURCES_NAMESPACE, Validation::class],
         ];
     }
 }
