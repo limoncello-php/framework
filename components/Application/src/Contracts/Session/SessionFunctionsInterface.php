@@ -34,6 +34,7 @@ interface SessionFunctionsInterface
      * @return self
      */
     public function setRetrieveCallable(callable $callable): self;
+
     /**
      * @return callable
      */

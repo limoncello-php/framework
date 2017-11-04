@@ -17,6 +17,7 @@
  */
 
 use Closure;
+use Limoncello\Application\Contracts\Cookie\CookieFunctionsInterface;
 use Limoncello\Contracts\Application\MiddlewareInterface;
 use Limoncello\Contracts\Cookies\CookieInterface;
 use Limoncello\Contracts\Cookies\CookieJarInterface;
@@ -29,16 +30,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class CookieMiddleware implements MiddlewareInterface
 {
-    /**
-     * A callable to set an ordinary (encoded) cookie.
-     */
-    protected const SET_COOKIE_CALLABLE = '\setcookie';
-
-    /**
-     * A callable to set a raw (not encoded) cookie.
-     */
-    protected const SET_RAW_COOKIE_CALLABLE = '\setrawcookie';
-
     /**
      * @inheritdoc
      */
@@ -53,6 +44,8 @@ class CookieMiddleware implements MiddlewareInterface
         if ($container->has(CookieJarInterface::class) === true) {
             /** @var CookieJarInterface $cookieJar */
             $cookieJar = $container->get(CookieJarInterface::class);
+            /** @var CookieFunctionsInterface $cookieFunctions */
+            $cookieFunctions = $container->get(CookieFunctionsInterface::class);
             foreach ($cookieJar->getAll() as $cookie) {
                 /** @var CookieInterface $cookie */
 
@@ -63,8 +56,8 @@ class CookieMiddleware implements MiddlewareInterface
                 // Using functions by names allows replace them with test mocks and check input values.
                 //
                 // Notice constants are used with `static::`. Their values can and will be replaced in tests.
-                $setCookieFunction =
-                    $cookie->isNotRaw() === true ? static::SET_COOKIE_CALLABLE : static::SET_RAW_COOKIE_CALLABLE;
+                $setCookieFunction = $cookie->isNotRaw() === true ?
+                    $cookieFunctions->getWriteCookieCallable() : $cookieFunctions->getWriteRawCookieCallable();
 
                 call_user_func(
                     $setCookieFunction,

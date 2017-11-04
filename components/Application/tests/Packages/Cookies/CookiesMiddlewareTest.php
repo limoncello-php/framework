@@ -17,7 +17,10 @@
  */
 
 use Closure;
+use Limoncello\Application\Contracts\Cookie\CookieFunctionsInterface;
+use Limoncello\Application\Cookies\CookieFunctions;
 use Limoncello\Application\Cookies\CookieJar;
+use Limoncello\Application\Packages\Cookies\CookieMiddleware;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Cookies\CookieJarInterface;
 use Mockery;
@@ -30,6 +33,16 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class CookiesMiddlewareTest extends TestCase
 {
+    /**
+     * @inheritdoc
+     */
+    protected const SET_COOKIE_CALLABLE = [self::class, 'setCookie'];
+
+    /**
+     * @inheritdoc
+     */
+    protected const SET_RAW_COOKIE_CALLABLE = [self::class, 'setRawCookie'];
+
     /**
      * @var Container
      */
@@ -51,6 +64,16 @@ class CookiesMiddlewareTest extends TestCase
     private $cookieJar;
 
     /**
+     * @var CookieFunctionsInterface
+     */
+    private $cookieFunctions;
+
+    /**
+     * @var array
+     */
+    private $cookieArgs;
+
+    /**
      * @inheritdoc
      */
     protected function setUp()
@@ -63,11 +86,17 @@ class CookiesMiddlewareTest extends TestCase
             return $responseMock;
         };
 
-        $this->cookieJar = new CookieJar('/path', 'domain', false, false, false);
+        $this->cookieArgs = [];
 
-        $container                            = new Container();
-        $container[CookieJarInterface::class] = $this->cookieJar;
-        $this->container                      = $container;
+        $this->cookieJar       = new CookieJar('/path', 'domain', false, false, false);
+        $this->cookieFunctions = (new CookieFunctions())
+            ->setWriteCookieCallable([$this, 'setCookie'])
+            ->setWriteRawCookieCallable([$this, 'setRawCookie']);
+
+        $container                                  = new Container();
+        $container[CookieJarInterface::class]       = $this->cookieJar;
+        $container[CookieFunctionsInterface::class] = $this->cookieFunctions;
+        $this->container                            = $container;
     }
 
     /**
@@ -78,13 +107,36 @@ class CookiesMiddlewareTest extends TestCase
         $this->cookieJar->create('raw')->setValue('raw_value')->setAsRaw();
         $this->cookieJar->create('not_raw')->setValue('not_raw_value')->setAsNotRaw();
 
-        TestCookieMiddleware::reset();
-        TestCookieMiddleware::handle($this->request, $this->next, $this->container);
+        CookieMiddleware::handle($this->request, $this->next, $this->container);
 
-        $setCookieInputs = TestCookieMiddleware::getInputs();
         $this->assertEquals([
             [true, 'raw', 'raw_value', 0, '/path', 'domain', false, false],
             [false, 'not_raw', 'not_raw_value', 0, '/path', 'domain', false, false],
-        ], $setCookieInputs);
+        ], $this->cookieArgs);
+    }
+
+    /**
+     * @param array $args
+     */
+    public function setCookie(...$args): void
+    {
+        $this->setCookieInt(false, $args);
+    }
+
+    /**
+     * @param array $args
+     */
+    public function setRawCookie(...$args): void
+    {
+        $this->setCookieInt(true, $args);
+    }
+
+    /**
+     * @param bool  $isRaw
+     * @param array $args
+     */
+    private function setCookieInt(bool $isRaw, array $args): void
+    {
+        $this->cookieArgs[] = array_merge([$isRaw], $args);
     }
 }

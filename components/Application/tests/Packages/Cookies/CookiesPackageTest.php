@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Contracts\Cookie\CookieFunctionsInterface;
 use Limoncello\Application\Packages\Cookies\CookieContainerConfigurator;
 use Limoncello\Application\Packages\Cookies\CookieProvider;
 use Limoncello\Application\Packages\Cookies\CookieSettings as C;
@@ -63,5 +64,6 @@ class CookiesPackageTest extends TestCase
         CookieContainerConfigurator::configureContainer($container);
 
         $this->assertNotNull($container->get(CookieJarInterface::class));
+        $this->assertNotNull($container->get(CookieFunctionsInterface::class));
     }
 }

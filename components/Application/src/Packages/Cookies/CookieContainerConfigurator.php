@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Contracts\Cookie\CookieFunctionsInterface;
+use Limoncello\Application\Cookies\CookieFunctions;
 use Limoncello\Application\Cookies\CookieJar;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
@@ -46,6 +48,11 @@ class CookieContainerConfigurator implements ContainerConfiguratorInterface
                     $settings[CookieSettings::KEY_DEFAULT_IS_ACCESSIBLE_ONLY_THROUGH_HTTP],
                     $settings[CookieSettings::KEY_DEFAULT_IS_RAW]
                 );
+            };
+
+        $container[CookieFunctionsInterface::class] =
+            function (PsrContainerInterface $container): CookieFunctionsInterface {
+                return new CookieFunctions();
             };
     }
 }
