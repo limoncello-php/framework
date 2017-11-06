@@ -1022,7 +1022,13 @@ class Crud implements CrudInterface
      */
     public function remove($index): bool
     {
-        return $this->withIndexFilter($index)->delete() > 0;
+        $this->withIndexFilter($index);
+
+        $deleted = $this->createDeleteBuilder()->execute();
+
+        $this->clearFetchParameters();
+
+        return (int)$deleted > 0;
     }
 
     /**
