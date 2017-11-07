@@ -383,13 +383,11 @@ class ModelQueryBuilder extends QueryBuilder
      */
     private function addFilters(string $tableOrAlias, CompositeExpression $filterLink, iterable $filters): self
     {
-        $added = false;
         foreach ($filters as $columnName => $operationsWithArgs) {
             $fullColumnName = $this->buildColumnName($tableOrAlias, $columnName);
             $this->applyFilter($filterLink, $fullColumnName, $operationsWithArgs);
-            $added = true;
         }
-        if ($added === true) {
+        if ($filterLink->count() > 0) {
             $this->andWhere($filterLink);
         }
 
@@ -496,7 +494,9 @@ class ModelQueryBuilder extends QueryBuilder
             $relationshipFilters,
             $relationshipSorts
         );
-        $this->andWhere($filterLink);
+        if ($filterLink->count() > 0) {
+            $this->andWhere($filterLink);
+        }
 
         return $this;
     }
@@ -528,7 +528,9 @@ class ModelQueryBuilder extends QueryBuilder
             $relationshipFilters,
             $relationshipSorts
         );
-        $this->andWhere($filterLink);
+        if ($filterLink->count() > 0) {
+            $this->andWhere($filterLink);
+        }
 
         return $this;
     }
@@ -570,7 +572,9 @@ class ModelQueryBuilder extends QueryBuilder
             $relationshipFilters,
             $relationshipSorts
         );
-        $this->andWhere($targetFilterLink);
+        if ($targetFilterLink->count() > 0) {
+            $this->andWhere($targetFilterLink);
+        }
 
         return $this;
     }

@@ -49,7 +49,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test filtering in BelongsTo relationship.
      */
-    public function testAddBelongsToRelationshipAndFilter(): void
+    public function testAddBelongsToRelationshipAndFilterWithSort(): void
     {
         $builder = $this->createModelQueryBuilder(Post::class);
 
@@ -78,6 +78,67 @@ class ModelQueryBuilderTest extends TestCase
         $this->migrateDatabase($this->connection);
         $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
         $this->assertCount(4, $posts);
+    }
+
+    /**
+     * Test filtering in BelongsTo relationship.
+     */
+    public function testAddBelongsToRelationshipFilterOnly(): void
+    {
+        $builder = $this->createModelQueryBuilder(Post::class);
+
+        $filters = [
+            User::FIELD_ID => [
+                FilterParameterInterface::OPERATION_EQUALS => [1],
+            ],
+        ];
+        $sorts   = null;
+        $builder
+            ->selectModelColumns()
+            ->fromModelTable()
+            ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
+
+        $expected =
+            'SELECT `posts1`.`id_post`, `posts1`.`id_board_fk`, `posts1`.`id_user_fk`, `posts1`.`id_editor_fk`, ' .
+            '`posts1`.`title`, `posts1`.`text`, `posts1`.`created_at`, `posts1`.`updated_at`, `posts1`.`deleted_at` ' .
+            'FROM `posts` `posts1` ' .
+            'INNER JOIN `users` `users2` ON `posts1`.`id_user_fk`=`users2`.`id_user` ' .
+            'WHERE `users2`.`id_user` = :dcValue1';
+        $this->assertEquals($expected, $builder->getSQL());
+
+        $this->migrateDatabase($this->connection);
+        $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
+        $this->assertCount(4, $posts);
+    }
+
+    /**
+     * Test sorting in BelongsTo relationship.
+     */
+    public function testAddBelongsToRelationshipSortOnly(): void
+    {
+        $builder = $this->createModelQueryBuilder(Post::class);
+
+        $filters = [
+        ];
+        $sorts   = [
+            User::FIELD_FIRST_NAME => false,
+        ];
+        $builder
+            ->selectModelColumns()
+            ->fromModelTable()
+            ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
+
+        $expected =
+            'SELECT `posts1`.`id_post`, `posts1`.`id_board_fk`, `posts1`.`id_user_fk`, `posts1`.`id_editor_fk`, ' .
+            '`posts1`.`title`, `posts1`.`text`, `posts1`.`created_at`, `posts1`.`updated_at`, `posts1`.`deleted_at` ' .
+            'FROM `posts` `posts1` ' .
+            'INNER JOIN `users` `users2` ON `posts1`.`id_user_fk`=`users2`.`id_user` ' .
+            'ORDER BY `users2`.`first_name` DESC';
+        $this->assertEquals($expected, $builder->getSQL());
+
+        $this->migrateDatabase($this->connection);
+        $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
+        $this->assertCount(20, $posts);
     }
 
     /**
@@ -374,7 +435,7 @@ class ModelQueryBuilderTest extends TestCase
             ]);
 
         $expected =
-            'UPDATE `boards` SET `title` = :dcValue3 '.
+            'UPDATE `boards` SET `title` = :dcValue3 ' .
             'WHERE (`boards`.`id_board` >= :dcValue1) OR (`boards`.`id_board` <= :dcValue2)';
 
         $this->assertEquals($expected, $builder->getSQL());
