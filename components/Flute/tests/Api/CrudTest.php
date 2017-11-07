@@ -123,7 +123,8 @@ class CrudTest extends TestCase
 
         $this->assertNotNull($crud->read($index));
 
-        $crud->remove($index);
+        // use equivalent index filter + delete
+        $crud->withIndexFilter($index)->delete();
 
         $this->assertNull($crud->read($index));
 
