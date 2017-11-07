@@ -350,7 +350,6 @@ abstract class BasePassportServer extends BaseAuthorizationServer implements Pas
             ->setUserIdentifier($userIdentifier);
         $isScopeModified === true ? $unsavedToken->setScopeModified() : $unsavedToken->setScopeUnmodified();
 
-
         $tokenExpiresIn = $this->setUpTokenValues($unsavedToken);
         $savedToken     = $this->getIntegration()->getTokenRepository()->createToken($unsavedToken);
 
