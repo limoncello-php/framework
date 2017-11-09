@@ -22,7 +22,10 @@ use Limoncello\Application\Data\FileMigrationRunner;
 use Limoncello\Application\Data\FileSeedRunner;
 use Limoncello\Application\FileSystem\FileSystem;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
+use Mockery;
+use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -42,8 +45,14 @@ class MigrationAndSeedRunnersTest extends TestCase
      */
     public function testMigrationsAndSeeds()
     {
-        $migrationRunner = new FileMigrationRunner(static::MIGRATIONS_PATH);
-        $seedRunner      = new FileSeedRunner(static::SEEDS_PATH, [static::class, 'seedInit']);
+        /** @var Mock $inOut */
+        $inOut = Mockery::mock(IoInterface::class);
+        $inOut->shouldReceive('writeInfo')->zeroOrMoreTimes()->withAnyArgs()->andReturnSelf();
+
+        /** @var IoInterface $inOut */
+
+        $migrationRunner = new FileMigrationRunner($inOut, static::MIGRATIONS_PATH);
+        $seedRunner      = new FileSeedRunner($inOut, static::SEEDS_PATH, [static::class, 'seedInit']);
 
         $container  = $this->createContainer();
         /** @var Connection $connection */

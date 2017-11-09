@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Psr\Container\ContainerInterface;
 
@@ -35,10 +36,13 @@ class FileMigrationRunner extends BaseMigrationRunner
     private $migrationClasses;
 
     /**
-     * @param string $migrationsPath
+     * @param IoInterface $inOut
+     * @param string      $migrationsPath
      */
-    public function __construct(string $migrationsPath)
+    public function __construct(IoInterface $inOut, string $migrationsPath)
     {
+        parent::__construct($inOut);
+
         $this->setMigrationsPath($migrationsPath);
     }
 
@@ -52,9 +56,12 @@ class FileMigrationRunner extends BaseMigrationRunner
         /** @var FileSystemInterface $fileSystem */
         $fileSystem = $container->get(FileSystemInterface::class);
 
-        assert($fileSystem->exists($this->getMigrationsPath()) === true);
+        $path = $this->getMigrationsPath();
+        assert($fileSystem->exists($path) === true);
 
-        $migrationClasses = $fileSystem->requireFile($this->getMigrationsPath());
+        $this->getIO()->writeInfo("Migrations `$path` started.", IoInterface::VERBOSITY_VERBOSE);
+
+        $migrationClasses = $fileSystem->requireFile($path);
         $this->setMigrationClasses($migrationClasses);
 
         // ... and run actual migration

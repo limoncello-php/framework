@@ -96,9 +96,11 @@ class ConsoleIoWrapper implements IoInterface
     /**
      * @inheritdoc
      */
-    public function writeInfo(string $message): IoInterface
+    public function writeInfo(string $message, int $verbosity = self::VERBOSITY_NORMAL): IoInterface
     {
-        $this->getOutput()->write("<info>$message</info>");
+        $isNewLine = false;
+        $options   = $this->convertVerbosityLevel($verbosity);
+        $this->getOutput()->write("<info>$message</info>", $isNewLine, $options);
 
         return $this;
     }
@@ -106,9 +108,11 @@ class ConsoleIoWrapper implements IoInterface
     /**
      * @inheritdoc
      */
-    public function writeWarning(string $message): IoInterface
+    public function writeWarning(string $message, int $verbosity = self::VERBOSITY_NORMAL): IoInterface
     {
-        $this->getOutput()->write("<comment>$message</comment>");
+        $isNewLine = false;
+        $options   = $this->convertVerbosityLevel($verbosity);
+        $this->getOutput()->write("<comment>$message</comment>", $isNewLine, $options);
 
         return $this;
     }
@@ -116,9 +120,11 @@ class ConsoleIoWrapper implements IoInterface
     /**
      * @inheritdoc
      */
-    public function writeError(string $message): IoInterface
+    public function writeError(string $message, int $verbosity = self::VERBOSITY_NORMAL): IoInterface
     {
-        $this->getOutput()->write("<error>$message</error>");
+        $isNewLine = false;
+        $options   = $this->convertVerbosityLevel($verbosity);
+        $this->getOutput()->write("<error>$message</error>", $isNewLine, $options);
 
         return $this;
     }
@@ -137,5 +143,33 @@ class ConsoleIoWrapper implements IoInterface
     protected function getInput(): InputInterface
     {
         return $this->input;
+    }
+
+    /**
+     * @param int $verbosity
+     *
+     * @return int
+     */
+    protected function convertVerbosityLevel(int $verbosity): int
+    {
+        switch ($verbosity) {
+            case static::VERBOSITY_QUIET:
+                $result = OutputInterface::VERBOSITY_QUIET;
+                break;
+            case static::VERBOSITY_NORMAL:
+                $result = OutputInterface::VERBOSITY_NORMAL;
+                break;
+            case static::VERBOSITY_VERBOSE:
+                $result = OutputInterface::VERBOSITY_VERBOSE;
+                break;
+            case static::VERBOSITY_VERY_VERBOSE:
+                $result = OutputInterface::VERBOSITY_VERY_VERBOSE;
+                break;
+            default:
+                $result = OutputInterface::VERBOSITY_NORMAL;
+                break;
+        }
+
+        return $result;
     }
 }

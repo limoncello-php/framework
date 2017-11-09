@@ -39,14 +39,15 @@ class DataCommandTest extends TestCase
     public function testCoverCreateRunnerMethods()
     {
         $command = new DataCommand();
+        $inOut   = Mockery::mock(IoInterface::class);
 
         $method = new ReflectionMethod(DataCommand::class, 'createMigrationRunner');
         $method->setAccessible(true);
-        $this->assertInstanceOf(FileMigrationRunner::class, $method->invoke($command, '/some/path'));
+        $this->assertInstanceOf(FileMigrationRunner::class, $method->invoke($command, $inOut, '/some/path'));
 
         $method = new ReflectionMethod(DataCommand::class, 'createSeedRunner');
         $method->setAccessible(true);
-        $this->assertInstanceOf(FileSeedRunner::class, $method->invoke($command, '/some/path'));
+        $this->assertInstanceOf(FileSeedRunner::class, $method->invoke($command, $inOut, '/some/path'));
     }
 
     /**

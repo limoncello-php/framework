@@ -136,16 +136,16 @@ class DataCommand implements CommandInterface
         switch ($action) {
             case static::ACTION_MIGRATE:
                 $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_LIST_FILE] ?? '';
-                $this->createMigrationRunner($path)->migrate($container);
+                $this->createMigrationRunner($inOut, $path)->migrate($container);
                 break;
             case static::ACTION_ROLLBACK:
                 $path = $path !== false ? $path : $settings[DataSettings::KEY_MIGRATIONS_LIST_FILE] ?? '';
-                $this->createMigrationRunner($path)->rollback($container);
+                $this->createMigrationRunner($inOut, $path)->rollback($container);
                 break;
             case static::ACTION_SEED:
                 $path     = $path !== false ? $path : $settings[DataSettings::KEY_SEEDS_LIST_FILE] ?? '';
                 $seedInit = $settings[DataSettings::KEY_SEED_INIT] ?? null;
-                $this->createSeedRunner($path, $seedInit)->run($container);
+                $this->createSeedRunner($inOut, $path, $seedInit)->run($container);
                 break;
             default:
                 $inOut->writeError("Unsupported action `$action`." . PHP_EOL);
@@ -154,16 +154,18 @@ class DataCommand implements CommandInterface
     }
 
     /**
-     * @param string $path
+     * @param IoInterface $inOut
+     * @param string      $path
      *
      * @return FileMigrationRunner
      */
-    protected function createMigrationRunner(string $path): FileMigrationRunner
+    protected function createMigrationRunner(IoInterface $inOut, string $path): FileMigrationRunner
     {
-        return new FileMigrationRunner($path);
+        return new FileMigrationRunner($inOut, $path);
     }
 
     /**
+     * @param IoInterface   $inOut
      * @param string        $seedsPath
      * @param callable|null $seedInit
      * @param string        $seedsTable
@@ -171,10 +173,11 @@ class DataCommand implements CommandInterface
      * @return FileSeedRunner
      */
     protected function createSeedRunner(
+        IoInterface $inOut,
         string $seedsPath,
         callable $seedInit = null,
         string $seedsTable = BaseMigrationRunner::SEEDS_TABLE
     ): FileSeedRunner {
-        return new FileSeedRunner($seedsPath, $seedInit, $seedsTable);
+        return new FileSeedRunner($inOut, $seedsPath, $seedInit, $seedsTable);
     }
 }

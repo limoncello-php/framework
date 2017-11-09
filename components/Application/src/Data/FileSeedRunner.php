@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Psr\Container\ContainerInterface;
 
@@ -35,18 +36,20 @@ class FileSeedRunner extends BaseSeedRunner
     private $seedClasses;
 
     /**
+     * @param IoInterface   $inOut
      * @param string        $seedsPath
      * @param callable|null $seedInit
      * @param string        $seedsTable
      */
     public function __construct(
+        IoInterface $inOut,
         string $seedsPath,
         callable $seedInit = null,
         string $seedsTable = BaseMigrationRunner::SEEDS_TABLE
     ) {
         $this->setSeedsPath($seedsPath);
 
-        parent::__construct($seedInit, $seedsTable);
+        parent::__construct($inOut, $seedInit, $seedsTable);
     }
 
     /**
@@ -59,9 +62,11 @@ class FileSeedRunner extends BaseSeedRunner
         /** @var FileSystemInterface $fileSystem */
         $fileSystem = $container->get(FileSystemInterface::class);
 
-        assert($fileSystem->exists($this->getSeedsPath()) === true);
+        $path = $this->getSeedsPath();
+        assert($fileSystem->exists($path) === true);
+        $this->getIO()->writeInfo("Seeds `$path` started.", IoInterface::VERBOSITY_VERBOSE);
 
-        $seedClasses = $fileSystem->requireFile($this->getSeedsPath());
+        $seedClasses = $fileSystem->requireFile($path);
         $this->setSeedClasses($seedClasses);
 
         // ... and run actual seeding

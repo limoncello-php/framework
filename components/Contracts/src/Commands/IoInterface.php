@@ -22,6 +22,26 @@
 interface IoInterface
 {
     /**
+     * Output verbosity level.
+     */
+    const VERBOSITY_QUIET = 0;
+
+    /**
+     * Output verbosity level.
+     */
+    const VERBOSITY_NORMAL = self::VERBOSITY_QUIET + 1;
+
+    /**
+     * Output verbosity level.
+     */
+    const VERBOSITY_VERBOSE = self::VERBOSITY_NORMAL + 1;
+
+    /**
+     * Output verbosity level.
+     */
+    const VERBOSITY_VERY_VERBOSE = self::VERBOSITY_VERBOSE + 1;
+
+    /**
      * @param string $name
      *
      * @return bool
@@ -61,22 +81,25 @@ interface IoInterface
 
     /**
      * @param string $message
+     * @param int    $verbosity
      *
      * @return self
      */
-    public function writeInfo(string $message): self;
+    public function writeInfo(string $message, int $verbosity = self::VERBOSITY_NORMAL): self;
 
     /**
      * @param string $message
+     * @param int    $verbosity
      *
      * @return self
      */
-    public function writeWarning(string $message): self;
+    public function writeWarning(string $message, int $verbosity = self::VERBOSITY_NORMAL): self;
 
     /**
      * @param string $message
+     * @param int    $verbosity
      *
      * @return self
      */
-    public function writeError(string $message): self;
+    public function writeError(string $message, int $verbosity = self::VERBOSITY_NORMAL): self;
 }

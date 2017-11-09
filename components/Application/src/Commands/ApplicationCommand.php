@@ -140,7 +140,13 @@ class ApplicationCommand implements CommandInterface
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
 
-        $this->getFileSystem($container)->delete($path);
+        $fileSystem = $this->getFileSystem($container);
+        if ($fileSystem->exists($path) === true) {
+            $fileSystem->delete($path);
+            $inOut->writeInfo("Cache file deleted `$path`.", IoInterface::VERBOSITY_VERBOSE);
+        } else {
+            $inOut->writeInfo('Cache already clean.');
+        }
     }
 
     /**
@@ -169,6 +175,9 @@ class ApplicationCommand implements CommandInterface
 
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
         $this->getFileSystem($container)->write($path, $content);
+
+        $inOut->writeInfo('Cache created.');
+        $inOut->writeInfo("Cache written to `$path`.", IoInterface::VERBOSITY_VERBOSE);
     }
 
     /**

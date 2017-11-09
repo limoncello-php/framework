@@ -143,7 +143,39 @@ class ApplicationCommandTest extends TestCase
             ]);
         /** @var Mock $fsMock */
         $container[FileSystemInterface::class] = $fsMock = Mockery::mock(FileSystemInterface::class);
+        $fsMock->shouldReceive('exists')->once()->withAnyArgs()->andReturn(true);
         $fsMock->shouldReceive('delete')->once()->withAnyArgs()->andReturnUndefined();
+
+        $inOut = $this->createInOutMock(ApplicationCommand::ARG_ACTION, ApplicationCommand::ACTION_CLEAR_CACHE);
+
+        $method = new ReflectionMethod(ApplicationCommand::class, 'run');
+        $method->setAccessible(true);
+        $command = new ApplicationCommand();
+        $method->invoke($command, $container, $inOut);
+
+        // Mockery will do checks when the test finishes
+        $this->assertTrue(true);
+    }
+
+    /**
+     * Test action.
+     */
+    public function testClearNonExistingCache()
+    {
+        $container = new Container();
+
+        /** @var Mock $providerMock */
+        $providerMock                                     = Mockery::mock(CacheSettingsProviderInterface::class);
+        $container[SettingsProviderInterface::class]      = $providerMock;
+        $container[CacheSettingsProviderInterface::class] = $providerMock;
+        $providerMock->shouldReceive('get')->once()->with(ApplicationSettingsInterface::class)
+            ->andReturn([
+                ApplicationSettingsInterface::KEY_CACHE_FOLDER   => '/some/path',
+                ApplicationSettingsInterface::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
+            ]);
+        /** @var Mock $fsMock */
+        $container[FileSystemInterface::class] = $fsMock = Mockery::mock(FileSystemInterface::class);
+        $fsMock->shouldReceive('exists')->once()->withAnyArgs()->andReturn(false);
 
         $inOut = $this->createInOutMock(ApplicationCommand::ARG_ACTION, ApplicationCommand::ACTION_CLEAR_CACHE);
 
@@ -248,6 +280,8 @@ class ApplicationCommandTest extends TestCase
         if ($expectErrors === true) {
             $mock->shouldReceive('writeError')->zeroOrMoreTimes()->withAnyArgs()->andReturnSelf();
         }
+
+        $mock->shouldReceive('writeInfo')->zeroOrMoreTimes()->withAnyArgs()->andReturnSelf();
 
         /** @var IoInterface $mock */
 

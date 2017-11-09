@@ -22,6 +22,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Generator;
+use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Data\MigrationInterface;
 use Psr\Container\ContainerInterface;
 
@@ -46,9 +47,22 @@ abstract class BaseMigrationRunner
     const SEEDS_TABLE = '_seeds';
 
     /**
+     * @var IoInterface
+     */
+    private $inOut;
+
+    /**
      * @return string[]
      */
     abstract protected function getMigrationClasses(): array;
+
+    /**
+     * @param IoInterface $inOut
+     */
+    public function __construct(IoInterface $inOut)
+    {
+        $this->setIO($inOut);
+    }
 
     /**
      * @param ContainerInterface $container
@@ -58,9 +72,12 @@ abstract class BaseMigrationRunner
     public function migrate(ContainerInterface $container): void
     {
         foreach ($this->getMigrations($container) as $class) {
+            assert(is_string($class));
+            $this->getIO()->writeInfo("Starting migration for `$class`...", IoInterface::VERBOSITY_VERBOSE);
             /** @var MigrationInterface $migration */
             $migration = new $class($container);
             $migration->init($container)->migrate();
+            $this->getIO()->writeInfo("Migration finished for `$class`.", IoInterface::VERBOSITY_NORMAL);
         }
     }
 
@@ -72,9 +89,12 @@ abstract class BaseMigrationRunner
     public function rollback(ContainerInterface $container): void
     {
         foreach ($this->getRollbacks($container) as $class) {
+            assert(is_string($class));
+            $this->getIO()->writeInfo("Starting rollback for `$class`...", IoInterface::VERBOSITY_VERBOSE);
             /** @var MigrationInterface $migration */
             $migration = new $class($container);
             $migration->init($container)->rollback();
+            $this->getIO()->writeInfo("Rollback finished for `$class`.", IoInterface::VERBOSITY_NORMAL);
         }
 
         $manager = $this->getConnection($container)->getSchemaManager();
@@ -84,6 +104,26 @@ abstract class BaseMigrationRunner
         if ($manager->tablesExist([static::SEEDS_TABLE]) === true) {
             $manager->dropTable(static::SEEDS_TABLE);
         }
+    }
+
+    /**
+     * @return IoInterface
+     */
+    protected function getIO(): IoInterface
+    {
+        return $this->inOut;
+    }
+
+    /**
+     * @param IoInterface $inOut
+     *
+     * @return self
+     */
+    private function setIO(IoInterface $inOut): self
+    {
+        $this->inOut = $inOut;
+
+        return $this;
     }
 
     /**

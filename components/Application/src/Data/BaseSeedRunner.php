@@ -22,6 +22,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Generator;
+use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Data\SeedInterface;
 use Psr\Container\ContainerInterface;
 
@@ -50,20 +51,31 @@ abstract class BaseSeedRunner
     private $seedInit = null;
 
     /**
+     * @var IoInterface
+     */
+    private $inOut;
+
+    /**
      * @return string[]
      */
     abstract protected function getSeedClasses(): array;
 
     /**
-     * @param callable $seedInit
-     * @param string   $seedsTable
+     * @param IoInterface $inOut
+     * @param callable    $seedInit
+     * @param string      $seedsTable
      */
-    public function __construct(callable $seedInit = null, string $seedsTable = BaseMigrationRunner::SEEDS_TABLE)
-    {
+    public function __construct(
+        IoInterface $inOut,
+        callable $seedInit = null,
+        string $seedsTable = BaseMigrationRunner::SEEDS_TABLE
+    ) {
         assert(empty($seedsTable) === false);
 
         $this->seedInit    = $seedInit;
         $this->seedsTable  = $seedsTable;
+
+        $this->setIO($inOut);
     }
 
     /**
@@ -74,10 +86,12 @@ abstract class BaseSeedRunner
     public function run(ContainerInterface $container): void
     {
         foreach ($this->getSeeds($container) as $seederClass) {
+            $this->getIO()->writeInfo("Starting seed for `$seederClass`...", IoInterface::VERBOSITY_VERBOSE);
             $this->executeSeedInit($container, $seederClass);
             /** @var SeedInterface $seeder */
             $seeder = new $seederClass();
             $seeder->init($container)->run();
+            $this->getIO()->writeInfo("Seed finished for `$seederClass`.", IoInterface::VERBOSITY_NORMAL);
         }
     }
 
@@ -129,6 +143,26 @@ abstract class BaseSeedRunner
         if ($this->seedInit !== null) {
             call_user_func($this->seedInit, $container, $seedClass);
         }
+    }
+
+    /**
+     * @return IoInterface
+     */
+    protected function getIO(): IoInterface
+    {
+        return $this->inOut;
+    }
+
+    /**
+     * @param IoInterface $inOut
+     *
+     * @return self
+     */
+    private function setIO(IoInterface $inOut): self
+    {
+        $this->inOut = $inOut;
+
+        return $this;
     }
 
     /**
