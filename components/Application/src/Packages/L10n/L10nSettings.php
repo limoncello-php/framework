@@ -52,7 +52,6 @@ abstract class L10nSettings implements SettingsInterface
             "Invalid Locales folder `$localesFolder`."
         );
 
-
         return $defaults + [
                 static::KEY_LOCALES_DATA => (new FileBundleEncoder($localesFolder))->getStorageData($defaultLocale),
             ];
