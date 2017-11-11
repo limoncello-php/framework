@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Application\Commands\CommandStorage;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as S;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;

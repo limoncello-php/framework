@@ -18,7 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
@@ -54,9 +54,9 @@ class FluteContainerConfiguratorTest extends TestCase
         $container[SettingsProviderInterface::class] = new SettingsProvider([
             FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
 
-            ApplicationSettingsInterface::class => [
-                ApplicationSettingsInterface::KEY_IS_LOG_ENABLED => true,
-                ApplicationSettingsInterface::KEY_IS_DEBUG       => true,
+            ApplicationConfigurationInterface::class => [
+                ApplicationConfigurationInterface::KEY_IS_LOG_ENABLED => true,
+                ApplicationConfigurationInterface::KEY_IS_DEBUG       => true,
             ],
         ]);
         $container[LoggerInterface::class]           = new NullLogger();

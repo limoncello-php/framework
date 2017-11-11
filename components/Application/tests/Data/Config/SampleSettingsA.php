@@ -24,9 +24,9 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 class SampleSettingsA implements SettingsInterface, MarkerInterfaceChild1
 {
     /**
-     * @return array
+     * @inheritdoc
      */
-    public function get(): array
+    public function get(array $appConfig): array
     {
         return ['value' => 'A'];
     }

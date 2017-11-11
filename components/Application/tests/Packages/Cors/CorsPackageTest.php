@@ -20,7 +20,7 @@ use Limoncello\Application\Packages\Cors\CorsContainerConfigurator;
 use Limoncello\Application\Packages\Cors\CorsProvider;
 use Limoncello\Application\Packages\Cors\CorsSettings as C;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
 use Mockery\Mock;
@@ -53,11 +53,12 @@ class CorsPackageTest extends TestCase
 
         /** @var Mock $provider */
         $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
-        $container[LoggerInterface::class] = new NullLogger();
+        $container[LoggerInterface::class]           = new NullLogger();
         $provider->shouldReceive('get')->once()->with(A::class)->andReturn([
             A::KEY_IS_DEBUG => true,
         ]);
-        $corsConfig = (new C())->get();
+        $appSettings                       = [];
+        $corsConfig                        = (new C())->get($appSettings);
         $corsConfig[C::KEY_LOG_IS_ENABLED] = true;
         $provider->shouldReceive('get')->once()->with(C::class)->andReturn($corsConfig);
 

@@ -82,10 +82,11 @@ class AuthorizationManagerTest extends TestCase
         $container = new Container();
 
         /** @var Mock $provider */
+        $appSettings                                 = [];
         $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
         $container[LoggerInterface::class]           = new NullLogger();
         $provider->shouldReceive('get')->once()->with(C::class)
-            ->andReturn(AuthorizationPackageTest::getAuthorizationSettings()->get());
+            ->andReturn(AuthorizationPackageTest::getAuthorizationSettings()->get($appSettings));
 
         AuthorizationContainerConfigurator::configureContainer($container);
 

@@ -78,7 +78,8 @@ class L10nPackageTest extends TestCase
             }
         };
 
-        $result = $settings->get();
+        $appSettings = [];
+        $result      = $settings->get($appSettings);
 
         return $result;
     }

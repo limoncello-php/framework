@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
-
 /**
  * @package Limoncello\Contracts
  */
-interface ApplicationSettingsInterface extends SettingsInterface
+interface ApplicationConfigurationInterface
 {
     /** Settings key */
     const KEY_APP_NAME = 0;
@@ -70,4 +68,9 @@ interface ApplicationSettingsInterface extends SettingsInterface
 
     /** Settings key */
     const KEY_LAST = self::KEY_EXCEPTION_DUMPER + 1;
+
+    /**
+     * @return array
+     */
+    public function get(): array;
 }

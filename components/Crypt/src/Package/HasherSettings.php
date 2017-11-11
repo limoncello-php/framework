@@ -35,7 +35,7 @@ class HasherSettings implements SettingsInterface
     /**
      * @inheritdoc
      */
-    final public function get(): array
+    final public function get(array $appConfig): array
     {
         return $this->getSettings();
     }

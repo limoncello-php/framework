@@ -17,7 +17,7 @@
  */
 
 use Exception;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;

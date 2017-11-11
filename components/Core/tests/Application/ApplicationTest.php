@@ -26,15 +26,13 @@ use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Application;
 use Limoncello\Core\Application\Sapi;
 use Limoncello\Core\Application\ThrowableResponseTrait;
-use Limoncello\Core\Contracts\CoreSettingsInterface;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;
-use Limoncello\Tests\Core\Application\Data\CoreSettings;
+use Limoncello\Tests\Core\Application\Data\CoreData;
 use Limoncello\Tests\Core\TestCase;
 use Mockery;
 use Mockery\Mock;
@@ -337,26 +335,10 @@ class ApplicationTest extends TestCase
         array $globalMiddleware = null,
         LimoncelloContainerInterface $container = null
     ): array {
-        $globalMiddleware = $globalMiddleware ??
-            [[self::class, 'globalMiddlewareItem1'], [self::class, 'globalMiddlewareItem2']];
-
-        $coreSettings = (new CoreSettings())
-            ->setRouterParameters([
-                CoreSettings::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
-                CoreSettings::KEY_ROUTER_PARAMS__DISPATCHER => GroupCountBasedDispatcher::class,
-            ])->setRoutesData($routesData)
-            ->setGlobalConfigurators([[self::class, 'createGlobalConfigurator']])
-            ->setGlobalMiddleware($globalMiddleware);
-
-        /** @var Mock $settings */
-        $settings = Mockery::mock(SettingsProviderInterface::class);
-        $settings->shouldReceive('get')->once()->with(CoreSettingsInterface::class)->andReturn($coreSettings->get());
 
         if ($container === null) {
             /** @var Mock $container */
             $container = Mockery::mock(LimoncelloContainerInterface::class);
-            $container->shouldReceive('offsetSet')->once()
-                ->with(SettingsProviderInterface::class, $settings)->andReturnUndefined();
         }
 
         $server['REQUEST_URI']    = $uri;
@@ -373,7 +355,17 @@ class ApplicationTest extends TestCase
 
         $app = Mockery::mock(Application::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $app->shouldReceive('createSettingsProvider')->once()->withAnyArgs()->andReturn($settings);
+        $globalMiddleware = $globalMiddleware ??
+            [[self::class, 'globalMiddlewareItem1'], [self::class, 'globalMiddlewareItem2']];
+        $coreData         = (new CoreData())
+            ->setRouterParameters([
+                CoreData::KEY_ROUTER_PARAMS__GENERATOR  => GroupCountBasedGenerator::class,
+                CoreData::KEY_ROUTER_PARAMS__DISPATCHER => GroupCountBasedDispatcher::class,
+            ])->setRoutesData($routesData)
+            ->setGlobalConfigurators([[self::class, 'createGlobalConfigurator']])
+            ->setGlobalMiddleware($globalMiddleware);
+
+        $app->shouldReceive('getCoreData')->once()->withAnyArgs()->andReturn($coreData->get());
         $app->shouldReceive('createContainerInstance')->zeroOrMoreTimes()->withNoArgs()->andReturn($container);
 
         /** @var Application $app */

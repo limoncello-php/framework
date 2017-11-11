@@ -29,10 +29,10 @@ class SampleSettingsAA extends SampleSettingsA implements MarkerInterfaceChild11
     }
 
     /**
-     * @return array
+     * @inheritdoc
      */
-    public function get(): array
+    public function get(array $appConfig): array
     {
-        return ['value' => 'AA'] + parent::get();
+        return ['value' => 'AA'] + parent::get($appConfig);
     }
 }

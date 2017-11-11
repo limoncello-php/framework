@@ -45,7 +45,8 @@ class PdoPackageTest extends TestCase
      */
     public function testSettings(): void
     {
-        $this->assertNotEmpty($this->createSettings()->get());
+        $appSettings = [];
+        $this->assertNotEmpty($this->createSettings()->get($appSettings));
     }
 
     /**

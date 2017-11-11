@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Application\Packages\Monolog\MonologFileSettings as C;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;

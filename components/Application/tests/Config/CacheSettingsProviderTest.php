@@ -18,6 +18,7 @@
 
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
+use Limoncello\Tests\Application\CoreSettings\CoreDataTest;
 use Limoncello\Tests\Application\Data\Config\MarkerInterfaceChild1;
 use Limoncello\Tests\Application\Data\Config\MarkerInterfaceTop;
 use Limoncello\Tests\Application\Data\Config\SampleSettingsAA;
@@ -36,7 +37,8 @@ class CacheSettingsProviderTest extends TestCase
         $provider = $this->createProvider();
         $provider->unserialize($provider->serialize());
 
-        $valuesA = (new SampleSettingsAA())->get();
+        $appSettings = [];
+        $valuesA     = (new SampleSettingsAA())->get($appSettings);
 
         $this->assertFalse($provider->has(MarkerInterfaceTop::class));
         $this->assertTrue($provider->isAmbiguous(MarkerInterfaceTop::class));
@@ -51,13 +53,16 @@ class CacheSettingsProviderTest extends TestCase
      */
     private function createProvider(): CacheSettingsProvider
     {
-        $fileSettingsProvider = (new FileSettingsProvider())->load(
+        $appSettings          = [];
+        $fileSettingsProvider = (new FileSettingsProvider($appSettings))->load(
             __DIR__ . DIRECTORY_SEPARATOR . '..'
             . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR . 'Config'
             . DIRECTORY_SEPARATOR . '*.php'
         );
 
-        return (new CacheSettingsProvider())->setInstanceSettings($fileSettingsProvider);
+        $coreData = CoreDataTest::createCoreData();
+
+        return (new CacheSettingsProvider())->setInstanceSettings($coreData, $fileSettingsProvider);
     }
 
     /**

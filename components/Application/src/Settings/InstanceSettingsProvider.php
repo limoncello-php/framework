@@ -28,6 +28,11 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 class InstanceSettingsProvider implements SettingsProviderInterface
 {
     /**
+     * @var array
+     */
+    private $applicationSettings;
+
+    /**
      * @var SettingsInterface[]
      */
     private $instances = [];
@@ -51,6 +56,14 @@ class InstanceSettingsProvider implements SettingsProviderInterface
      * @var array
      */
     private $ambiguousMap = [];
+
+    /**
+     * @param array $applicationSettings
+     */
+    public function __construct(array $applicationSettings)
+    {
+        $this->applicationSettings = $applicationSettings;
+    }
 
     /**
      * @inheritdoc
@@ -143,6 +156,14 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     }
 
     /**
+     * @return array
+     */
+    protected function getApplicationSettings(): array
+    {
+        return $this->applicationSettings;
+    }
+
+    /**
      * @return void
      */
     private function checkInstancesAreProcessed(): void
@@ -171,13 +192,13 @@ class InstanceSettingsProvider implements SettingsProviderInterface
         $nextIndex    = 0;
         $hashMap      = []; // hash  => index
         $settingsData = []; // index => instance data
-        $getIndex = function (SettingsInterface $instance) use (&$nextIndex, &$hashMap, &$settingsData): int {
+        $getIndex     = function (SettingsInterface $instance) use (&$nextIndex, &$hashMap, &$settingsData): int {
             $hash = spl_object_hash($instance);
             if (array_key_exists($hash, $hashMap) === true) {
                 $index = $hashMap[$hash];
             } else {
                 $hashMap[$hash]           = $nextIndex;
-                $settingsData[$nextIndex] = $instance->get();
+                $settingsData[$nextIndex] = $instance->get($this->getApplicationSettings());
                 $index                    = $nextIndex++;
             }
 
@@ -236,7 +257,8 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     private function selectChildSettingsAmongTwo(
         SettingsInterface $instance1,
         SettingsInterface $instance2
-    ) : ?SettingsInterface {
+    ): ?SettingsInterface
+    {
         return is_subclass_of($instance1, get_class($instance2)) === true ?
             $instance1 : (is_subclass_of($instance2, get_class($instance1)) === true ? $instance2 : null);
     }

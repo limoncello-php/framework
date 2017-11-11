@@ -18,7 +18,6 @@
 
 use Closure;
 use Limoncello\Application\Contracts\Session\SessionFunctionsInterface;
-use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
 use Limoncello\Application\Packages\Session\SessionMiddleware;
 use Limoncello\Application\Packages\Session\SessionSettings;
 use Limoncello\Application\Session\SessionFunctions;
@@ -77,8 +76,9 @@ class SessionMiddlewareTest extends TestCase
 
         /** @var Mock $providerMock */
         $providerMock = Mockery::mock(SettingsProviderInterface::class);
+        $appSettings  = [];
         $providerMock->shouldReceive('get')->once()->with(SessionSettings::class)
-            ->andReturn((new SessionSettings())->get());
+            ->andReturn((new SessionSettings())->get($appSettings));
 
         $container                                   = new Container();
         $container[SessionFunctionsInterface::class] = $settingsFunctions;

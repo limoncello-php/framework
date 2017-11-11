@@ -19,7 +19,7 @@
 use Exception;
 use Limoncello\Application\ExceptionHandlers\WhoopsThrowableHandler;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;

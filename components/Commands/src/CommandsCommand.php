@@ -20,7 +20,7 @@ use Composer\Command\BaseCommand;
 use Limoncello\Commands\Traits\CacheFilePathTrait;
 use Limoncello\Commands\Traits\CommandSerializationTrait;
 use Limoncello\Commands\Traits\CommandTrait;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as S;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Commands\IoInterface;

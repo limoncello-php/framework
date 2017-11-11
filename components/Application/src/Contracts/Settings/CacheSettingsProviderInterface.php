@@ -24,4 +24,8 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
  */
 interface CacheSettingsProviderInterface extends SettingsProviderInterface, ArraySerializableInterface
 {
+    /**
+     * @return array
+     */
+    public function getCoreData(): array;
 }

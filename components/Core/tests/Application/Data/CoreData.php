@@ -17,13 +17,13 @@
  */
 
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
-use Limoncello\Core\Application\BaseCoreSettings;
+use Limoncello\Core\Application\BaseCoreData;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 
 /**
  * @package Limoncello\Core
  */
-class CoreSettings extends BaseCoreSettings
+class CoreData extends BaseCoreData
 {
     /**
      * @var array
@@ -72,9 +72,9 @@ class CoreSettings extends BaseCoreSettings
     /**
      * @param array $routerParameters
      *
-     * @return CoreSettings
+     * @return CoreData
      */
-    public function setRouterParameters(array $routerParameters): CoreSettings
+    public function setRouterParameters(array $routerParameters): CoreData
     {
         $this->routerParameters = $routerParameters;
 
@@ -92,9 +92,9 @@ class CoreSettings extends BaseCoreSettings
     /**
      * @param array $routesData
      *
-     * @return CoreSettings
+     * @return CoreData
      */
-    public function setRoutesData(array $routesData): CoreSettings
+    public function setRoutesData(array $routesData): CoreData
     {
         $this->routesData = $routesData;
 
@@ -112,9 +112,9 @@ class CoreSettings extends BaseCoreSettings
     /**
      * @param array $globalConfigurators
      *
-     * @return CoreSettings
+     * @return CoreData
      */
-    public function setGlobalConfigurators(array $globalConfigurators): CoreSettings
+    public function setGlobalConfigurators(array $globalConfigurators): CoreData
     {
         $this->globalConfigurators = $globalConfigurators;
 
@@ -132,9 +132,9 @@ class CoreSettings extends BaseCoreSettings
     /**
      * @param array $globalMiddleware
      *
-     * @return CoreSettings
+     * @return CoreData
      */
-    public function setGlobalMiddleware(array $globalMiddleware): CoreSettings
+    public function setGlobalMiddleware(array $globalMiddleware): CoreData
     {
         $this->globalMiddleware = $globalMiddleware;
 

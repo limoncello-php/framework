@@ -53,7 +53,7 @@ class TemplatesSettings implements SettingsInterface
     /**
      * @inheritdoc
      */
-    final public function get(): array
+    final public function get(array $appConfig): array
     {
         $defaults = $this->getSettings();
 

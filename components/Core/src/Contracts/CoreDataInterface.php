@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
-
 /**
  * @package Limoncello\Core
  */
-interface CoreSettingsInterface extends SettingsInterface
+interface CoreDataInterface
 {
     /** Settings key for router parameters */
     const KEY_ROUTER_PARAMS = 0;

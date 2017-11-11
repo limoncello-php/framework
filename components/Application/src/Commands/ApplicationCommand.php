@@ -18,7 +18,7 @@
 
 use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
 use Limoncello\Application\Exceptions\ConfigurationException;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
@@ -129,8 +129,8 @@ class ApplicationCommand implements CommandInterface
         assert($inOut);
 
         $appSettings    = $this->getApplicationSettings($container);
-        $cacheDir       = $appSettings[ApplicationSettingsInterface::KEY_CACHE_FOLDER];
-        $cacheCallable  = $appSettings[ApplicationSettingsInterface::KEY_CACHE_CALLABLE];
+        $cacheDir       = $appSettings[ApplicationConfigurationInterface::KEY_CACHE_FOLDER];
+        $cacheCallable  = $appSettings[ApplicationConfigurationInterface::KEY_CACHE_CALLABLE];
         list (, $class) = $this->parseCacheCallable($cacheCallable);
 
         if ($class === null) {
@@ -160,8 +160,8 @@ class ApplicationCommand implements CommandInterface
         assert($inOut);
 
         $appSettings   = $this->getApplicationSettings($container);
-        $cacheDir      = $appSettings[ApplicationSettingsInterface::KEY_CACHE_FOLDER];
-        $cacheCallable = $appSettings[ApplicationSettingsInterface::KEY_CACHE_CALLABLE];
+        $cacheDir      = $appSettings[ApplicationConfigurationInterface::KEY_CACHE_FOLDER];
+        $cacheCallable = $appSettings[ApplicationConfigurationInterface::KEY_CACHE_CALLABLE];
         list ($namespace, $class, $method) = $this->parseCacheCallable($cacheCallable);
         if ($class === null || $namespace === null || $method === null) {
             // parsing of cache callable failed (most likely error in settings)
@@ -279,7 +279,7 @@ EOT;
     {
         /** @var SettingsProviderInterface $settingsProvider */
         $settingsProvider = $container->get(SettingsProviderInterface::class);
-        $appSettings      = $settingsProvider->get(ApplicationSettingsInterface::class);
+        $appSettings      = $settingsProvider->get(ApplicationConfigurationInterface::class);
 
         return $appSettings;
     }

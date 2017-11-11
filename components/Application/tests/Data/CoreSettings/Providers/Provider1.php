@@ -86,9 +86,9 @@ class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI, PrCmdI
         return [new class implements SettingsInterface
         {
             /**
-             * @return array
+             * @inheritdoc
              */
-            public function get(): array
+            public function get(array $appConfig): array
             {
                 return ['Provider1_Settings' => 'some value'];
             }

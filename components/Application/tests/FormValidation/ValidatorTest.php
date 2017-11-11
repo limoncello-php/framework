@@ -22,6 +22,7 @@ use Limoncello\Application\Packages\FormValidation\FormValidationContainerConfig
 use Limoncello\Application\Packages\FormValidation\FormValidationSettings;
 use Limoncello\Application\Packages\FormValidation\FormValidationSettings as C;
 use Limoncello\Application\Packages\L10n\L10nContainerConfigurator;
+use Limoncello\Application\Packages\L10n\L10nSettings as S;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
@@ -31,7 +32,6 @@ use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Limoncello\Application\Packages\L10n\L10nSettings as S;
 
 /**
  * @package Limoncello\Tests\Application
@@ -110,12 +110,13 @@ class ValidatorTest extends TestCase
                 $validatorsFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'FormValidators']);
 
                 return [
-                        static::KEY_VALIDATORS_FOLDER  => $validatorsFolder,
+                        static::KEY_VALIDATORS_FOLDER => $validatorsFolder,
                     ] + parent::getSettings();
             }
         };
 
-        $result = $settings->get();
+        $appSettings = [];
+        $result      = $settings->get($appSettings);
 
         return $result;
     }
@@ -140,7 +141,8 @@ class ValidatorTest extends TestCase
             }
         };
 
-        $result = $settings->get();
+        $appSettings = [];
+        $result      = $settings->get($appSettings);
 
         return $result;
     }

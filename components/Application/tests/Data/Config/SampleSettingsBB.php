@@ -39,10 +39,10 @@ class SampleSettingsBB extends SampleSettingsB implements MIC21, MIS, MIC1121
     }
 
     /**
-     * @return array
+     * @inheritdoc
      */
-    public function get(): array
+    public function get(array $appConfig): array
     {
-        return ['value' => 'BB'] + parent::get();
+        return ['value' => 'BB'] + parent::get($appConfig);
     }
 }

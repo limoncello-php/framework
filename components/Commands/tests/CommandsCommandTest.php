@@ -31,7 +31,7 @@ use Mockery\Mock;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as S;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
 
 /**
  * @package Limoncello\Tests\Commands

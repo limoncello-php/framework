@@ -18,13 +18,13 @@
 
 use FastRoute\DataGenerator;
 use FastRoute\Dispatcher;
-use Limoncello\Core\Contracts\CoreSettingsInterface;
+use Limoncello\Core\Contracts\CoreDataInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
 
 /**
  * @package Limoncello\Core
  */
-abstract class BaseCoreSettings implements CoreSettingsInterface
+abstract class BaseCoreData implements CoreDataInterface
 {
     use ClassIsTrait;
 

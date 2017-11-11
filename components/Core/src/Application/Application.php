@@ -23,8 +23,6 @@ use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Core\Contracts\CoreSettingsInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Routing\Router;
 use LogicException;
@@ -63,9 +61,9 @@ abstract class Application implements ApplicationInterface
     private $router = null;
 
     /**
-     * @return SettingsProviderInterface
+     * @return array
      */
-    abstract protected function createSettingsProvider(): SettingsProviderInterface;
+    abstract protected function getCoreData(): array;
 
     /**
      * @return LimoncelloContainerInterface
@@ -97,20 +95,16 @@ abstract class Application implements ApplicationInterface
         $container = null;
 
         try {
-            $container = $this->createContainerInstance();
-
-            $settingsProvider = $this->createSettingsProvider();
-            $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
-
-            $coreSettings = $settingsProvider->get(CoreSettingsInterface::class);
+            $coreData = $this->getCoreData();
 
             // match route from `Request` to handler, route container configurators/middleware, etc
             list($matchCode, $allowedMethods, $handlerParams, $handler,
-                $routeMiddleware, $routeConfigurators, $requestFactory) = $this->initRouter($coreSettings)
+                $routeMiddleware, $routeConfigurators, $requestFactory) = $this->initRouter($coreData)
                 ->match($this->sapi->getMethod(), $this->sapi->getUri()->getPath());
 
             // configure container
-            $globalConfigurators = BaseCoreSettings::getGlobalConfiguratorsFromData($coreSettings);
+            $container = $this->createContainerInstance();
+            $globalConfigurators = BaseCoreData::getGlobalConfiguratorsFromData($coreData);
             $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
 
             // build pipeline for handling `Request`: global middleware -> route middleware -> handler (e.g. controller)
@@ -129,7 +123,7 @@ abstract class Application implements ApplicationInterface
                     break;
             }
 
-            $globalMiddleware = BaseCoreSettings::getGlobalMiddlewareFromData($coreSettings);
+            $globalMiddleware = BaseCoreData::getGlobalMiddlewareFromData($coreData);
             $hasMiddleware    = empty($globalMiddleware) === false || empty($routeMiddleware) === false;
 
             $handler = $hasMiddleware === true ?
@@ -337,18 +331,18 @@ abstract class Application implements ApplicationInterface
     }
 
     /**
-     * @param array $coreSettings
+     * @param array $coreData
      *
      * @return RouterInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    protected function initRouter(array $coreSettings): RouterInterface
+    protected function initRouter(array $coreData): RouterInterface
     {
-        $routerParams    = BaseCoreSettings::getRouterParametersFromData($coreSettings);
-        $routesData      = BaseCoreSettings::getRoutesDataFromData($coreSettings);
-        $generatorClass  = BaseCoreSettings::getGeneratorFromParametersData($routerParams);
-        $dispatcherClass = BaseCoreSettings::getDispatcherFromParametersData($routerParams);
+        $routerParams    = BaseCoreData::getRouterParametersFromData($coreData);
+        $routesData      = BaseCoreData::getRoutesDataFromData($coreData);
+        $generatorClass  = BaseCoreData::getGeneratorFromParametersData($routerParams);
+        $dispatcherClass = BaseCoreData::getDispatcherFromParametersData($routerParams);
 
         $this->router = new Router($generatorClass, $dispatcherClass);
         $this->router->loadCachedRoutes($routesData);

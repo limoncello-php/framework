@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
+use Limoncello\Application\CoreSettings\CoreData;
 use Limoncello\Application\Exceptions\AmbiguousSettingsException;
 use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
 
@@ -26,13 +27,21 @@ use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
 class CacheSettingsProvider implements CacheSettingsProviderInterface
 {
     /** Internal data index */
-    const KEY_SETTINGS_MAP = 0;
+    const KEY_CORE_DATA = 0;
+
+    /** Internal data index */
+    const KEY_SETTINGS_MAP = self::KEY_CORE_DATA + 1;
 
     /** Internal data index */
     const KEY_SETTINGS_DATA = self::KEY_SETTINGS_MAP + 1;
 
     /** Internal data index */
     const KEY_AMBIGUOUS_MAP = self::KEY_SETTINGS_DATA + 1;
+
+    /**
+     * @var array
+     */
+    private $coreData = [];
 
     /**
      * @var array
@@ -69,6 +78,14 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
     /**
      * @inheritdoc
      */
+    public function getCoreData(): array
+    {
+        return $this->coreData;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function has(string $className): bool
     {
         $result = array_key_exists($className, $this->settingsMap);
@@ -87,13 +104,15 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
     }
 
     /**
+     * @param CoreData                 $coreData
      * @param InstanceSettingsProvider $provider
      *
      * @return CacheSettingsProvider
      */
-    public function setInstanceSettings(InstanceSettingsProvider $provider): CacheSettingsProvider
+    public function setInstanceSettings(CoreData $coreData, InstanceSettingsProvider $provider): CacheSettingsProvider
     {
         $this->unserialize([
+            static::KEY_CORE_DATA     => $coreData->get(),
             static::KEY_SETTINGS_MAP  => $provider->getSettingsMap(),
             static::KEY_SETTINGS_DATA => $provider->getSettingsData(),
             static::KEY_AMBIGUOUS_MAP => $provider->getAmbiguousMap(),
@@ -108,6 +127,7 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
     public function serialize(): array
     {
         return [
+            static::KEY_CORE_DATA     => $this->coreData,
             static::KEY_SETTINGS_MAP  => $this->settingsMap,
             static::KEY_SETTINGS_DATA => $this->settingsData,
             static::KEY_AMBIGUOUS_MAP => $this->ambiguousMap,
@@ -119,6 +139,11 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
      */
     public function unserialize(array $serialized): void
     {
-        list ($this->settingsMap, $this->settingsData, $this->ambiguousMap) = $serialized;
+        list (
+            static::KEY_CORE_DATA => $this->coreData,
+            static::KEY_SETTINGS_MAP => $this->settingsMap,
+            static::KEY_SETTINGS_DATA => $this->settingsData,
+            static::KEY_AMBIGUOUS_MAP => $this->ambiguousMap,
+            ) = $serialized;
     }
 }

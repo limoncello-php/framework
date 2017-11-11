@@ -53,7 +53,8 @@ class DataPackageTest extends TestCase
 
         /** @var Mock $provider */
         $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
-        $provider->shouldReceive('get')->once()->with(C::class)->andReturn($this->getDataSettings()->get());
+        $appSettings = [];
+        $provider->shouldReceive('get')->once()->with(C::class)->andReturn($this->getDataSettings()->get($appSettings));
         $provider->shouldReceive('get')->once()->with(S::class)->andReturn([
             S::KEY_URL    => 'sqlite:///',
             S::KEY_MEMORY => true,
@@ -70,8 +71,9 @@ class DataPackageTest extends TestCase
      */
     public function testSettings()
     {
-        $this->assertNotEmpty($this->getDataSettings()->get());
-        $this->assertNotEmpty($this->getDoctrineSettings()->get());
+        $appSettings = [];
+        $this->assertNotEmpty($this->getDataSettings()->get($appSettings));
+        $this->assertNotEmpty($this->getDoctrineSettings()->get($appSettings));
     }
 
     /**

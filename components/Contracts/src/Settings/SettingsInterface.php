@@ -24,7 +24,9 @@
 interface SettingsInterface
 {
     /**
+     * @param array $appConfig
+     *
      * @return array
      */
-    public function get(): array;
+    public function get(array $appConfig): array;
 }

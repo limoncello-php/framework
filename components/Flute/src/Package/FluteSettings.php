@@ -88,7 +88,7 @@ abstract class FluteSettings implements SettingsInterface
     /**
      * @return array
      */
-    final public function get(): array
+    final public function get(array $appConfig): array
     {
         $defaults = $this->getSettings();
 

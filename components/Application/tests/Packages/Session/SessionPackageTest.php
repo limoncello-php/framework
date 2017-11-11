@@ -52,7 +52,8 @@ class SessionPackageTest extends TestCase
         /** @var Mock $provider */
         $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
 
-        $corsConfig = (new C())->get();
+        $appSettings = [];
+        $corsConfig  = (new C())->get($appSettings);
         $provider->shouldReceive('get')->once()->with(C::class)->andReturn($corsConfig);
 
         SessionContainerConfigurator::configureContainer($container);

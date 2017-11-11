@@ -20,7 +20,7 @@ use Limoncello\Application\Packages\Application\ApplicationContainerConfigurator
 use Limoncello\Application\Packages\Application\ApplicationProvider;
 use Limoncello\Application\Packages\Application\WhoopsContainerConfigurator;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as S;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;

@@ -20,7 +20,7 @@ use Limoncello\Application\Packages\Monolog\MonologFileContainerConfigurator;
 use Limoncello\Application\Packages\Monolog\MonologFileProvider;
 use Limoncello\Application\Packages\Monolog\MonologFileSettings as C;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
 use Mockery\Mock;
@@ -67,7 +67,8 @@ class MonologPackageTest extends TestCase
      */
     public function testSettings(): void
     {
-        $this->assertNotEmpty($this->getSettings()->get());
+        $appSettings = [];
+        $this->assertNotEmpty($this->getSettings()->get($appSettings));
     }
 
     /**

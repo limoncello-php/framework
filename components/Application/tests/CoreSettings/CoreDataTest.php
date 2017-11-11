@@ -16,31 +16,31 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\CoreSettings\CoreSettings;
+use Limoncello\Application\CoreSettings\CoreData;
 use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
 use Limoncello\Tests\Application\TestCase;
 
 /**
  * @package Limoncello\Tests\Application
  */
-class CoreSettingsTest extends TestCase
+class CoreDataTest extends TestCase
 {
     /**
      * Test compose settings.
      */
     public function testSettings()
     {
-        $coreSettings = $this->createCoreSettings();
+        $coreSettings = $this->createCoreData();
 
         $this->assertNotEmpty($coreSettings->get());
     }
 
     /**
-     * @return CoreSettings
+     * @return CoreData
      */
-    public static function createCoreSettings(): CoreSettings
+    public static function createCoreData(): CoreData
     {
-        $coreSettings = new CoreSettings(
+        $coreSettings = new CoreData(
             implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'CoreSettings', 'Routes', '*.php']),
             implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'CoreSettings', 'Configurators', '*.php']),
             [Provider1::class]

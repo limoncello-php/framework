@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Application\ApplicationSettingsInterface;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
 
 /**
  * @package Limoncello\Tests\Application
  */
-class Application implements ApplicationSettingsInterface
+class Application implements ApplicationConfigurationInterface
 {
     /**
      * @inheritdoc

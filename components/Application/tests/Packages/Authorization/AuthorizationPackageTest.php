@@ -20,7 +20,7 @@ use Limoncello\Application\Packages\Authorization\AuthorizationContainerConfigur
 use Limoncello\Application\Packages\Authorization\AuthorizationProvider;
 use Limoncello\Application\Packages\Authorization\AuthorizationSettings as C;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Authorization\AuthorizationManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
@@ -55,7 +55,9 @@ class AuthorizationPackageTest extends TestCase
         $provider->shouldReceive('get')->once()->with(A::class)->andReturn([
             A::KEY_IS_DEBUG => true,
         ]);
-        $provider->shouldReceive('get')->once()->with(C::class)->andReturn($this->getAuthorizationSettings()->get());
+        $appSettings = [];
+        $provider->shouldReceive('get')->once()->with(C::class)
+            ->andReturn($this->getAuthorizationSettings()->get($appSettings));
 
         AuthorizationContainerConfigurator::configureContainer($container);
 

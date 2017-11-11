@@ -16,19 +16,11 @@
  * limitations under the License.
  */
 
-use Closure;
-use ErrorException;
-use Exception;
 use Limoncello\Application\Packages\Application\Application;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\InstanceSettingsProvider;
-use Limoncello\Container\Container;
-use Limoncello\Contracts\Core\SapiInterface;
-use Limoncello\Tests\Application\CoreSettings\CoreSettingsTest;
-use Mockery;
-use Mockery\Mock;
+use Limoncello\Tests\Application\CoreSettings\CoreDataTest;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 /**
  * @package Limoncello\Tests\Application
@@ -62,11 +54,11 @@ class ApplicationTest extends TestCase
      */
     public static function getCachedSettings(): array
     {
-        $provider = new InstanceSettingsProvider();
+        $appSettings = [];
+        $provider    = new InstanceSettingsProvider($appSettings);
 
-        $provider->register(CoreSettingsTest::createCoreSettings());
-
-        $cached = (new CacheSettingsProvider())->setInstanceSettings($provider)->serialize();
+        $coreData = CoreDataTest::createCoreData();
+        $cached   = (new CacheSettingsProvider())->setInstanceSettings($coreData, $provider)->serialize();
 
         return $cached;
     }
@@ -80,20 +72,6 @@ class ApplicationTest extends TestCase
     {
         $settingsPath = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Application', 'Settings', '*.php']);
         $application  = new Application($settingsPath, $settingCacheMethod);
-
-        return $application;
-    }
-
-    /**
-     * @return Application
-     */
-    private function createApplicationWithLastErrorMock(): Application
-    {
-        $settingsPath = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'Data', 'Application', 'Settings', '*.php']);
-        $application  = Mockery::mock(Application::class . '[getLastError]', [$settingsPath]);
-        $application->shouldAllowMockingProtectedMethods();
-
-        /** @var Application $application */
 
         return $application;
     }

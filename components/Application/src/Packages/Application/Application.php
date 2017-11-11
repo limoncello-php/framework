@@ -17,18 +17,17 @@
  */
 
 use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
-use Limoncello\Application\CoreSettings\CoreSettings;
+use Limoncello\Application\CoreSettings\CoreData;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
 use Limoncello\Application\Settings\InstanceSettingsProvider;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Sapi;
-use Limoncello\Core\Contracts\CoreSettingsInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
 use Zend\Diactoros\Response\SapiEmitter;
 
@@ -52,6 +51,16 @@ class Application extends \Limoncello\Core\Application\Application
     private $settingCacheMethod;
 
     /**
+     * @var array|null
+     */
+    private $applicationSettings = null;
+
+    /**
+     * @var CacheSettingsProviderInterface|null
+     */
+    private $cacheSettingsProvider = null;
+
+    /**
      * @param string                     $settingsPath
      * @param string|array|callable|null $settingCacheMethod
      * @param SapiInterface|null         $sapi
@@ -70,6 +79,14 @@ class Application extends \Limoncello\Core\Application\Application
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function getCoreData(): array
+    {
+        return $this->getCacheSettingsProvider()->getCoreData();
+    }
+
+    /**
      * Get container from application. If `method` and `path` are specified the container will be configured
      * not only with global container configurators but with route's one as well.
      *
@@ -84,68 +101,22 @@ class Application extends \Limoncello\Core\Application\Application
     {
         $container = $this->createContainerInstance();
 
-        $settingsProvider = $this->createSettingsProvider();
+        $settingsProvider = $this->getCacheSettingsProvider();
         $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
         $container->offsetSet(CacheSettingsProviderInterface::class, $settingsProvider);
 
-        $coreSettings = $settingsProvider->get(CoreSettingsInterface::class);
-
         $routeConfigurators = [];
+        $coreData           = $this->getCoreData();
         if (empty($method) === false && empty($path) === false) {
-            list(, , , , , $routeConfigurators) = $this->initRouter($coreSettings)->match($method, $path);
+            list(, , , , , $routeConfigurators) = $this->initRouter($coreData)->match($method, $path);
         }
 
         // configure container
-        $globalConfigurators = CoreSettings::getGlobalConfiguratorsFromData($coreSettings);
+        assert(!empty($coreData));
+        $globalConfigurators = CoreData::getGlobalConfiguratorsFromData($coreData);
         $this->configureContainer($container, $globalConfigurators, $routeConfigurators);
 
         return $container;
-    }
-
-    /**
-     * @return SettingsProviderInterface
-     *
-     * @SuppressWarnings(PHPMD.ElseExpression)
-     */
-    protected function createSettingsProvider(): SettingsProviderInterface
-    {
-        $provider = new CacheSettingsProvider();
-        if (is_callable($method = $this->getSettingCacheMethod()) === true) {
-            $data = call_user_func($method);
-            $provider->unserialize($data);
-        } else {
-            $provider->setInstanceSettings($this->createFileSettingsProvider());
-        }
-
-        return $provider;
-    }
-
-    /**
-     * @return InstanceSettingsProvider
-     */
-    protected function createFileSettingsProvider(): InstanceSettingsProvider
-    {
-        // Load all settings from path specified
-        $provider = (new FileSettingsProvider())->load($this->getSettingsPath());
-
-        // Application settings have a list of providers which might have additional settings to load
-        $appSettings     = $provider->get(A::class);
-        $providerClasses = $appSettings[A::KEY_PROVIDER_CLASSES];
-        foreach ($this->selectClassImplements($providerClasses, ProvidesSettingsInterface::class) as $providerClass) {
-            /** @var ProvidesSettingsInterface $providerClass */
-            foreach ($providerClass::getSettings() as $setting) {
-                $provider->register($setting);
-            }
-        }
-
-        // App settings (paths, lists) --> core settings (container configurators, routes, middleware and etc).
-        $routesPath     = $appSettings[A::KEY_ROUTES_PATH];
-        $containersPath = $appSettings[A::KEY_CONTAINER_CONFIGURATORS_PATH];
-        $coreSettings   = new CoreSettings($routesPath, $containersPath, $providerClasses);
-
-        $provider->register($coreSettings);
-
-        return $provider;
     }
 
     /**
@@ -170,5 +141,81 @@ class Application extends \Limoncello\Core\Application\Application
     protected function getSettingCacheMethod()
     {
         return $this->settingCacheMethod;
+    }
+
+    /**
+     * @return CacheSettingsProviderInterface
+     */
+    private function getCacheSettingsProvider(): CacheSettingsProviderInterface
+    {
+        if ($this->cacheSettingsProvider === null) {
+            $provider = new CacheSettingsProvider();
+
+            if (is_callable($method = $this->getSettingCacheMethod()) === true) {
+                $data = call_user_func($method);
+                $provider->unserialize($data);
+            } else {
+                $appSettings    = $this->getApplicationSettings();
+                $coreData       = new CoreData(
+                    $appSettings[A::KEY_ROUTES_PATH],
+                    $appSettings[A::KEY_CONTAINER_CONFIGURATORS_PATH],
+                    $appSettings[A::KEY_PROVIDER_CLASSES]
+                );
+
+                $provider->setInstanceSettings($coreData, $this->createInstanceSettingsProvider());
+            }
+
+            $this->cacheSettingsProvider = $provider;
+        }
+
+        return $this->cacheSettingsProvider;
+    }
+
+    /**
+     * @return array
+     */
+    private function getApplicationSettings(): array
+    {
+        if ($this->applicationSettings === null) {
+            $classes = iterator_to_array(static::selectClasses($this->getSettingsPath(), A::class));
+            assert(
+                count($classes) > 0,
+                'Settings path must contain a class implementing ApplicationConfigurationInterface.'
+            );
+            assert(
+                count($classes) === 1,
+                'Settings path must contain only one class implementing ApplicationConfigurationInterface.'
+            );
+            $class    = reset($classes);
+            $instance = new $class();
+            assert($instance instanceof A);
+
+            $this->applicationSettings = $instance->get();
+        }
+
+        return $this->applicationSettings;
+    }
+
+    /**
+     * @return InstanceSettingsProvider
+     */
+    private function createInstanceSettingsProvider(): InstanceSettingsProvider
+    {
+        $applicationSettings = $this->getApplicationSettings();
+
+        // Load all settings from path specified
+        $provider = (new FileSettingsProvider($applicationSettings))->load($this->getSettingsPath());
+
+        // Application settings have a list of providers which might have additional settings to load
+        $providerClasses = $applicationSettings[A::KEY_PROVIDER_CLASSES];
+        $selectedClasses = $this->selectClassImplements($providerClasses, ProvidesSettingsInterface::class);
+        foreach ($selectedClasses as $providerClass) {
+            /** @var ProvidesSettingsInterface $providerClass */
+            foreach ($providerClass::getSettings() as $setting) {
+                $provider->register($setting);
+            }
+        }
+
+        return $provider;
     }
 }

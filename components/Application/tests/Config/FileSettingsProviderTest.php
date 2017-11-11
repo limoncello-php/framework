@@ -48,8 +48,9 @@ class FileSettingsProviderTest extends TestCase
     {
         $provider = $this->createProvider();
 
-        $valuesA = (new SampleSettingsAA())->get();
-        $valuesB = (new SampleSettingsBB())->get();
+        $appSettings = [];
+        $valuesA     = (new SampleSettingsAA())->get($appSettings);
+        $valuesB     = (new SampleSettingsBB())->get($appSettings);
 
         $this->assertFalse($provider->has(MarkerInterfaceTop::class));
         $this->assertTrue($provider->isAmbiguous(MarkerInterfaceTop::class));
@@ -176,7 +177,9 @@ class FileSettingsProviderTest extends TestCase
             new ReflectionMethod(FileSettingsProvider::class, 'checkDoNotHaveRequiredParametersOnCreate');
         $reflectionMethod->setAccessible(true);
 
-        return $reflectionMethod->invoke(new FileSettingsProvider(), $className);
+        $appSettings = [];
+
+        return $reflectionMethod->invoke(new FileSettingsProvider($appSettings), $className);
     }
 
     /**
@@ -184,7 +187,9 @@ class FileSettingsProviderTest extends TestCase
      */
     private function createProvider(): FileSettingsProvider
     {
-        return (new FileSettingsProvider())->load(
+        $appSettings = [];
+
+        return (new FileSettingsProvider($appSettings))->load(
             implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Config', '*.php'])
         );
     }

@@ -21,7 +21,7 @@ use Limoncello\Application\Packages\Cookies\CookieContainerConfigurator;
 use Limoncello\Application\Packages\Cookies\CookieProvider;
 use Limoncello\Application\Packages\Cookies\CookieSettings as C;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationSettingsInterface as A;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Cookies\CookieJarInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
@@ -58,7 +58,8 @@ class CookiesPackageTest extends TestCase
         $provider->shouldReceive('get')->once()->with(A::class)->andReturn([
             A::KEY_IS_DEBUG => true,
         ]);
-        $corsConfig = (new C())->get();
+        $appSettings = [];
+        $corsConfig  = (new C())->get($appSettings);
         $provider->shouldReceive('get')->once()->with(C::class)->andReturn($corsConfig);
 
         CookieContainerConfigurator::configureContainer($container);
