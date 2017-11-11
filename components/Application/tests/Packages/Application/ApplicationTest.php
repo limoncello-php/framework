@@ -19,7 +19,8 @@
 use Limoncello\Application\Packages\Application\Application;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\InstanceSettingsProvider;
-use Limoncello\Tests\Application\CoreSettings\CoreDataTest;
+use Limoncello\Tests\Application\CoreData\CoreDataTest;
+use Limoncello\Tests\Application\Data\Application\Settings\Application as ApplicationConfiguration;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,7 +31,7 @@ class ApplicationTest extends TestCase
     /**
      * Test create container.
      */
-    public function testCreateContainerOnTheFly()
+    public function testCreateContainerOnTheFly(): void
     {
         $application = $this->createApplication();
 
@@ -40,7 +41,7 @@ class ApplicationTest extends TestCase
     /**
      * Test create container.
      */
-    public function testCreateContainerFromCache()
+    public function testCreateContainerFromCache(): void
     {
         /** @var callable $settingCacheMethod */
         $settingCacheMethod = [static::class, 'getCachedSettings'];
@@ -54,11 +55,11 @@ class ApplicationTest extends TestCase
      */
     public static function getCachedSettings(): array
     {
-        $appSettings = [];
-        $provider    = new InstanceSettingsProvider($appSettings);
+        $appConfig = new ApplicationConfiguration();
+        $provider  = new InstanceSettingsProvider($appConfig->get());
 
         $coreData = CoreDataTest::createCoreData();
-        $cached   = (new CacheSettingsProvider())->setInstanceSettings($coreData, $provider)->serialize();
+        $cached   = (new CacheSettingsProvider())->setInstanceSettings($appConfig, $coreData, $provider)->serialize();
 
         return $cached;
     }

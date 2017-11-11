@@ -34,7 +34,7 @@ class L10nPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(L10nProvider::getContainerConfigurators());
     }

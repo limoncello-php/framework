@@ -27,7 +27,7 @@ class FormValidationPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(FormValidationProvider::getContainerConfigurators());
         $this->assertNotEmpty(FormValidationProvider::getMessageDescriptions());

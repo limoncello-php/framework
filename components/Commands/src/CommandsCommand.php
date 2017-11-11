@@ -21,11 +21,11 @@ use Limoncello\Commands\Traits\CacheFilePathTrait;
 use Limoncello\Commands\Traits\CommandSerializationTrait;
 use Limoncello\Commands\Traits\CommandTrait;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -141,9 +141,9 @@ class CommandsCommand extends BaseCommand
         }
 
         if (empty($commandClasses) === false) {
-            $now     = date(DATE_RFC2822);
-            $data    = var_export($commandClasses, true);
-            $content = <<<EOT
+            $now           = date(DATE_RFC2822);
+            $data          = var_export($commandClasses, true);
+            $content       = <<<EOT
 <?php
 
 // THIS FILE IS AUTO GENERATED. DO NOT EDIT IT MANUALLY.
@@ -155,6 +155,7 @@ EOT;
             $cacheFilePath = $this->getCommandsCacheFilePath($this->getComposer());
             if (empty($cacheFilePath) === true) {
                 $inOut->writeError("Commands cache file path is not set. Check your `Application` settings." . PHP_EOL);
+
                 return;
             }
 
@@ -179,8 +180,7 @@ EOT;
         $class = $inOut->getArgument($argClass);
 
         $fileSystem     = $this->getFileSystem($container);
-        $settings       = $this->getAppSettings($container);
-        $commandsFolder = $settings[S::KEY_COMMANDS_FOLDER] ?? null;
+        $commandsFolder = $this->getCommandsFolder($container);
         if (empty($commandsFolder) === true || $fileSystem->isFolder($commandsFolder) === false) {
             $inOut->writeError(
                 "Commands folder `$commandsFolder` is not valid. Check your `Application` settings." . PHP_EOL
@@ -217,17 +217,18 @@ EOT;
     /**
      * @param ContainerInterface $container
      *
-     * @return array
+     * @return string
      */
-    private function getAppSettings(ContainerInterface $container): array
+    private function getCommandsFolder(ContainerInterface $container): string
     {
-        assert($container->has(SettingsProviderInterface::class));
+        assert($container->has(CacheSettingsProviderInterface::class));
 
-        /** @var SettingsProviderInterface $provider */
-        $provider = $container->get(SettingsProviderInterface::class);
-        $settings = $provider->get(S::class);
+        /** @var CacheSettingsProviderInterface $provider */
+        $provider  = $container->get(CacheSettingsProviderInterface::class);
+        $appConfig = $provider->getApplicationConfiguration();
+        $folder    = $appConfig[S::KEY_COMMANDS_FOLDER];
 
-        return $settings;
+        return $folder;
     }
 
     /**

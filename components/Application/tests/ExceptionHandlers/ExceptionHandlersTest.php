@@ -38,7 +38,7 @@ class ExceptionHandlersTest extends TestCase
     /**
      * Test handler.
      */
-    public function testDefaultExceptionHandler()
+    public function testDefaultExceptionHandler(): void
     {
         $handler = new WhoopsThrowableHandler();
 
@@ -51,7 +51,7 @@ class ExceptionHandlersTest extends TestCase
     /**
      * Test handler.
      */
-    public function testDefaultExceptionHandlerDebugDisabled()
+    public function testDefaultExceptionHandlerDebugDisabled(): void
     {
         $handler = new WhoopsThrowableHandler();
 
@@ -64,7 +64,7 @@ class ExceptionHandlersTest extends TestCase
     /**
      * Test handler.
      */
-    public function testFaultyLoggerOnError()
+    public function testFaultyLoggerOnError(): void
     {
         $handler = new WhoopsThrowableHandler();
 

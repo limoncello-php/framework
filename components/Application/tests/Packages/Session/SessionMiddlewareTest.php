@@ -47,7 +47,7 @@ class SessionMiddlewareTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -61,7 +61,7 @@ class SessionMiddlewareTest extends TestCase
     /**
      * Test setting cookies.
      */
-    public function testSettingCookies()
+    public function testSettingCookies(): void
     {
         $sessionStartCalled = false;
         $sessionCloseCalled = false;

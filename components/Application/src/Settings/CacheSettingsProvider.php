@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
 use Limoncello\Application\CoreSettings\CoreData;
 use Limoncello\Application\Exceptions\AmbiguousSettingsException;
 use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 
 /**
  * @package Limoncello\Application
@@ -27,7 +28,10 @@ use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
 class CacheSettingsProvider implements CacheSettingsProviderInterface
 {
     /** Internal data index */
-    const KEY_CORE_DATA = 0;
+    const KEY_APPLICATION_CONFIGURATION = 0;
+
+    /** Internal data index */
+    const KEY_CORE_DATA = self::KEY_APPLICATION_CONFIGURATION + 1;
 
     /** Internal data index */
     const KEY_SETTINGS_MAP = self::KEY_CORE_DATA + 1;
@@ -37,6 +41,11 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
 
     /** Internal data index */
     const KEY_AMBIGUOUS_MAP = self::KEY_SETTINGS_DATA + 1;
+
+    /**
+     * @var array
+     */
+    private $appConfig = [];
 
     /**
      * @var array
@@ -78,6 +87,14 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
     /**
      * @inheritdoc
      */
+    public function getApplicationConfiguration(): array
+    {
+        return $this->appConfig;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getCoreData(): array
     {
         return $this->coreData;
@@ -104,18 +121,23 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
     }
 
     /**
-     * @param CoreData                 $coreData
-     * @param InstanceSettingsProvider $provider
+     * @param ApplicationConfigurationInterface $appConfig
+     * @param CoreData                          $coreData
+     * @param InstanceSettingsProvider          $provider
      *
-     * @return CacheSettingsProvider
+     * @return self
      */
-    public function setInstanceSettings(CoreData $coreData, InstanceSettingsProvider $provider): CacheSettingsProvider
-    {
+    public function setInstanceSettings(
+        ApplicationConfigurationInterface $appConfig,
+        CoreData $coreData,
+        InstanceSettingsProvider $provider
+    ): self {
         $this->unserialize([
-            static::KEY_CORE_DATA     => $coreData->get(),
-            static::KEY_SETTINGS_MAP  => $provider->getSettingsMap(),
-            static::KEY_SETTINGS_DATA => $provider->getSettingsData(),
-            static::KEY_AMBIGUOUS_MAP => $provider->getAmbiguousMap(),
+            static::KEY_APPLICATION_CONFIGURATION => $appConfig->get(),
+            static::KEY_CORE_DATA                 => $coreData->get(),
+            static::KEY_SETTINGS_MAP              => $provider->getSettingsMap(),
+            static::KEY_SETTINGS_DATA             => $provider->getSettingsData(),
+            static::KEY_AMBIGUOUS_MAP             => $provider->getAmbiguousMap(),
         ]);
 
         return $this;
@@ -127,10 +149,11 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
     public function serialize(): array
     {
         return [
-            static::KEY_CORE_DATA     => $this->coreData,
-            static::KEY_SETTINGS_MAP  => $this->settingsMap,
-            static::KEY_SETTINGS_DATA => $this->settingsData,
-            static::KEY_AMBIGUOUS_MAP => $this->ambiguousMap,
+            static::KEY_APPLICATION_CONFIGURATION => $this->appConfig,
+            static::KEY_CORE_DATA                 => $this->coreData,
+            static::KEY_SETTINGS_MAP              => $this->settingsMap,
+            static::KEY_SETTINGS_DATA             => $this->settingsData,
+            static::KEY_AMBIGUOUS_MAP             => $this->ambiguousMap,
         ];
     }
 
@@ -140,6 +163,7 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
     public function unserialize(array $serialized): void
     {
         list (
+            static::KEY_APPLICATION_CONFIGURATION => $this->appConfig,
             static::KEY_CORE_DATA => $this->coreData,
             static::KEY_SETTINGS_MAP => $this->settingsMap,
             static::KEY_SETTINGS_DATA => $this->settingsData,

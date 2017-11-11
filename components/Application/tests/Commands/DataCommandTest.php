@@ -36,7 +36,7 @@ class DataCommandTest extends TestCase
     /**
      * Test and add coverage for methods we would mock in main tests.
      */
-    public function testCoverCreateRunnerMethods()
+    public function testCoverCreateRunnerMethods(): void
     {
         $command = new DataCommand();
         $inOut   = Mockery::mock(IoInterface::class);
@@ -53,7 +53,7 @@ class DataCommandTest extends TestCase
     /**
      * Test command descriptions.
      */
-    public function testCommandDescriptions()
+    public function testCommandDescriptions(): void
     {
         $this->assertNotEmpty(DataCommand::getName());
         $this->assertNotEmpty(DataCommand::getHelp());
@@ -65,7 +65,7 @@ class DataCommandTest extends TestCase
     /**
      * Test command called with invalid action parameter.
      */
-    public function testInvalidAction()
+    public function testInvalidAction(): void
     {
         $container = $this->createContainerWithDataSettings([
             DataSettings::KEY_MIGRATIONS_FOLDER => '/some/path',
@@ -89,7 +89,7 @@ class DataCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testMigrate()
+    public function testMigrate(): void
     {
         $container = $this->createContainerWithDataSettings([
             DataSettings::KEY_MIGRATIONS_FOLDER => '/some/path',
@@ -115,7 +115,7 @@ class DataCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testRollback()
+    public function testRollback(): void
     {
         $container = $this->createContainerWithDataSettings([
             DataSettings::KEY_MIGRATIONS_FOLDER => '/some/path',
@@ -141,7 +141,7 @@ class DataCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testSeed()
+    public function testSeed(): void
     {
         $container = $this->createContainerWithDataSettings([
             DataSettings::KEY_MIGRATIONS_FOLDER => '/some/path',

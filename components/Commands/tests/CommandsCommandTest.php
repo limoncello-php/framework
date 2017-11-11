@@ -22,16 +22,16 @@ use Limoncello\Commands\CommandsCommand;
 use Limoncello\Commands\Traits\CacheFilePathTrait;
 use Limoncello\Commands\Traits\CommandSerializationTrait;
 use Limoncello\Commands\Traits\CommandTrait;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Tests\Commands\Data\TestCommand;
 use Mockery;
 use Mockery\Mock;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
 
 /**
  * @package Limoncello\Tests\Commands
@@ -147,8 +147,8 @@ class CommandsCommandTest extends TestCase
         $tplContent = file_get_contents($tplPath);
 
         $container = $this->createContainerMock([
-            FileSystemInterface::class       => ($fileSystem = $this->createFileSystemMock()),
-            SettingsProviderInterface::class => $this->createSettingsProviderMock($folder)
+            FileSystemInterface::class            => ($fileSystem = $this->createFileSystemMock()),
+            CacheSettingsProviderInterface::class => $this->createCacheSettingsProviderMock($folder),
         ]);
 
         /** @var Mock $command */
@@ -207,8 +207,8 @@ class CommandsCommandTest extends TestCase
         $cmdClass = 'NewCommandClass';
 
         $container = $this->createContainerMock([
-            FileSystemInterface::class       => ($fileSystem = $this->createFileSystemMock()),
-            SettingsProviderInterface::class => $this->createSettingsProviderMock($folder)
+            FileSystemInterface::class            => ($fileSystem = $this->createFileSystemMock()),
+            CacheSettingsProviderInterface::class => $this->createCacheSettingsProviderMock($folder),
         ]);
 
         /** @var Mock $command */
@@ -240,8 +240,8 @@ class CommandsCommandTest extends TestCase
         $classPath = $folder . DIRECTORY_SEPARATOR . $cmdClass . '.php';
 
         $container = $this->createContainerMock([
-            FileSystemInterface::class       => ($fileSystem = $this->createFileSystemMock()),
-            SettingsProviderInterface::class => $this->createSettingsProviderMock($folder)
+            FileSystemInterface::class            => ($fileSystem = $this->createFileSystemMock()),
+            CacheSettingsProviderInterface::class => $this->createCacheSettingsProviderMock($folder),
         ]);
 
         /** @var Mock $command */
@@ -411,16 +411,17 @@ class CommandsCommandTest extends TestCase
     /**
      * @param string $commandFolder
      *
-     * @return SettingsProviderInterface
+     * @return CacheSettingsProviderInterface
      */
-    private function createSettingsProviderMock(string $commandFolder): SettingsProviderInterface
+    private function createCacheSettingsProviderMock(string $commandFolder): CacheSettingsProviderInterface
     {
         /** @var Mock $provider */
-        $provider = Mockery::mock(SettingsProviderInterface::class);
+        $provider = Mockery::mock(CacheSettingsProviderInterface::class);
 
-        $provider->shouldReceive('get')->once()->with(S::class)->andReturn([S::KEY_COMMANDS_FOLDER => $commandFolder]);
+        $provider->shouldReceive('getApplicationConfiguration')
+            ->once()->withNoArgs()->andReturn([S::KEY_COMMANDS_FOLDER => $commandFolder]);
 
-        /** @var SettingsProviderInterface $provider */
+        /** @var CacheSettingsProviderInterface $provider */
 
         return $provider;
     }

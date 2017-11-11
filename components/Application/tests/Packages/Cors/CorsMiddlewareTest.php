@@ -60,7 +60,7 @@ class CorsMiddlewareTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -86,7 +86,7 @@ class CorsMiddlewareTest extends TestCase
     /**
      * Test CORS.
      */
-    public function testOutOrCorsScopeRequest()
+    public function testOutOrCorsScopeRequest(): void
     {
         $this->analysis->shouldReceive('getRequestType')->once()->withNoArgs()
             ->andReturn(AnalysisResultInterface::TYPE_REQUEST_OUT_OF_CORS_SCOPE);
@@ -98,7 +98,7 @@ class CorsMiddlewareTest extends TestCase
     /**
      * Test CORS.
      */
-    public function testActualRequest()
+    public function testActualRequest(): void
     {
         $corsHeaders = ['key' => 'value'];
 
@@ -115,7 +115,7 @@ class CorsMiddlewareTest extends TestCase
     /**
      * Test CORS.
      */
-    public function testPreFlightRequest()
+    public function testPreFlightRequest(): void
     {
         $corsHeaders = ['key' => 'value'];
 
@@ -132,7 +132,7 @@ class CorsMiddlewareTest extends TestCase
     /**
      * Test CORS.
      */
-    public function testErrorNoHostRequest()
+    public function testErrorNoHostRequest(): void
     {
         $this->analysis->shouldReceive('getRequestType')->once()->withNoArgs()
             ->andReturn(AnalysisResultInterface::ERR_NO_HOST_HEADER);
@@ -145,7 +145,7 @@ class CorsMiddlewareTest extends TestCase
     /**
      * Test CORS.
      */
-    public function testErrorOriginNotAllowedRequest()
+    public function testErrorOriginNotAllowedRequest(): void
     {
         $this->analysis->shouldReceive('getRequestType')->once()->withNoArgs()
             ->andReturn(AnalysisResultInterface::ERR_ORIGIN_NOT_ALLOWED);
@@ -158,7 +158,7 @@ class CorsMiddlewareTest extends TestCase
     /**
      * Test CORS.
      */
-    public function testErrorMethodNotSupportedRequest()
+    public function testErrorMethodNotSupportedRequest(): void
     {
         $this->analysis->shouldReceive('getRequestType')->once()->withNoArgs()
             ->andReturn(AnalysisResultInterface::ERR_METHOD_NOT_SUPPORTED);
@@ -171,7 +171,7 @@ class CorsMiddlewareTest extends TestCase
     /**
      * Test CORS.
      */
-    public function testErrorHeadersNotSupportedRequest()
+    public function testErrorHeadersNotSupportedRequest(): void
     {
         $this->analysis->shouldReceive('getRequestType')->once()->withNoArgs()
             ->andReturn(AnalysisResultInterface::ERR_HEADERS_NOT_SUPPORTED);

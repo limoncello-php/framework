@@ -38,7 +38,7 @@ class CookiesPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(CookieProvider::getSettings());
         $this->assertNotEmpty(CookieProvider::getMiddleware());
@@ -48,7 +48,7 @@ class CookiesPackageTest extends TestCase
     /**
      * Test container configurator.
      */
-    public function testContainerConfigurator()
+    public function testContainerConfigurator(): void
     {
         $container = new Container();
 

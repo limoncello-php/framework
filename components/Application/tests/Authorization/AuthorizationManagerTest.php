@@ -47,7 +47,7 @@ class AuthorizationManagerTest extends TestCase
     /**
      * Test wrappers for working with context.
      */
-    public function testTraitWrappers()
+    public function testTraitWrappers(): void
     {
         $actionName       = 'some_action';
         $resourceType     = 'some_type';
@@ -77,7 +77,7 @@ class AuthorizationManagerTest extends TestCase
         $this->assertEquals($curAccount, $this->ctxGetCurrentAccount($context));
     }
 
-    public function testAuthorize()
+    public function testAuthorize(): void
     {
         $container = new Container();
 

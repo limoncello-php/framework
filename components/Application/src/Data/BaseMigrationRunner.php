@@ -73,11 +73,11 @@ abstract class BaseMigrationRunner
     {
         foreach ($this->getMigrations($container) as $class) {
             assert(is_string($class));
-            $this->getIO()->writeInfo("Starting migration for `$class`...", IoInterface::VERBOSITY_VERBOSE);
+            $this->getIO()->writeInfo("Starting migration for `$class`..." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
             /** @var MigrationInterface $migration */
             $migration = new $class($container);
             $migration->init($container)->migrate();
-            $this->getIO()->writeInfo("Migration finished for `$class`.", IoInterface::VERBOSITY_NORMAL);
+            $this->getIO()->writeInfo("Migration finished for `$class`." . PHP_EOL, IoInterface::VERBOSITY_NORMAL);
         }
     }
 
@@ -90,11 +90,11 @@ abstract class BaseMigrationRunner
     {
         foreach ($this->getRollbacks($container) as $class) {
             assert(is_string($class));
-            $this->getIO()->writeInfo("Starting rollback for `$class`...", IoInterface::VERBOSITY_VERBOSE);
+            $this->getIO()->writeInfo("Starting rollback for `$class`..." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
             /** @var MigrationInterface $migration */
             $migration = new $class($container);
             $migration->init($container)->rollback();
-            $this->getIO()->writeInfo("Rollback finished for `$class`.", IoInterface::VERBOSITY_NORMAL);
+            $this->getIO()->writeInfo("Rollback finished for `$class`." . PHP_EOL, IoInterface::VERBOSITY_NORMAL);
         }
 
         $manager = $this->getConnection($container)->getSchemaManager();

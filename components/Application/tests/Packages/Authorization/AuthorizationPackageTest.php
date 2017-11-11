@@ -37,7 +37,7 @@ class AuthorizationPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(AuthorizationProvider::getContainerConfigurators());
     }
@@ -45,7 +45,7 @@ class AuthorizationPackageTest extends TestCase
     /**
      * Test container configurator.
      */
-    public function testContainerConfigurator()
+    public function testContainerConfigurator(): void
     {
         $container = new Container();
 

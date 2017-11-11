@@ -59,7 +59,7 @@ class FileMigrationRunner extends BaseMigrationRunner
         $path = $this->getMigrationsPath();
         assert($fileSystem->exists($path) === true);
 
-        $this->getIO()->writeInfo("Migrations `$path` started.", IoInterface::VERBOSITY_VERBOSE);
+        $this->getIO()->writeInfo("Migrations `$path` started." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
 
         $migrationClasses = $fileSystem->requireFile($path);
         $this->setMigrationClasses($migrationClasses);

@@ -39,7 +39,7 @@ class ModelSchemesTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +56,7 @@ class ModelSchemesTest extends TestCase
     /**
      * Test register class.
      */
-    public function testRegisterClass()
+    public function testRegisterClass(): void
     {
         $this->assertEquals(Comment::class, Comment::class);
         $this->assertTrue($this->schemes->hasClass(Comment::class));
@@ -89,7 +89,7 @@ class ModelSchemesTest extends TestCase
     /**
      * Test register to 1 relationship.
      */
-    public function testRegisterToOneRelationship()
+    public function testRegisterToOneRelationship(): void
     {
         $this->assertTrue($this->schemes->hasRelationship(Comment::class, Comment::REL_USER));
         $this->assertEquals(
@@ -126,7 +126,7 @@ class ModelSchemesTest extends TestCase
     /**
      * Test register to many relationship.
      */
-    public function testRegisterToManyRelationship()
+    public function testRegisterToManyRelationship(): void
     {
         $this->assertTrue($this->schemes->hasRelationship(Comment::class, Comment::REL_EMOTIONS));
         $this->assertEquals(
@@ -160,7 +160,7 @@ class ModelSchemesTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testCannotRegisterWithEmptyClass()
+    public function testCannotRegisterWithEmptyClass(): void
     {
         $this->schemes->registerClass(
             '',
@@ -179,7 +179,7 @@ class ModelSchemesTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testCannotRegisterWithEmptyTableName()
+    public function testCannotRegisterWithEmptyTableName(): void
     {
         $this->schemes->registerClass(
             Comment::class,
@@ -198,7 +198,7 @@ class ModelSchemesTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testCannotRegisterWithEmptyPrimaryKey()
+    public function testCannotRegisterWithEmptyPrimaryKey(): void
     {
         $this->schemes->registerClass(
             Comment::class,
@@ -217,7 +217,7 @@ class ModelSchemesTest extends TestCase
     /**
      * @return void
      */
-    private function setUpStorage()
+    private function setUpStorage(): void
     {
         $this->schemes->registerClass(
             Comment::class,
@@ -236,7 +236,7 @@ class ModelSchemesTest extends TestCase
         $this->registerToMany();
     }
 
-    private function registerTo1()
+    private function registerTo1(): void
     {
         $this->schemes->registerBelongsToOneRelationship(
             Comment::class,
@@ -247,7 +247,7 @@ class ModelSchemesTest extends TestCase
         );
     }
 
-    private function registerToMany()
+    private function registerToMany(): void
     {
         $this->schemes->registerBelongsToManyRelationship(
             Comment::class,

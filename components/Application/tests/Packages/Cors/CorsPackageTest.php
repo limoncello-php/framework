@@ -37,7 +37,7 @@ class CorsPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(CorsProvider::getSettings());
         $this->assertNotEmpty(CorsProvider::getMiddleware());
@@ -47,7 +47,7 @@ class CorsPackageTest extends TestCase
     /**
      * Test container configurator.
      */
-    public function testContainerConfigurator()
+    public function testContainerConfigurator(): void
     {
         $container = new Container();
 

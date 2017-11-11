@@ -39,7 +39,7 @@ class ApplicationPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(ApplicationProvider::getCommands());
         $this->assertNotEmpty(ApplicationProvider::getContainerConfigurators());
@@ -48,7 +48,7 @@ class ApplicationPackageTest extends TestCase
     /**
      * Test container configurator.
      */
-    public function testContainerConfigurator()
+    public function testContainerConfigurator(): void
     {
         $container = new Container();
 

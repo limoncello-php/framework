@@ -30,7 +30,7 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     /**
      * @var array
      */
-    private $applicationSettings;
+    private $applicationData;
 
     /**
      * @var SettingsInterface[]
@@ -58,11 +58,11 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     private $ambiguousMap = [];
 
     /**
-     * @param array $applicationSettings
+     * @param array $applicationData
      */
-    public function __construct(array $applicationSettings)
+    public function __construct(array $applicationData)
     {
-        $this->applicationSettings = $applicationSettings;
+        $this->applicationData = $applicationData;
     }
 
     /**
@@ -158,9 +158,9 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     /**
      * @return array
      */
-    protected function getApplicationSettings(): array
+    protected function getApplicationData(): array
     {
-        return $this->applicationSettings;
+        return $this->applicationData;
     }
 
     /**
@@ -198,7 +198,7 @@ class InstanceSettingsProvider implements SettingsProviderInterface
                 $index = $hashMap[$hash];
             } else {
                 $hashMap[$hash]           = $nextIndex;
-                $settingsData[$nextIndex] = $instance->get($this->getApplicationSettings());
+                $settingsData[$nextIndex] = $instance->get($this->getApplicationData());
                 $index                    = $nextIndex++;
             }
 

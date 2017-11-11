@@ -86,12 +86,12 @@ abstract class BaseSeedRunner
     public function run(ContainerInterface $container): void
     {
         foreach ($this->getSeeds($container) as $seederClass) {
-            $this->getIO()->writeInfo("Starting seed for `$seederClass`...", IoInterface::VERBOSITY_VERBOSE);
+            $this->getIO()->writeInfo("Starting seed for `$seederClass`..." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
             $this->executeSeedInit($container, $seederClass);
             /** @var SeedInterface $seeder */
             $seeder = new $seederClass();
             $seeder->init($container)->run();
-            $this->getIO()->writeInfo("Seed finished for `$seederClass`.", IoInterface::VERBOSITY_NORMAL);
+            $this->getIO()->writeInfo("Seed finished for `$seederClass`." . PHP_EOL, IoInterface::VERBOSITY_NORMAL);
         }
     }
 

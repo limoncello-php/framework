@@ -43,7 +43,7 @@ class MigrationAndSeedRunnersTest extends TestCase
     /**
      * Test migrations and Seeds.
      */
-    public function testMigrationsAndSeeds()
+    public function testMigrationsAndSeeds(): void
     {
         /** @var Mock $inOut */
         $inOut = Mockery::mock(IoInterface::class);
@@ -86,7 +86,7 @@ class MigrationAndSeedRunnersTest extends TestCase
      *
      * @return void
      */
-    public static function seedInit(ContainerInterface $container, string $seederClass)
+    public static function seedInit(ContainerInterface $container, string $seederClass): void
     {
         assert($container && $seederClass);
     }

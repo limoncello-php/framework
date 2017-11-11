@@ -28,7 +28,7 @@ class CookieJarTest extends TestCase
     /**
      * Test basic cookie properties.
      */
-    public function testBasicCookieProperties()
+    public function testBasicCookieProperties(): void
     {
         $name       = 'name';
         $value      = 'value';

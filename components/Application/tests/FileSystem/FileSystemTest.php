@@ -39,7 +39,7 @@ class FileSystemTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -50,7 +50,7 @@ class FileSystemTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -60,7 +60,7 @@ class FileSystemTest extends TestCase
     /**
      * Test exists for files and folders.
      */
-    public function testExists()
+    public function testExists(): void
     {
         $this->assertTrue($this->fileSystem->exists(__DIR__));
         $this->assertTrue($this->fileSystem->exists(__FILE__));
@@ -71,7 +71,7 @@ class FileSystemTest extends TestCase
     /**
      * Test read.
      */
-    public function testRead()
+    public function testRead(): void
     {
         $this->assertContains('class FileSystemTest', $this->fileSystem->read(__FILE__));
     }
@@ -79,7 +79,7 @@ class FileSystemTest extends TestCase
     /**
      * Test create/delete for files.
      */
-    public function testFileCreateAndDelete()
+    public function testFileCreateAndDelete(): void
     {
         $tmpFileName = tempnam(null, null);
 
@@ -98,7 +98,7 @@ class FileSystemTest extends TestCase
     /**
      * Test delete non existent file will not fail.
      */
-    public function testFileDelete()
+    public function testFileDelete(): void
     {
         $tmpFileName = tempnam(null, null);
 
@@ -113,7 +113,7 @@ class FileSystemTest extends TestCase
     /**
      * Test folder scan.
      */
-    public function testScanFolder1()
+    public function testScanFolder1(): void
     {
         $foundCurrentFile = false;
         foreach ($this->fileSystem->scanFolder(__DIR__) as $fileOrFolder) {
@@ -129,7 +129,7 @@ class FileSystemTest extends TestCase
     /**
      * Test folder scan.
      */
-    public function testScanFolderShouldSeeFolders()
+    public function testScanFolderShouldSeeFolders(): void
     {
         $foundCurrentFolder = false;
         foreach ($this->fileSystem->scanFolder(__DIR__ . DIRECTORY_SEPARATOR . '..') as $fileOrFolder) {
@@ -145,7 +145,7 @@ class FileSystemTest extends TestCase
     /**
      * Test create/delete for folders.
      */
-    public function testFolderCreateAndDelete()
+    public function testFolderCreateAndDelete(): void
     {
         // we create tmp file, remove it and reuse its name as folder name.
         $tmpFolderName = tempnam(null, null);
@@ -162,7 +162,7 @@ class FileSystemTest extends TestCase
     /**
      * Test recursive delete.
      */
-    public function testRecursiveDelete()
+    public function testRecursiveDelete(): void
     {
         $rootPath        = 'root';
         $rootItems       = [
@@ -201,7 +201,7 @@ class FileSystemTest extends TestCase
      *
      * @expectedException \Limoncello\Application\Exceptions\FileSystemException
      */
-    public function testRecursiveDeleteFailedOnFile()
+    public function testRecursiveDeleteFailedOnFile(): void
     {
         $rootPath        = 'root';
         $rootItems       = [
@@ -233,7 +233,7 @@ class FileSystemTest extends TestCase
      *
      * @expectedException \Limoncello\Application\Exceptions\FileSystemException
      */
-    public function testRecursiveDeleteFailedOnFolder()
+    public function testRecursiveDeleteFailedOnFolder(): void
     {
         $rootPath        = 'root';
         $rootItems       = [
@@ -264,7 +264,7 @@ class FileSystemTest extends TestCase
     /**
      * Test symlinks.
      */
-    public function testSymlink()
+    public function testSymlink(): void
     {
         $contents = 'some content';
 
@@ -289,7 +289,7 @@ class FileSystemTest extends TestCase
     /**
      * Test require file.
      */
-    public function testRequire()
+    public function testRequire(): void
     {
         $path = __DIR__ . DIRECTORY_SEPARATOR . 'TestArray.php';
         $this->assertNotEmpty($this->fileSystem->requireFile($path));

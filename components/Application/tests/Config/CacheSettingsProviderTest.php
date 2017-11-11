@@ -18,7 +18,8 @@
 
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
-use Limoncello\Tests\Application\CoreSettings\CoreDataTest;
+use Limoncello\Tests\Application\CoreData\CoreDataTest;
+use Limoncello\Tests\Application\Data\Application\Settings\Application;
 use Limoncello\Tests\Application\Data\Config\MarkerInterfaceChild1;
 use Limoncello\Tests\Application\Data\Config\MarkerInterfaceTop;
 use Limoncello\Tests\Application\Data\Config\SampleSettingsAA;
@@ -32,7 +33,7 @@ class CacheSettingsProviderTest extends TestCase
     /**
      * Test loading from folder.
      */
-    public function testLoadFromFolder()
+    public function testLoadFromFolder(): void
     {
         $provider = $this->createProvider();
         $provider->unserialize($provider->serialize());
@@ -60,15 +61,16 @@ class CacheSettingsProviderTest extends TestCase
             . DIRECTORY_SEPARATOR . '*.php'
         );
 
-        $coreData = CoreDataTest::createCoreData();
+        $appConfig = new Application();
+        $coreData  = CoreDataTest::createCoreData();
 
-        return (new CacheSettingsProvider())->setInstanceSettings($coreData, $fileSettingsProvider);
+        return (new CacheSettingsProvider())->setInstanceSettings($appConfig, $coreData, $fileSettingsProvider);
     }
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\NotRegisteredSettingsException
      */
-    public function testGetNotRegistered()
+    public function testGetNotRegistered(): void
     {
         $this->createProvider()->get(static::class);
     }
@@ -76,8 +78,16 @@ class CacheSettingsProviderTest extends TestCase
     /**
      * @expectedException \Limoncello\Application\Exceptions\AmbiguousSettingsException
      */
-    public function testGetAmbiguous()
+    public function testGetAmbiguous(): void
     {
         $this->createProvider()->get(MarkerInterfaceTop::class);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetAppConfig(): void
+    {
+        $this->assertNotEmpty($this->createProvider()->getApplicationConfiguration());
     }
 }

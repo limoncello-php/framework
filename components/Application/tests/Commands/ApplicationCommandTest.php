@@ -17,9 +17,9 @@
  */
 
 use Limoncello\Application\Commands\ApplicationCommand;
-use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
@@ -36,7 +36,7 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test command descriptions.
      */
-    public function testCommandDescriptions()
+    public function testCommandDescriptions(): void
     {
         $this->assertNotEmpty(ApplicationCommand::getName());
         $this->assertNotEmpty(ApplicationCommand::getHelp());
@@ -48,7 +48,7 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test command called with invalid action parameter.
      */
-    public function testInvalidAction()
+    public function testInvalidAction(): void
     {
         $container = new Container();
         $inOut     = $this->createInOutMock(
@@ -66,7 +66,7 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testCache()
+    public function testCache(): void
     {
         $container = new Container();
 
@@ -100,7 +100,7 @@ class ApplicationCommandTest extends TestCase
      *
      * @expectedException \Limoncello\Application\Exceptions\ConfigurationException
      */
-    public function testCacheInvalidCallable()
+    public function testCacheInvalidCallable(): void
     {
         $container = new Container();
 
@@ -128,7 +128,7 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testClear()
+    public function testClear(): void
     {
         $container = new Container();
 
@@ -160,7 +160,7 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testClearNonExistingCache()
+    public function testClearNonExistingCache(): void
     {
         $container = new Container();
 
@@ -191,7 +191,7 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testParseCacheCallable1()
+    public function testParseCacheCallable1(): void
     {
         $mightBeCallable = '';
 
@@ -206,7 +206,7 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testParseCacheCallable2()
+    public function testParseCacheCallable2(): void
     {
         $mightBeCallable = ['NamespaceName\\ClassName', 'methodName'];
 
@@ -221,7 +221,7 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test action.
      */
-    public function testParseCacheCallable3()
+    public function testParseCacheCallable3(): void
     {
         $mightBeCallable = ['NamespaceName\\123ClassName', 'methodName']; // <- numbers not allowed
 
@@ -238,7 +238,7 @@ class ApplicationCommandTest extends TestCase
      *
      * @expectedException \Limoncello\Application\Exceptions\ConfigurationException
      */
-    public function testClearInvalidCallable()
+    public function testClearInvalidCallable(): void
     {
         $container = new Container();
 

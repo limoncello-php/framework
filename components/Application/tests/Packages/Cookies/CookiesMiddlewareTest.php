@@ -76,7 +76,7 @@ class CookiesMiddlewareTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -102,7 +102,7 @@ class CookiesMiddlewareTest extends TestCase
     /**
      * Test setting cookies.
      */
-    public function testSettingCookies()
+    public function testSettingCookies(): void
     {
         $this->cookieJar->create('raw')->setValue('raw_value')->setAsRaw();
         $this->cookieJar->create('not_raw')->setValue('not_raw_value')->setAsNotRaw();

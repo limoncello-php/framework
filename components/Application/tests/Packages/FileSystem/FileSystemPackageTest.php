@@ -30,7 +30,7 @@ class FileSystemPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(FileSystemProvider::getContainerConfigurators());
     }
@@ -38,7 +38,7 @@ class FileSystemPackageTest extends TestCase
     /**
      * Test container configurator.
      */
-    public function testContainerConfigurator()
+    public function testContainerConfigurator(): void
     {
         $container = new Container();
 

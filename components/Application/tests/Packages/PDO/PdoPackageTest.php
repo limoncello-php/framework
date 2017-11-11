@@ -18,8 +18,8 @@
 
 use Limoncello\Application\Packages\PDO\PdoContainerConfigurator;
 use Limoncello\Application\Packages\PDO\PdoProvider;
-use Limoncello\Application\Packages\PDO\PdoSettings as C;
 use Limoncello\Application\Packages\PDO\PdoSettings;
+use Limoncello\Application\Packages\PDO\PdoSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
@@ -70,7 +70,7 @@ class PdoPackageTest extends TestCase
     /**
      * @return PdoSettings
      */
-    private function createSettings():PdoSettings
+    private function createSettings(): PdoSettings
     {
         return new class extends PdoSettings
         {
@@ -81,7 +81,7 @@ class PdoPackageTest extends TestCase
             {
                 return [
 
-                    self::KEY_CONNECTION_STRING => 'some connection string',
+                        self::KEY_CONNECTION_STRING => 'some connection string',
 
                     ] + parent::getSettings();
             }

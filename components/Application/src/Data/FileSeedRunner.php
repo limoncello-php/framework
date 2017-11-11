@@ -64,7 +64,7 @@ class FileSeedRunner extends BaseSeedRunner
 
         $path = $this->getSeedsPath();
         assert($fileSystem->exists($path) === true);
-        $this->getIO()->writeInfo("Seeds `$path` started.", IoInterface::VERBOSITY_VERBOSE);
+        $this->getIO()->writeInfo("Seeds `$path` started." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
 
         $seedClasses = $fileSystem->requireFile($path);
         $this->setSeedClasses($seedClasses);

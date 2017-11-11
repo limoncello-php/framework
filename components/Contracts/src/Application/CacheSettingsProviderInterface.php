@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Contracts\Settings;
+<?php namespace Limoncello\Contracts\Application;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -24,6 +24,11 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
  */
 interface CacheSettingsProviderInterface extends SettingsProviderInterface, ArraySerializableInterface
 {
+    /**
+     * @return array
+     */
+    public function getApplicationConfiguration(): array;
+
     /**
      * @return array
      */

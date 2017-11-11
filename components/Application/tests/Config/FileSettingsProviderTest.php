@@ -44,7 +44,7 @@ class FileSettingsProviderTest extends TestCase
     /**
      * Test loading from folder.
      */
-    public function testLoadFromFolder()
+    public function testLoadFromFolder(): void
     {
         $provider = $this->createProvider();
 
@@ -121,7 +121,7 @@ class FileSettingsProviderTest extends TestCase
     /**
      * @expectedException \Limoncello\Application\Exceptions\NotRegisteredSettingsException
      */
-    public function testGetNotRegistered()
+    public function testGetNotRegistered(): void
     {
         $this->createProvider()->get(static::class);
     }
@@ -129,7 +129,7 @@ class FileSettingsProviderTest extends TestCase
     /**
      * @expectedException \Limoncello\Application\Exceptions\AmbiguousSettingsException
      */
-    public function testGetAmbiguous()
+    public function testGetAmbiguous(): void
     {
         $this->createProvider()->get(MarkerInterfaceTop::class);
     }
@@ -137,7 +137,7 @@ class FileSettingsProviderTest extends TestCase
     /**
      * @expectedException \Limoncello\Application\Exceptions\AlreadyRegisteredSettingsException
      */
-    public function testRegisterTwice()
+    public function testRegisterTwice(): void
     {
         $this->createProvider()->register(new SampleSettingsA());
     }
@@ -145,7 +145,7 @@ class FileSettingsProviderTest extends TestCase
     /**
      * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
      */
-    public function testCheckClassWithPrivateConstructor()
+    public function testCheckClassWithPrivateConstructor(): void
     {
         $this->invokeCheckMethod(PrivateConstructorClass::class);
     }
@@ -153,7 +153,7 @@ class FileSettingsProviderTest extends TestCase
     /**
      * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
      */
-    public function testCheckClassWithNonDefaultConstructor()
+    public function testCheckClassWithNonDefaultConstructor(): void
     {
         $this->invokeCheckMethod(NoDefaultConstructorClass::class);
     }
@@ -161,7 +161,7 @@ class FileSettingsProviderTest extends TestCase
     /**
      * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
      */
-    public function testCheckNotAClass()
+    public function testCheckNotAClass(): void
     {
         $this->invokeCheckMethod(__FILE__);
     }

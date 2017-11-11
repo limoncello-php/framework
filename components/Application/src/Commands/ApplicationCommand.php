@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Contracts\Settings\CacheSettingsProviderInterface;
 use Limoncello\Application\Exceptions\ConfigurationException;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
@@ -143,9 +143,9 @@ class ApplicationCommand implements CommandInterface
         $fileSystem = $this->getFileSystem($container);
         if ($fileSystem->exists($path) === true) {
             $fileSystem->delete($path);
-            $inOut->writeInfo("Cache file deleted `$path`.", IoInterface::VERBOSITY_VERBOSE);
+            $inOut->writeInfo("Cache file deleted `$path`." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
         } else {
-            $inOut->writeInfo('Cache already clean.');
+            $inOut->writeInfo('Cache already clean.' . PHP_EOL);
         }
     }
 
@@ -176,8 +176,8 @@ class ApplicationCommand implements CommandInterface
         $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
         $this->getFileSystem($container)->write($path, $content);
 
-        $inOut->writeInfo('Cache created.');
-        $inOut->writeInfo("Cache written to `$path`.", IoInterface::VERBOSITY_VERBOSE);
+        $inOut->writeInfo('Cache created.' . PHP_EOL);
+        $inOut->writeInfo("Cache written to `$path`." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
     }
 
     /**

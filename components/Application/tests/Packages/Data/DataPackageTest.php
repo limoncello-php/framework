@@ -39,7 +39,7 @@ class DataPackageTest extends TestCase
     /**
      * Test provider.
      */
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertNotEmpty(DataProvider::getContainerConfigurators());
     }
@@ -47,7 +47,7 @@ class DataPackageTest extends TestCase
     /**
      * Test container configurator.
      */
-    public function testContainerConfigurator()
+    public function testContainerConfigurator(): void
     {
         $container = new Container();
 
@@ -69,7 +69,7 @@ class DataPackageTest extends TestCase
     /**
      * Test settings.
      */
-    public function testSettings()
+    public function testSettings(): void
     {
         $appSettings = [];
         $this->assertNotEmpty($this->getDataSettings()->get($appSettings));

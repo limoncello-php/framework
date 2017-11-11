@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Application\CoreSettings;
+<?php namespace Limoncello\Tests\Application\CoreData;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -28,7 +28,7 @@ class CoreDataTest extends TestCase
     /**
      * Test compose settings.
      */
-    public function testSettings()
+    public function testSettings(): void
     {
         $coreSettings = $this->createCoreData();
 
