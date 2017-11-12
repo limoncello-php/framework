@@ -60,7 +60,7 @@ class CommandsTest extends TestCase
 
         /** @var TemplatesCommand $command */
 
-        $command->execute($container, $this->createIo(TemplatesCommand::ACTION_CLEAR_CACHE));
+        $command->execute($container, $this->createIo(TemplatesCommand::ACTION_CLEAR_CACHE, 0, 1));
 
         // Mockery will do checks when the test finished
         $this->assertTrue(true);
@@ -89,7 +89,7 @@ class CommandsTest extends TestCase
         $this->assertNotEmpty($command::getArguments());
         $this->assertEmpty($command::getOptions());
 
-        $command::execute($container, $this->createIo(TemplatesCommand::ACTION_CREATE_CACHE));
+        $command::execute($container, $this->createIo(TemplatesCommand::ACTION_CREATE_CACHE, 0, 2));
     }
 
     /**
@@ -119,7 +119,8 @@ class CommandsTest extends TestCase
      */
     private function addSettingsProvider(ContainerInterface $container): self
     {
-        $settings = (new Templates())->get();
+        $appConfig = [];
+        $settings  = (new Templates())->get($appConfig);
 
         /** @var Mock $settingsMock */
         $settingsMock = Mockery::mock(SettingsProviderInterface::class);
@@ -160,10 +161,11 @@ class CommandsTest extends TestCase
     /**
      * @param string $action
      * @param int    $errors
+     * @param int    $writes
      *
      * @return IoInterface
      */
-    private function createIo(string $action, int $errors = 0): IoInterface
+    private function createIo(string $action, int $errors = 0, int $writes = 0): IoInterface
     {
         /** @var Mock $ioMock */
         $ioMock = Mockery::mock(IoInterface::class);
@@ -173,6 +175,11 @@ class CommandsTest extends TestCase
 
         if ($errors > 0) {
             $ioMock->shouldReceive('writeError')->times($errors)
+                ->withAnyArgs()->andReturnSelf();
+        }
+
+        if ($writes > 0) {
+            $ioMock->shouldReceive('writeInfo')->times($writes)
                 ->withAnyArgs()->andReturnSelf();
         }
 

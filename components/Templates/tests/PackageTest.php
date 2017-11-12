@@ -48,7 +48,8 @@ class PackageTest extends TestCase
      */
     public function testContainerConfigurator()
     {
-        $settings = (new Templates())->get();
+        $appConfig = [];
+        $settings  = (new Templates())->get($appConfig);
 
         /** @var Mock $settingsMock */
         $settingsMock = Mockery::mock(SettingsProviderInterface::class);
@@ -81,7 +82,8 @@ class PackageTest extends TestCase
      */
     public function testSettings()
     {
-        $settings = (new Templates())->get();
+        $appConfig = [];
+        $settings  = (new Templates())->get($appConfig);
 
         $this->assertNotEmpty($settings[Templates::KEY_CACHE_FOLDER]);
         $this->assertNotEmpty($settings[Templates::KEY_TEMPLATES_FOLDER]);

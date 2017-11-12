@@ -97,10 +97,10 @@ class TemplatesCommand implements CommandInterface
         $action = $inOut->getArgument(static::ARG_ACTION);
         switch ($action) {
             case static::ACTION_CREATE_CACHE:
-                (new self())->executeCache($container);
+                (new self())->executeCache($inOut, $container);
                 break;
             case static::ACTION_CLEAR_CACHE:
-                (new self())->executeClear($container);
+                (new self())->executeClear($inOut, $container);
                 break;
             default:
                 $inOut->writeError("Unsupported action `$action`." . PHP_EOL);
@@ -109,11 +109,12 @@ class TemplatesCommand implements CommandInterface
     }
 
     /**
+     * @param IoInterface        $inOut
      * @param ContainerInterface $container
      *
      * @return void
      */
-    protected function executeClear(ContainerInterface $container): void
+    protected function executeClear(IoInterface $inOut, ContainerInterface $container): void
     {
         $settings    = $this->getTemplatesSettings($container);
         $cacheFolder = $settings[TemplatesSettings::KEY_CACHE_FOLDER];
@@ -123,16 +124,19 @@ class TemplatesCommand implements CommandInterface
         foreach ($fileSystem->scanFolder($cacheFolder) as $fileOrFolder) {
             $fileSystem->isFolder($fileOrFolder) === false ?: $fileSystem->deleteFolderRecursive($fileOrFolder);
         }
+
+        $inOut->writeInfo('Cache has been cleared.' . PHP_EOL);
     }
 
     /**
+     * @param IoInterface        $inOut
      * @param ContainerInterface $container
      *
      * @return void
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    protected function executeCache(ContainerInterface $container): void
+    protected function executeCache(IoInterface $inOut, ContainerInterface $container): void
     {
         /** @var TemplatesCacheInterface $cache */
         $cache = $container->get(TemplatesCacheInterface::class);
@@ -142,7 +146,17 @@ class TemplatesCommand implements CommandInterface
 
         foreach ($templates as $templateName) {
             // it will write template to cache
+            $inOut->writeInfo(
+                "Starting template caching for `$templateName`..." . PHP_EOL,
+                IoInterface::VERBOSITY_VERBOSE
+            );
+
             $cache->cache($templateName);
+
+            $inOut->writeInfo(
+                "Template caching finished for `$templateName`." . PHP_EOL,
+                IoInterface::VERBOSITY_NORMAL
+            );
         }
     }
 
