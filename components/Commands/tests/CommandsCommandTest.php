@@ -75,7 +75,7 @@ class CommandsCommandTest extends TestCase
 
         $command->execute(
             $this->createInputMock(CommandsCommand::ACTION_CONNECT),
-            $this->createOutputMock(false)
+            $this->createOutputMock(2)
         );
 
         // actual check would be performed by Mockery on test completion.
@@ -101,7 +101,7 @@ class CommandsCommandTest extends TestCase
 
         $command->execute(
             $this->createInputMock(CommandsCommand::ACTION_CONNECT),
-            $this->createOutputMock(true)
+            $this->createOutputMock(2)
         );
 
         // actual check would be performed by Mockery on test completion.
@@ -128,7 +128,7 @@ class CommandsCommandTest extends TestCase
 
         $command->execute(
             $this->createInputMock(CommandsCommand::ACTION_CONNECT),
-            $this->createOutputMock(true)
+            $this->createOutputMock(2)
         );
 
         // actual check would be performed by Mockery on test completion.
@@ -166,7 +166,7 @@ class CommandsCommandTest extends TestCase
 
         $command->execute(
             $this->createInputMock(CommandsCommand::ACTION_CREATE, $cmdClass),
-            $this->createOutputMock(false)
+            $this->createOutputMock()
         );
 
         // actual check would be performed by Mockery on test completion.
@@ -191,7 +191,7 @@ class CommandsCommandTest extends TestCase
 
         $command->execute(
             $this->createInputMock(CommandsCommand::ACTION_CREATE, $cmdClass),
-            $this->createOutputMock(true)
+            $this->createOutputMock(1)
         );
 
         // actual check would be performed by Mockery on test completion.
@@ -223,7 +223,7 @@ class CommandsCommandTest extends TestCase
 
         $command->execute(
             $this->createInputMock(CommandsCommand::ACTION_CREATE, $cmdClass),
-            $this->createOutputMock(true)
+            $this->createOutputMock(1)
         );
 
         // actual check would be performed by Mockery on test completion.
@@ -257,7 +257,7 @@ class CommandsCommandTest extends TestCase
 
         $command->execute(
             $this->createInputMock(CommandsCommand::ACTION_CREATE, $cmdClass),
-            $this->createOutputMock(true)
+            $this->createOutputMock(1)
         );
 
         // actual check would be performed by Mockery on test completion.
@@ -282,7 +282,7 @@ class CommandsCommandTest extends TestCase
 
         $command->execute(
             $this->createInputMock('XXX', $cmdClass), // <-- Invalid action
-            $this->createOutputMock(true)
+            $this->createOutputMock(1)
         );
 
         // actual check would be performed by Mockery on test completion.
@@ -329,17 +329,17 @@ class CommandsCommandTest extends TestCase
     }
 
     /**
-     * @param bool $expectOutput
+     * @param int $writeTimes
      *
      * @return OutputInterface
      */
-    private function createOutputMock(bool $expectOutput): OutputInterface
+    private function createOutputMock(int $writeTimes = 0): OutputInterface
     {
         /** @var Mock $output */
         $output = Mockery::mock(OutputInterface::class);
 
-        if ($expectOutput === true) {
-            $output->shouldReceive('write')->once()->withAnyArgs()->andReturnUndefined();
+        if ($writeTimes > 0) {
+            $output->shouldReceive('write')->times($writeTimes)->withAnyArgs()->andReturnUndefined();
         }
 
         /** @var OutputInterface $output */

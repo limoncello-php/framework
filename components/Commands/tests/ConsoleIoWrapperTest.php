@@ -29,7 +29,7 @@ class ConsoleIoWrapperTest extends TestCase
     /**
      * Test plugin.
      */
-    public function testActivate()
+    public function testActivate(): void
     {
         /** @var Mockery\Mock $input */
         /** @var Mockery\Mock $output */
@@ -54,5 +54,61 @@ class ConsoleIoWrapperTest extends TestCase
         $this->assertNotEmpty($wrapper->getOption('some_opt_name'));
 
         $wrapper->writeInfo('some warning');
+    }
+
+    /**
+     * Test verbosity convert.
+     *
+     * @return void
+     */
+    public function testVerbosityConvert(): void
+    {
+        $testWrapper = new class extends ConsoleIoWrapper
+        {
+            /**
+             * Constructor.
+             */
+            public function __construct()
+            {
+                $input  = Mockery::mock(InputInterface::class);
+                $output = Mockery::mock(OutputInterface::class);
+
+                /** @var InputInterface $input */
+                /** @var OutputInterface $output */
+
+                parent::__construct($input, $output);
+            }
+
+            /**
+             * @param int $verbosity
+             *
+             * @return int
+             */
+            public function getConvertedVerbosity(int $verbosity): int
+            {
+                return $this->convertVerbosityLevel($verbosity);
+            }
+        };
+
+        $this->assertEquals(
+            OutputInterface::VERBOSITY_QUIET,
+            $testWrapper->getConvertedVerbosity(ConsoleIoWrapper::VERBOSITY_QUIET)
+        );
+        $this->assertEquals(
+            OutputInterface::VERBOSITY_NORMAL,
+            $testWrapper->getConvertedVerbosity(ConsoleIoWrapper::VERBOSITY_NORMAL)
+        );
+        $this->assertEquals(
+            OutputInterface::VERBOSITY_VERBOSE,
+            $testWrapper->getConvertedVerbosity(ConsoleIoWrapper::VERBOSITY_VERBOSE)
+        );
+        $this->assertEquals(
+            OutputInterface::VERBOSITY_VERY_VERBOSE,
+            $testWrapper->getConvertedVerbosity(ConsoleIoWrapper::VERBOSITY_VERY_VERBOSE)
+        );
+        $this->assertEquals(
+            OutputInterface::VERBOSITY_NORMAL,
+            $testWrapper->getConvertedVerbosity(-1)
+        );
     }
 }

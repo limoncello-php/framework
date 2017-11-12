@@ -137,6 +137,8 @@ class CommandsCommand extends BaseCommand
                 continue;
             }
 
+            $inOut->writeInfo("Found command class `$commandClass`." . PHP_EOL);
+
             $commandClasses[] = $this->commandClassToArray($commandClass);
         }
 
@@ -160,7 +162,13 @@ EOT;
             }
 
             $this->getFileSystem($container)->write($cacheFilePath, $content);
+
+            $inOut->writeInfo('Commands connected.' . PHP_EOL);
+
+            return;
         }
+
+        $inOut->writeWarning('No commands found.' . PHP_EOL);
     }
 
     /**
