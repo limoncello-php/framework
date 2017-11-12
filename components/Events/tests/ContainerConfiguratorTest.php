@@ -40,9 +40,10 @@ class ContainerConfiguratorTest extends TestCase
     {
         /** @var ContainerConfiguratorInterface $configuratorClass */
         list($configuratorClass) = EventProvider::getContainerConfigurators();
-        $container    = new TestContainer();
+        $container = new TestContainer();
 
-        $this->addSettings($container, BaseEventSettings::class, (new EventSettings())->get());
+        $appConfig = [];
+        $this->addSettings($container, BaseEventSettings::class, (new EventSettings())->get($appConfig));
 
         $configuratorClass::configureContainer($container);
 

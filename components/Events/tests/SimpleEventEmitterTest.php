@@ -187,7 +187,8 @@ class SimpleEventEmitterTest extends TestCase
      */
     public function testEventDispatch()
     {
-        $cacheData = (new EventSettings())->get()[EventSettings::KEY_CACHED_DATA];
+        $appConfig = [];
+        $cacheData = (new EventSettings())->get($appConfig)[EventSettings::KEY_CACHED_DATA];
 
         // it has 4 sections for each non-abstract event we have described
         $this->assertCount(4, $cacheData);

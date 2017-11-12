@@ -1175,10 +1175,11 @@ EOT;
             return new ParametersMapper($container->get(JsonSchemesInterface::class));
         };
 
+        $appConfig                                     = [];
         $container[Connection::class]                  = $connection = $this->initDb();
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(10, 100);
         $container[SettingsProviderInterface::class]   = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
+            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get($appConfig),
         ]);
         $container[EncoderInterface::class]            =
             function (ContainerInterface $container) use ($factory, $jsonSchemes) {

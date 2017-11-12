@@ -29,6 +29,7 @@ class PassportSettingsTest extends TestCase
      */
     public function testGetSettings()
     {
-        $this->assertNotEmpty((new PassportSettings())->get());
+        $appConfig = [];
+        $this->assertNotEmpty((new PassportSettings())->get($appConfig));
     }
 }

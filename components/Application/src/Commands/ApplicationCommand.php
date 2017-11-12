@@ -143,9 +143,11 @@ class ApplicationCommand implements CommandInterface
         if ($fileSystem->exists($path) === true) {
             $fileSystem->delete($path);
             $inOut->writeInfo("Cache file deleted `$path`." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
-        } else {
-            $inOut->writeInfo('Cache already clean.' . PHP_EOL);
+
+            return;
         }
+
+        $inOut->writeInfo('Cache already clean.' . PHP_EOL);
     }
 
     /**

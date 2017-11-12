@@ -51,10 +51,14 @@ abstract class EventSettings implements SettingsInterface
     const KEY_LAST = self::KEY_CACHED_DATA;
 
     /**
+     * @param array $appConfig
+     *
      * @return array
      */
     final public function get(array $appConfig): array
     {
+        assert($appConfig !== null);
+
         $defaults = $this->getSettings();
 
         $eventsFolder = $defaults[static::KEY_EVENTS_FOLDER] ?? null;

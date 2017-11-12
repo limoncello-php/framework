@@ -140,6 +140,8 @@ class Application extends \Limoncello\Core\Application\Application
 
     /**
      * @return CacheSettingsProviderInterface
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function getCacheSettingsProvider(): CacheSettingsProviderInterface
     {

@@ -194,6 +194,7 @@ class Validator extends BaseValidator implements FormValidatorInterface
      * @param array $attributes
      *
      * @return self
+     * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function validateAttributes(array $attributes): self

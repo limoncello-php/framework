@@ -257,8 +257,7 @@ class InstanceSettingsProvider implements SettingsProviderInterface
     private function selectChildSettingsAmongTwo(
         SettingsInterface $instance1,
         SettingsInterface $instance2
-    ): ?SettingsInterface
-    {
+    ): ?SettingsInterface {
         return is_subclass_of($instance1, get_class($instance2)) === true ?
             $instance1 : (is_subclass_of($instance2, get_class($instance1)) === true ? $instance2 : null);
     }

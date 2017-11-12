@@ -51,8 +51,9 @@ class FluteContainerConfiguratorTest extends TestCase
     {
         $container = new Container();
 
+        $appConfig = [];
         $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get(),
+            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get($appConfig),
 
             ApplicationConfigurationInterface::class => [
                 ApplicationConfigurationInterface::KEY_IS_LOG_ENABLED => true,

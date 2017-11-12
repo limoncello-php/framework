@@ -153,7 +153,7 @@ class PackageTest extends TestCase
     {
         $container = new TestContainer();
 
-        $settings = new class extends SymmetricCryptSettings
+        $settings  = new class extends SymmetricCryptSettings
         {
             /**
              * @inheritdoc
@@ -168,7 +168,8 @@ class PackageTest extends TestCase
                     ] + parent::getSettings();
             }
         };
-        $this->addSettings($container, SymmetricCryptSettings::class, $settings->get());
+        $appConfig = [];
+        $this->addSettings($container, SymmetricCryptSettings::class, $settings->get($appConfig));
 
         /** @var ContainerConfiguratorInterface $configuratorClass */
         list ($configuratorClass) = SymmetricCryptProvider::getContainerConfigurators();
@@ -187,7 +188,8 @@ class PackageTest extends TestCase
 
         /** @var HasherSettings $settings */
         list($settings) = HasherProvider::getSettings();
-        $this->addSettings($container, HasherSettings::class, $settings->get());
+        $appConfig = [];
+        $this->addSettings($container, HasherSettings::class, $settings->get($appConfig));
 
         /** @var ContainerConfiguratorInterface $configuratorClass */
         list ($configuratorClass) = HasherProvider::getContainerConfigurators();
@@ -203,9 +205,10 @@ class PackageTest extends TestCase
      */
     private function addAsymmetricCryptSettingsProvider(ContainerInterface $container): self
     {
-        $settings = $this->getAsymmetricSettings($this->getPathToPublicKey(), $this->getPathToPrivateKey());
+        $settings  = $this->getAsymmetricSettings($this->getPathToPublicKey(), $this->getPathToPrivateKey());
+        $appConfig = [];
 
-        return $this->addSettings($container, AsymmetricCryptSettings::class, $settings->get());
+        return $this->addSettings($container, AsymmetricCryptSettings::class, $settings->get($appConfig));
     }
 
     /**
