@@ -21,9 +21,9 @@ use Limoncello\Application\Packages\Application\ApplicationProvider;
 use Limoncello\Application\Packages\Application\WhoopsContainerConfigurator;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
 use Mockery;
 use Mockery\Mock;
@@ -53,9 +53,11 @@ class ApplicationPackageTest extends TestCase
         $container = new Container();
 
         /** @var Mock $provider */
-        $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
+        $provider = Mockery::mock(CacheSettingsProviderInterface::class);
+        $container[CacheSettingsProviderInterface::class] = $provider;
         $container[LoggerInterface::class] = new NullLogger();
-        $provider->shouldReceive('get')->once()->with(S::class)->andReturn($this->getApplicationSettings()->get());
+        $provider->shouldReceive('getApplicationConfiguration')->once()
+            ->withNoArgs()->andReturn($this->getApplicationSettings()->get());
 
         ApplicationContainerConfigurator::configureContainer($container);
         WhoopsContainerConfigurator::configureContainer($container);

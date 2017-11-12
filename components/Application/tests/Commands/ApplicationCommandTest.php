@@ -74,7 +74,7 @@ class ApplicationCommandTest extends TestCase
         $providerMock                                     = Mockery::mock(CacheSettingsProviderInterface::class);
         $container[SettingsProviderInterface::class]      = $providerMock;
         $container[CacheSettingsProviderInterface::class] = $providerMock;
-        $providerMock->shouldReceive('get')->once()->with(ApplicationConfigurationInterface::class)
+        $providerMock->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()
             ->andReturn([
                 ApplicationConfigurationInterface::KEY_CACHE_FOLDER   => '/some/path',
                 ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
@@ -108,7 +108,7 @@ class ApplicationCommandTest extends TestCase
         $providerMock                                     = Mockery::mock(CacheSettingsProviderInterface::class);
         $container[SettingsProviderInterface::class]      = $providerMock;
         $container[CacheSettingsProviderInterface::class] = $providerMock;
-        $providerMock->shouldReceive('get')->once()->with(ApplicationConfigurationInterface::class)
+        $providerMock->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()
             ->andReturn([
                 ApplicationConfigurationInterface::KEY_CACHE_FOLDER   => '/some/path',
                 ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => '', // <-- invalid value
@@ -136,7 +136,7 @@ class ApplicationCommandTest extends TestCase
         $providerMock                                     = Mockery::mock(CacheSettingsProviderInterface::class);
         $container[SettingsProviderInterface::class]      = $providerMock;
         $container[CacheSettingsProviderInterface::class] = $providerMock;
-        $providerMock->shouldReceive('get')->once()->with(ApplicationConfigurationInterface::class)
+        $providerMock->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()
             ->andReturn([
                 ApplicationConfigurationInterface::KEY_CACHE_FOLDER   => '/some/path',
                 ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
@@ -168,7 +168,7 @@ class ApplicationCommandTest extends TestCase
         $providerMock                                     = Mockery::mock(CacheSettingsProviderInterface::class);
         $container[SettingsProviderInterface::class]      = $providerMock;
         $container[CacheSettingsProviderInterface::class] = $providerMock;
-        $providerMock->shouldReceive('get')->once()->with(ApplicationConfigurationInterface::class)
+        $providerMock->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()
             ->andReturn([
                 ApplicationConfigurationInterface::KEY_CACHE_FOLDER   => '/some/path',
                 ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
@@ -246,7 +246,7 @@ class ApplicationCommandTest extends TestCase
         $providerMock                                     = Mockery::mock(CacheSettingsProviderInterface::class);
         $container[SettingsProviderInterface::class]      = $providerMock;
         $container[CacheSettingsProviderInterface::class] = $providerMock;
-        $providerMock->shouldReceive('get')->once()->with(ApplicationConfigurationInterface::class)
+        $providerMock->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()
             ->andReturn([
                 ApplicationConfigurationInterface::KEY_CACHE_FOLDER   => '/some/path',
                 ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => '', // <-- invalid value

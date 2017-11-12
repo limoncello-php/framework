@@ -22,7 +22,6 @@ use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -128,9 +127,9 @@ class ApplicationCommand implements CommandInterface
     {
         assert($inOut);
 
-        $appSettings    = $this->getApplicationSettings($container);
-        $cacheDir       = $appSettings[ApplicationConfigurationInterface::KEY_CACHE_FOLDER];
-        $cacheCallable  = $appSettings[ApplicationConfigurationInterface::KEY_CACHE_CALLABLE];
+        $appConfig     = $this->getApplicationConfiguration($container);
+        $cacheDir      = $appConfig[ApplicationConfigurationInterface::KEY_CACHE_FOLDER];
+        $cacheCallable = $appConfig[ApplicationConfigurationInterface::KEY_CACHE_CALLABLE];
         list (, $class) = $this->parseCacheCallable($cacheCallable);
 
         if ($class === null) {
@@ -159,9 +158,9 @@ class ApplicationCommand implements CommandInterface
     {
         assert($inOut);
 
-        $appSettings   = $this->getApplicationSettings($container);
-        $cacheDir      = $appSettings[ApplicationConfigurationInterface::KEY_CACHE_FOLDER];
-        $cacheCallable = $appSettings[ApplicationConfigurationInterface::KEY_CACHE_CALLABLE];
+        $appConfig     = $this->getApplicationConfiguration($container);
+        $cacheDir      = $appConfig[ApplicationConfigurationInterface::KEY_CACHE_FOLDER];
+        $cacheCallable = $appConfig[ApplicationConfigurationInterface::KEY_CACHE_CALLABLE];
         list ($namespace, $class, $method) = $this->parseCacheCallable($cacheCallable);
         if ($class === null || $namespace === null || $method === null) {
             // parsing of cache callable failed (most likely error in settings)
@@ -245,8 +244,8 @@ class ApplicationCommand implements CommandInterface
         assert(
             $data !== null,
             'It seems the data are not exportable. It is likely to be caused by class instances ' .
-                'that do not implement ` __set_state` magic method required by `var_export`. ' .
-                'See http://php.net/manual/en/language.oop5.magic.php#object.set-state for more details.'
+            'that do not implement ` __set_state` magic method required by `var_export`. ' .
+            'See http://php.net/manual/en/language.oop5.magic.php#object.set-state for more details.'
         );
 
         $content = <<<EOT
@@ -275,13 +274,13 @@ EOT;
      *
      * @return array
      */
-    protected function getApplicationSettings(ContainerInterface $container): array
+    protected function getApplicationConfiguration(ContainerInterface $container): array
     {
-        /** @var SettingsProviderInterface $settingsProvider */
-        $settingsProvider = $container->get(SettingsProviderInterface::class);
-        $appSettings      = $settingsProvider->get(ApplicationConfigurationInterface::class);
+        /** @var CacheSettingsProviderInterface $settingsProvider */
+        $settingsProvider = $container->get(CacheSettingsProviderInterface::class);
+        $appConfig        = $settingsProvider->getApplicationConfiguration();
 
-        return $appSettings;
+        return $appConfig;
     }
 
     /**

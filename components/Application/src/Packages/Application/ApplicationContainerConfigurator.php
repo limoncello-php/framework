@@ -18,12 +18,12 @@
 
 use Limoncello\Application\Commands\CommandStorage;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Provider\ProvidesCommandsInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 
@@ -72,13 +72,13 @@ class ApplicationContainerConfigurator implements ContainerConfiguratorInterface
                     }
                 };
 
-                /** @var SettingsProviderInterface $provider */
-                $provider = $container->get(SettingsProviderInterface::class);
-                $settings = $provider->get(S::class);
+                /** @var CacheSettingsProviderInterface $provider */
+                $provider  = $container->get(CacheSettingsProviderInterface::class);
+                $appConfig = $provider->getApplicationConfiguration();
 
-                $providerClasses  = $settings[S::KEY_PROVIDER_CLASSES];
-                $commandsFolder   = $settings[S::KEY_COMMANDS_FOLDER];
-                $commandsFileMask = $settings[S::KEY_COMMANDS_FILE_MASK] ?? '*.php';
+                $providerClasses  = $appConfig[S::KEY_PROVIDER_CLASSES];
+                $commandsFolder   = $appConfig[S::KEY_COMMANDS_FOLDER];
+                $commandsFileMask = $appConfig[S::KEY_COMMANDS_FILE_MASK] ?? '*.php';
                 $commandsPath     = $commandsFolder . DIRECTORY_SEPARATOR . $commandsFileMask;
 
                 $storage = $creator->createCommandStorage($commandsPath, $providerClasses);
