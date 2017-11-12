@@ -21,7 +21,7 @@ use Limoncello\Application\Packages\Monolog\MonologFileProvider;
 use Limoncello\Application\Packages\Monolog\MonologFileSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
@@ -48,8 +48,9 @@ class MonologPackageTest extends TestCase
         $container = new Container();
 
         /** @var Mock $provider */
-        $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
-        $provider->shouldReceive('get')->once()->with(A::class)->andReturn([
+        $provider                                         = Mockery::mock(CacheSettingsProviderInterface::class);
+        $container[CacheSettingsProviderInterface::class] = $provider;
+        $provider->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()->andReturn([
             A::KEY_APP_NAME => 'Test_App',
         ]);
         $provider->shouldReceive('get')->once()->with(C::class)->andReturn([
@@ -85,7 +86,7 @@ class MonologPackageTest extends TestCase
             {
                 return [
 
-                    C::KEY_LOG_FOLDER => __DIR__,
+                        C::KEY_LOG_FOLDER => __DIR__,
 
                     ] + parent::getSettings();
             }

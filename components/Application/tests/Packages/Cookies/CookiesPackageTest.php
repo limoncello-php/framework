@@ -22,6 +22,7 @@ use Limoncello\Application\Packages\Cookies\CookieProvider;
 use Limoncello\Application\Packages\Cookies\CookieSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Cookies\CookieJarInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
@@ -53,9 +54,11 @@ class CookiesPackageTest extends TestCase
         $container = new Container();
 
         /** @var Mock $provider */
-        $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
-        $container[LoggerInterface::class]           = new NullLogger();
-        $provider->shouldReceive('get')->once()->with(A::class)->andReturn([
+        $provider                                         = Mockery::mock(CacheSettingsProviderInterface::class);
+        $container[SettingsProviderInterface::class]      = $provider;
+        $container[CacheSettingsProviderInterface::class] = $provider;
+        $container[LoggerInterface::class]                = new NullLogger();
+        $provider->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()->andReturn([
             A::KEY_IS_DEBUG => true,
         ]);
         $appSettings = [];

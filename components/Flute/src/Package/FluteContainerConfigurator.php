@@ -2,6 +2,7 @@
 
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
@@ -117,11 +118,13 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
     public static function configureExceptionHandler(LimoncelloContainerInterface $container)
     {
         $container[ThrowableHandlerInterface::class] = function (PsrContainerInterface $container) {
-            $appSettings   = $container->get(SettingsProviderInterface::class)->get(A::class);
-            $fluteSettings = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
+            /** @var CacheSettingsProviderInterface $provider */
+            $provider      = $container->get(CacheSettingsProviderInterface::class);
+            $appConfig     = $provider->getApplicationConfiguration();
+            $fluteSettings = $provider->get(FluteSettings::class);
 
-            $isLogEnabled = $appSettings[A::KEY_IS_LOG_ENABLED];
-            $isDebug      = $appSettings[A::KEY_IS_DEBUG];
+            $isLogEnabled = $appConfig[A::KEY_IS_LOG_ENABLED];
+            $isDebug      = $appConfig[A::KEY_IS_DEBUG];
 
             $ignoredErrorClasses = $fluteSettings[FluteSettings::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS];
             $codeForUnexpected   = $fluteSettings[FluteSettings::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE];

@@ -18,9 +18,9 @@
 
 use Limoncello\Application\Packages\Monolog\MonologFileSettings as C;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
@@ -44,11 +44,12 @@ class MonologFileContainerConfigurator implements ContainerConfiguratorInterface
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
         $container[LoggerInterface::class] = function (PsrContainerInterface $container) {
-            $settingsProvider = $container->get(SettingsProviderInterface::class);
-            $appSettings      = $settingsProvider->get(A::class);
+            /** @var CacheSettingsProviderInterface $settingsProvider */
+            $settingsProvider = $container->get(CacheSettingsProviderInterface::class);
+            $appConfig        = $settingsProvider->getApplicationConfiguration();
             $monologSettings  = $settingsProvider->get(C::class);
 
-            $monolog = new Logger($appSettings[A::KEY_APP_NAME]);
+            $monolog = new Logger($appConfig[A::KEY_APP_NAME]);
             $handler = $monologSettings[C::KEY_IS_ENABLED] === true ?
                 static::createHandler($monologSettings) : new NullHandler();
 

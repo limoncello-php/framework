@@ -20,6 +20,7 @@ use Exception;
 use Limoncello\Application\ExceptionHandlers\WhoopsThrowableHandler;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
@@ -86,9 +87,9 @@ class ExceptionHandlersTest extends TestCase
         $container[LoggerInterface::class] = new NullLogger();
 
         /** @var Mock $provider */
-        $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
-        $provider->shouldReceive('has')->once()->with(A::class)->andReturn(true);
-        $provider->shouldReceive('get')->once()->with(A::class)->andReturn([
+        $provider = Mockery::mock(CacheSettingsProviderInterface::class);
+        $container[CacheSettingsProviderInterface::class] = $provider;
+        $provider->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()->andReturn([
             A::KEY_IS_DEBUG         => $debugEnabled,
             A::KEY_APP_NAME         => 'Test App',
             A::KEY_EXCEPTION_DUMPER => [self::class, 'exceptionDumper'],

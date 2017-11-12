@@ -96,10 +96,6 @@ class Application extends \Limoncello\Core\Application\Application
     {
         $container = $this->createContainerInstance();
 
-        $settingsProvider = $this->getCacheSettingsProvider();
-        $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
-        $container->offsetSet(CacheSettingsProviderInterface::class, $settingsProvider);
-
         $routeConfigurators = [];
         $coreData           = $this->getCoreData();
         if (empty($method) === false && empty($path) === false) {
@@ -119,7 +115,13 @@ class Application extends \Limoncello\Core\Application\Application
      */
     protected function createContainerInstance(): LimoncelloContainerInterface
     {
-        return new Container();
+        $container = new Container();
+
+        $settingsProvider = $this->getCacheSettingsProvider();
+        $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
+        $container->offsetSet(CacheSettingsProviderInterface::class, $settingsProvider);
+
+        return $container;
     }
 
     /**

@@ -18,9 +18,9 @@
 
 use Exception;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\ThrowableResponseTrait;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -94,20 +94,19 @@ class WhoopsThrowableHandler implements ThrowableHandlerInterface
      */
     private function getSettings(ContainerInterface $container): array
     {
-        $appSettings = null;
+        $appConfig = null;
 
-        /** @var SettingsProviderInterface $settingsProvider */
-        if ($container->has(SettingsProviderInterface::class) === true &&
-            ($settingsProvider = $container->get(SettingsProviderInterface::class)) !== null &&
-            $settingsProvider->has(A::class) === true
+        /** @var CacheSettingsProviderInterface $settingsProvider */
+        if ($container->has(CacheSettingsProviderInterface::class) === true &&
+            ($settingsProvider = $container->get(CacheSettingsProviderInterface::class)) !== null
         ) {
-            $appSettings = $settingsProvider->get(A::class);
+            $appConfig = $settingsProvider->getApplicationConfiguration();
         }
 
         return [
-            $appSettings[A::KEY_IS_DEBUG] ?? false,
-            $appSettings[A::KEY_APP_NAME] ?? null,
-            $appSettings[A::KEY_EXCEPTION_DUMPER] ?? null,
+            $appConfig[A::KEY_IS_DEBUG] ?? false,
+            $appConfig[A::KEY_APP_NAME] ?? null,
+            $appConfig[A::KEY_EXCEPTION_DUMPER] ?? null,
         ];
     }
 

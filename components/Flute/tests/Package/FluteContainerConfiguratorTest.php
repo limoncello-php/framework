@@ -19,6 +19,7 @@
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
@@ -33,8 +34,8 @@ use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Package\FluteContainerConfigurator;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
+use Limoncello\Tests\Flute\Data\Package\CacheSettingsProvider;
 use Limoncello\Tests\Flute\Data\Package\Flute;
-use Limoncello\Tests\Flute\Data\Package\SettingsProvider;
 use Limoncello\Tests\Flute\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -51,15 +52,20 @@ class FluteContainerConfiguratorTest extends TestCase
     {
         $container = new Container();
 
-        $appConfig = [];
-        $container[SettingsProviderInterface::class] = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get($appConfig),
+        $appConfig                                        = [
+            ApplicationConfigurationInterface::KEY_IS_LOG_ENABLED => true,
+            ApplicationConfigurationInterface::KEY_IS_DEBUG       => true,
+        ];
+        $cacheSettingsProvider                            = new CacheSettingsProvider(
+            $appConfig,
+            [
+                FluteSettings::class =>
+                    (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get($appConfig),
+            ]
+        );
+        $container[CacheSettingsProviderInterface::class] = $cacheSettingsProvider;
+        $container[SettingsProviderInterface::class]      = $cacheSettingsProvider;
 
-            ApplicationConfigurationInterface::class => [
-                ApplicationConfigurationInterface::KEY_IS_LOG_ENABLED => true,
-                ApplicationConfigurationInterface::KEY_IS_DEBUG       => true,
-            ],
-        ]);
         $container[LoggerInterface::class]           = new NullLogger();
         $container[ModelSchemeInfoInterface::class]  = $this->getModelSchemes();
         $container[Connection::class]                = $this->createConnection();

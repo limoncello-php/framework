@@ -18,6 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
@@ -43,8 +44,8 @@ use Limoncello\Tests\Flute\Data\Http\UsersController;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
+use Limoncello\Tests\Flute\Data\Package\CacheSettingsProvider;
 use Limoncello\Tests\Flute\Data\Package\Flute;
-use Limoncello\Tests\Flute\Data\Package\SettingsProvider;
 use Limoncello\Tests\Flute\Data\Schemes\BoardSchema;
 use Limoncello\Tests\Flute\Data\Schemes\CategorySchema;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
@@ -1175,13 +1176,21 @@ EOT;
             return new ParametersMapper($container->get(JsonSchemesInterface::class));
         };
 
-        $appConfig                                     = [];
         $container[Connection::class]                  = $connection = $this->initDb();
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(10, 100);
-        $container[SettingsProviderInterface::class]   = new SettingsProvider([
-            FluteSettings::class => (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get($appConfig),
-        ]);
-        $container[EncoderInterface::class]            =
+
+        $appConfig                                        = [];
+        $cacheSettingsProvider                            = new CacheSettingsProvider(
+            $appConfig,
+            [
+                FluteSettings::class =>
+                    (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get($appConfig),
+            ]
+        );
+        $container[CacheSettingsProviderInterface::class] = $cacheSettingsProvider;
+        $container[SettingsProviderInterface::class]      = $cacheSettingsProvider;
+
+        $container[EncoderInterface::class] =
             function (ContainerInterface $container) use ($factory, $jsonSchemes) {
                 /** @var SettingsProviderInterface $provider */
                 $provider = $container->get(SettingsProviderInterface::class);

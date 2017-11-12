@@ -16,23 +16,31 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
+use LogicException;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class SettingsProvider implements SettingsProviderInterface
+class CacheSettingsProvider implements CacheSettingsProviderInterface
 {
+    /**
+     * @var array
+     */
+    private $appConf;
+
     /**
      * @var array
      */
     private $settings;
 
     /**
+     * @param array $appConf
      * @param array $settings
      */
-    public function __construct(array $settings)
+    public function __construct(array $appConf, array $settings)
     {
+        $this->appConf  = $appConf;
         $this->settings = $settings;
     }
 
@@ -50,5 +58,37 @@ class SettingsProvider implements SettingsProviderInterface
     public function get(string $className): array
     {
         return $this->settings[$className];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function serialize(): array
+    {
+        throw new LogicException('Not implemented in test mock-up.');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function unserialize(array $serialized): void
+    {
+        throw new LogicException('Not implemented in test mock-up.');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getApplicationConfiguration(): array
+    {
+        return $this->appConf;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCoreData(): array
+    {
+        throw new LogicException('Not implemented in test mock-up.');
     }
 }
