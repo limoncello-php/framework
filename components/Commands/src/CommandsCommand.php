@@ -137,7 +137,7 @@ class CommandsCommand extends BaseCommand
                 continue;
             }
 
-            $inOut->writeInfo("Found command class `$commandClass`." . PHP_EOL);
+            $inOut->writeInfo("Found command class `$commandClass`." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
 
             $commandClasses[] = $this->commandClassToArray($commandClass);
         }
