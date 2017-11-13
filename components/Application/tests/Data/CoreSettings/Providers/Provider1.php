@@ -22,12 +22,14 @@ use Limoncello\Contracts\Application\RoutesConfiguratorInterface as RCI;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Provider\ProvidesCommandsInterface as PrCmdI;
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as PrCCI;
+use Limoncello\Contracts\Provider\ProvidesMessageResourcesInterface as MRI;
 use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as PrMI;
 use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface as PrRCI;
 use Limoncello\Contracts\Provider\ProvidesSettingsInterface as PrSI;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Tests\Application\Data\CoreSettings\Middleware\PluginMiddleware;
+use Limoncello\Tests\Application\Data\L10n\SampleEnUsMessages;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,7 +38,7 @@ use Zend\Diactoros\Response\EmptyResponse;
 /**
  * @package Limoncello\Tests\Application
  */
-class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI, PrCmdI
+class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI, PrCmdI, MRI
 {
     /**
      * @inheritdoc
@@ -126,5 +128,15 @@ class Provider1 implements PrCCI, PrMI, PrRCI, PrSI, CCI, RCI, PrCmdI
         assert(($parameters && $container && $request) || true);
 
         return new EmptyResponse();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getMessageDescriptions(): array
+    {
+        return [
+            ['en_US', 'sample.messages.namespace', SampleEnUsMessages::class],
+        ];
     }
 }

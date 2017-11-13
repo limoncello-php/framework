@@ -30,9 +30,9 @@ class FormatterTest extends TestCase
     /**
      * Test translate.
      */
-    public function testFormatter()
+    public function testFormatter(): void
     {
-        $storageData = (new FileBundleEncoder(TranslatorTest::RESOURCES_DIR))->getStorageData('en');
+        $storageData = (new FileBundleEncoder(null, TranslatorTest::RESOURCES_DIR))->getStorageData('en');
         $formatter   = new Formatter('de', 'Messages', new Translator(new BundleStorage($storageData)));
 
         $this->assertEquals('Hallo Welt', $formatter->formatMessage('Hello World'));

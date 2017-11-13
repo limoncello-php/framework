@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
+use Limoncello\Contracts\Provider\ProvidesMessageResourcesInterface;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\l10n\Messages\FileBundleEncoder;
 
@@ -37,10 +39,17 @@ abstract class L10nSettings implements SettingsInterface
     protected const KEY_LAST = self::KEY_LOCALES_DATA;
 
     /**
+     * @var array
+     */
+    private $appConfig;
+
+    /**
      * @inheritdoc
      */
     final public function get(array $appConfig): array
     {
+        $this->appConfig = $appConfig;
+
         $defaults = $this->getSettings();
 
         $defaultLocale = $defaults[static::KEY_DEFAULT_LOCALE] ?? null;
@@ -52,8 +61,10 @@ abstract class L10nSettings implements SettingsInterface
             "Invalid Locales folder `$localesFolder`."
         );
 
+        $bundleEncoder = new FileBundleEncoder($this->getMessageDescriptionsFromProviders(), $localesFolder);
+
         return $defaults + [
-                static::KEY_LOCALES_DATA => (new FileBundleEncoder($localesFolder))->getStorageData($defaultLocale),
+                static::KEY_LOCALES_DATA => $bundleEncoder->getStorageData($defaultLocale),
             ];
     }
 
@@ -65,5 +76,30 @@ abstract class L10nSettings implements SettingsInterface
         return [
             static::KEY_DEFAULT_LOCALE => 'en',
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getAppConfig()
+    {
+        return $this->appConfig;
+    }
+
+    /**
+     *
+     * @return iterable
+     */
+    private function getMessageDescriptionsFromProviders(): iterable
+    {
+        $providerClasses = $this->getAppConfig()[A::KEY_PROVIDER_CLASSES] ?? [];
+        foreach ($providerClasses as $class) {
+            if (in_array(ProvidesMessageResourcesInterface::class, class_implements($class)) === true) {
+                /** @var ProvidesMessageResourcesInterface $class */
+                foreach ($class::getMessageDescriptions() as $messageDescription) {
+                    yield $messageDescription;
+                }
+            }
+        }
     }
 }

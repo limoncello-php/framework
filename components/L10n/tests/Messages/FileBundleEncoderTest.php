@@ -28,9 +28,9 @@ class FileBundleEncoderTest extends TestCase
     /**
      * Test load resources from files.
      */
-    public function testLoadResources()
+    public function testLoadResources(): void
     {
-        $encoder = new FileBundleEncoder(__DIR__ . DIRECTORY_SEPARATOR . 'Resources');
+        $encoder = new FileBundleEncoder(null, __DIR__ . DIRECTORY_SEPARATOR . 'Resources');
 
         $storageData = $encoder->getStorageData('en');
         $this->assertEquals([
@@ -52,5 +52,19 @@ class FileBundleEncoderTest extends TestCase
         $storage = new BundleStorage($storageData);
         $this->assertNull($storage->get('en_US', 'Messages', 'Hello World'));
         $this->assertEquals(['Hallo Welt', 'de'], $storage->get('de_DE', 'Messages', 'Hello World'));
+    }
+
+    /**
+     * Test load resources from message descriptions.
+     */
+    public function testLoadMessageDescriptions(): void
+    {
+        $messageDescriptions = [
+            ['en_US', 'Messages', EnUsTestMessages::class],
+        ];
+
+        $encoder = new FileBundleEncoder($messageDescriptions, __DIR__ . DIRECTORY_SEPARATOR . 'Resources');
+        $storage = new BundleStorage($encoder->getStorageData('en'));
+        $this->assertEquals(['Hello World from US.', 'en_US'], $storage->get('en_US', 'Messages', 'Hello World'));
     }
 }

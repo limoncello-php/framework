@@ -20,8 +20,10 @@ use Limoncello\Application\Packages\L10n\L10nContainerConfigurator;
 use Limoncello\Application\Packages\L10n\L10nProvider;
 use Limoncello\Application\Packages\L10n\L10nSettings as C;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
 use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
@@ -78,7 +80,11 @@ class L10nPackageTest extends TestCase
             }
         };
 
-        $appSettings = [];
+        $appSettings = [
+            A::KEY_PROVIDER_CLASSES => [
+                Provider1::class,
+            ],
+        ];
         $result      = $settings->get($appSettings);
 
         return $result;

@@ -27,7 +27,7 @@ class ResourceBundleTest extends TestCase
     /**
      * Test basic get and set operations.
      */
-    public function testGetAndSetStringKeys()
+    public function testGetAndSetStringKeys(): void
     {
         $bundle = new ResourceBundle('de_DE', 'ErrorMessages', [
             'Key as a readable text' => 'Lets assume it would be german translation',

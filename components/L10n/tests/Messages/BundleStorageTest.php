@@ -27,7 +27,7 @@ class BundleStorageTest extends TestCase
     /**
      * Test basic get and set operations.
      */
-    public function testGetAndSet()
+    public function testGetAndSet(): void
     {
         $messages = [
             'Key as a readable text' => ['Lets assume it would be german translation', 'de'],

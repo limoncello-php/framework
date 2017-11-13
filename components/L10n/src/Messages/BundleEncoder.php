@@ -35,8 +35,6 @@ class BundleEncoder implements BundleEncoderInterface
      */
     public function addBundle(ResourceBundleInterface $bundle): BundleEncoderInterface
     {
-        assert($this->hasLocalizedNamespace($bundle->getLocale(), $bundle->getNamespace()) === false);
-
         $this->bundles[$bundle->getLocale()][$bundle->getNamespace()] = $bundle;
 
         return $this;
@@ -174,21 +172,6 @@ class BundleEncoder implements BundleEncoderInterface
     private function getNamespaces(string $locale): array
     {
         $result = $this->hasLocale($locale) === true ? array_keys($this->getBundles()[$locale]) : [];
-
-        return $result;
-    }
-
-    /**
-     * @param string $locale
-     * @param string $namespace
-     *
-     * @return bool
-     */
-    private function hasLocalizedNamespace(string $locale, string $namespace): bool
-    {
-        $this->assertNamespace($namespace);
-
-        $result = in_array($namespace, $this->getNamespaces($locale));
 
         return $result;
     }

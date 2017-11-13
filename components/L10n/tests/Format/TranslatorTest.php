@@ -36,9 +36,9 @@ class TranslatorTest extends TestCase
     /**
      * Test translate.
      */
-    public function testTranslateWithNonExistingDefault()
+    public function testTranslateWithNonExistingDefault(): void
     {
-        $storageData = (new FileBundleEncoder(static::RESOURCES_DIR))->getStorageData('en');
+        $storageData = (new FileBundleEncoder(null, static::RESOURCES_DIR))->getStorageData('en');
 
         /** @var TranslatorInterface $translator */
         $translator = new Translator(new BundleStorage($storageData));
@@ -56,9 +56,9 @@ class TranslatorTest extends TestCase
     /**
      * Test translate.
      */
-    public function testTranslateWithExistingDefault()
+    public function testTranslateWithExistingDefault(): void
     {
-        $storageData = (new FileBundleEncoder(static::RESOURCES_DIR))->getStorageData('de');
+        $storageData = (new FileBundleEncoder(null, static::RESOURCES_DIR))->getStorageData('de');
 
         /** @var TranslatorInterface $translator */
         $translator = new Translator(new BundleStorage($storageData));

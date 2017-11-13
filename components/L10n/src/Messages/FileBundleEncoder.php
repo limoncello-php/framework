@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+use Limoncello\Contracts\L10n\MessageStorageInterface;
 use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
 
 /**
@@ -28,12 +29,49 @@ class FileBundleEncoder extends BundleEncoder
     private $globMessagePatterns;
 
     /**
-     * @param string $localesDir
-     * @param string $globMessagePatterns
+     * @param iterable|null $messageDescriptions
+     * @param string        $localesDir
+     * @param string        $globMessagePatterns
      */
-    public function __construct(string $localesDir, $globMessagePatterns = '*.php')
+    public function __construct(
+        ?iterable $messageDescriptions,
+        string $localesDir,
+        $globMessagePatterns = '*.php'
+    ) {
+        $this
+            ->setGlobMessagePatterns($globMessagePatterns)
+            ->loadDescriptions($messageDescriptions)
+            ->loadBundles($localesDir);
+    }
+
+    /**
+     * Method is used for loading resources from packages.
+     *
+     * @see ProvidesMessageResourcesInterface
+     *
+     * @param iterable|null $messageDescriptions
+     *
+     * @return FileBundleEncoder
+     */
+    protected function loadDescriptions(?iterable $messageDescriptions): self
     {
-        $this->setGlobMessagePatterns($globMessagePatterns)->loadBundles($localesDir);
+        if ($messageDescriptions !== null) {
+            foreach ($messageDescriptions as list($locale, $namespace, $messageStorage)) {
+                assert(is_string($locale) === true && empty($locale) === false);
+                assert(is_string($namespace) === true && empty($namespace) === false);
+                assert(is_string($messageStorage) === true && empty($messageStorage) === false);
+                assert(class_exists($messageStorage) === true);
+                assert(in_array(MessageStorageInterface::class, class_implements($messageStorage)) === true);
+
+                /** @var MessageStorageInterface $messageStorage */
+
+                $properties = $messageStorage::getMessages();
+                $bundle     = new ResourceBundle($locale, $namespace, $properties);
+                $this->addBundle($bundle);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -55,7 +93,7 @@ class FileBundleEncoder extends BundleEncoder
                 $localeDir = $fileOrDir;
                 foreach (glob($localeDirFullPath . $this->getGlobMessagePatterns()) as $messageFile) {
                     $namespace = pathinfo($messageFile, PATHINFO_FILENAME);
-                    $bundle = $this->loadBundleFromFile($messageFile, $localeDir, $namespace);
+                    $bundle    = $this->loadBundleFromFile($messageFile, $localeDir, $namespace);
                     $this->addBundle($bundle);
                 }
             }

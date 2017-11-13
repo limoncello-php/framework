@@ -29,7 +29,7 @@ class BundleEncoderTest extends TestCase
     /**
      * Test basic get and set operations.
      */
-    public function testGetAndSet()
+    public function testGetAndSet(): void
     {
         $encoder = new BundleEncoder();
         $encoder->addBundle(new ResourceBundle('en_US', 'ErrorMessages', [
