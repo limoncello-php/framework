@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
@@ -107,13 +108,20 @@ class PassportSettings implements SettingsInterface
     const KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER = self::KEY_USER_SCOPE_VALIDATOR + 1;
 
     /** Config key */
-    const KEY_LAST = self::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER;
+    protected const KEY_LAST = self::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER;
+
+    /**
+     * @var array
+     */
+    private $appConfig;
 
     /**
      * @inheritdoc
      */
     final public function get(array $appConfig): array
     {
+        $this->appConfig = $appConfig;
+
         $defaults = $this->getSettings();
 
         $credentialsValidator = $defaults[static::KEY_USER_CREDENTIALS_VALIDATOR];
@@ -194,11 +202,21 @@ class PassportSettings implements SettingsInterface
      */
     protected function getSettings(): array
     {
+        $appConfig = $this->getAppConfig();
+
         return [
-            static::KEY_IS_LOG_ENABLED                       => false,
+            static::KEY_IS_LOG_ENABLED                       => (bool)($appConfig[A::KEY_IS_LOG_ENABLED] ?? false),
             static::KEY_CODE_EXPIRATION_TIME_IN_SECONDS      => 10 * 60,
             static::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS     => 60 * 60,
             static::KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH => true,
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getAppConfig()
+    {
+        return $this->appConfig;
     }
 }

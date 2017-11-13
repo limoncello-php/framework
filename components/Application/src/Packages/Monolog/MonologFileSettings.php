@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Monolog\Logger;
 
@@ -43,10 +44,17 @@ class MonologFileSettings implements SettingsInterface
     protected const KEY_LAST = self::KEY_LOG_LEVEL;
 
     /**
+     * @var array
+     */
+    private $appConfig;
+
+    /**
      * @inheritdoc
      */
     final public function get(array $appConfig): array
     {
+        $this->appConfig = $appConfig;
+
         $defaults = $this->getSettings();
 
         $logFolder = $defaults[static::KEY_LOG_FOLDER] ?? null;
@@ -67,10 +75,22 @@ class MonologFileSettings implements SettingsInterface
      */
     protected function getSettings(): array
     {
+        $appConfig = $this->getAppConfig();
+
+        $isDebug = (bool)($appConfig[A::KEY_IS_DEBUG] ?? false);
+
         return [
-            static::KEY_IS_ENABLED => false,
-            static::KEY_LOG_LEVEL  => Logger::DEBUG,
+            static::KEY_IS_ENABLED => (bool)($appConfig[A::KEY_IS_LOG_ENABLED] ?? false),
+            static::KEY_LOG_LEVEL  => $isDebug === true ? Logger::DEBUG : Logger::INFO,
             static::KEY_LOG_FILE   => 'limoncello.log',
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getAppConfig()
+    {
+        return $this->appConfig;
     }
 }

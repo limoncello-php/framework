@@ -52,17 +52,28 @@ class CorsPackageTest extends TestCase
     {
         $container = new Container();
 
+        $appConfig = [
+            A::KEY_IS_DEBUG          => true,
+            A::KEY_IS_LOG_ENABLED    => true,
+            A::KEY_APP_ORIGIN_SCHEME => 'http',
+            A::KEY_APP_ORIGIN_HOST   => 'localhost',
+            A::KEY_APP_ORIGIN_PORT   => '8080',
+        ];
+
         /** @var Mock $provider */
         $provider                                         = Mockery::mock(CacheSettingsProviderInterface::class);
         $container[SettingsProviderInterface::class]      = $provider;
         $container[CacheSettingsProviderInterface::class] = $provider;
         $container[LoggerInterface::class]                = new NullLogger();
-        $provider->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()->andReturn([
-            A::KEY_IS_DEBUG => true,
-        ]);
-        $appSettings                       = [];
-        $corsConfig                        = (new C())->get($appSettings);
-        $corsConfig[C::KEY_LOG_IS_ENABLED] = true;
+        $provider->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()->andReturn($appConfig);
+
+        $corsConfig = (new C())->get($appConfig);
+        // check CORS config uses application configuration
+        $this->assertEquals([
+            C::KEY_SERVER_ORIGIN_SCHEME => 'http',
+            C::KEY_SERVER_ORIGIN_HOST   => 'localhost',
+            C::KEY_SERVER_ORIGIN_PORT   => '8080',
+        ], $corsConfig[C::KEY_SERVER_ORIGIN]);
         $provider->shouldReceive('get')->once()->with(C::class)->andReturn($corsConfig);
 
         CorsContainerConfigurator::configureContainer($container);

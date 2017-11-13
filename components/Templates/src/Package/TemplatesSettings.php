@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -51,10 +52,17 @@ class TemplatesSettings implements SettingsInterface
     protected const KEY_LAST = self::KEY_TEMPLATES_LIST;
 
     /**
+     * @var array
+     */
+    private $appConfig;
+
+    /**
      * @inheritdoc
      */
     final public function get(array $appConfig): array
     {
+        $this->appConfig = $appConfig;
+
         $defaults = $this->getSettings();
 
         $templatesFolder   = $defaults[static::KEY_TEMPLATES_FOLDER] ?? null;
@@ -94,11 +102,23 @@ class TemplatesSettings implements SettingsInterface
      */
     protected function getSettings(): array
     {
+        $appConfig = $this->getAppConfig();
+
+        $isDebug = (bool)($appConfig[A::KEY_IS_DEBUG] ?? false);
+
         return [
-            static::KEY_IS_DEBUG            => false,
-            static::KEY_IS_AUTO_RELOAD      => false,
+            static::KEY_IS_DEBUG            => $isDebug,
+            static::KEY_IS_AUTO_RELOAD      => $isDebug,
             static::KEY_TEMPLATES_FILE_MASK => '*.twig',
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getAppConfig()
+    {
+        return $this->appConfig;
     }
 
     /**

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Neomerx\Cors\Strategies\Settings;
 
@@ -73,10 +74,17 @@ class CorsSettings implements SettingsInterface
     protected const KEY_LAST = self::KEY_LOG_IS_ENABLED;
 
     /**
+     * @var array
+     */
+    private $appConfig;
+
+    /**
      * @inheritdoc
      */
     final public function get(array $appConfig): array
     {
+        $this->appConfig = $appConfig;
+
         return $this->getSettings();
     }
 
@@ -97,8 +105,34 @@ class CorsSettings implements SettingsInterface
             }
         })->getHiddenDefaults();
 
-        $defaults[static::KEY_LOG_IS_ENABLED] = false;
+        $appConfig = $this->getAppConfig();
+
+        $defaults[static::KEY_LOG_IS_ENABLED] = (bool)($appConfig[A::KEY_IS_LOG_ENABLED] ?? false);
+
+        if (array_key_exists(A::KEY_APP_ORIGIN_SCHEME, $appConfig) === true &&
+            array_key_exists(A::KEY_APP_ORIGIN_HOST, $appConfig) === true &&
+            array_key_exists(A::KEY_APP_ORIGIN_PORT, $appConfig) === true
+        ) {
+            /**
+             * Array should be in parse_url() result format.
+             *
+             * @see http://php.net/manual/function.parse-url.php
+             */
+            $defaults[static::KEY_SERVER_ORIGIN] = [
+                static::KEY_SERVER_ORIGIN_SCHEME => (string)$appConfig[A::KEY_APP_ORIGIN_SCHEME],
+                static::KEY_SERVER_ORIGIN_HOST   => (string)$appConfig[A::KEY_APP_ORIGIN_HOST],
+                static::KEY_SERVER_ORIGIN_PORT   => (string)$appConfig[A::KEY_APP_ORIGIN_PORT],
+            ];
+        }
 
         return $defaults;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getAppConfig()
+    {
+        return $this->appConfig;
     }
 }
