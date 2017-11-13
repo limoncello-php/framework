@@ -42,7 +42,7 @@ class FormatterFactory implements FormatterFactoryInterface
     public function createFormatterForLocale(string $namespace, string $locale): FormatterInterface
     {
         $dirPath   = implode(DIRECTORY_SEPARATOR, [__DIR__, 'res', 'Messages']);
-        $storage   = (new FileBundleEncoder($dirPath))->getStorageData('En');
+        $storage   = (new FileBundleEncoder(null, $dirPath))->getStorageData('En');
         $formatter = new Formatter($locale, $namespace, new Translator(new BundleStorage($storage)));
 
         return $formatter;
