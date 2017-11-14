@@ -12,9 +12,9 @@ cli_7_1_php:
   working_dir: /app
   tty: true
 
-cli_7_0_php:
-  build: ./../../docker/7_0_cli
-  container_name: cli_7_0_php_limoncello
+cli_7_2_php:
+  build: ./../../docker/7_2_cli
+  container_name: cli_7_2_php_limoncello
   volumes:
     - .:/app
   working_dir: /app

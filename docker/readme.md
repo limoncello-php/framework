@@ -10,23 +10,23 @@ $ docker-compose
 When you have `docker-compose` installed on your machine you can execute in each component's root (`./components/<Component Name>`) the following commands
 
 ```bash
-$ composer test-unit-php-7-0
 $ composer test-unit-php-7-1
+$ composer test-unit-php-7-2
 ```
 
 First run will download docker image and install necessary PHP extensions (it will take some time and produce rather scary output) however further runs will be very fast and produce something like
 
 ```
-> docker-compose run --rm cli_7_0_php php ./vendor/bin/phpunit
-PHPUnit 5.7.16 by Sebastian Bergmann and contributors.
+> docker-compose run --rm cli_7_2_php php ./vendor/bin/phpunit
+PHPUnit 6.4.4 by Sebastian Bergmann and contributors.
 
-Runtime:       PHP 7.0.17
+Runtime:       PHP 7.2.0RC6
 Configuration: /app/phpunit.xml
 
-...............................................................  63 / 116 ( 54%)
-.....................................................           116 / 116 (100%)
+................................................................. 65 / 93 ( 69%)
+............................                                      93 / 93 (100%)
 
-Time: 1.69 seconds, Memory: 16.00MB
+Time: 157 ms, Memory: 16.00MB
 
-OK (116 tests, 700 assertions)
+OK (93 tests, 304 assertions)
 ```

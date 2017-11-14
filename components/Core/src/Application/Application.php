@@ -439,9 +439,11 @@ abstract class Application implements ApplicationInterface
         PsrContainerInterface $container,
         array $middleware = null
     ): Closure {
-        $start = count($middleware) - 1;
-        for ($index = $start; $index >= 0; $index--) {
-            $handler = $this->createMiddlewareChainLink($handler, $middleware[$index], $container);
+        if (empty($middleware) === false) {
+            $start = count($middleware) - 1;
+            for ($index = $start; $index >= 0; $index--) {
+                $handler = $this->createMiddlewareChainLink($handler, $middleware[$index], $container);
+            }
         }
 
         return $handler;
