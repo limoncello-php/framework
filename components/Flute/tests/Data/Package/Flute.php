@@ -17,6 +17,8 @@
  */
 
 use Generator;
+use Limoncello\Flute\Contracts\Validation\FormRuleSetInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
 use Limoncello\Flute\Package\FluteSettings;
 
 /**
@@ -32,7 +34,12 @@ class Flute extends FluteSettings
     /**
      * @var string[]
      */
-    private $validationRuleSets;
+    private $jsonValRuleSets;
+
+    /**
+     * @var string[]
+     */
+    private $formValRuleSets;
 
     /**
      * @var string
@@ -46,15 +53,17 @@ class Flute extends FluteSettings
 
     /**
      * @param string[] $modelToSchemeMap
-     * @param string[] $validationRuleSets
+     * @param string[] $jsonRuleSets
+     * @param string[] $formRuleSets
      */
-    public function __construct(array $modelToSchemeMap = [], array $validationRuleSets = [])
+    public function __construct(array $modelToSchemeMap, array $jsonRuleSets, array $formRuleSets)
     {
         $this->schemesPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Schemes']);
         $this->validatorsPath = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', '**']);
 
-        $this->modelToSchemeMap   = $modelToSchemeMap;
-        $this->validationRuleSets = $validationRuleSets;
+        $this->modelToSchemeMap = $modelToSchemeMap;
+        $this->jsonValRuleSets  = $jsonRuleSets;
+        $this->formValRuleSets  = $formRuleSets;
     }
 
     /**
@@ -63,8 +72,9 @@ class Flute extends FluteSettings
     protected function getSettings(): array
     {
         return parent::getSettings() + [
-                static::KEY_SCHEMES_FOLDER    => $this->schemesPath,
-                static::KEY_VALIDATORS_FOLDER => $this->validatorsPath,
+                static::KEY_SCHEMES_FOLDER         => $this->schemesPath,
+                static::KEY_JSON_VALIDATORS_FOLDER => $this->validatorsPath,
+                static::KEY_FORM_VALIDATORS_FOLDER => $this->validatorsPath,
             ];
     }
 
@@ -82,8 +92,15 @@ class Flute extends FluteSettings
             }
         } else {
             assert($path === $this->validatorsPath . DIRECTORY_SEPARATOR . $validatorsFileMask);
-            foreach ($this->getValidationRuleSets() as $ruleSet) {
-                yield $ruleSet;
+            if ($implementClassName === JsonApiRuleSetInterface::class) {
+                foreach ($this->getJsonValidationRuleSets() as $ruleSet) {
+                    yield $ruleSet;
+                }
+            } else {
+                assert($implementClassName === FormRuleSetInterface::class);
+                foreach ($this->getFormValidationRuleSets() as $ruleSet) {
+                    yield $ruleSet;
+                }
             }
         }
     }
@@ -99,8 +116,16 @@ class Flute extends FluteSettings
     /**
      * @return string[]
      */
-    private function getValidationRuleSets(): array
+    private function getJsonValidationRuleSets(): array
     {
-        return $this->validationRuleSets;
+        return $this->jsonValRuleSets;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getFormValidationRuleSets(): array
+    {
+        return $this->formValRuleSets;
     }
 }

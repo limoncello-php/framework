@@ -15,6 +15,7 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
@@ -24,7 +25,8 @@ use Limoncello\Flute\Types\DateJsonApiStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
 use Limoncello\Flute\Types\JsonApiDateTimeType;
 use Limoncello\Flute\Types\JsonApiDateType;
-use Limoncello\Flute\Validation\Execution\JsonApiValidatorFactory;
+use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
+use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiValidatorFactory;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -91,6 +93,12 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
         $container[JsonApiValidatorFactoryInterface::class] = function (PsrContainerInterface $container) {
             $factory = new JsonApiValidatorFactory($container);
+
+            return $factory;
+        };
+
+        $container[FormValidatorFactoryInterface::class] = function (PsrContainerInterface $container) {
+            $factory = new FormValidatorFactory($container);
 
             return $factory;
         };

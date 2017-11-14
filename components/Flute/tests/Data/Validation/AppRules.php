@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Validation\Rules\ExistInDatabaseTrait;
-use Limoncello\Flute\Validation\Rules\RelationshipsTrait;
+use Limoncello\Flute\Validation\JsonApi\Rules\ExistInDatabaseTrait;
+use Limoncello\Flute\Validation\JsonApi\Rules\RelationshipsTrait;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;

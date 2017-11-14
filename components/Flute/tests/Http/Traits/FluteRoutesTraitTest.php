@@ -18,7 +18,7 @@
 
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Flute\Http\Traits\FluteRoutesTrait;
-use Limoncello\Tests\Flute\Data\Http\CategoriesController;
+use Limoncello\Tests\Flute\Data\Http\ApiCategoriesController;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\TestCase;
 use Mockery;
@@ -44,7 +44,7 @@ class FluteRoutesTraitTest extends TestCase
 
         /** @var GroupInterface $group */
 
-        $this->controller($group, '/categories', CategoriesController::class);
+        $this->controller($group, '/categories', ApiCategoriesController::class);
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
@@ -65,7 +65,7 @@ class FluteRoutesTraitTest extends TestCase
 
         /** @var GroupInterface $group */
 
-        $this->resource($group, CategoriesController::class);
+        $this->resource($group, ApiCategoriesController::class);
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
@@ -86,7 +86,7 @@ class FluteRoutesTraitTest extends TestCase
         $this->relationship(
             $group,
             Category::REL_CHILDREN,
-            CategoriesController::class,
+            ApiCategoriesController::class,
             'readChildren'
         );
 

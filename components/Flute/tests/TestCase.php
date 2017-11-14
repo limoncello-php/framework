@@ -43,9 +43,9 @@ use Limoncello\Tests\Flute\Data\Schemes\RoleSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
-use Limoncello\Tests\Flute\Data\Validation\RuleSets\CreateCommentRuleSet;
-use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateCommentRuleSet;
-use Limoncello\Tests\Flute\Data\Validation\RuleSets\UpdateUserMinimalRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\CreateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateUserMinimalRuleSet;
 use Mockery;
 
 /**
@@ -241,12 +241,22 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    protected function getValidationRuleSets()
+    protected function getJsonValidationRuleSets()
     {
         return [
             CreateCommentRuleSet::class,
             UpdateCommentRuleSet::class,
             UpdateUserMinimalRuleSet::class,
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFormValidationRuleSets()
+    {
+        return [
+            Data\Validation\FormRuleSets\CreateCommentRuleSet::class,
         ];
     }
 }

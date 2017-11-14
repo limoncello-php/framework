@@ -18,7 +18,7 @@
 
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
-use Limoncello\Flute\Validation\Validator;
+use Limoncello\Flute\Package\FluteSettings;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -35,7 +35,7 @@ trait HasValidationFormatterTrait
     {
         /** @var FormatterFactoryInterface $factory */
         $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
-        $formatter = $factory->createFormatter(Validator::RESOURCES_NAMESPACE);
+        $formatter = $factory->createFormatter(FluteSettings::VALIDATION_NAMESPACE);
 
         return $formatter;
     }

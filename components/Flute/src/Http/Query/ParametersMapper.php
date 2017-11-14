@@ -295,7 +295,7 @@ class ParametersMapper implements ParametersMapperInterface
                 yield $relationship->getNameInModel();
             }
         };
-        $mappedIncludes     = $this->getMappedIncludes();
+        $mappedIncludes      = $this->getMappedIncludes();
         $getIncludes         = function () use ($mappedIncludes, $includeAsModelNames) : iterable {
             foreach ($mappedIncludes as $relationships) {
                 yield $includeAsModelNames($relationships);
@@ -326,8 +326,7 @@ class ParametersMapper implements ParametersMapperInterface
             if ($filter->getRelationship() === null) {
                 $attributeFilters[$attributeName] = $filter->getOperationsWithArguments();
             } else {
-                $relationshipName                                                              =
-                    $filter->getRelationship()->getNameInModel();
+                $relationshipName = $filter->getRelationship()->getNameInModel();
                 $relFiltersAndSorts[$relationshipName][self::REL_FILTER_INDEX][$attributeName] =
                     $filter->getOperationsWithArguments();
             }
@@ -338,10 +337,8 @@ class ParametersMapper implements ParametersMapperInterface
             if ($sort->getRelationship() === null) {
                 $attributeSorts[$attributeName] = $sort->isAsc();
             } else {
-                $relationshipName                                                            =
-                    $sort->getRelationship()->getNameInModel();
-                $relFiltersAndSorts[$relationshipName][self::REL_SORT_INDEX][$attributeName] =
-                    $sort->isAsc();
+                $relationshipName = $sort->getRelationship()->getNameInModel();
+                $relFiltersAndSorts[$relationshipName][self::REL_SORT_INDEX][$attributeName] = $sort->isAsc();
             }
         }
 

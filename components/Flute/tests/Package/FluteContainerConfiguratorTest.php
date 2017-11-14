@@ -30,6 +30,7 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Package\FluteContainerConfigurator;
 use Limoncello\Flute\Package\FluteSettings;
@@ -60,7 +61,11 @@ class FluteContainerConfiguratorTest extends TestCase
             $appConfig,
             [
                 FluteSettings::class =>
-                    (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get($appConfig),
+                    (new Flute(
+                        $this->getSchemeMap(),
+                        $this->getJsonValidationRuleSets(),
+                        $this->getFormValidationRuleSets()
+                    ))->get($appConfig),
             ]
         );
         $container[CacheSettingsProviderInterface::class] = $cacheSettingsProvider;
@@ -82,5 +87,6 @@ class FluteContainerConfiguratorTest extends TestCase
         $this->assertNotNull($container->get(ParametersMapperInterface::class));
         $this->assertNotNull($container->get(PaginationStrategyInterface::class));
         $this->assertNotNull($container->get(JsonApiValidatorFactoryInterface::class));
+        $this->assertNotNull($container->get(FormValidatorFactoryInterface::class));
     }
 }

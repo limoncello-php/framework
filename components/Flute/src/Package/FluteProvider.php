@@ -5,7 +5,6 @@ use Limoncello\Contracts\Provider\ProvidesMessageResourcesInterface;
 use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Resources\Messages\En\Generic;
 use Limoncello\Flute\Resources\Messages\En\Validation;
-use Limoncello\Flute\Validation\Validator;
 
 /**
  * @package Limoncello\Flute
@@ -20,7 +19,7 @@ class FluteProvider implements ProvidesContainerConfiguratorsInterface, Provides
     /**
      * Namespace for string resources.
      */
-    const VALIDATION_NAMESPACE = Validator::RESOURCES_NAMESPACE;
+    const VALIDATION_NAMESPACE = FluteSettings::VALIDATION_NAMESPACE;
 
     /**
      * @inheritdoc

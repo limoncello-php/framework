@@ -29,18 +29,21 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
 use Limoncello\Flute\Http\Query\QueryParser;
 use Limoncello\Flute\Package\FluteSettings;
-use Limoncello\Flute\Validation\Execution\JsonApiValidatorFactory;
+use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
+use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiValidatorFactory;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
-use Limoncello\Tests\Flute\Data\Http\BoardsController;
-use Limoncello\Tests\Flute\Data\Http\CategoriesController;
-use Limoncello\Tests\Flute\Data\Http\CommentsController;
-use Limoncello\Tests\Flute\Data\Http\PostsController;
-use Limoncello\Tests\Flute\Data\Http\UsersController;
+use Limoncello\Tests\Flute\Data\Http\ApiBoardsController;
+use Limoncello\Tests\Flute\Data\Http\ApiCategoriesController;
+use Limoncello\Tests\Flute\Data\Http\ApiCommentsControllerApi;
+use Limoncello\Tests\Flute\Data\Http\ApiPostsController;
+use Limoncello\Tests\Flute\Data\Http\ApiUsersController;
+use Limoncello\Tests\Flute\Data\Http\FormCommentsController;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
@@ -83,7 +86,7 @@ class ControllerTest extends TestCase
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::index($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::index($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -115,7 +118,7 @@ class ControllerTest extends TestCase
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::index($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::index($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -169,7 +172,7 @@ class ControllerTest extends TestCase
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::index($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::index($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -215,7 +218,7 @@ class ControllerTest extends TestCase
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::index($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::index($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -259,7 +262,7 @@ class ControllerTest extends TestCase
 
         $exception = null;
         try {
-            CommentsController::index($routeParams, $container, $request);
+            ApiCommentsControllerApi::index($routeParams, $container, $request);
         } catch (JsonApiException $exception) {
         }
         $this->assertNotNull($exception);
@@ -293,7 +296,7 @@ class ControllerTest extends TestCase
 
         /** @var ServerRequestInterface $request */
 
-        $response = BoardsController::index($routeParams, $container, $request);
+        $response = ApiBoardsController::index($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -325,7 +328,7 @@ class ControllerTest extends TestCase
         // replace paging strategy to get paginated results in the relationship
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(3, 100);
 
-        $response = BoardsController::index($routeParams, $container, $request);
+        $response = ApiBoardsController::index($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -364,7 +367,7 @@ class ControllerTest extends TestCase
 
         /** @var ServerRequestInterface $request */
 
-        $response = CategoriesController::index($routeParams, $container, $request);
+        $response = ApiCategoriesController::index($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -387,7 +390,7 @@ class ControllerTest extends TestCase
      */
     public function testReadToOneRelationship(): void
     {
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => '2'];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => '2'];
         $queryParams = [];
         $container   = $this->createContainer();
         $uri         = new Uri('http://localhost.local/comments/2/users?' . http_build_query($queryParams));
@@ -401,7 +404,7 @@ class ControllerTest extends TestCase
         // replace paging strategy to get paginated results in the relationship
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(3, 100);
 
-        $response = CommentsController::readUser($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::readUser($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -439,7 +442,7 @@ class ControllerTest extends TestCase
 
         /** @var ServerRequestInterface $request */
 
-        $response = UsersController::index($routeParams, $container, $request);
+        $response = ApiUsersController::index($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -484,7 +487,8 @@ class ControllerTest extends TestCase
         try {
             // disable index filtering for this test
             CommentsApi::$isFilterIndexForCurrentUser = false;
-            $response                                 = CommentsController::index($routeParams, $container, $request);
+
+            $response = ApiCommentsControllerApi::index($routeParams, $container, $request);
         } finally {
             CommentsApi::$isFilterIndexForCurrentUser = CommentsApi::DEBUG_KEY_DEFAULT_FILTER_INDEX;
         }
@@ -548,7 +552,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::create($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::create($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(201, $response->getStatusCode());
         $this->assertEquals(['/comments/101'], $response->getHeader('Location'));
@@ -559,11 +563,27 @@ EOT;
     }
 
     /**
+     * Controller test (form validator).
+     */
+    public function testFormCreate(): void
+    {
+        $routeParams = [];
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        /** @var ServerRequestInterface $request */
+
+        $container = $this->createContainer();
+
+        $response = FormCommentsController::create($routeParams, $container, $request);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
      * Controller test.
      */
     public function testReadWithoutParameters(): void
     {
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => '10'];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => '10'];
         $container   = $this->createContainer();
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
@@ -572,7 +592,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::read($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::read($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -617,7 +637,7 @@ EOT;
         }
 EOT;
 
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => $index];
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
@@ -626,7 +646,7 @@ EOT;
         /** @var ServerRequestInterface $request */
 
         $container = $this->createContainer();
-        $response  = CommentsController::update($routeParams, $container, $request);
+        $response  = ApiCommentsControllerApi::update($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -674,7 +694,7 @@ EOT;
         }
 EOT;
 
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => $index];
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
@@ -684,7 +704,7 @@ EOT;
         $container = $this->createContainer();
         $exception = null;
         try {
-            CommentsController::update($routeParams, $container, $request);
+            ApiCommentsControllerApi::update($routeParams, $container, $request);
         } catch (JsonApiException $exception) {
         }
         $this->assertNotNull($exception);
@@ -714,7 +734,7 @@ EOT;
         }
 EOT;
 
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index2];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => $index2];
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
@@ -724,7 +744,7 @@ EOT;
         $container = $this->createContainer();
         $exception = null;
         try {
-            CommentsController::update($routeParams, $container, $request);
+            ApiCommentsControllerApi::update($routeParams, $container, $request);
         } catch (JsonApiException $exception) {
         }
         $this->assertNotNull($exception);
@@ -742,7 +762,7 @@ EOT;
         $index     = '1';
         $jsonInput = '{';
 
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => $index];
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
@@ -751,7 +771,7 @@ EOT;
 
         $exception = null;
         try {
-            CommentsController::update($routeParams, $this->createContainer(), $request);
+            ApiCommentsControllerApi::update($routeParams, $this->createContainer(), $request);
         } catch (JsonApiException $exception) {
         }
         $this->assertNotNull($exception);
@@ -779,7 +799,7 @@ EOT;
         }
 EOT;
 
-        $routeParams = [UsersController::ROUTE_KEY_INDEX => $index];
+        $routeParams = [ApiUsersController::ROUTE_KEY_INDEX => $index];
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
@@ -787,7 +807,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $response = UsersController::update($routeParams, $this->createContainer(), $request);
+        $response = ApiUsersController::update($routeParams, $this->createContainer(), $request);
 
         $this->assertEquals(404, $response->getStatusCode());
     }
@@ -816,7 +836,7 @@ EOT;
         // check the item is in the database
         $this->assertNotEmpty($connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $index")->fetch());
 
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => $index];
 
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
@@ -824,7 +844,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::delete($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::delete($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(204, $response->getStatusCode());
 
@@ -838,7 +858,7 @@ EOT;
     public function testReadRelationship(): void
     {
         $index       = '2';
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => $index];
         $queryParams = [
             'sort' => '+' . EmotionSchema::ATTR_NAME,
         ];
@@ -851,7 +871,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::readEmotions($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::readEmotions($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -872,7 +892,7 @@ EOT;
     public function testReadRelationshipIdentifiers(): void
     {
         $index       = '2';
-        $routeParams = [CommentsController::ROUTE_KEY_INDEX => $index];
+        $routeParams = [ApiCommentsControllerApi::ROUTE_KEY_INDEX => $index];
         $queryParams = [
             'sort' => '+' . EmotionSchema::ATTR_NAME,
         ];
@@ -885,7 +905,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::readEmotionsIdentifiers($routeParams, $container, $request);
+        $response = ApiCommentsControllerApi::readEmotionsIdentifiers($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -936,8 +956,8 @@ EOT;
         );
 
         $routeParams = [
-            CommentsController::ROUTE_KEY_INDEX       => (string)$postId,
-            CommentsController::ROUTE_KEY_CHILD_INDEX => (string)$commentId,
+            ApiCommentsControllerApi::ROUTE_KEY_INDEX       => (string)$postId,
+            ApiCommentsControllerApi::ROUTE_KEY_CHILD_INDEX => (string)$commentId,
         ];
 
         $newValue  = 'New text';
@@ -961,7 +981,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $this->assertNotNull($response = PostsController::updateComment($routeParams, $container, $request));
+        $this->assertNotNull($response = ApiPostsController::updateComment($routeParams, $container, $request));
         $this->assertEquals(200, $response->getStatusCode());
 
         // check value saved in the database
@@ -999,8 +1019,8 @@ EOT;
         );
 
         $routeParams = [
-            CommentsController::ROUTE_KEY_INDEX       => (string)$postId,
-            CommentsController::ROUTE_KEY_CHILD_INDEX => (string)$commentId,
+            ApiCommentsControllerApi::ROUTE_KEY_INDEX       => (string)$postId,
+            ApiCommentsControllerApi::ROUTE_KEY_CHILD_INDEX => (string)$commentId,
         ];
 
         $newValue  = 'New text';
@@ -1024,7 +1044,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $this->assertNotNull($response = PostsController::updateComment($routeParams, $container, $request));
+        $this->assertNotNull($response = ApiPostsController::updateComment($routeParams, $container, $request));
         $this->assertEquals(404, $response->getStatusCode());
     }
 
@@ -1056,8 +1076,8 @@ EOT;
         );
 
         $routeParams = [
-            CommentsController::ROUTE_KEY_INDEX       => $postId,
-            CommentsController::ROUTE_KEY_CHILD_INDEX => $commentId,
+            ApiCommentsControllerApi::ROUTE_KEY_INDEX       => $postId,
+            ApiCommentsControllerApi::ROUTE_KEY_CHILD_INDEX => $commentId,
         ];
 
         /** @var Mock $request */
@@ -1067,14 +1087,14 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $this->assertNotNull($response = PostsController::deleteComment($routeParams, $container, $request));
+        $this->assertNotNull($response = ApiPostsController::deleteComment($routeParams, $container, $request));
         $this->assertEquals(204, $response->getStatusCode());
 
         // check the item is not in the database
         $this->assertFalse($connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $commentId")->fetch());
 
         // calling `delete` again should return 404 as the resource has already been removed
-        $this->assertNotNull($response = PostsController::deleteComment($routeParams, $container, $request));
+        $this->assertNotNull($response = ApiPostsController::deleteComment($routeParams, $container, $request));
         $this->assertEquals(404, $response->getStatusCode());
     }
 
@@ -1100,7 +1120,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::index([], $container, $request);
+        $response = ApiCommentsControllerApi::index([], $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -1135,7 +1155,7 @@ EOT;
 
         /** @var ServerRequestInterface $request */
 
-        $response = CommentsController::index([], $container, $request);
+        $response = ApiCommentsControllerApi::index([], $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -1183,8 +1203,11 @@ EOT;
         $cacheSettingsProvider                            = new CacheSettingsProvider(
             $appConfig,
             [
-                FluteSettings::class =>
-                    (new Flute($this->getSchemeMap(), $this->getValidationRuleSets()))->get($appConfig),
+                FluteSettings::class => (new Flute(
+                    $this->getSchemeMap(),
+                    $this->getJsonValidationRuleSets(),
+                    $this->getFormValidationRuleSets()
+                ))->get($appConfig),
             ]
         );
         $container[CacheSettingsProviderInterface::class] = $cacheSettingsProvider;
@@ -1217,6 +1240,12 @@ EOT;
 
         $container[JsonApiValidatorFactoryInterface::class] = function (ContainerInterface $container) {
             $factory = new JsonApiValidatorFactory($container);
+
+            return $factory;
+        };
+
+        $container[FormValidatorFactoryInterface::class] = function (ContainerInterface $container) {
+            $factory = new FormValidatorFactory($container);
 
             return $factory;
         };
