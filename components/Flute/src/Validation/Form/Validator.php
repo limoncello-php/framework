@@ -62,6 +62,11 @@ class Validator extends BaseValidator implements FormValidatorInterface
     private $attributeRules;
 
     /**
+     * @var array
+     */
+    private $attributeRulesIdx;
+
+    /**
      * @param string             $name
      * @param array              $data
      * @param ContainerInterface $container
@@ -257,7 +262,8 @@ class Validator extends BaseValidator implements FormValidatorInterface
     {
         assert($this->debugCheckIndexesExist($rules));
 
-        $this->attributeRules = $rules;
+        $this->attributeRules    = $rules;
+        $this->attributeRulesIdx = FormRuleSerializer::getRulesIndexes($rules);
 
         return $this;
     }
@@ -299,8 +305,7 @@ class Validator extends BaseValidator implements FormValidatorInterface
      */
     private function getAttributeIndex(string $name): ?int
     {
-        $indexes = FormRuleSerializer::getRulesIndexes($this->getAttributeRules());
-        $index   = $indexes[$name] ?? null;
+        $index = $this->attributeRulesIdx[$name] ?? null;
 
         return $index;
     }
