@@ -37,7 +37,7 @@ final class BlockInterpreter
      * @param CaptureAggregatorInterface $captures
      * @param ErrorAggregatorInterface   $errors
      *
-     * @return void
+     * @return bool
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -47,13 +47,15 @@ final class BlockInterpreter
         ContextStorageInterface $context,
         CaptureAggregatorInterface $captures,
         ErrorAggregatorInterface $errors
-    ): void {
+    ): bool {
         $blockIndex = BlockSerializer::FIRST_BLOCK_INDEX;
 
-        $blocks = static::getBlocks($serializedBlocks);
-        static::executeStarts(static::getBlocksWithStart($serializedBlocks), $blocks, $context, $errors);
-        static::executeBlock($input, $blockIndex, $blocks, $context, $captures, $errors);
-        static::executeEnds(static::getBlocksWithEnd($serializedBlocks), $blocks, $context, $errors);
+        $blocks   = static::getBlocks($serializedBlocks);
+        $startsOk = static::executeStarts(static::getBlocksWithStart($serializedBlocks), $blocks, $context, $errors);
+        $blockOk  = static::executeBlock($input, $blockIndex, $blocks, $context, $captures, $errors);
+        $endsOk   = static::executeEnds(static::getBlocksWithEnd($serializedBlocks), $blocks, $context, $errors);
+
+        return $startsOk && $blockOk && $endsOk;
     }
 
     /**
@@ -62,7 +64,7 @@ final class BlockInterpreter
      * @param ContextStorageInterface  $context
      * @param ErrorAggregatorInterface $errors
      *
-     * @return void
+     * @return bool
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -71,15 +73,20 @@ final class BlockInterpreter
         array $blocks,
         ContextStorageInterface $context,
         ErrorAggregatorInterface $errors
-    ): void {
+    ): bool {
+        $allOk = true;
+
         foreach ($indexes as $index) {
             $context->setCurrentBlockId($index);
             $block      = $blocks[$index];
             $errorsInfo = static::executeProcedureStart($block, $context);
             if (empty($errorsInfo) === false) {
                 static::addBlockErrors($errorsInfo, $context, $errors);
+                $allOk = false;
             }
         }
+
+        return $allOk;
     }
 
     /**
@@ -88,7 +95,7 @@ final class BlockInterpreter
      * @param ContextStorageInterface  $context
      * @param ErrorAggregatorInterface $errors
      *
-     * @return void
+     * @return bool
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -97,15 +104,20 @@ final class BlockInterpreter
         array $blocks,
         ContextStorageInterface $context,
         ErrorAggregatorInterface $errors
-    ): void {
+    ): bool {
+        $allOk = true;
+
         foreach ($indexes as $index) {
             $context->setCurrentBlockId($index);
             $block      = $blocks[$index];
             $errorsInfo = static::executeProcedureEnd($block, $context);
             if (empty($errorsInfo) === false) {
                 static::addBlockErrors($errorsInfo, $context, $errors);
+                $allOk = false;
             }
         }
+
+        return $allOk;
     }
 
     /**
@@ -116,7 +128,7 @@ final class BlockInterpreter
      * @param CaptureAggregatorInterface $captures
      * @param ErrorAggregatorInterface   $errors
      *
-     * @return void
+     * @return bool
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -127,7 +139,7 @@ final class BlockInterpreter
         ContextStorageInterface $context,
         CaptureAggregatorInterface $captures,
         ErrorAggregatorInterface $errors
-    ): void {
+    ): bool {
         $result = static::executeBlockImpl(
             $input,
             $blockIndex,
@@ -138,7 +150,11 @@ final class BlockInterpreter
         if (BlockReplies::isResultSuccessful($result) === false) {
             $errorsInfo = BlockReplies::extractResultErrorsInfo($result);
             static::addBlockErrors($errorsInfo, $context, $errors);
+
+            return false;
         }
+
+        return true;
     }
 
     /**

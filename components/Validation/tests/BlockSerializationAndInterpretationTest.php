@@ -210,8 +210,9 @@ class BlockSerializationAndInterpretationTest extends TestCase
         $captures = new CaptureAggregator();
         $errors   = new ErrorAggregator();
 
-        BlockInterpreter::execute('whatever', $serialized, $context, $captures, $errors);
+        $isOk = BlockInterpreter::execute('whatever', $serialized, $context, $captures, $errors);
 
+        $this->assertTrue($isOk);
         $this->assertEquals(['name' => 'whatever'], $captures->get());
         $this->assertEmpty($errors->get());
 
@@ -239,8 +240,9 @@ class BlockSerializationAndInterpretationTest extends TestCase
         $captures = new CaptureAggregator();
         $errors   = new ErrorAggregator();
 
-        BlockInterpreter::execute('whatever', $serialized, $context, $captures, $errors);
+        $isOk = BlockInterpreter::execute('whatever', $serialized, $context, $captures, $errors);
 
+        $this->assertFalse($isOk);
         $this->assertEmpty($captures->get());
         $this->assertCount(1, $errors->get());
         /** @var ErrorInterface $error */
