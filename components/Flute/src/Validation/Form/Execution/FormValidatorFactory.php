@@ -48,7 +48,7 @@ class FormValidatorFactory implements FormValidatorFactoryInterface
         /** @var SettingsProviderInterface $settingsProvider */
         $settingsProvider = $this->getContainer()->get(SettingsProviderInterface::class);
         $settings         = $settingsProvider->get(S::class);
-        $ruleSetsData     = $settings[S::KEY_FORMS_VALIDATION_RULE_SETS_DATA];
+        $ruleSetsData     = $settings[S::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA];
         $formatter        = $this->createValidationFormatter();
         $validator        = new Validator($class, $ruleSetsData, $this->getContainer(), $formatter);
 

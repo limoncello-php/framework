@@ -17,7 +17,7 @@
  */
 
 use Generator;
-use Limoncello\Flute\Contracts\Validation\FormRuleSetInterface;
+use Limoncello\Flute\Contracts\Validation\AttributeRulesSetInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
 use Limoncello\Flute\Package\FluteSettings;
 
@@ -97,7 +97,7 @@ class Flute extends FluteSettings
                     yield $ruleSet;
                 }
             } else {
-                assert($implementClassName === FormRuleSetInterface::class);
+                assert($implementClassName === AttributeRulesSetInterface::class);
                 foreach ($this->getFormValidationRuleSets() as $ruleSet) {
                     yield $ruleSet;
                 }

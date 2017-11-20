@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Contracts\Validation;
+<?php namespace Limoncello\Flute\Contracts\Http\Query;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -19,6 +19,12 @@
 /**
  * @package Limoncello\Application
  */
-interface FormRuleSetInterface extends AttributeRulesSetInterface
+interface QueryValidatorFactoryInterface
 {
+    /**
+     * @param string $class
+     *
+     * @return QueryValidatorInterface
+     */
+    public function createValidator(string $class): QueryValidatorInterface;
 }

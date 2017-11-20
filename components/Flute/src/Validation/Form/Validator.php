@@ -257,6 +257,8 @@ class Validator extends BaseValidator implements FormValidatorInterface
      * @param array $rules
      *
      * @return self
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function setAttributeRules(array $rules): self
     {

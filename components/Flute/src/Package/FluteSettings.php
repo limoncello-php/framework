@@ -3,7 +3,7 @@
 use Generator;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Contracts\Validation\FormRuleSetInterface;
+use Limoncello\Flute\Contracts\Validation\AttributeRulesSetInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
 use Limoncello\Flute\Validation\Form\Execution\FormRuleSerializer;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiRuleSerializer;
@@ -75,10 +75,10 @@ abstract class FluteSettings implements SettingsInterface
     const KEY_JSON_VALIDATION_RULE_SETS_DATA = self::KEY_MODEL_TO_SCHEME_MAP + 1;
 
     /** Config key */
-    const KEY_FORMS_VALIDATION_RULE_SETS_DATA = self::KEY_JSON_VALIDATION_RULE_SETS_DATA + 1;
+    const KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA = self::KEY_JSON_VALIDATION_RULE_SETS_DATA + 1;
 
     /** Config key */
-    const KEY_DEFAULT_PAGING_SIZE = self::KEY_FORMS_VALIDATION_RULE_SETS_DATA + 1;
+    const KEY_DEFAULT_PAGING_SIZE = self::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA + 1;
 
     /** Config key */
     const KEY_MAX_PAGING_SIZE = self::KEY_DEFAULT_PAGING_SIZE + 1;
@@ -150,8 +150,8 @@ abstract class FluteSettings implements SettingsInterface
                 static::KEY_JSON_VALIDATION_RULE_SETS_DATA =>
                     $this->createJsonValidationRulesSetData($jsonValidatorsPath),
 
-                static::KEY_FORMS_VALIDATION_RULE_SETS_DATA =>
-                    $this->createFormsValidationRulesSetData($formsValidatorsPath),
+                static::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA =>
+                    $this->createValidationAttributeRulesSetData($formsValidatorsPath),
             ];
     }
 
@@ -259,18 +259,18 @@ abstract class FluteSettings implements SettingsInterface
      *
      * @return array
      */
-    private function createFormsValidationRulesSetData(string $validatorsPath): array
+    private function createValidationAttributeRulesSetData(string $validatorsPath): array
     {
         $serializer = new FormRuleSerializer();
-        foreach ($this->selectClasses($validatorsPath, FormRuleSetInterface::class) as $setClass) {
+        foreach ($this->selectClasses($validatorsPath, AttributeRulesSetInterface::class) as $setClass) {
             /** @var string $setName */
             $setName = $setClass;
             assert(
                 is_string($setClass) &&
                 class_exists($setClass) &&
-                array_key_exists(FormRuleSetInterface::class, class_implements($setClass))
+                array_key_exists(AttributeRulesSetInterface::class, class_implements($setClass))
             );
-            /** @var FormRuleSetInterface $setClass */
+            /** @var AttributeRulesSetInterface $setClass */
             $serializer->addResourceRules($setName, $setClass::getAttributeRules());
         }
 

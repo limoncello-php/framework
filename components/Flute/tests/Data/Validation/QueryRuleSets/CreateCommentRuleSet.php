@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Contracts\Validation;
+<?php namespace Limoncello\Tests\Flute\Data\Validation\QueryRuleSets;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,9 +16,22 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Validation\QueryRuleSetInterface;
+use Limoncello\Tests\Flute\Data\Models\Comment;
+use Limoncello\Validation\Rules as r;
+
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Tests
  */
-interface FormRuleSetInterface extends AttributeRulesSetInterface
+class CreateCommentRuleSet implements QueryRuleSetInterface
 {
+    /**
+     * @inheritdoc
+     */
+    public static function getAttributeRules(): array
+    {
+        return [
+            Comment::FIELD_TEXT => r::isString(r::stringLengthMax(Comment::LENGTH_TEXT)),
+        ];
+    }
 }

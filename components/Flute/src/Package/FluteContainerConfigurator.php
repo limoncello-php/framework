@@ -14,12 +14,14 @@ use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
+use Limoncello\Flute\Contracts\Http\Query\QueryValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
 use Limoncello\Flute\Http\Query\QueryParser;
+use Limoncello\Flute\Http\Query\QueryValidatorFactory;
 use Limoncello\Flute\Http\ThrowableHandlers\FluteThrowableHandler;
 use Limoncello\Flute\Types\DateJsonApiStringType;
 use Limoncello\Flute\Types\DateTimeJsonApiStringType;
@@ -99,6 +101,16 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
         $container[FormValidatorFactoryInterface::class] = function (PsrContainerInterface $container) {
             $factory = new FormValidatorFactory($container);
+
+            return $factory;
+        };
+
+        $container[QueryValidatorFactoryInterface::class] = function (PsrContainerInterface $container) {
+            /** @var PaginationStrategyInterface $paginationStrategy */
+            $paginationStrategy = $container->get(PaginationStrategyInterface::class);
+            $settings           = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
+            $ruleSetsData       = $settings[FluteSettings::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA];
+            $factory            = new QueryValidatorFactory($container, $paginationStrategy, $ruleSetsData);
 
             return $factory;
         };

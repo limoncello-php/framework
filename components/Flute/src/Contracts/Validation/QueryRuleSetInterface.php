@@ -19,6 +19,6 @@
 /**
  * @package Limoncello\Application
  */
-interface FormRuleSetInterface extends AttributeRulesSetInterface
+interface QueryRuleSetInterface extends AttributeRulesSetInterface
 {
 }

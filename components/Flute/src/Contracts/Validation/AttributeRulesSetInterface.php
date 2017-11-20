@@ -16,9 +16,15 @@
  * limitations under the License.
  */
 
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
+
 /**
  * @package Limoncello\Application
  */
-interface FormRuleSetInterface extends AttributeRulesSetInterface
+interface AttributeRulesSetInterface
 {
+    /**
+     * @return RuleInterface[]
+     */
+    public static function getAttributeRules(): array;
 }

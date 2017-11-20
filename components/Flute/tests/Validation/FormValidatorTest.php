@@ -76,7 +76,7 @@ class FormValidatorTest extends TestCase
      */
     private function createValidator(array $attributeRules): FormValidatorInterface
     {
-        $name      = 'for_a_single_validator_name_does_not_matter';
+        $name      = 'typically_a_class_name';
         $container = new Container();
 
         $data    = (new FormRuleSerializer())->addResourceRules($name, $attributeRules)->getData();
