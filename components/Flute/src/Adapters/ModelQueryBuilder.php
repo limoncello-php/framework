@@ -35,6 +35,7 @@ use PDO;
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ModelQueryBuilder extends QueryBuilder
@@ -867,6 +868,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param DateTimeInterface $dateTime
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function convertDataTimeToDatabaseFormat(DateTimeInterface $dateTime): string
     {

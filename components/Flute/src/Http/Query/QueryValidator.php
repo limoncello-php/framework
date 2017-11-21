@@ -147,7 +147,9 @@ class QueryValidator extends QueryParser implements QueryValidatorInterface
     {
         $this->withAllAllowedFilterFields();
 
-        return $this->setAttributeRules(AttributeRulesSerializer::getAttributeRules($rulesSetClass, $this->getRulesData()));
+        return $this->setAttributeRules(
+            AttributeRulesSerializer::getAttributeRules($rulesSetClass, $this->getRulesData())
+        );
     }
 
     /**
