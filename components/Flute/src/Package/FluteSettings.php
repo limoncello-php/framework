@@ -3,8 +3,9 @@
 use Generator;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Contracts\Validation\AttributeRulesSetInterface;
+use Limoncello\Flute\Contracts\Validation\FormRuleSetInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
+use Limoncello\Flute\Contracts\Validation\QueryRuleSetInterface;
 use Limoncello\Flute\Validation\Form\Execution\AttributeRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiRuleSerializer;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
@@ -57,13 +58,19 @@ abstract class FluteSettings implements SettingsInterface
     const KEY_JSON_VALIDATORS_FILE_MASK = self::KEY_JSON_VALIDATORS_FOLDER + 1;
 
     /** Config key */
-    const KEY_ATTRIBUTE_VALIDATORS_FOLDER = self::KEY_JSON_VALIDATORS_FILE_MASK + 1;
+    const KEY_FORM_VALIDATORS_FOLDER = self::KEY_JSON_VALIDATORS_FILE_MASK + 1;
 
     /** Config key */
-    const KEY_ATTRIBUTE_VALIDATORS_FILE_MASK = self::KEY_ATTRIBUTE_VALIDATORS_FOLDER + 1;
+    const KEY_FORM_VALIDATORS_FILE_MASK = self::KEY_FORM_VALIDATORS_FOLDER + 1;
 
     /** Config key */
-    const KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE = self::KEY_ATTRIBUTE_VALIDATORS_FILE_MASK + 1;
+    const KEY_QUERY_VALIDATORS_FOLDER = self::KEY_FORM_VALIDATORS_FILE_MASK + 1;
+
+    /** Config key */
+    const KEY_QUERY_VALIDATORS_FILE_MASK = self::KEY_QUERY_VALIDATORS_FOLDER + 1;
+
+    /** Config key */
+    const KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE = self::KEY_QUERY_VALIDATORS_FILE_MASK + 1;
 
     /** Config key */
     const KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER = self::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE + 1;
@@ -110,12 +117,14 @@ abstract class FluteSettings implements SettingsInterface
     {
         $defaults = $this->getSettings();
 
-        $schemesFolder   = $defaults[static::KEY_SCHEMES_FOLDER] ?? null;
-        $schemesFileMask = $defaults[static::KEY_SCHEMES_FILE_MASK] ?? null;
-        $jsonValFolder   = $defaults[static::KEY_JSON_VALIDATORS_FOLDER] ?? null;
-        $jsonValFileMask = $defaults[static::KEY_JSON_VALIDATORS_FILE_MASK] ?? null;
-        $attValFolder    = $defaults[static::KEY_ATTRIBUTE_VALIDATORS_FOLDER] ?? null;
-        $attValFileMask  = $defaults[static::KEY_ATTRIBUTE_VALIDATORS_FILE_MASK] ?? null;
+        $schemesFolder    = $defaults[static::KEY_SCHEMES_FOLDER] ?? null;
+        $schemesFileMask  = $defaults[static::KEY_SCHEMES_FILE_MASK] ?? null;
+        $jsonValFolder    = $defaults[static::KEY_JSON_VALIDATORS_FOLDER] ?? null;
+        $jsonValFileMask  = $defaults[static::KEY_JSON_VALIDATORS_FILE_MASK] ?? null;
+        $formsValFolder   = $defaults[static::KEY_FORM_VALIDATORS_FOLDER] ?? null;
+        $formsValFileMask = $defaults[static::KEY_FORM_VALIDATORS_FILE_MASK] ?? null;
+        $queryValFolder   = $defaults[static::KEY_QUERY_VALIDATORS_FOLDER] ?? null;
+        $queryValFileMask = $defaults[static::KEY_QUERY_VALIDATORS_FILE_MASK] ?? null;
 
         assert(
             $schemesFolder !== null && empty(glob($schemesFolder)) === false,
@@ -126,16 +135,22 @@ abstract class FluteSettings implements SettingsInterface
             $jsonValFolder !== null && empty(glob($jsonValFolder)) === false,
             "Invalid JSON Validators folder `$jsonValFolder`."
         );
-        assert(empty($jsonValFileMask) === false, "Invalid Forms Validators file mask `$jsonValFileMask`.");
+        assert(empty($jsonValFileMask) === false, "Invalid JSON Validators file mask `$jsonValFileMask`.");
         assert(
-            $attValFolder !== null && empty(glob($attValFolder)) === false,
-            "Invalid JSON Validators folder `$attValFolder`."
+            $formsValFolder !== null && empty(glob($formsValFolder)) === false,
+            "Invalid Forms Validators folder `$formsValFolder`."
         );
-        assert(empty($attValFileMask) === false, "Invalid Forms Validators file mask `$attValFileMask`.");
+        assert(empty($formsValFileMask) === false, "Invalid Forms Validators file mask `$formsValFileMask`.");
+        assert(
+            $queryValFolder !== null && empty(glob($queryValFolder)) === false,
+            "Invalid Query Validators folder `$queryValFolder`."
+        );
+        assert(empty($queryValFileMask) === false, "Invalid Query Validators file mask `$queryValFileMask`.");
 
-        $schemesPath        = $schemesFolder . DIRECTORY_SEPARATOR . $schemesFileMask;
-        $jsonValidatorsPath = $jsonValFolder . DIRECTORY_SEPARATOR . $jsonValFileMask;
-        $attValidatorsPath  = $attValFolder . DIRECTORY_SEPARATOR . $attValFileMask;
+        $schemesPath         = $schemesFolder . DIRECTORY_SEPARATOR . $schemesFileMask;
+        $jsonValidatorsPath  = $jsonValFolder . DIRECTORY_SEPARATOR . $jsonValFileMask;
+        $formsValidatorsPath = $formsValFolder . DIRECTORY_SEPARATOR . $formsValFileMask;
+        $queryValidatorsPath = $queryValFolder . DIRECTORY_SEPARATOR . $queryValFileMask;
 
         $requireUniqueTypes = $defaults[static::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES] ?? true;
 
@@ -151,7 +166,7 @@ abstract class FluteSettings implements SettingsInterface
                     $this->createJsonValidationRulesSetData($jsonValidatorsPath),
 
                 static::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA =>
-                    $this->createValidationAttributeRulesSetData($attValidatorsPath),
+                    $this->createValidationAttributeRulesSetData($formsValidatorsPath, $queryValidatorsPath),
             ];
     }
 
@@ -166,7 +181,8 @@ abstract class FluteSettings implements SettingsInterface
             static::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES              => true,
             static::KEY_SCHEMES_FILE_MASK                         => '*.php',
             static::KEY_JSON_VALIDATORS_FILE_MASK                 => '*.php',
-            static::KEY_ATTRIBUTE_VALIDATORS_FILE_MASK            => '*.php',
+            static::KEY_FORM_VALIDATORS_FILE_MASK                 => '*.php',
+            static::KEY_QUERY_VALIDATORS_FILE_MASK                => '*.php',
             static::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER => null,
             static::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE        => 500,
             static::KEY_DEFAULT_PAGING_SIZE                       => 20,
@@ -255,22 +271,34 @@ abstract class FluteSettings implements SettingsInterface
     }
 
     /**
-     * @param string $validatorsPath
+     * @param string $formsValPath
+     * @param string $queriesValPath
      *
      * @return array
      */
-    private function createValidationAttributeRulesSetData(string $validatorsPath): array
+    private function createValidationAttributeRulesSetData(string $formsValPath, string $queriesValPath): array
     {
         $serializer = new AttributeRulesSerializer();
-        foreach ($this->selectClasses($validatorsPath, AttributeRulesSetInterface::class) as $setClass) {
+        foreach ($this->selectClasses($formsValPath, FormRuleSetInterface::class) as $setClass) {
             /** @var string $setName */
             $setName = $setClass;
             assert(
                 is_string($setClass) &&
                 class_exists($setClass) &&
-                array_key_exists(AttributeRulesSetInterface::class, class_implements($setClass))
+                array_key_exists(FormRuleSetInterface::class, class_implements($setClass))
             );
-            /** @var AttributeRulesSetInterface $setClass */
+            /** @var FormRuleSetInterface $setClass */
+            $serializer->addResourceRules($setName, $setClass::getAttributeRules());
+        }
+        foreach ($this->selectClasses($queriesValPath, QueryRuleSetInterface::class) as $setClass) {
+            /** @var string $setName */
+            $setName = $setClass;
+            assert(
+                is_string($setClass) &&
+                class_exists($setClass) &&
+                array_key_exists(QueryRuleSetInterface::class, class_implements($setClass))
+            );
+            /** @var QueryRuleSetInterface $setClass */
             $serializer->addResourceRules($setName, $setClass::getAttributeRules());
         }
 

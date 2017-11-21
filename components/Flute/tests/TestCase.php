@@ -259,4 +259,14 @@ class TestCase extends \PHPUnit\Framework\TestCase
             Data\Validation\FormRuleSets\CreateCommentRuleSet::class,
         ];
     }
+
+    /**
+     * @return array
+     */
+    protected function getQueryValidationRuleSets()
+    {
+        return [
+            Data\Validation\QueryRuleSets\CreateCommentRuleSet::class,
+        ];
+    }
 }

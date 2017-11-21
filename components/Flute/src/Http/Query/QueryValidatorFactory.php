@@ -57,7 +57,8 @@ class QueryValidatorFactory implements QueryValidatorFactoryInterface
      */
     public function createValidator(string $class): QueryValidatorInterface
     {
-        return new QueryValidator($this->getRulesData(), $this->getContainer(), $this->getPaginationStrategy());
+        return (new QueryValidator($this->getRulesData(), $this->getContainer(), $this->getPaginationStrategy()))
+            ->withValidatedFilterFields($class);
     }
 
     /**

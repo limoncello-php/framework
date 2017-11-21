@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
@@ -260,8 +261,8 @@ class ModelQueryBuilderTest extends TestCase
     {
         $builder = $this->createModelQueryBuilder(Board::class);
         $filters = [
-            Board::FIELD_ID => [
-                FilterParameterInterface::OPERATION_EQUALS => [1],
+            Board::FIELD_CREATED_AT => [
+                FilterParameterInterface::OPERATION_EQUALS => [new DateTime()],
             ],
         ];
         $sorts   = [
@@ -277,7 +278,7 @@ class ModelQueryBuilderTest extends TestCase
             'SELECT `boards1`.`id_board`, `boards1`.`title`, `boards1`.`created_at`, ' .
             '`boards1`.`updated_at`, `boards1`.`deleted_at` ' .
             'FROM `boards` `boards1` ' .
-            'WHERE `boards1`.`id_board` = :dcValue1 ' .
+            'WHERE `boards1`.`created_at` = :dcValue1 ' .
             'ORDER BY `boards1`.`title` ASC';
 
         $this->assertEquals($expected, $builder->getSQL());

@@ -1206,7 +1206,8 @@ EOT;
                 FluteSettings::class => (new Flute(
                     $this->getSchemeMap(),
                     $this->getJsonValidationRuleSets(),
-                    $this->getFormValidationRuleSets()
+                    $this->getFormValidationRuleSets(),
+                    $this->getQueryValidationRuleSets()
                 ))->get($appConfig),
             ]
         );

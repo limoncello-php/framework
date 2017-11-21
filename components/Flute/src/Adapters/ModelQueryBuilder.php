@@ -17,9 +17,11 @@
  */
 
 use Closure;
+use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\Type;
 use Generator;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
@@ -71,6 +73,11 @@ class ModelQueryBuilder extends QueryBuilder
      * @var array
      */
     private $knownAliases = [];
+
+    /**
+     * @var null|Closure
+     */
+    private $dtToDbConverter = null;
 
     /**
      * @param Connection               $connection
@@ -813,7 +820,7 @@ class ModelQueryBuilder extends QueryBuilder
     private function createSingleNamedParameter(iterable $arguments): string
     {
         foreach ($arguments as $argument) {
-            $paramName = $this->createNamedParameter($argument, $this->getPdoType($argument));
+            $paramName = $this->createNamedParameter($this->getPdoValue($argument), $this->getPdoType($argument));
 
             return $paramName;
         }
@@ -832,7 +839,7 @@ class ModelQueryBuilder extends QueryBuilder
         $names = [];
 
         foreach ($arguments as $argument) {
-            $names[] = $this->createNamedParameter($argument, $this->getPdoType($argument));
+            $names[] = $this->createNamedParameter($this->getPdoValue($argument), $this->getPdoType($argument));
         }
 
         return $names;
@@ -849,6 +856,34 @@ class ModelQueryBuilder extends QueryBuilder
     /**
      * @param mixed $value
      *
+     * @return mixed
+     */
+    private function getPdoValue($value)
+    {
+        return $value instanceof DateTimeInterface ? $this->convertDataTimeToDatabaseFormat($value) : $value;
+    }
+
+    /**
+     * @param DateTimeInterface $dateTime
+     *
+     * @return string
+     */
+    private function convertDataTimeToDatabaseFormat(DateTimeInterface $dateTime): string
+    {
+        if ($this->dtToDbConverter === null) {
+            $type     = Type::getType(DateTimeType::DATETIME);
+            $platform = $this->getConnection()->getDatabasePlatform();
+            $this->dtToDbConverter = function (DateTimeInterface $dateTime) use ($type, $platform) : string {
+                return $type->convertToDatabaseValue($dateTime, $platform);
+            };
+        }
+
+        return call_user_func($this->dtToDbConverter, $dateTime);
+    }
+
+    /**
+     * @param mixed $value
+     *
      * @return int
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
@@ -859,6 +894,8 @@ class ModelQueryBuilder extends QueryBuilder
             $type = PDO::PARAM_INT;
         } elseif (is_bool($value)) {
             $type = PDO::PARAM_BOOL;
+        } elseif ($value instanceof DateTimeInterface) {
+            $type = PDO::PARAM_STR;
         } else {
             assert(
                 $value !== null,
