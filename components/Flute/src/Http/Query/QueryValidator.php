@@ -22,7 +22,7 @@ use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Http\Query\QueryValidatorInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
-use Limoncello\Flute\Validation\Form\Execution\FormRuleSerializer;
+use Limoncello\Flute\Validation\Form\Execution\AttributeRulesSerializer;
 use Limoncello\Validation\Captures\CaptureAggregator;
 use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
@@ -94,7 +94,7 @@ class QueryValidator extends QueryParser implements QueryValidatorInterface
         $this
             ->setContainer($container)
             ->setRulesData($data)
-            ->setBlocks(FormRuleSerializer::extractBlocks($this->getRulesData()))
+            ->setBlocks(AttributeRulesSerializer::extractBlocks($this->getRulesData()))
             ->setContextStorage($this->createContextStorage())
             ->setCaptureAggregator($this->createCaptureAggregator())
             ->setErrorAggregator($this->createErrorAggregator());
@@ -147,7 +147,7 @@ class QueryValidator extends QueryParser implements QueryValidatorInterface
     {
         $this->withAllAllowedFilterFields();
 
-        return $this->setAttributeRules(FormRuleSerializer::getAttributeRules($rulesSetClass, $this->getRulesData()));
+        return $this->setAttributeRules(AttributeRulesSerializer::getAttributeRules($rulesSetClass, $this->getRulesData()));
     }
 
     /**
@@ -164,7 +164,7 @@ class QueryValidator extends QueryParser implements QueryValidatorInterface
 
         // if validation rules were actually set
         if ($serializedRules !== null) {
-            $this->executeStarts(FormRuleSerializer::getRulesStartIndexes($serializedRules));
+            $this->executeStarts(AttributeRulesSerializer::getRulesStartIndexes($serializedRules));
 
             foreach ($filters as $field => $operationsAndArgs) {
                 if (($index = $this->getAttributeIndex($field)) !== null) {
@@ -177,7 +177,7 @@ class QueryValidator extends QueryParser implements QueryValidatorInterface
                 }
             }
 
-            $this->executeEnds(FormRuleSerializer::getRulesEndIndexes($this->getAttributeRules()));
+            $this->executeEnds(AttributeRulesSerializer::getRulesEndIndexes($this->getAttributeRules()));
 
             if ($this->getErrorAggregator()->count() > 0) {
                 throw new InvalidQueryParametersException($this->createParameterError(static::PARAM_FILTER));
@@ -359,7 +359,7 @@ class QueryValidator extends QueryParser implements QueryValidatorInterface
         assert($this->debugCheckIndexesExist($rules));
 
         $this->attributeRules    = $rules;
-        $this->attributeRulesIdx = FormRuleSerializer::getRulesIndexes($rules);
+        $this->attributeRulesIdx = AttributeRulesSerializer::getRulesIndexes($rules);
 
         return $this;
     }
@@ -463,13 +463,13 @@ class QueryValidator extends QueryParser implements QueryValidatorInterface
         $allOk = true;
 
         $indexes = array_merge(
-            FormRuleSerializer::getRulesIndexes($rules),
-            FormRuleSerializer::getRulesStartIndexes($rules),
-            FormRuleSerializer::getRulesEndIndexes($rules)
+            AttributeRulesSerializer::getRulesIndexes($rules),
+            AttributeRulesSerializer::getRulesStartIndexes($rules),
+            AttributeRulesSerializer::getRulesEndIndexes($rules)
         );
 
         foreach ($indexes as $index) {
-            $allOk = $allOk && is_int($index) && FormRuleSerializer::isRuleExist($index, $this->getBlocks());
+            $allOk = $allOk && is_int($index) && AttributeRulesSerializer::isRuleExist($index, $this->getBlocks());
         }
 
         return $allOk;

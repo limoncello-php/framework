@@ -20,7 +20,7 @@ use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Package\FluteSettings as C;
-use Limoncello\Flute\Validation\Form\Execution\FormRuleSerializer;
+use Limoncello\Flute\Validation\Form\Execution\AttributeRulesSerializer;
 use Limoncello\Flute\Validation\Form\Validator;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
@@ -79,7 +79,7 @@ class FormValidatorTest extends TestCase
         $name      = 'typically_a_class_name';
         $container = new Container();
 
-        $data    = (new FormRuleSerializer())->addResourceRules($name, $attributeRules)->getData();
+        $data    = (new AttributeRulesSerializer())->addResourceRules($name, $attributeRules)->getData();
         $factory = new FormatterFactory();
 
         $validator = new Validator($name, $data, $container, $factory->createFormatter(C::VALIDATION_NAMESPACE));

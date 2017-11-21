@@ -72,9 +72,9 @@ class Flute extends FluteSettings
     protected function getSettings(): array
     {
         return parent::getSettings() + [
-                static::KEY_SCHEMES_FOLDER         => $this->schemesPath,
-                static::KEY_JSON_VALIDATORS_FOLDER => $this->validatorsPath,
-                static::KEY_FORM_VALIDATORS_FOLDER => $this->validatorsPath,
+                static::KEY_SCHEMES_FOLDER              => $this->schemesPath,
+                static::KEY_JSON_VALIDATORS_FOLDER      => $this->validatorsPath,
+                static::KEY_ATTRIBUTE_VALIDATORS_FOLDER => $this->validatorsPath,
             ];
     }
 

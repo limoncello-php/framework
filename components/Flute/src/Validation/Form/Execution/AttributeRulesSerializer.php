@@ -23,7 +23,7 @@ use Limoncello\Validation\Execution\BlockSerializer;
 /**
  * @package Limoncello\Flute
  */
-class FormRuleSerializer
+class AttributeRulesSerializer
 {
     /** Serialized indexes key */
     protected const SERIALIZED_RULE_SETS = 0;

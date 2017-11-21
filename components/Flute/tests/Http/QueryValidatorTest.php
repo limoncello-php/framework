@@ -23,7 +23,7 @@ use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Http\Query\QueryValidator;
 use Limoncello\Flute\Types\DateBaseType;
-use Limoncello\Flute\Validation\Form\Execution\FormRuleSerializer;
+use Limoncello\Flute\Validation\Form\Execution\AttributeRulesSerializer;
 use Limoncello\Tests\Flute\Data\Validation\AppRules as v;
 use Limoncello\Tests\Flute\TestCase;
 
@@ -157,7 +157,7 @@ class QueryValidatorTest extends TestCase
         $name      = 'typically_a_class_name';
         $container = new Container();
 
-        $data = (new FormRuleSerializer())->addResourceRules($name, $attributeRules)->getData();
+        $data = (new AttributeRulesSerializer())->addResourceRules($name, $attributeRules)->getData();
 
         $paginationStrategy = new PaginationStrategy(20, 100);
         $parser             = (new QueryValidator($data, $container, $paginationStrategy))

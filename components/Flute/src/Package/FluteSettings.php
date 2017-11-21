@@ -5,7 +5,7 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Contracts\Validation\AttributeRulesSetInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
-use Limoncello\Flute\Validation\Form\Execution\FormRuleSerializer;
+use Limoncello\Flute\Validation\Form\Execution\AttributeRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiRuleSerializer;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
@@ -57,13 +57,13 @@ abstract class FluteSettings implements SettingsInterface
     const KEY_JSON_VALIDATORS_FILE_MASK = self::KEY_JSON_VALIDATORS_FOLDER + 1;
 
     /** Config key */
-    const KEY_FORM_VALIDATORS_FOLDER = self::KEY_JSON_VALIDATORS_FILE_MASK + 1;
+    const KEY_ATTRIBUTE_VALIDATORS_FOLDER = self::KEY_JSON_VALIDATORS_FILE_MASK + 1;
 
     /** Config key */
-    const KEY_FORM_VALIDATORS_FILE_MASK = self::KEY_FORM_VALIDATORS_FOLDER + 1;
+    const KEY_ATTRIBUTE_VALIDATORS_FILE_MASK = self::KEY_ATTRIBUTE_VALIDATORS_FOLDER + 1;
 
     /** Config key */
-    const KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE = self::KEY_FORM_VALIDATORS_FILE_MASK + 1;
+    const KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE = self::KEY_ATTRIBUTE_VALIDATORS_FILE_MASK + 1;
 
     /** Config key */
     const KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER = self::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE + 1;
@@ -114,8 +114,8 @@ abstract class FluteSettings implements SettingsInterface
         $schemesFileMask = $defaults[static::KEY_SCHEMES_FILE_MASK] ?? null;
         $jsonValFolder   = $defaults[static::KEY_JSON_VALIDATORS_FOLDER] ?? null;
         $jsonValFileMask = $defaults[static::KEY_JSON_VALIDATORS_FILE_MASK] ?? null;
-        $formsValFolder   = $defaults[static::KEY_FORM_VALIDATORS_FOLDER] ?? null;
-        $formsValFileMask = $defaults[static::KEY_FORM_VALIDATORS_FILE_MASK] ?? null;
+        $attValFolder    = $defaults[static::KEY_ATTRIBUTE_VALIDATORS_FOLDER] ?? null;
+        $attValFileMask  = $defaults[static::KEY_ATTRIBUTE_VALIDATORS_FILE_MASK] ?? null;
 
         assert(
             $schemesFolder !== null && empty(glob($schemesFolder)) === false,
@@ -128,14 +128,14 @@ abstract class FluteSettings implements SettingsInterface
         );
         assert(empty($jsonValFileMask) === false, "Invalid Forms Validators file mask `$jsonValFileMask`.");
         assert(
-            $formsValFolder !== null && empty(glob($formsValFolder)) === false,
-            "Invalid JSON Validators folder `$formsValFolder`."
+            $attValFolder !== null && empty(glob($attValFolder)) === false,
+            "Invalid JSON Validators folder `$attValFolder`."
         );
-        assert(empty($formsValFileMask) === false, "Invalid Forms Validators file mask `$formsValFileMask`.");
+        assert(empty($attValFileMask) === false, "Invalid Forms Validators file mask `$attValFileMask`.");
 
-        $schemesPath         = $schemesFolder . DIRECTORY_SEPARATOR . $schemesFileMask;
-        $jsonValidatorsPath  = $jsonValFolder . DIRECTORY_SEPARATOR . $jsonValFileMask;
-        $formsValidatorsPath = $formsValFolder . DIRECTORY_SEPARATOR . $formsValFileMask;
+        $schemesPath        = $schemesFolder . DIRECTORY_SEPARATOR . $schemesFileMask;
+        $jsonValidatorsPath = $jsonValFolder . DIRECTORY_SEPARATOR . $jsonValFileMask;
+        $attValidatorsPath  = $attValFolder . DIRECTORY_SEPARATOR . $attValFileMask;
 
         $requireUniqueTypes = $defaults[static::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES] ?? true;
 
@@ -151,7 +151,7 @@ abstract class FluteSettings implements SettingsInterface
                     $this->createJsonValidationRulesSetData($jsonValidatorsPath),
 
                 static::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA =>
-                    $this->createValidationAttributeRulesSetData($formsValidatorsPath),
+                    $this->createValidationAttributeRulesSetData($attValidatorsPath),
             ];
     }
 
@@ -166,7 +166,7 @@ abstract class FluteSettings implements SettingsInterface
             static::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES              => true,
             static::KEY_SCHEMES_FILE_MASK                         => '*.php',
             static::KEY_JSON_VALIDATORS_FILE_MASK                 => '*.php',
-            static::KEY_FORM_VALIDATORS_FILE_MASK                 => '*.php',
+            static::KEY_ATTRIBUTE_VALIDATORS_FILE_MASK            => '*.php',
             static::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER => null,
             static::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE        => 500,
             static::KEY_DEFAULT_PAGING_SIZE                       => 20,
@@ -261,7 +261,7 @@ abstract class FluteSettings implements SettingsInterface
      */
     private function createValidationAttributeRulesSetData(string $validatorsPath): array
     {
-        $serializer = new FormRuleSerializer();
+        $serializer = new AttributeRulesSerializer();
         foreach ($this->selectClasses($validatorsPath, AttributeRulesSetInterface::class) as $setClass) {
             /** @var string $setName */
             $setName = $setClass;

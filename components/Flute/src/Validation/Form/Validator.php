@@ -21,7 +21,7 @@ use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
-use Limoncello\Flute\Validation\Form\Execution\FormRuleSerializer;
+use Limoncello\Flute\Validation\Form\Execution\AttributeRulesSerializer;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
@@ -83,8 +83,8 @@ class Validator extends BaseValidator implements FormValidatorInterface
         $this
             ->setContainer($container)
             ->setMessageFormatter($messageFormatter)
-            ->setBlocks(FormRuleSerializer::extractBlocks($data))
-            ->setAttributeRules(FormRuleSerializer::getAttributeRules($name, $data));
+            ->setBlocks(AttributeRulesSerializer::extractBlocks($data))
+            ->setAttributeRules(AttributeRulesSerializer::getAttributeRules($name, $data));
 
         parent::__construct();
     }
@@ -183,7 +183,7 @@ class Validator extends BaseValidator implements FormValidatorInterface
     private function validateAttributes(iterable $attributes): self
     {
         // execute start(s)
-        $this->executeStarts(FormRuleSerializer::getRulesStartIndexes($this->getAttributeRules()));
+        $this->executeStarts(AttributeRulesSerializer::getRulesStartIndexes($this->getAttributeRules()));
 
         foreach ($attributes as $name => $value) {
             if (($index = $this->getAttributeIndex($name)) !== null) {
@@ -194,7 +194,7 @@ class Validator extends BaseValidator implements FormValidatorInterface
         }
 
         // execute end(s)
-        $this->executeEnds(FormRuleSerializer::getRulesEndIndexes($this->getAttributeRules()));
+        $this->executeEnds(AttributeRulesSerializer::getRulesEndIndexes($this->getAttributeRules()));
 
         return $this;
     }
@@ -265,7 +265,7 @@ class Validator extends BaseValidator implements FormValidatorInterface
         assert($this->debugCheckIndexesExist($rules));
 
         $this->attributeRules    = $rules;
-        $this->attributeRulesIdx = FormRuleSerializer::getRulesIndexes($rules);
+        $this->attributeRulesIdx = AttributeRulesSerializer::getRulesIndexes($rules);
 
         return $this;
     }
@@ -324,13 +324,13 @@ class Validator extends BaseValidator implements FormValidatorInterface
         $allOk = true;
 
         $indexes = array_merge(
-            FormRuleSerializer::getRulesIndexes($rules),
-            FormRuleSerializer::getRulesStartIndexes($rules),
-            FormRuleSerializer::getRulesEndIndexes($rules)
+            AttributeRulesSerializer::getRulesIndexes($rules),
+            AttributeRulesSerializer::getRulesStartIndexes($rules),
+            AttributeRulesSerializer::getRulesEndIndexes($rules)
         );
 
         foreach ($indexes as $index) {
-            $allOk = $allOk && is_int($index) && FormRuleSerializer::isRuleExist($index, $this->getBlocks());
+            $allOk = $allOk && is_int($index) && AttributeRulesSerializer::isRuleExist($index, $this->getBlocks());
         }
 
         return $allOk;
