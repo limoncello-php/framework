@@ -151,7 +151,7 @@ class Runner
                 $result = true;
             }
             $result ?: null;
-            assert('$result !== false', 'Statement execution failed');
+            assert($result !== false, 'Statement execution failed');
         }
     }
 
@@ -178,7 +178,7 @@ class Runner
             $result = true;
         }
         if ($result === false) {
-            assert('$result !== false', 'Statement execution failed');
+            assert($result !== false, 'Statement execution failed');
         }
     }
 

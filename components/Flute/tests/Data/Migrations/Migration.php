@@ -137,7 +137,7 @@ abstract class Migration
             /** @var ModelInterface $modelClass*/
             $lengths   = $modelClass::getAttributeLengths();
             $hasLength = array_key_exists($name, $lengths);
-            assert('$hasLength === true', "String length is not specified for column '$name' in model '$modelClass'.");
+            assert($hasLength === true, "String length is not specified for column '$name' in model '$modelClass'.");
             $hasLength ?: null;
             $length = $lengths[$name];
             $table->addColumn($name, Type::STRING, ['length' => $length])->setNotnull(true);
@@ -242,7 +242,7 @@ abstract class Migration
             $table->addColumn($name, Type::INTEGER)->setUnsigned(true)->setNotnull($notNull);
             $tableName = $this->getTableNameForClass($referredClass);
             /** @var Model $referredClass*/
-            assert('$tableName !== null', "Table name is not specified for model '$referredClass'.");
+            assert($tableName !== null, "Table name is not specified for model '$referredClass'.");
             $pkName = $referredClass::FIELD_ID;
             $table->addForeignKeyConstraint($tableName, [$name], [$pkName]);
         };
@@ -260,9 +260,9 @@ abstract class Migration
         $relationships = $modelClass::getRelationships();
         $relFound      = isset($relationships[RelationshipTypes::BELONGS_TO][$name]);
         if ($relFound === false) {
-            assert('$relFound === true', "Belongs-to relationship '$name' not found.");
+            assert($relFound === true, "Belongs-to relationship '$name' not found.");
         }
-        assert('$relFound === true', "Belongs-to relationship '$name' not found.");
+        assert($relFound === true, "Belongs-to relationship '$name' not found.");
         list ($referencedClass, $foreignKey) = $relationships[RelationshipTypes::BELONGS_TO][$name];
         return $this->foreignInt($foreignKey, $referencedClass);
     }
@@ -279,7 +279,7 @@ abstract class Migration
         $relationships = $modelClass::getRelationships();
         $relFound      = isset($relationships[RelationshipTypes::BELONGS_TO][$name]);
         if ($relFound === false) {
-            assert('$relFound === true', "Belongs-to relationship '$name' not found.");
+            assert($relFound === true, "Belongs-to relationship '$name' not found.");
         }
         list ($referencedClass, $foreignKey) = $relationships[RelationshipTypes::BELONGS_TO][$name];
         return $this->foreignInt($foreignKey, $referencedClass, false);
@@ -294,7 +294,7 @@ abstract class Migration
     {
         /** @var Model $modelClass*/
         $tableName = $modelClass::TABLE_NAME;
-        assert('$tableName !== null', "Table name is not specified for model '$modelClass'.");
+        assert($tableName !== null, "Table name is not specified for model '$modelClass'.");
 
         return $tableName;
     }
@@ -305,7 +305,7 @@ abstract class Migration
     private function getModelClass()
     {
         $modelClass = static::MODEL_CLASS;
-        assert('$modelClass !== null', 'Model class should be set in migration');
+        assert($modelClass !== null, 'Model class should be set in migration');
 
         return $modelClass;
     }
