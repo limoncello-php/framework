@@ -669,36 +669,75 @@ class Crud implements CrudInterface
             $modelStorage = $this->getFactory()->createModelStorage($this->getModelSchemes());
             $modelsAtPath = $this->getFactory()->createTagStorage();
 
-            // we gonna send this storage via function params so it is an equivalent for &array
+            // we gonna send these objects via function params so it is an equivalent for &array
             $classAtPath = new ArrayObject();
+            $idsAtPath   = new ArrayObject();
+
+            $registerModelAtRoot = function ($model) use ($modelStorage, $modelsAtPath, $idsAtPath): void {
+                self::registerModelAtPath(
+                    $model,
+                    static::ROOT_PATH,
+                    $this->getModelSchemes(),
+                    $modelStorage,
+                    $modelsAtPath,
+                    $idsAtPath
+                );
+            };
 
             $model = null;
             if ($isPaginated === true) {
                 foreach ($data->getData() as $model) {
-                    $uniqueModel = $modelStorage->register($model);
-                    if ($uniqueModel !== null) {
-                        $modelsAtPath->register($uniqueModel, static::ROOT_PATH);
-                    }
+                    $registerModelAtRoot($model);
                 }
             } else {
-                $model       = $data;
-                $uniqueModel = $modelStorage->register($model);
-                if ($uniqueModel !== null) {
-                    $modelsAtPath->register($uniqueModel, static::ROOT_PATH);
-                }
+                $model = $data;
+                $registerModelAtRoot($model);
             }
+            assert($model !== null);
             $classAtPath[static::ROOT_PATH] = get_class($model);
 
             foreach ($this->getPaths($this->getIncludes()) as list ($parentPath, $childPaths)) {
                 $this->loadRelationshipsLayer(
                     $modelsAtPath,
                     $classAtPath,
+                    $idsAtPath,
                     $modelStorage,
                     $parentPath,
                     $childPaths
                 );
             }
         }
+    }
+
+    /**
+     * A helper to remember all model related data. Helps to ensure we consistently handle models in CRUD.
+     *
+     * @param mixed                    $model
+     * @param string                   $path
+     * @param ModelSchemeInfoInterface $modelSchemes
+     * @param ModelStorageInterface    $modelStorage
+     * @param TagStorageInterface      $modelsAtPath
+     * @param ArrayObject              $idsAtPath
+     *
+     * @return mixed
+     */
+    private static function registerModelAtPath(
+        $model,
+        string $path,
+        ModelSchemeInfoInterface $modelSchemes,
+        ModelStorageInterface $modelStorage,
+        TagStorageInterface $modelsAtPath,
+        ArrayObject $idsAtPath
+    ) {
+        $uniqueModel = $modelStorage->register($model);
+        if ($uniqueModel !== null) {
+            $modelsAtPath->register($uniqueModel, $path);
+            $pkName             = $modelSchemes->getPrimaryKey(get_class($uniqueModel));
+            $modelId            = $uniqueModel->{$pkName};
+            $idsAtPath[$path][] = $modelId;
+        }
+
+        return $uniqueModel;
     }
 
     /**
@@ -1290,6 +1329,36 @@ class Crud implements CrudInterface
     /**
      * @param QueryBuilder $builder
      * @param string       $modelClass
+     * @param string       $keyColumnName
+     *
+     * @return iterable
+     */
+    private function fetchResourcesWithoutRelationships(
+        QueryBuilder $builder,
+        string $modelClass,
+        string $keyColumnName
+    ): iterable {
+        $statement = $builder->execute();
+
+        if ($this->isFetchTyped() === true) {
+            $statement->setFetchMode(PDOConnection::FETCH_ASSOC);
+            $platform  = $builder->getConnection()->getDatabasePlatform();
+            $typeNames = $this->getModelSchemes()->getAttributeTypes($modelClass);
+            while (($attributes = $statement->fetch()) !== false) {
+                $model = $this->readResourceFromAssoc($modelClass, $attributes, $typeNames, $platform);
+                yield $model->{$keyColumnName} => $model;
+            }
+        } else {
+            $statement->setFetchMode(PDOConnection::FETCH_CLASS, $modelClass);
+            while (($model = $statement->fetch()) !== false) {
+                yield $model->{$keyColumnName} => $model;
+            }
+        }
+    }
+
+    /**
+     * @param QueryBuilder $builder
+     * @param string       $modelClass
      *
      * @return PaginatedDataInterface
      */
@@ -1391,6 +1460,7 @@ class Crud implements CrudInterface
     /**
      * @param TagStorageInterface   $modelsAtPath
      * @param ArrayObject           $classAtPath
+     * @param ArrayObject           $idsAtPath
      * @param ModelStorageInterface $deDup
      * @param string                $parentsPath
      * @param array                 $childRelationships
@@ -1402,6 +1472,7 @@ class Crud implements CrudInterface
     private function loadRelationshipsLayer(
         TagStorageInterface $modelsAtPath,
         ArrayObject $classAtPath,
+        ArrayObject $idsAtPath,
         ModelStorageInterface $deDup,
         string $parentsPath,
         array $childRelationships
@@ -1415,6 +1486,17 @@ class Crud implements CrudInterface
         // $models.
 
         $pkName = $this->getModelSchemes()->getPrimaryKey($parentClass);
+
+        $registerModelAtPath = function ($model, string $path) use ($deDup, $modelsAtPath, $idsAtPath) {
+            return self::registerModelAtPath(
+                $model,
+                $path,
+                $this->getModelSchemes(),
+                $deDup,
+                $modelsAtPath,
+                $idsAtPath
+            );
+        };
 
         foreach ($childRelationships as $name) {
             $childrenPath = $parentsPath !== static::ROOT_PATH ? $parentsPath . static::PATH_SEPARATOR . $name : $name;
@@ -1432,24 +1514,32 @@ class Crud implements CrudInterface
 
             switch ($relationshipType) {
                 case RelationshipTypes::BELONGS_TO:
+                    // for 'belongsTo' relationship all resources could be read at once.
+                    $parentIds            = $idsAtPath[$parentsPath];
+                    $clonedBuilder        = (clone $builder)->addRelationshipFiltersAndSortsWithAnd(
+                        $reverseRelName,
+                        [$pkName => [FilterParameterInterface::OPERATION_IN => $parentIds]],
+                        null
+                    );
+                    $unregisteredChildren = $this->fetchResourcesWithoutRelationships(
+                        $clonedBuilder,
+                        $clonedBuilder->getModelClass(),
+                        $this->getModelSchemes()->getPrimaryKey($clonedBuilder->getModelClass())
+                    );
+                    $children             = [];
+                    foreach ($unregisteredChildren as $index => $unregisteredChild) {
+                        $children[$index] = $registerModelAtPath($unregisteredChild, $childrenPath);
+                    }
+                    $fkNameToChild = $this->getModelSchemes()->getForeignKey($parentClass, $name);
                     foreach ($parents as $parent) {
-                        $clonedBuilder = (clone $builder)->addRelationshipFiltersAndSortsWithAnd(
-                            $reverseRelName,
-                            [$pkName => [FilterParameterInterface::OPERATION_EQUALS => [$parent->{$pkName}]]],
-                            []
-                        );
-                        $child         = $deDup->register($this->fetchResourceWithoutRelationships(
-                            $clonedBuilder,
-                            $clonedBuilder->getModelClass()
-                        ));
-                        if ($child !== null) {
-                            $modelsAtPath->register($child, $childrenPath);
-                        }
-                        $parent->{$name} = $child;
+                        $fkToChild       = $parent->{$fkNameToChild};
+                        $parent->{$name} = $children[$fkToChild] ?? null;
                     }
                     break;
                 case RelationshipTypes::HAS_MANY:
                 case RelationshipTypes::BELONGS_TO_MANY:
+                    // unfortunately we have paging limits for 'many' relationship thus we have read such
+                    // relationships for each 'parent' individually
                     list ($queryOffset, $queryLimit) = $this->getPaginationStrategy()
                         ->getParameters($rootClass, $parentClass, $parentsPath, $name);
                     $builder->setFirstResult($queryOffset)->setMaxResults($queryLimit + 1);
@@ -1466,11 +1556,7 @@ class Crud implements CrudInterface
 
                         $deDupedChildren = [];
                         foreach ($children->getData() as $child) {
-                            $child = $deDup->register($child);
-                            $modelsAtPath->register($child, $childrenPath);
-                            if ($child !== null) {
-                                $deDupedChildren[] = $child;
-                            }
+                            $deDupedChildren[] = $registerModelAtPath($child, $childrenPath);
                         }
 
                         $paginated = $this->getFactory()
