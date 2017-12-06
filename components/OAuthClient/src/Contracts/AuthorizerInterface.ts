@@ -14,6 +14,13 @@ export default interface AuthorizerInterface {
     password(userName: string, password: string, scope?: string): Promise<TokenInterface>;
 
     /**
+     * Client Credentials Grant.
+     *
+     * @link https://tools.ietf.org/html/rfc6749#section-4.4
+     */
+    client(scope?: string): Promise<TokenInterface>;
+
+    /**
      * Refreshing an Access Token.
      *
      * @link https://tools.ietf.org/html/rfc6749#section-6

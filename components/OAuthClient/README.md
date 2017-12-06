@@ -48,7 +48,7 @@ RFC 6749 defines the following authorization grants
 - [Authorization Code Grant](https://tools.ietf.org/html/rfc6749#section-4.1) - not implemented.
 - [Implicit Grant](https://tools.ietf.org/html/rfc6749#section-4.2) - not implemented.
 - [Resource Owner Password Credentials Grant](https://tools.ietf.org/html/rfc6749#section-4.3) - **implemented**.
-- [Client Credentials Grant](https://tools.ietf.org/html/rfc6749#section-4.4) - not implemented.
+- [Client Credentials Grant](https://tools.ietf.org/html/rfc6749#section-4.4) - **implemented**.
 
 Additionally it describes [Refreshing an Access Token](https://tools.ietf.org/html/rfc6749#section-6) process - **implemented**.
 
@@ -61,7 +61,7 @@ interface ClientRequestsInterface {
     /**
      * Sends form data to a OAuth Server token endpoint.
      */
-    sendForm(data: any): Promise<Response>;
+    sendForm(data: any, addAuth: boolean): Promise<Response>;
 }
 ```
 
@@ -71,7 +71,7 @@ interface ClientRequestsInterface {
 import { Authorizer } from '@limoncello-framework/oauth-client';
 
 const fetcher = {
-    sendForm(data) {
+    sendForm(data, addAuth) {
         // fill it a form
         // for more see https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData
         let form = new FormData();
@@ -86,6 +86,11 @@ const fetcher = {
             credentials: "omit",
             cache: "no-cache",
         };
+
+        if (addAuth === true) {
+            // add client auth info or throw an exception if not applicable
+            init.headers = new Headers({Authorization: 'Basic ...'});
+        }
 
         return fetch('http://your-domain.name/token', init);
     }

@@ -4,18 +4,28 @@ import 'mocha';
 
 class RequestsMock implements ClientRequestsInterface {
     private _data: any | undefined;
+    private _headers: any | undefined;
     private readonly response: Response;
 
     public constructor(response: Response) {
+        this._data = undefined;
+        this._headers = undefined;
         this.response = response;
     }
 
-    public sendForm(data: any): Promise<Response> {
+    public sendForm(data: any, addAuth: boolean = false): Promise<Response> {
         expect(this._data, 'Mock cannot be used for more than one call.').to.be.undefined;
+        expect(this._headers, 'Mock cannot be used for more than one call.').to.be.undefined;
 
         // semi-emulation of reading own object properties and adding them to form
         const form: any = {};
         Object.getOwnPropertyNames(data).forEach((name: string) => form[name] = data[name]);
+
+        if (addAuth === true) {
+            // emulate adding auth header
+            this._headers = { Authorization: 'Basic <put auth info here>' };
+        }
+
         this._data = form;
 
         return Promise.resolve(this.response);
@@ -23,6 +33,10 @@ class RequestsMock implements ClientRequestsInterface {
 
     public get data(): any | undefined {
         return this._data;
+    }
+
+    public get headers(): any | undefined {
+        return this._headers;
     }
 }
 
@@ -64,6 +78,7 @@ describe('Authorizer component', () => {
         expect(requestsMock.data.username).to.equal('some-user-name');
         expect(requestsMock.data.password).to.equal('some-password');
         expect(requestsMock.data.scope).to.be.undefined;
+        expect(requestsMock.headers).to.be.undefined;
     });
 
     it('should return token for a resource owner password grant request with scope', () => {
@@ -79,6 +94,35 @@ describe('Authorizer component', () => {
         expect(requestsMock.data.username).to.equal('some-user-name');
         expect(requestsMock.data.password).to.equal('some-password');
         expect(requestsMock.data.scope).to.equal('scope1,scope2');
+        expect(requestsMock.headers).to.be.undefined;
+    });
+
+    it('should return token for a client credentials grant request without scope', () => {
+        const requestsMock = new RequestsMock(prepareResponse(true, Promise.resolve(tokenMock)));
+        const authorizer = new Authorizer(requestsMock);
+
+        authorizer.client()
+            .then(token => expect(token.access_token).to.equal(TEST_TOKEN_VALUE))
+            .catch(() => expect(false, 'It should not throw any errors.').to.be.true);
+
+        expect(requestsMock.data).to.be.not.undefined;
+        expect(requestsMock.data.grant_type).to.equal('client_credentials');
+        expect(requestsMock.data.scope).to.be.undefined;
+        expect(requestsMock.headers).to.be.not.undefined;
+    });
+
+    it('should return token for a client credentials grant request with scope', () => {
+        const requestsMock = new RequestsMock(prepareResponse(true, Promise.resolve(tokenMock)));
+        const authorizer = new Authorizer(requestsMock);
+
+        authorizer.client('scope1,scope2')
+            .then(token => expect(token.access_token).to.equal(TEST_TOKEN_VALUE))
+            .catch(() => expect(false, 'It should not throw any errors.').to.be.true);
+
+        expect(requestsMock.data).to.be.not.undefined;
+        expect(requestsMock.data.grant_type).to.equal('client_credentials');
+        expect(requestsMock.data.scope).to.equal('scope1,scope2');
+        expect(requestsMock.headers).to.be.not.undefined;
     });
 
     it('should return token for a refresh token grant request without scope', () => {

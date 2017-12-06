@@ -19,13 +19,13 @@ export default class implements AuthorizerInterface {
      *
      * @internal
      */
-    private readonly fetcher: ClientRequestsInterface;
+    private readonly requests: ClientRequestsInterface;
 
     /**
      * Constructor.
      */
-    public constructor(fetcher: ClientRequestsInterface) {
-        this.fetcher = fetcher;
+    public constructor(requests: ClientRequestsInterface) {
+        this.requests = requests;
     }
 
     /**
@@ -44,7 +44,22 @@ export default class implements AuthorizerInterface {
                 'password': password,
             };
 
-        return this.fetchForm(data);
+        return this.parseTokenResponse(this.requests.sendForm(data, false));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public client(scope?: string): Promise<TokenInterface> {
+        const data = scope !== undefined ?
+            {
+                'grant_type': 'client_credentials',
+                'scope': scope
+            } : {
+                'grant_type': 'client_credentials'
+            };
+
+        return this.parseTokenResponse(this.requests.sendForm(data, true));
     }
 
     /**
@@ -61,16 +76,16 @@ export default class implements AuthorizerInterface {
                 'refresh_token': refreshToken,
             };
 
-        return this.fetchForm(data);
+        return this.parseTokenResponse(this.requests.sendForm(data, false));
     }
 
     /**
-     * Fetch form to token endpoint.
+     * Common code for parsing token responses.
      *
-     * @internal
+     * @param responsePromise
      */
-    private fetchForm(data: object): Promise<TokenInterface> {
-        return this.fetcher.sendForm(data)
+    protected parseTokenResponse(responsePromise: Promise<Response>): Promise<TokenInterface> {
+        return responsePromise
             // here the response has only HTTP status but we want resolved JSON as well so...
             .then(response => Promise.all([
                 response.json(),

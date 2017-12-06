@@ -10,11 +10,11 @@ export default class  implements AuthorizerInterface {
      *
      * @internal
      */
-    private readonly fetcher;
+    private readonly requests;
     /**
      * Constructor.
      */
-    constructor(fetcher: ClientRequestsInterface);
+    constructor(requests: ClientRequestsInterface);
     /**
      * @inheritdoc
      */
@@ -22,11 +22,15 @@ export default class  implements AuthorizerInterface {
     /**
      * @inheritdoc
      */
+    client(scope?: string): Promise<TokenInterface>;
+    /**
+     * @inheritdoc
+     */
     refresh(refreshToken: string, scope?: string): Promise<TokenInterface>;
     /**
-     * Fetch form to token endpoint.
+     * Common code for parsing token responses.
      *
-     * @internal
+     * @param responsePromise
      */
-    private fetchForm(data);
+    protected parseTokenResponse(responsePromise: Promise<Response>): Promise<TokenInterface>;
 }
