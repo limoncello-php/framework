@@ -18,6 +18,10 @@ export default class  implements AuthorizerInterface {
     /**
      * @inheritdoc
      */
+    code(authCode: string, redirectUri?: string | undefined, clientId?: string | undefined): Promise<TokenInterface>;
+    /**
+     * @inheritdoc
+     */
     password(userName: string, password: string, scope?: string): Promise<TokenInterface>;
     /**
      * @inheritdoc

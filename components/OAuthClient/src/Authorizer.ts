@@ -31,17 +31,45 @@ export default class implements AuthorizerInterface {
     /**
      * @inheritdoc
      */
+    code(authCode: string, redirectUri?: string | undefined, clientId?: string | undefined): Promise<TokenInterface> {
+        // NOTE: it implements steps 4.1.3 and 4.1.4 of the spec.
+        // Steps 4.1.1 and 4.1.2 (getting authorization code) are outside of the implementation.
+        // Technically those steps are plain redirect to authorization server (AS) and reading the code from URL in a
+        // callback from AS. They are trivial and very specific to tools used for building the app.
+        //
+        // https://tools.ietf.org/html/rfc6749#section-4.1.3 and https://tools.ietf.org/html/rfc6749#section-4.1.4
+
+        const addAuth: boolean = (clientId === undefined);
+        const data: any = addAuth ?
+            {
+                grant_type: 'authorization_code',
+                code: authCode
+            } : {
+                grant_type: 'authorization_code',
+                code: authCode,
+                client_id: clientId
+            };
+        if (redirectUri !== undefined) {
+            data.redirect_uri = redirectUri;
+        }
+
+        return this.parseTokenResponse(this.requests.sendForm(data, addAuth));
+    }
+
+    /**
+     * @inheritdoc
+     */
     public password(userName: string, password: string, scope?: string): Promise<TokenInterface> {
         const data = scope !== undefined ?
             {
-                'grant_type': 'password',
-                'username': userName,
-                'password': password,
-                'scope': scope,
+                grant_type: 'password',
+                username: userName,
+                password: password,
+                scope: scope,
             } : {
-                'grant_type': 'password',
-                'username': userName,
-                'password': password,
+                grant_type: 'password',
+                username: userName,
+                password: password,
             };
 
         return this.parseTokenResponse(this.requests.sendForm(data, false));
@@ -53,10 +81,10 @@ export default class implements AuthorizerInterface {
     public client(scope?: string): Promise<TokenInterface> {
         const data = scope !== undefined ?
             {
-                'grant_type': 'client_credentials',
-                'scope': scope
+                grant_type: 'client_credentials',
+                scope: scope
             } : {
-                'grant_type': 'client_credentials'
+                grant_type: 'client_credentials'
             };
 
         return this.parseTokenResponse(this.requests.sendForm(data, true));
@@ -68,12 +96,12 @@ export default class implements AuthorizerInterface {
     public refresh(refreshToken: string, scope?: string): Promise<TokenInterface> {
         const data = scope !== undefined ?
             {
-                'grant_type': 'refresh_token',
-                'refresh_token': refreshToken,
-                'scope': scope,
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken,
+                scope: scope,
             } : {
-                'grant_type': 'refresh_token',
-                'refresh_token': refreshToken,
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken,
             };
 
         return this.parseTokenResponse(this.requests.sendForm(data, false));

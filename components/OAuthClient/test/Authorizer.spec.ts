@@ -65,6 +65,43 @@ describe('Authorizer component', () => {
         error: 'invalid_request',
     };
 
+    it('should return token for an authorization code grant request without redirect URI and client ID', () => {
+        // NOTE: it tests steps 4.1.3 and 4.1.4 of the spec. Steps 4.1.1 and 4.1.2 are outside of the implementation.
+        // https://tools.ietf.org/html/rfc6749#section-4.1.3 and https://tools.ietf.org/html/rfc6749#section-4.1.4
+
+        const requestsMock = new RequestsMock(prepareResponse(true, Promise.resolve(tokenMock)));
+        const authorizer = new Authorizer(requestsMock);
+
+        authorizer.code('some-auth-code')
+            .then(token => expect(token.access_token).to.equal(TEST_TOKEN_VALUE))
+            .catch(() => expect(false, 'It should not throw any errors.').to.be.true);
+
+        expect(requestsMock.data).to.be.not.undefined;
+        expect(requestsMock.data.grant_type).to.equal('authorization_code');
+        expect(requestsMock.data.code).to.equal('some-auth-code');
+        expect(requestsMock.data.redirect_uri).to.be.undefined;
+        expect(requestsMock.data.client_id).to.be.undefined;
+        // client authentication should be added
+        expect(requestsMock.headers).to.be.not.undefined;
+    });
+
+    it('should return token for an authorization code grant request with redirect URI and client ID', () => {
+        const requestsMock = new RequestsMock(prepareResponse(true, Promise.resolve(tokenMock)));
+        const authorizer = new Authorizer(requestsMock);
+
+        authorizer.code('some-auth-code', 'http://your-domain.name/auth-redirect', 'some-client-id')
+            .then(token => expect(token.access_token).to.equal(TEST_TOKEN_VALUE))
+            .catch(() => expect(false, 'It should not throw any errors.').to.be.true);
+
+        expect(requestsMock.data).to.be.not.undefined;
+        expect(requestsMock.data.grant_type).to.equal('authorization_code');
+        expect(requestsMock.data.code).to.equal('some-auth-code');
+        expect(requestsMock.data.redirect_uri).to.equal('http://your-domain.name/auth-redirect');
+        expect(requestsMock.data.client_id).to.equal('some-client-id');
+        // client authentication should not be added as the request body has client ID
+        expect(requestsMock.headers).to.be.undefined;
+    });
+
     it('should return token for a resource owner password grant request without scope', () => {
         const requestsMock = new RequestsMock(prepareResponse(true, Promise.resolve(tokenMock)));
         const authorizer = new Authorizer(requestsMock);

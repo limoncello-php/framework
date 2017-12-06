@@ -45,8 +45,8 @@ $ yarn add --dev @limoncello-framework/oauth-client
 
 RFC 6749 defines the following authorization grants
 
-- [Authorization Code Grant](https://tools.ietf.org/html/rfc6749#section-4.1) - not implemented.
-- [Implicit Grant](https://tools.ietf.org/html/rfc6749#section-4.2) - not implemented.
+- [Authorization Code Grant](https://tools.ietf.org/html/rfc6749#section-4.1) - **implemented** (steps 4.1.3 and 4.1.4 of the spec).
+- [Implicit Grant](https://tools.ietf.org/html/rfc6749#section-4.2) - out of the project scope (nothing to implement).
 - [Resource Owner Password Credentials Grant](https://tools.ietf.org/html/rfc6749#section-4.3) - **implemented**.
 - [Client Credentials Grant](https://tools.ietf.org/html/rfc6749#section-4.4) - **implemented**.
 
@@ -70,7 +70,7 @@ interface ClientRequestsInterface {
 ```js
 import { Authorizer } from '@limoncello-framework/oauth-client';
 
-const fetcher = {
+const clientRequests = {
     sendForm(data, addAuth) {
         // fill it a form
         // for more see https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData
@@ -96,7 +96,7 @@ const fetcher = {
     }
 };
 
-const authorizer = new Authorizer(fetcher);
+const authorizer = new Authorizer(clientRequests);
 
 // Request token
 
