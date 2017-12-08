@@ -122,20 +122,13 @@ export default class implements AuthorizerInterface {
             // ... now we have both
             .then(results => {
                 const [json, isOk] = results;
-                if (isOk === false) {
-                    throw new TokenError(<ErrorResponseInterface>json);
-                }
-
-                return Promise.resolve(<TokenInterface>json);
+                return isOk === true ?
+                    Promise.resolve(<TokenInterface>json) :
+                    Promise.reject(new TokenError(<ErrorResponseInterface>json));
             })
-            .catch((error: any) => {
-                // rethrow the error from the block above
-                if (error.reason !== undefined) {
-                    throw error;
-                }
-
-                // if we are here the response was not JSON
-                throw new TypeError(RESPONSE_IS_NOT_JSON);
-            });
+            // return the error from the block above or report the response was not JSON
+            .catch((error: any) => Promise.reject(
+                error.reason !== undefined ? error : new TypeError(RESPONSE_IS_NOT_JSON)
+            ));
     }
 }
