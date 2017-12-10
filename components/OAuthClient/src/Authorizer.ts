@@ -122,8 +122,9 @@ export default class implements AuthorizerInterface {
             // ... now we have both
             .then(results => {
                 const [json, isOk] = results;
-                return isOk === true ?
-                    Promise.resolve(<TokenInterface>json) :
+                const token: TokenInterface = json;
+                return isOk === true && token.access_token !== undefined && token.token_type !== undefined ?
+                    Promise.resolve(token) :
                     Promise.reject(new TokenError(<ErrorResponseInterface>json));
             })
             // return the error from the block above or report the response was not JSON
