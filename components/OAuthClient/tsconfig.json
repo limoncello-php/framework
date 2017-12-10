@@ -41,18 +41,16 @@
     "noImplicitThis": true,
     /* Parse in strict mode and emit "use strict" for each source file. */
     "alwaysStrict": true,
-
     /* Additional Checks */
 
     /* Report errors on unused locals. */
-    //"noUnusedLocals": true,
+    "noUnusedLocals": true,
     /* Report errors on unused parameters. */
     "noUnusedParameters": true,
     /* Report error when not all code paths in function return a value. */
     "noImplicitReturns": true,
     /* Report errors for fallthrough cases in switch statement. */
     "noFallthroughCasesInSwitch": true,
-
     /* Module Resolution Options */
 
     // "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
