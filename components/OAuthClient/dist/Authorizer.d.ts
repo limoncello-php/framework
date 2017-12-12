@@ -6,12 +6,6 @@ import ClientRequestsInterface from './Contracts/ClientRequestsInterface';
  */
 export default class  implements AuthorizerInterface {
     /**
-     * Fetcher wrapper.
-     *
-     * @internal
-     */
-    private readonly requests;
-    /**
      * Constructor.
      */
     constructor(requests: ClientRequestsInterface);
