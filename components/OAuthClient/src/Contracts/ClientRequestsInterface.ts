@@ -17,7 +17,7 @@
 /**
  * A basic wrapper for fetching forms.
  */
-export default interface ClientRequestsInterface {
+export interface ClientRequestsInterface {
     /**
      * Sends form data to a OAuth Server token endpoint.
      *

@@ -21,7 +21,7 @@ import { ErrorResponseCodes } from './ErrorResponseCodes';
  *
  * @link https://tools.ietf.org/html/rfc6749#section-5.2
  */
-export default interface ErrorResponseInterface {
+export interface ErrorResponseInterface {
     /**
      * Error code.
      */

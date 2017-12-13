@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import AuthorizerInterface from './Contracts/AuthorizerInterface';
-import TokenInterface from './Contracts/TokenInterface';
-import ClientRequestsInterface from './Contracts/ClientRequestsInterface';
+import { AuthorizerInterface } from './../Contracts/AuthorizerInterface';
+import { ClientRequestsInterface } from './../Contracts/ClientRequestsInterface';
+import { TokenInterface } from './../Contracts/TokenInterface';
 /**
  * @inheritdoc
  */
-export default class  implements AuthorizerInterface {
+export declare class Authorizer implements AuthorizerInterface {
     /**
      * Constructor.
      */
@@ -40,10 +40,4 @@ export default class  implements AuthorizerInterface {
      * @inheritdoc
      */
     refresh(refreshToken: string, scope?: string): Promise<TokenInterface>;
-    /**
-     * Common code for parsing token responses.
-     *
-     * @param responsePromise
-     */
-    protected parseTokenResponse(responsePromise: Promise<Response>): Promise<TokenInterface>;
 }

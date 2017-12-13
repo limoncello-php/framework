@@ -13,27 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import ErrorResponseInterface from './Contracts/ErrorResponseInterface';
-
+import { ErrorResponseInterface } from './../Contracts/ErrorResponseInterface';
 /**
  * OAuth token error.
  */
-export default class extends Error {
+export declare class TokenError extends Error {
     /**
      * OAuth Error details.
      */
-    public readonly reason: ErrorResponseInterface;
-
+    readonly reason: ErrorResponseInterface;
     /**
      * Constructor.
      */
-    public constructor(reason: ErrorResponseInterface, ...args: any[]) {
-        super(...args);
-
-        this.reason = reason;
-        if (reason.error_description !== null && reason.error_description !== undefined) {
-            this.message = reason.error_description;
-        }
-    }
+    constructor(reason: ErrorResponseInterface, ...args: any[]);
 }

@@ -19,7 +19,7 @@
  *
  * @link https://tools.ietf.org/html/rfc6749#section-5.1
  */
-export default interface TokenInterface {
+export interface TokenInterface {
     /**
      * The access token issued by the authorization server.
      */

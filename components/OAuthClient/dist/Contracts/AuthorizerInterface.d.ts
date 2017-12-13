@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import TokenInterface from './TokenInterface';
+import { TokenInterface } from './TokenInterface';
 /**
  * OAuth 2.0 authorization.
  *
  * @link https://tools.ietf.org/html/rfc6749#section-4
  */
-export default interface AuthorizerInterface {
+export interface AuthorizerInterface {
     /**
      * Resource Owner Password Credentials Grant.
      *

@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-import Authorizer from './Authorizer';
-import TokenError from './TokenError';
+export { Authorizer } from './OAuthClient/Authorizer';
+export { TokenError } from './OAuthClient/TokenError';
 
-import AuthorizerInterface from './Contracts/AuthorizerInterface';
-import ClientRequestsInterface from './Contracts/ClientRequestsInterface';
-import TokenInterface from './Contracts/TokenInterface';
-import ErrorResponseInterface from './Contracts/ErrorResponseInterface';
-import { ErrorResponseCodes } from './Contracts/ErrorResponseCodes';
-
-export {
-    Authorizer,
-    AuthorizerInterface,
-    TokenError,
-    ErrorResponseInterface,
-    ErrorResponseCodes,
-    ClientRequestsInterface,
-    TokenInterface
-};
+export { AuthorizerInterface } from './Contracts/AuthorizerInterface';
+export { ClientRequestsInterface } from './Contracts/ClientRequestsInterface';
+export { TokenInterface } from './Contracts/TokenInterface';
+export { ErrorResponseInterface } from './Contracts/ErrorResponseInterface';
+export { ErrorResponseCodes } from './Contracts/ErrorResponseCodes';

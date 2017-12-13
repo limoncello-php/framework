@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import AuthorizerInterface from './Contracts/AuthorizerInterface';
-import TokenInterface from './Contracts/TokenInterface';
-import ClientRequestsInterface from './Contracts/ClientRequestsInterface';
-import TokenError from './TokenError';
-import ErrorResponseInterface from './Contracts/ErrorResponseInterface';
+import { AuthorizerInterface } from './../Contracts/AuthorizerInterface';
+import { ClientRequestsInterface } from './../Contracts/ClientRequestsInterface';
+import { ErrorResponseInterface } from './../Contracts/ErrorResponseInterface';
+import { TokenInterface } from './../Contracts/TokenInterface';
+import { TokenError } from './TokenError';
 
 /**
  * Error message.
@@ -29,7 +29,7 @@ const RESPONSE_IS_NOT_JSON: string =
 /**
  * @inheritdoc
  */
-export default class implements AuthorizerInterface {
+export class Authorizer implements AuthorizerInterface {
     /**
      * Fetcher wrapper.
      *
@@ -127,6 +127,8 @@ export default class implements AuthorizerInterface {
      * Common code for parsing token responses.
      *
      * @param responsePromise
+     *
+     * @internal
      */
     protected parseTokenResponse(responsePromise: Promise<Response>): Promise<TokenInterface> {
         return responsePromise
