@@ -169,6 +169,24 @@ class QueryParserTest extends TestCase
     /**
      * Test query.
      */
+    public function testIsNullShortForm(): void
+    {
+        parse_str('filter[deleted-at-attribute][is-null]', $queryParameters);
+
+        $parser  = $this->createParser($queryParameters);
+        $filters = $this->iterableToArray($parser->getFilters());
+        $this->assertEquals([
+            BoardSchema::ATTR_DELETED_AT => [
+                'is-null' => [],
+            ],
+        ], $filters);
+
+        $this->assertTrue($parser->areFiltersWithAnd());
+    }
+
+    /**
+     * Test query.
+     */
     public function testGetSorts(): void
     {
         $queryParameters = [

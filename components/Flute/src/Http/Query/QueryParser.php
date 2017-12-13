@@ -438,14 +438,18 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
         // in this case we interpret it as an [operation => 'comma separated argument(s)']
         foreach ($value as $operationName => $arguments) {
             if (is_string($operationName) === false || empty($operationName) === true ||
-                is_string($arguments) === false || empty($arguments) === true
+                is_string($arguments) === false
             ) {
                 $title = static::MSG_ERR_INVALID_OPERATION_ARGUMENTS;
                 $error = $this->createQueryError($parameterName, $title);
                 throw new InvalidQueryParametersException($error);
             }
 
-            yield $operationName => $this->splitCommaSeparatedStringAndCheckNoEmpties($parameterName, $arguments);
+            if (empty($arguments) === true) {
+                yield $operationName => [];
+            } else {
+                yield $operationName => $this->splitCommaSeparatedStringAndCheckNoEmpties($parameterName, $arguments);
+            }
         }
     }
 
