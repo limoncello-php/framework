@@ -1,6 +1,6 @@
 {
     "name": "@limoncello-framework/oauth-client",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "description": "OAuth2 client",
     "homepage": "https://github.com/limoncello-php/framework/tree/master/components/OAuthClient",
     "author": "neomerx",
