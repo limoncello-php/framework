@@ -67,12 +67,17 @@ class CookieTest extends TestCase
         $this->assertEquals(!$isRaw, $cookie->isRaw());
         $this->assertEquals($isRaw, $cookie->isNotRaw());
 
-        $cookie->setExpiresInSeconds(10);
-        $this->assertEquals(time() + 10, $cookie->getExpiresAtUnixTime());
+        $now      = new DateTime();
+        $nowInSec = $now->getTimestamp();
 
-        $in100seconds = (new DateTime())->add(new DateInterval('PT100S'));
+        $cookie->setExpiresInSeconds(10);
+        // setExpiresInSeconds internally takes current time so there is a tiny chance that it will be
+        // 1 second difference.
+        $this->assertLessThanOrEqual(1, $cookie->getExpiresAtUnixTime() - ($nowInSec + 10));
+
+        $in100seconds = $now->add(new DateInterval('PT100S'));
         $cookie->setExpiresAtDataTime($in100seconds);
-        $this->assertEquals(time() + 100, $cookie->getExpiresAtUnixTime());
+        $this->assertEquals($nowInSec + 100, $cookie->getExpiresAtUnixTime());
 
         try {
             $cookie->setExpiresAtUnixTime(-1);
