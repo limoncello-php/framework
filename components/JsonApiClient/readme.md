@@ -16,7 +16,7 @@ It can build queries for reading resource collections, individual resources by i
 Usage sample
 
 ```javascript
-import { QueryBuilder } from ' @limoncello-framework/json-api-client';
+import { QueryBuilder } from '@limoncello-framework/json-api-client';
 
 const query = (new QueryBuilder('comments'))
     .onlyFields({
