@@ -548,7 +548,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      */
-    public function testIndexFilterOperationOnRelationship(): void
+    public function testIndexFilterOperationOnRelationshipById(): void
     {
         $crud = $this->createCrud(PostsApi::class);
 
@@ -561,6 +561,26 @@ class CrudTest extends TestCase
         ];
 
         $data = $crud->withFilters($filters)->withPaging($pagingOffset, $pagingSize)->index();
+
+        $this->assertCount(6, $data->getData());
+    }
+
+    /**
+     * Test index.
+     */
+    public function testIndexFilterOperationOnRelationshipByName(): void
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        $filters = [
+            User::FIELD_ID => [
+                FilterParameterInterface::OPERATION_IN => [2, 4],
+            ],
+        ];
+
+        $data = $crud
+            ->withRelationshipFilters(Post::REL_USER, $filters)
+            ->index();
 
         $this->assertCount(6, $data->getData());
     }
@@ -632,7 +652,7 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(PostsApi::class);
 
         // will select all comments for Posts with ID 1 or 2...
-        $postFilters    = [
+        $postFilters = [
             Post::FIELD_ID => [
                 FilterParameterInterface::OPERATION_EQUALS => [1],
                 FilterParameterInterface::OPERATION_IN     => [2],
@@ -645,7 +665,7 @@ class CrudTest extends TestCase
             ],
         ];
         // ... sort them by parent post ID
-        $commentSorts   = [
+        $commentSorts = [
             Comment::FIELD_ID_POST => true,
         ];
 
@@ -797,7 +817,7 @@ class CrudTest extends TestCase
             ->withColumnMapper(function (string $columnName, ModelQueryBuilder $builder): string {
                 // a bit naive implementation but fine for testing purposes
                 $quotedColumnName = $builder->getQuotedMainAliasColumn($columnName);
-                $dateTimeColumns = [Post::FIELD_CREATED_AT, Post::FIELD_UPDATED_AT, Post::FIELD_DELETED_AT];
+                $dateTimeColumns  = [Post::FIELD_CREATED_AT, Post::FIELD_UPDATED_AT, Post::FIELD_DELETED_AT];
                 if (in_array($columnName, $dateTimeColumns) === true) {
                     // emulate output datetime in JSON API as 2015-05-22T14:56:29.000Z
                     // this function is specific for SQLite

@@ -33,27 +33,27 @@ class PaginationStrategyTest extends TestCase
 
         $skip = 0;
         $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([$skip, $size], $parsed);
 
         $skip = -1;
         $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([0, $size], $parsed);
 
         $skip = 200;
         $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([$skip, $size], $parsed);
 
         $skip = 0;
         $size = 200;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([$skip, $maxPageSize], $parsed);
 
         $skip   = 0;
         $size   = -200;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([$skip, 1], $parsed);
     }
 
@@ -66,22 +66,22 @@ class PaginationStrategyTest extends TestCase
 
         $skip = 0;
         $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([$skip, $size], $parsed);
 
         $skip = -1;
         $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([0, $size], $parsed);
 
         $skip = 200;
         $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([$skip, $size], $parsed);
 
         $skip = 0;
         $size = 200;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_SKIP => $skip, PS::PARAM_PAGING_SIZE => $size]);
+        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
         $this->assertEquals([$skip, $defaultPageSize], $parsed);
     }
 }

@@ -70,14 +70,14 @@ class PaginationStrategy implements PaginationStrategyInterface
 
         $offset = $this->getValue(
             $parameters,
-            static::PARAM_PAGING_SKIP,
+            static::PARAM_PAGING_OFFSET,
             0,
             0,
             PHP_INT_MAX
         );
         $size   = $this->getValue(
             $parameters,
-            static::PARAM_PAGING_SIZE,
+            static::PARAM_PAGING_LIMIT,
             $this->getDefaultPageSize(),
             1,
             max($this->getDefaultPageSize(), $this->getMaxPageSize())

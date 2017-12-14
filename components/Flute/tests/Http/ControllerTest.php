@@ -94,7 +94,7 @@ class ControllerTest extends TestCase
         $resource = json_decode($body, true);
 
         $this->assertEquals(
-            'http://localhost.local/comments?page[skip]=10&page[size]=10',
+            'http://localhost.local/comments?page[offset]=10&page[limit]=10',
             urldecode($resource[DocumentInterface::KEYWORD_LINKS][DocumentInterface::KEYWORD_NEXT])
         );
         $this->assertCount(10, $resource[DocumentInterface::KEYWORD_DATA]);
@@ -126,7 +126,7 @@ class ControllerTest extends TestCase
         $resource = json_decode($body, true);
 
         $this->assertEquals(
-            'http://localhost.local/comments?sort=-id&page[skip]=10&page[size]=10',
+            'http://localhost.local/comments?sort=-id&page[offset]=10&page[limit]=10',
             urldecode($resource[DocumentInterface::KEYWORD_LINKS][DocumentInterface::KEYWORD_NEXT])
         );
         $this->assertCount(10, $resources = $resource[DocumentInterface::KEYWORD_DATA]);
@@ -346,7 +346,7 @@ class ControllerTest extends TestCase
         // manually checked that one of the elements should have paginated data in relationship
         $this->assertTrue(isset($resource['data'][2]['relationships']['posts-relationship']['links']['next']));
         $link = $resource['data'][2]['relationships']['posts-relationship']['links']['next'];
-        $this->assertEquals('/boards/3/relationships/posts-relationship?skip=3&size=3', $link);
+        $this->assertEquals('/boards/3/relationships/posts-relationship?offset=3&limit=3', $link);
     }
 
     /**

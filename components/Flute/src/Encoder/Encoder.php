@@ -128,8 +128,8 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
         return function ($offset) use ($pageSize, $queryParams) {
             $paramsWithPaging = array_merge($queryParams, [
                 QueryParametersParserInterface::PARAM_PAGE => [
-                    PaginationStrategyInterface::PARAM_PAGING_SKIP => $offset,
-                    PaginationStrategyInterface::PARAM_PAGING_SIZE => $pageSize,
+                    PaginationStrategyInterface::PARAM_PAGING_OFFSET => $offset,
+                    PaginationStrategyInterface::PARAM_PAGING_LIMIT  => $pageSize,
                 ],
             ]);
             $newUri           = $this->getOriginalUri()->withQuery(http_build_query($paramsWithPaging));

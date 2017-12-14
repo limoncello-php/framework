@@ -22,10 +22,10 @@
 interface PaginationStrategyInterface
 {
     /** Query parameter */
-    const PARAM_PAGING_SIZE = 'size';
+    const PARAM_PAGING_LIMIT = 'limit';
 
     /** Query parameter */
-    const PARAM_PAGING_SKIP = 'skip';
+    const PARAM_PAGING_OFFSET = 'offset';
 
     /**
      * @param string $rootClass

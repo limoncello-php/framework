@@ -214,8 +214,8 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
 
         $buildUrl = function ($offset) use ($data, $uri) {
             $paramsWithPaging = [
-                PaginationStrategyInterface::PARAM_PAGING_SKIP => $offset,
-                PaginationStrategyInterface::PARAM_PAGING_SIZE => $data->getLimit(),
+                PaginationStrategyInterface::PARAM_PAGING_OFFSET => $offset,
+                PaginationStrategyInterface::PARAM_PAGING_LIMIT  => $data->getLimit(),
             ];
             $fullUrl          = $uri . '?' . http_build_query($paramsWithPaging);
 
