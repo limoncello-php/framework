@@ -1,0 +1,40 @@
+{
+  "name": "@limoncello-framework/json-api-client",
+  "version": "0.1.0",
+  "description": "JSON API (jsonapi.org) client",
+  "homepage": "https://github.com/limoncello-php/framework/tree/master/components/JsonApiClient",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/limoncello-php/framework.git"
+  },
+  "bugs": {
+    "url": "https://github.com/limoncello-php/framework/issues"
+  },
+  "keywords": [
+    "JSON",
+    "API",
+    "JSON API",
+    "jsonapi.org",
+    "JSON API client",
+    "typescript",
+    "limoncello"
+  ],
+  "author": "neomerx",
+  "license": "Apache-2.0",
+  "private": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "del-cli ./dist/** && tsc --stripInternal",
+    "test": "mocha --colors --reporter progress --require ts-node/register ./test/*.spec.ts"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.8",
+    "@types/mocha": "^2.2.44",
+    "chai": "^4.1.2",
+    "del-cli": "^1.1.0",
+    "mocha": "^4.0.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.2"
+  }
+}
