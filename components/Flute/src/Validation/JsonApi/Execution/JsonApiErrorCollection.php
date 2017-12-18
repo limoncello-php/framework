@@ -23,7 +23,9 @@ use Limoncello\Flute\Http\JsonApiResponse;
 use Limoncello\Flute\Validation\Traits\HasValidationFormatterTrait;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Flute
@@ -84,6 +86,9 @@ class JsonApiErrorCollection extends ErrorCollection
 
     /**
      * @return string
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getInvalidValueMessage(): string
     {
@@ -96,6 +101,9 @@ class JsonApiErrorCollection extends ErrorCollection
      * @param ErrorInterface $error
      *
      * @return string
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getValidationMessage(ErrorInterface $error): string
     {
@@ -108,6 +116,9 @@ class JsonApiErrorCollection extends ErrorCollection
 
     /**
      * @return FormatterInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getMessageFormatter(): FormatterInterface
     {

@@ -146,7 +146,7 @@ class Runner
             $fields = array_merge($fields, [Model::FIELD_CREATED_AT => date('Y-m-d H:i:s')]);
             try {
                 $result = $connection->insert($tableName, $fields);
-            } catch (UniqueConstraintViolationException $e) {
+            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $e) {
                 // ignore non-unique records
                 $result = true;
             }
@@ -173,7 +173,7 @@ class Runner
 
         try {
             $result = $connection->insert($tableName, $quotedFields);
-        } catch (UniqueConstraintViolationException $e) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $e) {
             // ignore non-unique records
             $result = true;
         }

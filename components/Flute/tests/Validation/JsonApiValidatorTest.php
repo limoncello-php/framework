@@ -19,6 +19,7 @@
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
@@ -664,6 +665,8 @@ EOT;
 
     /**
      * Test unique in database rule.
+     *
+     * @throws DBALException
      */
     public function testDbUniqueRule(): void
     {

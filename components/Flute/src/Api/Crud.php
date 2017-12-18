@@ -19,6 +19,7 @@
 use ArrayObject;
 use Closure;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\PDOConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -39,7 +40,9 @@ use Limoncello\Flute\Contracts\Models\TagStorageInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
 use Limoncello\Flute\L10n\Messages;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Traversable;
 
 /**
@@ -139,6 +142,9 @@ class Crud implements CrudInterface
     /**
      * @param ContainerInterface $container
      * @param string             $modelClass
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function __construct(ContainerInterface $container, string $modelClass)
     {
@@ -436,6 +442,8 @@ class Crud implements CrudInterface
      * @param ModelQueryBuilder $builder
      *
      * @return Crud
+     *
+     * @throws DBALException
      */
     protected function applyAliasFilters(ModelQueryBuilder $builder): self
     {
@@ -452,6 +460,8 @@ class Crud implements CrudInterface
      * @param ModelQueryBuilder $builder
      *
      * @return self
+     *
+     * @throws DBALException
      */
     protected function applyTableFilters(ModelQueryBuilder $builder): self
     {
@@ -468,6 +478,8 @@ class Crud implements CrudInterface
      * @param ModelQueryBuilder $builder
      *
      * @return self
+     *
+     * @throws DBALException
      */
     protected function applyRelationshipFiltersAndSorts(ModelQueryBuilder $builder): self
     {
@@ -658,6 +670,8 @@ class Crud implements CrudInterface
      * @return void
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     *
+     * @throws DBALException
      */
     private function loadRelationships($data): void
     {
@@ -803,6 +817,8 @@ class Crud implements CrudInterface
      * @param iterable|null $columns
      *
      * @return ModelQueryBuilder
+     *
+     * @throws DBALException
      */
     protected function createIndexModelBuilder(iterable $columns = null): ModelQueryBuilder
     {
@@ -830,6 +846,8 @@ class Crud implements CrudInterface
 
     /**
      * @return ModelQueryBuilder
+     *
+     * @throws DBALException
      */
     protected function createDeleteModelBuilder(): ModelQueryBuilder
     {
@@ -910,6 +928,8 @@ class Crud implements CrudInterface
      * @param iterable|null $columns
      *
      * @return ModelQueryBuilder
+     *
+     * @throws DBALException
      */
     public function createReadRelationshipBuilder(
         string $relationshipName,
@@ -1202,6 +1222,8 @@ class Crud implements CrudInterface
      * @param Closure $closure
      *
      * @return void
+     *
+     * @throws DBALException
      */
     public function inTransaction(Closure $closure): void
     {
@@ -1303,6 +1325,8 @@ class Crud implements CrudInterface
      * @param string       $modelClass
      *
      * @return mixed|null
+     *
+     * @throws DBALException
      */
     private function fetchResourceWithoutRelationships(QueryBuilder $builder, string $modelClass)
     {
@@ -1332,6 +1356,8 @@ class Crud implements CrudInterface
      * @param string       $keyColumnName
      *
      * @return iterable
+     *
+     * @throws DBALException
      */
     private function fetchResourcesWithoutRelationships(
         QueryBuilder $builder,
@@ -1361,6 +1387,8 @@ class Crud implements CrudInterface
      * @param string       $modelClass
      *
      * @return PaginatedDataInterface
+     *
+     * @throws DBALException
      */
     private function fetchPaginatedResourcesWithoutRelationships(
         QueryBuilder $builder,
@@ -1384,6 +1412,8 @@ class Crud implements CrudInterface
      * @param string       $modelClass
      *
      * @return array
+     *
+     * @throws DBALException
      */
     private function fetchResourceCollection(QueryBuilder $builder, string $modelClass): array
     {
@@ -1468,6 +1498,8 @@ class Crud implements CrudInterface
      * @return void
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @throws DBALException
      */
     private function loadRelationshipsLayer(
         TagStorageInterface $modelsAtPath,
@@ -1578,6 +1610,9 @@ class Crud implements CrudInterface
      * @param string $message
      *
      * @return string
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getMessage(string $message): string
     {
@@ -1598,6 +1633,8 @@ class Crud implements CrudInterface
      * @return mixed
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @throws DBALException
      */
     private function readResourceFromAssoc(
         string $class,
@@ -1621,6 +1658,8 @@ class Crud implements CrudInterface
      * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @throws DBALException
      */
     private function readRowFromAssoc(array $attributes, array $typeNames, AbstractPlatform $platform): array
     {
@@ -1638,6 +1677,8 @@ class Crud implements CrudInterface
      * @param AbstractPlatform $platform
      *
      * @return iterable
+     *
+     * @throws DBALException
      */
     private function readTypedAttributes(iterable $attributes, array $typeNames, AbstractPlatform $platform): iterable
     {

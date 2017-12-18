@@ -34,7 +34,9 @@ use Limoncello\Flute\Http\Traits\CreateResponsesTrait;
 use Limoncello\Flute\L10n\Messages;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -170,6 +172,9 @@ abstract class BaseController implements ControllerInterface
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function readRelationship(
         string $index,
@@ -198,6 +203,9 @@ abstract class BaseController implements ControllerInterface
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function readRelationshipIdentifiers(
         string $index,
@@ -224,6 +232,9 @@ abstract class BaseController implements ControllerInterface
      * @param string|null        $class
      *
      * @return CrudInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createApi(ContainerInterface $container, string $class = null): CrudInterface
     {
@@ -239,6 +250,9 @@ abstract class BaseController implements ControllerInterface
      * @param ServerRequestInterface $request
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function readJsonFromRequest(ContainerInterface $container, ServerRequestInterface $request): array
     {
@@ -263,8 +277,10 @@ abstract class BaseController implements ControllerInterface
      * @param array              $jsonData
      *
      * @return array
-     *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function normalizeIndexValueOnUpdate(
         array $routeParams,
@@ -306,6 +322,9 @@ abstract class BaseController implements ControllerInterface
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function deleteInRelationship(
         $parentIndex,
@@ -342,6 +361,9 @@ abstract class BaseController implements ControllerInterface
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function updateInRelationship(
         $parentIndex,
@@ -379,6 +401,9 @@ abstract class BaseController implements ControllerInterface
      * @param ContainerInterface $container
      *
      * @return JsonApiValidatorInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createOnCreateValidator(ContainerInterface $container): JsonApiValidatorInterface
     {
@@ -394,6 +419,9 @@ abstract class BaseController implements ControllerInterface
      * @param ContainerInterface $container
      *
      * @return JsonApiValidatorInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createOnUpdateValidator(ContainerInterface $container): JsonApiValidatorInterface
     {
@@ -410,6 +438,9 @@ abstract class BaseController implements ControllerInterface
      * @param string             $rulesSetClass
      *
      * @return JsonApiValidatorInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createJsonApiValidator(
         ContainerInterface $container,
@@ -426,6 +457,9 @@ abstract class BaseController implements ControllerInterface
      * @param ContainerInterface $container
      *
      * @return QueryParserInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createQueryParser(ContainerInterface $container): QueryParserInterface
     {
@@ -486,6 +520,9 @@ abstract class BaseController implements ControllerInterface
      * @param ContainerInterface $container
      *
      * @return ParametersMapperInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createParameterMapper(ContainerInterface $container): ParametersMapperInterface
     {
@@ -505,6 +542,9 @@ abstract class BaseController implements ControllerInterface
      * @param string             $schemeClass
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function mapSchemeDataToModelData(
         ContainerInterface $container,
@@ -554,6 +594,9 @@ abstract class BaseController implements ControllerInterface
      * @param QueryParserInterface $parser
      *
      * @return PaginatedDataInterface|mixed|null
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private static function readRelationshipData(
         string $index,
@@ -576,6 +619,9 @@ abstract class BaseController implements ControllerInterface
      * @param ServerRequestInterface $request
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createImpl(
         ContainerInterface $container,
@@ -600,6 +646,9 @@ abstract class BaseController implements ControllerInterface
      * @param ServerRequestInterface $request
      *
      * @return array [int $updated, string $index, CrudInterface $api]
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function updateImpl(
         array $routeParams,
@@ -633,6 +682,9 @@ abstract class BaseController implements ControllerInterface
      * @param ContainerInterface     $container
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private static function updateInRelationshipImpl(
         $parentIndex,
@@ -663,6 +715,9 @@ abstract class BaseController implements ControllerInterface
      * @param string             $namespace
      *
      * @return FormatterInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createMessageFormatter(
         ContainerInterface $container,

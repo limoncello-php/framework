@@ -24,7 +24,9 @@ use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\CreateCommentRuleSet;
 use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateCommentRuleSet;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -51,6 +53,9 @@ class ApiCommentsControllerApi extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function readEmotions(
         array $routeParams,
@@ -68,6 +73,9 @@ class ApiCommentsControllerApi extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function readEmotionsIdentifiers(
         array $routeParams,
@@ -85,6 +93,9 @@ class ApiCommentsControllerApi extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function readUser(
         array $routeParams,
@@ -102,6 +113,9 @@ class ApiCommentsControllerApi extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function readPost(
         array $routeParams,

@@ -19,7 +19,9 @@
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Package\FluteSettings;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Flute
@@ -30,6 +32,9 @@ trait HasValidationFormatterTrait
 {
     /**
      * @return FormatterInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function createValidationFormatter(): FormatterInterface
     {

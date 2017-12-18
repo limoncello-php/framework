@@ -26,7 +26,9 @@ use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use Neomerx\JsonApi\Http\Headers\SupportedExtensions;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -40,6 +42,9 @@ trait CreateResponsesTrait
      * @param EncodingParametersInterface|null $parameters
      *
      * @return ResponsesInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function createResponses(
         ContainerInterface $container,

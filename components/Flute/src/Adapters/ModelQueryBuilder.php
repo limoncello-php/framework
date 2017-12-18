@@ -19,6 +19,7 @@
 use Closure;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\DateTimeType;
@@ -163,6 +164,8 @@ class ModelQueryBuilder extends QueryBuilder
      *
      * @return self
      *
+     * @throws DBALException
+     *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function createModel(iterable $attributes): self
@@ -182,6 +185,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $attributes
      *
      * @return self
+     *
+     * @throws DBALException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -203,6 +208,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @return iterable
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @throws DBALException
      */
     public function bindAttributes(string $modelClass, iterable $attributes): iterable
     {
@@ -213,8 +220,7 @@ class ModelQueryBuilder extends QueryBuilder
             assert(is_string($column) && $this->getModelSchemes()->hasAttributeType($this->getModelClass(), $column));
 
             $quotedColumn  = $this->quoteColumnName($column);
-
-            $type          = Type::getType($types[$column]);
+            $type          = $this->getDbalType($types[$column]);
             $pdoValue      = $type->convertToDatabaseValue($value, $dbPlatform);
             $parameterName = $this->createNamedParameter($pdoValue, $type->getBindingType());
 
@@ -273,6 +279,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $filters
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function addFiltersWithAndToTable(iterable $filters): self
     {
@@ -283,6 +291,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $filters
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function addFiltersWithOrToTable(iterable $filters): self
     {
@@ -293,6 +303,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $filters
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function addFiltersWithAndToAlias(iterable $filters): self
     {
@@ -303,6 +315,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $filters
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function addFiltersWithOrToAlias(iterable $filters): self
     {
@@ -315,6 +329,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable|null $relationshipSorts
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function addRelationshipFiltersAndSortsWithAnd(
         string $relationshipName,
@@ -349,6 +365,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable|null $relationshipSorts
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function addRelationshipFiltersAndSortsWithOr(
         string $relationshipName,
@@ -388,6 +406,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable            $filters
      *
      * @return self
+     *
+     * @throws DBALException
      */
     private function addFilters(string $tableOrAlias, CompositeExpression $filterLink, iterable $filters): self
     {
@@ -409,6 +429,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable|null       $relationshipSorts
      *
      * @return self
+     *
+     * @throws DBALException
      */
     private function addRelationshipFiltersAndSorts(
         string $relationshipName,
@@ -482,6 +504,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable|null       $relationshipSorts
      *
      * @return self
+     *
+     * @throws DBALException
      */
     private function addBelongsToFiltersAndSorts(
         string $relationshipName,
@@ -516,6 +540,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable|null       $relationshipSorts
      *
      * @return self
+     *
+     * @throws DBALException
      */
     private function addHasManyFiltersAndSorts(
         string $relationshipName,
@@ -550,6 +576,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable|null       $relationshipSorts
      *
      * @return self
+     *
+     * @throws DBALException
      */
     private function addBelongsToManyFiltersAndSorts(
         string $relationshipName,
@@ -597,6 +625,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable|null            $relationshipSorts
      *
      * @return string
+     *
+     * @throws DBALException
      */
     private function innerJoinOneTable(
         string $fromAlias,
@@ -653,6 +683,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @return string
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     *
+     * @throws DBALException
      */
     private function innerJoinTwoSequentialTables(
         string $fromAlias,
@@ -749,6 +781,21 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
+     * @param string $name
+     *
+     * @return Type
+     *
+     * @throws DBALException
+     */
+    protected function getDbalType(string $name): Type
+    {
+        assert(Type::hasType($name), "Type `$name` either do not exist or registered.");
+        $type = Type::getType($name);
+
+        return $type;
+    }
+
+    /**
      * @param CompositeExpression $filterLink
      * @param string              $fullColumnName
      * @param iterable            $operationsWithArgs
@@ -756,6 +803,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @return void
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @throws DBALException
      */
     private function applyFilter(
         CompositeExpression $filterLink,
@@ -817,6 +866,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $arguments
      *
      * @return string
+     *
+     * @throws DBALException
      */
     private function createSingleNamedParameter(iterable $arguments): string
     {
@@ -834,6 +885,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $arguments
      *
      * @return string[]
+     *
+     * @throws DBALException
      */
     private function createNamedParameterArray(iterable $arguments): array
     {
@@ -858,6 +911,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param mixed $value
      *
      * @return mixed
+     *
+     * @throws DBALException
      */
     private function getPdoValue($value)
     {
@@ -870,12 +925,14 @@ class ModelQueryBuilder extends QueryBuilder
      * @return string
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @throws DBALException
      */
     private function convertDataTimeToDatabaseFormat(DateTimeInterface $dateTime): string
     {
         if ($this->dtToDbConverter === null) {
-            $type     = Type::getType(DateTimeType::DATETIME);
-            $platform = $this->getConnection()->getDatabasePlatform();
+            $type                  = $this->getDbalType(DateTimeType::DATETIME);
+            $platform              = $this->getConnection()->getDatabasePlatform();
             $this->dtToDbConverter = function (DateTimeInterface $dateTime) use ($type, $platform) : string {
                 return $type->convertToDatabaseValue($dateTime, $platform);
             };

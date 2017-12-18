@@ -33,7 +33,9 @@ use Limoncello\Validation\Execution\ContextStorage;
 use Limoncello\Validation\Validator\BaseValidator;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Flute
@@ -226,6 +228,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      *
      * @return self
      *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -268,6 +273,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      *
      * @return self
      *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function validateId(array $jsonData): self
@@ -304,6 +312,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      * @param array $jsonData
      *
      * @return self
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
@@ -354,6 +365,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      * @param array $jsonData
      *
      * @return self
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
@@ -421,6 +435,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      *
      * @return void
      *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function validateAsToOneRelationship(int $index, string $name, $mightBeRelationship): void
@@ -444,6 +461,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      * @param mixed  $mightBeRelationship
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -569,6 +589,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      * @param ErrorInterface $error
      *
      * @return string
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getMessage(ErrorInterface $error): string
     {
@@ -739,6 +762,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
 
     /**
      * @return FormatterInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getMessageFormatter(): FormatterInterface
     {
@@ -771,6 +797,9 @@ class Validator extends BaseValidator implements JsonApiValidatorInterface
      * @param array $args
      *
      * @return string
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function formatMessage(int $messageId, array $args = []): string
     {

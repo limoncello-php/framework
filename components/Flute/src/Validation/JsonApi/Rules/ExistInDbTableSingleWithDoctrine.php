@@ -23,6 +23,8 @@ use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Execution\BlockReplies;
 use Limoncello\Validation\Rules\BaseRule;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Flute
@@ -80,6 +82,9 @@ final class ExistInDbTableSingleWithDoctrine extends BaseRule
      * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function execute($value, ContextInterface $context): array
     {

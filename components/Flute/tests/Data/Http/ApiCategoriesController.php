@@ -19,7 +19,9 @@
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Tests\Flute\Data\Api\CategoriesApi as Api;
 use Limoncello\Tests\Flute\Data\Schemes\CategorySchema as Schema;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -40,6 +42,9 @@ class ApiCategoriesController extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function readChildren(
         array $routeParams,

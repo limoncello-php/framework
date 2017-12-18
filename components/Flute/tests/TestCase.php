@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Application\ModelInterface;
@@ -161,6 +162,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @return Connection
+     *
+     * @throws DBALException
      */
     protected function createConnection()
     {
@@ -181,6 +184,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @return Connection
+     *
+     * @throws DBALException
      */
     protected function initDb()
     {

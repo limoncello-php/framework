@@ -105,8 +105,6 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     /** @noinspection PhpMissingParentCallCommonInspection
      * @param callable $callable
      *
-     * @return SchemaInterface
-     *
      * @codeCoverageIgnore
      */
     protected function createSchemaFromCallable(callable $callable)

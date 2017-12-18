@@ -18,6 +18,7 @@
 
 use DateTime;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Tests\Flute\Data\Models\Board;
@@ -49,6 +50,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test filtering in BelongsTo relationship.
+     *
+     * @throws DBALException
      */
     public function testAddBelongsToRelationshipAndFilterWithSort(): void
     {
@@ -83,6 +86,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test filtering in BelongsTo relationship.
+     *
+     * @throws DBALException
      */
     public function testAddBelongsToRelationshipFilterOnly(): void
     {
@@ -114,6 +119,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test sorting in BelongsTo relationship.
+     *
+     * @throws DBALException
      */
     public function testAddBelongsToRelationshipSortOnly(): void
     {
@@ -144,6 +151,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test filtering in HasMany relationship.
+     *
+     * @throws DBALException
      */
     public function testAddHasManyRelationshipAndFilter(): void
     {
@@ -180,6 +189,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test filtering in HasMany relationship.
+     *
+     * @throws DBALException
      */
     public function testAddHasManyRelationshipOrFilter(): void
     {
@@ -216,6 +227,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test filtering in BelongsTo relationship.
+     *
+     * @throws DBALException
      */
     public function testAddBelongsToManyRelationshipFilter(): void
     {
@@ -256,6 +269,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test builder.
+     *
+     * @throws DBALException
      */
     public function testRead(): void
     {
@@ -304,6 +319,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test builder.
+     *
+     * @throws DBALException
      */
     public function testIndexWithFilters(): void
     {
@@ -366,6 +383,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test builder.
+     *
+     * @throws DBALException
      */
     public function testIndexWithFiltersJoinedWithOR(): void
     {
@@ -398,6 +417,8 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test builder.
      *
+     * @throws DBALException
+     *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */
     public function testReadWithInvalidParam(): void
@@ -418,6 +439,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test update with OR condition.
+     *
+     * @throws DBALException
      */
     public function testUpdateWithOrCondition(): void
     {

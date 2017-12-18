@@ -20,7 +20,9 @@ use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Tests\Flute\Data\Api\UsersApi as Api;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateUserMinimalRuleSet;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -44,6 +46,9 @@ class ApiUsersController extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function readPosts(
         array $routeParams,
@@ -64,6 +69,9 @@ class ApiUsersController extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function readComments(
         array $routeParams,

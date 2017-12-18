@@ -21,7 +21,9 @@ use Limoncello\Tests\Flute\Data\Api\PostsApi as Api;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateCommentRuleSet;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -42,6 +44,9 @@ class ApiPostsController extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function readComments(
         array $routeParams,
@@ -59,6 +64,9 @@ class ApiPostsController extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function updateComment(
         array $routeParams,
@@ -94,6 +102,9 @@ class ApiPostsController extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function deleteComment(
         array $routeParams,
