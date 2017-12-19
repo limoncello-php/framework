@@ -26,6 +26,7 @@ use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Routing\Router;
 use LogicException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -112,7 +113,7 @@ abstract class Application implements ApplicationInterface
             // select terminal handler
             switch ($matchCode) {
                 case RouterInterface::MATCH_FOUND:
-                    $handler = $this->createTerminalHandler($handler, $handlerParams, $container);
+                    $handler = $this->createHandler($handler, $handlerParams, $container);
                     break;
                 case RouterInterface::MATCH_METHOD_NOT_ALLOWED:
                     $handler = $this->createMethodNotAllowedTerminalHandler($allowedMethods);
@@ -177,11 +178,9 @@ abstract class Application implements ApplicationInterface
      *
      * @return ResponseInterface
      */
-    protected function handleRequest(Closure $handler, RequestInterface $request = null): ResponseInterface
+    protected function handleRequest(Closure $handler, ?RequestInterface $request): ResponseInterface
     {
         $response = call_user_func($handler, $request);
-
-        assert($response instanceof ResponseInterface);
 
         return $response;
     }
@@ -191,6 +190,8 @@ abstract class Application implements ApplicationInterface
      * @param null|PsrContainerInterface $container
      *
      * @return ThrowableResponseInterface
+     *
+     * @throws ContainerExceptionInterface
      */
     protected function handleThrowable(
         Throwable $throwable,
@@ -198,6 +199,7 @@ abstract class Application implements ApplicationInterface
     ): ThrowableResponseInterface {
         if ($container !== null && $container->has(ThrowableHandlerInterface::class) === true) {
             /** @var ThrowableHandlerInterface $handler */
+            /** @noinspection PhpUnhandledExceptionInspection */
             $handler  = $container->get(ThrowableHandlerInterface::class);
             $response = $handler->createResponse($throwable, $container);
         } else {
@@ -351,6 +353,31 @@ abstract class Application implements ApplicationInterface
     }
 
     /**
+     * @param callable              $handler
+     * @param array                 $handlerParams
+     * @param PsrContainerInterface $container
+     *
+     * @return Closure
+     */
+    protected function createHandler(
+        callable $handler,
+        array $handlerParams,
+        PsrContainerInterface $container
+    ): Closure {
+        return function (ServerRequestInterface $request = null) use (
+            $handler,
+            $handlerParams,
+            $container
+        ): ResponseInterface {
+            try {
+                return $this->callHandler($handler, $handlerParams, $container, $request);
+            } catch (Throwable $throwable) {
+                return $this->handleThrowable($throwable, $container);
+            }
+        };
+    }
+
+    /**
      * @param SapiInterface         $sapi
      * @param PsrContainerInterface $container
      * @param callable              $requestFactory
@@ -376,31 +403,6 @@ abstract class Application implements ApplicationInterface
         $request = call_user_func($requestFactory, $sapi, $container);
 
         return $request;
-    }
-
-    /**
-     * @param callable              $handler
-     * @param array                 $handlerParams
-     * @param PsrContainerInterface $container
-     *
-     * @return Closure
-     */
-    private function createTerminalHandler(
-        callable $handler,
-        array $handlerParams,
-        PsrContainerInterface $container
-    ): Closure {
-        return function (ServerRequestInterface $request = null) use (
-            $handler,
-            $handlerParams,
-            $container
-        ): ResponseInterface {
-            try {
-                return $this->callHandler($handler, $handlerParams, $container, $request);
-            } catch (Throwable $throwable) {
-                return $this->handleThrowable($throwable, $container);
-            }
-        };
     }
 
     /**
