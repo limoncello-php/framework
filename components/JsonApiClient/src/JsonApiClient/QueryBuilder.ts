@@ -58,7 +58,10 @@ export class QueryBuilder implements QueryBuilderInterface {
      */
     private limit: number | undefined;
 
+    private isEncodeUriEnabled: boolean;
+
     constructor(type: ResourceType) {
+        this.enableEncodeUri();
         this.type = type;
     }
 
@@ -101,17 +104,29 @@ export class QueryBuilder implements QueryBuilderInterface {
         return this;
     }
 
+    public enableEncodeUri(): QueryBuilderInterface {
+        this.isEncodeUriEnabled = true;
+
+        return this;
+    }
+
+    public disableEncodeUri(): QueryBuilderInterface {
+        this.isEncodeUriEnabled = false;
+
+        return this;
+    }
+
     public read(index: ResourceIdentity, relationship?: RelationshipName): string {
         const relationshipTail = relationship === undefined ? `/${index}` : `/${index}/${relationship}`;
         const result = `/${this.type}${relationshipTail}${this.buildParameters(false)}`;
 
-        return result;
+        return this.isEncodeUriEnabled === true ? encodeURIComponent(result) : result;
     }
 
     public index(): string {
         const result = `/${this.type}${this.buildParameters(true)}`;
 
-        return result;
+        return this.isEncodeUriEnabled === true ? encodeURIComponent(result) : result;
     }
 
     /**

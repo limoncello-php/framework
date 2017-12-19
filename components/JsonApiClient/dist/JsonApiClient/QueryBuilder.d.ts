@@ -21,12 +21,15 @@ import { RelationshipName } from '../Contracts/JsonApi/RelationshipName';
 import { ResourceIdentity } from '../Contracts/JsonApi/ResourceIdentity';
 import { ResourceType } from '../Contracts/JsonApi/ResourceType';
 export declare class QueryBuilder implements QueryBuilderInterface {
+    private isEncodeUriEnabled;
     constructor(type: ResourceType);
     onlyFields(...fields: FieldParameterInterface[]): QueryBuilderInterface;
     withFilters(...filters: FilterParameterInterface[]): QueryBuilderInterface;
     withSorts(...sorts: SortParameterInterface[]): QueryBuilderInterface;
     withIncludes(...relationships: RelationshipName[]): QueryBuilderInterface;
     withPagination(offset: number, limit: number): QueryBuilderInterface;
+    enableEncodeUri(): QueryBuilderInterface;
+    disableEncodeUri(): QueryBuilderInterface;
     read(index: ResourceIdentity, relationship?: RelationshipName): string;
     index(): string;
 }
