@@ -120,13 +120,13 @@ export class QueryBuilder implements QueryBuilderInterface {
         const relationshipTail = relationship === undefined ? `/${index}` : `/${index}/${relationship}`;
         const result = `/${this.type}${relationshipTail}${this.buildParameters(false)}`;
 
-        return this.isEncodeUriEnabled === true ? encodeURIComponent(result) : result;
+        return this.isEncodeUriEnabled === true ? encodeURI(result) : result;
     }
 
     public index(): string {
         const result = `/${this.type}${this.buildParameters(true)}`;
 
-        return this.isEncodeUriEnabled === true ? encodeURIComponent(result) : result;
+        return this.isEncodeUriEnabled === true ? encodeURI(result) : result;
     }
 
     /**

@@ -7,13 +7,13 @@ describe('Query builder', () => {
     it('should build index URLs without any extra parameters', () => {
         const builder = new QueryBuilder('comments');
 
-        expect(builder.index()).to.equal(encodeURIComponent('/comments'));
+        expect(builder.index()).to.equal(encodeURI('/comments'));
     })
 
     it('should build read URLs without any extra parameters', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments/123');
+        const expectedUrl = encodeURI('/comments/123');
         const actualUrl = builder.read('123');
 
         expect(actualUrl).to.equal(expectedUrl);
@@ -22,7 +22,7 @@ describe('Query builder', () => {
     it('should build read URLs without any extra parameters for a given relationship', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments/123/post');
+        const expectedUrl = encodeURI('/comments/123/post');
         const actualUrl = builder.read('123', 'post');
 
         expect(actualUrl).to.equal(expectedUrl);
@@ -31,7 +31,7 @@ describe('Query builder', () => {
     it('should build index URLs with one fields parameter', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?fields[comments]=id,text');
+        const expectedUrl = encodeURI('/comments?fields[comments]=id,text');
         const actualUrl = builder
             .onlyFields({
                 type: 'comments',
@@ -45,7 +45,7 @@ describe('Query builder', () => {
     it('should build index URLs with many fields parameters', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?fields[comments]=text&fields[posts]=title,body');
+        const expectedUrl = encodeURI('/comments?fields[comments]=text&fields[posts]=title,body');
         const actualUrl = builder
             .onlyFields({
                 type: 'comments',
@@ -89,7 +89,7 @@ describe('Query builder', () => {
     it('should build index URLs with one sorting parameter', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?sort=-id');
+        const expectedUrl = encodeURI('/comments?sort=-id');
         const actualUrl = builder
             .withSorts({
                 field: 'id',
@@ -103,7 +103,7 @@ describe('Query builder', () => {
     it('should build index URLs with many sorting parameters', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?sort=-id,title');
+        const expectedUrl = encodeURI('/comments?sort=-id,title');
         const actualUrl = builder
             .withSorts({
                 field: 'id',
@@ -120,7 +120,7 @@ describe('Query builder', () => {
     it('should build index URLs with one include parameter', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?include=post');
+        const expectedUrl = encodeURI('/comments?include=post');
         const actualUrl = builder
             .withIncludes('post')
             .index();
@@ -131,7 +131,7 @@ describe('Query builder', () => {
     it('should build index URLs with many include parameters', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?include=post,likes');
+        const expectedUrl = encodeURI('/comments?include=post,likes');
         const actualUrl = builder
             .withIncludes('post', 'likes')
             .index();
@@ -142,7 +142,7 @@ describe('Query builder', () => {
     it('should build index URLs with pagination parameters', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?page[offset]=50&page[limit]=25');
+        const expectedUrl = encodeURI('/comments?page[offset]=50&page[limit]=25');
         const actualUrl = builder
             .withPagination(50, 25)
             .index();
@@ -153,7 +153,7 @@ describe('Query builder', () => {
     it('should build index URLs for zero offset pagination parameter', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?page[offset]=0&page[limit]=25');
+        const expectedUrl = encodeURI('/comments?page[offset]=0&page[limit]=25');
         const actualUrl = builder
             .withPagination(0, 25)
             .index();
@@ -164,7 +164,7 @@ describe('Query builder', () => {
     it('should ignore pagination parameters if offset is invalid', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments');
+        const expectedUrl = encodeURI('/comments');
         const actualUrl = builder
             .withPagination(-1, 25)
             .index();
@@ -175,7 +175,7 @@ describe('Query builder', () => {
     it('should ignore pagination parameters if limit is invalid', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments');
+        const expectedUrl = encodeURI('/comments');
         const actualUrl = builder
             .withPagination(50, 0)
             .index();
@@ -186,7 +186,7 @@ describe('Query builder', () => {
     it('should build index URLs with field, filter, sort, include and pagination parameters', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments?fields[comments]=text&filter[id][greater-than]=10&sort=-title&include=post&page[offset]=50&page[limit]=25');
+        const expectedUrl = encodeURI('/comments?fields[comments]=text&filter[id][greater-than]=10&sort=-title&include=post&page[offset]=50&page[limit]=25');
         const actualUrl = builder
             .onlyFields({
                 type: 'comments',
@@ -211,7 +211,7 @@ describe('Query builder', () => {
     it('should build index URLs with empty field, filter, sort and include parameters', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments');
+        const expectedUrl = encodeURI('/comments');
         const actualUrl = builder
             .onlyFields()
             .withFilters()
@@ -225,7 +225,7 @@ describe('Query builder', () => {
     it('should ignore filter, sort, include and pagination but not field parameters for read method', () => {
         const builder = new QueryBuilder('comments');
 
-        const expectedUrl = encodeURIComponent('/comments/5/post?fields[comments]=text');
+        const expectedUrl = encodeURI('/comments/5/post?fields[comments]=text');
         const actualUrl = builder
             .onlyFields({
                 type: 'comments',

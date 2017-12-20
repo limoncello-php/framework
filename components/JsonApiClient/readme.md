@@ -71,6 +71,10 @@ interface QueryBuilderInterface {
 
     withPagination(offset: number, limit: number): QueryBuilderInterface;
 
+    enableEncodeUri(): QueryBuilderInterface;
+
+    disableEncodeUri(): QueryBuilderInterface;
+
     read(index: ResourceIdentity, relationship?: RelationshipName): string;
 
     index(): string;
@@ -78,6 +82,8 @@ interface QueryBuilderInterface {
 ```
 
 Methods `onlyFields`, `withFilters`, `withSorts` and `withPagination` are fully shown in the example above and can accept 1 or more input parameters.
+
+Methods `enableEncodeUri` / `disableEncodeUri` enable and disable encoding query parameters after `?` mark in accordance with [RFC 3986](https://tools.ietf.org/html/rfc3986). By default query parameters will be encoded.
 
 ```javascript
 builder
