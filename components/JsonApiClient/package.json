@@ -1,6 +1,6 @@
 {
   "name": "@limoncello-framework/json-api-client",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "JSON API (jsonapi.org) client",
   "homepage": "https://github.com/limoncello-php/framework/tree/master/components/JsonApiClient",
   "repository": {

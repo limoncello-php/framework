@@ -199,6 +199,6 @@ export class QueryBuilder implements QueryBuilderInterface {
      * @internal
      */
     private separateByComma(values: string | string[]): string {
-        return typeof values === 'string' ? values : (<string[]>values).join(',');
+        return Array.isArray(values) === true ? (<string[]>values).join(',') : `${<string>values}`;
     }
 }
