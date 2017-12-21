@@ -24,7 +24,6 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\Type;
-use Generator;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
@@ -77,9 +76,9 @@ class ModelQueryBuilder extends QueryBuilder
     private $knownAliases = [];
 
     /**
-     * @var null|Closure
+     * @var Type|null
      */
-    private $dtToDbConverter = null;
+    private $dateTimeType;
 
     /**
      * @param Connection               $connection
@@ -98,7 +97,7 @@ class ModelQueryBuilder extends QueryBuilder
         $this->modelClass   = $modelClass;
 
         $this->mainTableName = $this->getModelSchemes()->getTable($this->getModelClass());
-        $this->mainAlias     = $this->createAlias($this->getMainTableName());
+        $this->mainAlias     = $this->createAlias($this->getTableName());
 
         $this->setColumnToDatabaseMapper(Closure::fromCallable([$this, 'getQuotedMainAliasColumn']));
     }
@@ -135,6 +134,18 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
+     * @return self
+     */
+    public function distinct(): self
+    {
+        // emulate SELECT DISTINCT with grouping by primary key
+        $primaryColumn = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
+        $this->addGroupBy($this->getQuotedMainAliasColumn($primaryColumn));
+
+        return $this;
+    }
+
+    /**
      * @param Closure $columnMapper
      *
      * @return self
@@ -152,8 +163,8 @@ class ModelQueryBuilder extends QueryBuilder
     public function fromModelTable(): self
     {
         $this->from(
-            $this->quoteTableName($this->getMainTableName()),
-            $this->quoteTableName($this->getMainAlias())
+            $this->quoteTableName($this->getTableName()),
+            $this->quoteTableName($this->getAlias())
         );
 
         return $this;
@@ -170,7 +181,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function createModel(iterable $attributes): self
     {
-        $this->insert($this->quoteTableName($this->getMainTableName()));
+        $this->insert($this->quoteTableName($this->getTableName()));
 
         $valuesAsParams = [];
         foreach ($this->bindAttributes($this->getModelClass(), $attributes) as $quotedColumn => $parameterName) {
@@ -192,7 +203,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function updateModels(iterable $attributes): self
     {
-        $this->update($this->quoteTableName($this->getMainTableName()));
+        $this->update($this->quoteTableName($this->getTableName()));
 
         foreach ($this->bindAttributes($this->getModelClass(), $attributes) as $quotedColumn => $parameterName) {
             $this->set($quotedColumn, $parameterName);
@@ -233,13 +244,17 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function deleteModels(): self
     {
-        $this->delete($this->quoteTableName($this->getMainTableName()));
+        $this->delete($this->quoteTableName($this->getTableName()));
 
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * @param string $relationshipName
+     * @param string $identity
+     * @param string $secondaryIdBindName
+     *
+     * @return self
      */
     public function prepareCreateInToManyRelationship(
         string $relationshipName,
@@ -260,7 +275,12 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
-     * @inheritdoc
+     * @param string $relationshipName
+     * @param string $identity
+     *
+     * @return self
+     *
+     * @throws DBALException
      */
     public function clearToManyRelationship(string $relationshipName, string $identity): self
     {
@@ -268,9 +288,12 @@ class ModelQueryBuilder extends QueryBuilder
             $this->getModelSchemes()->getBelongsToManyRelationship($this->getModelClass(), $relationshipName);
 
         $filters = [$primaryKey => [FilterParameterInterface::OPERATION_EQUALS => [$identity]]];
+        $addWith = $this->expr()->andX();
         $this
             ->delete($this->quoteTableName($intermediateTable))
-            ->addFilters($intermediateTable, $this->expr()->andX(), $filters);
+            ->applyFilters($addWith, $intermediateTable, $filters);
+
+        $addWith->count() <= 0 ?: $this->andWhere($addWith);
 
         return $this;
     }
@@ -284,7 +307,11 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function addFiltersWithAndToTable(iterable $filters): self
     {
-        return $this->addFilters($this->getMainTableName(), $this->expr()->andX(), $filters);
+        $addWith = $this->expr()->andX();
+        $this->applyFilters($addWith, $this->getTableName(), $filters);
+        $addWith->count() <= 0 ?: $this->andWhere($addWith);
+
+        return $this;
     }
 
     /**
@@ -296,7 +323,11 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function addFiltersWithOrToTable(iterable $filters): self
     {
-        return $this->addFilters($this->getMainTableName(), $this->expr()->orX(), $filters);
+        $addWith = $this->expr()->orX();
+        $this->applyFilters($addWith, $this->getTableName(), $filters);
+        $addWith->count() <= 0 ?: $this->andWhere($addWith);
+
+        return $this;
     }
 
     /**
@@ -308,7 +339,11 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function addFiltersWithAndToAlias(iterable $filters): self
     {
-        return $this->addFilters($this->getMainAlias(), $this->expr()->andX(), $filters);
+        $addWith = $this->expr()->andX();
+        $this->applyFilters($addWith, $this->getAlias(), $filters);
+        $addWith->count() <= 0 ?: $this->andWhere($addWith);
+
+        return $this;
     }
 
     /**
@@ -320,12 +355,16 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function addFiltersWithOrToAlias(iterable $filters): self
     {
-        return $this->addFilters($this->getMainAlias(), $this->expr()->orX(), $filters);
+        $addWith = $this->expr()->orX();
+        $this->applyFilters($addWith, $this->getAlias(), $filters);
+        $addWith->count() <= 0 ?: $this->andWhere($addWith);
+
+        return $this;
     }
 
     /**
      * @param string        $relationshipName
-     * @param iterable      $relationshipFilters
+     * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
      *
      * @return self
@@ -334,27 +373,18 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function addRelationshipFiltersAndSortsWithAnd(
         string $relationshipName,
-        iterable $relationshipFilters,
+        ?iterable $relationshipFilters,
         ?iterable $relationshipSorts
     ): self {
-        $joinWith = $this->expr()->andX();
+        $targetAlias = $this->createRelationshipAlias($relationshipName);
 
-        return $this->addRelationshipFiltersAndSorts(
-            $relationshipName,
-            $joinWith,
-            $relationshipFilters,
-            $relationshipSorts
-        );
-    }
+        if ($relationshipFilters !== null) {
+            $addWith = $this->expr()->andX();
+            $this->applyFilters($addWith, $targetAlias, $relationshipFilters);
+            $addWith->count() <= 0 ?: $this->andWhere($addWith);
+        }
 
-    /**
-     * @return self
-     */
-    public function distinct(): self
-    {
-        // emulate SELECT DISTINCT with grouping by primary key
-        $primaryColumn = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
-        $this->addGroupBy($this->getQuotedMainAliasColumn($primaryColumn));
+        $relationshipSorts === null ?: $this->applySorts($targetAlias, $relationshipSorts);
 
         return $this;
     }
@@ -370,17 +400,20 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function addRelationshipFiltersAndSortsWithOr(
         string $relationshipName,
-        iterable $relationshipFilters,
+        ?iterable $relationshipFilters,
         ?iterable $relationshipSorts
     ): self {
-        $joinWith = $this->expr()->orX();
+        $targetAlias = $this->createRelationshipAlias($relationshipName);
 
-        return $this->addRelationshipFiltersAndSorts(
-            $relationshipName,
-            $joinWith,
-            $relationshipFilters,
-            $relationshipSorts
-        );
+        if ($relationshipFilters !== null) {
+            $addWith = $this->expr()->orX();
+            $this->applyFilters($addWith, $targetAlias, $relationshipFilters);
+            $addWith->count() <= 0 ?: $this->andWhere($addWith);
+        }
+
+        $relationshipSorts === null ?: $this->applySorts($targetAlias, $relationshipSorts);
+
+        return $this;
     }
 
     /**
@@ -390,374 +423,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function addSorts(iterable $sortParameters): self
     {
-        foreach ($sortParameters as $columnName => $isAsc) {
-            assert(is_string($columnName) === true && is_bool($isAsc) === true);
-            $fullColumnName = $this->getQuotedMainAliasColumn($columnName);
-            assert($this->getModelSchemes()->hasAttributeType($this->getModelClass(), $columnName));
-            $this->addOrderBy($fullColumnName, $isAsc === true ? 'ASC' : 'DESC');
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string              $tableOrAlias
-     * @param CompositeExpression $filterLink
-     * @param iterable            $filters
-     *
-     * @return self
-     *
-     * @throws DBALException
-     */
-    private function addFilters(string $tableOrAlias, CompositeExpression $filterLink, iterable $filters): self
-    {
-        foreach ($filters as $columnName => $operationsWithArgs) {
-            $fullColumnName = $this->buildColumnName($tableOrAlias, $columnName);
-            $this->applyFilter($filterLink, $fullColumnName, $operationsWithArgs);
-        }
-        if ($filterLink->count() > 0) {
-            $this->andWhere($filterLink);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string              $relationshipName
-     * @param CompositeExpression $filterLink
-     * @param iterable            $relationshipFilters
-     * @param iterable|null       $relationshipSorts
-     *
-     * @return self
-     *
-     * @throws DBALException
-     */
-    private function addRelationshipFiltersAndSorts(
-        string $relationshipName,
-        CompositeExpression $filterLink,
-        iterable $relationshipFilters,
-        ?iterable $relationshipSorts
-    ): self {
-        $relationshipType = $this->getModelSchemes()->getRelationshipType($this->getModelClass(), $relationshipName);
-        switch ($relationshipType) {
-            case RelationshipTypes::BELONGS_TO:
-                $builder = $this->addBelongsToFiltersAndSorts(
-                    $relationshipName,
-                    $filterLink,
-                    $relationshipFilters,
-                    $relationshipSorts
-                );
-                break;
-
-            case RelationshipTypes::HAS_MANY:
-                $builder = $this->addHasManyFiltersAndSorts(
-                    $relationshipName,
-                    $filterLink,
-                    $relationshipFilters,
-                    $relationshipSorts
-                );
-                break;
-
-            case RelationshipTypes::BELONGS_TO_MANY:
-            default:
-                assert($relationshipType === RelationshipTypes::BELONGS_TO_MANY);
-                $builder = $this->addBelongsToManyFiltersAndSorts(
-                    $relationshipName,
-                    $filterLink,
-                    $relationshipFilters,
-                    $relationshipSorts
-                );
-                break;
-        }
-
-        return $builder;
-    }
-
-    /**
-     * @return string
-     */
-    private function getMainTableName(): string
-    {
-        return $this->mainTableName;
-    }
-
-    /**
-     * @return ModelSchemeInfoInterface
-     */
-    private function getModelSchemes(): ModelSchemeInfoInterface
-    {
-        return $this->modelSchemes;
-    }
-
-    /**
-     * @return string
-     */
-    private function getMainAlias(): string
-    {
-        return $this->mainAlias;
-    }
-
-    /**
-     * @param string              $relationshipName
-     * @param CompositeExpression $filterLink
-     * @param iterable            $relationshipFilters
-     * @param iterable|null       $relationshipSorts
-     *
-     * @return self
-     *
-     * @throws DBALException
-     */
-    private function addBelongsToFiltersAndSorts(
-        string $relationshipName,
-        CompositeExpression $filterLink,
-        iterable $relationshipFilters,
-        ?iterable $relationshipSorts
-    ): self {
-        $foreignKey = $this->getModelSchemes()->getForeignKey($this->getModelClass(), $relationshipName);
-        list($onePrimaryKey, $oneTable) =
-            $this->getModelSchemes()->getReversePrimaryKey($this->getModelClass(), $relationshipName);
-
-        $this->innerJoinOneTable(
-            $this->getMainAlias(),
-            $foreignKey,
-            $oneTable,
-            $onePrimaryKey,
-            $filterLink,
-            $relationshipFilters,
-            $relationshipSorts
-        );
-        if ($filterLink->count() > 0) {
-            $this->andWhere($filterLink);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string              $relationshipName
-     * @param CompositeExpression $filterLink
-     * @param iterable            $relationshipFilters
-     * @param iterable|null       $relationshipSorts
-     *
-     * @return self
-     *
-     * @throws DBALException
-     */
-    private function addHasManyFiltersAndSorts(
-        string $relationshipName,
-        CompositeExpression $filterLink,
-        iterable $relationshipFilters,
-        ?iterable $relationshipSorts
-    ): self {
-        $primaryKey = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
-        list($manyForeignKey, $manyTable) =
-            $this->getModelSchemes()->getReverseForeignKey($this->getModelClass(), $relationshipName);
-
-        $this->innerJoinOneTable(
-            $this->getMainAlias(),
-            $primaryKey,
-            $manyTable,
-            $manyForeignKey,
-            $filterLink,
-            $relationshipFilters,
-            $relationshipSorts
-        );
-        if ($filterLink->count() > 0) {
-            $this->andWhere($filterLink);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string              $relationshipName
-     * @param CompositeExpression $targetFilterLink
-     * @param iterable            $relationshipFilters
-     * @param iterable|null       $relationshipSorts
-     *
-     * @return self
-     *
-     * @throws DBALException
-     */
-    private function addBelongsToManyFiltersAndSorts(
-        string $relationshipName,
-        CompositeExpression $targetFilterLink,
-        iterable $relationshipFilters,
-        ?iterable $relationshipSorts
-    ): self {
-        $primaryKey = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
-        list ($intermediateTable, $intermediatePk, $intermediateFk) =
-            $this->getModelSchemes()->getBelongsToManyRelationship($this->getModelClass(), $relationshipName);
-        list($targetPrimaryKey, $targetTable) =
-            $this->getModelSchemes()->getReversePrimaryKey($this->getModelClass(), $relationshipName);
-
-        // no filters for intermediate table
-        $intFilterLink = null;
-        $intFilters    = null;
-        $this->innerJoinTwoSequentialTables(
-            $this->getMainAlias(),
-            $primaryKey,
-            $intermediateTable,
-            $intermediatePk,
-            $intermediateFk,
-            $targetTable,
-            $targetPrimaryKey,
-            $intFilterLink,
-            $intFilters,
-            $targetFilterLink,
-            $relationshipFilters,
-            $relationshipSorts
-        );
-        if ($targetFilterLink->count() > 0) {
-            $this->andWhere($targetFilterLink);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string                   $fromAlias
-     * @param string                   $fromColumn
-     * @param string                   $targetTable
-     * @param string                   $targetColumn
-     * @param CompositeExpression|null $targetFilterLink
-     * @param iterable|null            $targetFilterParams
-     * @param iterable|null            $relationshipSorts
-     *
-     * @return string
-     *
-     * @throws DBALException
-     */
-    private function innerJoinOneTable(
-        string $fromAlias,
-        string $fromColumn,
-        string $targetTable,
-        string $targetColumn,
-        ?CompositeExpression $targetFilterLink,
-        ?iterable $targetFilterParams,
-        ?iterable $relationshipSorts
-    ): string {
-        $targetAlias   = $this->createAlias($targetTable);
-        $joinCondition = $this->buildColumnName($fromAlias, $fromColumn) . '=' .
-            $this->buildColumnName($targetAlias, $targetColumn);
-
-        $this->innerJoin(
-            $this->quoteTableName($fromAlias),
-            $this->quoteTableName($targetTable),
-            $this->quoteTableName($targetAlias),
-            $joinCondition
-        );
-
-        if ($targetFilterLink !== null && $targetFilterParams !== null) {
-            foreach ($targetFilterParams as $columnName => $operationsWithArgs) {
-                assert(is_string($columnName) === true);
-                $fullColumnName = $this->buildColumnName($targetAlias, $columnName);
-                $this->applyFilter($targetFilterLink, $fullColumnName, $operationsWithArgs);
-            }
-        }
-        if ($relationshipSorts !== null) {
-            foreach ($relationshipSorts as $columnName => $isAsc) {
-                assert(is_string($columnName) === true && is_bool($isAsc) === true);
-                $fullColumnName = $this->buildColumnName($targetAlias, $columnName);
-                $this->addOrderBy($fullColumnName, $isAsc === true ? 'ASC' : 'DESC');
-            }
-        }
-
-        return $targetAlias;
-    }
-
-    /** @noinspection PhpTooManyParametersInspection
-     * @param string                   $fromAlias
-     * @param string                   $fromColumn
-     * @param string                   $intTable
-     * @param string                   $intToFromColumn
-     * @param string                   $intToTargetColumn
-     * @param string                   $targetTable
-     * @param string                   $targetColumn
-     * @param CompositeExpression|null $intFilterLink
-     * @param iterable|null            $intFilterParams
-     * @param CompositeExpression|null $targetFilterLink
-     * @param iterable|null            $targetFilterParams
-     * @param iterable|null            $targetSortParams
-     *
-     * @return string
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
-     *
-     * @throws DBALException
-     */
-    private function innerJoinTwoSequentialTables(
-        string $fromAlias,
-        string $fromColumn,
-        string $intTable,
-        string $intToFromColumn,
-        string $intToTargetColumn,
-        string $targetTable,
-        string $targetColumn,
-        ?CompositeExpression $intFilterLink,
-        ?iterable $intFilterParams,
-        ?CompositeExpression $targetFilterLink,
-        ?iterable $targetFilterParams,
-        ?iterable $targetSortParams
-    ): string {
-        $intNoSorting = null;
-        $intAlias     = $this->innerJoinOneTable(
-            $fromAlias,
-            $fromColumn,
-            $intTable,
-            $intToFromColumn,
-            $intFilterLink,
-            $intFilterParams,
-            $intNoSorting
-        );
-        $targetAlias  = $this->innerJoinOneTable(
-            $intAlias,
-            $intToTargetColumn,
-            $targetTable,
-            $targetColumn,
-            $targetFilterLink,
-            $targetFilterParams,
-            $targetSortParams
-        );
-
-        return $targetAlias;
-    }
-
-    /**
-     * @param string $tableName
-     *
-     * @return string
-     */
-    private function createAlias(string $tableName): string
-    {
-        $alias                          = $tableName . (++$this->aliasIdCounter);
-        $this->knownAliases[$tableName] = $alias;
-
-        return $alias;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    private function quoteTableName(string $tableName): string
-    {
-        return "`$tableName`";
-    }
-
-    /**
-     * @inheritdoc
-     */
-    private function quoteColumnName(string $columnName): string
-    {
-        return "`$columnName`";
-    }
-
-    /**
-     * @inheritdoc
-     */
-    private function buildColumnName(string $table, string $column): string
-    {
-        return "`$table`.`$column`";
+        return $this->applySorts($this->getAlias(), $sortParameters);
     }
 
     /**
@@ -767,7 +433,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function getQuotedMainTableColumn(string $column): string
     {
-        return $this->buildColumnName($this->getMainTableName(), $column);
+        return $this->buildColumnName($this->getTableName(), $column);
     }
 
     /**
@@ -777,7 +443,152 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function getQuotedMainAliasColumn(string $column): string
     {
-        return $this->buildColumnName($this->getMainAlias(), $column);
+        return $this->buildColumnName($this->getAlias(), $column);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string Table alias.
+     */
+    public function createRelationshipAlias(string $name): string
+    {
+        $relationshipType = $this->getModelSchemes()->getRelationshipType($this->getModelClass(), $name);
+        switch ($relationshipType) {
+            case RelationshipTypes::BELONGS_TO:
+                list($targetColumn, $targetTable) =
+                    $this->getModelSchemes()->getReversePrimaryKey($this->getModelClass(), $name);
+                $targetAlias = $this->innerJoinOneTable(
+                    $this->getAlias(),
+                    $this->getModelSchemes()->getForeignKey($this->getModelClass(), $name),
+                    $targetTable,
+                    $targetColumn
+                );
+                break;
+
+            case RelationshipTypes::HAS_MANY:
+                list($targetColumn, $targetTable) =
+                    $this->getModelSchemes()->getReverseForeignKey($this->getModelClass(), $name);
+                $targetAlias = $this->innerJoinOneTable(
+                    $this->getAlias(),
+                    $this->getModelSchemes()->getPrimaryKey($this->getModelClass()),
+                    $targetTable,
+                    $targetColumn
+                );
+                break;
+
+            case RelationshipTypes::BELONGS_TO_MANY:
+            default:
+                assert($relationshipType === RelationshipTypes::BELONGS_TO_MANY);
+                $primaryKey = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
+                list ($intermediateTable, $intermediatePk, $intermediateFk) =
+                    $this->getModelSchemes()->getBelongsToManyRelationship($this->getModelClass(), $name);
+                list($targetPrimaryKey, $targetTable) =
+                    $this->getModelSchemes()->getReversePrimaryKey($this->getModelClass(), $name);
+
+                $targetAlias = $this->innerJoinTwoSequentialTables(
+                    $this->getAlias(),
+                    $primaryKey,
+                    $intermediateTable,
+                    $intermediatePk,
+                    $intermediateFk,
+                    $targetTable,
+                    $targetPrimaryKey
+                );
+                break;
+        }
+
+        return $targetAlias;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlias(): string
+    {
+        return $this->mainAlias;
+    }
+
+    /**
+     * @param CompositeExpression $expression
+     * @param string              $tableOrAlias
+     * @param iterable            $filters
+     *
+     * @return self
+     *
+     * @throws DBALException
+     * @throws InvalidArgumentException
+     */
+    public function applyFilters(CompositeExpression $expression, string $tableOrAlias, iterable $filters): self
+    {
+        foreach ($filters as $columnName => $operationsWithArgs) {
+            $fullColumnName = $this->buildColumnName($tableOrAlias, $columnName);
+            foreach ($operationsWithArgs as $operation => $arguments) {
+                $expression->add($this->createFilterExpression($fullColumnName, $operation, $arguments));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string   $tableOrAlias
+     * @param iterable $sorts
+     *
+     * @return self
+     */
+    public function applySorts(string $tableOrAlias, iterable $sorts): self
+    {
+        foreach ($sorts as $columnName => $isAsc) {
+            assert(is_string($columnName) === true && is_bool($isAsc) === true);
+            $fullColumnName = $this->buildColumnName($tableOrAlias, $columnName);
+            $this->addOrderBy($fullColumnName, $isAsc === true ? 'ASC' : 'DESC');
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $table
+     * @param string $column
+     *
+     * @return string
+     */
+    public function buildColumnName(string $table, string $column): string
+    {
+        return "`$table`.`$column`";
+    }
+
+    /**
+     * @param $value
+     *
+     * @return string
+     *
+     * @throws DBALException
+     */
+    public function createSingleValueNamedParameter($value): string
+    {
+        $paramName = $this->createNamedParameter($this->getPdoValue($value), $this->getPdoType($value));
+
+        return $paramName;
+    }
+
+    /**
+     * @param iterable $values
+     *
+     * @return array
+     *
+     * @throws DBALException
+     */
+    public function createArrayValuesNamedParameter(iterable $values): array
+    {
+        $names = [];
+
+        foreach ($values as $value) {
+            $names[] = $this->createSingleValueNamedParameter($value);
+        }
+
+        return $names;
     }
 
     /**
@@ -796,107 +607,189 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
-     * @param CompositeExpression $filterLink
-     * @param string              $fullColumnName
-     * @param iterable            $operationsWithArgs
-     *
-     * @return void
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     *
-     * @throws DBALException
+     * @return string
      */
-    private function applyFilter(
-        CompositeExpression $filterLink,
-        string $fullColumnName,
-        iterable $operationsWithArgs
-    ): void {
-        foreach ($operationsWithArgs as $operation => $arguments) {
-            assert(is_int($operation));
-            assert(
-                is_array($arguments) || $arguments instanceof Generator,
-                "Filter argument(s) for $fullColumnName must be iterable (an array or Generator)."
-            );
-            switch ($operation) {
-                case FilterParameterInterface::OPERATION_EQUALS:
-                    $expression = $this->expr()->eq($fullColumnName, $this->createSingleNamedParameter($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_NOT_EQUALS:
-                    $expression = $this->expr()->neq($fullColumnName, $this->createSingleNamedParameter($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_LESS_THAN:
-                    $expression = $this->expr()->lt($fullColumnName, $this->createSingleNamedParameter($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_LESS_OR_EQUALS:
-                    $expression = $this->expr()->lte($fullColumnName, $this->createSingleNamedParameter($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_GREATER_THAN:
-                    $expression = $this->expr()->gt($fullColumnName, $this->createSingleNamedParameter($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_GREATER_OR_EQUALS:
-                    $expression = $this->expr()->gte($fullColumnName, $this->createSingleNamedParameter($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_LIKE:
-                    $expression = $this->expr()->like($fullColumnName, $this->createSingleNamedParameter($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_NOT_LIKE:
-                    $parameter  = $this->createSingleNamedParameter($arguments);
-                    $expression = $this->expr()->notLike($fullColumnName, $parameter);
-                    break;
-                case FilterParameterInterface::OPERATION_IN:
-                    $expression = $this->expr()->in($fullColumnName, $this->createNamedParameterArray($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_NOT_IN:
-                    $expression = $this->expr()->notIn($fullColumnName, $this->createNamedParameterArray($arguments));
-                    break;
-                case FilterParameterInterface::OPERATION_IS_NULL:
-                    $expression = $this->expr()->isNull($fullColumnName);
-                    break;
-                case FilterParameterInterface::OPERATION_IS_NOT_NULL:
-                default:
-                    $expression = $this->expr()->isNotNull($fullColumnName);
-                    break;
-            }
-
-            $filterLink->add($expression);
-        }
+    private function getTableName(): string
+    {
+        return $this->mainTableName;
     }
 
     /**
+     * @return ModelSchemeInfoInterface
+     */
+    private function getModelSchemes(): ModelSchemeInfoInterface
+    {
+        return $this->modelSchemes;
+    }
+
+    /**
+     * @param string $fromAlias
+     * @param string $fromColumn
+     * @param string $targetTable
+     * @param string $targetColumn
+     *
+     * @return string
+     */
+    private function innerJoinOneTable(
+        string $fromAlias,
+        string $fromColumn,
+        string $targetTable,
+        string $targetColumn
+    ): string {
+        $targetAlias   = $this->createAlias($targetTable);
+        $joinCondition = $this->buildColumnName($fromAlias, $fromColumn) . '=' .
+            $this->buildColumnName($targetAlias, $targetColumn);
+
+        $this->innerJoin(
+            $this->quoteTableName($fromAlias),
+            $this->quoteTableName($targetTable),
+            $this->quoteTableName($targetAlias),
+            $joinCondition
+        );
+
+        return $targetAlias;
+    }
+
+    /**
+     * @param string $fromAlias
+     * @param string $fromColumn
+     * @param string $intTable
+     * @param string $intToFromColumn
+     * @param string $intToTargetColumn
+     * @param string $targetTable
+     * @param string $targetColumn
+     *
+     * @return string
+     */
+    private function innerJoinTwoSequentialTables(
+        string $fromAlias,
+        string $fromColumn,
+        string $intTable,
+        string $intToFromColumn,
+        string $intToTargetColumn,
+        string $targetTable,
+        string $targetColumn
+    ): string {
+        $intAlias    = $this->innerJoinOneTable($fromAlias, $fromColumn, $intTable, $intToFromColumn);
+        $targetAlias = $this->innerJoinOneTable($intAlias, $intToTargetColumn, $targetTable, $targetColumn);
+
+        return $targetAlias;
+    }
+
+    /**
+     * @param string $tableName
+     *
+     * @return string
+     */
+    private function createAlias(string $tableName): string
+    {
+        $alias                          = $tableName . (++$this->aliasIdCounter);
+        $this->knownAliases[$tableName] = $alias;
+
+        return $alias;
+    }
+
+    /**
+     * @param string $tableName
+     *
+     * @return string
+     */
+    private function quoteTableName(string $tableName): string
+    {
+        return "`$tableName`";
+    }
+
+    /**
+     * @param string $columnName
+     *
+     * @return string
+     */
+    private function quoteColumnName(string $columnName): string
+    {
+        return "`$columnName`";
+    }
+
+    /**
+     * @param string   $fullColumnName
+     * @param int      $operation
      * @param iterable $arguments
      *
      * @return string
      *
      * @throws DBALException
+     * @throws InvalidArgumentException
      */
-    private function createSingleNamedParameter(iterable $arguments): string
+    private function createFilterExpression(string $fullColumnName, int $operation, iterable $arguments): string
     {
-        foreach ($arguments as $argument) {
-            $paramName = $this->createNamedParameter($this->getPdoValue($argument), $this->getPdoType($argument));
-
-            return $paramName;
+        switch ($operation) {
+            case FilterParameterInterface::OPERATION_EQUALS:
+                $parameter  = $this->createSingleValueNamedParameter($this->firstValue($arguments));
+                $expression = $this->expr()->eq($fullColumnName, $parameter);
+                break;
+            case FilterParameterInterface::OPERATION_NOT_EQUALS:
+                $parameter  = $this->createSingleValueNamedParameter($this->firstValue($arguments));
+                $expression = $this->expr()->neq($fullColumnName, $parameter);
+                break;
+            case FilterParameterInterface::OPERATION_LESS_THAN:
+                $parameter  = $this->createSingleValueNamedParameter($this->firstValue($arguments));
+                $expression = $this->expr()->lt($fullColumnName, $parameter);
+                break;
+            case FilterParameterInterface::OPERATION_LESS_OR_EQUALS:
+                $parameter  = $this->createSingleValueNamedParameter($this->firstValue($arguments));
+                $expression = $this->expr()->lte($fullColumnName, $parameter);
+                break;
+            case FilterParameterInterface::OPERATION_GREATER_THAN:
+                $parameter  = $this->createSingleValueNamedParameter($this->firstValue($arguments));
+                $expression = $this->expr()->gt($fullColumnName, $parameter);
+                break;
+            case FilterParameterInterface::OPERATION_GREATER_OR_EQUALS:
+                $parameter  = $this->createSingleValueNamedParameter($this->firstValue($arguments));
+                $expression = $this->expr()->gte($fullColumnName, $parameter);
+                break;
+            case FilterParameterInterface::OPERATION_LIKE:
+                $parameter  = $this->createSingleValueNamedParameter($this->firstValue($arguments));
+                $expression = $this->expr()->like($fullColumnName, $parameter);
+                break;
+            case FilterParameterInterface::OPERATION_NOT_LIKE:
+                $parameter  = $this->createSingleValueNamedParameter($this->firstValue($arguments));
+                $expression = $this->expr()->notLike($fullColumnName, $parameter);
+                break;
+            case FilterParameterInterface::OPERATION_IN:
+                $parameters = $this->createArrayValuesNamedParameter($arguments);
+                $expression = $this->expr()->in($fullColumnName, $parameters);
+                break;
+            case FilterParameterInterface::OPERATION_NOT_IN:
+                $parameters = $this->createArrayValuesNamedParameter($arguments);
+                $expression = $this->expr()->notIn($fullColumnName, $parameters);
+                break;
+            case FilterParameterInterface::OPERATION_IS_NULL:
+                $expression = $this->expr()->isNull($fullColumnName);
+                break;
+            case FilterParameterInterface::OPERATION_IS_NOT_NULL:
+            default:
+                assert($operation === FilterParameterInterface::OPERATION_IS_NOT_NULL);
+                $expression = $this->expr()->isNotNull($fullColumnName);
+                break;
         }
 
-        // arguments are empty
-        throw new InvalidArgumentException();
+        return $expression;
     }
 
     /**
      * @param iterable $arguments
      *
-     * @return string[]
+     * @return mixed
      *
-     * @throws DBALException
+     * @throws InvalidArgumentException
      */
-    private function createNamedParameterArray(iterable $arguments): array
+    private function firstValue(iterable $arguments)
     {
-        $names = [];
-
         foreach ($arguments as $argument) {
-            $names[] = $this->createNamedParameter($this->getPdoValue($argument), $this->getPdoType($argument));
+            return $argument;
         }
 
-        return $names;
+        // arguments are empty
+        throw new InvalidArgumentException();
     }
 
     /**
@@ -924,21 +817,14 @@ class ModelQueryBuilder extends QueryBuilder
      *
      * @return string
      *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     *
      * @throws DBALException
      */
     private function convertDataTimeToDatabaseFormat(DateTimeInterface $dateTime): string
     {
-        if ($this->dtToDbConverter === null) {
-            $type                  = $this->getDbalType(DateTimeType::DATETIME);
-            $platform              = $this->getConnection()->getDatabasePlatform();
-            $this->dtToDbConverter = function (DateTimeInterface $dateTime) use ($type, $platform) : string {
-                return $type->convertToDatabaseValue($dateTime, $platform);
-            };
-        }
-
-        return call_user_func($this->dtToDbConverter, $dateTime);
+        return $this->getDateTimeType()->convertToDatabaseValue(
+            $dateTime,
+            $this->getConnection()->getDatabasePlatform()
+        );
     }
 
     /**
@@ -967,5 +853,21 @@ class ModelQueryBuilder extends QueryBuilder
         }
 
         return $type;
+    }
+
+    /**
+     * @return Type
+     *
+     * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function getDateTimeType(): Type
+    {
+        if ($this->dateTimeType === null) {
+            $this->dateTimeType = Type::getType(DateTimeType::DATETIME);
+        }
+
+        return $this->dateTimeType;
     }
 }
