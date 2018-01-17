@@ -937,6 +937,11 @@ class Crud implements CrudInterface
         iterable $relationshipSorts = null,
         iterable $columns = null
     ): ModelQueryBuilder {
+        assert(
+            $this->getModelSchemes()->hasRelationship($this->getModelClass(), $relationshipName),
+            "Relationship `$relationshipName` do not exist in model `" . $this->getModelClass() . '`'
+        );
+
         // as we read data from a relationship our main table and model would be the table/model in the relationship
         // so 'root' model(s) will be located in the reverse relationship.
 
@@ -980,6 +985,11 @@ class Crud implements CrudInterface
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
     ) {
+        assert(
+            $this->getModelSchemes()->hasRelationship($this->getModelClass(), $name),
+            "Relationship `$name` do not exist in model `" . $this->getModelClass() . '`'
+        );
+
         // depending on the relationship type we expect the result to be either single resource or a collection
         $relationshipType = $this->getModelSchemes()->getRelationshipType($this->getModelClass(), $name);
         $isExpectMany     = $relationshipType === RelationshipTypes::HAS_MANY ||
@@ -1002,6 +1012,11 @@ class Crud implements CrudInterface
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
     ): array {
+        assert(
+            $this->getModelSchemes()->hasRelationship($this->getModelClass(), $name),
+            "Relationship `$name` do not exist in model `" . $this->getModelClass() . '`'
+        );
+
         // depending on the relationship type we expect the result to be either single resource or a collection
         $relationshipType = $this->getModelSchemes()->getRelationshipType($this->getModelClass(), $name);
         $isExpectMany     = $relationshipType === RelationshipTypes::HAS_MANY ||
