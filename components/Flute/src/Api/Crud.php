@@ -907,16 +907,37 @@ class Crud implements CrudInterface
      */
     public function count(): ?int
     {
-        $builder = $this
-            ->createBuilder($this->getModelClass())
-            ->select('COUNT(*)')
+        $builder = $this->createBuilder($this->getModelClass());
+
+        $pkName    = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
+        $aliasedPk = $builder->getQuotedMainAliasColumn($pkName);
+
+        $builder
+            ->select("COUNT($aliasedPk)")
             ->fromModelTable();
 
-        $this->applyAliasFilters($builder);
+        $this
+            ->applyAliasFilters($builder)
+            ->applyRelationshipFiltersAndSorts($builder);
+
+        $builder = $this->builderOnCount($builder);
+
+        // Things become more complicated when relationship filters come into play and
+        // SQL queries have `JOIN` clauses.
+        // Adding JOIN will tell the database to COUNT in relationships and it will return
+        // the records themselves. Thus we have to wrap it with another COUNT.
+        if (empty($this->relFiltersAndSorts) === false) {
+            $countBuilder = $this->getConnection()->createQueryBuilder();
+            $countBuilder->setParameters($builder->getParameters());
+
+            $countBuilder->select('COUNT(*)')->from('(' . $builder->getSQL() . ') AS RESULT');
+
+            $builder = $countBuilder;
+        }
 
         $this->clearBuilderParameters()->clearFetchParameters();
 
-        $result = $this->builderOnCount($builder)->execute()->fetchColumn();
+        $result = $builder->execute()->fetchColumn();
 
         return $result === false ? null : $result;
     }

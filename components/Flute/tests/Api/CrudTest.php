@@ -964,6 +964,26 @@ class CrudTest extends TestCase
     }
 
     /**
+     * Test index.
+     *
+     * @throws DBALException
+     */
+    public function testCountWithFilterInRelationship(): void
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        $filters = [
+            User::FIELD_ID => [
+                FilterParameterInterface::OPERATION_EQUALS => ['1'],
+            ],
+        ];
+
+        $result = $crud->withRelationshipFilters(Post::REL_USER, $filters)->count();
+
+        $this->assertEquals(4, $result);
+    }
+
+    /**
      * Test check resource exists in relationship.
      *
      * @throws DBALException
