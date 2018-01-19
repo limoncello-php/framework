@@ -1,4 +1,4 @@
-[![License](https://img.shields.io/packagist/l/limoncello-php/contracts.svg)](https://packagist.org/packages/limoncello-php/contracts)
+[![License](https://img.shields.io/github/license/limoncello-php/framework.svg)](https://packagist.org/packages/limoncello-php/framework)
 
 ## Summary
 
