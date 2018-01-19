@@ -597,6 +597,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @return Type
      *
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     protected function getDbalType(string $name): Type
     {
@@ -718,6 +720,9 @@ class ModelQueryBuilder extends QueryBuilder
      *
      * @throws DBALException
      * @throws InvalidArgumentException
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function createFilterExpression(string $fullColumnName, int $operation, iterable $arguments): string
     {
