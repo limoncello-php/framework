@@ -74,6 +74,10 @@ use Zend\Diactoros\Uri;
  */
 class ControllerTest extends TestCase
 {
+    const DEFAULT_JSON_META = [
+        'Title' => 'Default JSON API meta information',
+    ];
+
     /**
      * Controller test.
      *
@@ -128,14 +132,15 @@ class ControllerTest extends TestCase
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
 
-        $body     = (string)($response->getBody());
-        $resource = json_decode($body, true);
+        $body    = (string)($response->getBody());
+        $decoded = json_decode($body, true);
 
+        $this->assertEquals(self::DEFAULT_JSON_META, $decoded[DocumentInterface::KEYWORD_META]);
         $this->assertEquals(
             'http://localhost.local/comments?sort=-id&page[offset]=10&page[limit]=10',
-            urldecode($resource[DocumentInterface::KEYWORD_LINKS][DocumentInterface::KEYWORD_NEXT])
+            urldecode($decoded[DocumentInterface::KEYWORD_LINKS][DocumentInterface::KEYWORD_NEXT])
         );
-        $this->assertCount(10, $resources = $resource[DocumentInterface::KEYWORD_DATA]);
+        $this->assertCount(10, $resources = $decoded[DocumentInterface::KEYWORD_DATA]);
 
         // check IDs are in descending order
         $allDesc = true;
@@ -1293,6 +1298,9 @@ EOT;
                 /** @var SettingsProviderInterface $provider */
                 $provider = $container->get(SettingsProviderInterface::class);
                 $settings = $provider->get(FluteSettings::class);
+
+                // meta info so we can test it adds custom properties successfully
+                $settings[FluteSettings::KEY_META] = static::DEFAULT_JSON_META;
 
                 $urlPrefix = $settings[FluteSettings::KEY_URI_PREFIX];
                 $encoder   = $factory->createEncoder($jsonSchemes, new EncoderOptions(
