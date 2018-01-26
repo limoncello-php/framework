@@ -21,6 +21,7 @@ use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Exceptions\InvalidSchemeFactoryException;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaInterface as JsonSchemaInterface;
 use Neomerx\JsonApi\Schema\Container;
 
 /**
@@ -106,8 +107,10 @@ class JsonSchemes extends Container implements JsonSchemesInterface
      * @param callable $callable
      *
      * @codeCoverageIgnore
+     *
+     * @return SchemaInterface
      */
-    protected function createSchemaFromCallable(callable $callable)
+    protected function createSchemaFromCallable(callable $callable): JsonSchemaInterface
     {
         assert($callable);
 
@@ -120,7 +123,7 @@ class JsonSchemes extends Container implements JsonSchemesInterface
      *
      * @return SchemaInterface
      */
-    protected function createSchemaFromClassName($className)
+    protected function createSchemaFromClassName(string $className): JsonSchemaInterface
     {
         $schema = new $className($this->getFactory(), $this->getModelSchemes());
 

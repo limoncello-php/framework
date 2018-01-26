@@ -17,18 +17,13 @@
  */
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 
 /**
  * @package Limoncello\Flute
  */
 interface QueryParserInterface extends BaseQueryParserInterface
 {
-    /** Parameter name */
-    public const PARAM_PAGE = 'page';
-
-    /** Parameter name */
-    public const PARAM_FILTER = 'filter';
-
     /**
      * @param array $parameters
      *

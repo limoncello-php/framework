@@ -60,7 +60,6 @@ use Limoncello\Tests\Flute\TestCase;
 use Mockery;
 use Mockery\Mock;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
-use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Container\ContainerExceptionInterface;
@@ -1257,11 +1256,9 @@ EOT;
     {
         $container = new Container();
 
-        $container[FactoryInterface::class]               = $factory = new Factory($container);
-        $container[FormatterFactoryInterface::class]      = $formatterFactory = new FormatterFactory();
-        $container[QueryParametersParserInterface::class] = $factory
-            ->getJsonApiFactory()->createQueryParametersParser();
-        $container[ModelSchemeInfoInterface::class]       = $modelSchemes = $this->getModelSchemes();
+        $container[FactoryInterface::class]          = $factory = new Factory($container);
+        $container[FormatterFactoryInterface::class] = $formatterFactory = new FormatterFactory();
+        $container[ModelSchemeInfoInterface::class]  = $modelSchemes = $this->getModelSchemes();
 
         $container[JsonSchemesInterface::class] = $jsonSchemes = $this->getJsonSchemes($factory, $modelSchemes);
 

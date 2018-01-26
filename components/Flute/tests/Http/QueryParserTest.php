@@ -138,7 +138,7 @@ class QueryParserTest extends TestCase
                     'like' => 'like%',
                 ],
                 BoardSchema::REL_POSTS                                => [
-                    'eq' => '1',
+                    'eq' => '0',
                 ],
                 BoardSchema::REL_POSTS . '.' . PostSchema::ATTR_TITLE => [
                     'not-like' => 'not_like%',
@@ -156,7 +156,7 @@ class QueryParserTest extends TestCase
                 'like' => ['like%'],
             ],
             BoardSchema::REL_POSTS                                => [
-                'eq' => ['1'],
+                'eq' => ['0'],
             ],
             BoardSchema::REL_POSTS . '.' . PostSchema::ATTR_TITLE => [
                 'not-like' => ['not_like%'],

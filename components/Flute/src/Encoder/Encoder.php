@@ -22,7 +22,7 @@ use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
+use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -48,7 +48,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     /**
      * @inheritdoc
      */
-    public function encodeData($data, EncodingParametersInterface $parameters = null)
+    public function encodeData($data, EncodingParametersInterface $parameters = null): string
     {
         $data = $this->handleRelationshipStorageAndPagingData($data);
 
@@ -58,7 +58,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     /**
      * @inheritdoc
      */
-    public function encodeIdentifiers($data, EncodingParametersInterface $parameters = null)
+    public function encodeIdentifiers($data, EncodingParametersInterface $parameters = null): string
     {
         $data = $this->handleRelationshipStorageAndPagingData($data);
 
@@ -127,7 +127,7 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
 
         return function ($offset) use ($pageSize, $queryParams) {
             $paramsWithPaging = array_merge($queryParams, [
-                QueryParametersParserInterface::PARAM_PAGE => [
+                BaseQueryParserInterface::PARAM_PAGE => [
                     PaginationStrategyInterface::PARAM_PAGING_OFFSET => $offset,
                     PaginationStrategyInterface::PARAM_PAGING_LIMIT  => $pageSize,
                 ],

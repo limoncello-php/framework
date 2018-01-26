@@ -47,24 +47,4 @@ interface JsonSchemesInterface extends ContainerInterface
      */
     public function getModelRelationshipSchema(string $modelClass, string $relationshipName): SchemaInterface;
 
-    /**
-     * @inheritdoc
-     *
-     * @return SchemaInterface
-     */
-    public function getSchema($resourceObject);
-
-    /**
-     * @inheritdoc
-     *
-     * @return SchemaInterface
-     */
-    public function getSchemaByType($type);
-
-    /**
-     * @inheritdoc
-     *
-     * @return SchemaInterface
-     */
-    public function getSchemaByResourceType($resourceType);
 }

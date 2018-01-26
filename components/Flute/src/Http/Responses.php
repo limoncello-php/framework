@@ -16,18 +16,17 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
+use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Neomerx\JsonApi\Http\Responses as JsonApiResponses;
+use Neomerx\JsonApi\Http\BaseResponses;
 
 /**
  * @package Limoncello\Flute
  */
-class Responses extends JsonApiResponses
+class Responses extends BaseResponses
 {
     /**
      * @var EncodingParametersInterface|null
@@ -45,11 +44,6 @@ class Responses extends JsonApiResponses
     private $outputMediaType;
 
     /**
-     * @var SupportedExtensionsInterface
-     */
-    private $extensions;
-
-    /**
      * @var ContainerInterface
      */
     private $schemes;
@@ -61,7 +55,6 @@ class Responses extends JsonApiResponses
 
     /**
      * @param MediaTypeInterface               $outputMediaType
-     * @param SupportedExtensionsInterface     $extensions
      * @param EncoderInterface                 $encoder
      * @param ContainerInterface               $schemes
      * @param EncodingParametersInterface|null $parameters
@@ -69,13 +62,11 @@ class Responses extends JsonApiResponses
      */
     public function __construct(
         MediaTypeInterface $outputMediaType,
-        SupportedExtensionsInterface $extensions,
         EncoderInterface $encoder,
         ContainerInterface $schemes,
         EncodingParametersInterface $parameters = null,
         string $urlPrefix = null
     ) {
-        $this->extensions      = $extensions;
         $this->encoder         = $encoder;
         $this->outputMediaType = $outputMediaType;
         $this->schemes         = $schemes;
@@ -86,7 +77,7 @@ class Responses extends JsonApiResponses
     /**
      * @inheritdoc
      */
-    protected function createResponse($content, $statusCode, array $headers)
+    protected function createResponse(?string $content, int $statusCode, array $headers)
     {
         return new JsonApiResponse($content, $statusCode, $headers);
     }
@@ -94,7 +85,7 @@ class Responses extends JsonApiResponses
     /**
      * @inheritdoc
      */
-    protected function getEncoder()
+    protected function getEncoder(): EncoderInterface
     {
         return $this->encoder;
     }
@@ -102,7 +93,7 @@ class Responses extends JsonApiResponses
     /**
      * @inheritdoc
      */
-    protected function getUrlPrefix()
+    protected function getUrlPrefix(): ?string
     {
         return $this->urlPrefix;
     }
@@ -110,7 +101,7 @@ class Responses extends JsonApiResponses
     /**
      * @inheritdoc
      */
-    protected function getEncodingParameters()
+    protected function getEncodingParameters(): ?EncodingParametersInterface
     {
         return $this->parameters;
     }
@@ -118,7 +109,7 @@ class Responses extends JsonApiResponses
     /**
      * @inheritdoc
      */
-    protected function getSchemaContainer()
+    protected function getSchemaContainer(): ?ContainerInterface
     {
         return $this->schemes;
     }
@@ -126,15 +117,7 @@ class Responses extends JsonApiResponses
     /**
      * @inheritdoc
      */
-    protected function getSupportedExtensions()
-    {
-        return $this->extensions;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getMediaType()
+    protected function getMediaType(): MediaTypeInterface
     {
         return $this->outputMediaType;
     }
@@ -142,7 +125,7 @@ class Responses extends JsonApiResponses
     /**
      * @inheritdoc
      */
-    protected function getResourceLocationUrl($resource)
+    protected function getResourceLocationUrl($resource): string
     {
         return parent::getResourceLocationUrl(
             $resource instanceof PaginatedDataInterface ? $resource->getData() : $resource

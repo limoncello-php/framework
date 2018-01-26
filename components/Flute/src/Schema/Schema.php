@@ -24,12 +24,12 @@ use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
-use Neomerx\JsonApi\Schema\SchemaProvider;
+use Neomerx\JsonApi\Schema\BaseSchema;
 
 /**
  * @package Limoncello\Flute
  */
-abstract class Schema extends SchemaProvider implements SchemaInterface
+abstract class Schema extends BaseSchema implements SchemaInterface
 {
     /**
      * @var ModelSchemeInfoInterface
@@ -93,7 +93,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
     /**
      * @inheritdoc
      */
-    public function getAttributes($model)
+    public function getAttributes($model, array $fieldKeysFilter = null): ?array
     {
         $attributes = [];
         $mappings   = static::getMappings();
@@ -117,7 +117,7 @@ abstract class Schema extends SchemaProvider implements SchemaInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function getRelationships($model, $isPrimary, array $includeRelationships)
+    public function getRelationships($model, bool $isPrimary, array $includeRelationships): ?array
     {
         $modelClass    = get_class($model);
         $relationships = [];

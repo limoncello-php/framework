@@ -25,7 +25,6 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Http\Headers\MediaType;
-use Neomerx\JsonApi\Http\Headers\SupportedExtensions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -63,7 +62,6 @@ trait CreateResponsesTrait
         $jsonSchemes = $container->get(JsonSchemesInterface::class);
         $responses   = new Responses(
             new MediaType(MediaTypeInterface::JSON_API_TYPE, MediaTypeInterface::JSON_API_SUB_TYPE),
-            new SupportedExtensions(),
             $encoder,
             $jsonSchemes,
             $parameters,

@@ -22,6 +22,7 @@ use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
+use Neomerx\JsonApi\Http\Query\BaseQueryParser;
 
 /**
  * @package Limoncello\Flute
@@ -445,7 +446,7 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
                 throw new InvalidQueryParametersException($error);
             }
 
-            if (empty($arguments) === true) {
+            if ($arguments === '') {
                 yield $operationName => [];
             } else {
                 yield $operationName => $this->splitCommaSeparatedStringAndCheckNoEmpties($parameterName, $arguments);

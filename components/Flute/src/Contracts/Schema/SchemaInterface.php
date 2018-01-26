@@ -17,12 +17,12 @@
  */
 
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
-use Neomerx\JsonApi\Contracts\Schema\SchemaProviderInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaInterface as BaseSchemaInterface;
 
 /**
  * @package Limoncello\Flute
  */
-interface SchemaInterface extends SchemaProviderInterface
+interface SchemaInterface extends BaseSchemaInterface
 {
     /** Type */
     const TYPE = null;

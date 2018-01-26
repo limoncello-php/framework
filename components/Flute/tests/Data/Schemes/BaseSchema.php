@@ -36,7 +36,7 @@ abstract class BaseSchema extends Schema
     /**
      * @inheritdoc
      */
-    public function getId($resource)
+    public function getId($resource): ?string
     {
         /** @var Model $modelClass */
         $modelClass = static::MODEL;

@@ -18,7 +18,7 @@
         "ext-intl" : "*",
         "zendframework/zend-diactoros": "^1.4",
         "doctrine/dbal": "^2.5.0",
-        "neomerx/json-api": "^1.0.0",
+        "neomerx/json-api": "^2.0.0",
         "limoncello-php/contracts": "^0.8.0",
         "limoncello-php/l10n": "^0.8.0",
         "limoncello-php/validation": "^0.8.0"
