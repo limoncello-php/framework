@@ -65,7 +65,8 @@ trait CreateResponsesTrait
             $encoder,
             $jsonSchemes,
             $parameters,
-            $settings[S::KEY_URI_PREFIX]
+            $settings[S::KEY_URI_PREFIX],
+            $settings[S::KEY_META]
         );
 
         return $responses;

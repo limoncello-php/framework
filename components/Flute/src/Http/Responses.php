@@ -54,24 +54,66 @@ class Responses extends BaseResponses
     private $urlPrefix;
 
     /**
+     * @var mixed|null
+     */
+    private $defaultMeta;
+
+    /**
      * @param MediaTypeInterface               $outputMediaType
      * @param EncoderInterface                 $encoder
      * @param ContainerInterface               $schemes
      * @param EncodingParametersInterface|null $parameters
      * @param string|null                      $urlPrefix
+     * @param mixed|null                       $defaultMeta
      */
     public function __construct(
         MediaTypeInterface $outputMediaType,
         EncoderInterface $encoder,
         ContainerInterface $schemes,
         EncodingParametersInterface $parameters = null,
-        string $urlPrefix = null
+        string $urlPrefix = null,
+        $defaultMeta = null
     ) {
         $this->encoder         = $encoder;
         $this->outputMediaType = $outputMediaType;
         $this->schemes         = $schemes;
         $this->urlPrefix       = $urlPrefix;
         $this->parameters      = $parameters;
+        $this->defaultMeta     = $defaultMeta;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContentResponse(
+        $data,
+        int $statusCode = self::HTTP_OK,
+        array $links = null,
+        $meta = null,
+        array $headers = []
+    ) {
+        return parent::getContentResponse($data, $statusCode, $links, $this->mergeDefaultMeta($meta), $headers);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCreatedResponse($resource, array $links = null, $meta = null, array $headers = [])
+    {
+        return parent::getCreatedResponse($resource, $links, $this->mergeDefaultMeta($meta), $headers);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifiersResponse(
+        $data,
+        int $statusCode = self::HTTP_OK,
+        array $links = null,
+        $meta = null,
+        array $headers = []
+    ) {
+        return parent::getIdentifiersResponse($data, $statusCode, $links, $this->mergeDefaultMeta($meta), $headers);
     }
 
     /**
@@ -130,5 +172,26 @@ class Responses extends BaseResponses
         return parent::getResourceLocationUrl(
             $resource instanceof PaginatedDataInterface ? $resource->getData() : $resource
         );
+    }
+
+    /**
+     * @return mixed|null
+     */
+    protected function getDefaultMeta()
+    {
+        return $this->defaultMeta;
+    }
+
+    /**
+     * Merge with default meta if possible (if both are arrays).
+     *
+     * @param mixed $meta
+     *
+     * @return mixed|null
+     */
+    private function mergeDefaultMeta($meta)
+    {
+        return is_array($meta) === true && is_array($this->getDefaultMeta()) === true ?
+            $meta + $this->getDefaultMeta() : $meta;
     }
 }
