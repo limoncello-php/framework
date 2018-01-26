@@ -22,6 +22,7 @@ use Limoncello\Validation\Contracts\ValidatorInterface;
 use Limoncello\Validation\Execution\ContextStorage;
 use Limoncello\Validation\Validator\BaseValidator;
 use Limoncello\Validation\Validator\SingleValidation;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Validation
@@ -31,23 +32,32 @@ class SingleValidator extends BaseValidator
     use SingleValidation;
 
     /**
-     * @param RuleInterface $rule
+     * @var ContainerInterface|null
      */
-    public function __construct(RuleInterface $rule)
+    private $container;
+
+    /**
+     * @param RuleInterface           $rule
+     * @param ContainerInterface|null $container
+     */
+    public function __construct(RuleInterface $rule, ContainerInterface $container = null)
     {
         parent::__construct();
 
         $this->setRule($rule);
+
+        $this->container = $container;
     }
 
     /**
-     * @param RuleInterface $rule
+     * @param RuleInterface           $rule
+     * @param ContainerInterface|null $container
      *
      * @return ValidatorInterface
      */
-    public static function validator(RuleInterface $rule): ValidatorInterface
+    public static function validator(RuleInterface $rule, ContainerInterface $container = null): ValidatorInterface
     {
-        $validator = new static ($rule);
+        $validator = new static ($rule, $container);
 
         return $validator;
     }
@@ -72,6 +82,14 @@ class SingleValidator extends BaseValidator
     }
 
     /**
+     * @return ContainerInterface|null
+     */
+    protected function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
+    }
+
+    /**
      * During validation you can pass to rules your custom context which might have any additional
      * resources needed by your rules (extra properties, database connection settings, container, and etc).
      *
@@ -81,6 +99,6 @@ class SingleValidator extends BaseValidator
      */
     protected function createContextStorageFromBlocks(array $blocks): ContextStorageInterface
     {
-        return new ContextStorage($blocks);
+        return new ContextStorage($blocks, $this->getContainer());
     }
 }

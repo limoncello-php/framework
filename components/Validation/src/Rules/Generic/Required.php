@@ -77,7 +77,7 @@ final class Required extends BaseRule
     {
         $context->getStates()->setState(static::STATE_HAS_BEEN_CALLED, true);
 
-        return BlockReplies::createSuccessReply($value);
+        return static::createSuccessReply($value);
     }
 
     /**

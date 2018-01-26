@@ -16,26 +16,15 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Validation
  */
-final class StringToFloat extends BaseRule
+final class StringToFloat extends ExecuteRule
 {
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))->setProperties($this->getStandardProperties());
-    }
-
     /**
      * @param mixed            $value
      * @param ContextInterface $context
@@ -47,9 +36,9 @@ final class StringToFloat extends BaseRule
     public static function execute($value, ContextInterface $context): array
     {
         if (is_string($value) === true || is_numeric($value) === true) {
-            return BlockReplies::createSuccessReply((float)$value);
+            return static::createSuccessReply((float)$value);
         }
 
-        return BlockReplies::createErrorReply($context, $value, ErrorCodes::IS_FLOAT);
+        return static::createErrorReply($context, $value, ErrorCodes::IS_FLOAT);
     }
 }

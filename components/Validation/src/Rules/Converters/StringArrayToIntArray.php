@@ -16,26 +16,15 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Validation
  */
-final class StringArrayToIntArray extends BaseRule
+final class StringArrayToIntArray extends ExecuteRule
 {
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))->setProperties($this->getStandardProperties());
-    }
-
     /**
      * @param mixed            $value
      * @param ContextInterface $context
@@ -55,14 +44,14 @@ final class StringArrayToIntArray extends BaseRule
                 if (is_string($mightBeString) === true || is_numeric($mightBeString) === true) {
                     $result[$key] = (int)$mightBeString;
                 } else {
-                    $reply = BlockReplies::createErrorReply($context, $mightBeString, ErrorCodes::IS_STRING);
+                    $reply = static::createErrorReply($context, $mightBeString, ErrorCodes::IS_STRING);
                     break;
                 }
             }
         } else {
-            $reply = BlockReplies::createErrorReply($context, $value, ErrorCodes::IS_ARRAY);
+            $reply = static::createErrorReply($context, $value, ErrorCodes::IS_ARRAY);
         }
 
-        return $reply !== null ? $reply : BlockReplies::createSuccessReply($result);
+        return $reply !== null ? $reply : static::createSuccessReply($result);
     }
 }

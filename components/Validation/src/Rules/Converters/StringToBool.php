@@ -16,26 +16,15 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Validation
  */
-final class StringToBool extends BaseRule
+final class StringToBool extends ExecuteRule
 {
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))->setProperties($this->getStandardProperties());
-    }
-
     /**
      * @param mixed            $value
      * @param ContextInterface $context
@@ -51,16 +40,16 @@ final class StringToBool extends BaseRule
         if (is_string($value) === true) {
             $lcValue = strtolower($value);
             if ($lcValue === 'true' || $lcValue === '1' || $lcValue === 'on' || $lcValue === 'yes') {
-                $reply = BlockReplies::createSuccessReply(true);
+                $reply = static::createSuccessReply(true);
             } elseif ($lcValue === 'false' || $lcValue === '0' || $lcValue === 'off' || $lcValue === 'no') {
-                $reply = BlockReplies::createSuccessReply(false);
+                $reply = static::createSuccessReply(false);
             } else {
-                $reply = BlockReplies::createErrorReply($context, $value, ErrorCodes::IS_BOOL);
+                $reply = static::createErrorReply($context, $value, ErrorCodes::IS_BOOL);
             }
         } elseif (is_bool($value) === true) {
-            $reply = BlockReplies::createSuccessReply($value);
+            $reply = static::createSuccessReply($value);
         } else {
-            $reply = BlockReplies::createErrorReply($context, $value, ErrorCodes::IS_BOOL);
+            $reply = static::createErrorReply($context, $value, ErrorCodes::IS_BOOL);
         }
 
         return $reply;

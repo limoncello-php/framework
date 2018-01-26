@@ -16,26 +16,15 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Validation
  */
-final class AsArray extends BaseRule
+final class AsArray extends ExecuteRule
 {
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))->setProperties($this->getStandardProperties());
-    }
-
     /**
      * @param mixed            $value
      * @param ContextInterface $context
@@ -47,7 +36,7 @@ final class AsArray extends BaseRule
     public static function execute($value, ContextInterface $context): array
     {
         return is_array($value) === true ?
-            BlockReplies::createSuccessReply($value) :
-            BlockReplies::createErrorReply($context, $value, ErrorCodes::IS_ARRAY);
+            static::createSuccessReply($value) :
+            static::createErrorReply($context, $value, ErrorCodes::IS_ARRAY);
     }
 }

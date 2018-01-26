@@ -17,15 +17,25 @@
  */
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
+use Limoncello\Validation\I18n\EnUsLocale;
 
 /**
  * @package Sample
  */
-interface CustomErrorCodes extends ErrorCodes
+interface Errors extends ErrorCodes
 {
     /** Custom error code */
-    const IS_EMAIL = ErrorCodes::LAST + 1;
+    const IS_EMAIL = self::LAST + 1;
 
     /** Custom error code */
-    const IS_EXISTING_PAYMENT_PLAN = self::IS_EMAIL + 1;
+    const IS_VALID_SKU = self::IS_EMAIL + 1;
+
+    /** Custom error code */
+    const IS_DELIVERY_DATE = self::IS_VALID_SKU + 1;
+    
+    const MESSAGES = EnUsLocale::MESSAGES + [
+        self::IS_EMAIL         => 'The value should be a valid email address.',
+        self::IS_VALID_SKU     => 'The value should be a valid SKU.',
+        self::IS_DELIVERY_DATE => 'The value should be a valid delivery date.',
+    ];
 }

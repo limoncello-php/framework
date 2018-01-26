@@ -18,27 +18,19 @@
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Validation
  */
-final class StringToDateTime extends BaseRule
+final class StringToDateTime extends ExecuteRule
 {
     /**
      * Property key.
      */
     const PROPERTY_FORMAT = self::PROPERTY_LAST + 1;
-
-    /**
-     * @var string
-     */
-    private $format;
 
     /**
      * @param string $format
@@ -47,16 +39,9 @@ final class StringToDateTime extends BaseRule
     {
         assert(!empty($format));
 
-        $this->format = $format;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))
-            ->setProperties($this->getStandardProperties() + [self::PROPERTY_FORMAT => $this->getFormat()]);
+        parent::__construct([
+            self::PROPERTY_FORMAT => $format,
+        ]);
     }
 
     /**
@@ -71,25 +56,17 @@ final class StringToDateTime extends BaseRule
     {
         $format = $context->getProperties()->getProperty(self::PROPERTY_FORMAT);
         if (is_string($value) === true && ($parsed = static::parseFromFormat($value, $format)) !== null) {
-            return BlockReplies::createSuccessReply($parsed);
+            return static::createSuccessReply($parsed);
         } elseif ($value instanceof DateTimeInterface) {
-            return BlockReplies::createSuccessReply($value);
+            return static::createSuccessReply($value);
         }
 
-        return BlockReplies::createErrorReply(
+        return static::createErrorReply(
             $context,
             $value,
             ErrorCodes::IS_DATE_TIME,
             [self::PROPERTY_FORMAT => $format]
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getFormat(): string
-    {
-        return $this->format;
     }
 
     /**

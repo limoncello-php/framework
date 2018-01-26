@@ -1,4 +1,4 @@
-<?php namespace Sample\Validation;
+<?php namespace Limoncello\Tests\Validation\Rules;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,37 +16,31 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
+use PDO;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Sample
  */
-class IsPaymentPlanRule extends BaseRule
+class DbRule extends ExecuteRule
 {
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))->setProperties($this->getStandardProperties());
-    }
-
     /**
      * @param mixed            $value
      * @param ContextInterface $context
      *
      * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function execute($value, ContextInterface $context): array
     {
-        $idExists = is_int($value) === true && $value < 3;
+        // it emulates it takes connection from context's container and work with database.
+        $pdo = $context->getContainer()->get(PDO::class);
+        assert($pdo !== null);
 
-        return $idExists === true ?
-            BlockReplies::createSuccessReply($value) :
-            BlockReplies::createErrorReply($context, $value, CustomErrorCodes::IS_EXISTING_PAYMENT_PLAN);
+        return static::createSuccessReply($value);
     }
 }

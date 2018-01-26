@@ -21,6 +21,7 @@ use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Execution\ContextStorage;
 use Limoncello\Validation\Validator\ArrayValidation;
 use Limoncello\Validation\Validator\BaseValidator;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Validation
@@ -30,23 +31,34 @@ class ArrayValidator extends BaseValidator
     use ArrayValidation;
 
     /**
-     * @param RuleInterface[] $rules
+     * @var ContainerInterface|null
      */
-    public function __construct(array $rules)
+    private $container;
+
+    /**
+     * @param RuleInterface[]         $rules
+     * @param ContainerInterface|null $container
+     */
+    public function __construct(array $rules, ContainerInterface $container = null)
     {
         parent::__construct();
 
-        $this->setRules($rules);
+        if (empty($rules) === false) {
+            $this->setRules($rules);
+        }
+
+        $this->container = $container;
     }
 
     /**
-     * @param RuleInterface[] $rules
+     * @param RuleInterface[]    $rules
+     * @param ContainerInterface $container
      *
      * @return self
      */
-    public static function validator(array $rules): self
+    public static function validator(array $rules = [], ContainerInterface $container = null): self
     {
-        $validator = new static ($rules);
+        $validator = new static ($rules, $container);
 
         return $validator;
     }
@@ -69,6 +81,14 @@ class ArrayValidator extends BaseValidator
     }
 
     /**
+     * @return ContainerInterface|null
+     */
+    protected function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
+    }
+
+    /**
      * During validation you can pass to rules your custom context which might have any additional
      * resources needed by your rules (extra properties, database connection settings, container, and etc).
      *
@@ -78,6 +98,6 @@ class ArrayValidator extends BaseValidator
      */
     protected function createContextStorageFromBlocks(array $blocks): ContextStorageInterface
     {
-        return new ContextStorage($blocks);
+        return new ContextStorage($blocks, $this->getContainer());
     }
 }

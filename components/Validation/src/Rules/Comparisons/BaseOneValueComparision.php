@@ -80,7 +80,7 @@ abstract class BaseOneValueComparision extends BaseRule implements ComparisionIn
             $operator->enableCapture();
         }
 
-        return ($operator)->toBlock();
+        return $operator->toBlock();
     }
 
     /**

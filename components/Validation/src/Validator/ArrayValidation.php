@@ -31,16 +31,28 @@ use Limoncello\Validation\Execution\BlockSerializer;
 trait ArrayValidation
 {
     /**
-     * @var RuleInterface[]
+     * @var array
      */
-    private $rules;
+    private $serializedRules = [];
 
     /**
-     * @return RuleInterface[]
+     * @return array
      */
-    protected function getRules(): array
+    public function getSerializedRules(): array
     {
-        return $this->rules;
+        return $this->serializedRules;
+    }
+
+    /**
+     * @param array $serialized
+     *
+     * @return self
+     */
+    public function setSerializedRules(array $serialized): self
+    {
+        $this->serializedRules = $serialized;
+
+        return $this;
     }
 
     /**
@@ -50,9 +62,7 @@ trait ArrayValidation
      */
     private function setRules(array $rules): self
     {
-        $this->rules = $rules;
-
-        return $this;
+        return $this->setSerializedRules($this->serializeRules($rules));
     }
 
     /**
@@ -69,7 +79,7 @@ trait ArrayValidation
         CaptureAggregatorInterface $captures,
         ErrorAggregatorInterface $errors
     ): void {
-        list($indexMap, $serialized) = $this->getSerializedRules($this->getRules());
+        list($indexMap, $serialized) = $this->getSerializedRules();
 
         $blocks = BlockSerializer::unserializeBlocks($serialized);
 
@@ -95,11 +105,11 @@ trait ArrayValidation
     }
 
     /**
-     * @param RuleInterface[] $rules
+     * @var RuleInterface[] $rules
      *
      * @return array
      */
-    private function getSerializedRules(array $rules): array
+    private function serializeRules(array $rules): array
     {
         $serializer = new BlockSerializer();
 
@@ -108,8 +118,6 @@ trait ArrayValidation
             $indexMap[$name] = $serializer->addBlock($rule->setName($name)->enableCapture()->toBlock());
         }
 
-        $serialized = $serializer->get();
-
-        return [$indexMap, $serialized];
+        return [$indexMap, $serializer->get()];
     }
 }

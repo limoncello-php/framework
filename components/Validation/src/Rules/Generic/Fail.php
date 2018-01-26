@@ -16,17 +16,14 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Validation
  */
-final class Fail extends BaseRule
+final class Fail extends ExecuteRule
 {
     /**
      * Property key.
@@ -39,35 +36,15 @@ final class Fail extends BaseRule
     const PROPERTY_ERROR_CONTEXT = self::PROPERTY_ERROR_CODE + 1;
 
     /**
-     * @var int
-     */
-    private $errorCode;
-
-    /**
-     * @var mixed
-     */
-    private $errorContext;
-
-    /**
      * @param int   $errorCode
      * @param mixed $errorContext
      */
     public function __construct(int $errorCode = ErrorCodes::INVALID_VALUE, $errorContext = null)
     {
-        $this->errorCode    = $errorCode;
-        $this->errorContext = $errorContext;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))
-            ->setProperties($this->getStandardProperties() + [
-                    self::PROPERTY_ERROR_CODE    => $this->getErrorCode(),
-                    self::PROPERTY_ERROR_CONTEXT => $this->getErrorContext(),
-                ]);
+        parent::__construct([
+            self::PROPERTY_ERROR_CODE    => $errorCode,
+            self::PROPERTY_ERROR_CONTEXT => $errorContext,
+        ]);
     }
 
     /**
@@ -82,27 +59,11 @@ final class Fail extends BaseRule
     {
         $properties = $context->getProperties();
 
-        return BlockReplies::createErrorReply(
+        return static::createErrorReply(
             $context,
             $value,
             $properties->getProperty(self::PROPERTY_ERROR_CODE),
             $properties->getProperty(self::PROPERTY_ERROR_CONTEXT)
         );
-    }
-
-    /**
-     * @return int
-     */
-    public function getErrorCode(): int
-    {
-        return $this->errorCode;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getErrorContext()
-    {
-        return $this->errorContext;
     }
 }

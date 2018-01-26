@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
+use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Limoncello\Validation\Execution\BlockReplies;
 
 /**
  * @package Limoncello\Validation
@@ -173,5 +175,36 @@ abstract class BaseRule implements RuleInterface
             static::PROPERTY_NAME               => $name,
             static::PROPERTY_IS_CAPTURE_ENABLED => $isCaptureEnabled,
         ];
+    }
+
+    /**
+     * @param mixed $result
+     *
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    protected static function createSuccessReply($result): array
+    {
+        return BlockReplies::createSuccessReply($result);
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param mixed            $errorValue
+     * @param int              $errorCode
+     * @param mixed|null       $errorContext
+     *
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    protected static function createErrorReply(
+        ContextInterface $context,
+        $errorValue,
+        int $errorCode,
+        $errorContext = null
+    ): array {
+        return BlockReplies::createErrorReply($context, $errorValue, $errorCode, $errorContext);
     }
 }

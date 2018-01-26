@@ -16,15 +16,26 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\I18n\EnUsLocale;
+use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Sample
  */
-interface CustomErrorMessages
+class IsSkuRule extends ExecuteRule
 {
-    const MESSAGES = EnUsLocale::MESSAGES + [
-        CustomErrorCodes::IS_EMAIL                 => 'The value should be a valid email address.',
-        CustomErrorCodes::IS_EXISTING_PAYMENT_PLAN => 'The value should be a valid payment plan.',
-    ];
+    /**
+     * @param mixed            $value
+     * @param ContextInterface $context
+     *
+     * @return array
+     */
+    public static function execute($value, ContextInterface $context): array
+    {
+        $idExists = is_int($value) === true && $value < 3;
+
+        return $idExists === true ?
+            static::createSuccessReply($value) :
+            static::createErrorReply($context, $value, Errors::IS_VALID_SKU);
+    }
 }

@@ -17,26 +17,15 @@
  */
 
 use DateTimeInterface;
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Validation
  */
-final class AsDateTime extends BaseRule
+final class AsDateTime extends ExecuteRule
 {
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))->setProperties($this->getStandardProperties());
-    }
-
     /**
      * @param mixed            $value
      * @param ContextInterface $context
@@ -48,7 +37,7 @@ final class AsDateTime extends BaseRule
     public static function execute($value, ContextInterface $context): array
     {
         return $value instanceof DateTimeInterface ?
-            BlockReplies::createSuccessReply($value) :
-            BlockReplies::createErrorReply($context, $value, ErrorCodes::IS_DATE_TIME);
+            static::createSuccessReply($value) :
+            static::createErrorReply($context, $value, ErrorCodes::IS_DATE_TIME);
     }
 }

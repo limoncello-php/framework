@@ -16,11 +16,15 @@
  * limitations under the License.
  */
 
+use Limoncello\Tests\Validation\Rules\DbRule;
 use Limoncello\Validation\ArrayValidator as vv;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Rules as r;
 use Limoncello\Validation\SingleValidator as v;
+use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Tests\Validation
@@ -85,6 +89,43 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($validator->validate(['value1' => 'I am a string']));
         $this->assertFalse($validator->validate(['value1' => false]));
+    }
+
+    /**
+     * Test caching for array validation.
+     */
+    public function testArrayValidatorCache(): void
+    {
+        $validator = vv::validator([
+            'value1' => r::isString(),
+        ]);
+
+        $serialized = $validator->getSerializedRules();
+        unset($validator);
+
+        $validator = vv::validator()->setSerializedRules($serialized);
+
+        $this->assertTrue($validator->validate(['value1' => 'I am a string']));
+        $this->assertFalse($validator->validate(['value1' => false]));
+    }
+
+    /**
+     * Test container usage in validation rules.
+     */
+    public function testContainerUsageInRules(): void
+    {
+        $container = Mockery::mock(ContainerInterface::class);
+        $container->shouldReceive('get')->once()->with(PDO::class)->andReturnSelf();
+
+        $validator = vv::validator(
+            [
+                'value1' => new DbRule(),
+            ],
+            $container
+        );
+
+        // Actual check is inside the rule. It checks that container with PDO was provided.
+        $this->assertTrue($validator->validate(['value1' => 'whatever']));
     }
 
     /**

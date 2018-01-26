@@ -16,25 +16,16 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
+use DateTime;
+use DateTimeInterface;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Sample
  */
-class IsEmailRule extends BaseRule
+class IsDeliveryDateRule extends ExecuteRule
 {
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))->setProperties($this->getStandardProperties());
-    }
-
     /**
      * @param mixed            $value
      * @param ContextInterface $context
@@ -43,10 +34,13 @@ class IsEmailRule extends BaseRule
      */
     public static function execute($value, ContextInterface $context): array
     {
-        $isValidEmail = is_string($value) === true && filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+        $isValidDeliveryDate =
+            $value instanceof DateTimeInterface === true &&
+            $value >= new DateTime('tomorrow') &&
+            $value <= new DateTime('+5 days');
 
-        return $isValidEmail === true ?
-            BlockReplies::createSuccessReply($value) :
-            BlockReplies::createErrorReply($context, $value, CustomErrorCodes::IS_EMAIL);
+        return $isValidDeliveryDate === true ?
+            static::createSuccessReply($value) :
+            static::createErrorReply($context, $value, Errors::IS_DELIVERY_DATE);
     }
 }

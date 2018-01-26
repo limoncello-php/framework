@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Validation\Rules\Types;
+<?php namespace Limoncello\Validation\Contracts\Rules;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,27 +16,18 @@
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Validation
  */
-final class AsNumeric extends ExecuteRule
+interface ExecuteRuleInterface extends RuleInterface
 {
     /**
      * @param mixed            $value
      * @param ContextInterface $context
      *
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function execute($value, ContextInterface $context): array
-    {
-        return is_numeric($value) === true ?
-            static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, ErrorCodes::IS_NUMERIC);
-    }
+    public static function execute($value, ContextInterface $context): array;
 }
