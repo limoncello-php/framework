@@ -26,6 +26,9 @@ use Neomerx\JsonApi\Http\Query\BaseQueryParser;
 
 /**
  * @package Limoncello\Flute
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class QueryParser extends BaseQueryParser implements QueryParserInterface
 {
@@ -297,6 +300,7 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
     {
         $paths = null;
         foreach ($this->getIncludes() as $path => $links) {
+            assert($links);
             $paths[] = $path;
         }
 
@@ -324,6 +328,9 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
      * Pre-parsing for filter parameters.
      *
      * @return self
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function parseFilterLink(): self
     {
@@ -433,6 +440,8 @@ class QueryParser extends BaseQueryParser implements QueryParserInterface
      * @param array  $value
      *
      * @return iterable
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function parseOperationsAndArguments(string $parameterName, array $value): iterable
     {

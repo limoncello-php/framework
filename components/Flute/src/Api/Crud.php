@@ -50,6 +50,7 @@ use Traversable;
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -1304,6 +1305,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function fetchRow(QueryBuilder $builder, string $modelClass): ?array
     {
@@ -1329,6 +1332,9 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function fetchColumn(QueryBuilder $builder, string $modelClass, string $columnName): iterable
     {
@@ -1363,6 +1369,8 @@ class Crud implements CrudInterface
      * @return mixed|null
      *
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function fetchResourceWithoutRelationships(QueryBuilder $builder, string $modelClass)
     {
@@ -1394,6 +1402,8 @@ class Crud implements CrudInterface
      * @return iterable
      *
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function fetchResourcesWithoutRelationships(
         QueryBuilder $builder,
@@ -1450,6 +1460,8 @@ class Crud implements CrudInterface
      * @return array
      *
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function fetchResourceCollection(QueryBuilder $builder, string $modelClass): array
     {
@@ -1534,6 +1546,7 @@ class Crud implements CrudInterface
      * @return void
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      *
      * @throws DBALException
      */

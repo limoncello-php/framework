@@ -46,5 +46,4 @@ interface JsonSchemesInterface extends ContainerInterface
      * @return SchemaInterface
      */
     public function getModelRelationshipSchema(string $modelClass, string $relationshipName): SchemaInterface;
-
 }

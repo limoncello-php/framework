@@ -115,6 +115,9 @@ abstract class FluteSettings implements SettingsInterface
      */
     final public function get(array $appConfig): array
     {
+        // suppress 'unused variable'
+        assert(is_array($appConfig));
+
         $defaults = $this->getSettings();
 
         $schemesFolder    = $defaults[static::KEY_SCHEMES_FOLDER] ?? null;

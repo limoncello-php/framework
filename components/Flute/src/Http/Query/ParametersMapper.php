@@ -271,6 +271,10 @@ class ParametersMapper implements ParametersMapperInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function applyQueryParameters(QueryParserInterface $parser, CrudInterface $api): CrudInterface
     {
@@ -406,6 +410,8 @@ class ParametersMapper implements ParametersMapperInterface
      * @param iterable $value
      *
      * @return iterable
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function parseOperationsAndArguments(string $parameterName, iterable $value): iterable
     {
