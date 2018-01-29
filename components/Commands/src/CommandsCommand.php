@@ -26,7 +26,9 @@ use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -121,6 +123,9 @@ class CommandsCommand extends BaseCommand
      * @param IoInterface        $inOut
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function executeConnect(ContainerInterface $container, IoInterface $inOut): void
     {
@@ -176,6 +181,9 @@ EOT;
      * @param IoInterface        $inOut
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function executeCreate(ContainerInterface $container, IoInterface $inOut): void
     {
@@ -209,23 +217,30 @@ EOT;
             return;
         }
 
-        $commandName = strtolower($class);
+        $replace = function (string $template, iterable $parameters): string {
+            $result = $template;
+            foreach ($parameters as $key => $value) {
+                $result = str_replace($key, $value, $result);
+            }
+
+            return $result;
+        };
 
         $templateContent = $fileSystem->read(__DIR__ . DIRECTORY_SEPARATOR . 'SampleCommand.txt');
-
-        $tmpContent = $templateContent;
-        $tmpContent = str_replace('{CLASS_NAME}', $class, $tmpContent);
-        $tmpContent = str_replace('{COMMAND_NAME}', $commandName, $tmpContent);
-        $tmpContent = str_replace('{TO_DO}', 'TODO', $tmpContent);
-        $content    = $tmpContent;
-
-        $fileSystem->write($classPath, $content);
+        $fileSystem->write($classPath, $replace($templateContent, [
+            '{CLASS_NAME}'   => $class,
+            '{COMMAND_NAME}' => strtolower($class),
+            '{TO_DO}'        => 'TODO',
+        ]));
     }
 
     /**
      * @param ContainerInterface $container
      *
      * @return string
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getCommandsFolder(ContainerInterface $container): string
     {
@@ -243,6 +258,9 @@ EOT;
      * @param ContainerInterface $container
      *
      * @return FileSystemInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getFileSystem(ContainerInterface $container): FileSystemInterface
     {
