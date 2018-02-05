@@ -41,5 +41,5 @@ interface EventSettingsInterface extends SettingsInterface
     const KEY_CACHED_DATA = self::KEY_SUBSCRIBERS_FILE_MASK + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_CACHED_DATA;
+    const KEY_LAST = self::KEY_CACHED_DATA;
 }

@@ -35,5 +35,5 @@ interface L10nSettingsInterface extends SettingsInterface
     const KEY_LOCALES_DATA = self::KEY_LOCALES_FOLDER + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_LOCALES_DATA;
+    const KEY_LAST = self::KEY_LOCALES_DATA;
 }

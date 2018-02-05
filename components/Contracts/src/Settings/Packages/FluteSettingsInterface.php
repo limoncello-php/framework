@@ -103,5 +103,5 @@ interface FluteSettingsInterface extends SettingsInterface
     const KEY_URI_PREFIX = self::KEY_META + 1;
 
     /** Config key */
-    protected const KEY_LAST = self::KEY_URI_PREFIX + 1;
+    const KEY_LAST = self::KEY_URI_PREFIX + 1;
 }

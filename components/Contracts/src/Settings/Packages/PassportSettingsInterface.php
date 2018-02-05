@@ -102,5 +102,5 @@ interface PassportSettingsInterface extends SettingsInterface
     const KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER = self::KEY_USER_SCOPE_VALIDATOR + 1;
 
     /** Config key */
-    protected const KEY_LAST = self::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER;
+    const KEY_LAST = self::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER;
 }

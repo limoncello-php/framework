@@ -41,5 +41,5 @@ interface CookieSettingsInterface extends SettingsInterface
     const KEY_DEFAULT_IS_RAW = self::KEY_DEFAULT_IS_ACCESSIBLE_ONLY_THROUGH_HTTP + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_DEFAULT_IS_RAW;
+    const KEY_LAST = self::KEY_DEFAULT_IS_RAW;
 }

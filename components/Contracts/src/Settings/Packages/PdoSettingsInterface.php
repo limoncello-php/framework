@@ -38,5 +38,5 @@ interface PdoSettingsInterface extends SettingsInterface
     const KEY_OPTIONS = self::KEY_CONNECTION_STRING + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_OPTIONS;
+    const KEY_LAST = self::KEY_OPTIONS;
 }

@@ -32,5 +32,5 @@ interface AsymmetricCryptSettingsInterface extends SettingsInterface
     const KEY_PRIVATE_PATH_OR_KEY_VALUE = self::KEY_PUBLIC_PATH_OR_KEY_VALUE + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_PRIVATE_PATH_OR_KEY_VALUE;
+    const KEY_LAST = self::KEY_PRIVATE_PATH_OR_KEY_VALUE;
 }

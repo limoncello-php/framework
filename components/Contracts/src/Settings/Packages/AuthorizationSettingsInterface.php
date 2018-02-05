@@ -45,5 +45,5 @@ interface AuthorizationSettingsInterface extends SettingsInterface
     const KEY_POLICIES_DATA = self::KEY_POLICIES_FILE_MASK + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_POLICIES_DATA;
+    const KEY_LAST = self::KEY_POLICIES_DATA;
 }

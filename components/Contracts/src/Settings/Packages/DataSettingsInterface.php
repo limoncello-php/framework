@@ -50,5 +50,5 @@ interface DataSettingsInterface extends SettingsInterface
     const KEY_MODELS_SCHEME_INFO = self::KEY_SEED_INIT + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_MODELS_SCHEME_INFO;
+    const KEY_LAST = self::KEY_MODELS_SCHEME_INFO;
 }

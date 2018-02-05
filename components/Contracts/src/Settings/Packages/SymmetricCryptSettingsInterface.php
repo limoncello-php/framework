@@ -80,5 +80,5 @@ interface SymmetricCryptSettingsInterface extends SettingsInterface
     const KEY_TAG_LENGTH = self::KEY_USE_AUTHENTICATION + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_TAG_LENGTH;
+    const KEY_LAST = self::KEY_TAG_LENGTH;
 }

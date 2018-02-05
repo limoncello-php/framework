@@ -47,5 +47,5 @@ interface TemplatesSettingsInterface extends SettingsInterface
     const KEY_TEMPLATES_LIST = self::KEY_IS_AUTO_RELOAD + 1;
 
     /** Settings key */
-    protected const KEY_LAST = self::KEY_TEMPLATES_LIST;
+    const KEY_LAST = self::KEY_TEMPLATES_LIST;
 }
