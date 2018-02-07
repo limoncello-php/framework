@@ -49,7 +49,19 @@ interface FluteSettingsInterface extends SettingsInterface
     const KEY_SCHEMES_FILE_MASK = self::KEY_SCHEMES_FOLDER + 1;
 
     /** Config key */
-    const KEY_JSON_VALIDATORS_FOLDER = self::KEY_SCHEMES_FILE_MASK + 1;
+    const KEY_API_FOLDER = self::KEY_SCHEMES_FILE_MASK + 1;
+
+    /** Config key */
+    const KEY_ROUTES_FOLDER = self::KEY_API_FOLDER + 1;
+
+    /** Config key */
+    const KEY_JSON_VALIDATION_RULES_FOLDER = self::KEY_ROUTES_FOLDER + 1;
+
+    /** Config key */
+    const KEY_JSON_CONTROLLERS_FOLDER = self::KEY_JSON_VALIDATION_RULES_FOLDER + 1;
+
+    /** Config key */
+    const KEY_JSON_VALIDATORS_FOLDER = self::KEY_JSON_CONTROLLERS_FOLDER + 1;
 
     /** Config key */
     const KEY_JSON_VALIDATORS_FILE_MASK = self::KEY_JSON_VALIDATORS_FOLDER + 1;
