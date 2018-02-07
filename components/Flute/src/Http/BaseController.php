@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Closure;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
@@ -165,7 +166,7 @@ abstract class BaseController implements ControllerInterface
         return $response;
     }
 
-    /**
+    /** @deprecated Use `readRelationshipWithClosure` instead
      * @param string                 $index
      * @param string                 $relationshipName
      * @param ContainerInterface     $container
@@ -182,21 +183,14 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
-        $parser = static::configureOnReadRelationshipParser(
-            $relationshipName,
-            static::createQueryParser($container)
-        )->parse($request->getQueryParams());
+        $apiHandler = function (CrudInterface $crud) use ($index, $relationshipName) {
+            return $crud->readRelationship($index, $relationshipName);
+        };
 
-        $relData   = static::readRelationshipData($index, $relationshipName, $container, $parser);
-        $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
-        $response  = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null) ?
-            $responses->getCodeResponse(404) : $responses->getContentResponse($relData);
-
-        return $response;
+        return static::readRelationshipWithClosure($apiHandler, $relationshipName, $container, $request);
     }
 
-    /**
+    /** @deprecated Use `readRelationshipIdentifiersWithClosure` instead
      * @param string                 $index
      * @param string                 $relationshipName
      * @param ContainerInterface     $container
@@ -213,15 +207,76 @@ abstract class BaseController implements ControllerInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
+        $apiHandler = function (CrudInterface $crud) use ($index, $relationshipName) {
+            return $crud->readRelationship($index, $relationshipName);
+        };
+
+        return static::readRelationshipIdentifiersWithClosure($apiHandler, $relationshipName, $container, $request);
+    }
+
+    /**
+     * @param Closure                $apiHandler
+     * @param string                 $relationshipName
+     * @param ContainerInterface     $container
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected static function readRelationshipWithClosure(
+        Closure $apiHandler,
+        string $relationshipName,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
+        // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
+        $parser = static::configureOnReadRelationshipParser(
+            $relationshipName,
+            static::createQueryParser($container)
+        )->parse($request->getQueryParams());
+
+        $mapper  = static::createParameterMapper($container);
+        $api     = $mapper->applyQueryParameters($parser, static::createApi($container));
+        $relData = call_user_func($apiHandler, $api, $container);
+
+        $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
+        $response  = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null) ?
+            $responses->getCodeResponse(404) : $responses->getContentResponse($relData);
+
+        return $response;
+    }
+
+    /**
+     * @param Closure                $apiHandler
+     * @param string                 $relationshipName
+     * @param ContainerInterface     $container
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected static function readRelationshipIdentifiersWithClosure(
+        Closure $apiHandler,
+        string $relationshipName,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
         // By default no filters, sorts or includes are allowed from query. You can override this method to change it.
         $parser = static::configureOnReadRelationshipIdentifiersParser(
             $relationshipName,
             static::createQueryParser($container)
         )->parse($request->getQueryParams());
 
-        $relData   = static::readRelationshipData($index, $relationshipName, $container, $parser);
+        $mapper  = static::createParameterMapper($container);
+        $api     = $mapper->applyQueryParameters($parser, static::createApi($container));
+        $relData = call_user_func($apiHandler, $api, $container);
+
         $responses = static::createResponses($container, $request, $parser->createEncodingParameters());
-        $response  = $relData->getData() === null ?
+        $response  = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null) ?
             $responses->getCodeResponse(404) : $responses->getIdentifiersResponse($relData);
 
         return $response;
@@ -585,33 +640,6 @@ abstract class BaseController implements ControllerInterface
         $result = [$index, $fields, $toManyIndexes];
 
         return $result;
-    }
-
-    /**
-     * @param string               $index
-     * @param string               $relationshipName
-     * @param ContainerInterface   $container
-     * @param QueryParserInterface $parser
-     *
-     * @return PaginatedDataInterface|mixed|null
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private static function readRelationshipData(
-        string $index,
-        string $relationshipName,
-        ContainerInterface $container,
-        QueryParserInterface $parser
-    ) {
-        $mapper = static::createParameterMapper($container);
-        $api    = static::createApi($container);
-
-        $relData = $mapper
-            ->applyQueryParameters($parser, $api)
-            ->readRelationship($index, $relationshipName);
-
-        return $relData;
     }
 
     /**
