@@ -16,49 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\DoctrineSettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-class DoctrineSettings implements SettingsInterface
+class DoctrineSettings implements DoctrineSettingsInterface
 {
-    /** Settings key */
-    const KEY_USER_NAME = 0;
-
-    /** Settings key */
-    const KEY_PASSWORD = self::KEY_USER_NAME + 1;
-
-    /** Settings key */
-    const KEY_DATABASE_NAME = self::KEY_PASSWORD + 1;
-
-    /** Settings key */
-    const KEY_HOST = self::KEY_DATABASE_NAME + 1;
-
-    /** Settings key */
-    const KEY_PORT = self::KEY_HOST + 1;
-
-    /** Settings key */
-    const KEY_CHARSET = self::KEY_PORT + 1;
-
-    /** Settings key */
-    const KEY_DRIVER = self::KEY_CHARSET + 1;
-
-    /** Settings key */
-    const KEY_URL = self::KEY_DRIVER + 1;
-
-    /** Settings key */
-    const KEY_MEMORY = self::KEY_URL + 1;
-
-    /** Settings key */
-    const KEY_EXTRA = self::KEY_MEMORY + 1;
-
-    /** Settings key */
-    const KEY_PATH = self::KEY_EXTRA + 1;
-
-    /** Settings key */
-    protected const KEY_LAST = self::KEY_PATH;
-
     /**
      * @inheritdoc
      */

@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\TemplatesSettingsInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -25,32 +25,8 @@ use SplFileInfo;
 /**
  * @package Limoncello\Templates
  */
-class TemplatesSettings implements SettingsInterface
+class TemplatesSettings implements TemplatesSettingsInterface
 {
-    /** Settings key */
-    const KEY_TEMPLATES_FOLDER = 0;
-
-    /** Settings key */
-    const KEY_TEMPLATES_FILE_MASK = self::KEY_TEMPLATES_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_CACHE_FOLDER = self::KEY_TEMPLATES_FILE_MASK + 1;
-
-    /** Settings key */
-    const KEY_APP_ROOT_FOLDER = self::KEY_CACHE_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_IS_DEBUG = self::KEY_APP_ROOT_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_IS_AUTO_RELOAD = self::KEY_IS_DEBUG + 1;
-
-    /** Settings key */
-    const KEY_TEMPLATES_LIST = self::KEY_IS_AUTO_RELOAD + 1;
-
-    /** Settings key */
-    protected const KEY_LAST = self::KEY_TEMPLATES_LIST;
-
     /**
      * @var array
      */

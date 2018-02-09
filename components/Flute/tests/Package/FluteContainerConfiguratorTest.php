@@ -59,8 +59,12 @@ class FluteContainerConfiguratorTest extends TestCase
         $container = new Container();
 
         $appConfig                                        = [
-            ApplicationConfigurationInterface::KEY_IS_LOG_ENABLED => true,
-            ApplicationConfigurationInterface::KEY_IS_DEBUG       => true,
+            ApplicationConfigurationInterface::KEY_IS_LOG_ENABLED         => true,
+            ApplicationConfigurationInterface::KEY_IS_DEBUG               => true,
+            ApplicationConfigurationInterface::KEY_ROUTES_FOLDER          =>
+                implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Http']),
+            ApplicationConfigurationInterface::KEY_WEB_CONTROLLERS_FOLDER =>
+                implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Http']),
         ];
         $cacheSettingsProvider                            = new CacheSettingsProvider(
             $appConfig,

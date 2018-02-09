@@ -16,22 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\HasherSettingsInterface;
 
 /**
  * @package Limoncello\Crypt
  */
-class HasherSettings implements SettingsInterface
+class HasherSettings implements HasherSettingsInterface
 {
-    /** Settings key */
-    const KEY_ALGORITHM = 0;
-
-    /** Settings key */
-    const KEY_COST = self::KEY_ALGORITHM + 1;
-
-    /** Settings key */
-    const KEY_LAST = self::KEY_COST + 1;
-
     /**
      * @inheritdoc
      */

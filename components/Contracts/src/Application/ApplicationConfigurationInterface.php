@@ -58,7 +58,10 @@ interface ApplicationConfigurationInterface
     const KEY_IS_LOG_ENABLED = self::KEY_IS_DEBUG + 1;
 
     /** Settings key */
-    const KEY_ROUTES_PATH = self::KEY_IS_LOG_ENABLED + 1;
+    const KEY_WEB_CONTROLLERS_FOLDER = self::KEY_IS_LOG_ENABLED + 1;
+
+    /** Settings key */
+    const KEY_ROUTES_PATH = self::KEY_WEB_CONTROLLERS_FOLDER + 1;
 
     /** Settings key */
     const KEY_ROUTES_FOLDER = self::KEY_ROUTES_PATH + 1;

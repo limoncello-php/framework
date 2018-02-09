@@ -16,22 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\AsymmetricCryptSettingsInterface;
 
 /**
  * @package Limoncello\Crypt
  */
-class AsymmetricCryptSettings implements SettingsInterface
+class AsymmetricCryptSettings implements AsymmetricCryptSettingsInterface
 {
-    /** Settings key */
-    const KEY_PUBLIC_PATH_OR_KEY_VALUE = 0;
-
-    /** Settings key */
-    const KEY_PRIVATE_PATH_OR_KEY_VALUE = self::KEY_PUBLIC_PATH_OR_KEY_VALUE + 1;
-
-    /** Settings key */
-    const KEY_LAST = self::KEY_PRIVATE_PATH_OR_KEY_VALUE;
-
     /**
      * @inheritdoc
      */

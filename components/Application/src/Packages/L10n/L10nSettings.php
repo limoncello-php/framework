@@ -18,26 +18,14 @@
 
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Provider\ProvidesMessageResourcesInterface;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\L10nSettingsInterface;
 use Limoncello\l10n\Messages\FileBundleEncoder;
 
 /**
  * @package Limoncello\Application
  */
-abstract class L10nSettings implements SettingsInterface
+abstract class L10nSettings implements L10nSettingsInterface
 {
-    /** Settings key */
-    const KEY_DEFAULT_LOCALE = 0;
-
-    /** Settings key */
-    const KEY_LOCALES_FOLDER = self::KEY_DEFAULT_LOCALE + 1;
-
-    /** Settings key */
-    const KEY_LOCALES_DATA = self::KEY_LOCALES_FOLDER + 1;
-
-    /** Settings key */
-    protected const KEY_LAST = self::KEY_LOCALES_DATA;
-
     /**
      * @var array
      */

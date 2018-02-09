@@ -33,23 +33,23 @@ interface FluteSettingsInterface extends SettingsInterface
 
     /** Config key
      *
-     * By default it checks that all Schemes have unique resource types. That's a legit case
-     * to have multiple Schemes for a same resource type however it's more likely that developer
-     * just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
+     * By default it checks that all Schemas have unique resource types. That's a legit case
+     * to have multiple Schemas for a same resource type however it's more likely that developer
+     * just forgot to set a unique one. If you do need multiple Schemas for a resource feel free
      * to set it to `false`.
      *
      * Default: true
      */
-    const KEY_SCHEMES_REQUIRE_UNIQUE_TYPES = self::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS + 1;
+    const KEY_SCHEMAS_REQUIRE_UNIQUE_TYPES = self::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS + 1;
 
     /** Config key */
-    const KEY_SCHEMES_FOLDER = self::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES + 1;
+    const KEY_SCHEMAS_FOLDER = self::KEY_SCHEMAS_REQUIRE_UNIQUE_TYPES + 1;
 
     /** Config key */
-    const KEY_SCHEMES_FILE_MASK = self::KEY_SCHEMES_FOLDER + 1;
+    const KEY_SCHEMAS_FILE_MASK = self::KEY_SCHEMAS_FOLDER + 1;
 
     /** Config key */
-    const KEY_API_FOLDER = self::KEY_SCHEMES_FILE_MASK + 1;
+    const KEY_API_FOLDER = self::KEY_SCHEMAS_FILE_MASK + 1;
 
     /** Config key */
     const KEY_ROUTES_FOLDER = self::KEY_API_FOLDER + 1;
@@ -115,5 +115,18 @@ interface FluteSettingsInterface extends SettingsInterface
     const KEY_URI_PREFIX = self::KEY_META + 1;
 
     /** Config key */
-    const KEY_LAST = self::KEY_URI_PREFIX + 1;
+    const KEY_WEB_CONTROLLERS_FOLDER = self::KEY_URI_PREFIX + 1;
+
+    /** Config key */
+    const KEY_LAST = self::KEY_WEB_CONTROLLERS_FOLDER;
+
+
+    /** @deprecated Config key */
+    const KEY_SCHEMES_REQUIRE_UNIQUE_TYPES = self::KEY_SCHEMAS_REQUIRE_UNIQUE_TYPES;
+
+    /** @deprecated Config key */
+    const KEY_SCHEMES_FOLDER = self::KEY_SCHEMAS_FOLDER;
+
+    /** @deprecated Config key */
+    const KEY_SCHEMES_FILE_MASK = self::KEY_SCHEMAS_FILE_MASK;
 }

@@ -17,7 +17,7 @@
  */
 
 use Generator;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\EventSettingsInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
 use Limoncello\Events\Contracts\EventHandlerInterface;
 use Limoncello\Events\Contracts\EventInterface;
@@ -28,27 +28,9 @@ use ReflectionMethod;
 /**
  * @package Limoncello\Events
  */
-abstract class EventSettings implements SettingsInterface
+abstract class EventSettings implements EventSettingsInterface
 {
     use ClassIsTrait;
-
-    /** Settings key */
-    const KEY_EVENTS_FOLDER = 0;
-
-    /** Settings key */
-    const KEY_EVENTS_FILE_MASK = self::KEY_EVENTS_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_SUBSCRIBERS_FOLDER = self::KEY_EVENTS_FILE_MASK + 1;
-
-    /** Settings key */
-    const KEY_SUBSCRIBERS_FILE_MASK = self::KEY_SUBSCRIBERS_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_CACHED_DATA = self::KEY_SUBSCRIBERS_FILE_MASK + 1;
-
-    /** Settings key */
-    const KEY_LAST = self::KEY_CACHED_DATA;
 
     /**
      * @param array $appConfig

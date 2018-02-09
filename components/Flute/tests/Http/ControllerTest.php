@@ -19,6 +19,7 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Limoncello\Container\Container;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
@@ -1278,7 +1279,12 @@ EOT;
         $container[Connection::class]                  = $connection = $this->initDb();
         $container[PaginationStrategyInterface::class] = new PaginationStrategy(10, 100);
 
-        $appConfig                                        = [];
+        $appConfig                                        = [
+            ApplicationConfigurationInterface::KEY_ROUTES_FOLDER =>
+                implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Http']),
+            ApplicationConfigurationInterface::KEY_WEB_CONTROLLERS_FOLDER =>
+                implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Http']),
+        ];
         $cacheSettingsProvider                            = new CacheSettingsProvider(
             $appConfig,
             [

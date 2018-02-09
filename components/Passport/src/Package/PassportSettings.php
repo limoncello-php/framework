@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\PassportSettingsInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Psr\Container\ContainerInterface;
@@ -27,88 +27,9 @@ use ReflectionParameter;
 /**
  * @package Limoncello\Passport
  */
-class PassportSettings implements SettingsInterface
+class PassportSettings implements PassportSettingsInterface
 {
     use CheckCallableTrait;
-
-    /** Config key */
-    const KEY_IS_LOG_ENABLED = 0;
-
-    /** Config key */
-    const KEY_APPROVAL_URI_STRING = self::KEY_IS_LOG_ENABLED + 1;
-
-    /** Config key */
-    const KEY_ERROR_URI_STRING = self::KEY_APPROVAL_URI_STRING + 1;
-
-    /** Config key */
-    const KEY_DEFAULT_CLIENT_ID = self::KEY_ERROR_URI_STRING + 1;
-
-    /** Config key */
-    const KEY_CODE_EXPIRATION_TIME_IN_SECONDS = self::KEY_DEFAULT_CLIENT_ID + 1;
-
-    /** Config key */
-    const KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS = self::KEY_CODE_EXPIRATION_TIME_IN_SECONDS + 1;
-
-    /** Config key */
-    const KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH = self::KEY_TOKEN_EXPIRATION_TIME_IN_SECONDS + 1;
-
-    /** Config key */
-    const KEY_USER_TABLE_NAME = self::KEY_RENEW_REFRESH_VALUE_ON_TOKEN_REFRESH + 1;
-
-    /** Config key */
-    const KEY_USER_PRIMARY_KEY_NAME = self::KEY_USER_TABLE_NAME + 1;
-
-    /**
-     * Config key
-     *
-     * Value should be a static callable for user credentials validator (login and password).
-     *
-     * Examples ['SomeNamespace\ClassName', 'staticMethodName'] or 'SomeNamespace\ClassName::staticMethodName'
-     *
-     * Method signature
-     *
-     * public static function validateUser(ContainerInterface $container, string $userName, string $password)
-     *
-     * which returns either user ID (int|string) or null if user not found/invalid credentials.
-     */
-    const KEY_USER_CREDENTIALS_VALIDATOR = self::KEY_USER_PRIMARY_KEY_NAME + 1;
-
-    /** Config key */
-    const KEY_FAILED_CUSTOM_UNAUTHENTICATED_FACTORY = self::KEY_USER_CREDENTIALS_VALIDATOR + 1;
-
-    /**
-     * Config key
-     *
-     * Value should be a static callable for user scope validator (allowed scope identities).
-     *
-     * Examples ['SomeNamespace\ClassName', 'staticMethodName'] or 'SomeNamespace\ClassName::staticMethodName'
-     *
-     * Method signature
-     *
-     * public static function validateScope(ContainerInterface $container, int $userId, array $scopeIds = null): ?array
-     *
-     * which returns either changed allowed scope IDs or null if scope was not changed or throws auth exception.
-     */
-    const KEY_USER_SCOPE_VALIDATOR = self::KEY_FAILED_CUSTOM_UNAUTHENTICATED_FACTORY + 1;
-
-    /**
-     * Config key
-     *
-     * A custom properties provider for auth token. All the values returned from the provider
-     * will be added to the token.
-     *
-     * Value should be a static callable.
-     *
-     * Examples ['SomeNamespace\ClassName', 'staticMethodName'] or 'SomeNamespace\ClassName::staticMethodName'
-     *
-     * Method signature
-     *
-     * public static function getExtraProps(ContainerInterface $container, TokenInterface $token): array
-     */
-    const KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER = self::KEY_USER_SCOPE_VALIDATOR + 1;
-
-    /** Config key */
-    protected const KEY_LAST = self::KEY_TOKEN_CUSTOM_PROPERTIES_PROVIDER;
 
     /**
      * @var array

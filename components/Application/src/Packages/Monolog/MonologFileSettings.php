@@ -17,32 +17,14 @@
  */
 
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\MonologFileSettingsInterface;
 use Monolog\Logger;
 
 /**
  * @package Limoncello\Application
  */
-class MonologFileSettings implements SettingsInterface
+class MonologFileSettings implements MonologFileSettingsInterface
 {
-    /** Settings key */
-    const KEY_IS_ENABLED = 0;
-
-    /** Settings key */
-    const KEY_LOG_PATH = self::KEY_IS_ENABLED + 1;
-
-    /** Settings key */
-    const KEY_LOG_FOLDER = self::KEY_LOG_PATH + 1;
-
-    /** Settings key */
-    const KEY_LOG_FILE = self::KEY_LOG_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_LOG_LEVEL = self::KEY_LOG_FILE + 1;
-
-    /** Settings key */
-    protected const KEY_LAST = self::KEY_LOG_LEVEL;
-
     /**
      * @var array
      */

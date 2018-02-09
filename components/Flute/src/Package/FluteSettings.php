@@ -1,7 +1,8 @@
 <?php namespace Limoncello\Flute\Package;
 
 use Generator;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
+use Limoncello\Contracts\Settings\Packages\FluteSettingsInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Contracts\Validation\FormRuleSetInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
@@ -13,7 +14,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
 /**
  * @package Limoncello\Flute
  */
-abstract class FluteSettings implements SettingsInterface
+abstract class FluteSettings implements FluteSettingsInterface
 {
     /**
      * Namespace for string resources.
@@ -28,86 +29,6 @@ abstract class FluteSettings implements SettingsInterface
      */
     abstract protected function selectClasses(string $path, string $implementClassName): Generator;
 
-    /** Config key */
-    const KEY_DO_NOT_LOG_EXCEPTIONS_LIST = 0;
-
-    /** Config key */
-    const KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS = self::KEY_DO_NOT_LOG_EXCEPTIONS_LIST + 1;
-
-    /** Config key
-     *
-     * By default it checks that all Schemes have unique resource types. That's a legit case
-     * to have multiple Schemes for a same resource type however it's more likely that developer
-     * just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
-     * to set it to `false`.
-     *
-     * Default: true
-     */
-    const KEY_SCHEMES_REQUIRE_UNIQUE_TYPES = self::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS + 1;
-
-    /** Config key */
-    const KEY_SCHEMES_FOLDER = self::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES + 1;
-
-    /** Config key */
-    const KEY_SCHEMES_FILE_MASK = self::KEY_SCHEMES_FOLDER + 1;
-
-    /** Config key */
-    const KEY_JSON_VALIDATORS_FOLDER = self::KEY_SCHEMES_FILE_MASK + 1;
-
-    /** Config key */
-    const KEY_JSON_VALIDATORS_FILE_MASK = self::KEY_JSON_VALIDATORS_FOLDER + 1;
-
-    /** Config key */
-    const KEY_FORM_VALIDATORS_FOLDER = self::KEY_JSON_VALIDATORS_FILE_MASK + 1;
-
-    /** Config key */
-    const KEY_FORM_VALIDATORS_FILE_MASK = self::KEY_FORM_VALIDATORS_FOLDER + 1;
-
-    /** Config key */
-    const KEY_QUERY_VALIDATORS_FOLDER = self::KEY_FORM_VALIDATORS_FILE_MASK + 1;
-
-    /** Config key */
-    const KEY_QUERY_VALIDATORS_FILE_MASK = self::KEY_QUERY_VALIDATORS_FOLDER + 1;
-
-    /** Config key */
-    const KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE = self::KEY_QUERY_VALIDATORS_FILE_MASK + 1;
-
-    /** Config key */
-    const KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER = self::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE + 1;
-
-    /** Config key */
-    const KEY_MODEL_TO_SCHEME_MAP = self::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER + 1;
-
-    /** Config key */
-    const KEY_JSON_VALIDATION_RULE_SETS_DATA = self::KEY_MODEL_TO_SCHEME_MAP + 1;
-
-    /** Config key */
-    const KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA = self::KEY_JSON_VALIDATION_RULE_SETS_DATA + 1;
-
-    /** Config key */
-    const KEY_DEFAULT_PAGING_SIZE = self::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA + 1;
-
-    /** Config key */
-    const KEY_MAX_PAGING_SIZE = self::KEY_DEFAULT_PAGING_SIZE + 1;
-
-    /** Config key */
-    const KEY_JSON_ENCODE_OPTIONS = self::KEY_MAX_PAGING_SIZE + 1;
-
-    /** Config key */
-    const KEY_JSON_ENCODE_DEPTH = self::KEY_JSON_ENCODE_OPTIONS + 1;
-
-    /** Config key */
-    const KEY_IS_SHOW_VERSION = self::KEY_JSON_ENCODE_DEPTH + 1;
-
-    /** Config key */
-    const KEY_META = self::KEY_IS_SHOW_VERSION + 1;
-
-    /** Config key */
-    const KEY_URI_PREFIX = self::KEY_META + 1;
-
-    /** Config key */
-    protected const KEY_LAST = self::KEY_URI_PREFIX + 1;
-
     /**
      * @param array $appConfig
      *
@@ -115,13 +36,16 @@ abstract class FluteSettings implements SettingsInterface
      */
     final public function get(array $appConfig): array
     {
-        // suppress 'unused variable'
-        assert(is_array($appConfig));
-
         $defaults = $this->getSettings();
 
-        $schemesFolder    = $defaults[static::KEY_SCHEMES_FOLDER] ?? null;
-        $schemesFileMask  = $defaults[static::KEY_SCHEMES_FILE_MASK] ?? null;
+        $defaults[static::KEY_ROUTES_FOLDER]          = $appConfig[A::KEY_ROUTES_FOLDER];
+        $defaults[static::KEY_WEB_CONTROLLERS_FOLDER] = $appConfig[A::KEY_WEB_CONTROLLERS_FOLDER];
+
+        $apiFolder        = $defaults[static::KEY_API_FOLDER] ?? null;
+        $valRulesFolder   = $defaults[static::KEY_JSON_VALIDATION_RULES_FOLDER] ?? null;
+        $jsonCtrlFolder   = $defaults[static::KEY_JSON_CONTROLLERS_FOLDER] ?? null;
+        $schemesFolder    = $defaults[static::KEY_SCHEMAS_FOLDER] ?? null;
+        $schemesFileMask  = $defaults[static::KEY_SCHEMAS_FILE_MASK] ?? null;
         $jsonValFolder    = $defaults[static::KEY_JSON_VALIDATORS_FOLDER] ?? null;
         $jsonValFileMask  = $defaults[static::KEY_JSON_VALIDATORS_FILE_MASK] ?? null;
         $formsValFolder   = $defaults[static::KEY_FORM_VALIDATORS_FOLDER] ?? null;
@@ -129,6 +53,18 @@ abstract class FluteSettings implements SettingsInterface
         $queryValFolder   = $defaults[static::KEY_QUERY_VALIDATORS_FOLDER] ?? null;
         $queryValFileMask = $defaults[static::KEY_QUERY_VALIDATORS_FILE_MASK] ?? null;
 
+        assert(
+            $apiFolder !== null && empty(glob($apiFolder)) === false,
+            "Invalid API folder `$apiFolder`."
+        );
+        assert(
+            $valRulesFolder !== null && empty(glob($valRulesFolder)) === false,
+            "Invalid validation rules folder `$valRulesFolder`."
+        );
+        assert(
+            $jsonCtrlFolder !== null && empty(glob($jsonCtrlFolder)) === false,
+            "Invalid JSON API controllers' folder `$jsonCtrlFolder`."
+        );
         assert(
             $schemesFolder !== null && empty(glob($schemesFolder)) === false,
             "Invalid Schemes folder `$schemesFolder`."
@@ -155,7 +91,7 @@ abstract class FluteSettings implements SettingsInterface
         $formsValidatorsPath = $formsValFolder . DIRECTORY_SEPARATOR . $formsValFileMask;
         $queryValidatorsPath = $queryValFolder . DIRECTORY_SEPARATOR . $queryValFileMask;
 
-        $requireUniqueTypes = $defaults[static::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES] ?? true;
+        $requireUniqueTypes = $defaults[static::KEY_SCHEMAS_REQUIRE_UNIQUE_TYPES] ?? true;
 
         $doNotLogExceptions = $defaults[static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST] ?? [];
         unset($defaults[static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST]);
@@ -181,8 +117,8 @@ abstract class FluteSettings implements SettingsInterface
         $jsonOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES;
 
         return [
-            static::KEY_SCHEMES_REQUIRE_UNIQUE_TYPES              => true,
-            static::KEY_SCHEMES_FILE_MASK                         => '*.php',
+            static::KEY_SCHEMAS_REQUIRE_UNIQUE_TYPES              => true,
+            static::KEY_SCHEMAS_FILE_MASK                         => '*.php',
             static::KEY_JSON_VALIDATORS_FILE_MASK                 => '*.php',
             static::KEY_FORM_VALIDATORS_FILE_MASK                 => '*.php',
             static::KEY_QUERY_VALIDATORS_FILE_MASK                => '*.php',

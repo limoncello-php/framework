@@ -16,52 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\SessionSettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-class SessionSettings implements SettingsInterface
+class SessionSettings implements SessionSettingsInterface
 {
-    /** Settings key */
-    const KEY_SAVE_PATH = 'save_path';
-
-    /** Settings key */
-    const KEY_NAME = 'name';
-
-    /** Settings key */
-    const KEY_SAVE_HANDLER = 'save_handler';
-
-    /** Settings key */
-    const KEY_COOKIE_LIFETIME = 'cookie_lifetime';
-
-    /** Settings key */
-    const KEY_COOKIE_PATH = 'cookie_path';
-
-    /** Settings key */
-    const KEY_COOKIE_DOMAIN = 'cookie_domain';
-
-    /** Settings key */
-    const KEY_COOKIE_SECURE = 'cookie_secure';
-
-    /** Settings key */
-    const KEY_COOKIE_HTTP_ONLY = 'cookie_httponly';
-
-    /** Settings key */
-    const KEY_USE_STRICT_MODE = 'use_strict_mode';
-
-    /** Settings key */
-    const KEY_USE_COOKIES = 'use_cookies';
-
-    /** Settings key */
-    const KEY_USE_ONLY_COOKIES = 'use_only_cookies';
-
-    /** Settings key */
-    const KEY_CACHE_LIMITER = 'cache_limiter';
-
-    /** Settings key */
-    const KEY_CACHE_EXPIRE = 'cache_expire';
-
     /**
      * @inheritdoc
      */

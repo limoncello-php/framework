@@ -16,31 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\CookieSettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-class CookieSettings implements SettingsInterface
+class CookieSettings implements CookieSettingsInterface
 {
-    /** Settings key */
-    const KEY_DEFAULT_PATH = 0;
-
-    /** Settings key */
-    const KEY_DEFAULT_DOMAIN = self::KEY_DEFAULT_PATH + 1;
-
-    /** Settings key */
-    const KEY_DEFAULT_IS_SEND_ONLY_OVER_SECURE_CONNECTION = self::KEY_DEFAULT_DOMAIN + 1;
-
-    /** Settings key */
-    const KEY_DEFAULT_IS_ACCESSIBLE_ONLY_THROUGH_HTTP = self::KEY_DEFAULT_IS_SEND_ONLY_OVER_SECURE_CONNECTION + 1;
-
-    /** Settings key */
-    const KEY_DEFAULT_IS_RAW = self::KEY_DEFAULT_IS_ACCESSIBLE_ONLY_THROUGH_HTTP + 1;
-
-    /** Settings key */
-    protected const KEY_LAST = self::KEY_DEFAULT_IS_RAW;
-
     /**
      * @inheritdoc
      */

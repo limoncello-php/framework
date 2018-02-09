@@ -191,7 +191,9 @@ class Responses extends BaseResponses
      */
     private function mergeDefaultMeta($meta)
     {
-        return is_array($meta) === true && is_array($this->getDefaultMeta()) === true ?
-            $meta + $this->getDefaultMeta() : $meta;
+        $default = $this->getDefaultMeta();
+
+        return $meta === null ?
+            $default : (is_array($meta) === true && is_array($default) === true ? $meta + $default : $meta);
     }
 }

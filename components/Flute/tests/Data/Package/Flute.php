@@ -50,6 +50,21 @@ class Flute extends FluteSettings
     /**
      * @var string
      */
+    private $apiFolder;
+
+    /**
+     * @var string
+     */
+    private $valRulesFolder;
+
+    /**
+     * @var string
+     */
+    private $jsonCtrlFolder;
+
+    /**
+     * @var string
+     */
     private $schemesPath;
 
     /**
@@ -79,10 +94,13 @@ class Flute extends FluteSettings
         array $formRuleSets,
         array $queryRuleSets
     ) {
-        $this->schemesPath  = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Schemes']);
-        $this->formValPath  = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'FormRuleSets', '**']);
-        $this->jsonValPath  = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'JsonRuleSets', '**']);
-        $this->queryValPath = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'QueryRuleSets', '**']);
+        $this->apiFolder      = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Api']);
+        $this->jsonCtrlFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Http']);
+        $this->schemesPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Schemes']);
+        $this->valRulesFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation']);
+        $this->formValPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'FormRuleSets', '**']);
+        $this->jsonValPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'JsonRuleSets', '**']);
+        $this->queryValPath   = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'QueryRuleSets', '**']);
 
         $this->modelToSchemeMap = $modelToSchemeMap;
         $this->jsonValRuleSets  = $jsonRuleSets;
@@ -96,10 +114,13 @@ class Flute extends FluteSettings
     protected function getSettings(): array
     {
         return parent::getSettings() + [
-                static::KEY_SCHEMES_FOLDER          => $this->schemesPath,
-                static::KEY_JSON_VALIDATORS_FOLDER  => $this->jsonValPath,
-                static::KEY_FORM_VALIDATORS_FOLDER  => $this->formValPath,
-                static::KEY_QUERY_VALIDATORS_FOLDER => $this->queryValPath,
+                static::KEY_API_FOLDER                   => $this->apiFolder,
+                static::KEY_JSON_CONTROLLERS_FOLDER      => $this->jsonCtrlFolder,
+                static::KEY_SCHEMES_FOLDER               => $this->schemesPath,
+                static::KEY_JSON_VALIDATION_RULES_FOLDER => $this->valRulesFolder,
+                static::KEY_JSON_VALIDATORS_FOLDER       => $this->jsonValPath,
+                static::KEY_FORM_VALIDATORS_FOLDER       => $this->formValPath,
+                static::KEY_QUERY_VALIDATORS_FOLDER      => $this->queryValPath,
             ];
     }
 

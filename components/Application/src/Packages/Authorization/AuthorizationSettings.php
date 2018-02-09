@@ -17,35 +17,13 @@
  */
 
 use Limoncello\Application\Authorization\AuthorizationRulesLoader;
-use Limoncello\Contracts\Settings\SettingsInterface;
+use Limoncello\Contracts\Settings\Packages\AuthorizationSettingsInterface;
 
 /**
  * @package Limoncello\Application
  */
-abstract class AuthorizationSettings implements SettingsInterface
+abstract class AuthorizationSettings implements AuthorizationSettingsInterface
 {
-    /** Settings key */
-    const KEY_LOG_IS_ENABLED = 0;
-
-    /**
-     * Settings key
-     *
-     * Top level policy set name (used in logging).
-     */
-    const KEY_TOP_POLICY_NAME = self::KEY_LOG_IS_ENABLED + 1;
-
-    /** Settings key */
-    const KEY_POLICIES_FOLDER = self::KEY_TOP_POLICY_NAME + 1;
-
-    /** Settings key */
-    const KEY_POLICIES_FILE_MASK = self::KEY_POLICIES_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_POLICIES_DATA = self::KEY_POLICIES_FILE_MASK + 1;
-
-    /** Settings key */
-    protected const KEY_LAST = self::KEY_POLICIES_DATA;
-
     /**
      * @inheritdoc
      */

@@ -32,5 +32,5 @@ interface HasherSettingsInterface extends SettingsInterface
     const KEY_COST = self::KEY_ALGORITHM + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_COST + 1;
+    const KEY_LAST = self::KEY_COST;
 }
