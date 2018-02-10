@@ -22,7 +22,9 @@ use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Core\Application\ThrowableResponseTrait;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Whoops\Handler\PrettyPageHandler;
@@ -91,6 +93,9 @@ class WhoopsThrowableHandler implements ThrowableHandlerInterface
      * @param ContainerInterface $container
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getSettings(ContainerInterface $container): array
     {
@@ -116,6 +121,9 @@ class WhoopsThrowableHandler implements ThrowableHandlerInterface
      * @param string             $message
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function logException(Throwable $exception, ContainerInterface $container, string $message): void
     {

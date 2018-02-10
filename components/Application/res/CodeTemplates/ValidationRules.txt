@@ -1,0 +1,69 @@
+<?php namespace App\Validation\Rules;
+
+use App\Data\Models\{%SINGULAR_CC%} as Model;
+use App\Json\Schemes\{%SINGULAR_CC%}Schema as Schema;
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
+
+/**
+ * @package App
+ *
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
+final class {%SINGULAR_CC%}Rules extends BaseRules
+{
+    /**
+     * @return RuleInterface
+     */
+    public static function {%SINGULAR_LC%}Type(): RuleInterface
+    {
+        return self::equals(Schema::TYPE);
+    }
+
+    /**
+     * @return RuleInterface
+     */
+    public static function {%SINGULAR_LC%}Id(): RuleInterface
+    {
+        return self::stringToInt(self::exists(Model::TABLE_NAME, Model::FIELD_ID));
+    }
+
+    /**
+     * NOTE: It recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
+     *
+     * @return RuleInterface
+     */
+    public static function {%SINGULAR_LC%}Relationship(): RuleInterface
+    {
+        return self::toOneRelationship(Schema::TYPE, static::{%SINGULAR_LC%}Id());
+    }
+
+    /**
+     * NOTE: It recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
+     *
+     * @return RuleInterface
+     */
+    public static function {%PLURAL_LC%}Relationship(): RuleInterface
+    {
+        $readableAll = static::stringArrayToIntArray(static::existAll(Model::TABLE_NAME, Model::FIELD_ID));
+
+        return self::toManyRelationship(Schema::TYPE, $readableAll);
+    }
+
+    /**
+     * @return RuleInterface
+     */
+    public static function title(): RuleInterface
+    {
+        $maxLength = Model::getAttributeLengths()[Model::FIELD_TITLE];
+
+        return self::asSanitizedString(self::stringLengthMax($maxLength));
+    }
+
+    /**
+     * @return RuleInterface
+     */
+    public static function text(): RuleInterface
+    {
+        return self::asSanitizedString();
+    }
+}

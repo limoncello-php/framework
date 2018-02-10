@@ -18,12 +18,14 @@
 
 use Closure;
 use Limoncello\Application\Contracts\Session\SessionFunctionsInterface;
+use Limoncello\Application\Packages\Session\SessionSettings as C;
 use Limoncello\Contracts\Application\MiddlewareInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Limoncello\Application\Packages\Session\SessionSettings as C;
 
 /**
  * @package Limoncello\Application
@@ -36,6 +38,9 @@ class SessionMiddleware implements MiddlewareInterface
      * @param ContainerInterface     $container
      *
      * @return ResponseInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function handle(
         ServerRequestInterface $request,
@@ -58,6 +63,9 @@ class SessionMiddleware implements MiddlewareInterface
      * @param ContainerInterface $container
      *
      * @return SessionFunctionsInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function getSessionFunction(ContainerInterface $container): SessionFunctionsInterface
     {
@@ -71,6 +79,9 @@ class SessionMiddleware implements MiddlewareInterface
      * @param ContainerInterface $container
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function getSessionSettings(ContainerInterface $container): array
     {

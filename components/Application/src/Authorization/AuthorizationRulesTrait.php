@@ -19,7 +19,9 @@
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
 use Limoncello\Contracts\Authentication\AccountInterface;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Application
@@ -106,6 +108,9 @@ trait AuthorizationRulesTrait
      * @param ContextInterface $context
      *
      * @return bool
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function ctxHasCurrentAccount(ContextInterface $context): bool
     {
@@ -121,6 +126,9 @@ trait AuthorizationRulesTrait
      * @param ContextInterface $context
      *
      * @return AccountInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected static function ctxGetCurrentAccount(ContextInterface $context): AccountInterface
     {

@@ -28,12 +28,15 @@ use Limoncello\Container\Container;
 use Limoncello\Contracts\Authentication\AccountInterface;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Contracts\Authorization\AuthorizationManagerInterface;
+use Limoncello\Contracts\Exceptions\AuthorizationExceptionInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Tests\Application\Data\Authorization\NotificationRules;
 use Limoncello\Tests\Application\Packages\Authorization\AuthorizationPackageTest;
 use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -46,6 +49,11 @@ class AuthorizationManagerTest extends TestCase
 
     /**
      * Test wrappers for working with context.
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testTraitWrappers(): void
     {
@@ -77,6 +85,13 @@ class AuthorizationManagerTest extends TestCase
         $this->assertEquals($curAccount, $this->ctxGetCurrentAccount($context));
     }
 
+    /**
+     * Test authorization.
+     *
+     * @return void
+     *
+     * @throws AuthorizationExceptionInterface
+     */
     public function testAuthorize(): void
     {
         $container = new Container();

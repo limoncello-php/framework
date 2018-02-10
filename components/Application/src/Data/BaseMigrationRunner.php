@@ -18,13 +18,16 @@
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Generator;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Data\MigrationInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Application
@@ -68,6 +71,9 @@ abstract class BaseMigrationRunner
      * @param ContainerInterface $container
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function migrate(ContainerInterface $container): void
     {
@@ -85,6 +91,10 @@ abstract class BaseMigrationRunner
      * @param ContainerInterface $container
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws InvalidArgumentException
+     * @throws NotFoundExceptionInterface
      */
     public function rollback(ContainerInterface $container): void
     {
@@ -131,6 +141,9 @@ abstract class BaseMigrationRunner
      *
      * @return Generator
      *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     private function getMigrations(ContainerInterface $container): Generator
@@ -157,6 +170,10 @@ abstract class BaseMigrationRunner
      * @param ContainerInterface $container
      *
      * @return Generator
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
      */
     private function getRollbacks(ContainerInterface $container): Generator
     {
@@ -173,6 +190,9 @@ abstract class BaseMigrationRunner
      * @param ContainerInterface $container
      *
      * @return Connection
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getConnection(ContainerInterface $container): Connection
     {
@@ -252,6 +272,8 @@ abstract class BaseMigrationRunner
      * @param int        $index
      *
      * @return void
+     *
+     * @throws InvalidArgumentException
      */
     private function removeMigration(Connection $connection, int $index): void
     {

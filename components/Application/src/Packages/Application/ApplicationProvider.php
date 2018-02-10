@@ -18,6 +18,7 @@
 
 use Limoncello\Application\Commands\ApplicationCommand;
 use Limoncello\Application\Commands\DataCommand;
+use Limoncello\Application\Commands\MakeCommand;
 use Limoncello\Contracts\Provider\ProvidesCommandsInterface;
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 
@@ -44,6 +45,7 @@ class ApplicationProvider implements ProvidesContainerConfiguratorsInterface, Pr
         return [
             ApplicationCommand::class,
             DataCommand::class,
+            MakeCommand::class,
         ];
     }
 }

@@ -22,7 +22,9 @@ use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Application
@@ -100,6 +102,9 @@ class ApplicationCommand implements CommandInterface
      * @param IoInterface        $inOut
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function run(ContainerInterface $container, IoInterface $inOut): void
     {
@@ -122,6 +127,9 @@ class ApplicationCommand implements CommandInterface
      * @param IoInterface        $inOut
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function executeClear(ContainerInterface $container, IoInterface $inOut): void
     {
@@ -155,6 +163,9 @@ class ApplicationCommand implements CommandInterface
      * @param IoInterface        $inOut
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function executeCache(ContainerInterface $container, IoInterface $inOut): void
     {
@@ -275,6 +286,9 @@ EOT;
      * @param ContainerInterface $container
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getApplicationConfiguration(ContainerInterface $container): array
     {
@@ -289,6 +303,9 @@ EOT;
      * @param ContainerInterface $container
      *
      * @return FileSystemInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getFileSystem(ContainerInterface $container): FileSystemInterface
     {

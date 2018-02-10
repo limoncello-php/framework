@@ -1,0 +1,38 @@
+<?php namespace App\Web\Controllers;
+
+use App\Web\L10n\Views;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerIndexInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response\HtmlResponse;
+
+//use Limoncello\Flute\Contracts\Http\ControllerInterface;
+
+/**
+ * @package App
+ *
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
+class {%PLURAL_CC%}Controller extends BaseController implements ControllerIndexInterface
+{
+    use PaginationLinksTrait;
+
+    const SUB_URL = '/{%PLURAL_LC%}';
+
+    /**
+     * @inheritdoc
+     */
+    public static function index(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
+        $body = static::view($container, Views::HOME_PAGE, [
+            'title'        => '{%SINGULAR_CC%} page',
+            'content_text' => 'Hello world!',
+        ]);
+
+        return new HtmlResponse($body);
+    }
+}

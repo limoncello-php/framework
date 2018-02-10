@@ -1,0 +1,58 @@
+<?php namespace App\Validation\JsonValidators;
+
+use App\Json\Schemes\{%SINGULAR_CC%}Schema as Schema;
+use App\Validation\Rules\{%SINGULAR_CC%}Rules as r;
+use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
+
+/**
+ * @package App
+ *
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
+final class {%SINGULAR_CC%}Update implements JsonApiRuleSetInterface
+{
+    /**
+     * @inheritdoc
+     */
+    public static function getTypeRule(): RuleInterface
+    {
+        return r::{%SINGULAR_LC%}Type();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getIdRule(): RuleInterface
+    {
+        return r::{%SINGULAR_LC%}Id();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getAttributeRules(): array
+    {
+        return [
+            Schema::ATTR_TITLE => r::title(),
+            Schema::ATTR_TEXT  => r::text(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getToOneRelationshipRules(): array
+    {
+        // do not allow changing relationships for existing {%SINGULAR_LC%}s
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getToManyRelationshipRules(): array
+    {
+        return [];
+    }
+}

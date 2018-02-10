@@ -17,7 +17,9 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Limoncello\Application\Data\FileMigrationRunner;
 use Limoncello\Application\Data\FileSeedRunner;
 use Limoncello\Application\FileSystem\FileSystem;
@@ -27,7 +29,9 @@ use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Tests\Application
@@ -42,6 +46,11 @@ class MigrationAndSeedRunnersTest extends TestCase
 
     /**
      * Test migrations and Seeds.
+     *
+     * @throws DBALException
+     * @throws InvalidArgumentException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testMigrationsAndSeeds(): void
     {
@@ -93,6 +102,8 @@ class MigrationAndSeedRunnersTest extends TestCase
 
     /**
      * @return ContainerInterface
+     *
+     * @throws DBALException
      */
     private function createContainer(): ContainerInterface
     {
@@ -106,6 +117,8 @@ class MigrationAndSeedRunnersTest extends TestCase
 
     /**
      * @return Connection
+     *
+     * @throws DBALException
      */
     private function createConnection(): Connection
     {

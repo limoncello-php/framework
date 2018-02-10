@@ -24,6 +24,8 @@ use Mockery\Mock;
 use Neomerx\Cors\Contracts\AnalysisResultInterface;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\EmptyResponse;
 
@@ -85,6 +87,11 @@ class CorsMiddlewareTest extends TestCase
 
     /**
      * Test CORS.
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testOutOrCorsScopeRequest(): void
     {
@@ -97,6 +104,11 @@ class CorsMiddlewareTest extends TestCase
 
     /**
      * Test CORS.
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testActualRequest(): void
     {
@@ -114,6 +126,11 @@ class CorsMiddlewareTest extends TestCase
 
     /**
      * Test CORS.
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testPreFlightRequest(): void
     {
@@ -131,6 +148,11 @@ class CorsMiddlewareTest extends TestCase
 
     /**
      * Test CORS.
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testErrorNoHostRequest(): void
     {
@@ -144,6 +166,11 @@ class CorsMiddlewareTest extends TestCase
 
     /**
      * Test CORS.
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testErrorOriginNotAllowedRequest(): void
     {
@@ -157,6 +184,11 @@ class CorsMiddlewareTest extends TestCase
 
     /**
      * Test CORS.
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testErrorMethodNotSupportedRequest(): void
     {
@@ -170,6 +202,11 @@ class CorsMiddlewareTest extends TestCase
 
     /**
      * Test CORS.
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testErrorHeadersNotSupportedRequest(): void
     {

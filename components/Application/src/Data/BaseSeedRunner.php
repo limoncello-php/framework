@@ -24,7 +24,9 @@ use Doctrine\DBAL\Types\Type;
 use Generator;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Data\SeedInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Application
@@ -82,6 +84,9 @@ abstract class BaseSeedRunner
      * @param ContainerInterface $container
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function run(ContainerInterface $container): void
     {
@@ -99,6 +104,9 @@ abstract class BaseSeedRunner
      * @param ContainerInterface $container
      *
      * @return Generator
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -126,6 +134,9 @@ abstract class BaseSeedRunner
      * @param ContainerInterface $container
      *
      * @return Connection
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getConnection(ContainerInterface $container): Connection
     {

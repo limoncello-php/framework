@@ -1,0 +1,117 @@
+<?php namespace App\Authorization;
+
+//use App\Api\{%PLURAL_CC%}Api;
+//use App\Data\Models\{%SINGULAR_CC%};
+use App\Json\Schemes\{%SINGULAR_CC%}Schema as Schema;
+use Limoncello\Application\Contracts\Authorization\ResourceAuthorizationRulesInterface;
+use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
+//use Limoncello\Flute\Contracts\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+
+/**
+ * @package App
+ */
+class {%SINGULAR_CC%}Rules implements ResourceAuthorizationRulesInterface
+{
+    use RulesTrait;
+
+    /** Action name */
+    const ACTION_VIEW_{%PLURAL_UC%} = 'canView{%PLURAL_CC%}';
+
+    /** Action name */
+    const ACTION_CREATE_{%SINGULAR_UC%} = 'canCreate{%SINGULAR_CC%}';
+
+    /** Action name */
+    const ACTION_EDIT_{%SINGULAR_UC%} = 'canEdit{%SINGULAR_CC%}';
+
+//    /** Action name */
+//    const ACTION_VIEW_{%SINGULAR_UC%}_COMMENTS = 'canView{%SINGULAR_CC%}Comments';
+
+    /**
+     * @inheritdoc
+     */
+    public static function getResourcesType(): string
+    {
+        return Schema::TYPE;
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return bool
+     */
+    public static function canView{%PLURAL_CC%}(ContextInterface $context): bool
+    {
+        assert($context);
+
+        return true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return bool
+     */
+    public static function canCreate{%SINGULAR_CC%}(ContextInterface $context): bool
+    {
+        $userId = self::getCurrentUserIdentity($context);
+
+        return $userId !== null;
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return bool
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canEdit{%SINGULAR_CC%}(ContextInterface $context): bool
+    {
+        assert(self::reqGetResourceType($context) === Schema::TYPE);
+
+        $userId = self::getCurrentUserIdentity($context);
+
+        return $userId !== null;
+    }
+
+//    /**
+//     * @param ContextInterface $context
+//     *
+//     * @return bool
+//     */
+//    public static function canView{%SINGULAR_CC%}Comments(ContextInterface $context): bool
+//    {
+//        assert($context);
+//
+//        return true;
+//    }
+
+//    /**
+//     * @param ContextInterface $context
+//     *
+//     * @return bool
+//     *
+//     * @throws ContainerExceptionInterface
+//     * @throws NotFoundExceptionInterface
+//     */
+//    private static function isCurrentUser{%SINGULAR_CC%}Author(ContextInterface $context): bool
+//    {
+//        $isAuthor = false;
+//
+//        if (($userId = self::getCurrentUserIdentity($context)) !== null) {
+//            $userId = (int)$userId;
+//
+//            /** @var FactoryInterface $factory */
+//            $container = self::ctxGetContainer($context);
+//            $factory   = $container->get(FactoryInterface::class);
+//            ${%SINGULAR_LC%}Id    = self::reqGetResourceIdentity($context);
+//            ${%SINGULAR_LC%}      = $factory->createApi({%PLURAL_CC%}Api::class)->read(${%SINGULAR_LC%}Id);
+//            $isAuthor  = ${%SINGULAR_LC%} !== null && ${%SINGULAR_LC%}->{{%SINGULAR_CC%}::FIELD_ID_USER} === $userId;
+//        }
+//
+//        return $isAuthor;
+//    }
+}

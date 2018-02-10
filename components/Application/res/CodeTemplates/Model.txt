@@ -1,0 +1,112 @@
+<?php namespace App\Data\Models;
+
+use Doctrine\DBAL\Types\Type;
+use Limoncello\Contracts\Application\ModelInterface;
+//use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Flute\Types\JsonApiDateTimeType;
+
+/**
+ * @package App
+ */
+class {%SINGULAR_CC%} implements ModelInterface
+{
+    /** Table name */
+    const TABLE_NAME = '{%PLURAL_LC%}';
+
+    /** Primary key */
+    const FIELD_ID = 'id_{%SINGULAR_LC%}';
+
+    /** Field name */
+    const FIELD_ID_USER = User::FIELD_ID;
+
+    /** Field name */
+    const FIELD_TITLE = 'title';
+
+    /** Field name */
+    const FIELD_TEXT = 'text';
+
+    /** Field name */
+    const FIELD_CREATED_AT = 'created_at';
+
+    /** Field name */
+    const FIELD_UPDATED_AT = 'updated_at';
+
+    /** Field name */
+    const FIELD_DELETED_AT = 'deleted_at';
+
+//    /** Relationship name */
+//    const REL_USER = 'user';
+//
+//    /** Relationship name */
+//    const REL_COMMENTS = 'comments';
+//
+//    /** Relationship name */
+//    const REL_FILES = 'files';
+
+    /**
+     * @inheritdoc
+     */
+    public static function getTableName(): string
+    {
+        return static::TABLE_NAME;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPrimaryKeyName(): string
+    {
+        return static::FIELD_ID;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getAttributeTypes(): array
+    {
+        return [
+            self::FIELD_ID         => Type::INTEGER,
+//            self::FIELD_ID_USER    => Type::INTEGER,
+            self::FIELD_TITLE      => Type::STRING,
+            self::FIELD_TEXT       => Type::TEXT,
+            self::FIELD_CREATED_AT => JsonApiDateTimeType::NAME,
+            self::FIELD_UPDATED_AT => JsonApiDateTimeType::NAME,
+            self::FIELD_DELETED_AT => JsonApiDateTimeType::NAME,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getAttributeLengths(): array
+    {
+        return [
+            self::FIELD_TITLE => 255,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getRelationships(): array
+    {
+        return [
+            // sample relationships are below
+//            RelationshipTypes::BELONGS_TO => [
+//                self::REL_USER  => [User::class, self::FIELD_ID_USER, User::REL_{%PLURAL_UC%}],
+//            ],
+//            RelationshipTypes::HAS_MANY   => [
+//                self::REL_COMMENTS => [Comment::class, Comment::FIELD_ID_{%SINGULAR_UC%}, Comment::REL_{%SINGULAR_UC%}],
+//            ],
+//            RelationshipTypes::BELONGS_TO_MANY => [
+//                self::REL_FILES => [
+//                    File::class,
+//                    {%SINGULAR_CC%}File::TABLE_NAME,
+//                    {%SINGULAR_CC%}File::FIELD_ID_{%SINGULAR_UC%},
+//                    {%SINGULAR_CC%}File::FIELD_ID_MEDIA_FILE,
+//                    File::REL_{%PLURAL_UC%},
+//                ],
+//            ],
+        ];
+    }
+}
