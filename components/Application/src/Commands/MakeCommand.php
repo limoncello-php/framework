@@ -180,8 +180,8 @@ class MakeCommand implements CommandInterface
                     $this->composeApiParameters($container, $singular, $plural),
                     $this->composeAuthorizationParameters($container, $singular, $plural),
                     $this->composeValidationRulesParameters($container, $singular, $plural),
-                    $this->composeValidationOnCreateRuleSetsParameters($container, $singular, $plural),
-                    $this->composeValidationOnUpdateRuleSetsParameters($container, $singular, $plural),
+                    $this->composeValidationOnCreateRuleSetsParameters($container, $singular),
+                    $this->composeValidationOnUpdateRuleSetsParameters($container, $singular),
                     $this->composeJsonControllerParameters($container, $singular, $plural),
                     $this->composeJsonRouteParameters($container, $singular, $plural),
                 ]);
@@ -357,7 +357,6 @@ class MakeCommand implements CommandInterface
     /**
      * @param ContainerInterface $container
      * @param string             $singular
-     * @param string             $plural
      *
      * @return array
      * @throws ContainerExceptionInterface
@@ -365,8 +364,7 @@ class MakeCommand implements CommandInterface
      */
     private function composeValidationOnCreateRuleSetsParameters(
         ContainerInterface $container,
-        string $singular,
-        string $plural
+        string $singular
     ): array {
         $folder     = $this->filterOutFolderMask(
             $this->getFluteSettings($container)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER]
@@ -383,7 +381,6 @@ class MakeCommand implements CommandInterface
     /**
      * @param ContainerInterface $container
      * @param string             $singular
-     * @param string             $plural
      *
      * @return array
      * @throws ContainerExceptionInterface
@@ -391,8 +388,7 @@ class MakeCommand implements CommandInterface
      */
     private function composeValidationOnUpdateRuleSetsParameters(
         ContainerInterface $container,
-        string $singular,
-        string $plural
+        string $singular
     ): array {
         $folder     = $this->filterOutFolderMask(
             $this->getFluteSettings($container)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER]

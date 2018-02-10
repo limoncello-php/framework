@@ -192,6 +192,8 @@ abstract class Application implements ApplicationInterface
      * @return ThrowableResponseInterface
      *
      * @throws ContainerExceptionInterface
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function handleThrowable(
         Throwable $throwable,

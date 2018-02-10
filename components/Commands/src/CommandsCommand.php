@@ -41,6 +41,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Also it provides such a nice feature as generation of an empty/template command for the developer.
  *
  * @package Limoncello\Commands
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class CommandsCommand extends BaseCommand
 {

@@ -46,6 +46,7 @@ use Psr\Http\Message\ServerRequestInterface;
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class BaseController implements ControllerInterface
 {
