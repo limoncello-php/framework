@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "limoncello-php/contracts",
-            "version": "0.8.8",
+            "version": "0.8.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/contracts.git",
-                "reference": "c8c8d1e35ba515364e2ca2f873bedb83a7278b2a"
+                "reference": "f716610d8742e353ec22190a95fbde535ea5778e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/contracts/zipball/c8c8d1e35ba515364e2ca2f873bedb83a7278b2a",
-                "reference": "c8c8d1e35ba515364e2ca2f873bedb83a7278b2a",
+                "url": "https://api.github.com/repos/limoncello-php-dist/contracts/zipball/f716610d8742e353ec22190a95fbde535ea5778e",
+                "reference": "f716610d8742e353ec22190a95fbde535ea5778e",
                 "shasum": ""
             },
             "require": {
@@ -58,7 +58,7 @@
                 "interfaces",
                 "limoncello"
             ],
-            "time": "2018-02-09T11:40:54+00:00"
+            "time": "2018-02-10T15:25:13+00:00"
         },
         {
             "name": "psr/container",
