@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\TestCase;
@@ -45,6 +46,8 @@ class SchemaTest extends TestCase
 
     /**
      * Relationship test.
+     *
+     * @throws Exception
      */
     public function testEncodeNullToOneRelationship(): void
     {

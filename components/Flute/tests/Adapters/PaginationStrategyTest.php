@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Flute\Adapters\PaginationStrategy as PS;
 use Limoncello\Tests\Flute\TestCase;
 
@@ -26,6 +27,8 @@ class PaginationStrategyTest extends TestCase
 {
     /**
      * Test parse input paging parameters.
+     *
+     * @throws Exception
      */
     public function testParsingWithDefaultLessThanMaxLimitSize(): void
     {
@@ -59,6 +62,8 @@ class PaginationStrategyTest extends TestCase
 
     /**
      * Test parse input paging parameters.
+     *
+     * @throws Exception
      */
     public function testParsingWithDefaultGreaterThanMaxLimitSize(): void
     {

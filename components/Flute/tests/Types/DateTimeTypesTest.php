@@ -19,6 +19,7 @@
 use DateTime;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Limoncello\Flute\Types\DateJsonApiStringType;
 use Limoncello\Flute\Types\DateTimeDefaultNativeType;
 use Limoncello\Flute\Types\DateTimeDefaultStringType;
@@ -67,6 +68,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testDefaultNativeConversions(): void
@@ -102,6 +104,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testDefaultStringConversions(): void
@@ -127,6 +130,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiNativeConversions(): void
@@ -154,6 +158,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiStringConversions(): void
@@ -179,6 +184,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
@@ -199,6 +205,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiStringDateConversions(): void
@@ -227,6 +234,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiDateTimeTypeConversions(): void
@@ -245,6 +253,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiDateTimeTypeToDatabaseConversions1(): void
@@ -262,6 +271,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiDateTimeTypeToDatabaseConversions2(): void
@@ -279,6 +289,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiDateTimeTypeToDatabaseConversions3(): void
@@ -297,6 +308,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
@@ -314,6 +326,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
@@ -331,6 +344,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiDateTypeConversions(): void
@@ -349,6 +363,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiDateTypeToDatabaseConversions1(): void
@@ -367,6 +382,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiDateTypeToDatabaseConversions2(): void
@@ -385,6 +401,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testJsonApiDateTypeToDatabaseConversions3(): void
@@ -403,6 +420,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
@@ -420,6 +438,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
@@ -437,6 +456,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
@@ -457,6 +477,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions for invalid value.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
@@ -472,6 +493,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions for invalid value.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException
@@ -487,6 +509,7 @@ class DateTimeTypesTest extends TestCase
     /**
      * Test date conversions for invalid value.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Types\ConversionException

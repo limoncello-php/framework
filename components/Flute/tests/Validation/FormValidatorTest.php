@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
@@ -34,6 +35,8 @@ class FormValidatorTest extends TestCase
 {
     /**
      * @return void
+     *
+     * @throws Exception
      */
     public function testValidator(): void
     {
@@ -49,6 +52,8 @@ class FormValidatorTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Exception
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
      */

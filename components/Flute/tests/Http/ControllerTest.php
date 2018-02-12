@@ -1284,6 +1284,7 @@ EOT;
     /**
      * @return ContainerInterface
      *
+     * @throws Exception
      * @throws DBALException
      */
     protected function createContainer(): ContainerInterface

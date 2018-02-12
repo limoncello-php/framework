@@ -17,6 +17,7 @@
  */
 
 use DateTimeImmutable;
+use Exception;
 use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Flute\Adapters\PaginationStrategy;
@@ -34,6 +35,8 @@ class QueryValidatorTest extends TestCase
 {
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testQueryParams(): void
     {
@@ -68,6 +71,8 @@ class QueryValidatorTest extends TestCase
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testAllowedQueryParams(): void
     {

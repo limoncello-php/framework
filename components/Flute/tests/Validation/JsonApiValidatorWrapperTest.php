@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
@@ -40,6 +41,8 @@ class JsonApiValidatorWrapperTest extends TestCase
 {
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testCaptureValidData(): void
     {
@@ -61,6 +64,8 @@ class JsonApiValidatorWrapperTest extends TestCase
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testInvalidData(): void
     {

@@ -20,6 +20,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
@@ -53,6 +54,8 @@ class JsonApiValidatorTest extends TestCase
 {
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testCaptureValidData(): void
     {
@@ -129,6 +132,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testCaptureNullOrEmptyInRelationships(): void
     {
@@ -183,6 +188,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testCaptureInvalidData1(): void
     {
@@ -267,6 +274,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testCaptureInvalidData2(): void
     {
@@ -337,6 +346,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testCaptureInvalidData3(): void
     {
@@ -412,6 +423,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testCaptureInvalidData4(): void
     {
@@ -483,6 +496,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testCaptureInvalidData5(): void
     {
@@ -521,6 +536,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testValidateWithNotExistingNames(): void
     {
@@ -572,6 +589,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testInvalidInputDataFormat1(): void
     {
@@ -614,6 +633,8 @@ EOT;
 
     /**
      * Validation test.
+     *
+     * @throws Exception
      */
     public function testInvalidInputDataFormat2(): void
     {
@@ -666,6 +687,7 @@ EOT;
     /**
      * Test unique in database rule.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testDbUniqueRule(): void
@@ -711,6 +733,8 @@ EOT;
 
     /**
      * Test cover.
+     *
+     * @throws Exception
      */
     public function testCoverEnableIgnoreUnknowns(): void
     {
@@ -734,6 +758,8 @@ EOT;
 
     /**
      * Test string resources present.
+     *
+     * @throws Exception
      */
     public function testResourcesPresent(): void
     {

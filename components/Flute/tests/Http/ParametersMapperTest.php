@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
@@ -40,6 +41,8 @@ class ParametersMapperTest extends TestCase
 {
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testGetFiltersForVariousFieldTypes(): void
     {
@@ -111,6 +114,8 @@ class ParametersMapperTest extends TestCase
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testGetFiltersForVariousOperations(): void
     {
@@ -161,6 +166,8 @@ class ParametersMapperTest extends TestCase
     /**
      * Test query.
      *
+     * @throws Exception
+     *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidQueryParametersException
      */
     public function testGetFiltersForUnknownOperation(): void
@@ -184,6 +191,8 @@ class ParametersMapperTest extends TestCase
     /**
      * Test query.
      *
+     * @throws Exception
+     *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidQueryParametersException
      */
     public function testGetFiltersForUnknownField(): void
@@ -204,6 +213,8 @@ class ParametersMapperTest extends TestCase
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testGetSorts(): void
     {
@@ -258,6 +269,8 @@ class ParametersMapperTest extends TestCase
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testIncludes(): void
     {

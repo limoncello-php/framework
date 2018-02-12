@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
@@ -163,6 +164,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return Connection
      *
+     * @throws Exception
      * @throws DBALException
      */
     protected function createConnection()
@@ -185,6 +187,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return Connection
      *
+     * @throws Exception
      * @throws DBALException
      */
     protected function initDb()

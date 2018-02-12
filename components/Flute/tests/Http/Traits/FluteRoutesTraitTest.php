@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Flute\Http\Traits\FluteRoutesTrait;
 use Limoncello\Tests\Flute\Data\Http\ApiCategoriesController;
@@ -33,6 +34,8 @@ class FluteRoutesTraitTest extends TestCase
 
     /**
      * Test helper method.
+     *
+     * @throws Exception
      */
     public function testControllerMethod(): void
     {
@@ -52,6 +55,8 @@ class FluteRoutesTraitTest extends TestCase
 
     /**
      * Test helper method.
+     *
+     * @throws Exception
      */
     public function testResourceMethod(): void
     {
@@ -73,6 +78,8 @@ class FluteRoutesTraitTest extends TestCase
 
     /**
      * Test helper method.
+     *
+     * @throws Exception
      */
     public function testRelationshipMethod(): void
     {

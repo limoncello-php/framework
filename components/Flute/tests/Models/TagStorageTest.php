@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Flute\Models\TagStorage;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +28,8 @@ class TagStorageTest extends TestCase
 {
     /**
      * Test storage.
+     *
+     * @throws Exception
      */
     public function testStorage(): void
     {

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Generator;
 use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
@@ -32,6 +33,8 @@ class QueryParserTest extends TestCase
 {
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testEmptyQueryParams(): void
     {
@@ -55,7 +58,7 @@ class QueryParserTest extends TestCase
 
         $parser = $this->createParser($queryParameters);
 
-        $this->assertTrue($parser->areFiltersWithAnd());
+        $parser->areFiltersWithAnd();
     }
 
     /**
@@ -71,7 +74,7 @@ class QueryParserTest extends TestCase
 
         $parser = $this->createParser($queryParameters);
 
-        $this->assertTrue($parser->areFiltersWithAnd());
+        $parser->areFiltersWithAnd();
     }
 
     /**
@@ -92,13 +95,13 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $parser = $this->createParser($queryParameters);
-
-        $this->assertTrue($parser->areFiltersWithAnd());
+        $this->createParser($queryParameters)->areFiltersWithAnd();
     }
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testTopLevelConditionWithOr(): void
     {
@@ -126,6 +129,8 @@ class QueryParserTest extends TestCase
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testGetFilters(): void
     {
@@ -168,6 +173,8 @@ class QueryParserTest extends TestCase
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testIsNullShortForm(): void
     {
@@ -186,6 +193,8 @@ class QueryParserTest extends TestCase
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testGetSorts(): void
     {
@@ -209,6 +218,8 @@ class QueryParserTest extends TestCase
 
     /**
      * Test query.
+     *
+     * @throws Exception
      */
     public function testIncludes(): void
     {
@@ -266,6 +277,8 @@ class QueryParserTest extends TestCase
 
     /**
      * Test create EncodingParameters.
+     *
+     * @throws Exception
      */
     public function testCreateEncodingParametersForInputGenerator(): void
     {

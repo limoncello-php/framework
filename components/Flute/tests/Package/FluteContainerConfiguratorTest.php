@@ -18,6 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
@@ -53,6 +54,7 @@ class FluteContainerConfiguratorTest extends TestCase
      * Test configurator.
      *
      * @throws DBALException
+     * @throws Exception
      */
     public function testProvider(): void
     {

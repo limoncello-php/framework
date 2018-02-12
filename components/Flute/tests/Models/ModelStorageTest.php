@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Flute\Models\ModelStorage;
 use Limoncello\Tests\Flute\Data\Models\ModelSchemes;
@@ -29,6 +30,8 @@ class ModelStorageTest extends TestCase
 {
     /**
      * Test storage.
+     *
+     * @throws Exception
      */
     public function testStorage(): void
     {
