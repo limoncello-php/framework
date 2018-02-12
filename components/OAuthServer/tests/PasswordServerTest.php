@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\Tests\OAuthServer\Data\Client;
 use Limoncello\Tests\OAuthServer\Data\RepositoryInterface;
@@ -36,6 +37,8 @@ class PasswordServerTest extends ServerTestCase
 
     /**
      * Test successful token issue.
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssue()
     {
@@ -55,6 +58,8 @@ class PasswordServerTest extends ServerTestCase
      * Test successful token issue.
      *
      * @link https://github.com/limoncello-php/framework/issues/49
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueEmptyScope()
     {
@@ -73,6 +78,8 @@ class PasswordServerTest extends ServerTestCase
 
     /**
      * Test unsupported grant type.
+     *
+     * @throws Exception
      */
     public function testUnsupportedGrantType()
     {
@@ -92,6 +99,8 @@ class PasswordServerTest extends ServerTestCase
 
     /**
      * Test invalid scope.
+     *
+     * @throws Exception
      */
     public function testInvalidScope()
     {
@@ -111,6 +120,8 @@ class PasswordServerTest extends ServerTestCase
 
     /**
      * Test absent user name.
+     *
+     * @throws Exception
      */
     public function testAbsentUserName()
     {
@@ -129,6 +140,8 @@ class PasswordServerTest extends ServerTestCase
 
     /**
      * Test invalid credentials.
+     *
+     * @throws Exception
      */
     public function testInvalidCredentials()
     {
@@ -147,6 +160,8 @@ class PasswordServerTest extends ServerTestCase
 
     /**
      * Test with client credentials where client has prohibited 'password grant'.
+     *
+     * @throws Exception
      */
     public function testUnauthorizedClient()
     {
@@ -179,6 +194,8 @@ class PasswordServerTest extends ServerTestCase
 
     /**
      * Test public client with credentials assigned.
+     *
+     * @throws Exception
      */
     public function testPublicClientHasCredentials()
     {

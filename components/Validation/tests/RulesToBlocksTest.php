@@ -18,6 +18,7 @@
 
 use DateTime;
 use DateTimeImmutable;
+use Exception;
 use Limoncello\Validation\Blocks\AndBlock;
 use Limoncello\Validation\Blocks\IfBlock;
 use Limoncello\Validation\Blocks\OrBlock;
@@ -54,6 +55,8 @@ class RulesToBlocksTest extends TestCase
 {
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testOneValueComparision(): void
     {
@@ -97,6 +100,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testTwoValueComparision(): void
     {
@@ -144,6 +149,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testStringToBoolConverter(): void
     {
@@ -166,6 +173,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testStringToDateTimeConverter(): void
     {
@@ -190,6 +199,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testStringToFloatConverter(): void
     {
@@ -212,6 +223,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testStringToIntConverter(): void
     {
@@ -234,6 +247,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testAndOperator(): void
     {
@@ -256,6 +271,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testOrOperator(): void
     {
@@ -278,6 +295,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testIfOperator(): void
     {
@@ -300,6 +319,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testSuccess(): void
     {
@@ -322,6 +343,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testFail(): void
     {
@@ -348,6 +371,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testRequired(): void
     {
@@ -370,6 +395,8 @@ class RulesToBlocksTest extends TestCase
 
     /**
      * Test rule to blocks transformation.
+     *
+     * @throws Exception
      */
     public function testTypes(): void
     {

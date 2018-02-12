@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Validation\Blocks\AndBlock;
 use Limoncello\Validation\Blocks\IfBlock;
 use Limoncello\Validation\Blocks\OrBlock;
@@ -72,6 +73,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test procedure block serialization.
+     *
+     * @throws Exception
      */
     public function testSerializeProcedureBlock(): void
     {
@@ -101,6 +104,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test AND block serialization.
+     *
+     * @throws Exception
      */
     public function testSerializeAndBlock(): void
     {
@@ -130,6 +135,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test OR block serialization.
+     *
+     * @throws Exception
      */
     public function testSerializeOrBlock(): void
     {
@@ -159,6 +166,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test IF block serialization.
+     *
+     * @throws Exception
      */
     public function testSerializeIfBlock(): void
     {
@@ -191,6 +200,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test block interpreter.
+     *
+     * @throws Exception
      */
     public function testInterpretProcedureSuccess(): void
     {
@@ -221,6 +232,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test block interpreter.
+     *
+     * @throws Exception
      */
     public function testInterpretProcedureError(): void
     {
@@ -254,6 +267,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test block interpreter.
+     *
+     * @throws Exception
      */
     public function testInterpretProcedureStartError(): void
     {
@@ -286,6 +301,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test block interpreter.
+     *
+     * @throws Exception
      */
     public function testInterpretProcedureEndError(): void
     {
@@ -318,6 +335,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test block interpreter.
+     *
+     * @throws Exception
      */
     public function testInterpretProcedureStartExecEndError(): void
     {

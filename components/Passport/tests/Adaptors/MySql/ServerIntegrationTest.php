@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Adaptors\MySql\RedirectUri;
 use Limoncello\Passport\Adaptors\MySql\RedirectUriRepository;
@@ -41,6 +42,8 @@ class ServerIntegrationTest extends TestCase
 {
     /**
      * Test getters.
+     *
+     * @throws Exception
      */
     public function testGetters()
     {
@@ -77,6 +80,8 @@ class ServerIntegrationTest extends TestCase
 
     /**
      * @return PassportServerIntegrationInterface
+     *
+     * @throws Exception
      */
     private function createInstance(): PassportServerIntegrationInterface
     {

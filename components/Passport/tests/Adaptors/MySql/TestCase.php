@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Mockery;
 
 /**
@@ -41,6 +42,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @return Connection
+     *
+     * @throws Exception
      */
     protected function createConnection(): Connection
     {
@@ -53,6 +56,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @param array      $columns
      *
      * @return void
+     *
+     * @throws Exception
      */
     protected function createTable(Connection $connection, string $name, array $columns)
     {

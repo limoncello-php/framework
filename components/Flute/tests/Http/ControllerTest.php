@@ -18,6 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
@@ -82,6 +83,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithoutParameters(): void
@@ -112,6 +114,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexSortByIdDesc(): void
@@ -157,6 +160,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithParameters(): void
@@ -207,6 +211,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithParametersJoinedByOR(): void
@@ -256,6 +261,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithParametersWithInvalidJoinParam(): void
@@ -293,6 +299,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithInvalidParameters(): void
@@ -330,6 +337,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testPaginationInRelationship(): void
@@ -374,6 +382,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIncludeNullableRelationshipToItself(): void
@@ -415,6 +424,7 @@ class ControllerTest extends TestCase
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
+     * @throws Exception
      */
     public function testReadToOneRelationship(): void
     {
@@ -439,7 +449,7 @@ class ControllerTest extends TestCase
         $body     = (string)($response->getBody());
         $resource = json_decode($body, true);
 
-        $this->assertNotEmpty(3, $resource);
+        $this->assertNotEmpty($resource);
         $this->assertEquals(5, $resource['data']['id']);
     }
 
@@ -447,6 +457,7 @@ class ControllerTest extends TestCase
      * Controller test.
      *
      * @throws DBALException
+     * @throws Exception
      */
     public function testIndexWithHasManyFilter(): void
     {
@@ -491,6 +502,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithBelongsToManyFilter(): void
@@ -540,6 +552,7 @@ class ControllerTest extends TestCase
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -601,6 +614,7 @@ EOT;
     /**
      * Controller test (form validator).
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testFormCreate(): void
@@ -619,6 +633,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadWithoutParameters(): void
@@ -651,6 +666,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
@@ -722,6 +738,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testUpdateNonExistingItem(): void
@@ -763,6 +780,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testUpdateNonMatchingIndexes(): void
@@ -805,6 +823,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testSendInvalidInput(): void
@@ -833,6 +852,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testUpdateForNonExistingItem(): void
@@ -867,6 +887,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
@@ -911,6 +932,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
@@ -949,6 +971,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
@@ -993,6 +1016,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
@@ -1062,6 +1086,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
@@ -1123,6 +1148,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
@@ -1177,6 +1203,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testFilterBelongsToRelationship(): void
@@ -1214,6 +1241,7 @@ EOT;
     /**
      * Controller test.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testFilterBelongsToManyRelationship(): void

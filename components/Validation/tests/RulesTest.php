@@ -17,6 +17,7 @@
  */
 
 use DateTimeImmutable;
+use Exception;
 use Limoncello\Validation\Captures\CaptureAggregator;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
@@ -39,6 +40,8 @@ class RulesTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testDates(): void
     {
@@ -146,6 +149,8 @@ class RulesTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testScalars(): void
     {
@@ -265,6 +270,8 @@ class RulesTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testStrings(): void
     {
@@ -353,6 +360,8 @@ class RulesTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testConverters(): void
     {
@@ -441,6 +450,8 @@ class RulesTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testRequired(): void
     {
@@ -478,6 +489,8 @@ class RulesTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testEnum(): void
     {
@@ -525,6 +538,8 @@ class RulesTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testFilter(): void
     {
@@ -573,6 +588,8 @@ class RulesTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testTypes(): void
     {
@@ -653,6 +670,8 @@ class RulesTest extends TestCase
 
     /**
      * Test basic rule methods.
+     *
+     * @throws Exception
      */
     public function testBaseRule(): void
     {
@@ -677,6 +696,8 @@ class RulesTest extends TestCase
 
     /**
      * Emulate we validate data against database.
+     *
+     * @throws Exception
      */
     public function testEmulateValidationChecksDatabaseRecord(): void
     {
@@ -713,6 +734,8 @@ class RulesTest extends TestCase
      * @param array $rules
      *
      * @return array
+     *
+     * @throws Exception
      */
     private function validateArray(array $input, array $rules): array
     {

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Passport\Contracts\PassportServerInterface;
 use Limoncello\Passport\Package\PassportController;
 use Limoncello\Tests\Passport\Data\TestContainer;
@@ -32,6 +33,8 @@ class PassportControllerTest extends TestCase
 {
     /**
      * Test authorize.
+     *
+     * @throws Exception
      */
     public function testAuthorize()
     {
@@ -48,6 +51,8 @@ class PassportControllerTest extends TestCase
 
     /**
      * Test authorize.
+     *
+     * @throws Exception
      */
     public function testToken()
     {

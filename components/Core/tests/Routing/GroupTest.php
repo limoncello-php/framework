@@ -17,6 +17,7 @@
  */
 
 use Closure;
+use Exception;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Routing\GroupInterface as GI;
 use Limoncello\Contracts\Routing\RouteInterface;
@@ -37,8 +38,10 @@ class GroupTest extends TestCase
 
     /**
      * Test basic groups.
+     *
+     * @throws Exception
      */
-    public function testBasicGroups()
+    public function testBasicGroups(): void
     {
         $topGroup = (new Group([
             GI::PARAM_NAME_PREFIX => 'all::',
@@ -116,8 +119,10 @@ class GroupTest extends TestCase
 
     /**
      * Test advanced groups.
+     *
+     * @throws Exception
      */
-    public function testAdvancedGroups()
+    public function testAdvancedGroups(): void
     {
         $topGroup = (new Group([
             GI::PARAM_MIDDLEWARE_LIST         => [self::class . '::topMiddlewareHandler'],
@@ -208,8 +213,10 @@ class GroupTest extends TestCase
 
     /**
      * Test trailing slashes enabled.
+     *
+     * @throws Exception
      */
-    public function testEnabledTrailingSlashes()
+    public function testEnabledTrailingSlashes(): void
     {
         $topGroup = (new Group())->setUriPrefix('/')->setHasTrailSlash(true);
 
@@ -254,7 +261,7 @@ class GroupTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testInvalidCallable1()
+    public function testInvalidCallable1(): void
     {
         (new Group())->setMiddleware(['NonExistingClass::method']);
     }
@@ -262,7 +269,7 @@ class GroupTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testInvalidCallable2()
+    public function testInvalidCallable2(): void
     {
         (new Group())->setConfigurators(['NonExistingClass::method']);
     }
@@ -270,7 +277,7 @@ class GroupTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testInvalidCallable3()
+    public function testInvalidCallable3(): void
     {
         (new Group())->setRequestFactory(function () {
         });
@@ -279,7 +286,7 @@ class GroupTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testInvalidCallable4()
+    public function testInvalidCallable4(): void
     {
         (new Group())->get('/', function () {
         });
@@ -288,7 +295,7 @@ class GroupTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testInvalidCallable5()
+    public function testInvalidCallable5(): void
     {
         (new Group())->get(
             '/',
@@ -300,7 +307,7 @@ class GroupTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testInvalidCallable6()
+    public function testInvalidCallable6(): void
     {
         (new Group())->get(
             '/',
@@ -312,7 +319,7 @@ class GroupTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testInvalidCallable7()
+    public function testInvalidCallable7(): void
     {
         (new Group())->get(
             '/',
@@ -501,7 +508,7 @@ class GroupTest extends TestCase
         return $response;
     }
 
-    public static function methodContainerConfigurator()
+    public static function methodContainerConfigurator(): void
     {
         // dummy for tests
     }

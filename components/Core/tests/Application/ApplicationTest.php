@@ -107,8 +107,10 @@ class ApplicationTest extends TestCase
 
     /**
      * Test page.
+     *
+     * @throws Exception
      */
-    public function testHomeIndex()
+    public function testHomeIndex(): void
     {
         /** @var Application $app */
         /** @var SapiInterface $sapi */
@@ -130,8 +132,10 @@ class ApplicationTest extends TestCase
 
     /**
      * Test page.
+     *
+     * @throws Exception
      */
-    public function testPostsIndex()
+    public function testPostsIndex(): void
     {
         /** @var Application $app */
         /** @var SapiInterface $sapi */
@@ -151,8 +155,10 @@ class ApplicationTest extends TestCase
 
     /**
      * Test page.
+     *
+     * @throws Exception
      */
-    public function test404()
+    public function test404(): void
     {
         /** @var Application $app */
         /** @var SapiInterface $sapi */
@@ -172,8 +178,10 @@ class ApplicationTest extends TestCase
 
     /**
      * Test page.
+     *
+     * @throws Exception
      */
-    public function test405()
+    public function test405(): void
     {
         /** @var Application $app */
         /** @var SapiInterface $sapi */
@@ -197,7 +205,7 @@ class ApplicationTest extends TestCase
      *
      * @expectedException \LogicException
      */
-    public function testSapiNotSet()
+    public function testSapiNotSet(): void
     {
         $app = Mockery::mock(Application::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
@@ -208,8 +216,10 @@ class ApplicationTest extends TestCase
 
     /**
      * Test user can ask not to create request.
+     *
+     * @throws Exception
      */
-    public function testNoRequestInController()
+    public function testNoRequestInController(): void
     {
         /** @var Application $app */
         /** @var SapiInterface $sapi */
@@ -229,8 +239,10 @@ class ApplicationTest extends TestCase
 
     /**
      * Test error handling.
+     *
+     * @throws Exception
      */
-    public function testErrorHandling()
+    public function testErrorHandling(): void
     {
         $execute = function (string $uri): ResponseInterface {
             $container = new Container();
@@ -279,8 +291,10 @@ class ApplicationTest extends TestCase
 
     /**
      * Test page.
+     *
+     * @throws Exception
      */
-    public function testHomeIndexFaultyMiddleware()
+    public function testHomeIndexFaultyMiddleware(): void
     {
         /** @var Application $app */
         /** @var SapiInterface $sapi */
@@ -307,6 +321,8 @@ class ApplicationTest extends TestCase
 
     /**
      * Test page.
+     *
+     * @throws Exception
      */
     public function testGetRouter(): void
     {
@@ -378,7 +394,7 @@ class ApplicationTest extends TestCase
     /**
      * @return array
      */
-    private function getRoutesData()
+    private function getRoutesData(): array
     {
         $group = (new Group())
             ->get('/', [self::class, 'homeIndex'])
@@ -400,7 +416,7 @@ class ApplicationTest extends TestCase
     /**
      * @return array
      */
-    private function getRoutesDataForNoRequest()
+    private function getRoutesDataForNoRequest(): array
     {
         $group = (new Group([
             GroupInterface::PARAM_CONTAINER_CONFIGURATORS => [self::class . '::createPostConfigurator'],
@@ -416,7 +432,7 @@ class ApplicationTest extends TestCase
     /**
      * @return array
      */
-    private function getRoutesDataForErrorsTesting()
+    private function getRoutesDataForErrorsTesting(): array
     {
         $group = (new Group())
             ->group('', function (GroupInterface $group): void {
@@ -458,6 +474,8 @@ class ApplicationTest extends TestCase
      * @param PsrContainerInterface  $container
      *
      * @return ResponseInterface
+     *
+     * @throws Exception
      */
     public static function globalMiddlewareItem1(
         ServerRequestInterface $request,
@@ -480,6 +498,8 @@ class ApplicationTest extends TestCase
      * @param Closure                $next
      *
      * @return ResponseInterface
+     *
+     * @throws Exception
      */
     public static function globalMiddlewareItem2(ServerRequestInterface $request, Closure $next): ResponseInterface
     {
@@ -534,7 +554,7 @@ class ApplicationTest extends TestCase
      *
      * @return void
      */
-    public static function createGlobalConfigurator(LimoncelloContainerInterface $container)
+    public static function createGlobalConfigurator(LimoncelloContainerInterface $container): void
     {
         // dummy for tests
         $container ?: null;
@@ -549,7 +569,7 @@ class ApplicationTest extends TestCase
      *
      * @return void
      */
-    public static function createPostConfigurator(LimoncelloContainerInterface $container)
+    public static function createPostConfigurator(LimoncelloContainerInterface $container): void
     {
         // dummy for tests
         $container ?: null;
@@ -564,7 +584,7 @@ class ApplicationTest extends TestCase
      *
      * @return void
      */
-    public static function configureErrorHandler(LimoncelloContainerInterface $container)
+    public static function configureErrorHandler(LimoncelloContainerInterface $container): void
     {
         $container[ThrowableHandlerInterface::class] = new class implements ThrowableHandlerInterface
         {
@@ -682,6 +702,8 @@ EOT;
      * @param ServerRequestInterface|null $request
      *
      * @return ResponseInterface
+     *
+     * @throws Exception
      */
     public static function homeIndexNoRequest(
         array $params,
@@ -703,7 +725,7 @@ EOT;
      *
      * @return string
      */
-    private function getText(StreamInterface $stream)
+    private function getText(StreamInterface $stream): string
     {
         $text = $stream->read($stream->getSize());
 

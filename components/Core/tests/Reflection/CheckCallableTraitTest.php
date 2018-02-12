@@ -17,6 +17,7 @@
  */
 
 use DateTimeInterface;
+use Exception;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Tests\Core\TestCase;
 use ReflectionParameter;
@@ -30,8 +31,10 @@ class CheckCallableTraitTest extends TestCase
 
     /**
      * Test check callable.
+     *
+     * @throws Exception
      */
-    public function testCheckCallable()
+    public function testCheckCallable(): void
     {
         $isNullableInt = function (ReflectionParameter $parameter): bool {
             $type = $parameter->getType();
@@ -121,7 +124,7 @@ class CheckCallableTraitTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testCheckCallableWithInvalidParameters()
+    public function testCheckCallableWithInvalidParameters(): void
     {
         // parameters should be described either by strings, nulls or with Closures.
         $parameters    = [
@@ -159,21 +162,21 @@ class CheckCallableTraitTest extends TestCase
     /**
      * Method for tests.
      */
-    public static function method2()
+    public static function method2(): void
     {
     }
 
     /**
      * Method for tests.
      */
-    protected static function method3()
+    protected static function method3(): void
     {
     }
 
     /**
      * Method for tests.
      */
-    public function method4()
+    public function method4(): void
     {
     }
 }

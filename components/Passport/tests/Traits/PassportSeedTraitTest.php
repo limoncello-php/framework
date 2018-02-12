@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Contracts\Entities\RedirectUriInterface;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
@@ -45,6 +46,13 @@ class PassportSeedTraitTest extends TestCase
         Mockery::close();
     }
 
+    /**
+     * Test seed client.
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
     public function testSeedClient()
     {
         $client       = (new Client())->setScopeIdentifiers(['scope_1']);

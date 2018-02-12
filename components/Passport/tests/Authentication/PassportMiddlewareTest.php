@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Authentication\PassportMiddleware;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
@@ -38,6 +39,8 @@ class PassportMiddlewareTest extends TestCase
 {
     /**
      * Test handle.
+     *
+     * @throws Exception
      */
     public function testHandleWithValidToken()
     {
@@ -63,6 +66,8 @@ class PassportMiddlewareTest extends TestCase
 
     /**
      * Test handle.
+     *
+     * @throws Exception
      */
     public function testHandleWithMalformedToken()
     {
@@ -85,6 +90,8 @@ class PassportMiddlewareTest extends TestCase
 
     /**
      * Test handle.
+     *
+     * @throws Exception
      */
     public function testHandleWithInvalidToken()
     {

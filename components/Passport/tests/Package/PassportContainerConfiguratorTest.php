@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
@@ -48,6 +49,8 @@ class PassportContainerConfiguratorTest extends TestCase
 
     /**
      * Test container configurator.
+     *
+     * @throws Exception
      */
     public function testGenericContainerConfigurator()
     {
@@ -75,6 +78,8 @@ class PassportContainerConfiguratorTest extends TestCase
 
     /**
      * Test container configurator.
+     *
+     * @throws Exception
      */
     public function testMySqlContainerConfigurator()
     {

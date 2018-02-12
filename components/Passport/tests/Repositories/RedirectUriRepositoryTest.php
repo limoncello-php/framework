@@ -17,6 +17,7 @@
  */
 
 use DateTimeImmutable;
+use Exception;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\RedirectUri;
@@ -47,6 +48,8 @@ class RedirectUriRepositoryTest extends TestCase
 
     /**
      * Test basic CRUD.
+     *
+     * @throws Exception
      */
     public function testCrud()
     {
@@ -91,6 +94,8 @@ class RedirectUriRepositoryTest extends TestCase
 
     /**
      * Test entities get/set methods.
+     *
+     * @throws Exception
      */
     public function testEntities()
     {

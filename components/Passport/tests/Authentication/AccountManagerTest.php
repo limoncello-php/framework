@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Authentication\AccountManager;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
@@ -36,6 +37,8 @@ class AccountManagerTest extends TestCase
 {
     /**
      * Test get and set.
+     *
+     * @throws Exception
      */
     public function testGetSet()
     {
@@ -54,6 +57,8 @@ class AccountManagerTest extends TestCase
 
     /**
      * Test setting current account with token value.
+     *
+     * @throws Exception
      */
     public function testSetAccountWithTokenValue()
     {

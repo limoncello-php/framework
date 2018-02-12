@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Limoncello\Passport\Adaptors\MySql\Token;
 use Limoncello\Passport\Entities\DatabaseScheme;
 use PDO;
@@ -30,6 +31,8 @@ class TokenTest extends TestCase
 {
     /**
      * Test client's constructor.
+     *
+     * @throws Exception
      */
     public function testConstructor()
     {

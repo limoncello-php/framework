@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Limoncello\Passport\Adaptors\MySql\Client;
 use Limoncello\Passport\Adaptors\MySql\ClientRepository;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
@@ -30,6 +31,8 @@ class ClientRepositoryTest extends TestCase
 {
     /**
      * Test getters.
+     *
+     * @throws Exception
      */
     public function testGetters()
     {

@@ -19,6 +19,7 @@
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Limoncello\Passport\Adaptors\MySql\TokenRepository;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
@@ -32,6 +33,8 @@ class TokenRepositoryTest extends TestCase
 
     /**
      * Test read passport.
+     *
+     * @throws Exception
      */
     public function testReadPassport()
     {
@@ -52,6 +55,8 @@ class TokenRepositoryTest extends TestCase
      * @param DatabaseScheme $scheme
      *
      * @return void
+     *
+     * @throws Exception
      */
     private function preparePassportTable(Connection $connection, DatabaseScheme $scheme)
     {

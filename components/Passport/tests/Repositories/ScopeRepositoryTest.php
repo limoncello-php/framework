@@ -17,6 +17,7 @@
  */
 
 use DateTimeImmutable;
+use Exception;
 use Limoncello\Passport\Adaptors\Generic\Scope;
 use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
@@ -43,6 +44,8 @@ class ScopeRepositoryTest extends TestCase
 
     /**
      * Test basic CRUD.
+     *
+     * @throws Exception
      */
     public function testCrud()
     {

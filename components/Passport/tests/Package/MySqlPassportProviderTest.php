@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Passport\Package\MySqlPassportProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -26,6 +27,8 @@ class MySqlPassportProviderTest extends TestCase
 {
     /**
      * Test provider methods.
+     *
+     * @throws Exception
      */
     public function testGenericContainerConfigurator()
     {

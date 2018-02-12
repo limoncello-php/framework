@@ -58,7 +58,7 @@ class ArrayValidator extends BaseValidator
      */
     public static function validator(array $rules = [], ContainerInterface $container = null): self
     {
-        $validator = new static ($rules, $container);
+        $validator = new static($rules, $container);
 
         return $validator;
     }

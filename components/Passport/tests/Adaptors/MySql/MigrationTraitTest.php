@@ -18,6 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Exception;
 use Limoncello\Passport\Adaptors\MySql\DatabaseSchemeMigrationTrait;
 use Limoncello\Passport\Adaptors\MySql\DbDateFormatTrait;
 use Limoncello\Passport\Entities\DatabaseScheme;
@@ -46,6 +47,8 @@ class MigrationTraitTest extends TestCase
     /**
      * We'll build a dummy test for covering some very basics of migration script and
      * then will test the actual methods separately.
+     *
+     * @throws Exception
      */
     public function testDummyCreateAndDeleteScheme()
     {
@@ -67,6 +70,8 @@ class MigrationTraitTest extends TestCase
 
     /**
      * Test create views.
+     *
+     * @throws Exception
      */
     public function testCreateViews()
     {
@@ -82,10 +87,15 @@ class MigrationTraitTest extends TestCase
         /** @var Connection $connection */
 
         $this->parentCreateDatabaseViews($connection, $scheme);
+
+        // mocks will do the actual checks
+        $this->assertTrue(true);
     }
 
     /**
      * Test create views.
+     *
+     * @throws Exception
      */
     public function testRemoveViews()
     {
@@ -101,10 +111,15 @@ class MigrationTraitTest extends TestCase
         /** @var Connection $connection */
 
         $this->parentRemoveDatabaseViews($connection, $scheme);
+
+        // mocks will do the actual checks
+        $this->assertTrue(true);
     }
 
     /**
      * Test database format.
+     *
+     * @throws Exception
      */
     public function testDbFormat()
     {

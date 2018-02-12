@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenRedirectException;
 use Limoncello\Tests\OAuthServer\Data\Client;
@@ -52,6 +53,8 @@ class ImplicitServerTest extends ServerTestCase
 
     /**
      * Test successful auth with redirect URI (POST method).
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssue()
     {
@@ -73,6 +76,8 @@ class ImplicitServerTest extends ServerTestCase
      * Test successful auth with redirect URI (POST method).
      *
      * @link https://github.com/limoncello-php/framework/issues/49
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueEmptyScope()
     {
@@ -97,6 +102,8 @@ class ImplicitServerTest extends ServerTestCase
 
     /**
      * Test successful auth without redirect URI (GET method).
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueWithoutRedirectUri()
     {
@@ -118,6 +125,8 @@ class ImplicitServerTest extends ServerTestCase
 
     /**
      * Test failed auth without redirect URI.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueWithoutRedirectUri()
     {
@@ -139,6 +148,8 @@ class ImplicitServerTest extends ServerTestCase
 
     /**
      * Test failed auth due to too long `state` parameter.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueDueToTooLongStateParameter()
     {
@@ -165,6 +176,8 @@ class ImplicitServerTest extends ServerTestCase
 
     /**
      * Test failed auth due to invalid scope.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueDueInvalidScope()
     {
@@ -188,6 +201,8 @@ class ImplicitServerTest extends ServerTestCase
 
     /**
      * Test failed auth due to client does not allow implicit authorization grant.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueDueImplicitGrantIsNotAllowed()
     {

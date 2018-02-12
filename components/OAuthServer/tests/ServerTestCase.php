@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\OAuthServer\Exceptions\OAuthCodeRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenRedirectException;
@@ -138,6 +139,8 @@ abstract class ServerTestCase extends TestCase
      * @param string[]          $headers
      *
      * @return void
+     *
+     * @throws Exception
      */
     protected function validateBodyResponse(
         ResponseInterface $response,
@@ -155,7 +158,7 @@ abstract class ServerTestCase extends TestCase
         foreach ($headers as $header => $value) {
             $this->assertEquals([$value], $response->getHeader($header));
         }
-        $this->assertNotNull(false, $encoded = json_decode((string)$response->getBody(), true));
+        $this->assertNotNull($encoded = json_decode((string)$response->getBody(), true));
         $this->assertEquals($body, $encoded);
     }
 
@@ -234,6 +237,8 @@ abstract class ServerTestCase extends TestCase
      * @param string[]          $headers
      *
      * @return void
+     *
+     * @throws Exception
      */
     protected function validateRedirectResponse(
         ResponseInterface $response,

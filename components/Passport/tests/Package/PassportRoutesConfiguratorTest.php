@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Package\PassportMigration;
@@ -44,6 +45,8 @@ class PassportRoutesConfiguratorTest extends TestCase
 
     /**
      * Test settings could be instantiated.
+     *
+     * @throws Exception
      */
     public function testGetSettings()
     {
@@ -56,6 +59,8 @@ class PassportRoutesConfiguratorTest extends TestCase
 
     /**
      * Test provider.
+     *
+     * @throws Exception
      */
     public function testProvider()
     {
@@ -67,6 +72,8 @@ class PassportRoutesConfiguratorTest extends TestCase
 
     /**
      * Test migration.
+     *
+     * @throws Exception
      */
     public function testMigrationMigrate()
     {
@@ -88,6 +95,8 @@ class PassportRoutesConfiguratorTest extends TestCase
 
     /**
      * Test migration rollback.
+     *
+     * @throws Exception
      */
     public function testMigrationRollback()
     {

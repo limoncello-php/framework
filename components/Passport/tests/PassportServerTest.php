@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\OAuthServer\Contracts\GrantTypes;
 use Limoncello\OAuthServer\Exceptions\OAuthRedirectException;
@@ -69,6 +70,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test issuing resource owner password token.
+     *
+     * @throws Exception
      */
     public function testResourceOwnerPasswordToken()
     {
@@ -94,6 +97,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test issuing resource owner password token.
+     *
+     * @throws Exception
      */
     public function testResourceOwnerPasswordTokenInvalidCredentials()
     {
@@ -112,6 +117,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test refresh token.
+     *
+     * @throws Exception
      */
     public function testRefreshToken()
     {
@@ -143,6 +150,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test refresh token.
+     *
+     * @throws Exception
      */
     public function testRefreshTokenWithNewScope()
     {
@@ -177,26 +186,9 @@ class PassportServerTest extends TestCase
     }
 
     /**
-     * Test client grant with invalid client.
-     */
-//    public function testRefreshTokenInvalidClient()
-//    {
-//        $noClientIdRequest = $this->createServerRequest([
-//            'grant_type' => GrantTypes::REFRESH_TOKEN
-//
-//            // note no client_id
-//        ]);
-//        $response = $this->createPassportServer()->postCreateToken($noClientIdRequest);
-//        $this->assertEquals(400, $response->getStatusCode());
-//        $error = json_decode((string)$response->getBody());
-//        $this->assertTrue(property_exists($error, 'error'));
-//        $this->assertEquals(OAuthTokenBodyException::ERROR_INVALID_CLIENT, $error->error);
-//
-//        $this->assertNotEmpty($this->getLogs());
-//    }
-
-    /**
      * Test implicit grant.
+     *
+     * @throws Exception
      */
     public function testImplicitGrant()
     {
@@ -227,6 +219,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test implicit grant.
+     *
+     * @throws Exception
      */
     public function testImplicitGrantForClientWithMultipleRedirectUris()
     {
@@ -254,6 +248,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test implicit grant with invalid redirect URI.
+     *
+     * @throws Exception
      */
     public function testImplicitGrantInvalidRedirectUri()
     {
@@ -284,6 +280,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test implicit grant with invalid client.
+     *
+     * @throws Exception
      */
     public function testImplicitGrantInvalidClient()
     {
@@ -300,6 +298,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test code grant.
+     *
+     * @throws Exception
      */
     public function testCodeGrant()
     {
@@ -352,6 +352,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test code grant.
+     *
+     * @throws Exception
      */
     public function testCodeGrantShouldReturnScopeEvenIfNotModified()
     {
@@ -377,6 +379,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test code grant with invalid redirect URI.
+     *
+     * @throws Exception
      */
     public function testCodeGrantInvalidRedirectUri()
     {
@@ -409,6 +413,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test code grant with invalid client.
+     *
+     * @throws Exception
      */
     public function testCodeGrantInvalidClient()
     {
@@ -425,6 +431,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test client grant.
+     *
+     * @throws Exception
      */
     public function testClientGrant()
     {
@@ -456,6 +464,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test client grant with invalid client.
+     *
+     * @throws Exception
      */
     public function testClientGrantInvalidClient()
     {
@@ -475,6 +485,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test invalid grant.
+     *
+     * @throws Exception
      */
     public function testInvalidResponseType()
     {
@@ -498,6 +510,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test client grant with invalid client.
+     *
+     * @throws Exception
      */
     public function testInvalidGrantType()
     {
@@ -516,6 +530,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test create repositories.
+     *
+     * @throws Exception
      */
     public function testCreateGenericRepositories()
     {
@@ -529,6 +545,8 @@ class PassportServerTest extends TestCase
 
     /**
      * Test create repositories.
+     *
+     * @throws Exception
      */
     public function testCreateMySqlRepositories()
     {
@@ -754,6 +772,8 @@ class PassportServerTest extends TestCase
      * @param Connection $connection
      *
      * @return PassportServerIntegrationInterface
+     *
+     * @throws Exception
      */
     private function createInstance(Connection $connection): PassportServerIntegrationInterface
     {
@@ -772,6 +792,8 @@ class PassportServerTest extends TestCase
 
     /**
      * @param $token
+     *
+     * @throws Exception
      */
     private function checkItLooksLikeValidToken($token)
     {

@@ -17,6 +17,7 @@
  */
 
 use DateTimeImmutable;
+use Exception;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\Scope;
@@ -46,6 +47,8 @@ class ClientRepositoryTest extends TestCase
 
     /**
      * Test basic CRUD.
+     *
+     * @throws Exception
      */
     public function testCrud()
     {
@@ -93,6 +96,8 @@ class ClientRepositoryTest extends TestCase
 
     /**
      * Test add and remove scopes.
+     *
+     * @throws Exception
      */
     public function testAddAndRemoveScopes()
     {
@@ -131,6 +136,8 @@ class ClientRepositoryTest extends TestCase
 
     /**
      * Test entities get/set methods.
+     *
+     * @throws Exception
      */
     public function testEntities()
     {

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Tests\Passport\Data\PassportSettings;
 use PHPUnit\Framework\TestCase;
 
@@ -26,6 +27,8 @@ class PassportSettingsTest extends TestCase
 {
     /**
      * Test settings could be instantiated.
+     *
+     * @throws Exception
      */
     public function testGetSettings()
     {

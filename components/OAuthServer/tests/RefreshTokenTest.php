@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Contracts\TokenInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
@@ -44,6 +45,8 @@ class RefreshTokenTest extends ServerTestCase
 
     /**
      * Test successful token issue.
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueWithoutScopeChange()
     {
@@ -62,6 +65,8 @@ class RefreshTokenTest extends ServerTestCase
      * Test successful token issue.
      *
      * @link https://github.com/limoncello-php/framework/issues/49
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueWithoutScopeChangeEmptyScope()
     {
@@ -78,6 +83,8 @@ class RefreshTokenTest extends ServerTestCase
 
     /**
      * Test successful token issue.
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueWithScopeChange()
     {
@@ -94,6 +101,8 @@ class RefreshTokenTest extends ServerTestCase
 
     /**
      * Test failed token issue.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueWithScopeChange()
     {
@@ -112,6 +121,8 @@ class RefreshTokenTest extends ServerTestCase
 
     /**
      * Test with client where 'refresh grant' is disabled.
+     *
+     * @throws Exception
      */
     public function testClientWithDisabledRefreshGrant()
     {
@@ -131,6 +142,8 @@ class RefreshTokenTest extends ServerTestCase
 
     /**
      * Test refresh token without provided client auth/id (for public client).
+     *
+     * @throws Exception
      */
     public function testRefreshWithoutGivenClientId()
     {
@@ -149,6 +162,8 @@ class RefreshTokenTest extends ServerTestCase
 
     /**
      * Test refresh token without provided client auth/id (for confidential client).
+     *
+     * @throws Exception
      */
     public function testRefreshWithoutGivenClientIdForConfidentialClient()
     {
@@ -168,6 +183,8 @@ class RefreshTokenTest extends ServerTestCase
 
     /**
      * Test no refresh token.
+     *
+     * @throws Exception
      */
     public function testNoRefreshToken()
     {
@@ -186,6 +203,8 @@ class RefreshTokenTest extends ServerTestCase
 
     /**
      * Test invalid refresh token.
+     *
+     * @throws Exception
      */
     public function testInvalidRefreshToken()
     {

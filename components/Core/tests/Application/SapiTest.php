@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Core\Application\Sapi;
 use Limoncello\Tests\Core\TestCase;
 use Mockery;
@@ -29,8 +30,10 @@ class SapiTest extends TestCase
 {
     /**
      * Test handle Response.
+     *
+     * @throws Exception
      */
-    public function testHomeIndex()
+    public function testHomeIndex(): void
     {
         /** @var Mockery\Mock $emitter */
         $emitter  = Mockery::mock(EmitterInterface::class);

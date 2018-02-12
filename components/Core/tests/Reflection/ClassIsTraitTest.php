@@ -18,6 +18,7 @@
 
 use DateTime;
 use DateTimeInterface;
+use Exception;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
 use Limoncello\Tests\Core\TestCase;
@@ -32,8 +33,10 @@ class ClassIsTraitTest extends TestCase
 
     /**
      * Test class selections.
+     *
+     * @throws Exception
      */
-    public function testClassMethods()
+    public function testClassMethods(): void
     {
         $this->assertTrue($this->classImplements(DateTime::class, DateTimeInterface::class));
         $this->assertFalse($this->classImplements(DateTime::class, RouterInterface::class));

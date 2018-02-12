@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use PHPUnit\Framework\TestCase;
 
@@ -26,6 +27,8 @@ class ClientTest extends TestCase
 {
     /**
      * Test date format method implemented.
+     *
+     * @throws Exception
      */
     public function testDbDateFormat()
     {

@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Package\MySqlPassportMigration;
 use Limoncello\Tests\Passport\Data\TestContainer;
@@ -31,6 +32,8 @@ class MySqlPassportMigrationTest extends TestCase
 {
     /**
      * Test migrate and rollback.
+     *
+     * @throws Exception
      */
     public function testMigrateAndRollback()
     {

@@ -57,7 +57,7 @@ class SingleValidator extends BaseValidator
      */
     public static function validator(RuleInterface $rule, ContainerInterface $container = null): ValidatorInterface
     {
-        $validator = new static ($rule, $container);
+        $validator = new static($rule, $container);
 
         return $validator;
     }

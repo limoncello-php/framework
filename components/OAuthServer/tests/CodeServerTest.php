@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthCodeRedirectException;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
@@ -60,6 +61,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test successful auth with redirect URI.
+     *
+     * @throws Exception
      */
     public function testSuccessfulCodeIssue()
     {
@@ -81,6 +84,8 @@ class CodeServerTest extends ServerTestCase
      * Test successful auth with redirect URI.
      *
      * @link https://github.com/limoncello-php/framework/issues/49
+     *
+     * @throws Exception
      */
     public function testSuccessfulCodeIssueEmptyScope()
     {
@@ -101,6 +106,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test successful auth without redirect URI.
+     *
+     * @throws Exception
      */
     public function testSuccessfulCodeIssueWithoutRedirectUri()
     {
@@ -123,6 +130,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed auth without redirect URI.
+     *
+     * @throws Exception
      */
     public function testFailedCodeIssueWithoutRedirectUri1()
     {
@@ -145,6 +154,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed auth without redirect URI.
+     *
+     * @throws Exception
      */
     public function testFailedCodeIssueWithoutRedirectUri2()
     {
@@ -166,6 +177,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed auth due to too long `state` parameter.
+     *
+     * @throws Exception
      */
     public function testFailedCodeIssueDueToTooLongStateParameter()
     {
@@ -192,6 +205,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed auth due to invalid scope.
+     *
+     * @throws Exception
      */
     public function testFailedCodeIssueDueInvalidScope()
     {
@@ -215,6 +230,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed auth due to client does not allow code authorization grant.
+     *
+     * @throws Exception
      */
     public function testFailedCodeIssueDueCodeAuthorizationGrantIsNotAllowed()
     {
@@ -238,6 +255,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test successful token issue with redirect URI.
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssue()
     {
@@ -255,6 +274,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test successful token issue with redirect URI and client authentication.
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueWithClientAuthentication()
     {
@@ -281,6 +302,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed token issue with client id not matching client authentication.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueWithClientAuthentication()
     {
@@ -309,6 +332,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed token issue due to client denied code auth.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueDueToClientDeniedCodeAuth()
     {
@@ -329,6 +354,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed token issue due to invalid auth code.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueDueToInvalidAuthCode()
     {
@@ -348,6 +375,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed token issue due to used earlier auth code.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueDueToUsedEarlierAuthCode()
     {
@@ -367,6 +396,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed token issue due to the auth token was issued to another client.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueDueToAuthTokenIssuedToAnotherClient()
     {
@@ -396,6 +427,8 @@ class CodeServerTest extends ServerTestCase
 
     /**
      * Test failed token issue due to absent redirect URI.
+     *
+     * @throws Exception
      */
     public function testFailedTokenIssueDueAbsentRedirectUri()
     {

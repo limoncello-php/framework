@@ -17,6 +17,7 @@
  */
 
 use DateTimeImmutable;
+use Exception;
 use Limoncello\Passport\Adaptors\Generic\Client;
 use Limoncello\Passport\Adaptors\Generic\ClientRepository;
 use Limoncello\Passport\Adaptors\Generic\Token;
@@ -50,6 +51,8 @@ class TokenRepositoryTest extends TestCase
 
     /**
      * Test basic CRUD.
+     *
+     * @throws Exception
      */
     public function testCrud()
     {
@@ -135,6 +138,8 @@ class TokenRepositoryTest extends TestCase
 
     /**
      * Test create token (Resource Owner Credentials case).
+     *
+     * @throws Exception
      */
     public function testCreateTokenWithRefresh()
     {
@@ -158,6 +163,8 @@ class TokenRepositoryTest extends TestCase
 
     /**
      * Test disable token.
+     *
+     * @throws Exception
      */
     public function testDisableToken()
     {
@@ -186,6 +193,8 @@ class TokenRepositoryTest extends TestCase
 
     /**
      * Test create disabled token.
+     *
+     * @throws Exception
      */
     public function testCreateDisabledToken()
     {
@@ -210,6 +219,8 @@ class TokenRepositoryTest extends TestCase
 
     /**
      * Test create token (Resource Owner Credentials case).
+     *
+     * @throws Exception
      */
     public function testCreateTokenWithoutRefresh()
     {

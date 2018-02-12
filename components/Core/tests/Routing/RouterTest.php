@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use FastRoute\DataGenerator\CharCountBased as CharCountBasedGenerator;
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use FastRoute\DataGenerator\GroupPosBased as GroupPosBasedGenerator;
@@ -47,40 +48,50 @@ class RouterTest extends TestCase
 
     /**
      * Test match routes.
+     *
+     * @throws Exception
      */
-    public function testMatchForGroupCountBasedRouter()
+    public function testMatchForGroupCountBasedRouter(): void
     {
         $this->checkMatchRoutes($this->createGroupCountBasedRouter());
     }
 
     /**
      * Test match routes.
+     *
+     * @throws Exception
      */
-    public function testMatchForGroupPosBasedRouter()
+    public function testMatchForGroupPosBasedRouter(): void
     {
         $this->checkMatchRoutes($this->createGroupPosBasedRouter());
     }
 
     /**
      * Test match routes.
+     *
+     * @throws Exception
      */
-    public function testMatchForCharCountBasedRouter()
+    public function testMatchForCharCountBasedRouter(): void
     {
         $this->checkMatchRoutes($this->createCharCountBasedRouter());
     }
 
     /**
      * Test match routes.
+     *
+     * @throws Exception
      */
-    public function testMatchForMarkBasedRouter()
+    public function testMatchForMarkBasedRouter(): void
     {
         $this->checkMatchRoutes($this->createMarkBasedRouter());
     }
 
     /**
      * Test loading of cached data.
+     *
+     * @throws Exception
      */
-    public function testLoadCachedRoutes()
+    public function testLoadCachedRoutes(): void
     {
         $cached = $this->createGroupCountBasedRouter()->getCachedRoutes($this->createGroup());
 
@@ -96,15 +107,17 @@ class RouterTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testRoutesAreNotLoaded2()
+    public function testRoutesAreNotLoaded2(): void
     {
         $this->createGroupCountBasedRouter()->match('GET', '/');
     }
 
     /**
      * Test compose URI for named route with parameters.
+     *
+     * @throws Exception
      */
-    public function testRouterGetNamedRouteWithParams()
+    public function testRouterGetNamedRouteWithParams(): void
     {
         $router = $this->createGroupCountBasedRouter();
         $router->loadCachedRoutes($router->getCachedRoutes($this->createGroup()));
@@ -122,8 +135,10 @@ class RouterTest extends TestCase
 
     /**
      * Test extract host URI from server request.
+     *
+     * @throws Exception
      */
-    public function testGetHostUri()
+    public function testGetHostUri(): void
     {
         $router = $this->createGroupCountBasedRouter();
         $router->loadCachedRoutes($router->getCachedRoutes($this->createGroup()));
@@ -134,8 +149,10 @@ class RouterTest extends TestCase
 
     /**
      * @param RouterInterface $router
+     *
+     * @throws Exception
      */
-    private function checkMatchRoutes(RouterInterface $router)
+    private function checkMatchRoutes(RouterInterface $router): void
     {
         $cachedRoutes = $router->getCachedRoutes($this->createGroup());
         $router->loadCachedRoutes($cachedRoutes);
@@ -179,7 +196,7 @@ class RouterTest extends TestCase
     /**
      * @return GroupInterface
      */
-    private function createGroup()
+    private function createGroup(): GroupInterface
     {
         return (new Group([GroupInterface::PARAM_REQUEST_FACTORY => null]))
             ->get('/', [self::class, 'homeIndex'])
@@ -201,7 +218,7 @@ class RouterTest extends TestCase
     /**
      * @return RouterInterface
      */
-    private function createGroupCountBasedRouter()
+    private function createGroupCountBasedRouter(): RouterInterface
     {
         return new Router(GroupCountBasedGenerator::class, GroupCountBased::class);
     }
@@ -209,7 +226,7 @@ class RouterTest extends TestCase
     /**
      * @return RouterInterface
      */
-    private function createGroupPosBasedRouter()
+    private function createGroupPosBasedRouter(): RouterInterface
     {
         return new Router(GroupPosBasedGenerator::class, GroupPosBased::class);
     }
@@ -217,7 +234,7 @@ class RouterTest extends TestCase
     /**
      * @return RouterInterface
      */
-    private function createCharCountBasedRouter()
+    private function createCharCountBasedRouter(): RouterInterface
     {
         return new Router(CharCountBasedGenerator::class, CharCountBased::class);
     }
@@ -225,7 +242,7 @@ class RouterTest extends TestCase
     /**
      * @return RouterInterface
      */
-    private function createMarkBasedRouter()
+    private function createMarkBasedRouter(): RouterInterface
     {
         return new Router(MarkBasedGenerator::class, MarkBased::class);
     }
@@ -315,7 +332,7 @@ class RouterTest extends TestCase
         return $response;
     }
 
-    public static function createPostConfigurator()
+    public static function createPostConfigurator(): void
     {
         // dummy for tests
     }

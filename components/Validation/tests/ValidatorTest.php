@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Tests\Validation\Rules\DbRule;
 use Limoncello\Validation\ArrayValidator as vv;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
@@ -33,6 +34,8 @@ class ValidatorTest extends TestCase
 {
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testBasicValidatorMethods(): void
     {
@@ -46,8 +49,11 @@ class ValidatorTest extends TestCase
         $this->assertNotEmpty($validator->getErrors());
         $this->assertEmpty($validator->getCaptures());
     }
+
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testBasicValidatorCaptureWithoutName(): void
     {
@@ -60,6 +66,8 @@ class ValidatorTest extends TestCase
 
     /**
      * Test validator.
+     *
+     * @throws Exception
      */
     public function testBasicValidatorRules(): void
     {
@@ -80,6 +88,8 @@ class ValidatorTest extends TestCase
 
     /**
      * Test validation for array values.
+     *
+     * @throws Exception
      */
     public function testArrayValidator(): void
     {
@@ -93,6 +103,8 @@ class ValidatorTest extends TestCase
 
     /**
      * Test caching for array validation.
+     *
+     * @throws Exception
      */
     public function testArrayValidatorCache(): void
     {
@@ -111,6 +123,8 @@ class ValidatorTest extends TestCase
 
     /**
      * Test container usage in validation rules.
+     *
+     * @throws Exception
      */
     public function testContainerUsageInRules(): void
     {

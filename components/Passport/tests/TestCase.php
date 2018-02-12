@@ -21,6 +21,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Dotenv\Dotenv;
+use Exception;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
 use Limoncello\Passport\Entities\DatabaseScheme;
 use Limoncello\Tests\Passport\Data\User;
@@ -115,6 +116,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Init MySQL database.
+     *
+     * @throws Exception
      */
     protected function initMySqlDatabase()
     {
@@ -139,6 +142,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Init SQLite database.
+     *
+     * @throws Exception
      */
     protected function initSqliteDatabase()
     {
@@ -166,6 +171,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @return Connection
+     *
+     * @throws Exception
      */
     public static function createSqliteDatabaseConnection(): Connection
     {
@@ -177,6 +184,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @return Connection
+     *
+     * @throws Exception
      */
     protected function createMySqlDatabaseConnection(): Connection
     {
@@ -309,6 +318,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @param string[]          $headers
      *
      * @return void
+     *
+     * @throws Exception
      */
     protected function validateBodyResponse(
         ResponseInterface $response,
@@ -338,6 +349,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @param string[]          $headers
      *
      * @return void
+     *
+     * @throws Exception
      */
     protected function validateRedirectResponse(
         ResponseInterface $response,

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\Tests\OAuthServer\Data\Client;
@@ -52,6 +53,8 @@ class ClientServerTest extends ServerTestCase
 
     /**
      * Test successful token issue without scope.
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueWithoutScope()
     {
@@ -69,6 +72,8 @@ class ClientServerTest extends ServerTestCase
 
     /**
      * Test successful token issue with scope.
+     *
+     * @throws Exception
      */
     public function testSuccessfulTokenIssueWithScope()
     {
@@ -85,6 +90,8 @@ class ClientServerTest extends ServerTestCase
 
     /**
      * Test client credentials grant is disabled for the client.
+     *
+     * @throws Exception
      */
     public function testGrantTypeDisabled()
     {
@@ -102,6 +109,8 @@ class ClientServerTest extends ServerTestCase
 
     /**
      * Test invalid scope.
+     *
+     * @throws Exception
      */
     public function testInvalidScope()
     {
