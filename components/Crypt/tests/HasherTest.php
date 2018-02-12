@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Crypt\Contracts\HasherInterface;
 use Limoncello\Crypt\Hasher;
 use PHPUnit\Framework\TestCase;
@@ -27,8 +28,10 @@ class HasherTest extends TestCase
 {
     /**
      * Test hash value and verify hash.
+     *
+     * @throws Exception
      */
-    public function testHashAndVerify()
+    public function testHashAndVerify(): void
     {
         /** @var HasherInterface $hasher */
         $hasher = new Hasher();

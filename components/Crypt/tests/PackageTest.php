@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\Settings\SettingsInterface;
@@ -42,8 +43,10 @@ class PackageTest extends TestCase
 {
     /**
      * Test provider.
+     *
+     * @throws Exception
      */
-    public function testAsymmetricPrivateEncryptPublicDecrypt1()
+    public function testAsymmetricPrivateEncryptPublicDecrypt1(): void
     {
         $container = new TestContainer();
 
@@ -62,7 +65,7 @@ class PackageTest extends TestCase
      *
      * @expectedException \Limoncello\Crypt\Exceptions\CryptConfigurationException
      */
-    public function testAsymmetricPrivateEncryptPublicDecrypt2()
+    public function testAsymmetricPrivateEncryptPublicDecrypt2(): void
     {
         $container = new TestContainer();
 
@@ -72,7 +75,7 @@ class PackageTest extends TestCase
         list ($configuratorClass) = AsymmetricPrivateEncryptPublicDecryptProvider::getContainerConfigurators();
         $configuratorClass::configureContainer($container);
 
-        $this->assertNotNull($container->get(EncryptInterface::class));
+        $container->get(EncryptInterface::class);
     }
 
     /**
@@ -80,7 +83,7 @@ class PackageTest extends TestCase
      *
      * @expectedException \Limoncello\Crypt\Exceptions\CryptConfigurationException
      */
-    public function testAsymmetricPrivateEncryptPublicDecrypt3()
+    public function testAsymmetricPrivateEncryptPublicDecrypt3(): void
     {
         $container = new TestContainer();
 
@@ -90,13 +93,15 @@ class PackageTest extends TestCase
         list ($configuratorClass) = AsymmetricPrivateEncryptPublicDecryptProvider::getContainerConfigurators();
         $configuratorClass::configureContainer($container);
 
-        $this->assertNotNull($container->get(DecryptInterface::class));
+        $container->get(DecryptInterface::class);
     }
 
     /**
      * Test provider.
+     *
+     * @throws Exception
      */
-    public function testPublicEncryptPrivateDecrypt1()
+    public function testPublicEncryptPrivateDecrypt1(): void
     {
         $container = new TestContainer();
 
@@ -115,7 +120,7 @@ class PackageTest extends TestCase
      *
      * @expectedException \Limoncello\Crypt\Exceptions\CryptConfigurationException
      */
-    public function testPublicEncryptPrivateDecrypt2()
+    public function testPublicEncryptPrivateDecrypt2(): void
     {
         $container = new TestContainer();
 
@@ -125,7 +130,7 @@ class PackageTest extends TestCase
         list ($configuratorClass) = AsymmetricPublicEncryptPrivateDecryptProvider::getContainerConfigurators();
         $configuratorClass::configureContainer($container);
 
-        $this->assertNotNull($container->get(EncryptInterface::class));
+        $container->get(EncryptInterface::class);
     }
 
     /**
@@ -133,7 +138,7 @@ class PackageTest extends TestCase
      *
      * @expectedException \Limoncello\Crypt\Exceptions\CryptConfigurationException
      */
-    public function testPublicEncryptPrivateDecrypt3()
+    public function testPublicEncryptPrivateDecrypt3(): void
     {
         $container = new TestContainer();
 
@@ -143,13 +148,15 @@ class PackageTest extends TestCase
         list ($configuratorClass) = AsymmetricPublicEncryptPrivateDecryptProvider::getContainerConfigurators();
         $configuratorClass::configureContainer($container);
 
-        $this->assertNotNull($container->get(DecryptInterface::class));
+        $container->get(DecryptInterface::class);
     }
 
     /**
      * Test provider.
+     *
+     * @throws Exception
      */
-    public function testSymmetricCrypt()
+    public function testSymmetricCrypt(): void
     {
         $container = new TestContainer();
 
@@ -181,8 +188,10 @@ class PackageTest extends TestCase
 
     /**
      * Test provider.
+     *
+     * @throws Exception
      */
-    public function testHasher()
+    public function testHasher(): void
     {
         $container = new TestContainer();
 

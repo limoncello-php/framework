@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Crypt\Exceptions\CryptException;
 use Limoncello\Crypt\SymmetricCrypt;
 use Mockery;
@@ -29,8 +30,10 @@ class SymmetricCryptTest extends TestCase
 {
     /**
      * Test encrypt & decrypt.
+     *
+     * @throws Exception
      */
-    public function testEncryptDecrypt()
+    public function testEncryptDecrypt(): void
     {
         $input = str_repeat('Hello world' . PHP_EOL, 1000);
 
@@ -47,8 +50,10 @@ class SymmetricCryptTest extends TestCase
 
     /**
      * Test encrypt & decrypt.
+     *
+     * @throws Exception
      */
-    public function testAuthenticatedEncryptDecrypt()
+    public function testAuthenticatedEncryptDecrypt(): void
     {
         $input = str_repeat('Hello world' . PHP_EOL, 1000);
 
@@ -75,8 +80,10 @@ class SymmetricCryptTest extends TestCase
 
     /**
      * Test error handling.
+     *
+     * @throws Exception
      */
-    public function testSslErrorOccurred()
+    public function testSslErrorOccurred(): void
     {
         /** @var Mock $mock */
         $mock = Mockery::mock(
@@ -114,13 +121,12 @@ class SymmetricCryptTest extends TestCase
      *
      * @expectedException \Limoncello\Crypt\Exceptions\CryptException
      */
-    public function testInvalidInputOnDecrypt1()
+    public function testInvalidInputOnDecrypt1(): void
     {
         $encrypted = 'too short';
 
         $crypt = new SymmetricCrypt('aes128', 'secret');
-        $decrypted = $crypt->decrypt($encrypted);
-        $this->assertNotEmpty($decrypted);
+        $crypt->decrypt($encrypted);
     }
 
     /**
@@ -128,16 +134,13 @@ class SymmetricCryptTest extends TestCase
      *
      * @expectedException \Limoncello\Crypt\Exceptions\CryptException
      */
-    public function testInvalidInputOnDecrypt2()
+    public function testInvalidInputOnDecrypt2(): void
     {
         // resembles IV but not enough characters for tag
         $encrypted = '1234567890123456_no_tag';
 
         $crypt = new SymmetricCrypt('aes-256-gcm', 'secret');
-        $decrypted = $crypt
-            ->enableAuthentication()
-            ->decrypt($encrypted);
-        $this->assertNotEmpty($decrypted);
+        $crypt->enableAuthentication()->decrypt($encrypted);
     }
 
     /**
@@ -145,20 +148,21 @@ class SymmetricCryptTest extends TestCase
      *
      * @expectedException \Limoncello\Crypt\Exceptions\CryptException
      */
-    public function testInvalidInputOnDecrypt3()
+    public function testInvalidInputOnDecrypt3(): void
     {
         // input resembles IV (16 symbols) but no encrypted data
         $encrypted = '1234567890123456';
 
         $crypt = new SymmetricCrypt('aes128', 'secret');
-        $decrypted = $crypt->decrypt($encrypted);
-        $this->assertNotEmpty($decrypted);
+        $crypt->decrypt($encrypted);
     }
 
     /**
      * Test compatibility with Open SSL CLI.
+     *
+     * @throws Exception
      */
-    public function testCompatibilityWithOpenSslCli()
+    public function testCompatibilityWithOpenSslCli(): void
     {
         // That's original text that was encoded
         $input = 'Hello world';

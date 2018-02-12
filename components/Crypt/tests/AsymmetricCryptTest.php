@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Crypt\PrivateKeyAsymmetricDecrypt;
 use Limoncello\Crypt\PrivateKeyAsymmetricEncrypt;
 use Limoncello\Crypt\PublicKeyAsymmetricDecrypt;
@@ -35,8 +36,10 @@ class AsymmetricCryptTest extends TestCase
 
     /**
      * Test encrypt & decrypt.
+     *
+     * @throws Exception
      */
-    public function testEncryptDecrypt1()
+    public function testEncryptDecrypt1(): void
     {
         $encrypt = new PublicKeyAsymmetricEncrypt(file_get_contents(self::PUBLIC_FILE));
         $decrypt = new PrivateKeyAsymmetricDecrypt('file://' . self::PRIVATE_FILE);
@@ -51,8 +54,10 @@ class AsymmetricCryptTest extends TestCase
 
     /**
      * Test encrypt & decrypt.
+     *
+     * @throws Exception
      */
-    public function testEncryptDecrypt2()
+    public function testEncryptDecrypt2(): void
     {
         $decrypt = new PublicKeyAsymmetricDecrypt(file_get_contents(self::PUBLIC_FILE));
         $encrypt = new PrivateKeyAsymmetricEncrypt('file://' . self::PRIVATE_FILE);
@@ -67,8 +72,10 @@ class AsymmetricCryptTest extends TestCase
 
     /**
      * Test encrypt & decrypt.
+     *
+     * @throws Exception
      */
-    public function testEncryptDecrypt3()
+    public function testEncryptDecrypt3(): void
     {
         $encrypt = new PublicKeyAsymmetricEncrypt(file_get_contents(self::PUBLIC_FILE));
         $decrypt = new PrivateKeyAsymmetricDecrypt('file://' . self::PRIVATE_FILE);
