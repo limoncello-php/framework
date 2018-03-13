@@ -22,10 +22,10 @@ use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
+use Limoncello\Flute\Adapters\BasicRelationshipPaginationStrategy;
 use Limoncello\Flute\Adapters\ModelQueryBuilder;
-use Limoncello\Flute\Adapters\PaginationStrategy;
 use Limoncello\Flute\Api\Crud;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
+use Limoncello\Flute\Contracts\Adapters\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
@@ -53,8 +53,6 @@ use stdClass;
 class CrudTest extends TestCase
 {
     const DEFAULT_PAGE = 3;
-
-    const DEFAULT_MAX_PAGE = 100;
 
     /**
      * @var Connection
@@ -1047,10 +1045,8 @@ class CrudTest extends TestCase
         $container[FactoryInterface::class]          = $factory = new Factory($container);
         $container[ModelSchemeInfoInterface::class]  = $modelSchemes = $this->getModelSchemes();
 
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(
-            self::DEFAULT_PAGE,
-            self::DEFAULT_MAX_PAGE
-        );
+        $container[RelationshipPaginationStrategyInterface::class] =
+            new BasicRelationshipPaginationStrategy(self::DEFAULT_PAGE);
 
         $crud = new $class($container);
 

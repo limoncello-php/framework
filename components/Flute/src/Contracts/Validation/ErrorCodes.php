@@ -50,8 +50,11 @@ interface ErrorCodes extends BaseErrorCodes
     /** Message code */
     const UNIQUE_IN_DATABASE_SINGLE = self::EXIST_IN_DATABASE_MULTIPLE + 1;
 
+    /** Message code */
+    const INVALID_OPERATION_ARGUMENTS = self::UNIQUE_IN_DATABASE_SINGLE + 1;
+
     // Special code for those who extend this enum
 
     /** Message code */
-    const FLUTE_LAST = self::UNIQUE_IN_DATABASE_SINGLE;
+    const FLUTE_LAST = self::INVALID_OPERATION_ARGUMENTS;
 }

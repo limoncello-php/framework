@@ -18,9 +18,9 @@
 
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
@@ -214,8 +214,8 @@ abstract class Schema extends BaseSchema implements SchemaInterface
 
         $buildUrl = function ($offset) use ($data, $uri) {
             $paramsWithPaging = [
-                PaginationStrategyInterface::PARAM_PAGING_OFFSET => $offset,
-                PaginationStrategyInterface::PARAM_PAGING_LIMIT  => $data->getLimit(),
+                JsonApiQueryValidatingParserInterface::PARAM_PAGING_OFFSET => $offset,
+                JsonApiQueryValidatingParserInterface::PARAM_PAGING_LIMIT  => $data->getLimit(),
             ];
             $fullUrl          = $uri . '?' . http_build_query($paramsWithPaging);
 

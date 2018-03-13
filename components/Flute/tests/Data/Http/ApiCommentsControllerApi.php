@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
+use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi as Api;
-use Limoncello\Tests\Flute\Data\Models\Comment;
+use Limoncello\Tests\Flute\Data\Models\Comment as Model;
 use Limoncello\Tests\Flute\Data\Schemes\CommentSchema as Schema;
-use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\CreateCommentRuleSet;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\CreateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadCommentsQueryRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadEmotionsFromCommentsQueryRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -41,11 +41,17 @@ class ApiCommentsControllerApi extends ApiBaseController
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
 
-    /** JSON API validation rules set class */
-    const ON_CREATE_VALIDATION_RULES_SET_CLASS = CreateCommentRuleSet::class;
+    /** @inheritdoc */
+    const ON_INDEX_QUERY_VALIDATION_RULES_CLASS = ReadCommentsQueryRules::class;
 
-    /** JSON API validation rules set class */
-    const ON_UPDATE_VALIDATION_RULES_SET_CLASS = UpdateCommentRuleSet::class;
+    /** @inheritdoc */
+    const ON_READ_QUERY_VALIDATION_RULES_CLASS = ReadCommentsQueryRules::class;
+
+    /** @inheritdoc */
+    const ON_CREATE_DATA_VALIDATION_RULES_CLASS = CreateCommentRules::class;
+
+    /** @inheritdoc */
+    const ON_UPDATE_DATA_VALIDATION_RULES_CLASS = UpdateCommentRules::class;
 
     /**
      * @param array                  $routeParams
@@ -62,9 +68,14 @@ class ApiCommentsControllerApi extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
-        return static::readRelationship($index, Comment::REL_EMOTIONS, $container, $request);
+        // Test deprecated method (coverage)
+        return static::readRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_EMOTIONS,
+            ReadEmotionsFromCommentsQueryRules::class,
+            $container,
+            $request
+        );
     }
 
     /**
@@ -82,9 +93,13 @@ class ApiCommentsControllerApi extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
-        return static::readRelationshipIdentifiers($index, Comment::REL_EMOTIONS, $container, $request);
+        return static::readRelationshipIdentifiers(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_EMOTIONS,
+            ReadEmotionsFromCommentsQueryRules::class,
+            $container,
+            $request
+        );
     }
 
     /**
@@ -102,9 +117,13 @@ class ApiCommentsControllerApi extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
-        return static::readRelationship($index, Comment::REL_USER, $container, $request);
+        return static::readRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_USER,
+            DefaultQueryValidationRules::class,
+            $container,
+            $request
+        );
     }
 
     /**
@@ -122,54 +141,12 @@ class ApiCommentsControllerApi extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
-        return static::readRelationship($index, Comment::REL_POST, $container, $request);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function configureOnIndexParser(QueryParserInterface $parser): QueryParserInterface
-    {
-        $parser = parent::configureOnIndexParser($parser);
-
-        self::configureParser($parser);
-
-        return $parser;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function configureOnReadParser(QueryParserInterface $parser): QueryParserInterface
-    {
-        $parser = parent::configureOnReadParser($parser);
-
-        self::configureParser($parser);
-
-        return $parser;
-    }
-
-    /**
-     * @param QueryParserInterface $parser
-     */
-    private static function configureParser(QueryParserInterface $parser): void
-    {
-        $parser
-            ->withAllowedFilterFields([
-                Schema::RESOURCE_ID,
-                Schema::ATTR_TEXT,
-                Schema::REL_POST,
-                Schema::REL_POST . '.' . PostSchema::ATTR_TEXT,
-                Schema::REL_EMOTIONS . '.' . EmotionSchema::ATTR_NAME,
-            ])
-            ->withAllowedSortFields([
-                Schema::RESOURCE_ID,
-                Schema::REL_POST,
-            ])
-            ->withAllowedIncludePaths([
-                Schema::REL_USER,
-            ]);
+        return static::readRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_POST,
+            DefaultQueryValidationRules::class,
+            $container,
+            $request
+        );
     }
 }

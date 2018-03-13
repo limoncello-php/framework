@@ -21,12 +21,13 @@ use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Http\Query\AttributeInterface;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
-use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Http\Query\RelationshipInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
 use Limoncello\Flute\Exceptions\LogicException;
+use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Neomerx\JsonApi\Document\Error;
 
 /**
@@ -47,10 +48,10 @@ class ParametersMapper implements ParametersMapperInterface
     public const MSG_ERR_ROOT_SCHEME_IS_NOT_SET = 'Root Scheme is not set.';
 
     /** Message */
-    private const MSG_PARAM_INCLUDE = QueryParserInterface::PARAM_INCLUDE;
+    private const MSG_PARAM_INCLUDE = BaseQueryParserInterface::PARAM_INCLUDE;
 
     /** Message */
-    private const MSG_PARAM_FILTER = QueryParserInterface::PARAM_FILTER;
+    private const MSG_PARAM_FILTER = BaseQueryParserInterface::PARAM_FILTER;
 
     /** internal constant */
     private const REL_FILTER_INDEX = 0;
@@ -276,8 +277,10 @@ class ParametersMapper implements ParametersMapperInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function applyQueryParameters(QueryParserInterface $parser, CrudInterface $api): CrudInterface
-    {
+    public function applyQueryParameters(
+        JsonApiQueryValidatingParserInterface $parser,
+        CrudInterface $api
+    ): CrudInterface {
         //
         // Paging
         //
@@ -331,6 +334,7 @@ class ParametersMapper implements ParametersMapperInterface
                 $attributeFilters[$attributeName] = $filter->getOperationsWithArguments();
             } else {
                 $relationshipName = $filter->getRelationship()->getNameInModel();
+
                 $relFiltersAndSorts[$relationshipName][self::REL_FILTER_INDEX][$attributeName] =
                     $filter->getOperationsWithArguments();
             }
@@ -342,6 +346,7 @@ class ParametersMapper implements ParametersMapperInterface
                 $attributeSorts[$attributeName] = $sort->isAsc();
             } else {
                 $relationshipName = $sort->getRelationship()->getNameInModel();
+
                 $relFiltersAndSorts[$relationshipName][self::REL_SORT_INDEX][$attributeName] = $sort->isAsc();
             }
         }

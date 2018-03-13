@@ -21,8 +21,9 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Package\FluteSettings as S;
-use Limoncello\Flute\Validation\Form\Validator;
+use Limoncello\Flute\Validation\Form\FormValidator;
 use Limoncello\Flute\Validation\Traits\HasValidationFormatterTrait;
+use Limoncello\Validation\Execution\ContextStorage;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -42,15 +43,22 @@ class FormValidatorFactory implements FormValidatorFactoryInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function createValidator(string $class): FormValidatorInterface
+    public function createValidator(string $rulesClass): FormValidatorInterface
     {
         /** @var SettingsProviderInterface $settingsProvider */
         $settingsProvider = $this->getContainer()->get(SettingsProviderInterface::class);
-        $settings         = $settingsProvider->get(S::class);
-        $ruleSetsData     = $settings[S::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA];
-        $formatter        = $this->createValidationFormatter();
-        $validator        = new Validator($class, $ruleSetsData, $this->getContainer(), $formatter);
+        $serializedData   = S::getFormSerializedRules($settingsProvider->get(S::class));
+
+        $validator = new FormValidator(
+            $rulesClass,
+            FormRulesSerializer::class,
+            $serializedData,
+            new ContextStorage(FormRulesSerializer::readBlocks($serializedData), $this->getContainer()),
+            $this->createValidationFormatter()
+        );
 
         return $validator;
     }

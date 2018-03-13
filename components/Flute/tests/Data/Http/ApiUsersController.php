@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
+use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\UsersApi as Api;
+use Limoncello\Tests\Flute\Data\Models\User as Model;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema as Schema;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateUserMinimalRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateUserMinimalRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadUsersQueryRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -37,8 +39,14 @@ class ApiUsersController extends ApiBaseController
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
 
+    /** @inheritdoc */
+    const ON_INDEX_QUERY_VALIDATION_RULES_CLASS = ReadUsersQueryRules::class;
+
+    /** @inheritdoc */
+    const ON_READ_QUERY_VALIDATION_RULES_CLASS = ReadUsersQueryRules::class;
+
     /** JSON API validation rules set class */
-    const ON_UPDATE_VALIDATION_RULES_SET_CLASS = UpdateUserMinimalRuleSet::class;
+    const ON_UPDATE_DATA_VALIDATION_RULES_CLASS = UpdateUserMinimalRules::class;
 
     /**
      * @param array                  $routeParams
@@ -55,9 +63,12 @@ class ApiUsersController extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
+        $index = $routeParams[static::ROUTE_KEY_INDEX];
+
         return static::readRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
-            Schema::REL_POSTS,
+            $index,
+            Model::REL_AUTHORED_POSTS,
+            DefaultQueryValidationRules::class,
             $container,
             $request
         );
@@ -80,42 +91,12 @@ class ApiUsersController extends ApiBaseController
     ): ResponseInterface {
         $index = $routeParams[static::ROUTE_KEY_INDEX];
 
-        return static::readRelationship($index, Schema::REL_COMMENTS, $container, $request);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function configureOnIndexParser(QueryParserInterface $parser): QueryParserInterface
-    {
-        $parser = parent::configureOnIndexParser($parser);
-
-        self::configureParser($parser);
-
-        return $parser;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function configureOnReadParser(QueryParserInterface $parser): QueryParserInterface
-    {
-        $parser = parent::configureOnReadParser($parser);
-
-        self::configureParser($parser);
-
-        return $parser;
-    }
-
-    /**
-     * @param QueryParserInterface $parser
-     */
-    private static function configureParser(QueryParserInterface $parser): void
-    {
-        $parser
-            ->withAllowedFilterFields([
-                Schema::REL_POSTS,
-                Schema::REL_COMMENTS,
-            ]);
+        return static::readRelationship(
+            $index,
+            Model::REL_COMMENTS,
+            DefaultQueryValidationRules::class,
+            $container,
+            $request
+        );
     }
 }

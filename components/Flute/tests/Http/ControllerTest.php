@@ -25,21 +25,19 @@ use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Flute\Adapters\PaginationStrategy;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
+use Limoncello\Flute\Adapters\BasicRelationshipPaginationStrategy;
+use Limoncello\Flute\Contracts\Adapters\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
-use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
-use Limoncello\Flute\Http\Query\QueryParser;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
-use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiValidatorFactory;
+use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiParserFactory;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Http\ApiBoardsController;
 use Limoncello\Tests\Flute\Data\Http\ApiCategoriesController;
@@ -281,6 +279,9 @@ class ControllerTest extends TestCase
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
+        $uri = new Uri('http://localhost.local/comments?' . http_build_query($queryParams));
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn($uri);
+
 
         /** @var ServerRequestInterface $request */
 
@@ -323,15 +324,15 @@ class ControllerTest extends TestCase
 
         /** @var ServerRequestInterface $request */
 
-        $response = ApiBoardsController::index($routeParams, $container, $request);
-        $this->assertNotNull($response);
-        $this->assertEquals(200, $response->getStatusCode());
+        $exception = null;
+        try {
+            ApiBoardsController::index($routeParams, $container, $request);
+        } catch (JsonApiException $exception) {
+        }
+        $this->assertNotNull($exception);
 
-        // invalid params are ignored so it will not have any effect.
-        $body      = (string)($response->getBody());
-        $resources = json_decode($body, true);
-        // manually checked without any filters it will have same amount of results.
-        $this->assertCount(5, $resources[DocumentInterface::KEYWORD_DATA]);
+        $this->assertCount(1, $exception->getErrors());
+        $this->assertEquals(['parameter' => 'filter'], $exception->getErrors()->getArrayCopy()[0]->getSource());
     }
 
     /**
@@ -356,7 +357,7 @@ class ControllerTest extends TestCase
         /** @var ServerRequestInterface $request */
 
         // replace paging strategy to get paginated results in the relationship
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(3, 100);
+        $container[RelationshipPaginationStrategyInterface::class] = new BasicRelationshipPaginationStrategy(3);
 
         $response = ApiBoardsController::index($routeParams, $container, $request);
         $this->assertNotNull($response);
@@ -366,8 +367,8 @@ class ControllerTest extends TestCase
         $resource = json_decode($body, true);
 
         // check reply has resource included
-        $this->assertCount(7, $resource[DocumentInterface::KEYWORD_INCLUDED]);
-        $this->assertCount(3, $resource[DocumentInterface::KEYWORD_DATA]);
+        $this->assertCount(13, $resource[DocumentInterface::KEYWORD_INCLUDED]);
+        $this->assertCount(5, $resource[DocumentInterface::KEYWORD_DATA]);
         // check response sorted by post.id
         $this->assertEquals(1, $resource['data'][0]['id']);
         $this->assertEquals(2, $resource['data'][1]['id']);
@@ -440,7 +441,7 @@ class ControllerTest extends TestCase
         /** @var ServerRequestInterface $request */
 
         // replace paging strategy to get paginated results in the relationship
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(3, 100);
+        $container[RelationshipPaginationStrategyInterface::class] = new BasicRelationshipPaginationStrategy(3);
 
         $response = ApiCommentsControllerApi::readUser($routeParams, $container, $request);
         $this->assertNotNull($response);
@@ -761,6 +762,7 @@ EOT;
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri('http://localhost.local/comments'));
 
         /** @var ServerRequestInterface $request */
 
@@ -804,6 +806,7 @@ EOT;
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri('http://localhost.local/comments'));
 
         /** @var ServerRequestInterface $request */
 
@@ -835,6 +838,7 @@ EOT;
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri('http://localhost.local/comments'));
 
         /** @var ServerRequestInterface $request */
 
@@ -1297,19 +1301,15 @@ EOT;
 
         $container[JsonSchemesInterface::class] = $jsonSchemes = $this->getJsonSchemes($factory, $modelSchemes);
 
-        $container[QueryParserInterface::class] = function (PsrContainerInterface $container) {
-            return new QueryParser($container->get(PaginationStrategyInterface::class));
-        };
-
         $container[ParametersMapperInterface::class] = function (PsrContainerInterface $container) {
             return new ParametersMapper($container->get(JsonSchemesInterface::class));
         };
 
-        $container[Connection::class]                  = $connection = $this->initDb();
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(10, 100);
+        $container[Connection::class]                              = $connection = $this->initDb();
+        $container[RelationshipPaginationStrategyInterface::class] = new BasicRelationshipPaginationStrategy(10);
 
         $appConfig                                        = [
-            ApplicationConfigurationInterface::KEY_ROUTES_FOLDER =>
+            ApplicationConfigurationInterface::KEY_ROUTES_FOLDER          =>
                 implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Http']),
             ApplicationConfigurationInterface::KEY_WEB_CONTROLLERS_FOLDER =>
                 implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Http']),
@@ -1356,8 +1356,8 @@ EOT;
                 return $encoder;
             };
 
-        $container[JsonApiValidatorFactoryInterface::class] = function (ContainerInterface $container) {
-            $factory = new JsonApiValidatorFactory($container);
+        $container[JsonApiParserFactoryInterface::class] = function (ContainerInterface $container) {
+            $factory = new JsonApiParserFactory($container);
 
             return $factory;
         };

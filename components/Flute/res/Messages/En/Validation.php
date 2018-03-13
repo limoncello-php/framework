@@ -23,7 +23,7 @@ use Limoncello\Validation\I18n\EnUsLocale;
 /**
  * @package Limoncello\Flute
  */
-class Validation implements MessageStorageInterface
+class Validation implements MessageStorageInterface, ErrorCodes
 {
     /**
      * @inheritdoc
@@ -34,15 +34,16 @@ class Validation implements MessageStorageInterface
             EnUsLocale::MESSAGES +
 
             [
-                ErrorCodes::TYPE_MISSING               => 'JSON API type should be specified.',
-                ErrorCodes::INVALID_ATTRIBUTES         => 'JSON API attributes are invalid.',
-                ErrorCodes::UNKNOWN_ATTRIBUTE          => 'Unknown JSON API attribute.',
-                ErrorCodes::INVALID_RELATIONSHIP_TYPE  => 'The value should be a valid JSON API relationship type.',
-                ErrorCodes::INVALID_RELATIONSHIP       => 'Invalid JSON API relationship.',
-                ErrorCodes::UNKNOWN_RELATIONSHIP       => 'Unknown JSON API relationship.',
-                ErrorCodes::EXIST_IN_DATABASE_SINGLE   => 'The value should be a valid identifier.',
-                ErrorCodes::EXIST_IN_DATABASE_MULTIPLE => 'The value should be valid identifiers.',
-                ErrorCodes::UNIQUE_IN_DATABASE_SINGLE  => 'The value should be a unique identifier.',
+                static::TYPE_MISSING                => 'JSON API type should be specified.',
+                static::INVALID_ATTRIBUTES          => 'JSON API attributes are invalid.',
+                static::UNKNOWN_ATTRIBUTE           => 'Unknown JSON API attribute.',
+                static::INVALID_RELATIONSHIP_TYPE   => 'The value should be a valid JSON API relationship type.',
+                static::INVALID_RELATIONSHIP        => 'Invalid JSON API relationship.',
+                static::UNKNOWN_RELATIONSHIP        => 'Unknown JSON API relationship.',
+                static::EXIST_IN_DATABASE_SINGLE    => 'The value should be a valid identifier.',
+                static::EXIST_IN_DATABASE_MULTIPLE  => 'The value should be valid identifiers.',
+                static::UNIQUE_IN_DATABASE_SINGLE   => 'The value should be a unique identifier.',
+                static::INVALID_OPERATION_ARGUMENTS => 'Invalid Operation Arguments.',
             ];
     }
 }

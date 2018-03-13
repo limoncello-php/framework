@@ -45,9 +45,9 @@ use Limoncello\Tests\Flute\Data\Schemes\RoleSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\CreateCommentRuleSet;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateCommentRuleSet;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateUserMinimalRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\CreateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateUserMinimalRules;
 use Mockery;
 
 /**
@@ -252,9 +252,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function getJsonValidationRuleSets()
     {
         return [
-            CreateCommentRuleSet::class,
-            UpdateCommentRuleSet::class,
-            UpdateUserMinimalRuleSet::class,
+            CreateCommentRules::class,
+            UpdateCommentRules::class,
+            UpdateUserMinimalRules::class,
         ];
     }
 
@@ -264,7 +264,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function getFormValidationRuleSets()
     {
         return [
-            Data\Validation\FormRuleSets\CreateCommentRuleSet::class,
+            Data\Validation\Forms\CreateCommentRules::class,
         ];
     }
 
@@ -274,7 +274,13 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function getQueryValidationRuleSets()
     {
         return [
-            Data\Validation\QueryRuleSets\CreateCommentRuleSet::class,
+            Data\Validation\JsonQueries\AllowEverythingRules::class,
+            Data\Validation\JsonQueries\CommentsIndexRules::class,
+            Data\Validation\JsonQueries\ReadCommentsQueryRules::class,
+            Data\Validation\JsonQueries\ReadBoardsQueryRules::class,
+            Data\Validation\JsonQueries\ReadCategoriesQueryRules::class,
+            Data\Validation\JsonQueries\ReadUsersQueryRules::class,
+            Data\Validation\JsonQueries\ReadEmotionsFromCommentsQueryRules::class,
         ];
     }
 }

@@ -17,9 +17,9 @@
  */
 
 use Closure;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
@@ -128,8 +128,8 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
         return function ($offset) use ($pageSize, $queryParams) {
             $paramsWithPaging = array_merge($queryParams, [
                 BaseQueryParserInterface::PARAM_PAGE => [
-                    PaginationStrategyInterface::PARAM_PAGING_OFFSET => $offset,
-                    PaginationStrategyInterface::PARAM_PAGING_LIMIT  => $pageSize,
+                    JsonApiQueryValidatingParserInterface::PARAM_PAGING_OFFSET => $offset,
+                    JsonApiQueryValidatingParserInterface::PARAM_PAGING_LIMIT  => $pageSize,
                 ],
             ]);
             $newUri           = $this->getOriginalUri()->withQuery(http_build_query($paramsWithPaging));

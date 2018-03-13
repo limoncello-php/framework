@@ -77,6 +77,16 @@ class JsonApiErrorCollection extends ErrorCollection
     }
 
     /**
+     * @inheritdoc
+     */
+    public function addValidationQueryError(string $paramName, ErrorInterface $error)
+    {
+        $title  = $this->getInvalidValueMessage();
+        $detail = $this->getValidationMessage($error);
+        $this->addQueryParameterError($paramName, $title, $detail, $this->getErrorStatus());
+    }
+
+    /**
      * @return int
      */
     protected function getErrorStatus(): int

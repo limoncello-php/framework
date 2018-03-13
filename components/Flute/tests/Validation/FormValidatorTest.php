@@ -18,14 +18,15 @@
 
 use Exception;
 use Generator;
-use Limoncello\Container\Container;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
-use Limoncello\Flute\Package\FluteSettings as C;
-use Limoncello\Flute\Validation\Form\Execution\AttributeRulesSerializer;
-use Limoncello\Flute\Validation\Form\Validator;
+use Limoncello\Flute\Package\FluteSettings;
+use Limoncello\Flute\Validation\Form\Execution\FormRulesSerializer;
+use Limoncello\Flute\Validation\Form\FormValidator;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
-use Limoncello\Tests\Flute\Data\Validation\FormRuleSets\CreateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\Forms\CreateCommentRules;
+use Limoncello\Validation\Execution\BlockSerializer;
+use Limoncello\Validation\Execution\ContextStorage;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,7 +41,7 @@ class FormValidatorTest extends TestCase
      */
     public function testValidator(): void
     {
-        $this->assertNotNull($validator = $this->createValidator(CreateCommentRuleSet::getAttributeRules()));
+        $this->assertNotNull($validator = $this->createValidator(CreateCommentRules::class));
 
         $this->assertTrue($validator->validate([Comment::FIELD_TEXT => 'some text']));
         $this->assertFalse($validator->validate([Comment::FIELD_TEXT => false]));
@@ -59,7 +60,7 @@ class FormValidatorTest extends TestCase
      */
     public function testInvalidInput(): void
     {
-        $this->assertNotNull($validator = $this->createValidator(CreateCommentRuleSet::getAttributeRules()));
+        $this->assertNotNull($validator = $this->createValidator(CreateCommentRules::class));
 
         $validator->validate('not array');
     }
@@ -75,19 +76,23 @@ class FormValidatorTest extends TestCase
     }
 
     /**
-     * @param array $attributeRules
+     * @param string $rulesClass
      *
      * @return FormValidatorInterface
      */
-    private function createValidator(array $attributeRules): FormValidatorInterface
+    private function createValidator(string $rulesClass): FormValidatorInterface
     {
-        $name      = 'typically_a_class_name';
-        $container = new Container();
+        $serializer = new FormRulesSerializer(new BlockSerializer());
+        $serializer->addRulesFromClass($rulesClass);
 
-        $data    = (new AttributeRulesSerializer())->addResourceRules($name, $attributeRules)->getData();
-        $factory = new FormatterFactory();
-
-        $validator = new Validator($name, $data, $container, $factory->createFormatter(C::VALIDATION_NAMESPACE));
+        $container = null;
+        $validator = new FormValidator(
+            $rulesClass,
+            FormRulesSerializer::class,
+            $serializer->getData(),
+            new ContextStorage($serializer->getBlocks(), $container),
+            (new FormatterFactory())->createFormatter(FluteSettings::VALIDATION_NAMESPACE)
+        );
 
         return $validator;
     }
