@@ -16,10 +16,10 @@
     "require": {
         "php": ">=7.1.0",
         "pimple/pimple": "^3.0",
-        "limoncello-php/contracts": "^0.8.0"
+        "limoncello-php/contracts": "^0.9.0"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "^3.2",
+        "squizlabs/php_codesniffer": "^2.9",
         "phpmd/phpmd": "^2.4",
         "scrutinizer/ocular": "^1.4",
         "phpunit/phpunit": "^7.0"
@@ -46,7 +46,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "0.8.x-dev"
+            "dev-develop": "0.9.x-dev"
         }
     }
 }
