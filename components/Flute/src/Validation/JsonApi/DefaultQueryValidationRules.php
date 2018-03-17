@@ -47,7 +47,7 @@ class DefaultQueryValidationRules implements JsonApiQueryRulesInterface
      */
     public static function getSortsRule(): ?RuleInterface
     {
-        return null;
+        return r::fail();
     }
 
     /**
@@ -55,7 +55,7 @@ class DefaultQueryValidationRules implements JsonApiQueryRulesInterface
      */
     public static function getIncludesRule(): ?RuleInterface
     {
-        return null;
+        return r::fail();
     }
 
     /**
