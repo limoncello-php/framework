@@ -80,7 +80,10 @@ class DefaultQueryValidationRules implements JsonApiQueryRulesInterface
      */
     public static function getPageLimitRule(): ?RuleInterface
     {
-        return static::getPageLimitRuleForDefaultAndMaxSizes();
+        return static::getPageLimitRuleForDefaultAndMaxSizes(
+            FluteSettings::DEFAULT_PAGE_SIZE,
+            FluteSettings::DEFAULT_MAX_PAGE_SIZE
+        );
     }
 
     /**
@@ -91,10 +94,8 @@ class DefaultQueryValidationRules implements JsonApiQueryRulesInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function getPageLimitRuleForDefaultAndMaxSizes(
-        int $defaultSize = FluteSettings::DEFAULT_PAGE_SIZE,
-        int $maxSize = FluteSettings::DEFAULT_MAX_PAGE_SIZE
-    ): RuleInterface {
+    public static function getPageLimitRuleForDefaultAndMaxSizes(int $defaultSize, int $maxSize): RuleInterface
+    {
         assert($maxSize > 1 && $defaultSize <= $maxSize);
 
         // if not given (`null` as an input) then default value otherwise input should be integer 1 <= value <= max
