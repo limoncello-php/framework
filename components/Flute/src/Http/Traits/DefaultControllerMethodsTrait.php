@@ -550,6 +550,7 @@ trait DefaultControllerMethodsTrait
         ContainerInterface $container,
         string $schemaClass
     ): ParametersMapperInterface {
+        static::assertClassValueDefined(static::SCHEMA_CLASS);
         static::assertClassImplements($schemaClass, SchemaInterface::class);
 
         /** @var SchemaInterface $schemaClass */
@@ -663,7 +664,7 @@ trait DefaultControllerMethodsTrait
      *
      * @return void
      */
-    protected static function assertClassValueDefined(?string $value): void
+    private static function assertClassValueDefined(?string $value): void
     {
         assert(empty($value) === false, 'Value should be defined in `' . static::class . '`.');
     }
@@ -674,7 +675,7 @@ trait DefaultControllerMethodsTrait
      *
      * @return void
      */
-    protected static function assertClassImplements(string $class, string $interface): void
+    private static function assertClassImplements(string $class, string $interface): void
     {
         assert(
             array_key_exists($interface, class_implements($class)) === true,
