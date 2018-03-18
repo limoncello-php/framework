@@ -476,7 +476,7 @@ trait DefaultControllerMethodsTrait
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    protected static function createQueryValidator(
+    protected static function createQueryParser(
         ContainerInterface $container,
         string $rulesClass = DefaultQueryValidationRules::class
     ): JsonApiQueryValidatingParserInterface {
@@ -498,7 +498,7 @@ trait DefaultControllerMethodsTrait
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    protected static function createDataValidator(
+    protected static function createDataParser(
         ContainerInterface $container,
         string $rulesClass
     ): JsonApiDataValidatingParserInterface {
