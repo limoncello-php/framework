@@ -550,11 +550,9 @@ trait DefaultControllerMethodsTrait
         ContainerInterface $container,
         string $schemaClass
     ): ParametersMapperInterface {
-        static::assertClassValueDefined(static::SCHEMA_CLASS);
         static::assertClassImplements($schemaClass, SchemaInterface::class);
 
         /** @var SchemaInterface $schemaClass */
-        $schemaClass      = static::SCHEMA_CLASS;
         $jsonResourceType = $schemaClass::TYPE;
 
         /** @var ParametersMapperInterface $mapper */
