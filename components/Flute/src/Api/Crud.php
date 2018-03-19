@@ -561,11 +561,11 @@ class Crud implements CrudInterface
     }
 
     /**
-     * @param QueryBuilder $builder
+     * @param ModelQueryBuilder $builder
      *
-     * @return QueryBuilder
+     * @return ModelQueryBuilder
      */
-    protected function builderOnCount(QueryBuilder $builder): QueryBuilder
+    protected function builderOnCount(ModelQueryBuilder $builder): ModelQueryBuilder
     {
         return $builder;
     }
@@ -1337,11 +1337,11 @@ class Crud implements CrudInterface
     /**
      * @param QueryBuilder $builder
      *
-     * @return QueryBuilder
+     * @return ModelQueryBuilder
      */
-    protected function createCountBuilderFromBuilder(QueryBuilder $builder): QueryBuilder
+    protected function createCountBuilderFromBuilder(QueryBuilder $builder): ModelQueryBuilder
     {
-        $countBuilder = $this->getConnection()->createQueryBuilder();
+        $countBuilder = $this->createBuilder($this->getModelClass());
         $countBuilder->setParameters($builder->getParameters());
         $countBuilder->select('COUNT(*)')->from('(' . $builder->getSQL() . ') AS RESULT');
 
