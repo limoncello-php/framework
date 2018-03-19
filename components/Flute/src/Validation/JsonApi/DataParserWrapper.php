@@ -29,7 +29,7 @@ abstract class DataParserWrapper implements JsonApiDataValidatingParserInterface
     /**
      * @var JsonApiDataValidatingParserInterface
      */
-    private $validator;
+    private $parser;
 
     /**
      * @var int
@@ -52,14 +52,14 @@ abstract class DataParserWrapper implements JsonApiDataValidatingParserInterface
     private $overrideNotReplace;
 
     /**
-     * @param JsonApiDataValidatingParserInterface $validator
+     * @param JsonApiDataValidatingParserInterface $parser
      * @param int                                  $httpErrorCode
      */
     public function __construct(
-        JsonApiDataValidatingParserInterface $validator,
+        JsonApiDataValidatingParserInterface $parser,
         int $httpErrorCode = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
-        $this->validator     = $validator;
+        $this->parser        = $parser;
         $this->httpErrorCode = $httpErrorCode;
 
         $this->initWrapper();
@@ -187,7 +187,7 @@ abstract class DataParserWrapper implements JsonApiDataValidatingParserInterface
      */
     protected function getWrappedParser(): JsonApiDataValidatingParserInterface
     {
-        return $this->validator;
+        return $this->parser;
     }
 
     /**
