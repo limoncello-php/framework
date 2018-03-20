@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Types\DateTimeStringType;
+use Limoncello\Flute\Types\DateTimeType;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class SystemDateTimeType extends DateTimeStringType
+class SystemDateTimeType extends DateTimeType
 {
 }

@@ -18,6 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Types\Type;
 use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
@@ -43,6 +44,7 @@ use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
 use Limoncello\Tests\Flute\Data\Models\User;
+use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Limoncello\Tests\Flute\TestCase;
 use PDO;
 use stdClass;
@@ -1047,6 +1049,10 @@ class CrudTest extends TestCase
 
         $container[RelationshipPaginationStrategyInterface::class] =
             new BasicRelationshipPaginationStrategy(self::DEFAULT_PAGE);
+
+        if (Type::hasType(SystemDateTimeType::NAME) === false) {
+            Type::addType(SystemDateTimeType::NAME, SystemDateTimeType::class);
+        }
 
         $crud = new $class($container);
 

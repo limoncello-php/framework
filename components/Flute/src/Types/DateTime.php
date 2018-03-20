@@ -16,34 +16,24 @@
  * limitations under the License.
  */
 
-use DateTime;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\Type;
+use DateTimeImmutable;
+use JsonSerializable;
 
 /**
+ * Wrapper class for `DateTimeInterface` value with JSON serialization support.
+ *
  * @package Limoncello\Flute
  */
-abstract class DateBaseType extends Type
+class DateTime extends DateTimeImmutable implements JsonSerializable
 {
-    /** Type name */
-    const NAME = null;
-
     /** DateTime format */
-    const JSON_API_FORMAT = DateTime::ISO8601;
+    const JSON_API_FORMAT = self::ISO8601;
 
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function jsonSerialize()
     {
-        return static::NAME;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
-    {
-        return $platform->getDateTypeDeclarationSQL($fieldDeclaration);
+        return $this->format(static::JSON_API_FORMAT);
     }
 }

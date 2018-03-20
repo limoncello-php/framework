@@ -29,7 +29,7 @@ use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Resources\Messages\En\Generic;
 use Limoncello\Flute\Resources\Messages\En\Validation;
-use Limoncello\Flute\Types\DateBaseType;
+use Limoncello\Flute\Types\DateTime;
 use Limoncello\Flute\Validation\JsonApi\DataParser;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiDataRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
@@ -70,7 +70,7 @@ class DataParserTest extends TestCase
         $float     = 3.21;
         $bool      = true;
         $now       = new DateTimeImmutable();
-        $dateTime  = $now->format(DateBaseType::JSON_API_FORMAT);
+        $dateTime  = $now->format(DateTime::JSON_API_FORMAT);
         $jsonInput = <<<EOT
         {
             "data" : {
@@ -110,7 +110,7 @@ EOT;
                 CommentSchema::ATTR_INT       => v::isString(v::stringToInt()),
                 CommentSchema::ATTR_FLOAT     => v::isString(v::stringToFloat()),
                 CommentSchema::ATTR_BOOL      => v::isString(v::stringToBool()),
-                CommentSchema::ATTR_DATE_TIME => v::isString(v::stringToDateTime(DateBaseType::JSON_API_FORMAT)),
+                CommentSchema::ATTR_DATE_TIME => v::isString(v::stringToDateTime(DateTime::JSON_API_FORMAT)),
             ],
             [
                 CommentSchema::REL_USER => v::toOneRelationship(UserSchema::TYPE, v::stringToInt(v::between(0, 15))),

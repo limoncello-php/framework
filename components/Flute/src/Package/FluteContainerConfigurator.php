@@ -19,10 +19,8 @@ use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
 use Limoncello\Flute\Http\ThrowableHandlers\FluteThrowableHandler;
-use Limoncello\Flute\Types\DateJsonApiStringType;
-use Limoncello\Flute\Types\DateTimeJsonApiStringType;
-use Limoncello\Flute\Types\JsonApiDateTimeType;
-use Limoncello\Flute\Types\JsonApiDateType;
+use Limoncello\Flute\Types\DateTimeType;
+use Limoncello\Flute\Types\DateType;
 use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiParserFactory;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
@@ -95,18 +93,8 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
         };
 
         // register date/date time types
-        if (Type::hasType(DateTimeJsonApiStringType::NAME) === false) {
-            Type::addType(DateTimeJsonApiStringType::NAME, DateTimeJsonApiStringType::class);
-        }
-        if (Type::hasType(DateJsonApiStringType::NAME) === false) {
-            Type::addType(DateJsonApiStringType::NAME, DateJsonApiStringType::class);
-        }
-        if (Type::hasType(JsonApiDateTimeType::NAME) === false) {
-            Type::addType(JsonApiDateTimeType::NAME, JsonApiDateTimeType::class);
-        }
-        if (Type::hasType(JsonApiDateType::NAME) === false) {
-            Type::addType(JsonApiDateType::NAME, JsonApiDateType::class);
-        }
+        Type::hasType(DateTimeType::NAME) === true ?: Type::addType(DateTimeType::NAME, DateTimeType::class);
+        Type::hasType(DateType::NAME) === true ?: Type::addType(DateType::NAME, DateType::class);
     }
 
     /**

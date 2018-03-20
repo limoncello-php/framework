@@ -16,45 +16,52 @@
  * limitations under the License.
  */
 
-use DateTime;
 use DateTimeInterface;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\DateType;
+use Limoncello\Flute\Types\DateTime as JsonApiDateTime;
 
 /**
  * @package Limoncello\Flute
  */
-class JsonApiDateType extends DateType
+trait TypeTrait
 {
-    /** Type name */
-    const NAME = 'limoncelloDate';
-
     /**
-     * @inheritdoc
+     * @param DateTimeInterface $dateTime
+     *
+     * @return JsonApiDateTime
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    private function convertToJsonApiDateTime(DateTimeInterface $dateTime): JsonApiDateTime
     {
-        $dateOrNot = parent::convertToPHPValue($value, $platform);
+        $utcTimestamp = $dateTime->getTimestamp();
 
-        return $dateOrNot instanceof DateTimeInterface ? new JsonApiDateTime($dateOrNot) : $dateOrNot;
+        // yes, PHP DateTime constructor can only accept timestamp as a string ¯\_( ͡° ͜ʖ ͡°)_/¯
+        return new JsonApiDateTime("@$utcTimestamp");
     }
 
     /**
-     * @inheritdoc
+     * @param string|DateTimeInterface $value
+     * @param string                   $nonJsonFormat
+     * @param string                   $typeName
+     *
+     * @return DateTimeInterface
+     * @throws ConversionException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
-    {
+    private function convertToDateTimeFromString(
+        $value,
+        string $nonJsonFormat,
+        string $typeName
+    ): DateTimeInterface {
         if ($value instanceof DateTimeInterface || $value === null) {
-            $date = $value;
-        } elseif ($value instanceof JsonApiDateTime) {
-            $date = $value->getValue();
+            $result = $value;
         } elseif (is_string($value) === true) {
-            if (($date = DateTime::createFromFormat(JsonApiDateTimeType::JSON_API_FORMAT, $value)) === false) {
-                throw ConversionException::conversionFailed($value, $this->getName());
+            $result = JsonApiDateTime::createFromFormat($nonJsonFormat, $value);
+            $result = $result !== false ?
+                $result : JsonApiDateTime::createFromFormat(JsonApiDateTime::JSON_API_FORMAT, $value);
+            if ($result === false) {
+                throw ConversionException::conversionFailed($value, $typeName);
             }
         } else {
             throw ConversionException::conversionFailedInvalidType(
@@ -64,6 +71,6 @@ class JsonApiDateType extends DateType
             );
         }
 
-        return parent::convertToDatabaseValue($date, $platform);
+        return $result;
     }
 }

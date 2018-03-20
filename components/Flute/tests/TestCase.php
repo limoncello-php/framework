@@ -19,7 +19,6 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Types\Type;
 use Exception;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
@@ -44,7 +43,6 @@ use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
 use Limoncello\Tests\Flute\Data\Schemes\RoleSchema;
 use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
-use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\CreateCommentRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateCommentRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateUserMinimalRules;
@@ -146,10 +144,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         parent::setUp();
-
-        if (Type::hasType(SystemDateTimeType::NAME) === false) {
-            Type::addType(SystemDateTimeType::NAME, SystemDateTimeType::class);
-        }
     }
 
     /**
