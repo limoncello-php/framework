@@ -714,13 +714,44 @@ trait DefaultControllerMethodsTrait
     }
 
     /**
+     * Developers can override the method in order to add/remove some data for `create`/`update` inputs.
+     *
+     * @param string                    $requestBody
+     * @param FactoryInterface          $errorFactory
+     * @param FormatterFactoryInterface $formatterFactory
+     * @param string                    $messagesNamespace
+     * @param string                    $errorMessage
+     *
+     * @return array
+     */
+    protected static function readJsonFromRequest(
+        string $requestBody,
+        FactoryInterface $errorFactory,
+        FormatterFactoryInterface $formatterFactory,
+        string $messagesNamespace = S::GENERIC_NAMESPACE,
+        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
+    ): array {
+        if (empty($requestBody) === true || ($json = json_decode($requestBody, true)) === null) {
+            $formatter = $formatterFactory->createFormatter($messagesNamespace);
+            $errors    = $errorFactory->createErrorCollection();
+            $errors->addDataError($formatter->formatMessage($errorMessage));
+
+            throw new JsonApiException($errors);
+        }
+
+        return $json;
+    }
+
+    /**
+     * Developers can override the method in order to use custom data mapping from a Schema to Model.
+     *
      * @param array                    $captures
      * @param string                   $schemeClass
      * @param ModelSchemeInfoInterface $schemeInfo
      *
      * @return array
      */
-    private static function mapSchemeDataToModelData(
+    protected static function mapSchemeDataToModelData(
         array $captures,
         string $schemeClass,
         ModelSchemeInfoInterface $schemeInfo
@@ -756,33 +787,6 @@ trait DefaultControllerMethodsTrait
         $result = [$index, $fields, $toManyIndexes];
 
         return $result;
-    }
-
-    /**
-     * @param string                    $requestBody
-     * @param FactoryInterface          $errorFactory
-     * @param FormatterFactoryInterface $formatterFactory
-     * @param string                    $messagesNamespace
-     * @param string                    $errorMessage
-     *
-     * @return array
-     */
-    private static function readJsonFromRequest(
-        string $requestBody,
-        FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory,
-        string $messagesNamespace = S::GENERIC_NAMESPACE,
-        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
-    ): array {
-        if (empty($requestBody) === true || ($json = json_decode($requestBody, true)) === null) {
-            $formatter = $formatterFactory->createFormatter($messagesNamespace);
-            $errors    = $errorFactory->createErrorCollection();
-            $errors->addDataError($formatter->formatMessage($errorMessage));
-
-            throw new JsonApiException($errors);
-        }
-
-        return $json;
     }
 
     /**
