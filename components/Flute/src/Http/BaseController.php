@@ -67,12 +67,12 @@ abstract class BaseController implements ControllerInterface
         static::assertClassValueDefined(static::SCHEMA_CLASS);
         static::assertClassValueDefined(static::ON_INDEX_QUERY_VALIDATION_RULES_CLASS);
 
-        return static::defaultIndex(
+        return static::defaultIndexHandler(
             $request->getQueryParams(),
             $request->getUri(),
-            static::createQueryParser($container, static::ON_INDEX_QUERY_VALIDATION_RULES_CLASS),
-            static::createParameterMapper($container, static::SCHEMA_CLASS),
-            static::createApi($container, static::API_CLASS),
+            static::defaultCreateQueryParser($container, static::ON_INDEX_QUERY_VALIDATION_RULES_CLASS),
+            static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
+            static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
             $container->get(EncoderInterface::class)
@@ -91,13 +91,13 @@ abstract class BaseController implements ControllerInterface
         static::assertClassValueDefined(static::SCHEMA_CLASS);
         static::assertClassValueDefined(static::ON_CREATE_DATA_VALIDATION_RULES_CLASS);
 
-        $response = static::defaultCreate(
+        $response = static::defaultCreateHandler(
             $request->getUri(),
             $request->getBody(),
             static::SCHEMA_CLASS,
             $container->get(ModelSchemeInfoInterface::class),
-            static::createDataParser($container, static::ON_CREATE_DATA_VALIDATION_RULES_CLASS),
-            static::createApi($container, static::API_CLASS),
+            static::defaultCreateDataParser($container, static::ON_CREATE_DATA_VALIDATION_RULES_CLASS),
+            static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
             $container->get(EncoderInterface::class),
@@ -120,13 +120,13 @@ abstract class BaseController implements ControllerInterface
         static::assertClassValueDefined(static::SCHEMA_CLASS);
         static::assertClassValueDefined(static::ON_READ_QUERY_VALIDATION_RULES_CLASS);
 
-        return static::defaultRead(
+        return static::defaultReadHandler(
             $routeParams[static::ROUTE_KEY_INDEX],
             $request->getQueryParams(),
             $request->getUri(),
-            static::createQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
-            static::createParameterMapper($container, static::SCHEMA_CLASS),
-            static::createApi($container, static::API_CLASS),
+            static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
+            static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
+            static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
             $container->get(EncoderInterface::class)
@@ -145,14 +145,14 @@ abstract class BaseController implements ControllerInterface
         static::assertClassValueDefined(static::SCHEMA_CLASS);
         static::assertClassValueDefined(static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS);
 
-        $response = static::defaultUpdate(
+        $response = static::defaultUpdateHandler(
             $routeParams[static::ROUTE_KEY_INDEX],
             $request->getUri(),
             $request->getBody(),
             static::SCHEMA_CLASS,
             $container->get(ModelSchemeInfoInterface::class),
-            static::createDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
-            static::createApi($container, static::API_CLASS),
+            static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
+            static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
             $container->get(EncoderInterface::class),
@@ -173,10 +173,10 @@ abstract class BaseController implements ControllerInterface
     ): ResponseInterface {
         static::assertClassValueDefined(static::API_CLASS);
 
-        $response = static::defaultDelete(
+        $response = static::defaultDeleteHandler(
             $routeParams[static::ROUTE_KEY_INDEX],
             $request->getUri(),
-            static::createApi($container, static::API_CLASS),
+            static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
             $container->get(EncoderInterface::class)
@@ -207,17 +207,17 @@ abstract class BaseController implements ControllerInterface
         static::assertClassValueDefined(static::API_CLASS);
         static::assertClassValueDefined(static::SCHEMA_CLASS);
 
-        $api     = static::createApi($container, static::API_CLASS);
+        $api     = static::defaultCreateApi($container, static::API_CLASS);
         $handler = function () use ($api, $index, $modelRelName) {
             return $api->readRelationship($index, $modelRelName);
         };
 
-        return static::defaultReadRelationshipWithClosure(
+        return static::defaultReadRelationshipWithClosureHandler(
             $handler,
             $request->getQueryParams(),
             $request->getUri(),
-            static::createQueryParser($container, $queryValRulesClass),
-            static::createParameterMapper($container, static::SCHEMA_CLASS),
+            static::defaultCreateQueryParser($container, $queryValRulesClass),
+            static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             $api,
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
@@ -247,17 +247,17 @@ abstract class BaseController implements ControllerInterface
         static::assertClassValueDefined(static::API_CLASS);
         static::assertClassValueDefined(static::SCHEMA_CLASS);
 
-        $api     = static::createApi($container, static::API_CLASS);
+        $api     = static::defaultCreateApi($container, static::API_CLASS);
         $handler = function () use ($api, $index, $modelRelName) {
             return $api->readRelationship($index, $modelRelName);
         };
 
-        return static::defaultReadRelationshipIdentifiersWithClosure(
+        return static::defaultReadRelationshipIdentifiersWithClosureHandler(
             $handler,
             $request->getQueryParams(),
             $request->getUri(),
-            static::createQueryParser($container, $queryValRulesClass),
-            static::createParameterMapper($container, static::SCHEMA_CLASS),
+            static::defaultCreateQueryParser($container, $queryValRulesClass),
+            static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             $api,
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
@@ -291,7 +291,7 @@ abstract class BaseController implements ControllerInterface
     ): ResponseInterface {
         static::assertClassValueDefined(static::API_CLASS);
 
-        $response = static::defaultUpdateInRelationship(
+        $response = static::defaultUpdateInRelationshipHandler(
             $parentIndex,
             $modelRelName,
             $childIndex,
@@ -299,9 +299,9 @@ abstract class BaseController implements ControllerInterface
             $request->getBody(),
             $childSchemaClass,
             $container->get(ModelSchemeInfoInterface::class),
-            static::createDataParser($container, $childValidatorClass),
-            static::createApi($container, static::API_CLASS),
-            static::createApi($container, $childApiClass),
+            static::defaultCreateDataParser($container, $childValidatorClass),
+            static::defaultCreateApi($container, static::API_CLASS),
+            static::defaultCreateApi($container, $childApiClass),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
             $container->get(EncoderInterface::class),
@@ -334,13 +334,13 @@ abstract class BaseController implements ControllerInterface
     ): ResponseInterface {
         static::assertClassValueDefined(static::API_CLASS);
 
-        return static::defaultDeleteInRelationship(
+        return static::defaultDeleteInRelationshipHandler(
             $parentIndex,
             $modelRelName,
             $childIndex,
             $request->getUri(),
-            static::createApi($container, static::API_CLASS),
-            static::createApi($container, $childApiClass),
+            static::defaultCreateApi($container, static::API_CLASS),
+            static::defaultCreateApi($container, $childApiClass),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemesInterface::class),
             $container->get(EncoderInterface::class)

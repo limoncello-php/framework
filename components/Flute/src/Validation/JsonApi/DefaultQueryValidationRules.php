@@ -44,6 +44,8 @@ class DefaultQueryValidationRules implements JsonApiQueryRulesInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public static function getSortsRule(): ?RuleInterface
     {
@@ -52,6 +54,8 @@ class DefaultQueryValidationRules implements JsonApiQueryRulesInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public static function getIncludesRule(): ?RuleInterface
     {
