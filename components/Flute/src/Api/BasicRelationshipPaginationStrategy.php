@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Adapters;
+<?php namespace Limoncello\Flute\Api;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Adapters\RelationshipPaginationStrategyInterface;
+use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
 
 /**
  * @package Limoncello\Flute

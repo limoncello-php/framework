@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Adapters\BasicRelationshipPaginationStrategy as PS;
+use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy as PS;
 use Limoncello\Tests\Flute\TestCase;
 
 /**

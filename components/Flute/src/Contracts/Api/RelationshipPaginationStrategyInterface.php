@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Contracts\Adapters;
+<?php namespace Limoncello\Flute\Contracts\Api;
 
 /**
  * Copyright 2015-2017 info@neomerx.com

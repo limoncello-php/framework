@@ -8,8 +8,8 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Flute\Adapters\BasicRelationshipPaginationStrategy;
-use Limoncello\Flute\Contracts\Adapters\RelationshipPaginationStrategyInterface;
+use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy;
+use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
