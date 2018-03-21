@@ -27,7 +27,7 @@ use JsonSerializable;
 class DateTime extends DateTimeImmutable implements JsonSerializable
 {
     /** DateTime format */
-    const JSON_API_FORMAT = self::ISO8601;
+    const JSON_API_FORMAT = \DateTime::ISO8601;
 
     /**
      * @inheritdoc
