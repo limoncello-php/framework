@@ -82,10 +82,7 @@ trait DefaultControllerMethodsTrait
 
         $models = $mapper->applyQueryParameters($queryParser, $crud)->index();
 
-        $encParams = new EncodingParameters(
-            $queryParser->hasIncludes() === true ? array_keys($queryParser->getIncludes()) : null,
-            $queryParser->hasFields() === true ? $queryParser->getFields() : null
-        );
+        $encParams = self::defaultCreateEncodingParameters($queryParser);
         $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemes, $encoder, $encParams);
         $response  = ($models->getData()) === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($models);
@@ -122,10 +119,7 @@ trait DefaultControllerMethodsTrait
         $model = $mapper->applyQueryParameters($queryParser, $crud)->read($index);
         assert(!($model instanceof PaginatedDataInterface));
 
-        $encParams = new EncodingParameters(
-            $queryParser->hasIncludes() === true ? array_keys($queryParser->getIncludes()) : null,
-            $queryParser->hasFields() === true ? $queryParser->getFields() : null
-        );
+        $encParams = self::defaultCreateEncodingParameters($queryParser);
         $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemes, $encoder, $encParams);
         $response  = $model === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($model);
@@ -162,10 +156,7 @@ trait DefaultControllerMethodsTrait
 
         $relData = call_user_func($apiHandler);
 
-        $encParams = new EncodingParameters(
-            $queryParser->hasIncludes() === true ? array_keys($queryParser->getIncludes()) : null,
-            $queryParser->hasFields() === true ? $queryParser->getFields() : null
-        );
+        $encParams = self::defaultCreateEncodingParameters($queryParser);
         $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemes, $encoder, $encParams);
 
         $noData   = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null);
@@ -203,10 +194,7 @@ trait DefaultControllerMethodsTrait
 
         $relData = call_user_func($apiHandler);
 
-        $encParams = new EncodingParameters(
-            $queryParser->hasIncludes() === true ? array_keys($queryParser->getIncludes()) : null,
-            $queryParser->hasFields() === true ? $queryParser->getFields() : null
-        );
+        $encParams = self::defaultCreateEncodingParameters($queryParser);
         $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemes, $encoder, $encParams);
 
         $noData   = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null);
@@ -661,6 +649,20 @@ trait DefaultControllerMethodsTrait
         $mapper->selectRootSchemeByResourceType($jsonResourceType);
 
         return $mapper;
+    }
+
+    /**
+     * @param JsonApiQueryValidatingParserInterface $queryParser
+     *
+     * @return EncodingParametersInterface
+     */
+    protected static function defaultCreateEncodingParameters(
+        JsonApiQueryValidatingParserInterface $queryParser
+    ): EncodingParametersInterface {
+        return new EncodingParameters(
+            $queryParser->hasIncludes() === true ? array_keys($queryParser->getIncludes()) : null,
+            $queryParser->hasFields() === true ? $queryParser->getFields() : null
+        );
     }
 
     /**
