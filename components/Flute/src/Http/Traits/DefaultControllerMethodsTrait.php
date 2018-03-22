@@ -589,6 +589,7 @@ trait DefaultControllerMethodsTrait
      * @param string             $rulesClass
      *
      * @return JsonApiQueryValidatingParserInterface
+     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
@@ -632,6 +633,7 @@ trait DefaultControllerMethodsTrait
      * @param string             $schemaClass
      *
      * @return ParametersMapperInterface
+     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
