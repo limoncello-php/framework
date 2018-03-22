@@ -21,7 +21,7 @@ use Limoncello\Flute\Http\JsonApiResponse;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
-/**
+/** @deprecated
  * @package Limoncello\Flute
  */
 abstract class DataParserWrapper implements JsonApiDataValidatingParserInterface

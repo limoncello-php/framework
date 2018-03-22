@@ -22,16 +22,16 @@ use Limoncello\Container\Container;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Http\Query\RelationshipInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
 use Limoncello\Flute\Http\Query\SortParameter;
 use Limoncello\Tests\Flute\Data\Models\Board;
-use Limoncello\Tests\Flute\Data\Schemes\BoardSchema;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
-use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
+use Limoncello\Tests\Flute\Data\Schemas\BoardSchema;
+use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
+use Limoncello\Tests\Flute\Data\Schemas\EmotionSchema;
+use Limoncello\Tests\Flute\Data\Schemas\PostSchema;
 use Limoncello\Tests\Flute\TestCase;
 
 /**
@@ -70,8 +70,8 @@ class ParametersMapperTest extends TestCase
         $filter = $filters[0];
         $this->assertNull($filter->getRelationship());
         $this->assertNotNull($filter->getAttribute());
-        $this->assertEquals(BoardSchema::RESOURCE_ID, $filter->getAttribute()->getNameInScheme());
-        $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(BoardSchema::RESOURCE_ID, $filter->getAttribute()->getNameInSchema());
+        $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_IN => ['10', '11'],
         ], $this->iterableToArray($filter->getOperationsWithArguments()));
@@ -79,8 +79,8 @@ class ParametersMapperTest extends TestCase
         $filter = $filters[1];
         $this->assertNull($filter->getRelationship());
         $this->assertNotNull($filter->getAttribute());
-        $this->assertEquals(BoardSchema::ATTR_TITLE, $filter->getAttribute()->getNameInScheme());
-        $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(BoardSchema::ATTR_TITLE, $filter->getAttribute()->getNameInSchema());
+        $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_LIKE => ['like%'],
         ], $this->iterableToArray($filter->getOperationsWithArguments()));
@@ -90,10 +90,10 @@ class ParametersMapperTest extends TestCase
         $this->assertNotNull($filter->getAttribute());
         $this->assertEquals(BoardSchema::TYPE, $filter->getRelationship()->getFromSchema()::TYPE);
         $this->assertEquals(PostSchema::TYPE, $filter->getRelationship()->getToSchema()::TYPE);
-        $this->assertEquals(BoardSchema::REL_POSTS, $filter->getRelationship()->getNameInScheme());
+        $this->assertEquals(BoardSchema::REL_POSTS, $filter->getRelationship()->getNameInSchema());
         $this->assertEquals(Board::REL_POSTS, $filter->getRelationship()->getNameInModel());
-        $this->assertEquals(PostSchema::RESOURCE_ID, $filter->getAttribute()->getNameInScheme());
-        $this->assertEquals(PostSchema::TYPE, $filter->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(PostSchema::RESOURCE_ID, $filter->getAttribute()->getNameInSchema());
+        $this->assertEquals(PostSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_EQUALS => ['1'],
         ], $this->iterableToArray($filter->getOperationsWithArguments()));
@@ -103,10 +103,10 @@ class ParametersMapperTest extends TestCase
         $this->assertNotNull($filter->getAttribute());
         $this->assertEquals(BoardSchema::TYPE, $filter->getRelationship()->getFromSchema()::TYPE);
         $this->assertEquals(PostSchema::TYPE, $filter->getRelationship()->getToSchema()::TYPE);
-        $this->assertEquals(BoardSchema::REL_POSTS, $filter->getRelationship()->getNameInScheme());
+        $this->assertEquals(BoardSchema::REL_POSTS, $filter->getRelationship()->getNameInSchema());
         $this->assertEquals(Board::REL_POSTS, $filter->getRelationship()->getNameInModel());
-        $this->assertEquals(PostSchema::ATTR_TITLE, $filter->getAttribute()->getNameInScheme());
-        $this->assertEquals(PostSchema::TYPE, $filter->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(PostSchema::ATTR_TITLE, $filter->getAttribute()->getNameInSchema());
+        $this->assertEquals(PostSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_NOT_LIKE => ['not_like%'],
         ], $this->iterableToArray($filter->getOperationsWithArguments()));
@@ -145,8 +145,8 @@ class ParametersMapperTest extends TestCase
         $filter = reset($filters);
         $this->assertNull($filter->getRelationship());
         $this->assertNotNull($filter->getAttribute());
-        $this->assertEquals(BoardSchema::RESOURCE_ID, $filter->getAttribute()->getNameInScheme());
-        $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(BoardSchema::RESOURCE_ID, $filter->getAttribute()->getNameInSchema());
+        $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_EQUALS            => ['1'],
             FilterParameterInterface::OPERATION_NOT_EQUALS        => ['1'],
@@ -233,15 +233,15 @@ class ParametersMapperTest extends TestCase
         $sort = $sorts[0];
         $this->assertNull($sort->getRelationship());
         $this->assertNotNull($sort->getAttribute());
-        $this->assertEquals(BoardSchema::RESOURCE_ID, $sort->getAttribute()->getNameInScheme());
-        $this->assertEquals(BoardSchema::TYPE, $sort->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(BoardSchema::RESOURCE_ID, $sort->getAttribute()->getNameInSchema());
+        $this->assertEquals(BoardSchema::TYPE, $sort->getAttribute()->getSchema()::TYPE);
         $this->assertTrue($sort->isAsc());
 
         $sort = $sorts[1];
         $this->assertNull($sort->getRelationship());
         $this->assertNotNull($sort->getAttribute());
-        $this->assertEquals(BoardSchema::ATTR_TITLE, $sort->getAttribute()->getNameInScheme());
-        $this->assertEquals(BoardSchema::TYPE, $sort->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(BoardSchema::ATTR_TITLE, $sort->getAttribute()->getNameInSchema());
+        $this->assertEquals(BoardSchema::TYPE, $sort->getAttribute()->getSchema()::TYPE);
         $this->assertTrue($sort->isDesc());
 
         $sort = $sorts[2];
@@ -249,10 +249,10 @@ class ParametersMapperTest extends TestCase
         $this->assertNotNull($sort->getAttribute());
         $this->assertEquals(BoardSchema::TYPE, $sort->getRelationship()->getFromSchema()::TYPE);
         $this->assertEquals(PostSchema::TYPE, $sort->getRelationship()->getToSchema()::TYPE);
-        $this->assertEquals(BoardSchema::REL_POSTS, $sort->getRelationship()->getNameInScheme());
+        $this->assertEquals(BoardSchema::REL_POSTS, $sort->getRelationship()->getNameInSchema());
         $this->assertEquals(Board::REL_POSTS, $sort->getRelationship()->getNameInModel());
-        $this->assertEquals(PostSchema::RESOURCE_ID, $sort->getAttribute()->getNameInScheme());
-        $this->assertEquals(PostSchema::TYPE, $sort->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(PostSchema::RESOURCE_ID, $sort->getAttribute()->getNameInSchema());
+        $this->assertEquals(PostSchema::TYPE, $sort->getAttribute()->getSchema()::TYPE);
         $this->assertTrue($sort->isAsc());
 
         $sort = $sorts[3];
@@ -260,10 +260,10 @@ class ParametersMapperTest extends TestCase
         $this->assertNotNull($sort->getAttribute());
         $this->assertEquals(BoardSchema::TYPE, $sort->getRelationship()->getFromSchema()::TYPE);
         $this->assertEquals(PostSchema::TYPE, $sort->getRelationship()->getToSchema()::TYPE);
-        $this->assertEquals(BoardSchema::REL_POSTS, $sort->getRelationship()->getNameInScheme());
+        $this->assertEquals(BoardSchema::REL_POSTS, $sort->getRelationship()->getNameInSchema());
         $this->assertEquals(Board::REL_POSTS, $sort->getRelationship()->getNameInModel());
-        $this->assertEquals(PostSchema::ATTR_TITLE, $sort->getAttribute()->getNameInScheme());
-        $this->assertEquals(PostSchema::TYPE, $sort->getAttribute()->getScheme()::TYPE);
+        $this->assertEquals(PostSchema::ATTR_TITLE, $sort->getAttribute()->getNameInSchema());
+        $this->assertEquals(PostSchema::TYPE, $sort->getAttribute()->getSchema()::TYPE);
         $this->assertTrue($sort->isDesc());
     }
 
@@ -288,19 +288,19 @@ class ParametersMapperTest extends TestCase
         /** @var RelationshipInterface[] $include */
         $include = $includes[0];
         $this->assertCount(1, $include);
-        $this->assertEquals(BoardSchema::REL_POSTS, $include[0]->getNameInScheme());
+        $this->assertEquals(BoardSchema::REL_POSTS, $include[0]->getNameInSchema());
         $this->assertEquals(BoardSchema::TYPE, $include[0]->getFromSchema()::TYPE);
         $this->assertEquals(PostSchema::TYPE, $include[0]->getToSchema()::TYPE);
 
         $include = $includes[1];
         $this->assertCount(2, $include);
-        $this->assertEquals(PostSchema::REL_COMMENTS, $include[1]->getNameInScheme());
+        $this->assertEquals(PostSchema::REL_COMMENTS, $include[1]->getNameInSchema());
         $this->assertEquals(PostSchema::TYPE, $include[1]->getFromSchema()::TYPE);
         $this->assertEquals(CommentSchema::TYPE, $include[1]->getToSchema()::TYPE);
 
         $include = $includes[2];
         $this->assertCount(3, $include);
-        $this->assertEquals(CommentSchema::REL_EMOTIONS, $include[2]->getNameInScheme());
+        $this->assertEquals(CommentSchema::REL_EMOTIONS, $include[2]->getNameInSchema());
         $this->assertEquals(CommentSchema::TYPE, $include[2]->getFromSchema()::TYPE);
         $this->assertEquals(EmotionSchema::TYPE, $include[2]->getToSchema()::TYPE);
     }
@@ -323,9 +323,9 @@ class ParametersMapperTest extends TestCase
     /**
      * @expectedException \Limoncello\Flute\Exceptions\LogicException
      */
-    public function testUsageWhenNoRootSchemeSet(): void
+    public function testUsageWhenNoRootSchemaSet(): void
     {
-        $includes = (new ParametersMapper($this->createDefaultJsonSchemes()))->getMappedIncludes();
+        $includes = (new ParametersMapper($this->createDefaultJsonSchemas()))->getMappedIncludes();
 
         $this->iterableToArray($includes);
     }
@@ -341,16 +341,16 @@ class ParametersMapperTest extends TestCase
 
         /** @var SchemaInterface $schemaClass */
 
-        return (new ParametersMapper($this->createDefaultJsonSchemes()))
-            ->selectRootSchemeByResourceType($schemaClass::TYPE);
+        return (new ParametersMapper($this->createDefaultJsonSchemas()))
+            ->selectRootSchemaByResourceType($schemaClass::TYPE);
     }
 
     /**
-     * @return JsonSchemesInterface
+     * @return JsonSchemasInterface
      */
-    private function createDefaultJsonSchemes(): JsonSchemesInterface
+    private function createDefaultJsonSchemas(): JsonSchemasInterface
     {
-        return $this->getJsonSchemes(new Factory(new Container()), $this->getModelSchemes());
+        return $this->getJsonSchemas(new Factory(new Container()), $this->getModelSchemas());
     }
 
     /**

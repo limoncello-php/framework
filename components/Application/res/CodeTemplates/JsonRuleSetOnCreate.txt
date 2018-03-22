@@ -1,6 +1,6 @@
 <?php namespace App\Validation\JsonValidators;
 
-use App\Json\Schemes\{%SINGULAR_CC%}Schema as Schema;
+use App\Json\Schemas\{%SINGULAR_CC%}Schema as Schema;
 use App\Validation\Rules\{%SINGULAR_CC%}Rules as r;
 use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;

@@ -18,17 +18,18 @@
 
 use Exception;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
 use Limoncello\Flute\Factory;
+use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\JsonApi\DataParser;
 use Limoncello\Flute\Validation\JsonApi\DataParserWrapper;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiDataRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
+use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
 use Limoncello\Tests\Flute\Data\Validation\AppRules as v;
 use Limoncello\Tests\Flute\TestCase;
 use Limoncello\Validation\Execution\BlockSerializer;
@@ -124,8 +125,8 @@ EOT;
     {
         $container = new Container();
 
-        $container[ModelSchemeInfoInterface::class]  = $schemes = $this->getModelSchemes();
-        $container[JsonSchemesInterface::class]      = $this->getJsonSchemes(new Factory($container), $schemes);
+        $container[ModelSchemaInfoInterface::class]  = $schemas = $this->getModelSchemas();
+        $container[JsonSchemasInterface::class]      = $this->getJsonSchemas(new Factory($container), $schemas);
         $container[FormatterFactoryInterface::class] = new FormatterFactory();
 
         return $container;
@@ -202,12 +203,14 @@ EOT;
         $exception = null;
         $validator = null;
         try {
+            /** @var FormatterFactoryInterface $formatterFactory */
+            $formatterFactory = $container->get(FormatterFactoryInterface::class);
             $validator = new DataParser(
                 $name,
                 JsonApiDataRulesSerializer::class,
                 $data,
                 new ContextStorage($blocks, $container),
-                new JsonApiErrorCollection($container),
+                new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
                 $container->get(FormatterFactoryInterface::class)
             );
         } catch (Exception | NotFoundExceptionInterface | ContainerExceptionInterface $exception) {

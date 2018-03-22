@@ -503,7 +503,7 @@ class ModelQueryBuilderTest extends TestCase
      */
     private function createModelQueryBuilder(string $modelClass): ModelQueryBuilder
     {
-        return new ModelQueryBuilder($this->getConnection(), $modelClass, $this->getModelSchemes());
+        return new ModelQueryBuilder($this->getConnection(), $modelClass, $this->getModelSchemas());
     }
 
     /**

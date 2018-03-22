@@ -18,11 +18,12 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Types\Type;
 use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy;
@@ -30,12 +31,14 @@ use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
 use Limoncello\Flute\Package\FluteSettings;
+use Limoncello\Flute\Types\DateTimeType;
+use Limoncello\Flute\Types\DateType;
 use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiParserFactory;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
@@ -50,12 +53,12 @@ use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
 use Limoncello\Tests\Flute\Data\Package\CacheSettingsProvider;
 use Limoncello\Tests\Flute\Data\Package\Flute;
-use Limoncello\Tests\Flute\Data\Schemes\BoardSchema;
-use Limoncello\Tests\Flute\Data\Schemes\CategorySchema;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
-use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
-use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
+use Limoncello\Tests\Flute\Data\Schemas\BoardSchema;
+use Limoncello\Tests\Flute\Data\Schemas\CategorySchema;
+use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
+use Limoncello\Tests\Flute\Data\Schemas\EmotionSchema;
+use Limoncello\Tests\Flute\Data\Schemas\PostSchema;
+use Limoncello\Tests\Flute\Data\Schemas\UserSchema;
 use Limoncello\Tests\Flute\TestCase;
 use Mockery;
 use Mockery\Mock;
@@ -1297,12 +1300,12 @@ EOT;
 
         $container[FactoryInterface::class]          = $factory = new Factory($container);
         $container[FormatterFactoryInterface::class] = $formatterFactory = new FormatterFactory();
-        $container[ModelSchemeInfoInterface::class]  = $modelSchemes = $this->getModelSchemes();
+        $container[ModelSchemaInfoInterface::class]  = $modelSchemas = $this->getModelSchemas();
 
-        $container[JsonSchemesInterface::class] = $jsonSchemes = $this->getJsonSchemes($factory, $modelSchemes);
+        $container[JsonSchemasInterface::class] = $jsonSchemas = $this->getJsonSchemas($factory, $modelSchemas);
 
         $container[ParametersMapperInterface::class] = function (PsrContainerInterface $container) {
-            return new ParametersMapper($container->get(JsonSchemesInterface::class));
+            return new ParametersMapper($container->get(JsonSchemasInterface::class));
         };
 
         $container[Connection::class]                              = $connection = $this->initDb();
@@ -1318,7 +1321,7 @@ EOT;
             $appConfig,
             [
                 FluteSettings::class => (new Flute(
-                    $this->getSchemeMap(),
+                    $this->getSchemaMap(),
                     $this->getJsonValidationRuleSets(),
                     $this->getFormValidationRuleSets(),
                     $this->getQueryValidationRuleSets()
@@ -1329,7 +1332,7 @@ EOT;
         $container[SettingsProviderInterface::class]      = $cacheSettingsProvider;
 
         $container[EncoderInterface::class] =
-            function (ContainerInterface $container) use ($factory, $jsonSchemes) {
+            function (ContainerInterface $container) use ($factory, $jsonSchemas) {
                 /** @var SettingsProviderInterface $provider */
                 $provider = $container->get(SettingsProviderInterface::class);
                 $settings = $provider->get(FluteSettings::class);
@@ -1338,7 +1341,7 @@ EOT;
                 $settings[FluteSettings::KEY_META] = static::DEFAULT_JSON_META;
 
                 $urlPrefix = $settings[FluteSettings::KEY_URI_PREFIX];
-                $encoder   = $factory->createEncoder($jsonSchemes, new EncoderOptions(
+                $encoder   = $factory->createEncoder($jsonSchemas, new EncoderOptions(
                     $settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS],
                     $urlPrefix,
                     $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
@@ -1367,6 +1370,11 @@ EOT;
 
             return $factory;
         };
+
+        // If test is run withing the whole test suite then those lines not needed, however
+        // if only tests from this file are run then the lines are required.
+        Type::hasType(DateTimeType::NAME) === true ?: Type::addType(DateTimeType::NAME, DateTimeType::class);
+        Type::hasType(DateType::NAME) === true ?: Type::addType(DateType::NAME, DateType::class);
 
         return $container;
     }

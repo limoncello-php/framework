@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 
 /**
  * @package Limoncello\Passport
@@ -30,9 +30,9 @@ class PassportAccount implements PassportAccountInterface
     private $properties;
 
     /**
-     * @var DatabaseSchemeInterface
+     * @var DatabaseSchemaInterface
      */
-    private $scheme;
+    private $schema;
 
     /**
      * @var bool|string
@@ -50,12 +50,12 @@ class PassportAccount implements PassportAccountInterface
     private $scopesKey = false;
 
     /**
-     * @param DatabaseSchemeInterface $scheme
-     * @param array $properties
+     * @param DatabaseSchemaInterface $schema
+     * @param array                   $properties
      */
-    public function __construct(DatabaseSchemeInterface $scheme, array $properties = [])
+    public function __construct(DatabaseSchemaInterface $schema, array $properties = [])
     {
-        $this->scheme = $scheme;
+        $this->schema = $schema;
         $this->setPassportProperties($properties);
     }
 
@@ -153,7 +153,7 @@ class PassportAccount implements PassportAccountInterface
     protected function getUserIdentityKey(): string
     {
         if ($this->userIdentityKey === false) {
-            $this->userIdentityKey = $this->getScheme()->getTokensUserIdentityColumn();
+            $this->userIdentityKey = $this->getSchema()->getTokensUserIdentityColumn();
         }
 
         return $this->userIdentityKey;
@@ -165,7 +165,7 @@ class PassportAccount implements PassportAccountInterface
     protected function getClientIdentityKey(): string
     {
         if ($this->clientIdentityKey === false) {
-            $this->clientIdentityKey = $this->getScheme()->getTokensClientIdentityColumn();
+            $this->clientIdentityKey = $this->getSchema()->getTokensClientIdentityColumn();
         }
 
         return $this->clientIdentityKey;
@@ -177,17 +177,17 @@ class PassportAccount implements PassportAccountInterface
     protected function getScopesKey(): string
     {
         if ($this->scopesKey === false) {
-            $this->scopesKey = $this->getScheme()->getTokensViewScopesColumn();
+            $this->scopesKey = $this->getSchema()->getTokensViewScopesColumn();
         }
 
         return $this->scopesKey;
     }
 
     /**
-     * @return DatabaseSchemeInterface
+     * @return DatabaseSchemaInterface
      */
-    protected function getScheme(): DatabaseSchemeInterface
+    protected function getSchema(): DatabaseSchemaInterface
     {
-        return $this->scheme;
+        return $this->schema;
     }
 }

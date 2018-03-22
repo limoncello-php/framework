@@ -2,7 +2,7 @@
 
 use App\Api\{%PLURAL_CC%}Api as Api;
 //use App\Data\Models\{%SINGULAR_CC%} as Model;
-use App\Json\Schemes\{%SINGULAR_CC%}Schema as Schema;
+use App\Json\Schemas\{%SINGULAR_CC%}Schema as Schema;
 use App\Validation\JsonValidators\{%SINGULAR_CC%}Create;
 use App\Validation\JsonValidators\{%SINGULAR_CC%}Update;
 //use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;

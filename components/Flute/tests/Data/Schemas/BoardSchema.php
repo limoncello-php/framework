@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Data\Schemes;
+<?php namespace Limoncello\Tests\Flute\Data\Schemas;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,24 +16,24 @@
  * limitations under the License.
  */
 
-use Limoncello\Tests\Flute\Data\Models\Role as Model;
+use Limoncello\Tests\Flute\Data\Models\Board as Model;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class RoleSchema extends BaseSchema
+class BoardSchema extends BaseSchema
 {
     /** Type */
-    const TYPE = 'roles';
+    const TYPE = 'boards';
 
     /** Model class name */
     const MODEL = Model::class;
 
     /** Attribute name */
-    const ATTR_NAME = 'name-attribute';
+    const ATTR_TITLE = 'title-attribute';
 
     /** Relationship name */
-    const REL_USERS = 'users-relationship';
+    const REL_POSTS = 'posts-relationship';
 
     /**
      * @inheritdoc
@@ -43,12 +43,12 @@ class RoleSchema extends BaseSchema
         return [
             self::SCHEMA_ATTRIBUTES => [
                 self::RESOURCE_ID     => Model::FIELD_ID,
-                self::ATTR_NAME       => Model::FIELD_NAME,
+                self::ATTR_TITLE      => Model::FIELD_TITLE,
                 self::ATTR_CREATED_AT => Model::FIELD_CREATED_AT,
                 self::ATTR_UPDATED_AT => Model::FIELD_UPDATED_AT,
             ],
             self::SCHEMA_RELATIONSHIPS => [
-                self::REL_USERS => Model::REL_USERS,
+                self::REL_POSTS => Model::REL_POSTS,
             ],
         ];
     }

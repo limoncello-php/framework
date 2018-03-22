@@ -18,7 +18,7 @@
 
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
-use Limoncello\Tests\Flute\Data\Schemes\UserSchema as Schema;
+use Limoncello\Tests\Flute\Data\Schemas\UserSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\AppRules as v;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 

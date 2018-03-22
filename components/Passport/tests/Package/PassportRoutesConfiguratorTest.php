@@ -19,7 +19,7 @@
 use Doctrine\DBAL\Connection;
 use Exception;
 use Limoncello\Core\Routing\Group;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Package\PassportMigration;
 use Limoncello\Passport\Package\PassportProvider;
 use Limoncello\Passport\Package\PassportRoutesConfigurator;
@@ -77,13 +77,13 @@ class PassportRoutesConfiguratorTest extends TestCase
      */
     public function testMigrationMigrate()
     {
-        $migration = Mockery::mock(PassportMigration::class . '[createDatabaseScheme]')
+        $migration = Mockery::mock(PassportMigration::class . '[createDatabaseSchema]')
             ->makePartial()->shouldAllowMockingProtectedMethods();
-        $migration->shouldReceive('createDatabaseScheme')->once()->withAnyArgs()->andReturnUndefined();
+        $migration->shouldReceive('createDatabaseSchema')->once()->withAnyArgs()->andReturnUndefined();
 
-        $container = new TestContainer();
-        $container[Connection::class] = Mockery::mock(Connection::class);
-        $container[DatabaseSchemeInterface::class] = Mockery::mock(DatabaseSchemeInterface::class);
+        $container                                 = new TestContainer();
+        $container[Connection::class]              = Mockery::mock(Connection::class);
+        $container[DatabaseSchemaInterface::class] = Mockery::mock(DatabaseSchemaInterface::class);
 
         /** @var PassportMigration $migration */
 
@@ -100,13 +100,13 @@ class PassportRoutesConfiguratorTest extends TestCase
      */
     public function testMigrationRollback()
     {
-        $migration = Mockery::mock(PassportMigration::class . '[removeDatabaseScheme]')
+        $migration = Mockery::mock(PassportMigration::class . '[removeDatabaseSchema]')
             ->makePartial()->shouldAllowMockingProtectedMethods();
-        $migration->shouldReceive('removeDatabaseScheme')->once()->withAnyArgs()->andReturnUndefined();
+        $migration->shouldReceive('removeDatabaseSchema')->once()->withAnyArgs()->andReturnUndefined();
 
-        $container = new TestContainer();
-        $container[Connection::class] = Mockery::mock(Connection::class);
-        $container[DatabaseSchemeInterface::class] = Mockery::mock(DatabaseSchemeInterface::class);
+        $container                                 = new TestContainer();
+        $container[Connection::class]              = Mockery::mock(Connection::class);
+        $container[DatabaseSchemaInterface::class] = Mockery::mock(DatabaseSchemaInterface::class);
 
         /** @var PassportMigration $migration */
 

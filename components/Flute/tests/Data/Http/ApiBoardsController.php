@@ -19,7 +19,7 @@
 use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\BoardsApi as Api;
 use Limoncello\Tests\Flute\Data\Models\Board as Model;
-use Limoncello\Tests\Flute\Data\Schemes\BoardSchema as Schema;
+use Limoncello\Tests\Flute\Data\Schemas\BoardSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadBoardsQueryRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;

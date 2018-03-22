@@ -18,7 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Container\Traits\HasContainerTrait;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
@@ -26,12 +26,12 @@ use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\TagStorageInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Encoder\Encoder;
 use Limoncello\Flute\Models\ModelStorage;
 use Limoncello\Flute\Models\PaginatedData;
 use Limoncello\Flute\Models\TagStorage;
-use Limoncello\Flute\Schema\JsonSchemes;
+use Limoncello\Flute\Schema\JsonSchemas;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as JsonApiFactoryInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
@@ -79,9 +79,9 @@ class Factory implements FactoryInterface
     public function createModelQueryBuilder(
         Connection $connection,
         string $modelClass,
-        ModelSchemeInfoInterface $modelSchemes
+        ModelSchemaInfoInterface $modelSchemas
     ): ModelQueryBuilder {
-        return new ModelQueryBuilder($connection, $modelClass, $modelSchemes);
+        return new ModelQueryBuilder($connection, $modelClass, $modelSchemas);
     }
 
     /**
@@ -105,9 +105,9 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createModelStorage(ModelSchemeInfoInterface $modelSchemes): ModelStorageInterface
+    public function createModelStorage(ModelSchemaInfoInterface $modelSchemas): ModelStorageInterface
     {
-        return new ModelStorage($modelSchemes);
+        return new ModelStorage($modelSchemas);
     }
 
     /**
@@ -121,19 +121,19 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createJsonSchemes(array $schemes, ModelSchemeInfoInterface $modelSchemes): JsonSchemesInterface
+    public function createJsonSchemas(array $schemas, ModelSchemaInfoInterface $modelSchemas): JsonSchemasInterface
     {
-        return new JsonSchemes($this->getJsonApiFactory(), $schemes, $modelSchemes);
+        return new JsonSchemas($this->getJsonApiFactory(), $schemas, $modelSchemas);
     }
 
     /**
      * @inheritdoc
      */
     public function createEncoder(
-        JsonSchemesInterface $schemes,
+        JsonSchemasInterface $schemas,
         EncoderOptions $encoderOptions = null
     ): EncoderInterface {
-        return new Encoder($this->getJsonApiFactory(), $schemes, $encoderOptions);
+        return new Encoder($this->getJsonApiFactory(), $schemas, $encoderOptions);
     }
 
     /**

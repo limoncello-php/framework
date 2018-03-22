@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Data\Schemes;
+<?php namespace Limoncello\Tests\Flute\Data\Schemas;
 
 /**
  * Copyright 2015-2017 info@neomerx.com

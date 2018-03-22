@@ -21,7 +21,7 @@ use Limoncello\Contracts\Application\ContainerConfiguratorInterface as CCI;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Passport\Adaptors\MySql\PassportServerIntegration;
 use Limoncello\Passport\Adaptors\MySql\TokenRepository;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -48,9 +48,9 @@ class MySqlPassportContainerConfigurator extends BasePassportContainerConfigurat
             PsrContainerInterface $container
         ): TokenRepositoryInterface {
             $connection = $container->get(Connection::class);
-            $scheme     = $container->get(DatabaseSchemeInterface::class);
+            $schema     = $container->get(DatabaseSchemaInterface::class);
 
-            return new TokenRepository($connection, $scheme);
+            return new TokenRepository($connection, $schema);
         };
     }
 }

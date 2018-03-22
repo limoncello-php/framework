@@ -17,8 +17,8 @@
  */
 
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Application\Data\ModelSchemeInfo;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Application\Data\ModelSchemaInfo;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Tests\Application\Data\Models\Comment;
 use Limoncello\Tests\Application\Data\Models\CommentEmotion;
@@ -29,12 +29,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @package Limoncello\Tests\Application
  */
-class ModelSchemesTest extends TestCase
+class ModelSchemasTest extends TestCase
 {
     /**
-     * @var ModelSchemeInfoInterface
+     * @var ModelSchemaInfoInterface
      */
-    private $schemes;
+    private $schemas;
 
     /**
      * @inheritdoc
@@ -43,14 +43,14 @@ class ModelSchemesTest extends TestCase
     {
         parent::setUp();
 
-        $this->schemes = new ModelSchemeInfo();
+        $this->schemas = new ModelSchemaInfo();
 
         $this->setUpStorage();
 
         // before every test get and set internal data to make sure
         // functionality works fine when restored from cache
-        $cache = $this->schemes->getData();
-        $this->schemes->setData($cache);
+        $cache = $this->schemas->getData();
+        $this->schemas->setData($cache);
     }
 
     /**
@@ -59,30 +59,30 @@ class ModelSchemesTest extends TestCase
     public function testRegisterClass(): void
     {
         $this->assertEquals(Comment::class, Comment::class);
-        $this->assertTrue($this->schemes->hasClass(Comment::class));
-        $this->assertFalse($this->schemes->hasClass(get_class($this)));
-        $this->assertEquals(Comment::TABLE_NAME, $this->schemes->getTable(Comment::class));
-        $this->assertEquals(Comment::FIELD_ID, $this->schemes->getPrimaryKey(Comment::class));
-        $this->assertNotEmpty($this->schemes->getAttributeTypes(Comment::class));
-        $this->assertNotEmpty($this->schemes->getAttributeLengths(Comment::class));
+        $this->assertTrue($this->schemas->hasClass(Comment::class));
+        $this->assertFalse($this->schemas->hasClass(get_class($this)));
+        $this->assertEquals(Comment::TABLE_NAME, $this->schemas->getTable(Comment::class));
+        $this->assertEquals(Comment::FIELD_ID, $this->schemas->getPrimaryKey(Comment::class));
+        $this->assertNotEmpty($this->schemas->getAttributeTypes(Comment::class));
+        $this->assertNotEmpty($this->schemas->getAttributeLengths(Comment::class));
         $this->assertEquals([
             Comment::FIELD_ID,
             Comment::FIELD_ID_USER,
             Comment::FIELD_TEXT,
             Comment::FIELD_CREATED_AT,
-        ], $this->schemes->getAttributes(Comment::class));
-        $this->assertTrue($this->schemes->hasAttributeType(Comment::class, Comment::FIELD_TEXT));
-        $this->assertFalse($this->schemes->hasAttributeType(Comment::class, 'non-existing-field'));
-        $this->assertTrue($this->schemes->hasAttributeLength(Comment::class, Comment::FIELD_TEXT));
-        $this->assertFalse($this->schemes->hasAttributeLength(Comment::class, Comment::FIELD_CREATED_AT));
-        $this->assertEquals(Type::STRING, $this->schemes->getAttributeType(Comment::class, Comment::FIELD_TEXT));
+        ], $this->schemas->getAttributes(Comment::class));
+        $this->assertTrue($this->schemas->hasAttributeType(Comment::class, Comment::FIELD_TEXT));
+        $this->assertFalse($this->schemas->hasAttributeType(Comment::class, 'non-existing-field'));
+        $this->assertTrue($this->schemas->hasAttributeLength(Comment::class, Comment::FIELD_TEXT));
+        $this->assertFalse($this->schemas->hasAttributeLength(Comment::class, Comment::FIELD_CREATED_AT));
+        $this->assertEquals(Type::STRING, $this->schemas->getAttributeType(Comment::class, Comment::FIELD_TEXT));
         $this->assertEquals(
             Type::DATE,
-            $this->schemes->getAttributeType(Comment::class, Comment::FIELD_CREATED_AT)
+            $this->schemas->getAttributeType(Comment::class, Comment::FIELD_CREATED_AT)
         );
         $this->assertEquals(
             Comment::LENGTH_TEXT,
-            $this->schemes->getAttributeLength(Comment::class, Comment::FIELD_TEXT)
+            $this->schemas->getAttributeLength(Comment::class, Comment::FIELD_TEXT)
         );
     }
 
@@ -91,35 +91,35 @@ class ModelSchemesTest extends TestCase
      */
     public function testRegisterToOneRelationship(): void
     {
-        $this->assertTrue($this->schemes->hasRelationship(Comment::class, Comment::REL_USER));
+        $this->assertTrue($this->schemas->hasRelationship(Comment::class, Comment::REL_USER));
         $this->assertEquals(
             RelationshipTypes::BELONGS_TO,
-            $this->schemes->getRelationshipType(Comment::class, Comment::REL_USER)
+            $this->schemas->getRelationshipType(Comment::class, Comment::REL_USER)
         );
         $this->assertEquals(
             RelationshipTypes::HAS_MANY,
-            $this->schemes->getRelationshipType(User::class, User::REL_COMMENTS)
+            $this->schemas->getRelationshipType(User::class, User::REL_COMMENTS)
         );
-        $this->assertEquals(Comment::FIELD_ID_USER, $this->schemes->getForeignKey(Comment::class, Comment::REL_USER));
+        $this->assertEquals(Comment::FIELD_ID_USER, $this->schemas->getForeignKey(Comment::class, Comment::REL_USER));
         $this->assertEquals(
             [User::class, User::REL_COMMENTS],
-            $this->schemes->getReverseRelationship(Comment::class, Comment::REL_USER)
+            $this->schemas->getReverseRelationship(Comment::class, Comment::REL_USER)
         );
         $this->assertEquals(
             [Comment::class, Comment::REL_USER],
-            $this->schemes->getReverseRelationship(User::class, User::REL_COMMENTS)
+            $this->schemas->getReverseRelationship(User::class, User::REL_COMMENTS)
         );
         $this->assertEquals(
             [Comment::FIELD_ID, Comment::TABLE_NAME],
-            $this->schemes->getReversePrimaryKey(User::class, User::REL_COMMENTS)
+            $this->schemas->getReversePrimaryKey(User::class, User::REL_COMMENTS)
         );
         $this->assertEquals(
             [Comment::FIELD_ID_USER, Comment::TABLE_NAME],
-            $this->schemes->getReverseForeignKey(User::class, User::REL_COMMENTS)
+            $this->schemas->getReverseForeignKey(User::class, User::REL_COMMENTS)
         );
         $this->assertEquals(
             Comment::class,
-            $this->schemes->getReverseModelClass(User::class, User::REL_COMMENTS)
+            $this->schemas->getReverseModelClass(User::class, User::REL_COMMENTS)
         );
     }
 
@@ -128,32 +128,32 @@ class ModelSchemesTest extends TestCase
      */
     public function testRegisterToManyRelationship(): void
     {
-        $this->assertTrue($this->schemes->hasRelationship(Comment::class, Comment::REL_EMOTIONS));
+        $this->assertTrue($this->schemas->hasRelationship(Comment::class, Comment::REL_EMOTIONS));
         $this->assertEquals(
             RelationshipTypes::BELONGS_TO_MANY,
-            $this->schemes->getRelationshipType(Comment::class, Comment::REL_EMOTIONS)
+            $this->schemas->getRelationshipType(Comment::class, Comment::REL_EMOTIONS)
         );
         $this->assertEquals(
             RelationshipTypes::BELONGS_TO_MANY,
-            $this->schemes->getRelationshipType(Emotion::class, Emotion::REL_COMMENTS)
+            $this->schemas->getRelationshipType(Emotion::class, Emotion::REL_COMMENTS)
         );
         $this->assertEquals([
             CommentEmotion::TABLE_NAME,
             CommentEmotion::FIELD_ID_COMMENT,
             CommentEmotion::FIELD_ID_EMOTION,
-        ], $this->schemes->getBelongsToManyRelationship(Comment::class, Comment::REL_EMOTIONS));
+        ], $this->schemas->getBelongsToManyRelationship(Comment::class, Comment::REL_EMOTIONS));
         $this->assertEquals([
             CommentEmotion::TABLE_NAME,
             CommentEmotion::FIELD_ID_EMOTION,
             CommentEmotion::FIELD_ID_COMMENT,
-        ], $this->schemes->getBelongsToManyRelationship(Emotion::class, Emotion::REL_COMMENTS));
+        ], $this->schemas->getBelongsToManyRelationship(Emotion::class, Emotion::REL_COMMENTS));
         $this->assertEquals(
             [Emotion::class, Emotion::REL_COMMENTS],
-            $this->schemes->getReverseRelationship(Comment::class, Comment::REL_EMOTIONS)
+            $this->schemas->getReverseRelationship(Comment::class, Comment::REL_EMOTIONS)
         );
         $this->assertEquals(
             [Comment::class, Comment::REL_EMOTIONS],
-            $this->schemes->getReverseRelationship(Emotion::class, Emotion::REL_COMMENTS)
+            $this->schemas->getReverseRelationship(Emotion::class, Emotion::REL_COMMENTS)
         );
     }
 
@@ -162,7 +162,7 @@ class ModelSchemesTest extends TestCase
      */
     public function testCannotRegisterWithEmptyClass(): void
     {
-        $this->schemes->registerClass(
+        $this->schemas->registerClass(
             '',
             Comment::TABLE_NAME,
             Comment::FIELD_ID,
@@ -181,7 +181,7 @@ class ModelSchemesTest extends TestCase
      */
     public function testCannotRegisterWithEmptyTableName(): void
     {
-        $this->schemes->registerClass(
+        $this->schemas->registerClass(
             Comment::class,
             '',
             Comment::FIELD_ID,
@@ -200,7 +200,7 @@ class ModelSchemesTest extends TestCase
      */
     public function testCannotRegisterWithEmptyPrimaryKey(): void
     {
-        $this->schemes->registerClass(
+        $this->schemas->registerClass(
             Comment::class,
             Comment::TABLE_NAME,
             '',
@@ -219,7 +219,7 @@ class ModelSchemesTest extends TestCase
      */
     private function setUpStorage(): void
     {
-        $this->schemes->registerClass(
+        $this->schemas->registerClass(
             Comment::class,
             Comment::TABLE_NAME,
             Comment::FIELD_ID,
@@ -238,7 +238,7 @@ class ModelSchemesTest extends TestCase
 
     private function registerTo1(): void
     {
-        $this->schemes->registerBelongsToOneRelationship(
+        $this->schemas->registerBelongsToOneRelationship(
             Comment::class,
             Comment::REL_USER,
             Comment::FIELD_ID_USER,
@@ -249,7 +249,7 @@ class ModelSchemesTest extends TestCase
 
     private function registerToMany(): void
     {
-        $this->schemes->registerBelongsToManyRelationship(
+        $this->schemas->registerBelongsToManyRelationship(
             Comment::class,
             Comment::REL_EMOTIONS,
             CommentEmotion::TABLE_NAME,

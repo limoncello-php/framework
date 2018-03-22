@@ -18,8 +18,8 @@
 
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Tests\Flute\Data\Models\Comment;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
+use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
+use Limoncello\Tests\Flute\Data\Schemas\PostSchema;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Rules as r;
 

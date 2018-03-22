@@ -21,9 +21,9 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Authentication\AccountManager;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Passport\Authentication\PassportAccount;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use Limoncello\Passport\Package\PassportSettings;
 use Limoncello\Tests\Passport\Data\TestContainer;
 use Mockery;
@@ -48,9 +48,9 @@ class AccountManagerTest extends TestCase
         $manager = new AccountManager($container);
         $this->assertNull($manager->getAccount());
 
-        /** @var DatabaseSchemeInterface $schemeMock */
-        $schemeMock = Mockery::mock(DatabaseSchemeInterface::class);
-        $passport   = new PassportAccount($schemeMock);
+        /** @var DatabaseSchemaInterface $schemaMock */
+        $schemaMock = Mockery::mock(DatabaseSchemaInterface::class);
+        $passport   = new PassportAccount($schemaMock);
 
         $this->assertSame($passport, $manager->setAccount($passport)->getAccount());
     }
@@ -66,9 +66,9 @@ class AccountManagerTest extends TestCase
 
         /** @var Mock $repoMock */
         /** @var Mock $providerMock */
-        $container[TokenRepositoryInterface::class] = $repoMock = Mockery::mock(TokenRepositoryInterface::class);
+        $container[TokenRepositoryInterface::class]  = $repoMock = Mockery::mock(TokenRepositoryInterface::class);
         $container[SettingsProviderInterface::class] = $providerMock = Mockery::mock(SettingsProviderInterface::class);
-        $container[DatabaseSchemeInterface::class] = $scheme = new DatabaseScheme();
+        $container[DatabaseSchemaInterface::class]   = $schema = new DatabaseSchema();
 
         $timeout    = 3600;
         $tokenValue = '123';
@@ -78,9 +78,9 @@ class AccountManagerTest extends TestCase
         ]);
 
         $properties = [
-            $scheme->getTokensUserIdentityColumn()   => $userId = '123',
-            $scheme->getTokensClientIdentityColumn() => $clientId = 'some_client_id',
-            $scheme->getTokensViewScopesColumn()     => [
+            $schema->getTokensUserIdentityColumn()   => $userId = '123',
+            $schema->getTokensClientIdentityColumn() => $clientId = 'some_client_id',
+            $schema->getTokensViewScopesColumn()     => [
                 $scope1 = 'some_scope_1',
             ],
         ];

@@ -21,7 +21,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Exception;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy;
@@ -1045,7 +1045,7 @@ class CrudTest extends TestCase
         $container[FormatterFactoryInterface::class] = $formatterFactory = new FormatterFactory();
         $container[Connection::class]                = $this->connection = $this->initDb();
         $container[FactoryInterface::class]          = $factory = new Factory($container);
-        $container[ModelSchemeInfoInterface::class]  = $modelSchemes = $this->getModelSchemes();
+        $container[ModelSchemaInfoInterface::class]  = $modelSchemas = $this->getModelSchemas();
 
         $container[RelationshipPaginationStrategyInterface::class] =
             new BasicRelationshipPaginationStrategy(self::DEFAULT_PAGE);

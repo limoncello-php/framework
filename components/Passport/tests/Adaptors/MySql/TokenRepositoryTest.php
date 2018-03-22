@@ -21,8 +21,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Exception;
 use Limoncello\Passport\Adaptors\MySql\TokenRepository;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
+use Limoncello\Passport\Entities\DatabaseSchema;
 
 /**
  * @package Limoncello\Tests\Passport
@@ -39,44 +39,44 @@ class TokenRepositoryTest extends TestCase
     public function testReadPassport()
     {
         $connection = $this->createConnection();
-        $scheme     = new DatabaseScheme('users_table', 'id_user');
-        $this->preparePassportTable($connection, $scheme);
+        $schema     = new DatabaseSchema('users_table', 'id_user');
+        $this->preparePassportTable($connection, $schema);
 
 
         /** @var Connection $connection */
-        /** @var DatabaseSchemeInterface $scheme */
+        /** @var DatabaseSchemaInterface $schema */
 
-        $repository = new TokenRepository($connection, $scheme);
+        $repository = new TokenRepository($connection, $schema);
         $this->assertNotEmpty($repository->readPassport(self::TEST_TOKEN_VALUE, 3600));
     }
 
     /**
      * @param Connection     $connection
-     * @param DatabaseScheme $scheme
+     * @param DatabaseSchema $schema
      *
      * @return void
      *
      * @throws Exception
      */
-    private function preparePassportTable(Connection $connection, DatabaseScheme $scheme)
+    private function preparePassportTable(Connection $connection, DatabaseSchema $schema)
     {
         // emulate view with table
         $types = [
-            $scheme->getTokensIdentityColumn()       => Type::INTEGER,
-            $scheme->getTokensValueColumn()          => Type::STRING,
-            $scheme->getTokensViewScopesColumn()     => Type::STRING,
-            $scheme->getTokensIsEnabledColumn()      => Type::BOOLEAN,
-            $scheme->getTokensValueCreatedAtColumn() => Type::DATETIME,
+            $schema->getTokensIdentityColumn()       => Type::INTEGER,
+            $schema->getTokensValueColumn()          => Type::STRING,
+            $schema->getTokensViewScopesColumn()     => Type::STRING,
+            $schema->getTokensIsEnabledColumn()      => Type::BOOLEAN,
+            $schema->getTokensValueCreatedAtColumn() => Type::DATETIME,
         ];
         $data  = [
-            $scheme->getTokensIdentityColumn()       => 1,
-            $scheme->getTokensValueColumn()          => self::TEST_TOKEN_VALUE,
-            $scheme->getTokensViewScopesColumn()     => 'one two three',
-            $scheme->getTokensIsEnabledColumn()      => true,
-            $scheme->getTokensValueCreatedAtColumn() => new DateTimeImmutable(),
+            $schema->getTokensIdentityColumn()       => 1,
+            $schema->getTokensValueColumn()          => self::TEST_TOKEN_VALUE,
+            $schema->getTokensViewScopesColumn()     => 'one two three',
+            $schema->getTokensIsEnabledColumn()      => true,
+            $schema->getTokensValueCreatedAtColumn() => new DateTimeImmutable(),
         ];
 
-        $this->createTable($connection, $scheme->getPassportView(), $types);
-        $connection->insert($scheme->getPassportView(), $data, $types);
+        $this->createTable($connection, $schema->getPassportView(), $types);
+        $connection->insert($schema->getPassportView(), $data, $types);
     }
 }

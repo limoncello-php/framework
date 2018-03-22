@@ -18,8 +18,8 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Contracts\Data\MigrationInterface;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
-use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
+use Limoncello\Passport\Traits\DatabaseSchemaMigrationTrait;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -27,7 +27,7 @@ use Psr\Container\ContainerInterface;
  */
 class PassportMigration implements MigrationInterface
 {
-    use DatabaseSchemeMigrationTrait;
+    use DatabaseSchemaMigrationTrait;
 
     /**
      * @var ContainerInterface
@@ -49,7 +49,7 @@ class PassportMigration implements MigrationInterface
      */
     public function migrate(): void
     {
-        $this->createDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
+        $this->createDatabaseSchema($this->getConnection(), $this->getDatabaseSchema());
     }
 
     /**
@@ -57,7 +57,7 @@ class PassportMigration implements MigrationInterface
      */
     public function rollback(): void
     {
-        $this->removeDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
+        $this->removeDatabaseSchema($this->getConnection(), $this->getDatabaseSchema());
     }
 
     /**
@@ -79,10 +79,10 @@ class PassportMigration implements MigrationInterface
     }
 
     /**
-     * @return DatabaseSchemeInterface
+     * @return DatabaseSchemaInterface
      */
-    protected function getDatabaseScheme(): DatabaseSchemeInterface
+    protected function getDatabaseSchema(): DatabaseSchemaInterface
     {
-        return $this->getContainer()->get(DatabaseSchemeInterface::class);
+        return $this->getContainer()->get(DatabaseSchemaInterface::class);
     }
 }

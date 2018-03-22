@@ -17,7 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 
 /**
  * @package Limoncello\Passport
@@ -31,15 +31,15 @@ class RedirectUriRepository extends \Limoncello\Passport\Repositories\RedirectUr
 
     /**
      * @param Connection              $connection
-     * @param DatabaseSchemeInterface $databaseScheme
+     * @param DatabaseSchemaInterface $databaseSchema
      * @param string                  $modelClass
      */
     public function __construct(
         Connection $connection,
-        DatabaseSchemeInterface $databaseScheme,
+        DatabaseSchemaInterface $databaseSchema,
         string $modelClass = RedirectUri::class
     ) {
-        $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+        $this->setConnection($connection)->setDatabaseSchema($databaseSchema);
         $this->modelClass = $modelClass;
     }
 

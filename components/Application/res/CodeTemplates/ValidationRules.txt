@@ -1,7 +1,7 @@
 <?php namespace App\Validation\Rules;
 
 use App\Data\Models\{%SINGULAR_CC%} as Model;
-use App\Json\Schemes\{%SINGULAR_CC%}Schema as Schema;
+use App\Json\Schemas\{%SINGULAR_CC%}Schema as Schema;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 
 /**

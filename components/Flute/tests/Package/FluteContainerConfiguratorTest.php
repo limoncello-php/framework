@@ -22,7 +22,7 @@ use Exception;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
@@ -30,7 +30,7 @@ use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
 use Limoncello\Flute\Package\FluteContainerConfigurator;
@@ -72,7 +72,7 @@ class FluteContainerConfiguratorTest extends TestCase
             [
                 FluteSettings::class =>
                     (new Flute(
-                        $this->getSchemeMap(),
+                        $this->getSchemaMap(),
                         $this->getJsonValidationRuleSets(),
                         $this->getFormValidationRuleSets(),
                         $this->getQueryValidationRuleSets()
@@ -83,7 +83,7 @@ class FluteContainerConfiguratorTest extends TestCase
         $container[SettingsProviderInterface::class]      = $cacheSettingsProvider;
 
         $container[LoggerInterface::class]           = new NullLogger();
-        $container[ModelSchemeInfoInterface::class]  = $this->getModelSchemes();
+        $container[ModelSchemaInfoInterface::class]  = $this->getModelSchemas();
         $container[Connection::class]                = $this->createConnection();
         $container[FormatterFactoryInterface::class] = new FormatterFactory();
 
@@ -92,7 +92,7 @@ class FluteContainerConfiguratorTest extends TestCase
 
         $this->assertNotNull($container->get(FactoryInterface::class));
         $this->assertNotNull($container->get(ThrowableHandlerInterface::class));
-        $this->assertNotNull($container->get(JsonSchemesInterface::class));
+        $this->assertNotNull($container->get(JsonSchemasInterface::class));
         $this->assertNotNull($container->get(EncoderInterface::class));
         $this->assertNotNull($container->get(ParametersMapperInterface::class));
         $this->assertNotNull($container->get(RelationshipPaginationStrategyInterface::class));

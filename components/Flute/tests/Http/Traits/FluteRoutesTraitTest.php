@@ -20,7 +20,7 @@ use Exception;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Flute\Http\Traits\FluteRoutesTrait;
 use Limoncello\Tests\Flute\Data\Http\ApiCategoriesController;
-use Limoncello\Tests\Flute\Data\Models\Category;
+use Limoncello\Tests\Flute\Data\Schemas\CategorySchema;
 use Limoncello\Tests\Flute\TestCase;
 use Mockery;
 use Mockery\Mock;
@@ -70,7 +70,7 @@ class FluteRoutesTraitTest extends TestCase
 
         /** @var GroupInterface $group */
 
-        $this->resource($group, ApiCategoriesController::class);
+        $this->resource($group, CategorySchema::TYPE, ApiCategoriesController::class);
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
@@ -92,7 +92,8 @@ class FluteRoutesTraitTest extends TestCase
 
         $this->relationship(
             $group,
-            Category::REL_CHILDREN,
+            CategorySchema::TYPE,
+            CategorySchema::REL_CHILDREN,
             ApiCategoriesController::class,
             'readChildren'
         );

@@ -21,7 +21,7 @@ use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Exceptions\AuthenticationException;
 use Psr\Container\ContainerInterface;
@@ -94,9 +94,9 @@ class AccountManager implements PassportAccountManagerInterface
             throw new AuthenticationException();
         }
 
-        /** @var DatabaseSchemeInterface $scheme */
-        $scheme  = $this->getContainer()->get(DatabaseSchemeInterface::class);
-        $account = new PassportAccount($scheme, $properties);
+        /** @var DatabaseSchemaInterface $schema */
+        $schema  = $this->getContainer()->get(DatabaseSchemaInterface::class);
+        $account = new PassportAccount($schema, $properties);
         $this->setAccount($account);
 
         $this->logger === null ?: $this->logger->info('Passport account is set for a given token value.');

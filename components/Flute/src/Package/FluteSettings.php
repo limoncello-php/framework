@@ -69,8 +69,8 @@ abstract class FluteSettings implements FluteSettingsInterface
         $apiFolder            = $defaults[static::KEY_API_FOLDER] ?? null;
         $valRulesFolder       = $defaults[static::KEY_JSON_VALIDATION_RULES_FOLDER] ?? null;
         $jsonCtrlFolder       = $defaults[static::KEY_JSON_CONTROLLERS_FOLDER] ?? null;
-        $schemesFolder        = $defaults[static::KEY_SCHEMAS_FOLDER] ?? null;
-        $schemesFileMask      = $defaults[static::KEY_SCHEMAS_FILE_MASK] ?? null;
+        $schemasFolder        = $defaults[static::KEY_SCHEMAS_FOLDER] ?? null;
+        $schemasFileMask      = $defaults[static::KEY_SCHEMAS_FILE_MASK] ?? null;
         $jsonDataValFolder    = $defaults[static::KEY_JSON_VALIDATORS_FOLDER] ?? null;
         $jsonDataValFileMask  = $defaults[static::KEY_JSON_VALIDATORS_FILE_MASK] ?? null;
         $formsValFolder       = $defaults[static::KEY_FORM_VALIDATORS_FOLDER] ?? null;
@@ -91,10 +91,10 @@ abstract class FluteSettings implements FluteSettingsInterface
             "Invalid JSON API controllers' folder `$jsonCtrlFolder`."
         );
         assert(
-            $schemesFolder !== null && empty(glob($schemesFolder)) === false,
-            "Invalid Schemes folder `$schemesFolder`."
+            $schemasFolder !== null && empty(glob($schemasFolder)) === false,
+            "Invalid Schemas folder `$schemasFolder`."
         );
-        assert(empty($schemesFileMask) === false, "Invalid Schemes file mask `$schemesFileMask`.");
+        assert(empty($schemasFileMask) === false, "Invalid Schemas file mask `$schemasFileMask`.");
         assert(
             $jsonDataValFolder !== null && empty(glob($jsonDataValFolder)) === false,
             "Invalid JSON Validators folder `$jsonDataValFolder`."
@@ -111,7 +111,7 @@ abstract class FluteSettings implements FluteSettingsInterface
         );
         assert(empty($jsonQueryValFileMask) === false, "Invalid Query Validators file mask `$jsonQueryValFileMask`.");
 
-        $schemesPath         = $schemesFolder . DIRECTORY_SEPARATOR . $schemesFileMask;
+        $schemasPath         = $schemasFolder . DIRECTORY_SEPARATOR . $schemasFileMask;
         $jsonDataValPath     = $jsonDataValFolder . DIRECTORY_SEPARATOR . $jsonDataValFileMask;
         $formsValidatorsPath = $formsValFolder . DIRECTORY_SEPARATOR . $formsValFileMask;
         $jsonQueryValPath    = $jsonQueryValFolder . DIRECTORY_SEPARATOR . $jsonQueryValFileMask;
@@ -124,7 +124,7 @@ abstract class FluteSettings implements FluteSettingsInterface
         return $defaults + [
                 static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS => array_flip($doNotLogExceptions),
 
-                static::KEY_MODEL_TO_SCHEME_MAP => $this->createModelToSchemeMap($schemesPath, $requireUniqueTypes),
+                static::KEY_MODEL_TO_SCHEMA_MAP => $this->createModelToSchemaMap($schemasPath, $requireUniqueTypes),
 
                 static::KEY_JSON_VALIDATION_RULE_SETS_DATA =>
                     $this->serializeJsonValidationRules($jsonDataValPath, $jsonQueryValPath),
@@ -164,31 +164,31 @@ abstract class FluteSettings implements FluteSettingsInterface
     }
 
     /**
-     * @param string $schemesPath
+     * @param string $schemasPath
      * @param bool   $requireUniqueTypes
      *
      * @return array
      */
-    private function createModelToSchemeMap(string $schemesPath, bool $requireUniqueTypes): array
+    private function createModelToSchemaMap(string $schemasPath, bool $requireUniqueTypes): array
     {
         $map   = [];
         $types = [];
-        foreach ($this->selectClasses($schemesPath, SchemaInterface::class) as $schemeClass) {
+        foreach ($this->selectClasses($schemasPath, SchemaInterface::class) as $schemaClass) {
             assert(
-                is_string($schemeClass) &&
-                class_exists($schemeClass) &&
-                array_key_exists(SchemaInterface::class, class_implements($schemeClass))
+                is_string($schemaClass) &&
+                class_exists($schemaClass) &&
+                array_key_exists(SchemaInterface::class, class_implements($schemaClass))
             );
-            /** @var SchemaInterface $schemeClass */
-            $modelClass   = $schemeClass::MODEL;
-            $resourceType = $schemeClass::TYPE;
+            /** @var SchemaInterface $schemaClass */
+            $modelClass   = $schemaClass::MODEL;
+            $resourceType = $schemaClass::TYPE;
 
             assert(is_string($modelClass) === true && empty($modelClass) === false);
             assert(is_string($resourceType) === true && empty($resourceType) === false);
 
-            // By default it checks that all Schemes have unique resource types. That's a legit case
-            // to have multiple Schemes for a same resource type however it's more likely that developer
-            // just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
+            // By default it checks that all Schemas have unique resource types. That's a legit case
+            // to have multiple Schemas for a same resource type however it's more likely that developer
+            // just forgot to set a unique one. If you do need multiple Schemas for a resource feel free
             // to set to turn off this check.
             assert(
                 $requireUniqueTypes === false || array_key_exists($resourceType, $types) === false,
@@ -196,7 +196,7 @@ abstract class FluteSettings implements FluteSettingsInterface
             );
             $types[$resourceType] = true;
 
-            $map[$modelClass] = $schemeClass;
+            $map[$modelClass] = $schemaClass;
         }
 
         return $map;

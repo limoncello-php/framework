@@ -20,7 +20,7 @@ use Doctrine\DBAL\Connection;
 use Exception;
 use Limoncello\Passport\Adaptors\MySql\Client;
 use Limoncello\Passport\Adaptors\MySql\ClientRepository;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Mockery;
 use ReflectionMethod;
 
@@ -37,16 +37,16 @@ class ClientRepositoryTest extends TestCase
     public function testGetters()
     {
         $connection = Mockery::mock(Connection::class);
-        /** @var Mockery\Mock $scheme */
-        $scheme = Mockery::mock(DatabaseSchemeInterface::class);
+        /** @var Mockery\Mock $schema */
+        $schema = Mockery::mock(DatabaseSchemaInterface::class);
 
         $viewName = 'whatever';
-        $scheme->shouldReceive('getClientsView')->once()->withNoArgs()->andReturn($viewName);
+        $schema->shouldReceive('getClientsView')->once()->withNoArgs()->andReturn($viewName);
 
         /** @var Connection $connection */
-        /** @var DatabaseSchemeInterface $scheme */
+        /** @var DatabaseSchemaInterface $schema */
 
-        $repository = new ClientRepository($connection, $scheme);
+        $repository = new ClientRepository($connection, $schema);
 
         $method = new ReflectionMethod(ClientRepository::class, 'getClassName');
         $method->setAccessible(true);

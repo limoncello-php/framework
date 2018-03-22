@@ -54,7 +54,7 @@ class PassportServerIntegration extends BasePassportServerIntegration
     public function getClientRepository(): ClientRepositoryInterface
     {
         if ($this->clientRepo === null) {
-            $this->clientRepo = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
+            $this->clientRepo = new ClientRepository($this->getConnection(), $this->getDatabaseSchema());
         }
 
         return $this->clientRepo;
@@ -66,7 +66,7 @@ class PassportServerIntegration extends BasePassportServerIntegration
     public function getScopeRepository(): ScopeRepositoryInterface
     {
         if ($this->scopeRepo === null) {
-            $this->scopeRepo = new ScopeRepository($this->getConnection(), $this->getDatabaseScheme());
+            $this->scopeRepo = new ScopeRepository($this->getConnection(), $this->getDatabaseSchema());
         }
 
         return $this->scopeRepo;
@@ -78,7 +78,7 @@ class PassportServerIntegration extends BasePassportServerIntegration
     public function getRedirectUriRepository(): RedirectUriRepositoryInterface
     {
         if ($this->uriRepo === null) {
-            $this->uriRepo = new RedirectUriRepository($this->getConnection(), $this->getDatabaseScheme());
+            $this->uriRepo = new RedirectUriRepository($this->getConnection(), $this->getDatabaseSchema());
         }
 
         return $this->uriRepo;
@@ -90,7 +90,7 @@ class PassportServerIntegration extends BasePassportServerIntegration
     public function getTokenRepository(): TokenRepositoryInterface
     {
         if ($this->tokenRepo === null) {
-            $this->tokenRepo = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
+            $this->tokenRepo = new TokenRepository($this->getConnection(), $this->getDatabaseSchema());
         }
 
         return $this->tokenRepo;

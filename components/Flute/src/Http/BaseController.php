@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\ControllerInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Http\Traits\DefaultControllerMethodsTrait;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -74,7 +74,7 @@ abstract class BaseController implements ControllerInterface
             static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }
@@ -95,11 +95,11 @@ abstract class BaseController implements ControllerInterface
             $request->getUri(),
             $request->getBody(),
             static::SCHEMA_CLASS,
-            $container->get(ModelSchemeInfoInterface::class),
+            $container->get(ModelSchemaInfoInterface::class),
             static::defaultCreateDataParser($container, static::ON_CREATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
             $container->get(FormatterFactoryInterface::class)
@@ -128,7 +128,7 @@ abstract class BaseController implements ControllerInterface
             static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }
@@ -150,11 +150,11 @@ abstract class BaseController implements ControllerInterface
             $request->getUri(),
             $request->getBody(),
             static::SCHEMA_CLASS,
-            $container->get(ModelSchemeInfoInterface::class),
+            $container->get(ModelSchemaInfoInterface::class),
             static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
             $container->get(FormatterFactoryInterface::class)
@@ -178,7 +178,7 @@ abstract class BaseController implements ControllerInterface
             $request->getUri(),
             static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
 
@@ -220,7 +220,7 @@ abstract class BaseController implements ControllerInterface
             static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             $api,
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }
@@ -260,7 +260,7 @@ abstract class BaseController implements ControllerInterface
             static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             $api,
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }
@@ -298,12 +298,12 @@ abstract class BaseController implements ControllerInterface
             $request->getUri(),
             $request->getBody(),
             $childSchemaClass,
-            $container->get(ModelSchemeInfoInterface::class),
+            $container->get(ModelSchemaInfoInterface::class),
             static::defaultCreateDataParser($container, $childValidatorClass),
             static::defaultCreateApi($container, static::API_CLASS),
             static::defaultCreateApi($container, $childApiClass),
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
             $container->get(FormatterFactoryInterface::class)
@@ -342,7 +342,7 @@ abstract class BaseController implements ControllerInterface
             static::defaultCreateApi($container, static::API_CLASS),
             static::defaultCreateApi($container, $childApiClass),
             $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemesInterface::class),
+            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }

@@ -29,7 +29,7 @@ interface ParametersMapperInterface
      *
      * @return self
      */
-    public function selectRootSchemeByResourceType(string $resourceType): self;
+    public function selectRootSchemaByResourceType(string $resourceType): self;
 
     /**
      * @param iterable $filters

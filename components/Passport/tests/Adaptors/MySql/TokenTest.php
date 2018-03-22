@@ -19,7 +19,7 @@
 use Doctrine\DBAL\Types\Type;
 use Exception;
 use Limoncello\Passport\Adaptors\MySql\Token;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use PDO;
 
 /**
@@ -65,14 +65,14 @@ class TokenTest extends TestCase
             Token::FIELD_SCOPES            => 'one two three',
         ];
 
-        $this->createTable($connection, DatabaseScheme::TABLE_CLIENTS, $types);
-        $connection->insert(DatabaseScheme::TABLE_CLIENTS, $columns, $types);
+        $this->createTable($connection, DatabaseSchema::TABLE_CLIENTS, $types);
+        $connection->insert(DatabaseSchema::TABLE_CLIENTS, $columns, $types);
 
         // now read from SqLite table as it was MySql view or table
         $query     = $connection->createQueryBuilder();
         $statement = $query
             ->select(['*'])
-            ->from(DatabaseScheme::TABLE_CLIENTS)
+            ->from(DatabaseSchema::TABLE_CLIENTS)
             ->setMaxResults(1)
             ->execute();
         $statement->setFetchMode(PDO::FETCH_CLASS, Token::class);

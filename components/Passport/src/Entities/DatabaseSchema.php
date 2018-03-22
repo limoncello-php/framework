@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 
 /**
  * @package Limoncello\Passport
  *
  * @SuppressWarnings(PHPMD)
  */
-class DatabaseScheme implements DatabaseSchemeInterface
+class DatabaseSchema implements DatabaseSchemaInterface
 {
     /** Table name */
     const TABLE_CLIENTS = 'oauth_clients';

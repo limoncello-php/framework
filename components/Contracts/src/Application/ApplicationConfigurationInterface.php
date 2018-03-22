@@ -25,10 +25,10 @@ interface ApplicationConfigurationInterface
     const KEY_APP_NAME = 0;
 
     /** Settings key */
-    const KEY_APP_ORIGIN_SCHEME = self::KEY_APP_NAME + 1;
+    const KEY_APP_ORIGIN_SCHEMA = self::KEY_APP_NAME + 1;
 
     /** Settings key */
-    const KEY_APP_ORIGIN_HOST = self::KEY_APP_ORIGIN_SCHEME + 1;
+    const KEY_APP_ORIGIN_HOST = self::KEY_APP_ORIGIN_SCHEMA + 1;
 
     /** Settings key */
     const KEY_APP_ORIGIN_PORT = self::KEY_APP_ORIGIN_HOST + 1;

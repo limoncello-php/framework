@@ -19,7 +19,7 @@
 /**
  * @package Limoncello\Contracts
  */
-interface ModelSchemeInfoInterface
+interface ModelSchemaInfoInterface
 {
     /**
      * @param string $class

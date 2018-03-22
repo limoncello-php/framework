@@ -22,11 +22,12 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
 use Limoncello\Flute\Factory;
+use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Resources\Messages\En\Generic;
 use Limoncello\Flute\Resources\Messages\En\Validation;
 use Limoncello\Flute\Types\DateTime;
@@ -36,9 +37,9 @@ use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiQueryRulesSerializer;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
-use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
-use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
+use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
+use Limoncello\Tests\Flute\Data\Schemas\EmotionSchema;
+use Limoncello\Tests\Flute\Data\Schemas\UserSchema;
 use Limoncello\Tests\Flute\Data\Validation\AppRules as v;
 use Limoncello\Tests\Flute\TestCase;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
@@ -806,12 +807,14 @@ EOT;
         $parser    = null;
         $blocks    = JsonApiQueryRulesSerializer::readBlocks($serializedData);
         try {
+            /** @var FormatterFactoryInterface $formatterFactory */
+            $formatterFactory = $container->get(FormatterFactoryInterface::class);
             $parser = new DataParser(
                 $rulesClass,
                 JsonApiDataRulesSerializer::class,
                 $serializedData,
                 new ContextStorage($blocks, $container),
-                new JsonApiErrorCollection($container),
+                new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
                 $container->get(FormatterFactoryInterface::class)
             );
         } catch (Exception | NotFoundExceptionInterface | ContainerExceptionInterface $exception) {
@@ -828,8 +831,8 @@ EOT;
     {
         $container = new Container();
 
-        $container[ModelSchemeInfoInterface::class]  = $schemes = $this->getModelSchemes();
-        $container[JsonSchemesInterface::class]      = $this->getJsonSchemes(new Factory($container), $schemes);
+        $container[ModelSchemaInfoInterface::class]  = $schemas = $this->getModelSchemas();
+        $container[JsonSchemasInterface::class]      = $this->getJsonSchemas(new Factory($container), $schemas);
         $container[FormatterFactoryInterface::class] = new FormatterFactory();
 
         return $container;

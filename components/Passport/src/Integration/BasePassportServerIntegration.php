@@ -19,11 +19,11 @@
 use Doctrine\DBAL\Connection;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Entities\Client;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use Limoncello\Passport\Package\PassportSettings as C;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -80,9 +80,9 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     private $connection;
 
     /**
-     * @var DatabaseSchemeInterface
+     * @var DatabaseSchemaInterface
      */
-    private $databaseScheme;
+    private $databaseSchema;
 
     /**
      * @var string
@@ -309,15 +309,15 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     }
 
     /**
-     * @return DatabaseSchemeInterface
+     * @return DatabaseSchemaInterface
      */
-    protected function getDatabaseScheme(): DatabaseSchemeInterface
+    protected function getDatabaseSchema(): DatabaseSchemaInterface
     {
-        if ($this->databaseScheme === null) {
-            $this->databaseScheme = new DatabaseScheme();
+        if ($this->databaseSchema === null) {
+            $this->databaseSchema = new DatabaseSchema();
         }
 
-        return $this->databaseScheme;
+        return $this->databaseSchema;
     }
 
     /**

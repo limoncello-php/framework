@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Passport\Traits;
+<?php namespace Limoncello\Tests\Passport\Adaptors;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -18,8 +18,8 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
-use Limoncello\Passport\Entities\DatabaseScheme;
-use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
+use Limoncello\Passport\Adaptors\MySql\DatabaseSchemaMigrationTrait;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use Limoncello\Tests\Passport\Data\User;
 use Mockery;
 use Mockery\Mock;
@@ -28,9 +28,9 @@ use PHPUnit\Framework\TestCase;
 /**
  * @package Limoncello\Tests\Passport
  */
-class DatabaseSchemeMigrationTest extends TestCase
+class DatabaseSchemaMigrationTest extends TestCase
 {
-    use DatabaseSchemeMigrationTrait;
+    use DatabaseSchemaMigrationTrait;
 
     /**
      * @inheritdoc
@@ -52,13 +52,14 @@ class DatabaseSchemeMigrationTest extends TestCase
         /** @var Mock $connection */
         $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getSchemaManager')->zeroOrMoreTimes()->withNoArgs()->andReturnSelf();
-        $connection->shouldReceive('dropAndCreateTable')->once()->withAnyArgs()
-            ->andThrow(DBALException::invalidTableName('whatever'));
+        $connection->shouldReceive('dropAndCreateTable')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
         $connection->shouldReceive('isConnected')->once()->withNoArgs()->andReturn(true);
         $connection->shouldReceive('tablesExist')->zeroOrMoreTimes()->withAnyArgs()->andReturn(false);
+        $connection->shouldReceive('exec')->once()->withAnyArgs()->andThrow(DBALException::invalidTableName('abc'));
+        $connection->shouldReceive('exec')->zeroOrMoreTimes()->withAnyArgs()->andReturnUndefined();
 
         /** @var Connection $connection */
 
-        $this->createDatabaseScheme($connection, new DatabaseScheme(User::TABLE_NAME, User::FIELD_ID));
+        $this->createDatabaseSchema($connection, new DatabaseSchema(User::TABLE_NAME, User::FIELD_ID));
     }
 }

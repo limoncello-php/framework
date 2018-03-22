@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Data\Schemes;
+<?php namespace Limoncello\Tests\Flute\Data\Schemas;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,24 +16,27 @@
  * limitations under the License.
  */
 
-use Limoncello\Tests\Flute\Data\Models\Emotion as Model;
+use Limoncello\Tests\Flute\Data\Models\Category as Model;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class EmotionSchema extends BaseSchema
+class CategorySchema extends BaseSchema
 {
     /** Type */
-    const TYPE = 'emotions';
+    const TYPE = 'categories';
 
     /** Model class name */
     const MODEL = Model::class;
 
     /** Attribute name */
-    const ATTR_NAME = 'text-attribute';
+    const ATTR_NAME = 'name-attribute';
 
     /** Relationship name */
-    const REL_COMMENTS = 'comments-relationship';
+    const REL_PARENT = 'parent-relationship';
+
+    /** Relationship name */
+    const REL_CHILDREN = 'children-relationship';
 
     /**
      * @inheritdoc
@@ -48,7 +51,8 @@ class EmotionSchema extends BaseSchema
                 self::ATTR_UPDATED_AT => Model::FIELD_UPDATED_AT,
             ],
             self::SCHEMA_RELATIONSHIPS => [
-                self::REL_COMMENTS => Model::REL_COMMENTS,
+                self::REL_PARENT   => Model::REL_PARENT,
+                self::REL_CHILDREN => Model::REL_CHILDREN,
             ],
         ];
     }

@@ -19,7 +19,7 @@
 use Doctrine\DBAL\Types\Type;
 use Exception;
 use Limoncello\Passport\Adaptors\MySql\Client;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use PDO;
 
 /**
@@ -71,14 +71,14 @@ class ClientTest extends TestCase
             Client::FIELD_REDIRECT_URIS             => 'https://acme.foo/redirect',
         ];
 
-        $this->createTable($connection, DatabaseScheme::TABLE_CLIENTS, $types);
-        $connection->insert(DatabaseScheme::TABLE_CLIENTS, $columns, $types);
+        $this->createTable($connection, DatabaseSchema::TABLE_CLIENTS, $types);
+        $connection->insert(DatabaseSchema::TABLE_CLIENTS, $columns, $types);
 
         // now read from SqLite table as it was MySql view or table
         $query     = $connection->createQueryBuilder();
         $statement = $query
             ->select(['*'])
-            ->from(DatabaseScheme::TABLE_CLIENTS)
+            ->from(DatabaseSchema::TABLE_CLIENTS)
             ->setMaxResults(1)
             ->execute();
         $statement->setFetchMode(PDO::FETCH_CLASS, Client::class);

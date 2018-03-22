@@ -19,7 +19,7 @@
 use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\CategoriesApi as Api;
 use Limoncello\Tests\Flute\Data\Models\Category as Model;
-use Limoncello\Tests\Flute\Data\Schemes\CategorySchema as Schema;
+use Limoncello\Tests\Flute\Data\Schemas\CategorySchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadCategoriesQueryRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;

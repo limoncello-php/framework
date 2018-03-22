@@ -58,13 +58,14 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
     {
         $serializedData = FluteSettings::getJsonDataSerializedRules($this->getFluteSettings());
 
-        $blocks    = JsonApiQueryRulesSerializer::readBlocks($serializedData);
+        /** @var FormatterFactoryInterface $formatterFactory */
+        $formatterFactory = $this->getContainer()->get(FormatterFactoryInterface::class);
         $validator = new DataParser(
             $rulesClass,
             JsonApiDataRulesSerializer::class,
             $serializedData,
-            new ContextStorage($blocks, $this->getContainer()),
-            new JsonApiErrorCollection($this->getContainer()),
+            new ContextStorage(JsonApiQueryRulesSerializer::readBlocks($serializedData), $this->getContainer()),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
             $this->getContainer()->get(FormatterFactoryInterface::class)
         );
 
@@ -80,15 +81,16 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
     {
         $serializedData = FluteSettings::getJsonQuerySerializedRules($this->getFluteSettings());
 
-        $blocks    = JsonApiQueryRulesSerializer::readBlocks($serializedData);
-        $validator = new QueryParser(
+        /** @var FormatterFactoryInterface $formatterFactory */
+        $formatterFactory = $this->getContainer()->get(FormatterFactoryInterface::class);
+        $validator        = new QueryParser(
             $rulesClass,
             JsonApiQueryRulesSerializer::class,
             $serializedData,
-            new ContextStorage($blocks, $this->getContainer()),
+            new ContextStorage(JsonApiQueryRulesSerializer::readBlocks($serializedData), $this->getContainer()),
             new CaptureAggregator(),
             new ErrorAggregator(),
-            new JsonApiErrorCollection($this->getContainer()),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
             $this->getContainer()->get(FormatterFactoryInterface::class)
         );
 

@@ -30,7 +30,7 @@ class Flute extends FluteSettings
     /**
      * @var string[]
      */
-    private $modelToSchemeMap;
+    private $modelToSchemaMap;
 
     /**
      * @var string[]
@@ -65,7 +65,7 @@ class Flute extends FluteSettings
     /**
      * @var string
      */
-    private $schemesPath;
+    private $schemasPath;
 
     /**
      * @var string
@@ -83,26 +83,26 @@ class Flute extends FluteSettings
     private $queryValPath;
 
     /**
-     * @param string[] $modelToSchemeMap
+     * @param string[] $modelToSchemaMap
      * @param string[] $jsonRuleSets
      * @param string[] $formRuleSets
      * @param string[] $queryRuleSets
      */
     public function __construct(
-        array $modelToSchemeMap,
+        array $modelToSchemaMap,
         array $jsonRuleSets,
         array $formRuleSets,
         array $queryRuleSets
     ) {
         $this->apiFolder      = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Api']);
         $this->jsonCtrlFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Http']);
-        $this->schemesPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Schemes']);
+        $this->schemasPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Schemas']);
         $this->valRulesFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation']);
         $this->formValPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'Forms', '**']);
         $this->jsonValPath    = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'JsonData', '**']);
         $this->queryValPath   = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Validation', 'JsonQueries', '**']);
 
-        $this->modelToSchemeMap = $modelToSchemeMap;
+        $this->modelToSchemaMap = $modelToSchemaMap;
         $this->jsonValRuleSets  = $jsonRuleSets;
         $this->formValRuleSets  = $formRuleSets;
         $this->queryValRuleSets = $queryRuleSets;
@@ -116,7 +116,7 @@ class Flute extends FluteSettings
         return parent::getSettings() + [
                 static::KEY_API_FOLDER                   => $this->apiFolder,
                 static::KEY_JSON_CONTROLLERS_FOLDER      => $this->jsonCtrlFolder,
-                static::KEY_SCHEMAS_FOLDER               => $this->schemesPath,
+                static::KEY_SCHEMAS_FOLDER               => $this->schemasPath,
                 static::KEY_JSON_VALIDATION_RULES_FOLDER => $this->valRulesFolder,
                 static::KEY_JSON_VALIDATORS_FOLDER       => $this->jsonValPath,
                 static::KEY_FORM_VALIDATORS_FOLDER       => $this->formValPath,
@@ -130,15 +130,15 @@ class Flute extends FluteSettings
     protected function selectClasses(string $path, string $implementClassName): Generator
     {
         $settings      = parent::getSettings();
-        $schemesPath   = $this->schemesPath . DIRECTORY_SEPARATOR . $settings[static::KEY_SCHEMAS_FILE_MASK];
+        $schemasPath   = $this->schemasPath . DIRECTORY_SEPARATOR . $settings[static::KEY_SCHEMAS_FILE_MASK];
         $jsonFilePath  = $this->jsonValPath . DIRECTORY_SEPARATOR . $settings[static::KEY_JSON_VALIDATORS_FILE_MASK];
         $formsFilePath = $this->formValPath . DIRECTORY_SEPARATOR . $settings[static::KEY_FORM_VALIDATORS_FILE_MASK];
         $queryFilePath = $this->queryValPath . DIRECTORY_SEPARATOR . $settings[static::KEY_QUERY_VALIDATORS_FILE_MASK];
 
         switch ($path) {
-            case $schemesPath:
-                foreach ($this->getModelToSchemeMap() as $schemeClass) {
-                    yield $schemeClass;
+            case $schemasPath:
+                foreach ($this->getModelToSchemaMap() as $schemaClass) {
+                    yield $schemaClass;
                 }
                 break;
             case $jsonFilePath:
@@ -169,9 +169,9 @@ class Flute extends FluteSettings
     /**
      * @inheritdoc
      */
-    private function getModelToSchemeMap(): array
+    private function getModelToSchemaMap(): array
     {
-        return $this->modelToSchemeMap;
+        return $this->modelToSchemaMap;
     }
 
     /**

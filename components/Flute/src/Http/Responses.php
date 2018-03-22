@@ -46,7 +46,7 @@ class Responses extends BaseResponses
     /**
      * @var ContainerInterface
      */
-    private $schemes;
+    private $schemas;
 
     /**
      * @var null|string
@@ -61,7 +61,7 @@ class Responses extends BaseResponses
     /**
      * @param MediaTypeInterface               $outputMediaType
      * @param EncoderInterface                 $encoder
-     * @param ContainerInterface               $schemes
+     * @param ContainerInterface               $schemas
      * @param EncodingParametersInterface|null $parameters
      * @param string|null                      $urlPrefix
      * @param mixed|null                       $defaultMeta
@@ -69,14 +69,14 @@ class Responses extends BaseResponses
     public function __construct(
         MediaTypeInterface $outputMediaType,
         EncoderInterface $encoder,
-        ContainerInterface $schemes,
+        ContainerInterface $schemas,
         EncodingParametersInterface $parameters = null,
         string $urlPrefix = null,
         $defaultMeta = null
     ) {
         $this->encoder         = $encoder;
         $this->outputMediaType = $outputMediaType;
-        $this->schemes         = $schemes;
+        $this->schemas         = $schemas;
         $this->urlPrefix       = $urlPrefix;
         $this->parameters      = $parameters;
         $this->defaultMeta     = $defaultMeta;
@@ -153,7 +153,7 @@ class Responses extends BaseResponses
      */
     protected function getSchemaContainer(): ?ContainerInterface
     {
-        return $this->schemes;
+        return $this->schemas;
     }
 
     /**

@@ -21,7 +21,7 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 /**
  * @package Limoncello\Flute
  */
-interface JsonSchemesInterface extends ContainerInterface
+interface JsonSchemasInterface extends ContainerInterface
 {
     /**
      * @param string $schemaClass

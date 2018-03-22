@@ -39,11 +39,11 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
     public function create(ScopeInterface $scope): ScopeInterface
     {
         $now    = new DateTimeImmutable();
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         $this->createResource([
-            $scheme->getScopesIdentityColumn()    => $scope->getIdentifier(),
-            $scheme->getScopesDescriptionColumn() => $scope->getDescription(),
-            $scheme->getScopesCreatedAtColumn()   => $now,
+            $schema->getScopesIdentityColumn()    => $scope->getIdentifier(),
+            $schema->getScopesDescriptionColumn() => $scope->getDescription(),
+            $schema->getScopesCreatedAtColumn()   => $now,
         ]);
 
         $scope->setCreatedAt($now);
@@ -65,10 +65,10 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
     public function update(ScopeInterface $scope): void
     {
         $now    = new DateTimeImmutable();
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         $this->updateResource($scope->getIdentifier(), [
-            $scheme->getScopesDescriptionColumn() => $scope->getDescription(),
-            $scheme->getScopesUpdatedAtColumn()   => $now,
+            $schema->getScopesDescriptionColumn() => $scope->getDescription(),
+            $schema->getScopesUpdatedAtColumn()   => $now,
         ]);
         $scope->setUpdatedAt($now);
     }
@@ -86,7 +86,7 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
      */
     protected function getTableNameForWriting(): string
     {
-        return $this->getDatabaseScheme()->getScopesTable();
+        return $this->getDatabaseSchema()->getScopesTable();
     }
 
     /**
@@ -94,6 +94,6 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
      */
     protected function getPrimaryKeyName(): string
     {
-        return $this->getDatabaseScheme()->getScopesIdentityColumn();
+        return $this->getDatabaseSchema()->getScopesIdentityColumn();
     }
 }

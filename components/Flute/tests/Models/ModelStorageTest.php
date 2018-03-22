@@ -17,9 +17,9 @@
  */
 
 use Exception;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Flute\Models\ModelStorage;
-use Limoncello\Tests\Flute\Data\Models\ModelSchemes;
+use Limoncello\Tests\Flute\Data\Models\ModelSchemas;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use PHPUnit\Framework\TestCase;
 
@@ -54,11 +54,11 @@ class ModelStorageTest extends TestCase
     }
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    private function createSchemaStorage(): ModelSchemeInfoInterface
+    private function createSchemaStorage(): ModelSchemaInfoInterface
     {
-        $storage = new ModelSchemes();
+        $storage = new ModelSchemas();
         $storage->registerClass(Post::class, Post::TABLE_NAME, Post::FIELD_ID, [], []);
 
         return $storage;

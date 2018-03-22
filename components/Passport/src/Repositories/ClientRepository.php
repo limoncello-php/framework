@@ -42,21 +42,21 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     public function create(ClientInterface $client): ClientInterface
     {
         $now    = new DateTimeImmutable();
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         $values = [
-            $scheme->getClientsIdentityColumn()               => $client->getIdentifier(),
-            $scheme->getClientsNameColumn()                   => $client->getName(),
-            $scheme->getClientsDescriptionColumn()            => $client->getDescription(),
-            $scheme->getClientsCredentialsColumn()            => $client->getCredentials(),
-            $scheme->getClientsIsConfidentialColumn()         => $client->isConfidential(),
-            $scheme->getClientsIsScopeExcessAllowedColumn()   => $client->isScopeExcessAllowed(),
-            $scheme->getClientsIsUseDefaultScopeColumn()      => $client->isUseDefaultScopesOnEmptyRequest(),
-            $scheme->getClientsIsCodeGrantEnabledColumn()     => $client->isCodeGrantEnabled(),
-            $scheme->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
-            $scheme->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
-            $scheme->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
-            $scheme->getClientsIsRefreshGrantEnabledColumn()  => $client->isRefreshGrantEnabled(),
-            $scheme->getClientsCreatedAtColumn()              => $now,
+            $schema->getClientsIdentityColumn()               => $client->getIdentifier(),
+            $schema->getClientsNameColumn()                   => $client->getName(),
+            $schema->getClientsDescriptionColumn()            => $client->getDescription(),
+            $schema->getClientsCredentialsColumn()            => $client->getCredentials(),
+            $schema->getClientsIsConfidentialColumn()         => $client->isConfidential(),
+            $schema->getClientsIsScopeExcessAllowedColumn()   => $client->isScopeExcessAllowed(),
+            $schema->getClientsIsUseDefaultScopeColumn()      => $client->isUseDefaultScopesOnEmptyRequest(),
+            $schema->getClientsIsCodeGrantEnabledColumn()     => $client->isCodeGrantEnabled(),
+            $schema->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
+            $schema->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
+            $schema->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
+            $schema->getClientsIsRefreshGrantEnabledColumn()  => $client->isRefreshGrantEnabled(),
+            $schema->getClientsCreatedAtColumn()              => $now,
         ];
 
         $identifier = $client->getIdentifier();
@@ -97,13 +97,13 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     public function bindScopeIdentifiers(string $identifier, array $scopeIdentifiers): void
     {
         if (empty($scopeIdentifiers) === false) {
-            $scheme = $this->getDatabaseScheme();
+            $schema = $this->getDatabaseSchema();
             $this->createBelongsToManyRelationship(
                 $identifier,
                 $scopeIdentifiers,
-                $scheme->getClientsScopesTable(),
-                $scheme->getClientsScopesClientIdentityColumn(),
-                $scheme->getClientsScopesScopeIdentityColumn()
+                $schema->getClientsScopesTable(),
+                $schema->getClientsScopesClientIdentityColumn(),
+                $schema->getClientsScopesScopeIdentityColumn()
             );
         }
     }
@@ -113,10 +113,10 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
      */
     public function unbindScopes(string $identifier): void
     {
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         $this->deleteBelongsToManyRelationshipIdentifiers(
-            $scheme->getClientsScopesTable(),
-            $scheme->getClientsScopesClientIdentityColumn(),
+            $schema->getClientsScopesTable(),
+            $schema->getClientsScopesClientIdentityColumn(),
             $identifier
         );
     }
@@ -134,12 +134,12 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
      */
     public function readScopeIdentifiers(string $identifier): array
     {
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         return $this->readBelongsToManyRelationshipIdentifiers(
             $identifier,
-            $scheme->getClientsScopesTable(),
-            $scheme->getClientsScopesClientIdentityColumn(),
-            $scheme->getClientsScopesScopeIdentityColumn()
+            $schema->getClientsScopesTable(),
+            $schema->getClientsScopesClientIdentityColumn(),
+            $schema->getClientsScopesScopeIdentityColumn()
         );
     }
 
@@ -148,12 +148,12 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
      */
     public function readRedirectUriStrings(string $identifier): array
     {
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         return $this->readHasManyRelationshipColumn(
             $identifier,
-            $scheme->getRedirectUrisTable(),
-            $scheme->getRedirectUrisValueColumn(),
-            $scheme->getRedirectUrisClientIdentityColumn()
+            $schema->getRedirectUrisTable(),
+            $schema->getRedirectUrisValueColumn(),
+            $schema->getRedirectUrisClientIdentityColumn()
         );
     }
 
@@ -163,19 +163,19 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     public function update(ClientInterface $client): void
     {
         $now    = new DateTimeImmutable();
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         $this->updateResource($client->getIdentifier(), [
-            $scheme->getClientsNameColumn()                   => $client->getName(),
-            $scheme->getClientsDescriptionColumn()            => $client->getDescription(),
-            $scheme->getClientsCredentialsColumn()            => $client->getCredentials(),
-            $scheme->getClientsIsConfidentialColumn()         => $client->isConfidential(),
-            $scheme->getClientsIsScopeExcessAllowedColumn()   => $client->isScopeExcessAllowed(),
-            $scheme->getClientsIsUseDefaultScopeColumn()      => $client->isUseDefaultScopesOnEmptyRequest(),
-            $scheme->getClientsIsCodeGrantEnabledColumn()     => $client->isCodeGrantEnabled(),
-            $scheme->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
-            $scheme->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
-            $scheme->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
-            $scheme->getClientsUpdatedAtColumn()              => $now,
+            $schema->getClientsNameColumn()                   => $client->getName(),
+            $schema->getClientsDescriptionColumn()            => $client->getDescription(),
+            $schema->getClientsCredentialsColumn()            => $client->getCredentials(),
+            $schema->getClientsIsConfidentialColumn()         => $client->isConfidential(),
+            $schema->getClientsIsScopeExcessAllowedColumn()   => $client->isScopeExcessAllowed(),
+            $schema->getClientsIsUseDefaultScopeColumn()      => $client->isUseDefaultScopesOnEmptyRequest(),
+            $schema->getClientsIsCodeGrantEnabledColumn()     => $client->isCodeGrantEnabled(),
+            $schema->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
+            $schema->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
+            $schema->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
+            $schema->getClientsUpdatedAtColumn()              => $now,
         ]);
         $client->setUpdatedAt($now);
     }
@@ -193,7 +193,7 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
      */
     protected function getTableNameForWriting(): string
     {
-        return $this->getDatabaseScheme()->getClientsTable();
+        return $this->getDatabaseSchema()->getClientsTable();
     }
 
     /**
@@ -201,6 +201,6 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
      */
     protected function getPrimaryKeyName(): string
     {
-        return $this->getDatabaseScheme()->getClientsIdentityColumn();
+        return $this->getDatabaseSchema()->getClientsIdentityColumn();
     }
 }

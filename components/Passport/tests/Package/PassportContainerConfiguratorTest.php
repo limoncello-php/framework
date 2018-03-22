@@ -21,7 +21,7 @@ use Exception;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\PassportServerInterface;
@@ -63,7 +63,7 @@ class PassportContainerConfiguratorTest extends TestCase
 
         $this->assertNotNull($container->get(AccountManagerInterface::class));
         $this->assertNotNull($container->get(PassportAccountManagerInterface::class));
-        $this->assertNotNull($container->get(DatabaseSchemeInterface::class));
+        $this->assertNotNull($container->get(DatabaseSchemaInterface::class));
         $this->assertNotNull($container->get(PassportServerInterface::class));
         $this->assertNotNull($container->get(TokenRepositoryInterface::class));
         /** @var PassportServerIntegrationInterface $integration */

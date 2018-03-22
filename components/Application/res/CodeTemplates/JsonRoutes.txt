@@ -1,7 +1,7 @@
 <?php namespace App\Routes;
 
 use App\Json\Controllers\{%PLURAL_CC%}Controller;
-//use App\Json\Schemes\{%SINGULAR_CC%}Schema;
+//use App\Json\Schemas\{%SINGULAR_CC%}Schema;
 use Limoncello\Contracts\Application\RoutesConfiguratorInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Flute\Http\Traits\FluteRoutesTrait;

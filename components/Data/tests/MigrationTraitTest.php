@@ -21,7 +21,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Data\MigrationInterface;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\Data\TimestampFields as TSF;
 use Limoncello\Data\Migrations\MigrationTrait;
@@ -88,13 +88,13 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         ];
         $migration = new TestTableMigration($modelClass, $columnToCreate);
 
-        $modelSchemes = Mockery::mock(ModelSchemeInfoInterface::class);
-        $this->prepareTable($modelSchemes, $modelClass, $tableName, 2);
-        $this->prepareAttributeLength($modelSchemes, $modelClass, $columnNonNullString, $columnStringLength);
-        $this->prepareAttributeLength($modelSchemes, $modelClass, $columnNullableString, $columnStringLength);
-        $this->prepareTimestamps($modelSchemes, $modelClass);
+        $modelSchemas = Mockery::mock(ModelSchemaInfoInterface::class);
+        $this->prepareTable($modelSchemas, $modelClass, $tableName, 2);
+        $this->prepareAttributeLength($modelSchemas, $modelClass, $columnNonNullString, $columnStringLength);
+        $this->prepareAttributeLength($modelSchemas, $modelClass, $columnNullableString, $columnStringLength);
+        $this->prepareTimestamps($modelSchemas, $modelClass);
 
-        $container = $this->createContainer($modelSchemes);
+        $container = $this->createContainer($modelSchemas);
         // as we create columns in one migration (this test) and then pass it to another migration
         // we have to init both migrations.
         $this->init($container);
@@ -181,16 +181,16 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $rel2_3      = 'rel_2_3_to_1';
         $length      = 100;
 
-        $modelSchemes = Mockery::mock(ModelSchemeInfoInterface::class);
-        $this->prepareTable($modelSchemes, $modelClass1, $table1);
-        $this->prepareTable($modelSchemes, $modelClass2, $table2);
-        $this->prepareAttributeLength($modelSchemes, $modelClass2, $pk2, $length);
-        $this->prepareRelationship($modelSchemes, $modelClass2, $rel2_1, $fk2_1, $modelClass1, $table1, $pk1);
-        $this->prepareForeignRelationship($modelSchemes, $modelClass2, $fk2_2, $modelClass1, $table1, $pk1);
-        $this->prepareRelationship($modelSchemes, $modelClass2, $rel2_3, $fk2_3, $modelClass1, $table1, $pk1);
-        $this->prepareForeignRelationship($modelSchemes, $modelClass2, $fk2_4, $modelClass1, $table1, $pk1);
+        $modelSchemas = Mockery::mock(ModelSchemaInfoInterface::class);
+        $this->prepareTable($modelSchemas, $modelClass1, $table1);
+        $this->prepareTable($modelSchemas, $modelClass2, $table2);
+        $this->prepareAttributeLength($modelSchemas, $modelClass2, $pk2, $length);
+        $this->prepareRelationship($modelSchemas, $modelClass2, $rel2_1, $fk2_1, $modelClass1, $table1, $pk1);
+        $this->prepareForeignRelationship($modelSchemas, $modelClass2, $fk2_2, $modelClass1, $table1, $pk1);
+        $this->prepareRelationship($modelSchemas, $modelClass2, $rel2_3, $fk2_3, $modelClass1, $table1, $pk1);
+        $this->prepareForeignRelationship($modelSchemas, $modelClass2, $fk2_4, $modelClass1, $table1, $pk1);
 
-        $container = $this->createContainer($modelSchemes);
+        $container = $this->createContainer($modelSchemas);
         // as we create columns in one migration (this test) and then pass it to another migration
         // we have to init both migrations.
         $this->init($container);
@@ -231,16 +231,16 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
     }
 
     /**
-     * @param MockInterface $modelSchemes
+     * @param MockInterface $modelSchemas
      *
      * @return ContainerInterface
      */
-    private function createContainer(MockInterface $modelSchemes): ContainerInterface
+    private function createContainer(MockInterface $modelSchemas): ContainerInterface
     {
         $container                    = new TestContainer();
         $container[Connection::class] = $this->connection = $this->createConnection();
 
-        $container[ModelSchemeInfoInterface::class] = $modelSchemes;
+        $container[ModelSchemaInfoInterface::class] = $modelSchemas;
 
         return $container;
     }

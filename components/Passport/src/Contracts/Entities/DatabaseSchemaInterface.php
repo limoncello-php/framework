@@ -19,7 +19,7 @@
 /**
  * @package Limoncello\Passport
  */
-interface DatabaseSchemeInterface
+interface DatabaseSchemaInterface
 {
     /**************************************************************************
      * OAuth Clients table and view.

@@ -18,7 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Exception;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Package\MySqlPassportMigration;
 use Limoncello\Tests\Passport\Data\TestContainer;
 use Mockery;
@@ -38,16 +38,16 @@ class MySqlPassportMigrationTest extends TestCase
     public function testMigrateAndRollback()
     {
         /** @var Mock $migration */
-        $migration = Mockery::mock(MySqlPassportMigration::class . '[createDatabaseScheme,removeDatabaseScheme]');
+        $migration = Mockery::mock(MySqlPassportMigration::class . '[createDatabaseSchema,removeDatabaseSchema]');
         $migration->shouldAllowMockingProtectedMethods();
 
-        $migration->shouldReceive('createDatabaseScheme')->once()->withAnyArgs()->andReturnSelf();
-        $migration->shouldReceive('removeDatabaseScheme')->once()->withAnyArgs()->andReturnSelf();
+        $migration->shouldReceive('createDatabaseSchema')->once()->withAnyArgs()->andReturnSelf();
+        $migration->shouldReceive('removeDatabaseSchema')->once()->withAnyArgs()->andReturnSelf();
 
         /** @var MySqlPassportMigration $migration */
 
         $container                                 = new TestContainer();
-        $container[DatabaseSchemeInterface::class] = Mockery::mock(DatabaseSchemeInterface::class);
+        $container[DatabaseSchemaInterface::class] = Mockery::mock(DatabaseSchemaInterface::class);
         $container[Connection::class]              = Mockery::mock(Connection::class);
 
         $migration->init($container);

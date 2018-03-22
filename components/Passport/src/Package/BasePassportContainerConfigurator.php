@@ -21,10 +21,10 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Authentication\AccountManager;
 use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\PassportServerInterface;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use Limoncello\Passport\Package\PassportSettings as C;
 use Limoncello\Passport\PassportServer;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -58,12 +58,12 @@ abstract class BasePassportContainerConfigurator
         $container[AccountManagerInterface::class]         = $factory;
         $container[PassportAccountManagerInterface::class] = $factory;
 
-        $container[DatabaseSchemeInterface::class] = function (
+        $container[DatabaseSchemaInterface::class] = function (
             PsrContainerInterface $container
-        ): DatabaseSchemeInterface {
+        ): DatabaseSchemaInterface {
             $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
 
-            return new DatabaseScheme($settings[C::KEY_USER_TABLE_NAME], $settings[C::KEY_USER_PRIMARY_KEY_NAME]);
+            return new DatabaseSchema($settings[C::KEY_USER_TABLE_NAME], $settings[C::KEY_USER_PRIMARY_KEY_NAME]);
         };
 
         $container[PassportServerInterface::class] = function (

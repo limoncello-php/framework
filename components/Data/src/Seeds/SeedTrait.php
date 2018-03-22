@@ -21,7 +21,7 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\SeedInterface;
 use PDO;
 use Psr\Container\ContainerInterface;
@@ -68,13 +68,13 @@ trait SeedTrait
     }
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemeInfoInterface
+    protected function getModelSchemas(): ModelSchemaInfoInterface
     {
-        assert($this->getContainer()->has(ModelSchemeInfoInterface::class) === true);
+        assert($this->getContainer()->has(ModelSchemaInfoInterface::class) === true);
 
-        return $this->getContainer()->get(ModelSchemeInfoInterface::class);
+        return $this->getContainer()->get(ModelSchemaInfoInterface::class);
     }
 
     /**
@@ -126,7 +126,7 @@ trait SeedTrait
      */
     protected function readModelsData(string $modelClass, int $limit = null): array
     {
-        return $this->readTableData($this->getModelSchemes()->getTable($modelClass), $limit);
+        return $this->readTableData($this->getModelSchemas()->getTable($modelClass), $limit);
     }
 
     /**
@@ -153,7 +153,7 @@ trait SeedTrait
      */
     protected function seedModelsData(int $records, string $modelClass, Closure $dataClosure): void
     {
-        $this->seedTableData($records, $this->getModelSchemes()->getTable($modelClass), $dataClosure);
+        $this->seedTableData($records, $this->getModelSchemas()->getTable($modelClass), $dataClosure);
     }
 
     /**
@@ -175,7 +175,7 @@ trait SeedTrait
      */
     protected function seedModelData(string $modelClass, array $data): ?string
     {
-        return $this->seedRowData($this->getModelSchemes()->getTable($modelClass), $data);
+        return $this->seedRowData($this->getModelSchemas()->getTable($modelClass), $data);
     }
 
     /**

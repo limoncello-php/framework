@@ -22,6 +22,6 @@ use LogicException;
 /**
  * @package Limoncello\Flute
  */
-class InvalidSchemeFactoryException extends LogicException implements LimoncelloExceptionInterface
+class InvalidSchemaFactoryException extends LogicException implements LimoncelloExceptionInterface
 {
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
@@ -32,22 +32,22 @@ use Neomerx\JsonApi\Schema\BaseSchema;
 abstract class Schema extends BaseSchema implements SchemaInterface
 {
     /**
-     * @var ModelSchemeInfoInterface
+     * @var ModelSchemaInfoInterface
      */
-    private $modelSchemes;
+    private $modelSchemas;
 
     /**
      * @param FactoryInterface         $factory
-     * @param ModelSchemeInfoInterface $modelSchemes
+     * @param ModelSchemaInfoInterface $modelSchemas
      */
-    public function __construct(FactoryInterface $factory, ModelSchemeInfoInterface $modelSchemes)
+    public function __construct(FactoryInterface $factory, ModelSchemaInfoInterface $modelSchemas)
     {
         /** @noinspection PhpUndefinedFieldInspection */
         $this->resourceType = static::TYPE;
 
         parent::__construct($factory);
 
-        $this->modelSchemes = $modelSchemes;
+        $this->modelSchemas = $modelSchemas;
     }
 
     /**
@@ -128,7 +128,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
                 $isRelToBeIncluded = array_key_exists($jsonRelName, $includeRelationships) === true;
 
                 $hasRelData = $this->hasRelationship($model, $modelRelName);
-                $relType    = $this->getModelSchemes()->getRelationshipType($modelClass, $modelRelName);
+                $relType    = $this->getModelSchemas()->getRelationshipType($modelClass, $modelRelName);
 
                 $isShowAsLink = false;
 
@@ -138,7 +138,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
                         $relationships[$jsonRelName] = [static::DATA => $model->{$modelRelName}];
                         continue;
                     } else {
-                        $schema = $this->getModelSchemes();
+                        $schema = $this->getModelSchemas();
 
                         $class  = get_class($model);
                         $fkName = $schema->getForeignKey($class, $modelRelName);
@@ -193,11 +193,11 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     }
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemeInfoInterface
+    protected function getModelSchemas(): ModelSchemaInfoInterface
     {
-        return $this->modelSchemes;
+        return $this->modelSchemas;
     }
 
     /**

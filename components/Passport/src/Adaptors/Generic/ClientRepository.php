@@ -18,7 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Passport\Contracts\Entities\ClientInterface;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 
 /**
  * @package Limoncello\Passport
@@ -32,15 +32,15 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
 
     /**
      * @param Connection              $connection
-     * @param DatabaseSchemeInterface $databaseScheme
+     * @param DatabaseSchemaInterface $databaseSchema
      * @param string                  $modelClass
      */
     public function __construct(
         Connection $connection,
-        DatabaseSchemeInterface $databaseScheme,
+        DatabaseSchemaInterface $databaseSchema,
         string $modelClass = Client::class
     ) {
-        $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+        $this->setConnection($connection)->setDatabaseSchema($databaseSchema);
         $this->modelClass = $modelClass;
     }
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 
 /**
@@ -30,16 +30,16 @@ class ModelStorage implements ModelStorageInterface
     private $models = [];
 
     /**
-     * @var ModelSchemeInfoInterface
+     * @var ModelSchemaInfoInterface
      */
-    private $schemes;
+    private $schemas;
 
     /**
-     * @param ModelSchemeInfoInterface $schemes
+     * @param ModelSchemaInfoInterface $schemas
      */
-    public function __construct(ModelSchemeInfoInterface $schemes)
+    public function __construct(ModelSchemaInfoInterface $schemas)
     {
-        $this->schemes = $schemes;
+        $this->schemas = $schemas;
     }
 
     /**
@@ -51,7 +51,7 @@ class ModelStorage implements ModelStorageInterface
 
         if ($model !== null) {
             $class  = get_class($model);
-            $pkName = $this->schemes->getPrimaryKey($class);
+            $pkName = $this->schemas->getPrimaryKey($class);
             $index  = $model->{$pkName};
 
             $registered = $this->models[$class][$index] ?? null;

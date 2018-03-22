@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Exceptions\InvalidSchemeFactoryException;
+use Limoncello\Flute\Exceptions\InvalidSchemaFactoryException;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface as JsonSchemaInterface;
 use Neomerx\JsonApi\Schema\Container;
@@ -27,22 +27,22 @@ use Neomerx\JsonApi\Schema\Container;
 /**
  * @package Limoncello\Flute
  */
-class JsonSchemes extends Container implements JsonSchemesInterface
+class JsonSchemas extends Container implements JsonSchemasInterface
 {
     /**
-     * @var ModelSchemeInfoInterface
+     * @var ModelSchemaInfoInterface
      */
-    private $modelSchemes;
+    private $modelSchemas;
 
     /**
      * @param SchemaFactoryInterface   $factory
      * @param array                    $schemas
-     * @param ModelSchemeInfoInterface $modelSchemes
+     * @param ModelSchemaInfoInterface $modelSchemas
      */
-    public function __construct(SchemaFactoryInterface $factory, array $schemas, ModelSchemeInfoInterface $modelSchemes)
+    public function __construct(SchemaFactoryInterface $factory, array $schemas, ModelSchemaInfoInterface $modelSchemas)
     {
         parent::__construct($factory, $schemas);
-        $this->modelSchemes = $modelSchemes;
+        $this->modelSchemas = $modelSchemas;
     }
 
     /**
@@ -87,7 +87,7 @@ class JsonSchemes extends Container implements JsonSchemesInterface
      */
     public function getModelRelationshipSchema(string $modelClass, string $relationshipName): SchemaInterface
     {
-        $reverseModelClass = $this->getModelSchemes()->getReverseModelClass($modelClass, $relationshipName);
+        $reverseModelClass = $this->getModelSchemas()->getReverseModelClass($modelClass, $relationshipName);
 
         /** @var SchemaInterface $targetSchema */
         $targetSchema = $this->getSchemaByType($reverseModelClass);
@@ -96,11 +96,11 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     }
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemeInfoInterface
+    protected function getModelSchemas(): ModelSchemaInfoInterface
     {
-        return $this->modelSchemes;
+        return $this->modelSchemas;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection
@@ -114,8 +114,8 @@ class JsonSchemes extends Container implements JsonSchemesInterface
     {
         assert($callable);
 
-        // callable as Scheme factory is not supported.
-        throw new InvalidSchemeFactoryException();
+        // callable as Schema factory is not supported.
+        throw new InvalidSchemaFactoryException();
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection
@@ -125,7 +125,7 @@ class JsonSchemes extends Container implements JsonSchemesInterface
      */
     protected function createSchemaFromClassName(string $className): JsonSchemaInterface
     {
-        $schema = new $className($this->getFactory(), $this->getModelSchemes());
+        $schema = new $className($this->getFactory(), $this->getModelSchemas());
 
         return $schema;
     }

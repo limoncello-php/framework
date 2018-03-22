@@ -20,13 +20,14 @@ use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
+use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiQueryRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\QueryParser;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
+use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
+use Limoncello\Tests\Flute\Data\Schemas\PostSchema;
 use Limoncello\Tests\Flute\Data\Validation\JsonQueries\AllowEverythingRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonQueries\CommentsIndexRules;
 use Limoncello\Tests\Flute\TestCase;
@@ -518,7 +519,7 @@ class QueryParserTest extends TestCase
             new ContextStorage($blocks, $container),
             new CaptureAggregator(),
             new ErrorAggregator(),
-            new JsonApiErrorCollection($container),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
             $formatterFactory
         );
 

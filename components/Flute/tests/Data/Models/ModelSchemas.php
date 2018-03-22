@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Data;
+<?php namespace Limoncello\Tests\Flute\Data\Models;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,15 +16,35 @@
  * limitations under the License.
  */
 
+use Doctrine\DBAL\Types\Type;
 use InvalidArgumentException;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 
 /**
- * @package Limoncello\Application
+ * @package Limoncello\Flute
  */
-class ModelSchemeInfo implements ModelSchemeInfoInterface
+class ModelSchemas implements ModelSchemaInfoInterface
 {
+    /**
+     * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function getAttributeTypeInstances($class)
+    {
+        $types  = $this->getAttributeTypes($class);
+        $result = [];
+
+        foreach ($types as $name => $type) {
+            $result[$name] = Type::getType($type);
+        }
+
+        return $result;
+    }
+
+    // Code below copy-pasted from Application component
+
     /**
      * @var array
      */
@@ -76,7 +96,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
     private $attributes = [];
 
     /**
-     * @return array
+     * @inheritdoc
      */
     public function getData(): array
     {
@@ -97,17 +117,13 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
     }
 
     /**
-     * @param array $data
-     *
-     * @return self
+     * @inheritdoc
      */
-    public function setData(array $data): self
+    public function setData(array $data)
     {
         list($this->foreignKeys, $this->belongsToMany, $this->relationshipTypes,
             $this->reversedRelationships,$this->tableNames, $this->primaryKeys,
             $this->attributeTypes, $this->attributeLengths, $this->attributes, $this->reversedClasses) = $data;
-
-        return $this;
     }
 
     /**
@@ -119,7 +135,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
         string $primaryKey,
         array $attributeTypes,
         array $attributeLengths
-    ): ModelSchemeInfoInterface {
+    ): ModelSchemaInfoInterface {
         if (empty($class) === true) {
             throw new InvalidArgumentException('class');
         }
@@ -337,7 +353,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
         string $foreignKey,
         string $reverseClass,
         string $reverseName
-    ): ModelSchemeInfoInterface {
+    ): ModelSchemaInfoInterface {
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO, $class, $name);
         $this->registerRelationshipType(RelationshipTypes::HAS_MANY, $reverseClass, $reverseName);
 
@@ -360,7 +376,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
         string $reverseForeignKey,
         string $reverseClass,
         string $reverseName
-    ): ModelSchemeInfoInterface {
+    ): ModelSchemaInfoInterface {
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO_MANY, $class, $name);
         $this->registerRelationshipType(RelationshipTypes::BELONGS_TO_MANY, $reverseClass, $reverseName);
 
@@ -383,7 +399,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
      *
      * @return void
      */
-    private function registerRelationshipType(int $type, string $class, string $name): void
+    private function registerRelationshipType(int $type, string $class, string $name)
     {
         assert(empty($class) === false && empty($name) === false);
         assert(
@@ -407,7 +423,7 @@ class ModelSchemeInfo implements ModelSchemeInfoInterface
         string $name,
         string $reverseClass,
         string $reverseName
-    ): void {
+    ) {
         assert(
             empty($class) === false &&
             empty($name) === false &&

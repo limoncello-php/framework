@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 
 /**
  * @package Limoncello\Data
@@ -29,7 +29,7 @@ interface MigrationContextInterface
     public function getModelClass(): string;
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    public function getModelSchemes(): ModelSchemeInfoInterface;
+    public function getModelSchemas(): ModelSchemaInfoInterface;
 }

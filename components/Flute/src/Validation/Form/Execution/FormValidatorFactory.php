@@ -17,12 +17,12 @@
  */
 
 use Limoncello\Container\Traits\HasContainerTrait;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Package\FluteSettings as S;
 use Limoncello\Flute\Validation\Form\FormValidator;
-use Limoncello\Flute\Validation\Traits\HasValidationFormatterTrait;
 use Limoncello\Validation\Execution\ContextStorage;
 use Psr\Container\ContainerInterface;
 
@@ -31,7 +31,7 @@ use Psr\Container\ContainerInterface;
  */
 class FormValidatorFactory implements FormValidatorFactoryInterface
 {
-    use HasContainerTrait, HasValidationFormatterTrait;
+    use HasContainerTrait;
 
     /**
      * @param ContainerInterface $container
@@ -52,12 +52,16 @@ class FormValidatorFactory implements FormValidatorFactoryInterface
         $settingsProvider = $this->getContainer()->get(SettingsProviderInterface::class);
         $serializedData   = S::getFormSerializedRules($settingsProvider->get(S::class));
 
+        /** @var FormatterFactoryInterface $factory */
+        $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
+        $formatter = $factory->createFormatter(S::VALIDATION_NAMESPACE);
+
         $validator = new FormValidator(
             $rulesClass,
             FormRulesSerializer::class,
             $serializedData,
             new ContextStorage(FormRulesSerializer::readBlocks($serializedData), $this->getContainer()),
-            $this->createValidationFormatter()
+            $formatter
         );
 
         return $validator;
