@@ -43,7 +43,8 @@ trait TypeTrait
      * @param string                   $nonJsonFormat
      * @param string                   $typeName
      *
-     * @return DateTimeInterface
+     * @return DateTimeInterface|null
+     *
      * @throws ConversionException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
@@ -53,7 +54,7 @@ trait TypeTrait
         $value,
         string $nonJsonFormat,
         string $typeName
-    ): DateTimeInterface {
+    ): ?DateTimeInterface {
         if ($value instanceof DateTimeInterface || $value === null) {
             $result = $value;
         } elseif (is_string($value) === true) {
