@@ -438,9 +438,8 @@ trait DefaultControllerMethodsTrait
     ): ResponseInterface {
         $encParams = null;
         $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
-        if ($updated > 0) {
-            $model = $crud->read($index);
-            assert($model !== null && !($model instanceof PaginatedDataInterface));
+        if ($updated > 0 && ($model = $crud->read($index)) !== null) {
+            assert(!($model instanceof PaginatedDataInterface));
             $response = $responses->getContentResponse($model);
         } else {
             $response = $responses->getCodeResponse(404);
