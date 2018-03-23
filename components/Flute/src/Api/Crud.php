@@ -346,6 +346,17 @@ class Crud implements CrudInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function withoutPaging(): CrudInterface
+    {
+        $this->pagingOffset = null;
+        $this->pagingLimit  = null;
+
+        return $this;
+    }
+
+    /**
      * @return self
      */
     public function shouldBeTyped(): self

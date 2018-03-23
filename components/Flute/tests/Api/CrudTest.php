@@ -601,6 +601,31 @@ class CrudTest extends TestCase
      * @throws Exception
      * @throws DBALException
      */
+    public function testIndexWithoutPaging(): void
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        $pagingOffset = 1;
+        $pagingSize   = 2;
+
+        $crud
+            ->combineWithAnd()
+            ->withPaging($pagingOffset, $pagingSize);
+
+        $data = $crud
+            ->withoutPaging()
+            ->index();
+
+        $this->assertNotEmpty($data->getData());
+        $this->assertGreaterThan($pagingSize, count($data->getData()));
+    }
+
+    /**
+     * Test index.
+     *
+     * @throws Exception
+     * @throws DBALException
+     */
     public function testIndexFilterOperationOnRelationshipById(): void
     {
         $crud = $this->createCrud(PostsApi::class);
