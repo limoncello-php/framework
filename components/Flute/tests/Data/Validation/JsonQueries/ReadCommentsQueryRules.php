@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
-use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Schemas\CommentSchema as Schema;
 use Limoncello\Tests\Flute\Data\Schemas\EmotionSchema;
 use Limoncello\Tests\Flute\Data\Schemas\PostSchema;

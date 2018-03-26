@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Validation\JsonApi;
+<?php namespace Limoncello\Flute\Validation\JsonApi\Rules;
 
 /**
  * Copyright 2015-2017 info@neomerx.com

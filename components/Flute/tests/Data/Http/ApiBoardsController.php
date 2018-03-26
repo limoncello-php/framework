@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\BoardsApi as Api;
 use Limoncello\Tests\Flute\Data\Models\Board as Model;
 use Limoncello\Tests\Flute\Data\Schemas\BoardSchema as Schema;

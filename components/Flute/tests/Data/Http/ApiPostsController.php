@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Api\PostsApi as Api;
 use Limoncello\Tests\Flute\Data\Models\Post as Model;

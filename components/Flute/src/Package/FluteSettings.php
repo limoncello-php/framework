@@ -9,9 +9,9 @@ use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Validation\Form\Execution\FormRulesSerializer;
-use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiDataRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiQueryRulesSerializer;
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Validation\Execution\BlockSerializer;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 

@@ -37,7 +37,7 @@ use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
 use Limoncello\Flute\Http\Responses;
 use Limoncello\Flute\Package\FluteSettings as S;
 use Limoncello\Flute\Resources\Messages\En\Generic;
-use Limoncello\Flute\Validation\JsonApi\DefaultQueryValidationRules;
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
