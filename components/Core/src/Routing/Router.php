@@ -222,6 +222,7 @@ class Router implements RouterInterface
             $character = $path[$index];
             switch ($character) {
                 case '{':
+                    assert($inPlaceholder === false, 'Nested placeholders (e.g. `{{}}}` are not allowed.');
                     $inPlaceholder     = true;
                     $inPlaceholderName = true;
                     break;
