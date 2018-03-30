@@ -46,10 +46,10 @@ trait FluteRoutesTrait
         assert(class_exists($controllerClass) === true);
 
         $indexSlug = '/{' . CI::ROUTE_KEY_INDEX . '}';
-        $params    = function ($method) use ($resourceName) {
-            return [RouteInterface::PARAM_NAME => $resourceName . '_' . $method];
+        $params    = function (string $method) use ($resourceName): array {
+            return [RouteInterface::PARAM_NAME => static::routeName($resourceName, $method)];
         };
-        $handler   = function ($method) use ($controllerClass) {
+        $handler   = function (string $method) use ($controllerClass): array {
             return [$controllerClass, $method];
         };
 
@@ -84,10 +84,10 @@ trait FluteRoutesTrait
     protected static function controller(GroupInterface $group, string $subUri, string $controllerClass): GroupInterface
     {
         $slugged = $subUri . '/{' . CI::ROUTE_KEY_INDEX . '}';
-        $params  = function ($method) use ($subUri) {
-            return [RouteInterface::PARAM_NAME => $subUri . '_' . $method];
+        $params  = function (string $method) use ($subUri) : array {
+            return [RouteInterface::PARAM_NAME => static::routeName($subUri, $method)];
         };
-        $handler = function ($method) use ($controllerClass) {
+        $handler = function (string $method) use ($controllerClass): array {
             return [$controllerClass, $method];
         };
 
@@ -142,5 +142,18 @@ trait FluteRoutesTrait
             ->get($selfUri, [$controllerClass, $selfGetMethod])
             // `related`
             ->get($resourceIdUri . $relationshipName, [$controllerClass, $selfGetMethod]);
+    }
+
+    /**
+     * @param string $name
+     * @param string $method
+     *
+     * @return string
+     */
+    protected static function routeName(string $name, string $method): string
+    {
+        assert(empty($name) === false && empty($method) === false);
+
+        return $name . '_' . $method;
     }
 }
