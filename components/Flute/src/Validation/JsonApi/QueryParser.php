@@ -31,19 +31,41 @@ use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Errors\Error;
 use Limoncello\Validation\Execution\BlockInterpreter;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Document\Error as JsonApiError;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Neomerx\JsonApi\Http\Query\BaseQueryParser;
+use Neomerx\JsonApi\Http\Query\BaseQueryParserTrait;
 
 /**
  * @package Limoncello\Flute
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParserInterface
+class QueryParser implements JsonApiQueryValidatingParserInterface
 {
+    use BaseQueryParserTrait {
+        BaseQueryParserTrait::getFields as getFieldsImpl;
+        BaseQueryParserTrait::getIncludes as getIncludesImpl;
+        BaseQueryParserTrait::getSorts as getSortsImpl;
+    }
+
+    /** Message */
+    public const MSG_ERR_INVALID_PARAMETER = 'Invalid Parameter.';
+
+    /**
+     * @var array
+     */
+    private $parameters;
+
+    /**
+     * @var string[]|null
+     */
+    private $messages;
+
     /**
      * @var array
      */
@@ -159,7 +181,7 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
         );
 
         $parameters = [];
-        parent::__construct($parameters, $messages);
+        $this->setParameters($parameters)->setMessages($messages);
         $this->serializerClass  = $serializerClass;
         $this->context          = $context;
         $this->captures         = $captures;
@@ -181,7 +203,7 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
     {
         $this->clear();
 
-        parent::setParameters($parameters);
+        $this->setParameters($parameters);
 
         $this->parsePagingParameters()->parseFilterLink();
 
@@ -254,7 +276,8 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
     public function getFields(): array
     {
         if ($this->cachedFields === null) {
-            $this->cachedFields = $this->iterableToArray($this->getValidatedFields(parent::getFields()));
+            $fields = $this->getFieldsImpl($this->getParameters(), $this->getInvalidParamMessage());
+            $this->cachedFields = $this->iterableToArray($this->getValidatedFields($fields));
         }
 
         return $this->cachedFields;
@@ -266,7 +289,8 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
     public function getSorts(): array
     {
         if ($this->cachedSorts === null) {
-            $this->cachedSorts = $this->iterableToArray($this->getValidatedSorts(parent::getSorts()));
+            $sorts = $this->getSortsImpl($this->getParameters(), $this->getInvalidParamMessage());
+            $this->cachedSorts = $this->iterableToArray($this->getValidatedSorts($sorts));
         }
 
         return $this->cachedSorts;
@@ -278,7 +302,8 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
     public function getIncludes(): iterable
     {
         if ($this->cachedIncludes === null) {
-            $this->cachedIncludes = $this->iterableToArray($this->getValidatedIncludes(parent::getIncludes()));
+            $includes = $this->getIncludesImpl($this->getParameters(), $this->getInvalidParamMessage());
+            $this->cachedIncludes = $this->iterableToArray($this->getValidatedIncludes($includes));
         }
 
         return $this->cachedIncludes;
@@ -298,6 +323,50 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
     public function getPagingLimit(): ?int
     {
         return $this->pagingLimit;
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return self
+     */
+    protected function setParameters(array $parameters): self
+    {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $messages
+     *
+     * @return self
+     */
+    protected function setMessages(?array $messages): self
+    {
+        $this->messages = $messages;
+
+        return $this;
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return string
+     */
+    protected function getMessage(string $message): string
+    {
+        $hasTranslation = $this->messages !== null && array_key_exists($message, $this->messages) === false;
+
+        return $hasTranslation === true ? $this->messages[$message] : $message;
     }
 
     /**
@@ -400,7 +469,10 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
                 if (is_string($field) === false || empty($field) === true ||
                     is_array($operationsWithArgs) === false || empty($operationsWithArgs) === true
                 ) {
-                    throw new InvalidQueryParametersException($this->createParameterError(static::PARAM_FILTER));
+                    throw new InvalidQueryParametersException($this->createParameterError(
+                        static::PARAM_FILTER,
+                        $this->getInvalidParamMessage()
+                    ));
                 }
 
                 if (array_key_exists($field, $mainIndexes) === false) {
@@ -441,7 +513,7 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
             // with validation
             $mainIndexes = $this->serializerClass::readRuleMainIndexes($ruleIndexes);
             $this->validationStarts(static::PARAM_FIELDS, $ruleIndexes);
-            foreach (parent::getFields() as $type => $fieldList) {
+            foreach ($fieldsFromParent as $type => $fieldList) {
                 if (array_key_exists($type, $mainIndexes) === true) {
                     yield $type => $this->validateValues($mainIndexes[$type], $fieldList);
                 } else {
@@ -469,7 +541,7 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
 
         if ($ruleIndexes === null) {
             // without validation
-            foreach (parent::getSorts() as $field => $isAsc) {
+            foreach ($sortsFromParent as $field => $isAsc) {
                 yield $field => $isAsc;
             }
         } else {
@@ -501,7 +573,7 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
 
         if ($ruleIndexes === null) {
             // without validation
-            foreach (parent::getIncludes() as $path => $split) {
+            foreach ($includesFromParent as $path => $split) {
                 yield $path => $split;
             }
         } else {
@@ -824,7 +896,10 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
 
         $filterSection = $this->getParameters()[static::PARAM_FILTER];
         if (is_array($filterSection) === false || empty($filterSection) === true) {
-            throw new InvalidQueryParametersException($this->createParameterError(static::PARAM_FILTER));
+            throw new InvalidQueryParametersException($this->createParameterError(
+                static::PARAM_FILTER,
+                $this->getInvalidParamMessage()
+            ));
         }
 
         $isWithAnd = true;
@@ -838,7 +913,10 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
                 empty($filterSection = $filterSection[$firstKey]) === true ||
                 is_array($filterSection) === false
             ) {
-                throw new InvalidQueryParametersException($this->createParameterError(static::PARAM_FILTER));
+                throw new InvalidQueryParametersException($this->createParameterError(
+                    static::PARAM_FILTER,
+                    $this->getInvalidParamMessage()
+                ));
             } else {
                 $this->setFilterParameters($filterSection);
                 if ($hasOr === true) {
@@ -877,8 +955,35 @@ class QueryParser extends BaseQueryParser implements JsonApiQueryValidatingParse
             if ($arguments === '') {
                 yield $operationName => [];
             } else {
-                yield $operationName => $this->splitCommaSeparatedStringAndCheckNoEmpties($parameterName, $arguments);
+                yield $operationName => $this->splitCommaSeparatedStringAndCheckNoEmpties(
+                    $parameterName,
+                    $arguments,
+                    $this->getInvalidParamMessage()
+                );
             }
         }
+    }
+
+    /**
+     * @param string $paramName
+     * @param string $errorTitle
+     *
+     * @return ErrorInterface
+     */
+    private function createQueryError(string $paramName, string $errorTitle): ErrorInterface
+    {
+        $source = [ErrorInterface::SOURCE_PARAMETER => $paramName];
+        $error  = new JsonApiError(null, null, null, null, $errorTitle, null, $source);
+
+        return $error;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    private function getInvalidParamMessage(): string
+    {
+        return $this->getMessage(static::MSG_ERR_INVALID_PARAMETER);
     }
 }
