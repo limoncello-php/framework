@@ -45,11 +45,12 @@ trait FluteRoutesTrait
     ): GroupInterface {
         assert(class_exists($controllerClass) === true);
 
-        $indexSlug = '/{' . CI::ROUTE_KEY_INDEX . '}';
-        $params    = function (string $method) use ($resourceName): array {
-            return [RouteInterface::PARAM_NAME => static::routeName($resourceName, $method)];
+        $groupPrefix = $group->getUriPrefix();
+        $indexSlug   = '/{' . CI::ROUTE_KEY_INDEX . '}';
+        $params      = function (string $method) use ($groupPrefix, $resourceName): array {
+            return [RouteInterface::PARAM_NAME => static::routeName($groupPrefix, $resourceName, $method)];
         };
-        $handler   = function (string $method) use ($controllerClass): array {
+        $handler     = function (string $method) use ($controllerClass): array {
             return [$controllerClass, $method];
         };
 
@@ -83,11 +84,12 @@ trait FluteRoutesTrait
      */
     protected static function controller(GroupInterface $group, string $subUri, string $controllerClass): GroupInterface
     {
-        $slugged = $subUri . '/{' . CI::ROUTE_KEY_INDEX . '}';
-        $params  = function (string $method) use ($subUri) : array {
-            return [RouteInterface::PARAM_NAME => static::routeName($subUri, $method)];
+        $groupPrefix = $group->getUriPrefix();
+        $slugged     = $subUri . '/{' . CI::ROUTE_KEY_INDEX . '}';
+        $params      = function (string $method) use ($groupPrefix, $subUri) : array {
+            return [RouteInterface::PARAM_NAME => static::routeName($groupPrefix, $subUri, $method)];
         };
-        $handler = function (string $method) use ($controllerClass): array {
+        $handler     = function (string $method) use ($controllerClass): array {
             return [$controllerClass, $method];
         };
 
@@ -145,15 +147,16 @@ trait FluteRoutesTrait
     }
 
     /**
+     * @param string $prefix
      * @param string $name
      * @param string $method
      *
      * @return string
      */
-    protected static function routeName(string $name, string $method): string
+    protected static function routeName(string $prefix, string $name, string $method): string
     {
         assert(empty($name) === false && empty($method) === false);
 
-        return $name . '_' . $method;
+        return $prefix . '/' . $name . '::' . $method;
     }
 }

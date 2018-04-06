@@ -44,6 +44,7 @@ class FluteRoutesTraitTest extends TestCase
 
         $group->shouldReceive('get')->twice()->withAnyArgs()->andReturnSelf();
         $group->shouldReceive('post')->times(3)->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('getUriPrefix')->times(1)->withNoArgs()->andReturn('');
 
         /** @var GroupInterface $group */
 
@@ -67,6 +68,7 @@ class FluteRoutesTraitTest extends TestCase
         $group->shouldReceive('post')->once()->withAnyArgs()->andReturnSelf();
         $group->shouldReceive('patch')->once()->withAnyArgs()->andReturnSelf();
         $group->shouldReceive('delete')->once()->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('getUriPrefix')->times(1)->withNoArgs()->andReturn('');
 
         /** @var GroupInterface $group */
 
