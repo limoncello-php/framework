@@ -84,6 +84,11 @@ trait FluteRoutesTrait
      */
     protected static function controller(GroupInterface $group, string $subUri, string $controllerClass): GroupInterface
     {
+        // normalize url to have predictable URLs and their names
+        if ($subUri[-1] === '/') {
+            $subUri = substr($subUri, 0, -1);
+        }
+
         $groupPrefix = $group->getUriPrefix();
         $slugged     = $subUri . '/{' . CI::ROUTE_KEY_INDEX . '}';
         $params      = function (string $method) use ($groupPrefix, $subUri) : array {
@@ -148,15 +153,25 @@ trait FluteRoutesTrait
 
     /**
      * @param string $prefix
-     * @param string $name
+     * @param string $subUri
      * @param string $method
      *
      * @return string
      */
-    protected static function routeName(string $prefix, string $name, string $method): string
+    protected static function routeName(string $prefix, string $subUri, string $method): string
     {
-        assert(empty($name) === false && empty($method) === false);
+        assert(empty($method) === false);
 
-        return $prefix . '/' . $name . '::' . $method;
+        // normalize prefix and url to have predictable name
+
+        if (empty($prefix) === true || $prefix[-1] !== '/') {
+            $prefix .= '/';
+        }
+
+        if (empty($subUri) === false && $subUri[-1] === '/') {
+            $subUri = substr($subUri, 0, -1);
+        }
+
+        return $prefix . $subUri . '::' . $method;
     }
 }

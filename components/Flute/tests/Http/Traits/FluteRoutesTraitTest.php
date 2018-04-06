@@ -42,13 +42,14 @@ class FluteRoutesTraitTest extends TestCase
         /** @var Mock $group */
         $group = Mockery::mock(GroupInterface::class);
 
-        $group->shouldReceive('get')->twice()->withAnyArgs()->andReturnSelf();
-        $group->shouldReceive('post')->times(3)->withAnyArgs()->andReturnSelf();
-        $group->shouldReceive('getUriPrefix')->times(1)->withNoArgs()->andReturn('');
+        $group->shouldReceive('get')->times(4)->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('post')->times(6)->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('getUriPrefix')->times(2)->withNoArgs()->andReturn('');
 
         /** @var GroupInterface $group */
 
         $this->controller($group, '/categories', ApiCategoriesController::class);
+        $this->controller($group, '/products/', ApiCategoriesController::class);
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
@@ -102,5 +103,18 @@ class FluteRoutesTraitTest extends TestCase
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
+    }
+
+    /**
+     * Test how predictable/stable generated route names are.
+     *
+     * @return void
+     */
+    public function testRouteNamePredictability(): void
+    {
+        $this->assertEquals('/::index', static::routeName('', '', 'index'));
+        $this->assertEquals('/::index', static::routeName('/', '', 'index'));
+        $this->assertEquals('/::index', static::routeName('', '/', 'index'));
+        $this->assertEquals('/::index', static::routeName('/', '/', 'index'));
     }
 }
