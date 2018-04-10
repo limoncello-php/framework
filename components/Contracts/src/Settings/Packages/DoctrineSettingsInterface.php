@@ -59,5 +59,8 @@ interface DoctrineSettingsInterface extends SettingsInterface
     const KEY_PATH = self::KEY_EXTRA + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_PATH;
+    const KEY_EXEC = self::KEY_PATH + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_EXEC;
 }

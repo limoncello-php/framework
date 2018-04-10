@@ -58,6 +58,9 @@ class DataPackageTest extends TestCase
         $provider->shouldReceive('get')->once()->with(S::class)->andReturn([
             S::KEY_URL    => 'sqlite:///',
             S::KEY_MEMORY => true,
+            S::KEY_EXEC   => [
+                'PRAGMA foreign_keys = ON;'
+            ],
         ]);
 
         DataContainerConfigurator::configureContainer($container);

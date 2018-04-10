@@ -41,7 +41,7 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
             function (PsrContainerInterface $container): ModelSchemaInfoInterface {
                 $settings = $container->get(SettingsProviderInterface::class)->get(DataSettings::class);
                 $data     = $settings[DataSettings::KEY_MODELS_SCHEMA_INFO];
-    
+
                 return (new ModelSchemaInfo())->setData($data);
             };
 
@@ -61,9 +61,18 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
             ], function ($value) {
                 return $value !== null;
             });
-            $extra = $settings[DoctrineSettings::KEY_EXTRA] ?? [];
+            $extra    = $settings[DoctrineSettings::KEY_EXTRA] ?? [];
 
             $connection = DriverManager::getConnection($params + $extra);
+
+            if (array_key_exists(DoctrineSettings::KEY_EXEC, $settings) === true &&
+                is_array($toExec = $settings[DoctrineSettings::KEY_EXEC]) === true &&
+                empty($toExec) === false
+            ) {
+                foreach ($toExec as $statement) {
+                    $connection->exec($statement);
+                }
+            }
 
             return $connection;
         };
