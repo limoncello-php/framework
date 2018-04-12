@@ -104,7 +104,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
             unset($attrMappings[static::RESOURCE_ID]);
 
             foreach ($attrMappings as $jsonAttrName => $modelAttrName) {
-                $attributes[$jsonAttrName] = isset($model->{$modelAttrName}) === true ? $model->{$modelAttrName} : null;
+                $attributes[$jsonAttrName] = $model->{$modelAttrName} ?? null;
             }
         }
 
