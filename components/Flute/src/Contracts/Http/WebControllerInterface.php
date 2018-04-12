@@ -19,13 +19,14 @@
 use Limoncello\Flute\Contracts\Http\Controller\ControllerCreateInterface as CCI;
 use Limoncello\Flute\Contracts\Http\Controller\ControllerDeleteInterface as CDI;
 use Limoncello\Flute\Contracts\Http\Controller\ControllerIndexInterface as CII;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerInstanceInterface as CInI;
 use Limoncello\Flute\Contracts\Http\Controller\ControllerReadInterface as CRI;
 use Limoncello\Flute\Contracts\Http\Controller\ControllerUpdateInterface as CUI;
 
 /**
  * @package Limoncello\Flute
  */
-interface ControllerInterface extends CII, CCI, CRI, CUI, CDI
+interface WebControllerInterface extends CII, CCI, CRI, CUI, CDI, CInI
 {
     /** URI key used in routing table */
     const ROUTE_KEY_INDEX = 'idx';

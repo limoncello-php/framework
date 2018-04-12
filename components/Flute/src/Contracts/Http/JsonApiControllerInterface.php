@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Flute\Data\Http;
+<?php namespace Limoncello\Flute\Contracts\Http;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,13 +16,17 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Http\JsonApiBaseController;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerCreateInterface as CCI;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerDeleteInterface as CDI;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerIndexInterface as CII;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerReadInterface as CRI;
+use Limoncello\Flute\Contracts\Http\Controller\ControllerUpdateInterface as CUI;
 
 /**
- * @package Limoncello\Tests\Flute
+ * @package Limoncello\Flute
  */
-abstract class ApiBaseController extends JsonApiBaseController
+interface JsonApiControllerInterface extends CII, CCI, CRI, CUI, CDI
 {
     /** URI key used in routing table */
-    const ROUTE_KEY_CHILD_INDEX = 'child_idx';
+    const ROUTE_KEY_INDEX = 'idx';
 }

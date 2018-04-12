@@ -20,6 +20,7 @@ use Exception;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Flute\Http\Traits\FluteRoutesTrait;
 use Limoncello\Tests\Flute\Data\Http\ApiCategoriesController;
+use Limoncello\Tests\Flute\Data\Http\WebCategoriesController;
 use Limoncello\Tests\Flute\Data\Schemas\CategorySchema;
 use Limoncello\Tests\Flute\TestCase;
 use Mockery;
@@ -42,14 +43,13 @@ class FluteRoutesTraitTest extends TestCase
         /** @var Mock $group */
         $group = Mockery::mock(GroupInterface::class);
 
-        $group->shouldReceive('get')->times(4)->withAnyArgs()->andReturnSelf();
-        $group->shouldReceive('post')->times(6)->withAnyArgs()->andReturnSelf();
-        $group->shouldReceive('getUriPrefix')->times(2)->withNoArgs()->andReturn('');
+        $group->shouldReceive('get')->times(3)->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('post')->times(3)->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('getUriPrefix')->times(1)->withNoArgs()->andReturn('');
 
         /** @var GroupInterface $group */
 
-        $this->controller($group, '/categories', ApiCategoriesController::class);
-        $this->controller($group, '/products/', ApiCategoriesController::class);
+        $this->webController($group, '/categories/', WebCategoriesController::class);
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
@@ -60,7 +60,7 @@ class FluteRoutesTraitTest extends TestCase
      *
      * @throws Exception
      */
-    public function testResourceMethod(): void
+    public function testApiControllerMethod(): void
     {
         /** @var Mock $group */
         $group = Mockery::mock(GroupInterface::class);
@@ -73,7 +73,7 @@ class FluteRoutesTraitTest extends TestCase
 
         /** @var GroupInterface $group */
 
-        $this->resource($group, CategorySchema::TYPE, ApiCategoriesController::class);
+        $this->apiController($group, CategorySchema::TYPE, ApiCategoriesController::class);
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);

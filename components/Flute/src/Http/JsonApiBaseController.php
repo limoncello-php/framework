@@ -21,7 +21,7 @@ use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Flute\Contracts\Http\ControllerInterface;
+use Limoncello\Flute\Contracts\Http\JsonApiControllerInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Http\Traits\DefaultControllerMethodsTrait;
 use Psr\Container\ContainerExceptionInterface;
@@ -33,7 +33,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * @package Limoncello\Flute
  */
-abstract class BaseController implements ControllerInterface
+abstract class JsonApiBaseController implements JsonApiControllerInterface
 {
     use DefaultControllerMethodsTrait;
 
