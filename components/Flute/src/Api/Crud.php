@@ -1665,7 +1665,7 @@ class Crud implements CrudInterface
     {
         /** @var FormatterFactoryInterface $factory */
         $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
-        $formatter = $factory->createFormatter(FluteSettings::VALIDATION_NAMESPACE);
+        $formatter = $factory->createFormatter(FluteSettings::GENERIC_NAMESPACE);
         $result    = $formatter->formatMessage($message);
 
         return $result;
