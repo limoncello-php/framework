@@ -207,6 +207,8 @@ class Crud implements CrudInterface
      */
     public function withRelationshipFilters(string $name, iterable $filters): CrudInterface
     {
+        assert($this->getModelSchemas()->hasRelationship($this->getModelClass(), $name) === true);
+
         $this->relFiltersAndSorts[$name][self::REL_FILTERS_AND_SORTS__FILTERS] = $filters;
 
         return $this;
@@ -217,6 +219,8 @@ class Crud implements CrudInterface
      */
     public function withRelationshipSorts(string $name, iterable $sorts): CrudInterface
     {
+        assert($this->getModelSchemas()->hasRelationship($this->getModelClass(), $name) === true);
+
         $this->relFiltersAndSorts[$name][self::REL_FILTERS_AND_SORTS__SORTS] = $sorts;
 
         return $this;
