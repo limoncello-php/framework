@@ -30,6 +30,8 @@ use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class MakeCommand implements CommandInterface
 {
@@ -48,16 +50,16 @@ class MakeCommand implements CommandInterface
     const ARG_PLURAL = 'plural';
 
     /** Command action */
-    const ITEM_MIGRATE = 'migrate';
+    const ITEM_DATA_RESOURCE = 'data-resource';
 
     /** Command action */
-    const ITEM_SEED = 'seed';
+    const ITEM_WEB_RESOURCE = 'web-resource';
 
     /** Command action */
-    const ITEM_CONTROLLER = 'controller';
+    const ITEM_JSON_API_RESOURCE = 'json-resource';
 
     /** Command action */
-    const ITEM_JSONAPI = 'jsonapi';
+    const ITEM_FULL_RESOURCE = 'resource';
 
     /**
      * Taken from http://php.net/manual/en/language.oop5.basic.php
@@ -93,14 +95,15 @@ class MakeCommand implements CommandInterface
      */
     public static function getArguments(): array
     {
-        $migrate = static::ITEM_MIGRATE;
-        $seed    = static::ITEM_SEED;
-        $jsonapi = static::ITEM_JSONAPI;
+        $data     = static::ITEM_DATA_RESOURCE;
+        $web      = static::ITEM_WEB_RESOURCE;
+        $json     = static::ITEM_JSON_API_RESOURCE;
+        $resource = static::ITEM_FULL_RESOURCE;
 
         return [
             [
                 static::ARGUMENT_NAME        => static::ARG_ITEM,
-                static::ARGUMENT_DESCRIPTION => "Action such as `$migrate`, `$seed` or `$jsonapi`.",
+                static::ARGUMENT_DESCRIPTION => "Action such as `$data`, `$web`, `$json` or `$resource`.",
                 static::ARGUMENT_MODE        => static::ARGUMENT_MODE__REQUIRED,
             ],
             [
@@ -154,37 +157,74 @@ class MakeCommand implements CommandInterface
             throw new InvalidArgumentException("`$plural` is not a valid class name.");
         }
 
+        /** @var FileSystemInterface $fileSystem */
+        $fileSystem = $container->get(FileSystemInterface::class);
+        /** @var SettingsProviderInterface $settingsProvider */
+        $settingsProvider = $container->get(SettingsProviderInterface::class);
+
+        $dataTemplates = function () use ($settingsProvider, $fileSystem, $singular, $plural) : array {
+            return [
+                $this->composeMigration($settingsProvider, $fileSystem, $singular, $plural),
+                $this->composeSeed($settingsProvider, $fileSystem, $singular, $plural),
+                $this->composeModel($settingsProvider, $fileSystem, $singular, $plural),
+            ];
+        };
+
+        $basicTemplates = function () use ($settingsProvider, $fileSystem, $singular, $plural) : array {
+            return [
+                $this->composeSchema($settingsProvider, $fileSystem, $singular, $plural),
+                $this->composeAuthorization($settingsProvider, $fileSystem, $singular, $plural),
+                $this->composeApi($settingsProvider, $fileSystem, $singular, $plural),
+                $this->composeValidationRules($settingsProvider, $fileSystem, $singular, $plural),
+                $this->composeQueryValidationOnReadRules($settingsProvider, $fileSystem, $singular, $plural),
+            ];
+        };
+
+        $webTemplates = function () use ($settingsProvider, $fileSystem, $singular, $plural) : array {
+            return [
+                $this->composeWebValidationOnCreateRules($settingsProvider, $fileSystem, $singular),
+                $this->composeWebValidationOnUpdateRules($settingsProvider, $fileSystem, $singular),
+                $this->composeWebController($settingsProvider, $fileSystem, $singular, $plural),
+                $this->composeWebRoute($settingsProvider, $fileSystem, $singular, $plural),
+            ];
+        };
+
+        $jsonTemplates = function () use ($settingsProvider, $fileSystem, $singular, $plural) : array {
+            return [
+                $this->composeJsonValidationOnCreateRules($settingsProvider, $fileSystem, $singular),
+                $this->composeJsonValidationOnUpdateRules($settingsProvider, $fileSystem, $singular),
+                $this->composeJsonController($settingsProvider, $fileSystem, $singular, $plural),
+                $this->composeJsonRoute($settingsProvider, $fileSystem, $singular, $plural),
+            ];
+        };
+
         switch ($item) {
-            case static::ITEM_MIGRATE:
-                $this->createTemplates($this->getFileSystem($container), [
-                    $this->composeMigrationParameters($container, $singular, $plural),
-                ]);
+            case static::ITEM_DATA_RESOURCE:
+                $this->createTemplates($fileSystem, array_merge(
+                    $dataTemplates()
+                ));
                 break;
-            case static::ITEM_SEED:
-                $this->createTemplates($this->getFileSystem($container), [
-                    $this->composeSeedParameters($container, $singular, $plural),
-                ]);
+            case static::ITEM_WEB_RESOURCE:
+                $this->createTemplates($fileSystem, array_merge(
+                    $dataTemplates(),
+                    $basicTemplates(),
+                    $webTemplates()
+                ));
                 break;
-            case static::ITEM_CONTROLLER:
-                $this->createTemplates($this->getFileSystem($container), [
-                    $this->composeWebControllerParameters($container, $singular, $plural),
-                    $this->composeWebRouteParameters($container, $singular, $plural),
-                ]);
+            case static::ITEM_JSON_API_RESOURCE:
+                $this->createTemplates($fileSystem, array_merge(
+                    $dataTemplates(),
+                    $basicTemplates(),
+                    $jsonTemplates()
+                ));
                 break;
-            case static::ITEM_JSONAPI:
-                $this->createTemplates($this->getFileSystem($container), [
-                    $this->composeMigrationParameters($container, $singular, $plural),
-                    $this->composeSeedParameters($container, $singular, $plural),
-                    $this->composeModelParameters($container, $singular, $plural),
-                    $this->composeSchemaParameters($container, $singular, $plural),
-                    $this->composeApiParameters($container, $singular, $plural),
-                    $this->composeAuthorizationParameters($container, $singular, $plural),
-                    $this->composeValidationRulesParameters($container, $singular, $plural),
-                    $this->composeValidationOnCreateRuleSetsParameters($container, $singular),
-                    $this->composeValidationOnUpdateRuleSetsParameters($container, $singular),
-                    $this->composeJsonControllerParameters($container, $singular, $plural),
-                    $this->composeJsonRouteParameters($container, $singular, $plural),
-                ]);
+            case static::ITEM_FULL_RESOURCE:
+                $this->createTemplates($fileSystem, array_merge(
+                    $dataTemplates(),
+                    $basicTemplates(),
+                    $webTemplates(),
+                    $jsonTemplates()
+                ));
                 break;
             default:
                 $inOut->writeError("Unsupported item type `$item`." . PHP_EOL);
@@ -193,407 +233,560 @@ class MakeCommand implements CommandInterface
     }
 
     /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
      *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return TemplateOutput
      */
-    private function composeMigrationParameters(ContainerInterface $container, string $singular, string $plural): array
-    {
-        $outputPath = $this->getDataSettings($container)[DataSettingsInterface::KEY_MIGRATIONS_FOLDER]
-            . DIRECTORY_SEPARATOR . $plural . 'Migration.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_CC%}'   => $plural,
-        ];
-
-        return [$outputPath, $this->getTemplatePath('Migration.txt'), $parameters];
-    }
-
-    /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
-     *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function composeSeedParameters(ContainerInterface $container, string $singular, string $plural): array
-    {
-        $outputPath = $this->getDataSettings($container)[DataSettingsInterface::KEY_SEEDS_FOLDER]
-            . DIRECTORY_SEPARATOR . $plural . 'Seed.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_CC%}'   => $plural,
-        ];
-
-        return [$outputPath, $this->getTemplatePath('Seed.txt'), $parameters];
-    }
-
-    /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
-     *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function composeModelParameters(ContainerInterface $container, string $singular, string $plural): array
-    {
-        $outputPath = $this->getDataSettings($container)[DataSettingsInterface::KEY_MODELS_FOLDER]
-            . DIRECTORY_SEPARATOR . $singular . '.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%SINGULAR_LC%}' => strtolower($singular),
-            '{%SINGULAR_UC%}' => strtoupper($singular),
-            '{%PLURAL_LC%}'   => strtolower($plural),
-            '{%PLURAL_UC%}'   => strtoupper($plural),
-        ];
-
-        return [$outputPath, $this->getTemplatePath('Model.txt'), $parameters];
-    }
-
-    /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
-     *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function composeSchemaParameters(ContainerInterface $container, string $singular, string $plural): array
-    {
-        $outputPath = $this->getFluteSettings($container)[FluteSettingsInterface::KEY_SCHEMAS_FOLDER]
-            . DIRECTORY_SEPARATOR . $singular . 'Schema.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_LC%}'   => strtolower($plural),
-        ];
-
-        return [$outputPath, $this->getTemplatePath('Schema.txt'), $parameters];
-    }
-
-    /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
-     *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function composeApiParameters(ContainerInterface $container, string $singular, string $plural): array
-    {
-        $outputPath = $this->getFluteSettings($container)[FluteSettingsInterface::KEY_API_FOLDER]
-            . DIRECTORY_SEPARATOR . $plural . 'Api.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_CC%}'   => $plural,
-            '{%SINGULAR_UC%}' => strtoupper($singular),
-            '{%PLURAL_UC%}'   => strtoupper($plural),
-        ];
-
-        return [$outputPath, $this->getTemplatePath('Api.txt'), $parameters];
-    }
-
-    /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
-     *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function composeAuthorizationParameters(
-        ContainerInterface $container,
+    private function composeMigration(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
         string $singular,
         string $plural
-    ): array {
-        $outputPath = $this->getAuthorizationSettings($container)[AuthorizationSettingsInterface::KEY_POLICIES_FOLDER]
-            . DIRECTORY_SEPARATOR . $singular . 'Rules.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_CC%}'   => $plural,
-            '{%SINGULAR_LC%}' => strtolower($singular),
-            '{%PLURAL_UC%}'   => strtoupper($plural),
-            '{%SINGULAR_UC%}' => strtoupper($singular),
-        ];
+    ): TemplateOutput {
+        $folder = $settingsProvider->get(DataSettingsInterface::class)[DataSettingsInterface::KEY_MIGRATIONS_FOLDER];
 
-        return [$outputPath, $this->getTemplatePath('ApiAuthorization.txt'), $parameters];
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $plural . 'Migration.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('Migration.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
     }
 
     /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
      *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return TemplateOutput
      */
-    private function composeValidationRulesParameters(
-        ContainerInterface $container,
+    private function composeSeed(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
         string $singular,
         string $plural
-    ): array {
-        $outputPath = $this->getFluteSettings($container)[FluteSettingsInterface::KEY_JSON_VALIDATION_RULES_FOLDER]
-            . DIRECTORY_SEPARATOR . $singular . 'Rules.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%SINGULAR_LC%}' => strtolower($singular),
-            '{%PLURAL_LC%}'   => strtolower($plural),
-        ];
+    ): TemplateOutput {
+        $folder = $settingsProvider->get(DataSettingsInterface::class)[DataSettingsInterface::KEY_SEEDS_FOLDER];
 
-        return [$outputPath, $this->getTemplatePath('ValidationRules.txt'), $parameters];
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $plural . 'Seed.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('Seed.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
     }
 
     /**
-     * @param ContainerInterface $container
-     * @param string             $singular
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
      *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return TemplateOutput
      */
-    private function composeValidationOnCreateRuleSetsParameters(
-        ContainerInterface $container,
+    private function composeModel(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
+        string $singular,
+        string $plural
+    ): TemplateOutput {
+        $folder = $settingsProvider->get(DataSettingsInterface::class)[DataSettingsInterface::KEY_MODELS_FOLDER];
+
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . '.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('Model.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%SINGULAR_LC%}' => strtolower($singular),
+                '{%SINGULAR_UC%}' => strtoupper($singular),
+                '{%PLURAL_LC%}'   => strtolower($plural),
+                '{%PLURAL_UC%}'   => strtoupper($plural),
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
+    }
+
+    /**
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
+     *
+     * @return TemplateOutput
+     */
+    private function composeSchema(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
+        string $singular,
+        string $plural
+    ): TemplateOutput {
+        $folder = $settingsProvider->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_SCHEMAS_FOLDER];
+
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'Schema.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('Schema.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_LC%}'   => strtolower($plural),
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
+    }
+
+    /**
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
+     *
+     * @return TemplateOutput
+     */
+    private function composeApi(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
+        string $singular,
+        string $plural
+    ): TemplateOutput {
+        $folder = $settingsProvider->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_API_FOLDER];
+
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $plural . 'Api.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('Api.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+                '{%SINGULAR_UC%}' => strtoupper($singular),
+                '{%PLURAL_UC%}'   => strtoupper($plural),
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
+    }
+
+    /**
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
+     *
+     * @return TemplateOutput
+     */
+    private function composeAuthorization(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
+        string $singular,
+        string $plural
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(AuthorizationSettingsInterface::class)[AuthorizationSettingsInterface::KEY_POLICIES_FOLDER];
+
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'Rules.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('ApiAuthorization.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+                '{%SINGULAR_LC%}' => strtolower($singular),
+                '{%PLURAL_UC%}'   => strtoupper($plural),
+                '{%SINGULAR_UC%}' => strtoupper($singular),
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
+    }
+
+    /**
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
+     *
+     * @return TemplateOutput
+     */
+    private function composeValidationRules(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
+        string $singular,
+        string $plural
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_JSON_VALIDATION_RULES_FOLDER];
+
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'Rules.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('ValidationRules.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%SINGULAR_LC%}' => strtolower($singular),
+                '{%PLURAL_LC%}'   => strtolower($plural),
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent, $singular);
+    }
+
+    /**
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     *
+     * @return TemplateOutput
+     */
+    private function composeJsonValidationOnCreateRules(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
         string $singular
-    ): array {
-        $folder     = $this->filterOutFolderMask(
-            $this->getFluteSettings($container)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER]
-        );
-        $outputPath = $folder . DIRECTORY_SEPARATOR . $singular . 'Create.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%SINGULAR_LC%}' => strtolower($singular),
-        ];
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER];
 
-        return [$outputPath, $this->getTemplatePath('JsonRuleSetOnCreate.txt'), $parameters];
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'CreateJson.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('JsonRulesOnCreate.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%SINGULAR_LC%}' => strtolower($singular),
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent, $singular);
     }
 
     /**
-     * @param ContainerInterface $container
-     * @param string             $singular
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
      *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return TemplateOutput
      */
-    private function composeValidationOnUpdateRuleSetsParameters(
-        ContainerInterface $container,
+    private function composeJsonValidationOnUpdateRules(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
         string $singular
-    ): array {
-        $folder     = $this->filterOutFolderMask(
-            $this->getFluteSettings($container)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER]
-        );
-        $outputPath = $folder . DIRECTORY_SEPARATOR . $singular . 'Update.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%SINGULAR_LC%}' => strtolower($singular),
-        ];
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER];
 
-        return [$outputPath, $this->getTemplatePath('JsonRuleSetOnUpdate.txt'), $parameters];
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'UpdateJson.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('JsonRulesOnUpdate.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%SINGULAR_LC%}' => strtolower($singular),
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent, $singular);
     }
 
     /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
      *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return TemplateOutput
+     *
      */
-    private function composeJsonControllerParameters(
-        ContainerInterface $container,
+    private function composeQueryValidationOnReadRules(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
         string $singular,
         string $plural
-    ): array {
-        $folder     = $this->filterOutFolderMask(
-            $this->getFluteSettings($container)[FluteSettingsInterface::KEY_JSON_CONTROLLERS_FOLDER]
-        );
-        $outputPath = $folder . DIRECTORY_SEPARATOR . $plural . 'Controller.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_CC%}'   => $plural,
-        ];
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER];
 
-        return [$outputPath, $this->getTemplatePath('JsonController.txt'), $parameters];
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $plural . 'ReadQuery.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('QueryRulesOnRead.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent, $singular);
     }
 
     /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
      *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return TemplateOutput
      */
-    private function composeJsonRouteParameters(
-        ContainerInterface $container,
+    private function composeJsonController(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
         string $singular,
         string $plural
-    ): array {
-        $folder     = $this->filterOutFolderMask(
-            $this->getFluteSettings($container)[FluteSettingsInterface::KEY_ROUTES_FOLDER]
-        );
-        $outputPath = $folder . DIRECTORY_SEPARATOR . $singular . 'ApiRoutes.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_CC%}'   => $plural,
-        ];
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_JSON_CONTROLLERS_FOLDER];
 
-        return [$outputPath, $this->getTemplatePath('JsonRoutes.txt'), $parameters];
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $plural . 'Controller.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('JsonController.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
     }
 
     /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
      *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return TemplateOutput
      */
-    private function composeWebControllerParameters(
-        ContainerInterface $container,
+    private function composeJsonRoute(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
         string $singular,
         string $plural
-    ): array {
-        $folder     = $this->filterOutFolderMask(
-            $this->getFluteSettings($container)[FluteSettingsInterface::KEY_WEB_CONTROLLERS_FOLDER]
-        );
-        $outputPath = $folder . DIRECTORY_SEPARATOR . $plural . 'Controller.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_CC%}'   => $plural,
-            '{%PLURAL_LC%}'   => strtolower($plural),
-        ];
+    ): TemplateOutput {
+        $folder = $settingsProvider->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_ROUTES_FOLDER];
 
-        return [$outputPath, $this->getTemplatePath('WebController.txt'), $parameters];
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'ApiRoutes.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('JsonRoutes.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
     }
 
     /**
-     * @param ContainerInterface $container
-     * @param string             $singular
-     * @param string             $plural
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
      *
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return TemplateOutput
      */
-    private function composeWebRouteParameters(
-        ContainerInterface $container,
+    private function composeWebValidationOnCreateRules(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
+        string $singular
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER];
+
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'CreateForm.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('WebRulesOnCreate.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent, $singular);
+    }
+
+    /**
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     *
+     * @return TemplateOutput
+     */
+    private function composeWebValidationOnUpdateRules(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
+        string $singular
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_JSON_VALIDATORS_FOLDER];
+
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'UpdateForm.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('WebRulesOnUpdate.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent, $singular);
+    }
+
+    /**
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
+     *
+     * @return TemplateOutput
+     */
+    private function composeWebController(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
         string $singular,
         string $plural
-    ): array {
-        $folder     = $this->filterOutFolderMask(
-            $this->getFluteSettings($container)[FluteSettingsInterface::KEY_ROUTES_FOLDER]
-        );
-        $outputPath = $folder . DIRECTORY_SEPARATOR . $singular . 'WebRoutes.php';
-        $parameters = [
-            '{%SINGULAR_CC%}' => $singular,
-            '{%PLURAL_CC%}'   => $plural,
-        ];
+    ): TemplateOutput {
+        $folder = $settingsProvider
+                      ->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_WEB_CONTROLLERS_FOLDER];
 
-        return [$outputPath, $this->getTemplatePath('WebRoutes.txt'), $parameters];
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $plural . 'Controller.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('WebController.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+                '{%PLURAL_LC%}'   => strtolower($plural),
+                '{%PLURAL_UC%}'   => strtoupper($plural),
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
+    }
+
+    /**
+     * @param SettingsProviderInterface $settingsProvider
+     * @param FileSystemInterface       $fileSystem
+     * @param string                    $singular
+     * @param string                    $plural
+     *
+     * @return TemplateOutput
+     */
+    private function composeWebRoute(
+        SettingsProviderInterface $settingsProvider,
+        FileSystemInterface $fileSystem,
+        string $singular,
+        string $plural
+    ): TemplateOutput {
+        $folder = $settingsProvider->get(FluteSettingsInterface::class)[FluteSettingsInterface::KEY_ROUTES_FOLDER];
+
+        $outputRootFolder = $this->filterOutFolderMask($folder);
+        $outputFileName   = $singular . 'WebRoutes.php';
+        $outputContent    = $this->composeTemplateContent(
+            $fileSystem,
+            $this->getTemplatePath('WebRoutes.txt'),
+            [
+                '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
+            ]
+        );
+
+        return new TemplateOutput($outputRootFolder, $outputFileName, $outputContent);
     }
 
     /**
      * @param FileSystemInterface $fileSystem
-     * @param array               $pathsAndParams
+     * @param TemplateOutput[]    $templateOutputs
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function createTemplates(FileSystemInterface $fileSystem, array $pathsAndParams): void
+    private function createTemplates(FileSystemInterface $fileSystem, array $templateOutputs): void
     {
-        foreach ($pathsAndParams as list($outputPath)) {
-            if ($fileSystem->exists($outputPath) === true) {
-                throw new InvalidArgumentException("File `$outputPath` already exists.");
+        // before making any changes in the filesystem we have to check there is a good chance we can make it
+        foreach ($templateOutputs as $templateOutput) {
+            if ($fileSystem->exists($templateOutput->getOutputRootFolder()) === false) {
+                $rootFolder = $templateOutput->getOutputRootFolder();
+                throw new InvalidArgumentException("Folder `$rootFolder` do not exist.");
+            }
+
+            if ($fileSystem->exists($templateOutput->getOutputPath()) === true) {
+                $filePath = $templateOutput->getOutputPath();
+                throw new InvalidArgumentException("File `$filePath` already exists.");
+            }
+
+            $outFolder = $templateOutput->getOutputFolder();
+            if ($fileSystem->exists($outFolder) === true) {
+                // the folder already exist so we have to check it is writable
+                if ($fileSystem->isWritable($outFolder) === false) {
+                    throw new InvalidArgumentException("Folder `$outFolder` is not writable.");
+                }
+            } else {
+                // it should be a root folder with not yet existing sub-folder so root should be writable
+                $rootFolder = $templateOutput->getOutputRootFolder();
+                if ($fileSystem->isWritable($rootFolder) === false) {
+                    throw new InvalidArgumentException("Folder `$rootFolder` is not writable.");
+                }
             }
         }
 
-        foreach ($pathsAndParams as list($outputPath, $templatePath, $parameters)) {
-            $this->writeByTemplate($fileSystem, $outputPath, $templatePath, $parameters);
+        foreach ($templateOutputs as $templateOutput) {
+            if ($fileSystem->exists($templateOutput->getOutputFolder()) === false) {
+                $fileSystem->createFolder($templateOutput->getOutputFolder());
+            }
+            $fileSystem->write($templateOutput->getOutputPath(), $templateOutput->getOutputContent());
         }
     }
 
     /**
      * @param FileSystemInterface $fileSystem
-     * @param string              $outputPath
      * @param string              $templatePath
-     * @param iterable            $parameters
-     *
-     * @return void
-     */
-    private function writeByTemplate(
-        FileSystemInterface $fileSystem,
-        string $outputPath,
-        string $templatePath,
-        iterable $parameters
-    ): void {
-        $templateContent = $fileSystem->read($templatePath);
-        $outputContent   = $this->replaceInTemplate($templateContent, $parameters);
-        $fileSystem->write($outputPath, $outputContent);
-    }
-
-    /**
-     * @param string   $template
-     * @param iterable $parameters
+     * @param iterable            $templateParams
      *
      * @return string
      */
-    private function replaceInTemplate(string $template, iterable $parameters): string
-    {
-        $result = $template;
-        foreach ($parameters as $key => $value) {
-            $result = str_replace($key, $value, $result);
+    private function composeTemplateContent(
+        FileSystemInterface $fileSystem,
+        string $templatePath,
+        iterable $templateParams
+    ): string {
+        $templateContent = $fileSystem->read($templatePath);
+
+        foreach ($templateParams as $key => $value) {
+            $templateContent = str_replace($key, $value, $templateContent);
         }
 
-        return $result;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return FileSystemInterface
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function getFileSystem(ContainerInterface $container): FileSystemInterface
-    {
-        assert($container->has(FileSystemInterface::class));
-
-        /** @var FileSystemInterface $fileSystem */
-        $fileSystem = $container->get(FileSystemInterface::class);
-
-        return $fileSystem;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return SettingsProviderInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function getSettingsProvider(ContainerInterface $container): SettingsProviderInterface
-    {
-        assert($container->has(SettingsProviderInterface::class));
-
-        /** @var SettingsProviderInterface $provider */
-        $provider = $container->get(SettingsProviderInterface::class);
-
-        return $provider;
+        return $templateContent;
     }
 
     /**
@@ -614,51 +807,6 @@ class MakeCommand implements CommandInterface
     private function getTemplatePath(string $fileName): string
     {
         return implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'res', 'CodeTemplates', $fileName]);
-    }
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return array
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function getDataSettings(ContainerInterface $container): array
-    {
-        $dataSettings = $this->getSettingsProvider($container)->get(DataSettingsInterface::class);
-
-        return $dataSettings;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return array
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function getFluteSettings(ContainerInterface $container): array
-    {
-        $dataSettings = $this->getSettingsProvider($container)->get(FluteSettingsInterface::class);
-
-        return $dataSettings;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return array
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function getAuthorizationSettings(ContainerInterface $container): array
-    {
-        $dataSettings = $this->getSettingsProvider($container)->get(AuthorizationSettingsInterface::class);
-
-        return $dataSettings;
     }
 
     /**

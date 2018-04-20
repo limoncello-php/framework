@@ -65,6 +65,13 @@ interface FileSystemInterface
     public function isFolder(string $path): bool;
 
     /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function isWritable(string $path): bool;
+
+    /**
      * @param string $folderPath
      *
      * @return void

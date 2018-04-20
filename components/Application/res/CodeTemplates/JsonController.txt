@@ -3,9 +3,10 @@
 use App\Api\{%PLURAL_CC%}Api as Api;
 //use App\Data\Models\{%SINGULAR_CC%} as Model;
 use App\Json\Schemas\{%SINGULAR_CC%}Schema as Schema;
-use App\Validation\JsonValidators\{%SINGULAR_CC%}Create;
-use App\Validation\JsonValidators\{%SINGULAR_CC%}Update;
-//use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
+use App\Validation\{%SINGULAR_CC%}\{%SINGULAR_CC%}CreateJson;
+use App\Validation\{%SINGULAR_CC%}\{%PLURAL_CC%}ReadQuery;
+use App\Validation\{%SINGULAR_CC%}\{%SINGULAR_CC%}UpdateJson;
+//use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 //use Psr\Container\ContainerExceptionInterface;
 //use Psr\Container\ContainerInterface;
 //use Psr\Container\NotFoundExceptionInterface;
@@ -26,10 +27,16 @@ class {%PLURAL_CC%}Controller extends BaseController
     const SCHEMA_CLASS = Schema::class;
 
     /** @inheritdoc */
-    const ON_CREATE_VALIDATION_RULES_SET_CLASS = {%SINGULAR_CC%}Create::class;
+    const ON_CREATE_DATA_VALIDATION_RULES_CLASS = {%SINGULAR_CC%}CreateJson::class;
 
     /** @inheritdoc */
-    const ON_UPDATE_VALIDATION_RULES_SET_CLASS = {%SINGULAR_CC%}Update::class;
+    const ON_UPDATE_DATA_VALIDATION_RULES_CLASS = {%SINGULAR_CC%}UpdateJson::class;
+
+    /** @inheritdoc */
+    const ON_INDEX_QUERY_VALIDATION_RULES_CLASS = {%PLURAL_CC%}ReadQuery::class;
+
+    /** @inheritdoc */
+    const ON_READ_QUERY_VALIDATION_RULES_CLASS = {%PLURAL_CC%}ReadQuery::class;
 
 //    /**
 //     * @param array                  $routeParams
@@ -41,36 +48,17 @@ class {%PLURAL_CC%}Controller extends BaseController
 //     * @throws ContainerExceptionInterface
 //     * @throws NotFoundExceptionInterface
 //     */
-//    public static function readComments(
+//    public static function readOthers(
 //        array $routeParams,
 //        ContainerInterface $container,
 //        ServerRequestInterface $request
 //    ): ResponseInterface {
-//        $apiHandler = function (Api $api) use ($routeParams) {
-//            return $api->readComments($routeParams[static::ROUTE_KEY_INDEX]);
-//        };
-//
-//        return static::readRelationshipWithClosure($apiHandler, Model::REL_COMMENTS, $container, $request);
-//    }
-//
-//    /**
-//     * @inheritdoc
-//     *
-//     * By default no filters, sorts and includes are allowed (will be ignored). We override this method
-//     * in order allow it.
-//     */
-//    protected static function configureOnIndexParser(QueryParserInterface $parser): QueryParserInterface
-//    {
-//        return parent::configureOnIndexParser($parser)
-//            ->withAllowedFilterFields([
-//                Schema::RESOURCE_ID,
-//            ])
-//            ->withAllowedSortFields([
-//                Schema::RESOURCE_ID,
-//                Schema::ATTR_TITLE,
-//            ])
-//            ->withAllowedIncludePaths([
-//                Schema::REL_COMMENTS,
-//            ]);
+//        return static::readRelationship(
+//            $routeParams[static::ROUTE_KEY_INDEX],
+//            Model::REL_OTHERS,
+//            DefaultQueryValidationRules::class,
+//            $container,
+//            $request
+//        );
 //    }
 }

@@ -33,7 +33,7 @@ class {%SINGULAR_CC%}WebRoutes implements RoutesConfiguratorInterface
             // This group uses exception handler to provide error information in HTML format with Whoops.
             ->group('', function (GroupInterface $routes): void {
 
-                self::controller($routes, {%PLURAL_CC%}Controller::SUB_URL, {%PLURAL_CC%}Controller::class);
+                self::webController($routes, {%PLURAL_CC%}Controller::SUB_URL, {%PLURAL_CC%}Controller::class);
 
             }, [
                 GroupInterface::PARAM_CONTAINER_CONFIGURATORS => [

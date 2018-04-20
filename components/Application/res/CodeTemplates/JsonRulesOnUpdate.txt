@@ -1,8 +1,8 @@
-<?php namespace App\Validation\JsonValidators;
+<?php namespace App\Validation\{%SINGULAR_CC%};
 
 use App\Json\Schemas\{%SINGULAR_CC%}Schema as Schema;
-use App\Validation\Rules\{%SINGULAR_CC%}Rules as r;
-use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
+use App\Validation\{%SINGULAR_CC%}\{%SINGULAR_CC%}Rules as r;
+use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 
 /**
@@ -10,7 +10,7 @@ use Limoncello\Validation\Contracts\Rules\RuleInterface;
  *
  * @SuppressWarnings(PHPMD.StaticAccess)
  */
-final class {%SINGULAR_CC%}Create implements JsonApiRuleSetInterface
+final class {%SINGULAR_CC%}UpdateJson implements JsonApiDataRulesInterface
 {
     /**
      * @inheritdoc
@@ -25,7 +25,7 @@ final class {%SINGULAR_CC%}Create implements JsonApiRuleSetInterface
      */
     public static function getIdRule(): RuleInterface
     {
-        return r::equals(null);
+        return r::{%SINGULAR_LC%}Id();
     }
 
     /**
@@ -34,8 +34,8 @@ final class {%SINGULAR_CC%}Create implements JsonApiRuleSetInterface
     public static function getAttributeRules(): array
     {
         return [
-            Schema::ATTR_TITLE => r::required(r::title()),
-            Schema::ATTR_TEXT  => r::required(r::text()),
+            Schema::ATTR_TITLE => r::title(),
+            Schema::ATTR_TEXT  => r::text(),
         ];
     }
 
@@ -44,8 +44,9 @@ final class {%SINGULAR_CC%}Create implements JsonApiRuleSetInterface
      */
     public static function getToOneRelationshipRules(): array
     {
+        // do not allow changing relationships for existing {%SINGULAR_LC%}s
         return [
-//            Schema::REL_ABC => r::required(r::abcRelationship()),
+//            Schema::REL_OTHER => r::otherRelationship(),
         ];
     }
 
@@ -54,6 +55,8 @@ final class {%SINGULAR_CC%}Create implements JsonApiRuleSetInterface
      */
     public static function getToManyRelationshipRules(): array
     {
-        return [];
+        return [
+//            Schema::REL_OTHERS => r::toManyRelationship(OtherSchema::TYPE, r::othersRelationship()),
+        ];
     }
 }

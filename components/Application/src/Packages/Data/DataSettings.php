@@ -19,6 +19,7 @@
 use Limoncello\Application\Data\ModelSchemaInfo;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Contracts\Settings\Packages\DataSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Reflection\ClassIsTrait;
@@ -27,36 +28,9 @@ use Psr\Container\ContainerInterface;
 /**
  * @package Limoncello\Application
  */
-abstract class DataSettings implements SettingsInterface
+abstract class DataSettings implements SettingsInterface, DataSettingsInterface
 {
     use ClassIsTrait, CheckCallableTrait;
-
-    /** Settings key */
-    const KEY_MODELS_FOLDER = 0;
-
-    /** Settings key */
-    const KEY_MODELS_FILE_MASK = self::KEY_MODELS_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_MIGRATIONS_FOLDER = self::KEY_MODELS_FILE_MASK + 1;
-
-    /** Settings key */
-    const KEY_MIGRATIONS_LIST_FILE = self::KEY_MIGRATIONS_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_SEEDS_FOLDER = self::KEY_MIGRATIONS_LIST_FILE + 1;
-
-    /** Settings key */
-    const KEY_SEEDS_LIST_FILE = self::KEY_SEEDS_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_SEED_INIT = self::KEY_SEEDS_LIST_FILE + 1;
-
-    /** Settings key */
-    const KEY_MODELS_SCHEMA_INFO = self::KEY_SEED_INIT + 1;
-
-    /** Settings key */
-    protected const KEY_LAST = self::KEY_MODELS_SCHEMA_INFO;
 
     /**
      * @inheritdoc

@@ -1,0 +1,25 @@
+<?php namespace App\Validation\{%SINGULAR_CC%};
+
+use App\Json\Schemas\{%SINGULAR_CC%}Schema as Schema;
+use App\Validation\{%SINGULAR_CC%}\{%SINGULAR_CC%}Rules as r;
+use Limoncello\Flute\Contracts\Validation\FormRulesInterface;
+
+/**
+ * @package App
+ *
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
+final class {%SINGULAR_CC%}UpdateForm implements FormRulesInterface
+{
+    /**
+     * @inheritdoc
+     */
+    public static function getAttributeRules(): array
+    {
+        return [
+            Schema::ATTR_TITLE => r::title(),
+            Schema::ATTR_TEXT  => r::text(),
+//            Schema::REL_OTHER  => r::otherId(),
+        ];
+    }
+}

@@ -1,7 +1,7 @@
 <?php namespace App\Routes;
 
 use App\Json\Controllers\{%PLURAL_CC%}Controller;
-//use App\Json\Schemas\{%SINGULAR_CC%}Schema;
+use App\Json\Schemas\{%SINGULAR_CC%}Schema;
 use Limoncello\Contracts\Application\RoutesConfiguratorInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Flute\Http\Traits\FluteRoutesTrait;
@@ -34,8 +34,8 @@ class {%SINGULAR_CC%}ApiRoutes implements RoutesConfiguratorInterface
             // This group uses custom exception handler to provide error information in JSON API format.
             ->group(ApiRoutes::API_URI_PREFIX, function (GroupInterface $routes): void {
 
-                self::resource($routes, {%PLURAL_CC%}Controller::class);
-//                self::relationship($routes, {%SINGULAR_CC%}Schema::REL_COMMENTS, {%PLURAL_CC%}Controller::class, 'readComments');
+                self::apiController($routes, {%SINGULAR_CC%}Schema::TYPE, {%PLURAL_CC%}Controller::class);
+//                self::relationship($routes, {%SINGULAR_CC%}Schema::TYPE, {%SINGULAR_CC%}Schema::REL_OTHERS, {%PLURAL_CC%}Controller::class, 'readOthers');
 
             }, [
                 GroupInterface::PARAM_CONTAINER_CONFIGURATORS => [

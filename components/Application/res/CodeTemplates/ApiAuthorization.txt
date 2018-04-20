@@ -26,7 +26,7 @@ class {%SINGULAR_CC%}Rules implements ResourceAuthorizationRulesInterface
     const ACTION_EDIT_{%SINGULAR_UC%} = 'canEdit{%SINGULAR_CC%}';
 
 //    /** Action name */
-//    const ACTION_VIEW_{%SINGULAR_UC%}_COMMENTS = 'canView{%SINGULAR_CC%}Comments';
+//    const ACTION_VIEW_{%SINGULAR_UC%}_OTHERS = 'canView{%SINGULAR_CC%}Others';
 
     /**
      * @inheritdoc
@@ -52,6 +52,9 @@ class {%SINGULAR_CC%}Rules implements ResourceAuthorizationRulesInterface
      * @param ContextInterface $context
      *
      * @return bool
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function canCreate{%SINGULAR_CC%}(ContextInterface $context): bool
     {
@@ -82,7 +85,7 @@ class {%SINGULAR_CC%}Rules implements ResourceAuthorizationRulesInterface
 //     *
 //     * @return bool
 //     */
-//    public static function canView{%SINGULAR_CC%}Comments(ContextInterface $context): bool
+//    public static function canView{%SINGULAR_CC%}Others(ContextInterface $context): bool
 //    {
 //        assert($context);
 //
