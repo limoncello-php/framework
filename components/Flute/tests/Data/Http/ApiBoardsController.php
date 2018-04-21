@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\BoardsApi as Api;
-use Limoncello\Tests\Flute\Data\Schemes\BoardSchema as Schema;
+use Limoncello\Tests\Flute\Data\Models\Board as Model;
+use Limoncello\Tests\Flute\Data\Schemas\BoardSchema as Schema;
+use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadBoardsQueryRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -36,6 +38,12 @@ class ApiBoardsController extends ApiBaseController
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
 
+    /** @inheritdoc */
+    const ON_INDEX_QUERY_VALIDATION_RULES_CLASS = ReadBoardsQueryRules::class;
+
+    /** @inheritdoc */
+    const ON_READ_QUERY_VALIDATION_RULES_CLASS = ReadBoardsQueryRules::class;
+
     /**
      * @param array                  $routeParams
      * @param ContainerInterface     $container
@@ -51,41 +59,12 @@ class ApiBoardsController extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        return static::readRelationship($routeParams[static::ROUTE_KEY_INDEX], Schema::REL_POSTS, $container, $request);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function configureOnIndexParser(QueryParserInterface $parser): QueryParserInterface
-    {
-        $parser = parent::configureOnIndexParser($parser);
-
-        self::configureParser($parser);
-
-        return $parser;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function configureOnReadParser(QueryParserInterface $parser): QueryParserInterface
-    {
-        $parser = parent::configureOnReadParser($parser);
-
-        self::configureParser($parser);
-
-        return $parser;
-    }
-
-    /**
-     * @param QueryParserInterface $parser
-     */
-    private static function configureParser(QueryParserInterface $parser): void
-    {
-        $parser
-            ->withAllowedIncludePaths([
-                Schema::REL_POSTS,
-            ]);
+        return static::readRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_POSTS,
+            DefaultQueryValidationRules::class,
+            $container,
+            $request
+        );
     }
 }

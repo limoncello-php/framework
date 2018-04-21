@@ -27,7 +27,7 @@ class Relationship implements RelationshipInterface
     /**
      * @var string
      */
-    private $nameInScheme;
+    private $nameInSchema;
 
     /**
      * @var string
@@ -45,16 +45,16 @@ class Relationship implements RelationshipInterface
     private $toSchema;
 
     /**
-     * @param string          $nameInScheme
+     * @param string          $nameInSchema
      * @param SchemaInterface $fromSchema
      * @param SchemaInterface $toSchema
      */
     public function __construct(
-        string $nameInScheme,
+        string $nameInSchema,
         SchemaInterface $fromSchema,
         SchemaInterface $toSchema
     ) {
-        $this->nameInScheme = $nameInScheme;
+        $this->nameInSchema = $nameInSchema;
         $this->fromSchema   = $fromSchema;
         $this->toSchema     = $toSchema;
 
@@ -64,9 +64,9 @@ class Relationship implements RelationshipInterface
     /**
      * @inheritdoc
      */
-    public function getNameInScheme(): string
+    public function getNameInSchema(): string
     {
-        return $this->nameInScheme;
+        return $this->nameInSchema;
     }
 
     /**
@@ -75,7 +75,7 @@ class Relationship implements RelationshipInterface
     public function getNameInModel(): string
     {
         if ($this->nameInModel === null) {
-            $this->nameInModel = $this->getFromSchema()->getRelationshipMapping($this->getNameInScheme());
+            $this->nameInModel = $this->getFromSchema()->getRelationshipMapping($this->getNameInSchema());
         }
 
         return $this->nameInModel;

@@ -19,9 +19,9 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Exception;
-use Limoncello\Passport\Adaptors\MySql\DatabaseSchemeMigrationTrait;
+use Limoncello\Passport\Adaptors\MySql\DatabaseSchemaMigrationTrait;
 use Limoncello\Passport\Adaptors\MySql\DbDateFormatTrait;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use Mockery;
 use Mockery\Mock;
 
@@ -34,9 +34,9 @@ class MigrationTraitTest extends TestCase
 {
     const MY_EX_MARKER = 'my_ex_marker';
 
-    use DbDateFormatTrait, DatabaseSchemeMigrationTrait {
-        DatabaseSchemeMigrationTrait::createDatabaseViews as parentCreateDatabaseViews;
-        DatabaseSchemeMigrationTrait::removeDatabaseViews as parentRemoveDatabaseViews;
+    use DbDateFormatTrait, DatabaseSchemaMigrationTrait {
+        DatabaseSchemaMigrationTrait::createDatabaseViews as parentCreateDatabaseViews;
+        DatabaseSchemaMigrationTrait::removeDatabaseViews as parentRemoveDatabaseViews;
     }
 
     /**
@@ -50,17 +50,17 @@ class MigrationTraitTest extends TestCase
      *
      * @throws Exception
      */
-    public function testDummyCreateAndDeleteScheme()
+    public function testDummyCreateAndDeleteSchema()
     {
-        $scheme     = new DatabaseScheme();
+        $schema     = new DatabaseSchema();
         $connection = $this->createConnection();
 
-        $this->createDatabaseScheme($connection, $scheme);
+        $this->createDatabaseSchema($connection, $schema);
 
         $this->isThrowInDummyCreate = true;
         $gotException = false;
         try {
-            $this->createDatabaseScheme($connection, $scheme);
+            $this->createDatabaseSchema($connection, $schema);
         } catch (DBALException $exception) {
             $this->assertEquals(static::MY_EX_MARKER, $exception->getMessage());
             $gotException = true;
@@ -77,7 +77,7 @@ class MigrationTraitTest extends TestCase
     {
         /** @var Mock $connection */
         $connection = Mockery::mock(Connection::class);
-        $scheme     = new DatabaseScheme('users_table');
+        $schema     = new DatabaseSchema('users_table');
 
         // Should we set expectations with specific SQL values?
         // I have a feeling it's better to have more generic expectations.
@@ -86,7 +86,7 @@ class MigrationTraitTest extends TestCase
 
         /** @var Connection $connection */
 
-        $this->parentCreateDatabaseViews($connection, $scheme);
+        $this->parentCreateDatabaseViews($connection, $schema);
 
         // mocks will do the actual checks
         $this->assertTrue(true);
@@ -101,7 +101,7 @@ class MigrationTraitTest extends TestCase
     {
         /** @var Mock $connection */
         $connection = Mockery::mock(Connection::class);
-        $scheme     = new DatabaseScheme('users_table');
+        $schema     = new DatabaseSchema('users_table');
 
         // Should we set expectations with specific SQL values?
         // I have a feeling it's better to have more generic expectations.
@@ -110,7 +110,7 @@ class MigrationTraitTest extends TestCase
 
         /** @var Connection $connection */
 
-        $this->parentRemoveDatabaseViews($connection, $scheme);
+        $this->parentRemoveDatabaseViews($connection, $schema);
 
         // mocks will do the actual checks
         $this->assertTrue(true);
@@ -128,15 +128,15 @@ class MigrationTraitTest extends TestCase
 
     /**
      * @param Connection     $connection
-     * @param DatabaseScheme $scheme
+     * @param DatabaseSchema $schema
      *
      * @return void
      *
      * @throws DBALException
      */
-    protected function createDatabaseViews(Connection $connection, DatabaseScheme $scheme)
+    protected function createDatabaseViews(Connection $connection, DatabaseSchema $schema)
     {
-        assert($connection || $scheme);
+        assert($connection || $schema);
 
         // do nothing as here and test this functionality separately.
         if ($this->isThrowInDummyCreate === true) {
@@ -146,13 +146,13 @@ class MigrationTraitTest extends TestCase
 
     /**
      * @param Connection     $connection
-     * @param DatabaseScheme $scheme
+     * @param DatabaseSchema $schema
      *
      * @return void
      */
-    protected function removeDatabaseViews(Connection $connection, DatabaseScheme $scheme)
+    protected function removeDatabaseViews(Connection $connection, DatabaseSchema $schema)
     {
-        assert($connection || $scheme);
+        assert($connection || $schema);
 
         // do nothing as here and test this functionality separately.
     }

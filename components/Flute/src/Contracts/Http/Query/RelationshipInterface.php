@@ -26,7 +26,7 @@ interface RelationshipInterface
     /**
      * @return string
      */
-    public function getNameInScheme(): string;
+    public function getNameInSchema(): string;
 
     /**
      * @return string

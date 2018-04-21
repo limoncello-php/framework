@@ -85,10 +85,10 @@ interface FluteSettingsInterface extends SettingsInterface
     const KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER = self::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE + 1;
 
     /** Config key */
-    const KEY_MODEL_TO_SCHEME_MAP = self::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER + 1;
+    const KEY_MODEL_TO_SCHEMA_MAP = self::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER + 1;
 
     /** Config key */
-    const KEY_JSON_VALIDATION_RULE_SETS_DATA = self::KEY_MODEL_TO_SCHEME_MAP + 1;
+    const KEY_JSON_VALIDATION_RULE_SETS_DATA = self::KEY_MODEL_TO_SCHEMA_MAP + 1;
 
     /** Config key */
     const KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA = self::KEY_JSON_VALIDATION_RULE_SETS_DATA + 1;
@@ -119,14 +119,4 @@ interface FluteSettingsInterface extends SettingsInterface
 
     /** Config key */
     const KEY_LAST = self::KEY_WEB_CONTROLLERS_FOLDER;
-
-
-    /** @deprecated Config key */
-    const KEY_SCHEMES_REQUIRE_UNIQUE_TYPES = self::KEY_SCHEMAS_REQUIRE_UNIQUE_TYPES;
-
-    /** @deprecated Config key */
-    const KEY_SCHEMES_FOLDER = self::KEY_SCHEMAS_FOLDER;
-
-    /** @deprecated Config key */
-    const KEY_SCHEMES_FILE_MASK = self::KEY_SCHEMAS_FILE_MASK;
 }

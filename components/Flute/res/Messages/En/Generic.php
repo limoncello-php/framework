@@ -22,7 +22,7 @@ use Limoncello\Flute\L10n\Messages;
 /**
  * @package Limoncello\Flute
  */
-class Generic implements MessageStorageInterface
+class Generic implements MessageStorageInterface, Messages
 {
     /**
      * @inheritdoc
@@ -30,10 +30,10 @@ class Generic implements MessageStorageInterface
     public static function getMessages(): array
     {
         return [
-            Messages::MSG_ERR_INVALID_ELEMENT   => 'Invalid element.',
-            Messages::MSG_ERR_INVALID_PARAMETER => 'Invalid parameter.',
-            Messages::MSG_ERR_INVALID_OPERATION => 'Invalid operation.',
-            Messages::MSG_ERR_INVALID_ARGUMENT  => 'Invalid argument.',
+            static::MSG_ERR_INVALID_ELEMENT   => 'Invalid element.',
+            static::MSG_ERR_INVALID_PARAMETER => 'Invalid parameter.',
+            static::MSG_ERR_INVALID_OPERATION => 'Invalid operation.',
+            static::MSG_ERR_INVALID_ARGUMENT  => 'Invalid argument.',
         ];
     }
 }

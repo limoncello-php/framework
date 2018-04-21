@@ -1,0 +1,61 @@
+<?php namespace App\Validation\{%SINGULAR_CC%};
+
+use App\Json\Schemas\{%SINGULAR_CC%}Schema as Schema;
+use App\Validation\{%SINGULAR_CC%}\{%SINGULAR_CC%}Rules as r;
+use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
+use Limoncello\Validation\Contracts\Rules\RuleInterface;
+
+/**
+ * @package App
+ *
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
+final class {%SINGULAR_CC%}CreateJson implements JsonApiDataRulesInterface
+{
+    /**
+     * @inheritdoc
+     */
+    public static function getTypeRule(): RuleInterface
+    {
+        return r::{%SINGULAR_LC%}Type();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getIdRule(): RuleInterface
+    {
+        return r::equals(null);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getAttributeRules(): array
+    {
+        return [
+            Schema::ATTR_TITLE => r::required(r::title()),
+            Schema::ATTR_TEXT  => r::required(r::text()),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getToOneRelationshipRules(): array
+    {
+        return [
+//            Schema::REL_OTHER => r::otherRelationship(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getToManyRelationshipRules(): array
+    {
+        return [
+//            Schema::REL_OTHERS => r::toManyRelationship(OtherSchema::TYPE, r::othersRelationship()),
+        ];
+    }
+}

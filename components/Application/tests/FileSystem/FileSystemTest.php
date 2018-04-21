@@ -111,6 +111,16 @@ class FileSystemTest extends TestCase
     }
 
     /**
+     * Test folder is writable.
+     *
+     * @return void
+     */
+    public function testIsWritable(): void
+    {
+        $this->assertTrue($this->fileSystem->isWritable(__DIR__));
+    }
+
+    /**
      * Test folder scan.
      */
     public function testScanFolder1(): void
@@ -175,20 +185,21 @@ class FileSystemTest extends TestCase
         ];
         $subFolder1Items = [];
 
-        $this->mock->shouldReceive('scanFolder')->with($rootPath)->once()->andReturn($rootItems);
-        $this->mock->shouldReceive('scanFolder')->with('root/folder1')->once()->andReturn($folder1Items);
-        $this->mock->shouldReceive('scanFolder')->with('root/folder1/subFolder1')->once()->andReturn($subFolder1Items);
+        $this->mock->shouldReceive('scanFolder')->withArgs([$rootPath])->once()->andReturn($rootItems);
+        $this->mock->shouldReceive('scanFolder')->withArgs(['root/folder1'])->once()->andReturn($folder1Items);
+        $this->mock->shouldReceive('scanFolder')
+            ->withArgs(['root/folder1/subFolder1'])->once()->andReturn($subFolder1Items);
 
-        $this->mock->shouldReceive('isFolder')->with('root/folder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('isFolder')->with('root/folder1/subFolder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('isFolder')->with('root/file1')->once()->andReturn(false);
-        $this->mock->shouldReceive('isFolder')->with('root/folder1/file11')->once()->andReturn(false);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1/subFolder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/file1'])->once()->andReturn(false);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1/file11'])->once()->andReturn(false);
 
-        $this->mock->shouldReceive('deleteFolder')->with('root/folder1/subFolder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('delete')->with('root/folder1/file11')->once()->andReturn(true);
-        $this->mock->shouldReceive('deleteFolder')->with('root/folder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('delete')->with('root/file1')->once()->andReturn(true);
-        $this->mock->shouldReceive('deleteFolder')->with('root')->once()->andReturn(true);
+        $this->mock->shouldReceive('deleteFolder')->withArgs(['root/folder1/subFolder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('delete')->withArgs(['root/folder1/file11'])->once()->andReturn(true);
+        $this->mock->shouldReceive('deleteFolder')->withArgs(['root/folder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('delete')->withArgs(['root/file1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('deleteFolder')->withArgs(['root'])->once()->andReturn(true);
 
         $this->fileSystem->deleteFolderRecursive($rootPath);
 
@@ -214,16 +225,17 @@ class FileSystemTest extends TestCase
         ];
         $subFolder1Items = [];
 
-        $this->mock->shouldReceive('scanFolder')->with($rootPath)->once()->andReturn($rootItems);
-        $this->mock->shouldReceive('scanFolder')->with('root/folder1')->once()->andReturn($folder1Items);
-        $this->mock->shouldReceive('scanFolder')->with('root/folder1/subFolder1')->once()->andReturn($subFolder1Items);
+        $this->mock->shouldReceive('scanFolder')->withArgs([$rootPath])->once()->andReturn($rootItems);
+        $this->mock->shouldReceive('scanFolder')->withArgs(['root/folder1'])->once()->andReturn($folder1Items);
+        $this->mock->shouldReceive('scanFolder')
+            ->withArgs(['root/folder1/subFolder1'])->once()->andReturn($subFolder1Items);
 
-        $this->mock->shouldReceive('isFolder')->with('root/folder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('isFolder')->with('root/folder1/subFolder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('isFolder')->with('root/folder1/file11')->once()->andReturn(false);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1/subFolder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1/file11'])->once()->andReturn(false);
 
-        $this->mock->shouldReceive('deleteFolder')->with('root/folder1/subFolder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('delete')->with('root/folder1/file11')->once()->andReturn(false);
+        $this->mock->shouldReceive('deleteFolder')->withArgs(['root/folder1/subFolder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('delete')->withArgs(['root/folder1/file11'])->once()->andReturn(false);
 
         $this->fileSystem->deleteFolderRecursive($rootPath);
     }
@@ -246,17 +258,18 @@ class FileSystemTest extends TestCase
         ];
         $subFolder1Items = [];
 
-        $this->mock->shouldReceive('scanFolder')->with($rootPath)->once()->andReturn($rootItems);
-        $this->mock->shouldReceive('scanFolder')->with('root/folder1')->once()->andReturn($folder1Items);
-        $this->mock->shouldReceive('scanFolder')->with('root/folder1/subFolder1')->once()->andReturn($subFolder1Items);
+        $this->mock->shouldReceive('scanFolder')->withArgs([$rootPath])->once()->andReturn($rootItems);
+        $this->mock->shouldReceive('scanFolder')->withArgs(['root/folder1'])->once()->andReturn($folder1Items);
+        $this->mock->shouldReceive('scanFolder')
+            ->withArgs(['root/folder1/subFolder1'])->once()->andReturn($subFolder1Items);
 
-        $this->mock->shouldReceive('isFolder')->with('root/folder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('isFolder')->with('root/folder1/subFolder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('isFolder')->with('root/folder1/file11')->once()->andReturn(false);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1/subFolder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('isFolder')->withArgs(['root/folder1/file11'])->once()->andReturn(false);
 
-        $this->mock->shouldReceive('deleteFolder')->with('root/folder1/subFolder1')->once()->andReturn(true);
-        $this->mock->shouldReceive('delete')->with('root/folder1/file11')->once()->andReturn(true);
-        $this->mock->shouldReceive('deleteFolder')->with('root/folder1')->once()->andReturn(false);
+        $this->mock->shouldReceive('deleteFolder')->withArgs(['root/folder1/subFolder1'])->once()->andReturn(true);
+        $this->mock->shouldReceive('delete')->withArgs(['root/folder1/file11'])->once()->andReturn(true);
+        $this->mock->shouldReceive('deleteFolder')->withArgs(['root/folder1'])->once()->andReturn(false);
 
         $this->fileSystem->deleteFolderRecursive($rootPath);
     }

@@ -33,7 +33,7 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
     {
         $query = $this->getConnection()->createQueryBuilder();
 
-        $clientIdColumn = $this->getDatabaseScheme()->getRedirectUrisClientIdentityColumn();
+        $clientIdColumn = $this->getDatabaseSchema()->getRedirectUrisClientIdentityColumn();
         $statement      = $query
             ->select(['*'])
             ->from($this->getTableNameForWriting())
@@ -52,11 +52,11 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
     public function create(RedirectUriInterface $redirectUri): RedirectUriInterface
     {
         $now        = new DateTimeImmutable();
-        $scheme     = $this->getDatabaseScheme();
+        $schema     = $this->getDatabaseSchema();
         $identifier = $this->createResource([
-            $scheme->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
-            $scheme->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
-            $scheme->getRedirectUrisCreatedAtColumn()      => $now,
+            $schema->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
+            $schema->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
+            $schema->getRedirectUrisCreatedAtColumn()      => $now,
         ]);
 
         $redirectUri->setIdentifier($identifier)->setCreatedAt($now);
@@ -78,11 +78,11 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
     public function update(RedirectUriInterface $redirectUri): void
     {
         $now    = new DateTimeImmutable();
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         $this->updateResource($redirectUri->getIdentifier(), [
-            $scheme->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
-            $scheme->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
-            $scheme->getRedirectUrisUpdatedAtColumn()      => $now,
+            $schema->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
+            $schema->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
+            $schema->getRedirectUrisUpdatedAtColumn()      => $now,
         ]);
         $redirectUri->setUpdatedAt($now);
     }
@@ -100,7 +100,7 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
      */
     protected function getTableNameForWriting(): string
     {
-        return $this->getDatabaseScheme()->getRedirectUrisTable();
+        return $this->getDatabaseSchema()->getRedirectUrisTable();
     }
 
     /**
@@ -108,6 +108,6 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
      */
     protected function getPrimaryKeyName(): string
     {
-        return $this->getDatabaseScheme()->getRedirectUrisIdentityColumn();
+        return $this->getDatabaseSchema()->getRedirectUrisIdentityColumn();
     }
 }

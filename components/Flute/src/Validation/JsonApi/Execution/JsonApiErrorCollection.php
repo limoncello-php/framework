@@ -16,44 +16,57 @@
  * limitations under the License.
  */
 
-use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Http\JsonApiResponse;
-use Limoncello\Flute\Validation\Traits\HasValidationFormatterTrait;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Flute
  */
 class JsonApiErrorCollection extends ErrorCollection
 {
-    use HasContainerTrait, HasValidationFormatterTrait;
-
     /**
      * @var int
      */
     private $errorStatus;
 
     /**
-     * @var FormatterInterface|null
+     * @var FormatterInterface
      */
     private $messageFormatter;
 
     /**
-     * @param ContainerInterface $container
+     * @param FormatterInterface $formatter
      * @param int                $errorStatus
      */
     public function __construct(
-        ContainerInterface $container,
+        FormatterInterface $formatter,
         int $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
     ) {
-        $this->setContainer($container);
-        $this->errorStatus = $errorStatus;
+        $this->messageFormatter = $formatter;
+        $this->errorStatus      = $errorStatus;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addValidationIdError(ErrorInterface $error)
+    {
+        $title  = $this->getInvalidValueMessage();
+        $detail = $this->getValidationMessage($error);
+        $this->addDataIdError($title, $detail, $this->getErrorStatus());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addValidationTypeError(ErrorInterface $error)
+    {
+        $title  = $this->getInvalidValueMessage();
+        $detail = $this->getValidationMessage($error);
+        $this->addDataTypeError($title, $detail, $this->getErrorStatus());
     }
 
     /**
@@ -77,6 +90,16 @@ class JsonApiErrorCollection extends ErrorCollection
     }
 
     /**
+     * @inheritdoc
+     */
+    public function addValidationQueryError(string $paramName, ErrorInterface $error)
+    {
+        $title  = $this->getInvalidValueMessage();
+        $detail = $this->getValidationMessage($error);
+        $this->addQueryParameterError($paramName, $title, $detail, $this->getErrorStatus());
+    }
+
+    /**
      * @return int
      */
     protected function getErrorStatus(): int
@@ -85,10 +108,8 @@ class JsonApiErrorCollection extends ErrorCollection
     }
 
     /**
-     * @return string
      *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return string
      */
     private function getInvalidValueMessage(): string
     {
@@ -101,9 +122,6 @@ class JsonApiErrorCollection extends ErrorCollection
      * @param ErrorInterface $error
      *
      * @return string
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     private function getValidationMessage(ErrorInterface $error): string
     {
@@ -116,16 +134,9 @@ class JsonApiErrorCollection extends ErrorCollection
 
     /**
      * @return FormatterInterface
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     private function getMessageFormatter(): FormatterInterface
     {
-        if ($this->messageFormatter === null) {
-            $this->messageFormatter = $this->createValidationFormatter();
-        }
-
         return $this->messageFormatter;
     }
 }

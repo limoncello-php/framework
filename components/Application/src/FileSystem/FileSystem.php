@@ -96,6 +96,14 @@ class FileSystem implements FileSystemInterface
     /**
      * @inheritdoc
      */
+    public function isWritable(string $path): bool
+    {
+        return is_writable($path);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function createFolder(string $folderPath): void
     {
         $isCreated = mkdir($folderPath);

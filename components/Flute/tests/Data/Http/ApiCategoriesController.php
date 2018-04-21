@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\CategoriesApi as Api;
-use Limoncello\Tests\Flute\Data\Schemes\CategorySchema as Schema;
+use Limoncello\Tests\Flute\Data\Models\Category as Model;
+use Limoncello\Tests\Flute\Data\Schemas\CategorySchema as Schema;
+use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadCategoriesQueryRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -36,6 +38,12 @@ class ApiCategoriesController extends ApiBaseController
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
 
+    /** @inheritdoc */
+    const ON_INDEX_QUERY_VALIDATION_RULES_CLASS = ReadCategoriesQueryRules::class;
+
+    /** @inheritdoc */
+    const ON_READ_QUERY_VALIDATION_RULES_CLASS = ReadCategoriesQueryRules::class;
+
     /**
      * @param array                  $routeParams
      * @param ContainerInterface     $container
@@ -51,44 +59,12 @@ class ApiCategoriesController extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
-        return static::readRelationship($index, Schema::REL_CHILDREN, $container, $request);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function configureOnIndexParser(QueryParserInterface $parser): QueryParserInterface
-    {
-        $parser = parent::configureOnIndexParser($parser);
-
-        self::configureParser($parser);
-
-        return $parser;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function configureOnReadParser(QueryParserInterface $parser): QueryParserInterface
-    {
-        $parser = parent::configureOnReadParser($parser);
-
-        self::configureParser($parser);
-
-        return $parser;
-    }
-
-    /**
-     * @param QueryParserInterface $parser
-     */
-    private static function configureParser(QueryParserInterface $parser): void
-    {
-        $parser
-            ->withAllowedIncludePaths([
-                Schema::REL_PARENT,
-                Schema::REL_CHILDREN,
-            ]);
+        return static::readRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_CHILDREN,
+            DefaultQueryValidationRules::class,
+            $container,
+            $request
+        );
     }
 }

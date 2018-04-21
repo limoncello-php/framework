@@ -19,7 +19,7 @@
 use Limoncello\Flute\Contracts\Http\Controller\ControllerCreateInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Tests\Flute\Data\Models\Comment;
-use Limoncello\Tests\Flute\Data\Validation\FormRuleSets\CreateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\Forms\CreateCommentRules;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -40,7 +40,7 @@ class FormCommentsController implements ControllerCreateInterface
     ): ResponseInterface {
         /** @var FormValidatorFactoryInterface $factory */
         $factory   = $container->get(FormValidatorFactoryInterface::class);
-        $validator = $factory->createValidator(CreateCommentRuleSet::class);
+        $validator = $factory->createValidator(CreateCommentRules::class);
 
         $isOk = $validator->validate([
             Comment::FIELD_TEXT => 'some text',

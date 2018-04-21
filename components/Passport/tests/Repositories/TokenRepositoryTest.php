@@ -28,7 +28,7 @@ use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
-use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
+use Limoncello\Passport\Traits\DatabaseSchemaMigrationTrait;
 use Limoncello\Tests\Passport\PassportServerTest;
 use Limoncello\Tests\Passport\TestCase;
 
@@ -37,7 +37,7 @@ use Limoncello\Tests\Passport\TestCase;
  */
 class TokenRepositoryTest extends TestCase
 {
-    use DatabaseSchemeMigrationTrait;
+    use DatabaseSchemaMigrationTrait;
 
     /**
      * @inheritdoc
@@ -245,9 +245,9 @@ class TokenRepositoryTest extends TestCase
      */
     private function createRepositories(): array
     {
-        $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
-        $scopeRepo  = new ScopeRepository($this->getConnection(), $this->getDatabaseScheme());
-        $clientRepo = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
+        $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseSchema());
+        $scopeRepo  = new ScopeRepository($this->getConnection(), $this->getDatabaseSchema());
+        $clientRepo = new ClientRepository($this->getConnection(), $this->getDatabaseSchema());
 
         return [$tokenRepo, $scopeRepo, $clientRepo];
     }

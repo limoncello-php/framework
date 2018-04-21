@@ -5,30 +5,24 @@ use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Flute\Adapters\PaginationStrategy;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
+use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy;
+use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
-use Limoncello\Flute\Contracts\Http\Query\QueryParserInterface;
-use Limoncello\Flute\Contracts\Http\Query\QueryValidatorFactoryInterface;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiValidatorFactoryInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Http\Query\ParametersMapper;
-use Limoncello\Flute\Http\Query\QueryParser;
-use Limoncello\Flute\Http\Query\QueryValidatorFactory;
 use Limoncello\Flute\Http\ThrowableHandlers\FluteThrowableHandler;
-use Limoncello\Flute\Types\DateJsonApiStringType;
-use Limoncello\Flute\Types\DateTimeJsonApiStringType;
-use Limoncello\Flute\Types\JsonApiDateTimeType;
-use Limoncello\Flute\Types\JsonApiDateType;
+use Limoncello\Flute\Types\DateTimeType;
+use Limoncello\Flute\Types\DateType;
 use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
-use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiValidatorFactory;
+use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiParserFactory;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -54,26 +48,22 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
         $container[FactoryInterface::class] = $factory;
 
-        $container[JsonSchemesInterface::class] = function (PsrContainerInterface $container) use ($factory) {
+        $container[JsonSchemasInterface::class] = function (PsrContainerInterface $container) use ($factory) {
             $settings     = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
-            $modelSchemes = $container->get(ModelSchemeInfoInterface::class);
+            $modelSchemas = $container->get(ModelSchemaInfoInterface::class);
 
-            return $factory->createJsonSchemes($settings[FluteSettings::KEY_MODEL_TO_SCHEME_MAP], $modelSchemes);
-        };
-
-        $container[QueryParserInterface::class] = function (PsrContainerInterface $container) {
-            return new QueryParser($container->get(PaginationStrategyInterface::class));
+            return $factory->createJsonSchemas($settings[FluteSettings::KEY_MODEL_TO_SCHEMA_MAP], $modelSchemas);
         };
 
         $container[ParametersMapperInterface::class] = function (PsrContainerInterface $container) {
-            return new ParametersMapper($container->get(JsonSchemesInterface::class));
+            return new ParametersMapper($container->get(JsonSchemasInterface::class));
         };
 
         $container[EncoderInterface::class] = function (PsrContainerInterface $container) use ($factory) {
-            /** @var JsonSchemesInterface $jsonSchemes */
-            $jsonSchemes = $container->get(JsonSchemesInterface::class);
+            /** @var JsonSchemasInterface $jsonSchemas */
+            $jsonSchemas = $container->get(JsonSchemasInterface::class);
             $settings    = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
-            $encoder     = $factory->createEncoder($jsonSchemes, new EncoderOptions(
+            $encoder     = $factory->createEncoder($jsonSchemas, new EncoderOptions(
                 $settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS],
                 $settings[FluteSettings::KEY_URI_PREFIX],
                 $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
@@ -84,17 +74,14 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             return $encoder;
         };
 
-        $container[PaginationStrategyInterface::class] = function (PsrContainerInterface $container) {
+        $container[RelationshipPaginationStrategyInterface::class] = function (PsrContainerInterface $container) {
             $settings = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
 
-            return new PaginationStrategy(
-                $settings[FluteSettings::KEY_DEFAULT_PAGING_SIZE],
-                $settings[FluteSettings::KEY_MAX_PAGING_SIZE]
-            );
+            return new BasicRelationshipPaginationStrategy($settings[FluteSettings::KEY_DEFAULT_PAGING_SIZE]);
         };
 
-        $container[JsonApiValidatorFactoryInterface::class] = function (PsrContainerInterface $container) {
-            $factory = new JsonApiValidatorFactory($container);
+        $container[JsonApiParserFactoryInterface::class] = function (PsrContainerInterface $container) {
+            $factory = new JsonApiParserFactory($container);
 
             return $factory;
         };
@@ -105,29 +92,9 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             return $factory;
         };
 
-        $container[QueryValidatorFactoryInterface::class] = function (PsrContainerInterface $container) {
-            /** @var PaginationStrategyInterface $paginationStrategy */
-            $paginationStrategy = $container->get(PaginationStrategyInterface::class);
-            $settings           = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
-            $ruleSetsData       = $settings[FluteSettings::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA];
-            $factory            = new QueryValidatorFactory($container, $paginationStrategy, $ruleSetsData);
-
-            return $factory;
-        };
-
         // register date/date time types
-        if (Type::hasType(DateTimeJsonApiStringType::NAME) === false) {
-            Type::addType(DateTimeJsonApiStringType::NAME, DateTimeJsonApiStringType::class);
-        }
-        if (Type::hasType(DateJsonApiStringType::NAME) === false) {
-            Type::addType(DateJsonApiStringType::NAME, DateJsonApiStringType::class);
-        }
-        if (Type::hasType(JsonApiDateTimeType::NAME) === false) {
-            Type::addType(JsonApiDateTimeType::NAME, JsonApiDateTimeType::class);
-        }
-        if (Type::hasType(JsonApiDateType::NAME) === false) {
-            Type::addType(JsonApiDateType::NAME, JsonApiDateType::class);
-        }
+        Type::hasType(DateTimeType::NAME) === true ?: Type::addType(DateTimeType::NAME, DateTimeType::class);
+        Type::hasType(DateType::NAME) === true ?: Type::addType(DateType::NAME, DateType::class);
     }
 
     /**

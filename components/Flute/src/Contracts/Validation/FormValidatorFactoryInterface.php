@@ -22,9 +22,9 @@
 interface FormValidatorFactoryInterface
 {
     /**
-     * @param string $class
+     * @param string $rulesClass
      *
      * @return FormValidatorInterface
      */
-    public function createValidator(string $class): FormValidatorInterface;
+    public function createValidator(string $rulesClass): FormValidatorInterface;
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Adapters\PaginationStrategy as PS;
+use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy as PS;
 use Limoncello\Tests\Flute\TestCase;
 
 /**
@@ -25,63 +25,16 @@ use Limoncello\Tests\Flute\TestCase;
 class PaginationStrategyTest extends TestCase
 {
     /**
-     * Test parse input paging parameters.
+     * Test get methods.
      */
-    public function testParsingWithDefaultLessThanMaxLimitSize(): void
+    public function testGetMethods(): void
     {
-        $strategy = new PS($defaultPageSize = 30, $maxPageSize = 100);
+        $strategy = new PS($defaultPageSize = 30);
 
-        $skip = 0;
-        $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([$skip, $size], $parsed);
-
-        $skip = -1;
-        $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([0, $size], $parsed);
-
-        $skip = 200;
-        $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([$skip, $size], $parsed);
-
-        $skip = 0;
-        $size = 200;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([$skip, $maxPageSize], $parsed);
-
-        $skip   = 0;
-        $size   = -200;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([$skip, 1], $parsed);
-    }
-
-    /**
-     * Test parse input paging parameters.
-     */
-    public function testParsingWithDefaultGreaterThanMaxLimitSize(): void
-    {
-        $strategy = new PS($defaultPageSize = 200, $maxPageSize = 100);
-
-        $skip = 0;
-        $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([$skip, $size], $parsed);
-
-        $skip = -1;
-        $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([0, $size], $parsed);
-
-        $skip = 200;
-        $size = 40;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([$skip, $size], $parsed);
-
-        $skip = 0;
-        $size = 200;
-        $parsed = $strategy->parseParameters([PS::PARAM_PAGING_OFFSET => $skip, PS::PARAM_PAGING_LIMIT => $size]);
-        $this->assertEquals([$skip, $defaultPageSize], $parsed);
+        $this->assertEquals(
+            [0, $defaultPageSize],
+            $strategy->getParameters('RootClass', 'TargetClass', 'relationship1.relationship2', 'relationship3')
+        );
+        $this->assertEquals($defaultPageSize, $strategy->getDefaultPageSize());
     }
 }

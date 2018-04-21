@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Http\BaseController;
+use Limoncello\Flute\Http\JsonApiBaseController;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-abstract class ApiBaseController extends BaseController
+abstract class ApiBaseController extends JsonApiBaseController
 {
     /** URI key used in routing table */
     const ROUTE_KEY_CHILD_INDEX = 'child_idx';

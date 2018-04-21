@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\Data\ModelSchemeInfo;
+use Limoncello\Application\Data\ModelSchemaInfo;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Contracts\Settings\Packages\DataSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Reflection\ClassIsTrait;
@@ -27,36 +28,9 @@ use Psr\Container\ContainerInterface;
 /**
  * @package Limoncello\Application
  */
-abstract class DataSettings implements SettingsInterface
+abstract class DataSettings implements SettingsInterface, DataSettingsInterface
 {
     use ClassIsTrait, CheckCallableTrait;
-
-    /** Settings key */
-    const KEY_MODELS_FOLDER = 0;
-
-    /** Settings key */
-    const KEY_MODELS_FILE_MASK = self::KEY_MODELS_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_MIGRATIONS_FOLDER = self::KEY_MODELS_FILE_MASK + 1;
-
-    /** Settings key */
-    const KEY_MIGRATIONS_LIST_FILE = self::KEY_MIGRATIONS_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_SEEDS_FOLDER = self::KEY_MIGRATIONS_LIST_FILE + 1;
-
-    /** Settings key */
-    const KEY_SEEDS_LIST_FILE = self::KEY_SEEDS_FOLDER + 1;
-
-    /** Settings key */
-    const KEY_SEED_INIT = self::KEY_SEEDS_LIST_FILE + 1;
-
-    /** Settings key */
-    const KEY_MODELS_SCHEME_INFO = self::KEY_SEED_INIT + 1;
-
-    /** Settings key */
-    protected const KEY_LAST = self::KEY_MODELS_SCHEME_INFO;
 
     /**
      * @inheritdoc
@@ -99,7 +73,7 @@ abstract class DataSettings implements SettingsInterface
             'Seed init should be either `null` or static callable.'
         );
 
-        $defaults[static::KEY_MODELS_SCHEME_INFO] = $this->getModelsSchemeInfo($modelsPath);
+        $defaults[static::KEY_MODELS_SCHEMA_INFO] = $this->getModelsSchemaInfo($modelsPath);
 
         return $defaults;
     }
@@ -122,16 +96,16 @@ abstract class DataSettings implements SettingsInterface
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function getModelsSchemeInfo(string $modelsPath): array
+    private function getModelsSchemaInfo(string $modelsPath): array
     {
         // check reverse relationships
         $requireReverseRel = true;
 
         $registered    = [];
-        $modelSchemes  = new ModelSchemeInfo();
-        $registerModel = function ($modelClass) use ($modelSchemes, &$registered, $requireReverseRel) {
+        $modelSchemas  = new ModelSchemaInfo();
+        $registerModel = function ($modelClass) use ($modelSchemas, &$registered, $requireReverseRel) {
             /** @var ModelInterface $modelClass */
-            $modelSchemes->registerClass(
+            $modelSchemas->registerClass(
                 $modelClass,
                 $modelClass::getTableName(),
                 $modelClass::getPrimaryKeyName(),
@@ -144,7 +118,7 @@ abstract class DataSettings implements SettingsInterface
             if (array_key_exists(RelationshipTypes::BELONGS_TO, $relationships) === true) {
                 foreach ($relationships[RelationshipTypes::BELONGS_TO] as $relName => list($rClass, $fKey, $rRel)) {
                     /** @var string $rClass */
-                    $modelSchemes->registerBelongsToOneRelationship($modelClass, $relName, $fKey, $rClass, $rRel);
+                    $modelSchemas->registerBelongsToOneRelationship($modelClass, $relName, $fKey, $rClass, $rRel);
                     $registered[(string)$modelClass][$relName] = true;
                     $registered[$rClass][$rRel]                = true;
 
@@ -182,7 +156,7 @@ abstract class DataSettings implements SettingsInterface
                     }
                     /** @var string $rClass */
                     list($rClass, $iTable, $fKeyPrimary, $fKeySecondary, $rRel) = $data;
-                    $modelSchemes->registerBelongsToManyRelationship(
+                    $modelSchemas->registerBelongsToManyRelationship(
                         $modelClass,
                         $relName,
                         $iTable,
@@ -200,7 +174,7 @@ abstract class DataSettings implements SettingsInterface
         $modelClasses = iterator_to_array($this->selectClasses($modelsPath, ModelInterface::class));
         array_map($registerModel, $modelClasses);
 
-        $data = $modelSchemes->getData();
+        $data = $modelSchemas->getData();
 
         return $data;
     }

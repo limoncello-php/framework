@@ -18,10 +18,10 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Limoncello\Application\Data\ModelSchemeInfo;
+use Limoncello\Application\Data\ModelSchemaInfo;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 
@@ -37,12 +37,12 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
-        $container[ModelSchemeInfoInterface::class] =
-            function (PsrContainerInterface $container): ModelSchemeInfoInterface {
+        $container[ModelSchemaInfoInterface::class] =
+            function (PsrContainerInterface $container): ModelSchemaInfoInterface {
                 $settings = $container->get(SettingsProviderInterface::class)->get(DataSettings::class);
-                $data     = $settings[DataSettings::KEY_MODELS_SCHEME_INFO];
-    
-                return (new ModelSchemeInfo())->setData($data);
+                $data     = $settings[DataSettings::KEY_MODELS_SCHEMA_INFO];
+
+                return (new ModelSchemaInfo())->setData($data);
             };
 
         $container[Connection::class] = function (PsrContainerInterface $container): Connection {
@@ -61,9 +61,18 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
             ], function ($value) {
                 return $value !== null;
             });
-            $extra = $settings[DoctrineSettings::KEY_EXTRA] ?? [];
+            $extra    = $settings[DoctrineSettings::KEY_EXTRA] ?? [];
 
             $connection = DriverManager::getConnection($params + $extra);
+
+            if (array_key_exists(DoctrineSettings::KEY_EXEC, $settings) === true &&
+                is_array($toExec = $settings[DoctrineSettings::KEY_EXEC]) === true &&
+                empty($toExec) === false
+            ) {
+                foreach ($toExec as $statement) {
+                    $connection->exec($statement);
+                }
+            }
 
             return $connection;
         };

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Flute\Models\PaginatedData;
 use PHPUnit\Framework\TestCase;
 
@@ -26,6 +27,8 @@ class PaginatedDataTest extends TestCase
 {
     /**
      * Test getters and setters.
+     *
+     * @throws Exception
      */
     public function testGettersAndSetters()
     {

@@ -20,7 +20,7 @@ class {%PLURAL_CC%}Migration implements MigrationInterface
 
         $this->createTable(Model::class, [
             $this->primaryInt(Model::FIELD_ID),
-//            $this->relationship(Model::REL_USER, $isCascadeDelete),
+//            $this->relationship(Model::REL_OTHER, $isCascadeDelete),
             $this->string(Model::FIELD_TITLE),
             $this->text(Model::FIELD_TEXT),
             $this->timestamps(),

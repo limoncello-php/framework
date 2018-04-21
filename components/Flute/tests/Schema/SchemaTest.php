@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Tests\Flute\Data\Models\Post;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
+use Limoncello\Tests\Flute\Data\Schemas\PostSchema;
 use Limoncello\Tests\Flute\TestCase;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Factories\Factory;
@@ -39,12 +40,14 @@ class SchemaTest extends TestCase
     {
         parent::setUp();
 
-        $modelSchemes = $this->getModelSchemes();
-        $this->schema = new PostSchema(new Factory(), $modelSchemes);
+        $modelSchemas = $this->getModelSchemas();
+        $this->schema = new PostSchema(new Factory(), $modelSchemas);
     }
 
     /**
      * Relationship test.
+     *
+     * @throws Exception
      */
     public function testEncodeNullToOneRelationship(): void
     {

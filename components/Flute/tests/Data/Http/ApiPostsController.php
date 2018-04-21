@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Api\PostsApi as Api;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema as Schema;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateCommentRuleSet;
+use Limoncello\Tests\Flute\Data\Models\Post as Model;
+use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
+use Limoncello\Tests\Flute\Data\Schemas\PostSchema as Schema;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateCommentRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -53,9 +55,13 @@ class ApiPostsController extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
-        return static::readRelationship($index, Schema::REL_COMMENTS, $container, $request);
+        return static::readRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_COMMENTS,
+            DefaultQueryValidationRules::class,
+            $container,
+            $request
+        );
     }
 
     /**
@@ -73,21 +79,12 @@ class ApiPostsController extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index        = $routeParams[static::ROUTE_KEY_INDEX];
-        $commentIndex = $routeParams[static::ROUTE_KEY_CHILD_INDEX];
-
-        $captures = static::createJsonApiValidator($container, UpdateCommentRuleSet::class)
-            ->assert(static::readJsonFromRequest($container, $request))
-            ->getJsonApiCaptures();
-
-        list (, $attributes, $toMany) = static::mapSchemeDataToModelData($container, $captures, CommentSchema::class);
-
         $response = static::updateInRelationship(
-            $index,
-            Schema::REL_COMMENTS,
-            $commentIndex,
-            $attributes,
-            $toMany,
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_COMMENTS,
+            $routeParams[static::ROUTE_KEY_CHILD_INDEX],
+            CommentSchema::class,
+            UpdateCommentRules::class,
             CommentsApi::class,
             $container,
             $request
@@ -111,13 +108,10 @@ class ApiPostsController extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index        = $routeParams[static::ROUTE_KEY_INDEX];
-        $commentIndex = $routeParams[static::ROUTE_KEY_CHILD_INDEX];
-
         $response = static::deleteInRelationship(
-            $index,
-            Schema::REL_COMMENTS,
-            $commentIndex,
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Model::REL_COMMENTS,
+            $routeParams[static::ROUTE_KEY_CHILD_INDEX],
             CommentsApi::class,
             $container,
             $request

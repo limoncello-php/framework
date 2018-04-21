@@ -19,6 +19,7 @@
 use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Exception;
 use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Tests\Flute\Data\Models\Board;
@@ -51,6 +52,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test filtering in BelongsTo relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testAddBelongsToRelationshipAndFilterWithSort(): void
@@ -87,6 +89,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test filtering in BelongsTo relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testAddBelongsToRelationshipFilterOnly(): void
@@ -120,6 +123,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test sorting in BelongsTo relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testAddBelongsToRelationshipSortOnly(): void
@@ -152,6 +156,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test filtering in HasMany relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testAddHasManyRelationshipAndFilter(): void
@@ -190,6 +195,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test filtering in HasMany relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testAddHasManyRelationshipOrFilter(): void
@@ -228,6 +234,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test filtering in BelongsTo relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testAddBelongsToManyRelationshipFilter(): void
@@ -270,6 +277,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test builder.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testRead(): void
@@ -301,6 +309,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test builder.
+     *
+     * @throws Exception
      */
     public function testIndex(): void
     {
@@ -320,6 +330,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test builder.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithFilters(): void
@@ -384,6 +395,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test builder.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithFiltersJoinedWithOR(): void
@@ -440,6 +452,7 @@ class ModelQueryBuilderTest extends TestCase
     /**
      * Test update with OR condition.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testUpdateWithOrCondition(): void
@@ -472,6 +485,8 @@ class ModelQueryBuilderTest extends TestCase
 
     /**
      * Test building quoted column names.
+     *
+     * @throws Exception
      */
     public function testBuildingQuotedColumns(): void
     {
@@ -488,7 +503,7 @@ class ModelQueryBuilderTest extends TestCase
      */
     private function createModelQueryBuilder(string $modelClass): ModelQueryBuilder
     {
-        return new ModelQueryBuilder($this->getConnection(), $modelClass, $this->getModelSchemes());
+        return new ModelQueryBuilder($this->getConnection(), $modelClass, $this->getModelSchemas());
     }
 
     /**

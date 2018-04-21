@@ -21,7 +21,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\SeedInterface;
 use Limoncello\Data\Seeds\SeedTrait;
 use Limoncello\Tests\Data\Data\TestContainer;
@@ -51,10 +51,10 @@ class SeedTraitTest extends TestCase
         $tableName  = 'table_name';
         $columnName = self::TEST_COLUMN_NAME;
 
-        $modelSchemes = Mockery::mock(ModelSchemeInfoInterface::class);
+        $modelSchemas = Mockery::mock(ModelSchemaInfoInterface::class);
 
-        $container = $this->createContainer($modelSchemes);
-        $this->prepareTable($modelSchemes, self::TEST_MODEL_CLASS, $tableName);
+        $container = $this->createContainer($modelSchemas);
+        $this->prepareTable($modelSchemas, self::TEST_MODEL_CLASS, $tableName);
 
         $manager = $this->connection->getSchemaManager();
         $table   = new Table(
@@ -125,16 +125,16 @@ class SeedTraitTest extends TestCase
     }
 
     /**
-     * @param MockInterface $modelSchemes
+     * @param MockInterface $modelSchemas
      *
      * @return ContainerInterface
      */
-    private function createContainer(MockInterface $modelSchemes): ContainerInterface
+    private function createContainer(MockInterface $modelSchemas): ContainerInterface
     {
         $container                    = new TestContainer();
         $container[Connection::class] = $this->connection = $this->createConnection();
 
-        $container[ModelSchemeInfoInterface::class] = $modelSchemes;
+        $container[ModelSchemaInfoInterface::class] = $modelSchemas;
 
         return $container;
     }

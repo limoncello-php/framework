@@ -18,14 +18,16 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Types\Type;
+use Exception;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Adapters\ModelQueryBuilder;
-use Limoncello\Flute\Adapters\PaginationStrategy;
+use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy;
 use Limoncello\Flute\Api\Crud;
-use Limoncello\Flute\Contracts\Adapters\PaginationStrategyInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
+use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
@@ -42,6 +44,7 @@ use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
 use Limoncello\Tests\Flute\Data\Models\User;
+use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Limoncello\Tests\Flute\TestCase;
 use PDO;
 use stdClass;
@@ -53,8 +56,6 @@ class CrudTest extends TestCase
 {
     const DEFAULT_PAGE = 3;
 
-    const DEFAULT_MAX_PAGE = 100;
-
     /**
      * @var Connection
      */
@@ -63,6 +64,7 @@ class CrudTest extends TestCase
     /**
      * Test create read and delete newly created resource.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testCreateReadAndDeletePost(): void
@@ -105,6 +107,7 @@ class CrudTest extends TestCase
     /**
      * Test create read and delete newly created resource with string primary key.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testCreateReadAndDeleteStringPKModel(): void
@@ -138,6 +141,7 @@ class CrudTest extends TestCase
     }
 
     /**
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
@@ -150,6 +154,7 @@ class CrudTest extends TestCase
     }
 
     /**
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
@@ -162,6 +167,7 @@ class CrudTest extends TestCase
     }
 
     /**
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
@@ -174,6 +180,7 @@ class CrudTest extends TestCase
     }
 
     /**
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
@@ -186,6 +193,7 @@ class CrudTest extends TestCase
     }
 
     /**
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
@@ -198,6 +206,7 @@ class CrudTest extends TestCase
     }
 
     /**
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
@@ -210,6 +219,7 @@ class CrudTest extends TestCase
     }
 
     /**
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
@@ -224,6 +234,7 @@ class CrudTest extends TestCase
     /**
      * Test create resource with to-many (belongs-to-many relationships).
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testCreateCommentsWithEmotions(): void
@@ -296,6 +307,7 @@ class CrudTest extends TestCase
     /**
      * Test update resource with to-many (belongs-to-many relationships).
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testUpdateCommentsWithEmotions(): void
@@ -351,6 +363,7 @@ class CrudTest extends TestCase
     }
 
     /**
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Doctrine\DBAL\Exception\DriverException
@@ -364,6 +377,7 @@ class CrudTest extends TestCase
     /**
      * Check 'read' with included paths.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadWithIncludes(): void
@@ -431,6 +445,7 @@ class CrudTest extends TestCase
     /**
      * Check 'read' with included paths.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testUntypedReadWithIncludes(): void
@@ -505,6 +520,7 @@ class CrudTest extends TestCase
     /**
      * Check 'read' with included paths where could be nulls.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadWithNullableInclude(): void
@@ -533,6 +549,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndex(): void
@@ -581,6 +598,32 @@ class CrudTest extends TestCase
     /**
      * Test index.
      *
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function testIndexWithoutPaging(): void
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        $pagingOffset = 1;
+        $pagingSize   = 2;
+
+        $crud
+            ->combineWithAnd()
+            ->withPaging($pagingOffset, $pagingSize);
+
+        $data = $crud
+            ->withoutPaging()
+            ->index();
+
+        $this->assertNotEmpty($data->getData());
+        $this->assertGreaterThan($pagingSize, count($data->getData()));
+    }
+
+    /**
+     * Test index.
+     *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexFilterOperationOnRelationshipById(): void
@@ -603,6 +646,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexFilterOperationOnRelationshipByName(): void
@@ -625,6 +669,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testCommentsIndex(): void
@@ -645,6 +690,7 @@ class CrudTest extends TestCase
     /**
      * Test read relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadRelationship(): void
@@ -688,6 +734,7 @@ class CrudTest extends TestCase
     /**
      * Test read relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadRelationshipWithOrFilters(): void
@@ -728,6 +775,7 @@ class CrudTest extends TestCase
     /**
      * Test read relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadRelationshipIdentities(): void
@@ -765,6 +813,7 @@ class CrudTest extends TestCase
     /**
      * Test read relationship.
      *
+     * @throws Exception
      * @throws DBALException
      *
      * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
@@ -777,6 +826,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithFilterByBooleanColumn(): void
@@ -803,6 +853,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testIndexWithEqualsOperator(): void
@@ -827,6 +878,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadRow(): void
@@ -843,6 +895,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadUntypedRow(): void
@@ -861,6 +914,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadUntypedModelWithCustomColumnBuilder(): void
@@ -892,6 +946,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadColumn(): void
@@ -916,6 +971,7 @@ class CrudTest extends TestCase
     /**
      * Test read typed row.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testReadUntypedColumn(): void
@@ -943,6 +999,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testCount(): void
@@ -966,6 +1023,7 @@ class CrudTest extends TestCase
     /**
      * Test index.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testCountWithFilterInRelationship(): void
@@ -986,6 +1044,7 @@ class CrudTest extends TestCase
     /**
      * Test check resource exists in relationship.
      *
+     * @throws Exception
      * @throws DBALException
      */
     public function testHasInRelationship(): void
@@ -1001,6 +1060,7 @@ class CrudTest extends TestCase
      *
      * @return CrudInterface
      *
+     * @throws Exception
      * @throws DBALException
      */
     private function createCrud(string $class): CrudInterface
@@ -1010,12 +1070,14 @@ class CrudTest extends TestCase
         $container[FormatterFactoryInterface::class] = $formatterFactory = new FormatterFactory();
         $container[Connection::class]                = $this->connection = $this->initDb();
         $container[FactoryInterface::class]          = $factory = new Factory($container);
-        $container[ModelSchemeInfoInterface::class]  = $modelSchemes = $this->getModelSchemes();
+        $container[ModelSchemaInfoInterface::class]  = $modelSchemas = $this->getModelSchemas();
 
-        $container[PaginationStrategyInterface::class] = new PaginationStrategy(
-            self::DEFAULT_PAGE,
-            self::DEFAULT_MAX_PAGE
-        );
+        $container[RelationshipPaginationStrategyInterface::class] =
+            new BasicRelationshipPaginationStrategy(self::DEFAULT_PAGE);
+
+        if (Type::hasType(SystemDateTimeType::NAME) === false) {
+            Type::addType(SystemDateTimeType::NAME, SystemDateTimeType::class);
+        }
 
         $crud = new $class($container);
 

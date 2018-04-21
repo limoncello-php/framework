@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Data\Contracts\MigrationContextInterface;
 
 /**
@@ -30,18 +30,18 @@ class MigrationContext implements MigrationContextInterface
     private $modelClass;
 
     /**
-     * @var ModelSchemeInfoInterface
+     * @var ModelSchemaInfoInterface
      */
-    private $modelSchemes;
+    private $modelSchemas;
 
     /**
      * @param string                   $modelClass
-     * @param ModelSchemeInfoInterface $modelSchemes
+     * @param ModelSchemaInfoInterface $modelSchemas
      */
-    public function __construct(string $modelClass, ModelSchemeInfoInterface $modelSchemes)
+    public function __construct(string $modelClass, ModelSchemaInfoInterface $modelSchemas)
     {
         $this->modelClass   = $modelClass;
-        $this->modelSchemes = $modelSchemes;
+        $this->modelSchemas = $modelSchemas;
     }
 
     /**
@@ -53,10 +53,10 @@ class MigrationContext implements MigrationContextInterface
     }
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    public function getModelSchemes(): ModelSchemeInfoInterface
+    public function getModelSchemas(): ModelSchemaInfoInterface
     {
-        return $this->modelSchemes;
+        return $this->modelSchemas;
     }
 }

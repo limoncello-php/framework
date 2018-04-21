@@ -669,6 +669,57 @@ class RulesTest extends TestCase
     }
 
     /**
+     * Test validator.
+     *
+     * @throws Exception
+     */
+    public function testValue(): void
+    {
+        $rules = [
+            'nullable_int' => v::ifX(
+                v::IS_NULL_CALLABLE,
+                v::value(10),
+                v::stringToInt(v::between(20, 30))
+            ),
+            'empty_string' => v::ifX(
+                v::IS_EMPTY_CALLABLE,
+                v::value('it was empty'),
+                v::isString(v::stringLengthBetween(1, 5))
+            ),
+        ];
+
+        // Check with valid input 1 to trigger left branch
+
+        $input1 = [
+            'nullable_int' => null,
+            'empty_string' => '',
+        ];
+
+        list($captures, $errors) = $this->validateArray($input1, $rules);
+
+        $this->assertEmpty($errors);
+        $this->assertSame(
+            ['nullable_int' => 10, 'empty_string' => 'it was empty'],
+            $captures
+        );
+
+        // Check with valid input 2 to trigger right branch
+
+        $input2 = [
+            'nullable_int' => '25',
+            'empty_string' => 'hello',
+        ];
+
+        list($captures, $errors) = $this->validateArray($input2, $rules);
+
+        $this->assertEmpty($errors);
+        $this->assertSame(
+            ['nullable_int' => 25, 'empty_string' => 'hello'],
+            $captures
+        );
+    }
+
+    /**
      * Test basic rule methods.
      *
      * @throws Exception

@@ -18,7 +18,7 @@
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use PDO;
 
@@ -34,15 +34,15 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
 
     /**
      * @param Connection              $connection
-     * @param DatabaseSchemeInterface $databaseScheme
+     * @param DatabaseSchemaInterface $databaseSchema
      * @param string                  $modelClass
      */
     public function __construct(
         Connection $connection,
-        DatabaseSchemeInterface $databaseScheme,
+        DatabaseSchemaInterface $databaseSchema,
         string $modelClass = Token::class
     ) {
-        $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+        $this->setConnection($connection)->setDatabaseSchema($databaseSchema);
         $this->modelClass = $modelClass;
     }
 
@@ -109,9 +109,9 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
 
         // select scope identifiers for tokens
         if (empty($tokens) === false) {
-            $scheme        = $this->getDatabaseScheme();
-            $tokenIdColumn = $scheme->getTokensScopesTokenIdentityColumn();
-            $scopeIdColumn = $scheme->getTokensScopesScopeIdentityColumn();
+            $schema        = $this->getDatabaseSchema();
+            $tokenIdColumn = $schema->getTokensScopesTokenIdentityColumn();
+            $scopeIdColumn = $schema->getTokensScopesScopeIdentityColumn();
 
             $connection = $this->getConnection();
             $query      = $connection->createQueryBuilder();
@@ -119,7 +119,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
             $tokenIds = array_keys($tokens);
             $query
                 ->select([$tokenIdColumn, $scopeIdColumn])
-                ->from($scheme->getTokensScopesTable())
+                ->from($schema->getTokensScopesTable())
                 ->where($query->expr()->in($tokenIdColumn, $tokenIds))
                 ->orderBy($tokenIdColumn);
 
@@ -161,10 +161,10 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
         $data = $statement->fetch();
         $result = null;
         if ($data !== false) {
-            $scheme  = $this->getDatabaseScheme();
-            $tokenId = $data[$scheme->getTokensIdentityColumn()];
+            $schema  = $this->getDatabaseSchema();
+            $tokenId = $data[$schema->getTokensIdentityColumn()];
             $scopes  =  $this->readScopeIdentifiers($tokenId);
-            $data[$scheme->getTokensViewScopesColumn()] = $scopes;
+            $data[$schema->getTokensViewScopesColumn()] = $scopes;
             $result = $data;
         }
 
@@ -197,18 +197,18 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
         string $tokenValue,
         int $expirationInSeconds
     ): QueryBuilder {
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         $query  = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
             $tokenValue,
-            $scheme->getTokensValueColumn(),
+            $schema->getTokensValueColumn(),
             $expirationInSeconds,
-            $scheme->getTokensValueCreatedAtColumn()
+            $schema->getTokensValueCreatedAtColumn()
         );
 
         $tokensTable = $this->getTableNameForReading();
-        $usersTable  = $aliased = $scheme->getUsersTable();
-        $usersFk     = $scheme->getTokensUserIdentityColumn();
-        $usersPk     = $scheme->getUsersIdentityColumn();
+        $usersTable  = $aliased = $schema->getUsersTable();
+        $usersFk     = $schema->getTokensUserIdentityColumn();
+        $usersPk     = $schema->getUsersIdentityColumn();
         $query->innerJoin(
             $tokensTable,
             $usersTable,

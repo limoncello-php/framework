@@ -17,7 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use PDO;
 
 /**
@@ -32,15 +32,15 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
 
     /**
      * @param Connection              $connection
-     * @param DatabaseSchemeInterface $databaseScheme
+     * @param DatabaseSchemaInterface $databaseSchema
      * @param string                  $modelClass
      */
     public function __construct(
         Connection $connection,
-        DatabaseSchemeInterface $databaseScheme,
+        DatabaseSchemaInterface $databaseSchema,
         string $modelClass = Token::class
     ) {
-        $this->setConnection($connection)->setDatabaseScheme($databaseScheme);
+        $this->setConnection($connection)->setDatabaseSchema($databaseSchema);
         $this->modelClass = $modelClass;
     }
 
@@ -49,15 +49,15 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      */
     public function readPassport(string $tokenValue, int $expirationInSeconds): ?array
     {
-        $scheme = $this->getDatabaseScheme();
+        $schema = $this->getDatabaseSchema();
         $query  = $this->getConnection()->createQueryBuilder();
         $query  = $this->addExpirationCondition(
             $query->select(['*'])
-                ->from($scheme->getPassportView())
-                ->where($scheme->getTokensValueColumn() . '=' . $this->createTypedParameter($query, $tokenValue))
-                ->andWhere($query->expr()->eq($this->getDatabaseScheme()->getTokensIsEnabledColumn(), '1')),
+                ->from($schema->getPassportView())
+                ->where($schema->getTokensValueColumn() . '=' . $this->createTypedParameter($query, $tokenValue))
+                ->andWhere($query->expr()->eq($this->getDatabaseSchema()->getTokensIsEnabledColumn(), '1')),
             $expirationInSeconds,
-            $scheme->getTokensValueCreatedAtColumn()
+            $schema->getTokensValueCreatedAtColumn()
         );
 
         $statement = $query->execute();
@@ -66,7 +66,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
 
         $result = null;
         if ($data !== false) {
-            $scopesColumn        = $scheme->getTokensViewScopesColumn();
+            $scopesColumn        = $schema->getTokensViewScopesColumn();
             $scopeList           = $data[$scopesColumn];
             $data[$scopesColumn] = explode(' ', $scopeList);
             $result              = $data;
@@ -88,6 +88,6 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      */
     protected function getTableNameForReading(): string
     {
-        return $this->getDatabaseScheme()->getTokensView();
+        return $this->getDatabaseSchema()->getTokensView();
     }
 }

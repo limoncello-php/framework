@@ -24,7 +24,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
@@ -61,9 +61,9 @@ class ModelQueryBuilder extends QueryBuilder
     private $columnMapper;
 
     /**
-     * @var ModelSchemeInfoInterface
+     * @var ModelSchemaInfoInterface
      */
-    private $modelSchemes;
+    private $modelSchemas;
 
     /**
      * @var int
@@ -83,20 +83,20 @@ class ModelQueryBuilder extends QueryBuilder
     /**
      * @param Connection               $connection
      * @param string                   $modelClass
-     * @param ModelSchemeInfoInterface $modelSchemes
+     * @param ModelSchemaInfoInterface $modelSchemas
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function __construct(Connection $connection, string $modelClass, ModelSchemeInfoInterface $modelSchemes)
+    public function __construct(Connection $connection, string $modelClass, ModelSchemaInfoInterface $modelSchemas)
     {
         assert(!empty($modelClass));
 
         parent::__construct($connection);
 
-        $this->modelSchemes = $modelSchemes;
+        $this->modelSchemas = $modelSchemas;
         $this->modelClass   = $modelClass;
 
-        $this->mainTableName = $this->getModelSchemes()->getTable($this->getModelClass());
+        $this->mainTableName = $this->getModelSchemas()->getTable($this->getModelClass());
         $this->mainAlias     = $this->createAlias($this->getTableName());
 
         $this->setColumnToDatabaseMapper(Closure::fromCallable([$this, 'getQuotedMainAliasColumn']));
@@ -120,7 +120,7 @@ class ModelQueryBuilder extends QueryBuilder
     public function selectModelColumns(iterable $columns = null): self
     {
         $selectedColumns =
-            $columns === null ? $this->getModelSchemes()->getAttributes($this->getModelClass()) : $columns;
+            $columns === null ? $this->getModelSchemas()->getAttributes($this->getModelClass()) : $columns;
 
         $quotedColumns = [];
         $columnMapper  = $this->getColumnToDatabaseMapper();
@@ -139,7 +139,7 @@ class ModelQueryBuilder extends QueryBuilder
     public function distinct(): self
     {
         // emulate SELECT DISTINCT with grouping by primary key
-        $primaryColumn = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
+        $primaryColumn = $this->getModelSchemas()->getPrimaryKey($this->getModelClass());
         $this->addGroupBy($this->getQuotedMainAliasColumn($primaryColumn));
 
         return $this;
@@ -225,10 +225,10 @@ class ModelQueryBuilder extends QueryBuilder
     public function bindAttributes(string $modelClass, iterable $attributes): iterable
     {
         $dbPlatform = $this->getConnection()->getDatabasePlatform();
-        $types      = $this->getModelSchemes()->getAttributeTypes($modelClass);
+        $types      = $this->getModelSchemas()->getAttributeTypes($modelClass);
 
         foreach ($attributes as $column => $value) {
-            assert(is_string($column) && $this->getModelSchemes()->hasAttributeType($this->getModelClass(), $column));
+            assert(is_string($column) && $this->getModelSchemas()->hasAttributeType($this->getModelClass(), $column));
 
             $quotedColumn  = $this->quoteColumnName($column);
             $type          = $this->getDbalType($types[$column]);
@@ -262,7 +262,7 @@ class ModelQueryBuilder extends QueryBuilder
         string $secondaryIdBindName
     ): self {
         list ($intermediateTable, $primaryKey, $secondaryKey) =
-            $this->getModelSchemes()->getBelongsToManyRelationship($this->getModelClass(), $relationshipName);
+            $this->getModelSchemas()->getBelongsToManyRelationship($this->getModelClass(), $relationshipName);
 
         $this
             ->insert($this->quoteTableName($intermediateTable))
@@ -285,7 +285,7 @@ class ModelQueryBuilder extends QueryBuilder
     public function clearToManyRelationship(string $relationshipName, string $identity): self
     {
         list ($intermediateTable, $primaryKey) =
-            $this->getModelSchemes()->getBelongsToManyRelationship($this->getModelClass(), $relationshipName);
+            $this->getModelSchemas()->getBelongsToManyRelationship($this->getModelClass(), $relationshipName);
 
         $filters = [$primaryKey => [FilterParameterInterface::OPERATION_EQUALS => [$identity]]];
         $addWith = $this->expr()->andX();
@@ -453,14 +453,14 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function createRelationshipAlias(string $name): string
     {
-        $relationshipType = $this->getModelSchemes()->getRelationshipType($this->getModelClass(), $name);
+        $relationshipType = $this->getModelSchemas()->getRelationshipType($this->getModelClass(), $name);
         switch ($relationshipType) {
             case RelationshipTypes::BELONGS_TO:
                 list($targetColumn, $targetTable) =
-                    $this->getModelSchemes()->getReversePrimaryKey($this->getModelClass(), $name);
+                    $this->getModelSchemas()->getReversePrimaryKey($this->getModelClass(), $name);
                 $targetAlias = $this->innerJoinOneTable(
                     $this->getAlias(),
-                    $this->getModelSchemes()->getForeignKey($this->getModelClass(), $name),
+                    $this->getModelSchemas()->getForeignKey($this->getModelClass(), $name),
                     $targetTable,
                     $targetColumn
                 );
@@ -468,10 +468,10 @@ class ModelQueryBuilder extends QueryBuilder
 
             case RelationshipTypes::HAS_MANY:
                 list($targetColumn, $targetTable) =
-                    $this->getModelSchemes()->getReverseForeignKey($this->getModelClass(), $name);
+                    $this->getModelSchemas()->getReverseForeignKey($this->getModelClass(), $name);
                 $targetAlias = $this->innerJoinOneTable(
                     $this->getAlias(),
-                    $this->getModelSchemes()->getPrimaryKey($this->getModelClass()),
+                    $this->getModelSchemas()->getPrimaryKey($this->getModelClass()),
                     $targetTable,
                     $targetColumn
                 );
@@ -480,11 +480,11 @@ class ModelQueryBuilder extends QueryBuilder
             case RelationshipTypes::BELONGS_TO_MANY:
             default:
                 assert($relationshipType === RelationshipTypes::BELONGS_TO_MANY);
-                $primaryKey = $this->getModelSchemes()->getPrimaryKey($this->getModelClass());
+                $primaryKey = $this->getModelSchemas()->getPrimaryKey($this->getModelClass());
                 list ($intermediateTable, $intermediatePk, $intermediateFk) =
-                    $this->getModelSchemes()->getBelongsToManyRelationship($this->getModelClass(), $name);
+                    $this->getModelSchemas()->getBelongsToManyRelationship($this->getModelClass(), $name);
                 list($targetPrimaryKey, $targetTable) =
-                    $this->getModelSchemes()->getReversePrimaryKey($this->getModelClass(), $name);
+                    $this->getModelSchemas()->getReversePrimaryKey($this->getModelClass(), $name);
 
                 $targetAlias = $this->innerJoinTwoSequentialTables(
                     $this->getAlias(),
@@ -617,11 +617,11 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    private function getModelSchemes(): ModelSchemeInfoInterface
+    private function getModelSchemas(): ModelSchemaInfoInterface
     {
-        return $this->modelSchemes;
+        return $this->modelSchemas;
     }
 
     /**

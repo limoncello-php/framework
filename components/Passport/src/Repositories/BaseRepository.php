@@ -21,7 +21,7 @@ use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use PDO;
 
 /**
@@ -55,9 +55,9 @@ abstract class BaseRepository
     private $connection;
 
     /**
-     * @var DatabaseSchemeInterface
+     * @var DatabaseSchemaInterface
      */
-    private $databaseScheme;
+    private $databaseSchema;
 
     /**
      * @param Closure $closure
@@ -337,21 +337,21 @@ abstract class BaseRepository
     }
 
     /**
-     * @return DatabaseSchemeInterface
+     * @return DatabaseSchemaInterface
      */
-    protected function getDatabaseScheme(): DatabaseSchemeInterface
+    protected function getDatabaseSchema(): DatabaseSchemaInterface
     {
-        return $this->databaseScheme;
+        return $this->databaseSchema;
     }
 
     /**
-     * @param DatabaseSchemeInterface $databaseScheme
+     * @param DatabaseSchemaInterface $databaseSchema
      *
      * @return self
      */
-    protected function setDatabaseScheme(DatabaseSchemeInterface $databaseScheme): self
+    protected function setDatabaseSchema(DatabaseSchemaInterface $databaseSchema): self
     {
-        $this->databaseScheme = $databaseScheme;
+        $this->databaseSchema = $databaseSchema;
 
         return $this;
     }

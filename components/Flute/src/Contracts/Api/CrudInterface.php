@@ -72,6 +72,11 @@ interface CrudInterface
     public function withPaging(int $offset, int $limit): self;
 
     /**
+     * @return self
+     */
+    public function withoutPaging(): self;
+
+    /**
      * @param string   $name
      * @param iterable $filters
      *

@@ -22,7 +22,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Data\MigrationInterface;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\Data\TimestampFields;
 use Limoncello\Data\Contracts\MigrationContextInterface;
@@ -70,13 +70,13 @@ trait MigrationTrait
     }
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    protected function getModelSchemes(): ModelSchemeInfoInterface
+    protected function getModelSchemas(): ModelSchemaInfoInterface
     {
-        assert($this->getContainer()->has(ModelSchemeInfoInterface::class) === true);
+        assert($this->getContainer()->has(ModelSchemaInfoInterface::class) === true);
 
-        return $this->getContainer()->get(ModelSchemeInfoInterface::class);
+        return $this->getContainer()->get(ModelSchemaInfoInterface::class);
     }
 
     /**
@@ -95,8 +95,8 @@ trait MigrationTrait
      */
     protected function createTable(string $modelClass, array $expressions = []): Table
     {
-        $context   = new MigrationContext($modelClass, $this->getModelSchemes());
-        $tableName = $this->getModelSchemes()->getTable($modelClass);
+        $context   = new MigrationContext($modelClass, $this->getModelSchemas());
+        $tableName = $this->getModelSchemas()->getTable($modelClass);
         $table     = new Table($tableName);
         foreach ($expressions as $expression) {
             /** @var Closure $expression */
@@ -115,11 +115,11 @@ trait MigrationTrait
      */
     protected function dropTableIfExists(string $modelClass): void
     {
-        $tableName     = $this->getModelSchemes()->getTable($modelClass);
-        $schemeManager = $this->getSchemaManager();
+        $tableName     = $this->getModelSchemas()->getTable($modelClass);
+        $schemaManager = $this->getSchemaManager();
 
-        if ($schemeManager->tablesExist([$tableName]) === true) {
-            $schemeManager->dropTable($tableName);
+        if ($schemaManager->tablesExist([$tableName]) === true) {
+            $schemaManager->dropTable($tableName);
         }
     }
 
@@ -144,7 +144,7 @@ trait MigrationTrait
     protected function primaryString(string $name): Closure
     {
         return function (Table $table, MigrationContextInterface $context) use ($name) {
-            $length = $context->getModelSchemes()->getAttributeLength($context->getModelClass(), $name);
+            $length = $context->getModelSchemas()->getAttributeLength($context->getModelClass(), $name);
             $table->addColumn($name, Type::STRING)->setLength($length)->setNotnull(true);
             $table->setPrimaryKey([$name]);
         };
@@ -194,7 +194,7 @@ trait MigrationTrait
     protected function string(string $name): Closure
     {
         return function (Table $table, MigrationContextInterface $context) use ($name) {
-            $length = $context->getModelSchemes()->getAttributeLength($context->getModelClass(), $name);
+            $length = $context->getModelSchemas()->getAttributeLength($context->getModelClass(), $name);
             $table->addColumn($name, Type::STRING)->setLength($length)->setNotnull(true);
         };
     }
@@ -207,7 +207,7 @@ trait MigrationTrait
     protected function nullableString(string $name): Closure
     {
         return function (Table $table, MigrationContextInterface $context) use ($name) {
-            $length = $context->getModelSchemes()->getAttributeLength($context->getModelClass(), $name);
+            $length = $context->getModelSchemas()->getAttributeLength($context->getModelClass(), $name);
             $table->addColumn($name, Type::STRING)->setLength($length)->setNotnull(false);
         };
     }
@@ -288,13 +288,13 @@ trait MigrationTrait
 
             // a list of data columns and `nullable` flag
             $datesToAdd = [];
-            if ($this->getModelSchemes()->hasAttributeType($modelClass, $createdAt) === true) {
+            if ($this->getModelSchemas()->hasAttributeType($modelClass, $createdAt) === true) {
                 $datesToAdd[$createdAt] = true;
             }
-            if ($this->getModelSchemes()->hasAttributeType($modelClass, $updatedAt) === true) {
+            if ($this->getModelSchemas()->hasAttributeType($modelClass, $updatedAt) === true) {
                 $datesToAdd[$updatedAt] = false;
             }
-            if ($this->getModelSchemes()->hasAttributeType($modelClass, $deletedAt) === true) {
+            if ($this->getModelSchemas()->hasAttributeType($modelClass, $deletedAt) === true) {
                 $datesToAdd[$deletedAt] = false;
             }
 
@@ -399,8 +399,8 @@ trait MigrationTrait
             $cascadeDelete
         ) {
             $tableName  = $this->getTableNameForClass($referredClass);
-            $pkName     = $this->getModelSchemes()->getPrimaryKey($referredClass);
-            $columnType = $this->getModelSchemes()->getAttributeType($context->getModelClass(), $column);
+            $pkName     = $this->getModelSchemas()->getPrimaryKey($referredClass);
+            $columnType = $this->getModelSchemas()->getAttributeType($context->getModelClass(), $column);
 
             $closure = $this->foreignColumn($column, $tableName, $pkName, $columnType, $cascadeDelete);
 
@@ -431,8 +431,8 @@ trait MigrationTrait
             $cascadeDelete
         ) {
             $tableName  = $this->getTableNameForClass($referredClass);
-            $pkName     = $this->getModelSchemes()->getPrimaryKey($referredClass);
-            $columnType = $this->getModelSchemes()->getAttributeType($context->getModelClass(), $column);
+            $pkName     = $this->getModelSchemas()->getPrimaryKey($referredClass);
+            $columnType = $this->getModelSchemas()->getAttributeType($context->getModelClass(), $column);
 
             $closure = $this->nullableForeignColumn($column, $tableName, $pkName, $columnType, $cascadeDelete);
 
@@ -516,11 +516,11 @@ trait MigrationTrait
     protected function getTableNameForClass(string $modelClass): string
     {
         assert(
-            $this->getModelSchemes()->hasClass($modelClass),
+            $this->getModelSchemas()->hasClass($modelClass),
             "Table name is not specified for model '$modelClass'."
         );
 
-        $tableName = $this->getModelSchemes()->getTable($modelClass);
+        $tableName = $this->getModelSchemas()->getTable($modelClass);
 
         return $tableName;
     }
@@ -610,20 +610,20 @@ trait MigrationTrait
             $modelClass = $context->getModelClass();
 
             assert(
-                $this->getModelSchemes()->hasRelationship($modelClass, $name),
+                $this->getModelSchemas()->hasRelationship($modelClass, $name),
                 "Relationship `$name` not found for model `$modelClass`."
             );
             assert(
-                $this->getModelSchemes()->getRelationshipType($modelClass, $name) === RelationshipTypes::BELONGS_TO,
+                $this->getModelSchemas()->getRelationshipType($modelClass, $name) === RelationshipTypes::BELONGS_TO,
                 "Relationship `$name` for model `$modelClass` must be `belongsTo`."
             );
 
-            $localKey   = $this->getModelSchemes()->getForeignKey($modelClass, $name);
-            $columnType = $this->getModelSchemes()->getAttributeType($modelClass, $localKey);
+            $localKey   = $this->getModelSchemas()->getForeignKey($modelClass, $name);
+            $columnType = $this->getModelSchemas()->getAttributeType($modelClass, $localKey);
 
-            $otherModelClass = $this->getModelSchemes()->getReverseModelClass($modelClass, $name);
-            $foreignTable    = $this->getModelSchemes()->getTable($otherModelClass);
-            $foreignKey      = $this->getModelSchemes()->getPrimaryKey($otherModelClass);
+            $otherModelClass = $this->getModelSchemas()->getReverseModelClass($modelClass, $name);
+            $foreignTable    = $this->getModelSchemas()->getTable($otherModelClass);
+            $foreignKey      = $this->getModelSchemas()->getPrimaryKey($otherModelClass);
 
             $fkClosure = $this->foreignColumnImpl(
                 $localKey,

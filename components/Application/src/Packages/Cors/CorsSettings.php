@@ -32,7 +32,7 @@ class CorsSettings implements SettingsInterface
     const KEY_SERVER_ORIGIN = Settings::KEY_SERVER_ORIGIN;
 
     /** @see Settings */
-    const KEY_SERVER_ORIGIN_SCHEME = Settings::KEY_SERVER_ORIGIN_SCHEME;
+    const KEY_SERVER_ORIGIN_SCHEMA = Settings::KEY_SERVER_ORIGIN_SCHEME;
 
     /** @see Settings */
     const KEY_SERVER_ORIGIN_HOST = Settings::KEY_SERVER_ORIGIN_HOST;
@@ -109,7 +109,7 @@ class CorsSettings implements SettingsInterface
 
         $defaults[static::KEY_LOG_IS_ENABLED] = (bool)($appConfig[A::KEY_IS_LOG_ENABLED] ?? false);
 
-        if (array_key_exists(A::KEY_APP_ORIGIN_SCHEME, $appConfig) === true &&
+        if (array_key_exists(A::KEY_APP_ORIGIN_SCHEMA, $appConfig) === true &&
             array_key_exists(A::KEY_APP_ORIGIN_HOST, $appConfig) === true &&
             array_key_exists(A::KEY_APP_ORIGIN_PORT, $appConfig) === true
         ) {
@@ -119,7 +119,7 @@ class CorsSettings implements SettingsInterface
              * @see http://php.net/manual/function.parse-url.php
              */
             $defaults[static::KEY_SERVER_ORIGIN] = [
-                static::KEY_SERVER_ORIGIN_SCHEME => (string)$appConfig[A::KEY_APP_ORIGIN_SCHEME],
+                static::KEY_SERVER_ORIGIN_SCHEMA => (string)$appConfig[A::KEY_APP_ORIGIN_SCHEMA],
                 static::KEY_SERVER_ORIGIN_HOST   => (string)$appConfig[A::KEY_APP_ORIGIN_HOST],
                 static::KEY_SERVER_ORIGIN_PORT   => (string)$appConfig[A::KEY_APP_ORIGIN_PORT],
             ];

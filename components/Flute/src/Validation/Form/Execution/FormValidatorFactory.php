@@ -17,12 +17,13 @@
  */
 
 use Limoncello\Container\Traits\HasContainerTrait;
+use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Package\FluteSettings as S;
-use Limoncello\Flute\Validation\Form\Validator;
-use Limoncello\Flute\Validation\Traits\HasValidationFormatterTrait;
+use Limoncello\Flute\Validation\Form\FormValidator;
+use Limoncello\Validation\Execution\ContextStorage;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -30,7 +31,7 @@ use Psr\Container\ContainerInterface;
  */
 class FormValidatorFactory implements FormValidatorFactoryInterface
 {
-    use HasContainerTrait, HasValidationFormatterTrait;
+    use HasContainerTrait;
 
     /**
      * @param ContainerInterface $container
@@ -42,15 +43,26 @@ class FormValidatorFactory implements FormValidatorFactoryInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function createValidator(string $class): FormValidatorInterface
+    public function createValidator(string $rulesClass): FormValidatorInterface
     {
         /** @var SettingsProviderInterface $settingsProvider */
         $settingsProvider = $this->getContainer()->get(SettingsProviderInterface::class);
-        $settings         = $settingsProvider->get(S::class);
-        $ruleSetsData     = $settings[S::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA];
-        $formatter        = $this->createValidationFormatter();
-        $validator        = new Validator($class, $ruleSetsData, $this->getContainer(), $formatter);
+        $serializedData   = S::getFormSerializedRules($settingsProvider->get(S::class));
+
+        /** @var FormatterFactoryInterface $factory */
+        $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
+        $formatter = $factory->createFormatter(S::VALIDATION_NAMESPACE);
+
+        $validator = new FormValidator(
+            $rulesClass,
+            FormRulesSerializer::class,
+            $serializedData,
+            new ContextStorage(FormRulesSerializer::readBlocks($serializedData), $this->getContainer()),
+            $formatter
+        );
 
         return $validator;
     }

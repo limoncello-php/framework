@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Flute\Package\FluteProvider;
 use Limoncello\Tests\Flute\TestCase;
 
@@ -26,6 +27,8 @@ class FluteProviderTest extends TestCase
 {
     /**
      * Test provider.
+     *
+     * @throws Exception
      */
     public function testProvider(): void
     {

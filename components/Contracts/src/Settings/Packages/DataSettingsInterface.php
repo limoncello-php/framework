@@ -47,8 +47,8 @@ interface DataSettingsInterface extends SettingsInterface
     const KEY_SEED_INIT = self::KEY_SEEDS_LIST_FILE + 1;
 
     /** Settings key */
-    const KEY_MODELS_SCHEME_INFO = self::KEY_SEED_INIT + 1;
+    const KEY_MODELS_SCHEMA_INFO = self::KEY_SEED_INIT + 1;
 
     /** Settings key */
-    const KEY_LAST = self::KEY_MODELS_SCHEME_INFO;
+    const KEY_LAST = self::KEY_MODELS_SCHEMA_INFO;
 }

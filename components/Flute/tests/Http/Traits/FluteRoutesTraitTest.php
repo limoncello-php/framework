@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Flute\Http\Traits\FluteRoutesTrait;
 use Limoncello\Tests\Flute\Data\Http\ApiCategoriesController;
-use Limoncello\Tests\Flute\Data\Models\Category;
+use Limoncello\Tests\Flute\Data\Http\WebCategoriesController;
+use Limoncello\Tests\Flute\Data\Schemas\CategorySchema;
 use Limoncello\Tests\Flute\TestCase;
 use Mockery;
 use Mockery\Mock;
@@ -33,18 +35,21 @@ class FluteRoutesTraitTest extends TestCase
 
     /**
      * Test helper method.
+     *
+     * @throws Exception
      */
     public function testControllerMethod(): void
     {
         /** @var Mock $group */
         $group = Mockery::mock(GroupInterface::class);
 
-        $group->shouldReceive('get')->twice()->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('get')->times(3)->withAnyArgs()->andReturnSelf();
         $group->shouldReceive('post')->times(3)->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('getUriPrefix')->times(1)->withNoArgs()->andReturn('');
 
         /** @var GroupInterface $group */
 
-        $this->controller($group, '/categories', ApiCategoriesController::class);
+        $this->webController($group, '/categories/', WebCategoriesController::class);
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
@@ -52,8 +57,10 @@ class FluteRoutesTraitTest extends TestCase
 
     /**
      * Test helper method.
+     *
+     * @throws Exception
      */
-    public function testResourceMethod(): void
+    public function testApiControllerMethod(): void
     {
         /** @var Mock $group */
         $group = Mockery::mock(GroupInterface::class);
@@ -62,10 +69,11 @@ class FluteRoutesTraitTest extends TestCase
         $group->shouldReceive('post')->once()->withAnyArgs()->andReturnSelf();
         $group->shouldReceive('patch')->once()->withAnyArgs()->andReturnSelf();
         $group->shouldReceive('delete')->once()->withAnyArgs()->andReturnSelf();
+        $group->shouldReceive('getUriPrefix')->times(1)->withNoArgs()->andReturn('');
 
         /** @var GroupInterface $group */
 
-        $this->resource($group, ApiCategoriesController::class);
+        $this->apiController($group, CategorySchema::TYPE, ApiCategoriesController::class);
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
@@ -73,6 +81,8 @@ class FluteRoutesTraitTest extends TestCase
 
     /**
      * Test helper method.
+     *
+     * @throws Exception
      */
     public function testRelationshipMethod(): void
     {
@@ -85,12 +95,26 @@ class FluteRoutesTraitTest extends TestCase
 
         $this->relationship(
             $group,
-            Category::REL_CHILDREN,
+            CategorySchema::TYPE,
+            CategorySchema::REL_CHILDREN,
             ApiCategoriesController::class,
             'readChildren'
         );
 
         // mockery will do checks when the test finished
         $this->assertTrue(true);
+    }
+
+    /**
+     * Test how predictable/stable generated route names are.
+     *
+     * @return void
+     */
+    public function testRouteNamePredictability(): void
+    {
+        $this->assertEquals('/::index', static::routeName('', '', 'index'));
+        $this->assertEquals('/::index', static::routeName('/', '', 'index'));
+        $this->assertEquals('/::index', static::routeName('', '/', 'index'));
+        $this->assertEquals('/::index', static::routeName('/', '/', 'index'));
     }
 }

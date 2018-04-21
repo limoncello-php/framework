@@ -26,6 +26,7 @@ use Limoncello\Validation\Rules\Generic\IfOperator;
 use Limoncello\Validation\Rules\Generic\OrOperator;
 use Limoncello\Validation\Rules\Generic\Required;
 use Limoncello\Validation\Rules\Generic\Success;
+use Limoncello\Validation\Rules\Generic\Value;
 
 /**
  * @package Limoncello\Validation
@@ -88,6 +89,19 @@ trait Generics
     protected static function fail(int $errorCode = ErrorCodes::INVALID_VALUE, $errorContext = null): RuleInterface
     {
         return new Fail($errorCode, $errorContext);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return RuleInterface
+     */
+    protected static function value($value): RuleInterface
+    {
+        // check the value is not a resource and can be represented as string
+        assert(is_resource($value) === false);
+
+        return new Value($value);
     }
 
     /**

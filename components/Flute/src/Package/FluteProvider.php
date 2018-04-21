@@ -2,7 +2,6 @@
 
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface;
 use Limoncello\Contracts\Provider\ProvidesMessageResourcesInterface;
-use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Resources\Messages\En\Generic;
 use Limoncello\Flute\Resources\Messages\En\Validation;
 
@@ -14,7 +13,7 @@ class FluteProvider implements ProvidesContainerConfiguratorsInterface, Provides
     /**
      * Namespace for string resources.
      */
-    const GENERIC_NAMESPACE = Messages::RESOURCES_NAMESPACE;
+    const GENERIC_NAMESPACE = FluteSettings::GENERIC_NAMESPACE;
 
     /**
      * Namespace for string resources.

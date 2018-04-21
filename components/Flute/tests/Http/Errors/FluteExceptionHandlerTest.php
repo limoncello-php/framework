@@ -36,6 +36,8 @@ class FluteExceptionHandlerTest extends TestCase
 {
     /**
      * Test Exception handler.
+     *
+     * @throws Exception
      */
     public function testHandlerWithNonJsonException(): void
     {
@@ -57,6 +59,8 @@ class FluteExceptionHandlerTest extends TestCase
 
     /**
      * Test Exception handler.
+     *
+     * @throws Exception
      */
     public function testHandlerWithJsonException(): void
     {
@@ -78,6 +82,8 @@ class FluteExceptionHandlerTest extends TestCase
 
     /**
      * Test Exception handler.
+     *
+     * @throws Exception
      */
     public function testHandlerWithFaultyLogger(): void
     {
@@ -104,6 +110,8 @@ class FluteExceptionHandlerTest extends TestCase
 
     /**
      * Test Exception handler.
+     *
+     * @throws Exception
      */
     public function testHandlerWithNonJsonExceptionAndConverter(): void
     {
@@ -126,6 +134,8 @@ class FluteExceptionHandlerTest extends TestCase
 
     /**
      * Test Exception handler.
+     *
+     * @throws Exception
      */
     public function testHandlerWithNonJsonExceptionAndFaultyConverter(): void
     {

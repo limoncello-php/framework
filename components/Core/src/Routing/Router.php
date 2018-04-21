@@ -89,6 +89,10 @@ class Router implements RouterInterface
 
             $routeName = $route->getName();
             if (empty($routeName) === false) {
+                assert(
+                    $this->checkRouteNameIsUnique($route, $namedRouteUriPaths, $uriPath, $otherUri) === true,
+                    "Route name `$routeName` from `$uriPath` has already been used for `$otherUri`."
+                );
                 $namedRouteUriPaths[$routeName] = $route->getUriPath();
             }
 
@@ -105,7 +109,7 @@ class Router implements RouterInterface
      */
     public function loadCachedRoutes(array $cachedRoutes): void
     {
-        $this->cachedRoutes  = $cachedRoutes;
+        $this->cachedRoutes = $cachedRoutes;
         list($collectorData) = $cachedRoutes;
 
         $this->dispatcher = $this->createDispatcher();
@@ -123,18 +127,17 @@ class Router implements RouterInterface
 
         // Array contains matching result code, allowed methods list, handler parameters list, handler,
         // middleware list, container configurators list, custom request factory.
-        switch ($result[0]) {
+        list ($dispatchResult) = $result;
+        switch ($dispatchResult) {
             case DispatcherInterface::ROUTE_FOUND:
-                $routeIndex    = $result[1];
-                $handlerParams = $result[2];
-
+                list (, $routeIndex, $handlerParams) = $result;
                 list(, $allRoutesInfo) = $this->cachedRoutes;
-                $routeInfo             = $allRoutesInfo[$routeIndex];
+                $routeInfo = $allRoutesInfo[$routeIndex];
 
                 return array_merge([self::MATCH_FOUND, null, $handlerParams], $routeInfo);
 
             case DispatcherInterface::ROUTE_METHOD_NOT_ALLOWED:
-                $allowedMethods = $result[1];
+                list (, $allowedMethods) = $result;
 
                 return [self::MATCH_METHOD_NOT_ALLOWED, $allowedMethods, null, null, null, null, null];
 
@@ -166,9 +169,9 @@ class Router implements RouterInterface
         array $placeholders = [],
         array $queryParams = []
     ): string {
-        $path   = $this->getUriPath($routeName);
-        $path   = $path === null ? $path : $this->replacePlaceholders($path, $placeholders);
-        $url    = empty($queryParams) === true ? "$hostUri$path" : "$hostUri$path?" . http_build_query($queryParams);
+        $path = $this->getUriPath($routeName);
+        $path = $path === null ? $path : $this->replacePlaceholders($path, $placeholders);
+        $url  = empty($queryParams) === true ? "$hostUri$path" : "$hostUri$path?" . http_build_query($queryParams);
 
         return $url;
     }
@@ -222,12 +225,14 @@ class Router implements RouterInterface
             $character = $path[$index];
             switch ($character) {
                 case '{':
+                    assert($inPlaceholder === false, 'Nested placeholders (e.g. `{{}}}` are not allowed.');
                     $inPlaceholder     = true;
                     $inPlaceholderName = true;
                     break;
                 case '}':
                     $result .= array_key_exists($curPlaceholder, $placeholders) === true ?
                         $placeholders[$curPlaceholder] : '{' . $curPlaceholder . '}';
+
                     $inPlaceholder     = false;
                     $curPlaceholder    = null;
                     $inPlaceholderName = false;
@@ -257,5 +262,28 @@ class Router implements RouterInterface
         if ($this->cachedRoutes === false) {
             throw new LogicException('Routes are not loaded yet.');
         }
+    }
+
+    /**
+     * @param RouteInterface $route
+     * @param array          $namedRouteUriPaths
+     * @param null|string    $url
+     * @param null|string    $otherUrl
+     *
+     * @return bool
+     */
+    private function checkRouteNameIsUnique(
+        RouteInterface $route,
+        array $namedRouteUriPaths,
+        ?string &$url,
+        ?string &$otherUrl
+    ): bool {
+        // check is really simple, the main purpose of the method is to prepare data for assert
+        $isUnique = array_key_exists($route->getName(), $namedRouteUriPaths) === false;
+
+        $url      = $isUnique === true ? null : $route->getUriPath();
+        $otherUrl = $isUnique === true ? null : $namedRouteUriPaths[$route->getName()];
+
+        return $isUnique;
     }
 }

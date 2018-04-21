@@ -35,7 +35,7 @@ use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\PassportServerInterface;
 use Limoncello\Passport\Package\MySqlPassportContainerConfigurator;
 use Limoncello\Passport\PassportServer;
-use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
+use Limoncello\Passport\Traits\DatabaseSchemaMigrationTrait;
 use Limoncello\Tests\Passport\Data\TestContainer;
 use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest;
 use Psr\Http\Message\ServerRequestInterface;
@@ -47,7 +47,7 @@ use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest as T;
  */
 class PassportServerTest extends TestCase
 {
-    use DatabaseSchemeMigrationTrait;
+    use DatabaseSchemaMigrationTrait;
 
     /**
      * @inheritdoc
@@ -88,7 +88,7 @@ class PassportServerTest extends TestCase
         $this->assertNotEmpty($token->refresh_token);
 
         // check scopes were saved
-        $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
+        $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseSchema());
         $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
         $this->assertNotEmpty($savedToken->getScopeIdentifiers());
 
@@ -228,8 +228,8 @@ class PassportServerTest extends TestCase
 
         // step 0 - add one more redirect URI to client so the server will not know which one to use (no default)
         $connection      = $this->getConnection();
-        $scheme          = $this->getDatabaseScheme();
-        $redirectUriRepo = new RedirectUriRepository($connection, $scheme);
+        $schema          = $this->getDatabaseSchema();
+        $redirectUriRepo = new RedirectUriRepository($connection, $schema);
         $redirectUriRepo->create(
             $uri1 = (new RedirectUri())
                 ->setClientIdentifier(T::TEST_DEFAULT_CLIENT_ID)
@@ -439,7 +439,7 @@ class PassportServerTest extends TestCase
         $server = $this->createPassportServer();
 
         // add client authentication so we can actually get any tokens
-        $clientRepo    = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
+        $clientRepo    = new ClientRepository($this->getConnection(), $this->getDatabaseSchema());
         $defaultClient = $clientRepo->read(T::TEST_DEFAULT_CLIENT_ID);
         $defaultClient->enableClientGrant()->setCredentials(
             password_hash(static::TEST_DEFAULT_CLIENT_PASS, PASSWORD_DEFAULT)
@@ -455,7 +455,7 @@ class PassportServerTest extends TestCase
         $this->assertNotEmpty($token->scope);
 
         // check scopes were saved
-        $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseScheme());
+        $tokenRepo  = new TokenRepository($this->getConnection(), $this->getDatabaseSchema());
         $this->assertNotNull($savedToken = $tokenRepo->readByValue($token->access_token, 100));
         $this->assertNotEmpty($savedToken->getScopeIdentifiers());
 
@@ -718,10 +718,10 @@ class PassportServerTest extends TestCase
     private function createPassportServer(): PassportServerInterface
     {
         $connection      = $this->getConnection();
-        $scheme          = $this->getDatabaseScheme();
-        $scopeRepo       = new ScopeRepository($connection, $scheme);
-        $clientRepo      = new ClientRepository($connection, $scheme);
-        $redirectUriRepo = new RedirectUriRepository($connection, $scheme);
+        $schema          = $this->getDatabaseSchema();
+        $scopeRepo       = new ScopeRepository($connection, $schema);
+        $clientRepo      = new ClientRepository($connection, $schema);
+        $redirectUriRepo = new RedirectUriRepository($connection, $schema);
 
         $clientRepo->inTransaction(function () use ($scopeRepo, $clientRepo, $redirectUriRepo) {
             $client = $clientRepo->create(

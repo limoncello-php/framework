@@ -19,34 +19,33 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Types\Type;
+use Exception;
 use Limoncello\Contracts\Application\ModelInterface;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
-use Limoncello\Flute\Contracts\Schema\JsonSchemesInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Tests\Flute\Data\Migrations\Runner as MigrationRunner;
 use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
-use Limoncello\Tests\Flute\Data\Models\ModelSchemes;
+use Limoncello\Tests\Flute\Data\Models\ModelSchemas;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Models\Role;
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
 use Limoncello\Tests\Flute\Data\Models\User;
-use Limoncello\Tests\Flute\Data\Schemes\BoardSchema;
-use Limoncello\Tests\Flute\Data\Schemes\CategorySchema;
-use Limoncello\Tests\Flute\Data\Schemes\CommentSchema;
-use Limoncello\Tests\Flute\Data\Schemes\EmotionSchema;
-use Limoncello\Tests\Flute\Data\Schemes\PostSchema;
-use Limoncello\Tests\Flute\Data\Schemes\RoleSchema;
-use Limoncello\Tests\Flute\Data\Schemes\UserSchema;
+use Limoncello\Tests\Flute\Data\Schemas\BoardSchema;
+use Limoncello\Tests\Flute\Data\Schemas\CategorySchema;
+use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
+use Limoncello\Tests\Flute\Data\Schemas\EmotionSchema;
+use Limoncello\Tests\Flute\Data\Schemas\PostSchema;
+use Limoncello\Tests\Flute\Data\Schemas\RoleSchema;
+use Limoncello\Tests\Flute\Data\Schemas\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
-use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\CreateCommentRuleSet;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateCommentRuleSet;
-use Limoncello\Tests\Flute\Data\Validation\JsonRuleSets\UpdateUserMinimalRuleSet;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\CreateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateUserMinimalRules;
 use Mockery;
 
 /**
@@ -58,17 +57,17 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * @param array $modelClasses
      * @param bool  $requireReverseRelationships
      *
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    public static function createSchemes(
+    public static function createSchemas(
         array $modelClasses,
         $requireReverseRelationships = true
-    ): ModelSchemeInfoInterface {
+    ): ModelSchemaInfoInterface {
         $registered    = [];
-        $modelSchemes  = new ModelSchemes();
-        $registerModel = function ($modelClass) use ($modelSchemes, &$registered, $requireReverseRelationships) {
+        $modelSchemas  = new ModelSchemas();
+        $registerModel = function ($modelClass) use ($modelSchemas, &$registered, $requireReverseRelationships) {
             /** @var ModelInterface $modelClass */
-            $modelSchemes->registerClass(
+            $modelSchemas->registerClass(
                 $modelClass,
                 $modelClass::getTableName(),
                 $modelClass::getPrimaryKeyName(),
@@ -81,7 +80,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             if (array_key_exists(RelationshipTypes::BELONGS_TO, $relationships) === true) {
                 foreach ($relationships[RelationshipTypes::BELONGS_TO] as $relName => list($rClass, $fKey, $rRel)) {
                     /** @var string $rClass */
-                    $modelSchemes->registerBelongsToOneRelationship($modelClass, $relName, $fKey, $rClass, $rRel);
+                    $modelSchemas->registerBelongsToOneRelationship($modelClass, $relName, $fKey, $rClass, $rRel);
                     $registered[(string)$modelClass][$relName] = true;
                     $registered[$rClass][$rRel]                = true;
 
@@ -119,7 +118,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
                     }
                     /** @var string $rClass */
                     list($rClass, $iTable, $fKeyPrimary, $fKeySecondary, $rRel) = $data;
-                    $modelSchemes->registerBelongsToManyRelationship(
+                    $modelSchemas->registerBelongsToManyRelationship(
                         $modelClass,
                         $relName,
                         $iTable,
@@ -136,7 +135,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         array_map($registerModel, $modelClasses);
 
-        return $modelSchemes;
+        return $modelSchemas;
     }
 
     /**
@@ -145,10 +144,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         parent::setUp();
-
-        if (Type::hasType(SystemDateTimeType::NAME) === false) {
-            Type::addType(SystemDateTimeType::NAME, SystemDateTimeType::class);
-        }
     }
 
     /**
@@ -163,6 +158,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return Connection
      *
+     * @throws Exception
      * @throws DBALException
      */
     protected function createConnection()
@@ -185,6 +181,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return Connection
      *
+     * @throws Exception
      * @throws DBALException
      */
     protected function initDb()
@@ -196,11 +193,11 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ModelSchemeInfoInterface
+     * @return ModelSchemaInfoInterface
      */
-    protected function getModelSchemes()
+    protected function getModelSchemas()
     {
-        $modelSchemes = static::createSchemes([
+        $modelSchemas = static::createSchemas([
             Board::class,
             Comment::class,
             Emotion::class,
@@ -211,26 +208,26 @@ class TestCase extends \PHPUnit\Framework\TestCase
             StringPKModel::class,
         ]);
 
-        return $modelSchemes;
+        return $modelSchemas;
     }
 
     /**
      * @param Factory                  $factory
-     * @param ModelSchemeInfoInterface $modelSchemes
+     * @param ModelSchemaInfoInterface $modelSchemas
      *
-     * @return JsonSchemesInterface
+     * @return JsonSchemasInterface
      */
-    protected function getJsonSchemes(Factory $factory, ModelSchemeInfoInterface $modelSchemes)
+    protected function getJsonSchemas(Factory $factory, ModelSchemaInfoInterface $modelSchemas)
     {
-        $schemes = $factory->createJsonSchemes($this->getSchemeMap(), $modelSchemes);
+        $schemas = $factory->createJsonSchemas($this->getSchemaMap(), $modelSchemas);
 
-        return $schemes;
+        return $schemas;
     }
 
     /**
      * @return array
      */
-    protected function getSchemeMap()
+    protected function getSchemaMap()
     {
         return [
             Board::class    => BoardSchema::class,
@@ -249,9 +246,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function getJsonValidationRuleSets()
     {
         return [
-            CreateCommentRuleSet::class,
-            UpdateCommentRuleSet::class,
-            UpdateUserMinimalRuleSet::class,
+            CreateCommentRules::class,
+            UpdateCommentRules::class,
+            UpdateUserMinimalRules::class,
         ];
     }
 
@@ -261,7 +258,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function getFormValidationRuleSets()
     {
         return [
-            Data\Validation\FormRuleSets\CreateCommentRuleSet::class,
+            Data\Validation\Forms\CreateCommentRules::class,
         ];
     }
 
@@ -271,7 +268,13 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function getQueryValidationRuleSets()
     {
         return [
-            Data\Validation\QueryRuleSets\CreateCommentRuleSet::class,
+            Data\Validation\JsonQueries\AllowEverythingRules::class,
+            Data\Validation\JsonQueries\CommentsIndexRules::class,
+            Data\Validation\JsonQueries\ReadCommentsQueryRules::class,
+            Data\Validation\JsonQueries\ReadBoardsQueryRules::class,
+            Data\Validation\JsonQueries\ReadCategoriesQueryRules::class,
+            Data\Validation\JsonQueries\ReadUsersQueryRules::class,
+            Data\Validation\JsonQueries\ReadEmotionsFromCommentsQueryRules::class,
         ];
     }
 }

@@ -24,7 +24,7 @@ use Limoncello\Application\Packages\Data\DataSettings as C;
 use Limoncello\Application\Packages\Data\DoctrineSettings;
 use Limoncello\Application\Packages\Data\DoctrineSettings as S;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Data\ModelSchemeInfoInterface;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Mockery;
 use Mockery\Mock;
@@ -58,11 +58,14 @@ class DataPackageTest extends TestCase
         $provider->shouldReceive('get')->once()->with(S::class)->andReturn([
             S::KEY_URL    => 'sqlite:///',
             S::KEY_MEMORY => true,
+            S::KEY_EXEC   => [
+                'PRAGMA foreign_keys = ON;'
+            ],
         ]);
 
         DataContainerConfigurator::configureContainer($container);
 
-        $this->assertNotNull($container->get(ModelSchemeInfoInterface::class));
+        $this->assertNotNull($container->get(ModelSchemaInfoInterface::class));
         $this->assertNotNull($container->get(Connection::class));
     }
 

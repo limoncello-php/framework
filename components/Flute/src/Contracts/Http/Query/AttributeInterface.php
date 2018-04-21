@@ -26,7 +26,7 @@ interface AttributeInterface
     /**
      * @return string
      */
-    public function getNameInScheme(): string;
+    public function getNameInSchema(): string;
 
     /**
      * @return string
@@ -36,5 +36,5 @@ interface AttributeInterface
     /**
      * @return SchemaInterface
      */
-    public function getScheme(): SchemaInterface;
+    public function getSchema(): SchemaInterface;
 }

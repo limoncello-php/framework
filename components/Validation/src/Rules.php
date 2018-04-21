@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Validator\Comparisons;
 use Limoncello\Validation\Validator\Converters;
 use Limoncello\Validation\Validator\Generics;
@@ -26,6 +27,16 @@ use Limoncello\Validation\Validator\Types;
  */
 class Rules
 {
+    /**
+     * Callable for using in `ifX`.
+     */
+    public const IS_NULL_CALLABLE = [self::class, 'isNull'];
+
+    /**
+     * Callable for using in `ifX`.
+     */
+    public const IS_EMPTY_CALLABLE = [self::class, 'isEmpty'];
+
     use Comparisons {
         equals as public;
         notEquals as public;
@@ -56,6 +67,7 @@ class Rules
         ifX as public;
         success as public;
         fail as public;
+        value as public;
         required as public;
         enum as public;
         filter as public;
@@ -69,5 +81,31 @@ class Rules
         isFloat as public;
         isNumeric as public;
         isDateTime as public;
+    }
+
+    /**
+     * @param mixed            $value
+     * @param ContextInterface $context
+     *
+     * @return bool
+     */
+    public static function isNull($value, ContextInterface $context): bool
+    {
+        assert($context);
+
+        return $value === null;
+    }
+
+    /**
+     * @param mixed            $value
+     * @param ContextInterface $context
+     *
+     * @return bool
+     */
+    public static function isEmpty($value, ContextInterface $context): bool
+    {
+        assert($context);
+
+        return empty($value);
     }
 }

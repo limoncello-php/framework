@@ -25,7 +25,7 @@ use Limoncello\Passport\Adaptors\Generic\ScopeRepository;
 use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
-use Limoncello\Passport\Traits\DatabaseSchemeMigrationTrait;
+use Limoncello\Passport\Traits\DatabaseSchemaMigrationTrait;
 use Limoncello\Tests\Passport\TestCase;
 
 /**
@@ -33,7 +33,7 @@ use Limoncello\Tests\Passport\TestCase;
  */
 class ClientRepositoryTest extends TestCase
 {
-    use DatabaseSchemeMigrationTrait;
+    use DatabaseSchemaMigrationTrait;
 
     /**
      * @inheritdoc
@@ -151,8 +151,8 @@ class ClientRepositoryTest extends TestCase
      */
     private function createRepositories(): array
     {
-        $clientRepo = new ClientRepository($this->getConnection(), $this->getDatabaseScheme());
-        $scopeRepo  = new ScopeRepository($this->getConnection(), $this->getDatabaseScheme());
+        $clientRepo = new ClientRepository($this->getConnection(), $this->getDatabaseSchema());
+        $scopeRepo  = new ScopeRepository($this->getConnection(), $this->getDatabaseSchema());
 
         return [$clientRepo, $scopeRepo];
     }

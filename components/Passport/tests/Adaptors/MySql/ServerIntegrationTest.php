@@ -26,7 +26,7 @@ use Limoncello\Passport\Adaptors\MySql\ScopeRepository;
 use Limoncello\Passport\Adaptors\MySql\Token;
 use Limoncello\Passport\Adaptors\MySql\TokenRepository;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use Limoncello\Passport\Package\MySqlPassportContainerConfigurator;
 use Limoncello\Tests\Passport\Data\TestContainer;
 use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest;
@@ -57,7 +57,7 @@ class ServerIntegrationTest extends TestCase
         $this->assertEquals(Scope::class, $method->invoke($repo));
         $method = new ReflectionMethod(ScopeRepository::class, 'getTableNameForReading');
         $method->setAccessible(true);
-        $this->assertEquals(DatabaseScheme::TABLE_SCOPES, $method->invoke($repo));
+        $this->assertEquals(DatabaseSchema::TABLE_SCOPES, $method->invoke($repo));
 
         $this->assertNotNull($repo = $integration->getRedirectUriRepository());
         $method = new ReflectionMethod(RedirectUriRepository::class, 'getClassName');
@@ -65,7 +65,7 @@ class ServerIntegrationTest extends TestCase
         $this->assertEquals(RedirectUri::class, $method->invoke($repo));
         $method = new ReflectionMethod(RedirectUriRepository::class, 'getTableNameForReading');
         $method->setAccessible(true);
-        $this->assertEquals(DatabaseScheme::TABLE_REDIRECT_URIS, $method->invoke($repo));
+        $this->assertEquals(DatabaseSchema::TABLE_REDIRECT_URIS, $method->invoke($repo));
 
         $this->assertNotNull($repo = $integration->getTokenRepository());
         $method = new ReflectionMethod(TokenRepository::class, 'getClassName');
@@ -73,7 +73,7 @@ class ServerIntegrationTest extends TestCase
         $this->assertEquals(Token::class, $method->invoke($repo));
         $method = new ReflectionMethod(TokenRepository::class, 'getTableNameForReading');
         $method->setAccessible(true);
-        $this->assertEquals(DatabaseScheme::VIEW_TOKENS, $method->invoke($repo));
+        $this->assertEquals(DatabaseSchema::VIEW_TOKENS, $method->invoke($repo));
 
         $this->assertNotNull($integration->createTokenInstance());
     }

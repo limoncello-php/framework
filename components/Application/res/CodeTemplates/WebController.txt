@@ -1,13 +1,15 @@
 <?php namespace App\Web\Controllers;
 
-use App\Web\L10n\Views;
+use App\Api\{%PLURAL_CC%}Api;
+use App\Json\Schemas\{%SINGULAR_CC%}Schema;
+use App\Validation\{%SINGULAR_CC%}\{%PLURAL_CC%}ReadQuery;
+use App\Web\Views;
 use Limoncello\Flute\Contracts\Http\Controller\ControllerIndexInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response\HtmlResponse;
 
-//use Limoncello\Flute\Contracts\Http\ControllerInterface;
+//use Limoncello\Flute\Contracts\Http\WebControllerInterface;
 
 /**
  * @package App
@@ -16,8 +18,6 @@ use Zend\Diactoros\Response\HtmlResponse;
  */
 class {%PLURAL_CC%}Controller extends BaseController implements ControllerIndexInterface
 {
-    use PaginationLinksTrait;
-
     const SUB_URL = '/{%PLURAL_LC%}';
 
     /**
@@ -28,11 +28,26 @@ class {%PLURAL_CC%}Controller extends BaseController implements ControllerIndexI
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $body = static::view($container, Views::HOME_PAGE, [
-            'title'        => '{%SINGULAR_CC%} page',
-            'content_text' => 'Hello world!',
-        ]);
+        // Default index implementation
+        // - parses HTTP query parameters for filters, sorts and pagination parameters
+        // - checks the query parameters comply with validation rules defined by a developer
+        // - reads data from the database with filters, sorts and pagination applied via API specified
+        // - generates HTML response with template specified (including pagination links)
+        //
+        // Consider it as a starting point and feel free to modify the code here and
+        // in `BaseController` to meet your requirements.
 
-        return new HtmlResponse($body);
+        $queryRules = {%PLURAL_CC%}ReadQuery::class;
+        $dataSchema = {%SINGULAR_CC%}Schema::class;
+        $apiClass   = {%PLURAL_CC%}Api::class;
+        $templateId = Views::{%PLURAL_UC%}_INDEX_PAGE; // <-- set valid View ID here
+
+        $extraParams = [
+//            'title'         => '{%PLURAL_CC%} page',
+//            'content_text'  => 'Hello world!',
+//            'url_to_create' => static::createUrl($container, {%SINGULAR_CC%}Schema::TYPE, static::METHOD_INSTANCE),
+        ];
+
+        return self::defaultIndex($queryRules, $dataSchema, $apiClass, $templateId, $container, $request, $extraParams);
     }
 }

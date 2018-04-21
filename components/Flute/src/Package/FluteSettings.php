@@ -4,11 +4,15 @@ use Generator;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\Packages\FluteSettingsInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Contracts\Validation\FormRuleSetInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiRuleSetInterface;
-use Limoncello\Flute\Contracts\Validation\QueryRuleSetInterface;
-use Limoncello\Flute\Validation\Form\Execution\AttributeRulesSerializer;
-use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiRuleSerializer;
+use Limoncello\Flute\Contracts\Validation\FormRulesInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
+use Limoncello\Flute\L10n\Messages;
+use Limoncello\Flute\Validation\Form\Execution\FormRulesSerializer;
+use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiDataRulesSerializer;
+use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiQueryRulesSerializer;
+use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
+use Limoncello\Validation\Execution\BlockSerializer;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
@@ -19,7 +23,28 @@ abstract class FluteSettings implements FluteSettingsInterface
     /**
      * Namespace for string resources.
      */
-    const VALIDATION_NAMESPACE = 'Limoncello.Flute.Validation';
+    const GENERIC_NAMESPACE = Messages::RESOURCES_NAMESPACE;
+
+    /**
+     * Namespace for string resources.
+     */
+    public const VALIDATION_NAMESPACE = 'Limoncello.Flute.Validation';
+
+    /**
+     * Default page size.
+     */
+    public const DEFAULT_PAGE_SIZE = 10;
+
+    /**
+     * Default page size.
+     */
+    public const DEFAULT_MAX_PAGE_SIZE = 30;
+
+    /** Serialized validation data index */
+    protected const JSON_API_DATA_VALIDATION_RULES_SERIALIZED = 0;
+
+    /** Serialized validation data index */
+    protected const JSON_API_QUERIES_VALIDATION_RULES_SERIALIZED = self::JSON_API_DATA_VALIDATION_RULES_SERIALIZED + 1;
 
     /**
      * @param string $path
@@ -41,17 +66,17 @@ abstract class FluteSettings implements FluteSettingsInterface
         $defaults[static::KEY_ROUTES_FOLDER]          = $appConfig[A::KEY_ROUTES_FOLDER];
         $defaults[static::KEY_WEB_CONTROLLERS_FOLDER] = $appConfig[A::KEY_WEB_CONTROLLERS_FOLDER];
 
-        $apiFolder        = $defaults[static::KEY_API_FOLDER] ?? null;
-        $valRulesFolder   = $defaults[static::KEY_JSON_VALIDATION_RULES_FOLDER] ?? null;
-        $jsonCtrlFolder   = $defaults[static::KEY_JSON_CONTROLLERS_FOLDER] ?? null;
-        $schemesFolder    = $defaults[static::KEY_SCHEMAS_FOLDER] ?? null;
-        $schemesFileMask  = $defaults[static::KEY_SCHEMAS_FILE_MASK] ?? null;
-        $jsonValFolder    = $defaults[static::KEY_JSON_VALIDATORS_FOLDER] ?? null;
-        $jsonValFileMask  = $defaults[static::KEY_JSON_VALIDATORS_FILE_MASK] ?? null;
-        $formsValFolder   = $defaults[static::KEY_FORM_VALIDATORS_FOLDER] ?? null;
-        $formsValFileMask = $defaults[static::KEY_FORM_VALIDATORS_FILE_MASK] ?? null;
-        $queryValFolder   = $defaults[static::KEY_QUERY_VALIDATORS_FOLDER] ?? null;
-        $queryValFileMask = $defaults[static::KEY_QUERY_VALIDATORS_FILE_MASK] ?? null;
+        $apiFolder            = $defaults[static::KEY_API_FOLDER] ?? null;
+        $valRulesFolder       = $defaults[static::KEY_JSON_VALIDATION_RULES_FOLDER] ?? null;
+        $jsonCtrlFolder       = $defaults[static::KEY_JSON_CONTROLLERS_FOLDER] ?? null;
+        $schemasFolder        = $defaults[static::KEY_SCHEMAS_FOLDER] ?? null;
+        $schemasFileMask      = $defaults[static::KEY_SCHEMAS_FILE_MASK] ?? null;
+        $jsonDataValFolder    = $defaults[static::KEY_JSON_VALIDATORS_FOLDER] ?? null;
+        $jsonDataValFileMask  = $defaults[static::KEY_JSON_VALIDATORS_FILE_MASK] ?? null;
+        $formsValFolder       = $defaults[static::KEY_FORM_VALIDATORS_FOLDER] ?? null;
+        $formsValFileMask     = $defaults[static::KEY_FORM_VALIDATORS_FILE_MASK] ?? null;
+        $jsonQueryValFolder   = $defaults[static::KEY_QUERY_VALIDATORS_FOLDER] ?? null;
+        $jsonQueryValFileMask = $defaults[static::KEY_QUERY_VALIDATORS_FILE_MASK] ?? null;
 
         assert(
             $apiFolder !== null && empty(glob($apiFolder)) === false,
@@ -66,30 +91,30 @@ abstract class FluteSettings implements FluteSettingsInterface
             "Invalid JSON API controllers' folder `$jsonCtrlFolder`."
         );
         assert(
-            $schemesFolder !== null && empty(glob($schemesFolder)) === false,
-            "Invalid Schemes folder `$schemesFolder`."
+            $schemasFolder !== null && empty(glob($schemasFolder)) === false,
+            "Invalid Schemas folder `$schemasFolder`."
         );
-        assert(empty($schemesFileMask) === false, "Invalid Schemes file mask `$schemesFileMask`.");
+        assert(empty($schemasFileMask) === false, "Invalid Schemas file mask `$schemasFileMask`.");
         assert(
-            $jsonValFolder !== null && empty(glob($jsonValFolder)) === false,
-            "Invalid JSON Validators folder `$jsonValFolder`."
+            $jsonDataValFolder !== null && empty(glob($jsonDataValFolder)) === false,
+            "Invalid JSON Validators folder `$jsonDataValFolder`."
         );
-        assert(empty($jsonValFileMask) === false, "Invalid JSON Validators file mask `$jsonValFileMask`.");
+        assert(empty($jsonDataValFileMask) === false, "Invalid JSON Validators file mask `$jsonDataValFileMask`.");
         assert(
             $formsValFolder !== null && empty(glob($formsValFolder)) === false,
             "Invalid Forms Validators folder `$formsValFolder`."
         );
         assert(empty($formsValFileMask) === false, "Invalid Forms Validators file mask `$formsValFileMask`.");
         assert(
-            $queryValFolder !== null && empty(glob($queryValFolder)) === false,
-            "Invalid Query Validators folder `$queryValFolder`."
+            $jsonQueryValFolder !== null && empty(glob($jsonQueryValFolder)) === false,
+            "Invalid Query Validators folder `$jsonQueryValFolder`."
         );
-        assert(empty($queryValFileMask) === false, "Invalid Query Validators file mask `$queryValFileMask`.");
+        assert(empty($jsonQueryValFileMask) === false, "Invalid Query Validators file mask `$jsonQueryValFileMask`.");
 
-        $schemesPath         = $schemesFolder . DIRECTORY_SEPARATOR . $schemesFileMask;
-        $jsonValidatorsPath  = $jsonValFolder . DIRECTORY_SEPARATOR . $jsonValFileMask;
+        $schemasPath         = $schemasFolder . DIRECTORY_SEPARATOR . $schemasFileMask;
+        $jsonDataValPath     = $jsonDataValFolder . DIRECTORY_SEPARATOR . $jsonDataValFileMask;
         $formsValidatorsPath = $formsValFolder . DIRECTORY_SEPARATOR . $formsValFileMask;
-        $queryValidatorsPath = $queryValFolder . DIRECTORY_SEPARATOR . $queryValFileMask;
+        $jsonQueryValPath    = $jsonQueryValFolder . DIRECTORY_SEPARATOR . $jsonQueryValFileMask;
 
         $requireUniqueTypes = $defaults[static::KEY_SCHEMAS_REQUIRE_UNIQUE_TYPES] ?? true;
 
@@ -99,13 +124,13 @@ abstract class FluteSettings implements FluteSettingsInterface
         return $defaults + [
                 static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS => array_flip($doNotLogExceptions),
 
-                static::KEY_MODEL_TO_SCHEME_MAP => $this->createModelToSchemeMap($schemesPath, $requireUniqueTypes),
+                static::KEY_MODEL_TO_SCHEMA_MAP => $this->createModelToSchemaMap($schemasPath, $requireUniqueTypes),
 
                 static::KEY_JSON_VALIDATION_RULE_SETS_DATA =>
-                    $this->createJsonValidationRulesSetData($jsonValidatorsPath),
+                    $this->serializeJsonValidationRules($jsonDataValPath, $jsonQueryValPath),
 
                 static::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA =>
-                    $this->createValidationAttributeRulesSetData($formsValidatorsPath, $queryValidatorsPath),
+                    $this->serializeFormValidationRules($formsValidatorsPath),
             ];
     }
 
@@ -124,8 +149,8 @@ abstract class FluteSettings implements FluteSettingsInterface
             static::KEY_QUERY_VALIDATORS_FILE_MASK                => '*.php',
             static::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER => null,
             static::KEY_HTTP_CODE_FOR_UNEXPECTED_THROWABLE        => 500,
-            static::KEY_DEFAULT_PAGING_SIZE                       => 20,
-            static::KEY_MAX_PAGING_SIZE                           => 100,
+            static::KEY_DEFAULT_PAGING_SIZE                       => static::DEFAULT_PAGE_SIZE,
+            static::KEY_MAX_PAGING_SIZE                           => static::DEFAULT_MAX_PAGE_SIZE,
             static::KEY_JSON_ENCODE_OPTIONS                       => $jsonOptions,
             static::KEY_JSON_ENCODE_DEPTH                         => 512,
             static::KEY_IS_SHOW_VERSION                           => false,
@@ -139,31 +164,31 @@ abstract class FluteSettings implements FluteSettingsInterface
     }
 
     /**
-     * @param string $schemesPath
+     * @param string $schemasPath
      * @param bool   $requireUniqueTypes
      *
      * @return array
      */
-    private function createModelToSchemeMap(string $schemesPath, bool $requireUniqueTypes): array
+    private function createModelToSchemaMap(string $schemasPath, bool $requireUniqueTypes): array
     {
         $map   = [];
         $types = [];
-        foreach ($this->selectClasses($schemesPath, SchemaInterface::class) as $schemeClass) {
+        foreach ($this->selectClasses($schemasPath, SchemaInterface::class) as $schemaClass) {
             assert(
-                is_string($schemeClass) &&
-                class_exists($schemeClass) &&
-                array_key_exists(SchemaInterface::class, class_implements($schemeClass))
+                is_string($schemaClass) &&
+                class_exists($schemaClass) &&
+                array_key_exists(SchemaInterface::class, class_implements($schemaClass))
             );
-            /** @var SchemaInterface $schemeClass */
-            $modelClass   = $schemeClass::MODEL;
-            $resourceType = $schemeClass::TYPE;
+            /** @var SchemaInterface $schemaClass */
+            $modelClass   = $schemaClass::MODEL;
+            $resourceType = $schemaClass::TYPE;
 
             assert(is_string($modelClass) === true && empty($modelClass) === false);
             assert(is_string($resourceType) === true && empty($resourceType) === false);
 
-            // By default it checks that all Schemes have unique resource types. That's a legit case
-            // to have multiple Schemes for a same resource type however it's more likely that developer
-            // just forgot to set a unique one. If you do need multiple Schemes for a resource feel free
+            // By default it checks that all Schemas have unique resource types. That's a legit case
+            // to have multiple Schemas for a same resource type however it's more likely that developer
+            // just forgot to set a unique one. If you do need multiple Schemas for a resource feel free
             // to set to turn off this check.
             assert(
                 $requireUniqueTypes === false || array_key_exists($resourceType, $types) === false,
@@ -171,7 +196,7 @@ abstract class FluteSettings implements FluteSettingsInterface
             );
             $types[$resourceType] = true;
 
-            $map[$modelClass] = $schemeClass;
+            $map[$modelClass] = $schemaClass;
         }
 
         return $map;
@@ -179,70 +204,85 @@ abstract class FluteSettings implements FluteSettingsInterface
 
     /**
      * @param string $validatorsPath
-     *
-     * @return array
-     */
-    private function createJsonValidationRulesSetData(string $validatorsPath): array
-    {
-        $serializer = new JsonApiRuleSerializer();
-        foreach ($this->selectClasses($validatorsPath, JsonApiRuleSetInterface::class) as $setClass) {
-            /** @var string $setName */
-            $setName = $setClass;
-            assert(
-                is_string($setClass) &&
-                class_exists($setClass) &&
-                array_key_exists(JsonApiRuleSetInterface::class, class_implements($setClass))
-            );
-            /** @var JsonApiRuleSetInterface $setClass */
-            $serializer->addResourceRules(
-                $setName,
-                $setClass::getIdRule(),
-                $setClass::getTypeRule(),
-                $setClass::getAttributeRules(),
-                $setClass::getToOneRelationshipRules(),
-                $setClass::getToManyRelationshipRules()
-            );
-        }
-
-        $ruleSetsData = $serializer->getData();
-
-        return $ruleSetsData;
-    }
-
-    /**
-     * @param string $formsValPath
      * @param string $queriesValPath
      *
      * @return array
      */
-    private function createValidationAttributeRulesSetData(string $formsValPath, string $queriesValPath): array
+    private function serializeJsonValidationRules(string $validatorsPath, string $queriesValPath): array
     {
-        $serializer = new AttributeRulesSerializer();
-        foreach ($this->selectClasses($formsValPath, FormRuleSetInterface::class) as $setClass) {
-            /** @var string $setName */
-            $setName = $setClass;
-            assert(
-                is_string($setClass) &&
-                class_exists($setClass) &&
-                array_key_exists(FormRuleSetInterface::class, class_implements($setClass))
-            );
-            /** @var FormRuleSetInterface $setClass */
-            $serializer->addResourceRules($setName, $setClass::getAttributeRules());
-        }
-        foreach ($this->selectClasses($queriesValPath, QueryRuleSetInterface::class) as $setClass) {
-            /** @var string $setName */
-            $setName = $setClass;
-            assert(
-                is_string($setClass) &&
-                class_exists($setClass) &&
-                array_key_exists(QueryRuleSetInterface::class, class_implements($setClass))
-            );
-            /** @var QueryRuleSetInterface $setClass */
-            $serializer->addResourceRules($setName, $setClass::getAttributeRules());
+        // JSON API data validation rules
+        $dataSerializer = new JsonApiDataRulesSerializer(new BlockSerializer());
+        foreach ($this->selectClasses($validatorsPath, JsonApiDataRulesInterface::class) as $rulesClass) {
+            $dataSerializer->addRulesFromClass($rulesClass);
         }
 
-        $ruleSetsData = $serializer->getData();
+        // JSON API query validation rules
+        $querySerializer = new JsonApiQueryRulesSerializer(new BlockSerializer());
+        // Add predefined rules for queries...
+        $querySerializer->addRulesFromClass(DefaultQueryValidationRules::class);
+        // ... and add user defined ones.
+        foreach ($this->selectClasses($queriesValPath, JsonApiQueryRulesInterface::class) as $rulesClass) {
+            $querySerializer->addRulesFromClass($rulesClass);
+        }
 
-        return $ruleSetsData;
+        return [
+            static::JSON_API_DATA_VALIDATION_RULES_SERIALIZED    => $dataSerializer->getData(),
+            static::JSON_API_QUERIES_VALIDATION_RULES_SERIALIZED => $querySerializer->getData(),
+        ];
+    }
+
+    /**
+     * @param string $formsValPath
+     *
+     * @return array
+     */
+    private function serializeFormValidationRules(string $formsValPath): array
+    {
+        $serializer = new FormRulesSerializer(new BlockSerializer());
+
+        foreach ($this->selectClasses($formsValPath, FormRulesInterface::class) as $rulesClass) {
+            $serializer->addRulesFromClass($rulesClass);
+        }
+
+        return $serializer->getData();
+    }
+
+    // serialization above makes some assumptions about format of returned data
+    // the methods below help to deal with the data encapsulation
+
+    /**
+     * @param array $fluteSettings
+     *
+     * @return array
+     */
+    public static function getJsonDataSerializedRules(array $fluteSettings): array
+    {
+        $serializedRulesKey = static::KEY_JSON_VALIDATION_RULE_SETS_DATA;
+        $dataSubKey         = static::JSON_API_DATA_VALIDATION_RULES_SERIALIZED;
+
+        return $fluteSettings[$serializedRulesKey][$dataSubKey];
+    }
+
+    /**
+     * @param array $fluteSettings
+     *
+     * @return array
+     */
+    public static function getJsonQuerySerializedRules(array $fluteSettings): array
+    {
+        $serializedRulesKey = static::KEY_JSON_VALIDATION_RULE_SETS_DATA;
+        $dataSubKey         = static::JSON_API_QUERIES_VALIDATION_RULES_SERIALIZED;
+
+        return $fluteSettings[$serializedRulesKey][$dataSubKey];
+    }
+
+    /**
+     * @param array $fluteSettings
+     *
+     * @return array
+     */
+    public static function getFormSerializedRules(array $fluteSettings): array
+    {
+        return $fluteSettings[static::KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA];
     }
 }

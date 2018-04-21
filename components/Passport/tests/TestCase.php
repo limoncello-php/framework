@@ -22,8 +22,8 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Dotenv\Dotenv;
 use Exception;
-use Limoncello\Passport\Contracts\Entities\DatabaseSchemeInterface;
-use Limoncello\Passport\Entities\DatabaseScheme;
+use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
+use Limoncello\Passport\Entities\DatabaseSchema;
 use Limoncello\Tests\Passport\Data\User;
 use Mockery;
 use Monolog\Handler\StreamHandler;
@@ -53,19 +53,19 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @param Connection              $connection
-     * @param DatabaseSchemeInterface $scheme
+     * @param DatabaseSchemaInterface $schema
      *
      * @return void
      */
-    abstract protected function createDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme): void;
+    abstract protected function createDatabaseSchema(Connection $connection, DatabaseSchemaInterface $schema): void;
 
     /**
      * @param Connection              $connection
-     * @param DatabaseSchemeInterface $scheme
+     * @param DatabaseSchemaInterface $schema
      *
      * @return void
      */
-    abstract protected function removeDatabaseScheme(Connection $connection, DatabaseSchemeInterface $scheme): void;
+    abstract protected function removeDatabaseSchema(Connection $connection, DatabaseSchemaInterface $schema): void;
 
     /**
      * DBAL option.
@@ -78,9 +78,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     private $connection = null;
 
     /**
-     * @var DatabaseSchemeInterface|null
+     * @var DatabaseSchemaInterface|null
      */
-    private $databaseScheme = null;
+    private $databaseSchema = null;
 
     /**
      * @inheritdoc
@@ -99,12 +99,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     protected function tearDown()
     {
         parent::tearDown();
-        if ($this->getConnection() !== null && $this->getDatabaseScheme() !== null) {
-            $this->removeDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
+        if ($this->getConnection() !== null && $this->getDatabaseSchema() !== null) {
+            $this->removeDatabaseSchema($this->getConnection(), $this->getDatabaseSchema());
             $this->getConnection()->rollBack();
             $this->getConnection()->close();
             $this->connection     = null;
-            $this->databaseScheme = null;
+            $this->databaseSchema = null;
         }
 
         Mockery::close();
@@ -121,7 +121,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function initMySqlDatabase()
     {
-        $this->setDatabaseScheme(new DatabaseScheme(User::TABLE_NAME, User::FIELD_ID));
+        $this->setDatabaseSchema(new DatabaseSchema(User::TABLE_NAME, User::FIELD_ID));
 
         $this->setConnection($this->createMySqlDatabaseConnection());
         $this->getConnection()->beginTransaction();
@@ -133,7 +133,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $table->setPrimaryKey([User::FIELD_ID]);
         $this->getConnection()->getSchemaManager()->dropAndCreateTable($table);
 
-        $this->createDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
+        $this->createDatabaseSchema($this->getConnection(), $this->getDatabaseSchema());
 
         $this->getConnection()->insert(User::TABLE_NAME, [
             User::FIELD_NAME => 'John Dow',
@@ -147,26 +147,26 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function initSqliteDatabase()
     {
-        $this->setDatabaseScheme($scheme = new DatabaseScheme(User::TABLE_NAME, User::FIELD_ID));
+        $this->setDatabaseSchema($schema = new DatabaseSchema(User::TABLE_NAME, User::FIELD_ID));
 
         $this->setConnection($this->createSqliteDatabaseConnection());
         $this->getConnection()->beginTransaction();
 
         $manager = $this->getConnection()->getSchemaManager();
 
-        $table = new Table($scheme->getUsersTable());
-        $table->addColumn($scheme->getUsersIdentityColumn(), Type::INTEGER)->setNotnull(true);
+        $table = new Table($schema->getUsersTable());
+        $table->addColumn($schema->getUsersIdentityColumn(), Type::INTEGER)->setNotnull(true);
         $table->addColumn(self::USERS_COLUMN_NAME, Type::STRING)->setNotnull(false);
-        $table->setPrimaryKey([$scheme->getUsersIdentityColumn()]);
+        $table->setPrimaryKey([$schema->getUsersIdentityColumn()]);
 
         $manager->dropAndCreateTable($table);
 
-        $this->getConnection()->insert($scheme->getUsersTable(), [
-            $scheme->getUsersIdentityColumn()     => PassportServerTest::TEST_USER_ID,
+        $this->getConnection()->insert($schema->getUsersTable(), [
+            $schema->getUsersIdentityColumn()     => PassportServerTest::TEST_USER_ID,
             PassportServerTest::USERS_COLUMN_NAME => PassportServerTest::TEST_USER_NAME,
         ]);
 
-        $this->createDatabaseScheme($this->getConnection(), $this->getDatabaseScheme());
+        $this->createDatabaseSchema($this->getConnection(), $this->getDatabaseSchema());
     }
 
     /**
@@ -204,21 +204,21 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return DatabaseSchemeInterface
+     * @return DatabaseSchemaInterface
      */
-    protected function getDatabaseScheme(): DatabaseSchemeInterface
+    protected function getDatabaseSchema(): DatabaseSchemaInterface
     {
-        return $this->databaseScheme;
+        return $this->databaseSchema;
     }
 
     /**
-     * @param DatabaseSchemeInterface $scheme
+     * @param DatabaseSchemaInterface $schema
      *
      * @return TestCase
      */
-    protected function setDatabaseScheme(DatabaseSchemeInterface $scheme): self
+    protected function setDatabaseSchema(DatabaseSchemaInterface $schema): self
     {
-        $this->databaseScheme = $scheme;
+        $this->databaseSchema = $schema;
 
         return $this;
     }

@@ -27,7 +27,7 @@ class Attribute implements AttributeInterface
     /**
      * @var string
      */
-    private $nameInScheme;
+    private $nameInSchema;
 
     /**
      * @var string
@@ -37,16 +37,16 @@ class Attribute implements AttributeInterface
     /**
      * @var SchemaInterface
      */
-    private $scheme;
+    private $schema;
 
     /**
-     * @param string          $nameInScheme
-     * @param SchemaInterface $scheme
+     * @param string          $nameInSchema
+     * @param SchemaInterface $schema
      */
-    public function __construct(string $nameInScheme, SchemaInterface $scheme)
+    public function __construct(string $nameInSchema, SchemaInterface $schema)
     {
-        $this->nameInScheme = $nameInScheme;
-        $this->scheme       = $scheme;
+        $this->nameInSchema = $nameInSchema;
+        $this->schema       = $schema;
 
         $this->nameInModel = null;
     }
@@ -54,17 +54,17 @@ class Attribute implements AttributeInterface
     /**
      * @return string
      */
-    public function getNameInScheme(): string
+    public function getNameInSchema(): string
     {
-        return $this->nameInScheme;
+        return $this->nameInSchema;
     }
 
     /**
      * @return SchemaInterface
      */
-    public function getScheme(): SchemaInterface
+    public function getSchema(): SchemaInterface
     {
-        return $this->scheme;
+        return $this->schema;
     }
 
     /**
@@ -73,7 +73,7 @@ class Attribute implements AttributeInterface
     public function getNameInModel():string
     {
         if ($this->nameInModel === null) {
-            $this->nameInModel = $this->getScheme()->getAttributeMapping($this->getNameInScheme());
+            $this->nameInModel = $this->getSchema()->getAttributeMapping($this->getNameInSchema());
         }
 
         return $this->nameInModel;

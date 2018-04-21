@@ -26,6 +26,7 @@ use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
+use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Sapi;
 use Limoncello\Core\Reflection\ClassIsTrait;
@@ -120,6 +121,7 @@ class Application extends \Limoncello\Core\Application\Application
         $settingsProvider = $this->getCacheSettingsProvider();
         $container->offsetSet(SettingsProviderInterface::class, $settingsProvider);
         $container->offsetSet(CacheSettingsProviderInterface::class, $settingsProvider);
+        $container->offsetSet(RouterInterface::class, $this->getRouter());
 
         return $container;
     }
