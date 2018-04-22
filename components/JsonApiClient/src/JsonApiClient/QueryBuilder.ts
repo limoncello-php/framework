@@ -61,7 +61,7 @@ export class QueryBuilder implements QueryBuilderInterface {
     private isEncodeUriEnabled: boolean;
 
     constructor(type: ResourceType) {
-        this.enableEncodeUri();
+        this.isEncodeUriEnabled = true;
         this.type = type;
     }
 
@@ -116,17 +116,21 @@ export class QueryBuilder implements QueryBuilderInterface {
         return this;
     }
 
+    public isUriEncodingEnabled(): boolean {
+        return this.isEncodeUriEnabled;
+    }
+
     public read(index: ResourceIdentity, relationship?: RelationshipName): string {
         const relationshipTail = relationship === undefined ? `/${index}` : `/${index}/${relationship}`;
         const result = `/${this.type}${relationshipTail}${this.buildParameters(false)}`;
 
-        return this.isEncodeUriEnabled === true ? encodeURI(result) : result;
+        return this.isUriEncodingEnabled() === true ? encodeURI(result) : result;
     }
 
     public index(): string {
         const result = `/${this.type}${this.buildParameters(true)}`;
 
-        return this.isEncodeUriEnabled === true ? encodeURI(result) : result;
+        return this.isUriEncodingEnabled() === true ? encodeURI(result) : result;
     }
 
     /**
@@ -140,12 +144,10 @@ export class QueryBuilder implements QueryBuilderInterface {
         if (this.fields !== undefined && this.fields.length > 0) {
             let fieldsResult = '';
             for (let field of this.fields) {
-                const curResult = `fields[${field.type}]=${this.separateByComma(field.fields)}`;
+                const curResult = `fields[${field.type}]=${QueryBuilder.separateByComma(field.fields)}`;
                 fieldsResult = fieldsResult.length === 0 ? curResult : `${fieldsResult}&${curResult}`;
             }
-            if (fieldsResult.length > 0) {
-                params = fieldsResult;
-            }
+            params = fieldsResult;
         }
 
         // add filter parameters to get URL like 'filter[id][greater-than]=10&filter[id][less-than]=20&filter[title][like]=%Typ%'
@@ -156,12 +158,10 @@ export class QueryBuilder implements QueryBuilderInterface {
                 const params = filter.parameters;
                 const curResult = params === undefined ?
                     `filter[${filter.field}][${filter.operation}]` :
-                    `filter[${filter.field}][${filter.operation}]=${this.separateByComma(params)}`;
+                    `filter[${filter.field}][${filter.operation}]=${QueryBuilder.separateByComma(params)}`;
                 filtersResult = filtersResult.length === 0 ? curResult : `${filtersResult}&${curResult}`;
             }
-            if (filtersResult.length > 0) {
-                params = params === null ? filtersResult : `${params}&${filtersResult}`;
-            }
+            params = params === null ? filtersResult : `${params}&${filtersResult}`;
         }
 
         // add sorts to get URL like '/articles?sort=-created,title'
@@ -179,7 +179,7 @@ export class QueryBuilder implements QueryBuilderInterface {
         // add includes to get URL like '/articles/1?include=author,comments.author'
         // see http://jsonapi.org/format/#fetching-includes
         if (isIncludeNonFields === true && this.includes !== undefined && this.includes.length > 0) {
-            const includesResult = `include=${this.separateByComma(this.includes)}`;
+            const includesResult = `include=${QueryBuilder.separateByComma(this.includes)}`;
             params = params === null ? includesResult : `${params}&${includesResult}`;
         }
 
@@ -190,15 +190,13 @@ export class QueryBuilder implements QueryBuilderInterface {
             params = params === null ? paginationResult : `${params}&${paginationResult}`;
         }
 
-        const result = params === null ? '' : `?${params}`;
-
-        return result;
+        return params === null ? '' : `?${params}`;
     }
 
     /**
      * @internal
      */
-    private separateByComma(values: string | string[]): string {
+    private static separateByComma(values: string | string[]): string {
         return Array.isArray(values) === true ? (<string[]>values).join(',') : `${<string>values}`;
     }
 }

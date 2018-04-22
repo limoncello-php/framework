@@ -35,6 +35,8 @@ export interface QueryBuilderInterface {
 
     disableEncodeUri(): QueryBuilderInterface;
 
+    isUriEncodingEnabled(): boolean;
+
     read(index: ResourceIdentity, relationship?: RelationshipName): string;
 
     index(): string;

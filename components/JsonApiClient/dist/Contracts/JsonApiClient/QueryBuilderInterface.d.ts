@@ -26,6 +26,7 @@ export interface QueryBuilderInterface {
     withPagination(offset: number, limit: number): QueryBuilderInterface;
     enableEncodeUri(): QueryBuilderInterface;
     disableEncodeUri(): QueryBuilderInterface;
+    isUriEncodingEnabled(): boolean;
     read(index: ResourceIdentity, relationship?: RelationshipName): string;
     index(): string;
 }

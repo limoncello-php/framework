@@ -1,23 +1,43 @@
 import 'mocha';
 import { expect } from 'chai';
-import { QueryBuilder } from './../src';
-import { FieldParameterInterface } from '../src/Contracts/JsonApiClient/FieldParameterInterface';
+import { QueryBuilder } from '../src';
 
 describe('Query builder', () => {
+    it('should provide a switch to enable/disable URI encoding', () => {
+        const builder = new QueryBuilder('comments');
+
+        builder.enableEncodeUri();
+        expect(builder.isUriEncodingEnabled()).to.equal(true);
+
+        builder.disableEncodeUri();
+        expect(builder.isUriEncodingEnabled()).to.equal(false);
+    });
+
     it('should build index URLs without any extra parameters', () => {
         const builder = new QueryBuilder('comments');
 
         expect(builder.index()).to.equal(encodeURI('/comments'));
-    })
+    });
 
-    it('should build read URLs without any extra parameters', () => {
+    it('should build read URLs without any extra parameters (encoding on)', () => {
         const builder = new QueryBuilder('comments');
+
+        expect(builder.isUriEncodingEnabled()).to.equal(true);
 
         const expectedUrl = encodeURI('/comments/123');
         const actualUrl = builder.read('123');
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
+
+    it('should build read URLs without any extra parameters (encoding off)', () => {
+        const builder = new QueryBuilder('comments');
+
+        const expectedUrl = encodeURI('/comments/123');
+        const actualUrl = builder.disableEncodeUri().read('123');
+
+        expect(actualUrl).to.equal(expectedUrl);
+    });
 
     it('should build read URLs without any extra parameters for a given relationship', () => {
         const builder = new QueryBuilder('comments');
@@ -26,7 +46,7 @@ describe('Query builder', () => {
         const actualUrl = builder.read('123', 'post');
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with one fields parameter', () => {
         const builder = new QueryBuilder('comments');
@@ -40,7 +60,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with many fields parameters', () => {
         const builder = new QueryBuilder('comments');
@@ -57,7 +77,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with many filter parameters', () => {
         const builder = new QueryBuilder('comments');
@@ -84,7 +104,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with one sorting parameter', () => {
         const builder = new QueryBuilder('comments');
@@ -98,7 +118,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with many sorting parameters', () => {
         const builder = new QueryBuilder('comments');
@@ -115,7 +135,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with one include parameter', () => {
         const builder = new QueryBuilder('comments');
@@ -126,7 +146,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with many include parameters', () => {
         const builder = new QueryBuilder('comments');
@@ -137,7 +157,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with pagination parameters', () => {
         const builder = new QueryBuilder('comments');
@@ -148,7 +168,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs for zero offset pagination parameter', () => {
         const builder = new QueryBuilder('comments');
@@ -159,7 +179,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should ignore pagination parameters if offset is invalid', () => {
         const builder = new QueryBuilder('comments');
@@ -170,7 +190,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should ignore pagination parameters if limit is invalid', () => {
         const builder = new QueryBuilder('comments');
@@ -181,7 +201,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with field, filter, sort, include and pagination parameters', () => {
         const builder = new QueryBuilder('comments');
@@ -206,7 +226,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should build index URLs with empty field, filter, sort and include parameters', () => {
         const builder = new QueryBuilder('comments');
@@ -220,7 +240,7 @@ describe('Query builder', () => {
             .index();
 
         expect(actualUrl).to.equal(expectedUrl);
-    })
+    });
 
     it('should ignore filter, sort, include and pagination but not field parameters for read method', () => {
         const builder = new QueryBuilder('comments');
@@ -246,4 +266,4 @@ describe('Query builder', () => {
 
         expect(actualUrl).to.equal(expectedUrl);
     })
-})
+});
