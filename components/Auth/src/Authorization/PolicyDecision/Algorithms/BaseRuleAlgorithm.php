@@ -136,18 +136,12 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
 
         /** @see http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html #7.11 (table 4) */
 
-        $ruleEffect = Encoder::ruleEffect($encodedRule);
-        try {
-            $isPermit = static::evaluateLogical($context, $ruleEffect);
-        } catch (RuntimeException $exception) {
-            $isPermit = false;
-        }
-        unset($ruleEffect);
-
         if ($match === TargetMatchEnum::INDETERMINATE) {
+            $isPermit   = static::evaluateIsPermit($context, $encodedRule);
             $evaluation = $isPermit === true ?
                 EvaluationEnum::INDETERMINATE_PERMIT : EvaluationEnum::INDETERMINATE_DENY;
         } elseif ($match === TargetMatchEnum::NO_TARGET || $match === TargetMatchEnum::MATCH) {
+            $isPermit = static::evaluateIsPermit($context, $encodedRule);
             try {
                 $condition = Encoder::ruleCondition($encodedRule);
                 if (static::evaluateLogical($context, $condition) === false) {
@@ -174,6 +168,25 @@ abstract class BaseRuleAlgorithm extends BaseAlgorithm implements RuleCombiningA
             Encoder::getFulfillObligations($evaluation, Encoder::ruleObligations($encodedRule)),
             Encoder::getAppliedAdvice($evaluation, Encoder::ruleAdvice($encodedRule))
         );
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param array            $encodedRule
+     *
+     * @return bool
+     */
+    private static function evaluateIsPermit(ContextInterface $context, array $encodedRule): bool
+    {
+        $ruleEffect = Encoder::ruleEffect($encodedRule);
+
+        try {
+            $isPermit = static::evaluateLogical($context, $ruleEffect);
+        } catch (RuntimeException $exception) {
+            $isPermit = false;
+        }
+
+        return $isPermit;
     }
 
     /**
