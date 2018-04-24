@@ -1,7 +1,8 @@
 <?php namespace App\Validation\{%SINGULAR_CC%};
 
+use App\Api\{%PLURAL_LC%}Api;
 use App\Data\Models\{%SINGULAR_CC%} as Model;
-use App\Json\Schemas\{%SINGULAR_CC%}Schema as Schema;
+use App\Json\Schemas\{%SINGULAR_CC%}Schema;
 use App\Validation\BaseRules;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 
@@ -13,41 +14,51 @@ use Limoncello\Validation\Contracts\Rules\RuleInterface;
 final class {%SINGULAR_CC%}Rules extends BaseRules
 {
     /**
+     * @param RuleInterface|null $next
+     *
      * @return RuleInterface
      */
-    public static function {%SINGULAR_LC%}Type(): RuleInterface
+    public static function {%SINGULAR_LC%}Type(RuleInterface $next = null): RuleInterface
     {
-        return self::equals(Schema::TYPE);
-    }
-
-    /**
-     * @return RuleInterface
-     */
-    public static function {%SINGULAR_LC%}Id(): RuleInterface
-    {
-        return self::stringToInt(self::exists(Model::TABLE_NAME, Model::FIELD_ID));
+        return self::equals({%SINGULAR_CC%}Schema::TYPE);
     }
 
     /**
      * NOTE: It recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
      *
+     * @param RuleInterface|null $next
+     *
      * @return RuleInterface
      */
-    public static function {%SINGULAR_LC%}Relationship(): RuleInterface
+    public static function {%SINGULAR_LC%}Id(RuleInterface $next = null): RuleInterface
     {
-        return self::toOneRelationship(Schema::TYPE, static::{%SINGULAR_LC%}Id());
+        return self::stringToInt(self::readable({%PLURAL_LC%}Api::class, $next));
     }
 
     /**
      * NOTE: It recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
      *
+     * @param RuleInterface|null $next
+     *
      * @return RuleInterface
      */
-    public static function {%PLURAL_LC%}Relationship(): RuleInterface
+    public static function {%SINGULAR_LC%}Relationship(RuleInterface $next = null): RuleInterface
     {
-        $readableAll = static::stringArrayToIntArray(static::existAll(Model::TABLE_NAME, Model::FIELD_ID));
+        return self::toOneRelationship({%SINGULAR_CC%}Schema::TYPE, self::{%SINGULAR_LC%}Id($next));
+    }
 
-        return self::toManyRelationship(Schema::TYPE, $readableAll);
+    /**
+     * NOTE: It recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
+     *
+     * @param RuleInterface|null $next
+     *
+     * @return RuleInterface
+     */
+    public static function {%PLURAL_LC%}Relationship(RuleInterface $next = null): RuleInterface
+    {
+        $readableAll = self::stringArrayToIntArray(self::readableAll({%PLURAL_LC%}Api::class, $next));
+
+        return self::toManyRelationship({%SINGULAR_CC%}Schema::TYPE, $readableAll);
     }
 
     /**

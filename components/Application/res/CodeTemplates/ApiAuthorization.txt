@@ -100,9 +100,9 @@ class {%SINGULAR_CC%}Rules implements ResourceAuthorizationRulesInterface
 //     * @throws ContainerExceptionInterface
 //     * @throws NotFoundExceptionInterface
 //     */
-//    private static function isCurrentUser{%SINGULAR_CC%}Author(ContextInterface $context): bool
+//    private static function canCurrentUserChange{%SINGULAR_CC%}(ContextInterface $context): bool
 //    {
-//        $isAuthor = false;
+//        $canChange = false;
 //
 //        if (($userId = self::getCurrentUserIdentity($context)) !== null) {
 //            $userId = (int)$userId;
@@ -112,9 +112,9 @@ class {%SINGULAR_CC%}Rules implements ResourceAuthorizationRulesInterface
 //            $factory   = $container->get(FactoryInterface::class);
 //            ${%SINGULAR_LC%}Id    = self::reqGetResourceIdentity($context);
 //            ${%SINGULAR_LC%}      = $factory->createApi({%PLURAL_CC%}Api::class)->read(${%SINGULAR_LC%}Id);
-//            $isAuthor  = ${%SINGULAR_LC%} !== null && ${%SINGULAR_LC%}->{{%SINGULAR_CC%}::FIELD_ID_USER} === $userId;
+//            $canChange = ${%SINGULAR_LC%} === null || ${%SINGULAR_LC%}->{{%SINGULAR_CC%}::FIELD_ID_USER} === $userId;
 //        }
 //
-//        return $isAuthor;
+//        return $canChange;
 //    }
 }

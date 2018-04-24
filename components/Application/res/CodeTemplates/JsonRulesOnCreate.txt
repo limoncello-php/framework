@@ -44,6 +44,7 @@ final class {%SINGULAR_CC%}CreateJson implements JsonApiDataRulesInterface
      */
     public static function getToOneRelationshipRules(): array
     {
+        // if relationships validation is needed uncomment and setup rules below
         return [
 //            Schema::REL_OTHER => r::otherRelationship(),
         ];
@@ -54,8 +55,9 @@ final class {%SINGULAR_CC%}CreateJson implements JsonApiDataRulesInterface
      */
     public static function getToManyRelationshipRules(): array
     {
+        // if relationships validation is needed uncomment and setup rules below
         return [
-//            Schema::REL_OTHERS => r::toManyRelationship(OtherSchema::TYPE, r::othersRelationship()),
+//            Schema::REL_OTHERS => r::othersRelationship(),
         ];
     }
 }
