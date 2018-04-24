@@ -898,6 +898,21 @@ class CrudTest extends TestCase
      * @throws Exception
      * @throws DBALException
      */
+    public function testReadRows(): void
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        $ids = $crud->withIndexesFilter([1, 2])->indexIdentities();
+
+        $this->assertEquals([1, 2], $ids);
+    }
+
+    /**
+     * Test read typed row.
+     *
+     * @throws Exception
+     * @throws DBALException
+     */
     public function testReadUntypedRow(): void
     {
         /** @var Crud $crud */

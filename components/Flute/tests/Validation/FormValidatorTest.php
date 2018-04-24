@@ -16,18 +16,27 @@
  * limitations under the License.
  */
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Exception;
 use Generator;
+use Limoncello\Container\Container;
+use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
+use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy;
+use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
+use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
+use Limoncello\Flute\Factory;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\Form\Execution\FormRulesSerializer;
 use Limoncello\Flute\Validation\Form\FormValidator;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Validation\Forms\CreateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\Forms\UpdateCommentRules;
+use Limoncello\Tests\Flute\TestCase;
 use Limoncello\Validation\Execution\BlockSerializer;
 use Limoncello\Validation\Execution\ContextStorage;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Application
@@ -66,6 +75,31 @@ class FormValidatorTest extends TestCase
     }
 
     /**
+     * @return void
+     *
+     * @throws DBALException
+     * @throws Exception
+     */
+    public function testReadableValidationRules(): void
+    {
+        $this->assertNotNull($validator = $this->createValidator(UpdateCommentRules::class));
+
+        $this->assertTrue($validator->validate([Comment::REL_POST => '1']));
+        $this->assertFalse($validator->validate([Comment::REL_POST => '-1']));
+        $this->assertEquals(
+            [Comment::REL_POST => 'The value should be a valid identifier.'],
+            $this->iterableToArray($validator->getMessages())
+        );
+
+        $this->assertTrue($validator->validate([Comment::REL_EMOTIONS => ['1', '2']]));
+        $this->assertFalse($validator->validate([Comment::REL_EMOTIONS => ['1', '-2']]));
+        $this->assertEquals(
+            [Comment::REL_EMOTIONS => 'The value should be valid identifiers.'],
+            $this->iterableToArray($validator->getMessages())
+        );
+    }
+
+    /**
      * @param iterable $iterable
      *
      * @return array
@@ -79,13 +113,21 @@ class FormValidatorTest extends TestCase
      * @param string $rulesClass
      *
      * @return FormValidatorInterface
+     *
+     * @throws Exception
+     * @throws DBALException
      */
     private function createValidator(string $rulesClass): FormValidatorInterface
     {
         $serializer = new FormRulesSerializer(new BlockSerializer());
         $serializer->addRulesFromClass($rulesClass);
 
-        $container = null;
+        $container                                                 = new Container();
+        $container[FactoryInterface::class]                        = new Factory($container);
+        $container[Connection::class]                              = $this->initDb();
+        $container[ModelSchemaInfoInterface::class]                = $this->getModelSchemas();
+        $container[RelationshipPaginationStrategyInterface::class] = new BasicRelationshipPaginationStrategy(30);
+
         $validator = new FormValidator(
             $rulesClass,
             FormRulesSerializer::class,

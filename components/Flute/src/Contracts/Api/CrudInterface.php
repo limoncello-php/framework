@@ -50,6 +50,13 @@ interface CrudInterface
     public function withIndexFilter($index): self;
 
     /**
+     * @param array $indexes
+     *
+     * @return self
+     */
+    public function withIndexesFilter(array $indexes): self;
+
+    /**
      * @param iterable $sortingParameters
      *
      * @return self

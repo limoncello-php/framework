@@ -259,6 +259,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     {
         return [
             Data\Validation\Forms\CreateCommentRules::class,
+            Data\Validation\Forms\UpdateCommentRules::class,
         ];
     }
 

@@ -17,16 +17,13 @@
  */
 
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Flute
  */
-final class ToOneRelationshipTypeChecker extends BaseRule
+final class ToOneRelationshipTypeCheckerRule extends ExecuteRule
 {
     /**
      * Property key.
@@ -34,25 +31,13 @@ final class ToOneRelationshipTypeChecker extends BaseRule
     const PROPERTY_RESOURCE_TYPE = self::PROPERTY_LAST + 1;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * @param string $type
      */
     public function __construct(string $type)
     {
-        $this->type = $type;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))
-            ->setProperties($this->getStandardProperties() + [self::PROPERTY_RESOURCE_TYPE => $this->getType()]);
+        parent::__construct([
+            static::PROPERTY_RESOURCE_TYPE => $type,
+        ]);
     }
 
     /**
@@ -68,26 +53,18 @@ final class ToOneRelationshipTypeChecker extends BaseRule
         // parser guarantees that input will be either null or an [$type => $id] where type and id are scalars
 
         if ($value === null) {
-            return BlockReplies::createSuccessReply($value);
+            return static::createSuccessReply($value);
         }
 
         assert(is_array($value) === true && count($value) === 1);
         $index = reset($value);
         $type  = key($value);
         assert(is_scalar($index) === true && is_scalar($type) === true);
-        $expectedType = $context->getProperties()->getProperty(self::PROPERTY_RESOURCE_TYPE);
-        $reply = $type === $expectedType ?
-            BlockReplies::createSuccessReply($index) :
-            BlockReplies::createErrorReply($context, $type, ErrorCodes::INVALID_RELATIONSHIP_TYPE);
+        $expectedType = $context->getProperties()->getProperty(static::PROPERTY_RESOURCE_TYPE);
+        $reply        = $type === $expectedType ?
+            static::createSuccessReply($index) :
+            static::createErrorReply($context, $type, ErrorCodes::INVALID_RELATIONSHIP_TYPE);
 
         return $reply;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
     }
 }

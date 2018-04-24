@@ -18,18 +18,15 @@
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Flute
  */
-final class ExistInDbTableSingleWithDoctrine extends BaseRule
+final class ExistInDbTableSingleWithDoctrineRule extends ExecuteRule
 {
     /**
      * Property key.
@@ -42,37 +39,15 @@ final class ExistInDbTableSingleWithDoctrine extends BaseRule
     const PROPERTY_PRIMARY_NAME = self::PROPERTY_TABLE_NAME + 1;
 
     /**
-     * @var string
-     */
-    private $tableName;
-
-    /**
-     * @var string
-     */
-    private $primaryName;
-
-    /**
      * @param string $tableName
      * @param string $primaryName
      */
     public function __construct(string $tableName, string $primaryName)
     {
-        $this->tableName   = $tableName;
-        $this->primaryName = $primaryName;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        $customProperties = [
-            self::PROPERTY_TABLE_NAME   => $this->getTableName(),
-            self::PROPERTY_PRIMARY_NAME => $this->getPrimaryName(),
-        ];
-
-        return (new ProcedureBlock([self::class, 'execute']))
-            ->setProperties($this->getStandardProperties() + $customProperties);
+        parent::__construct([
+            static::PROPERTY_TABLE_NAME   => $tableName,
+            static::PROPERTY_PRIMARY_NAME => $primaryName,
+        ]);
     }
 
     /**
@@ -91,13 +66,13 @@ final class ExistInDbTableSingleWithDoctrine extends BaseRule
         $count = 0;
 
         if (is_scalar($value) === true) {
-            $tableName   = $context->getProperties()->getProperty(self::PROPERTY_TABLE_NAME);
-            $primaryName = $context->getProperties()->getProperty(self::PROPERTY_PRIMARY_NAME);
+            $tableName   = $context->getProperties()->getProperty(static::PROPERTY_TABLE_NAME);
+            $primaryName = $context->getProperties()->getProperty(static::PROPERTY_PRIMARY_NAME);
 
             /** @var Connection $connection */
-            $connection  = $context->getContainer()->get(Connection::class);
-            $builder     = $connection->createQueryBuilder();
-            $statement   = $builder
+            $connection = $context->getContainer()->get(Connection::class);
+            $builder    = $connection->createQueryBuilder();
+            $statement  = $builder
                 ->select('count(*)')
                 ->from($tableName)
                 ->where($builder->expr()->eq($primaryName, $builder->createPositionalParameter($value)))
@@ -107,25 +82,9 @@ final class ExistInDbTableSingleWithDoctrine extends BaseRule
         }
 
         $reply = $count > 0 ?
-            BlockReplies::createSuccessReply($value) :
-            BlockReplies::createErrorReply($context, $value, ErrorCodes::EXIST_IN_DATABASE_SINGLE);
+            static::createSuccessReply($value) :
+            static::createErrorReply($context, $value, ErrorCodes::EXIST_IN_DATABASE_SINGLE);
 
         return $reply;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableName(): string
-    {
-        return $this->tableName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrimaryName(): string
-    {
-        return $this->primaryName;
     }
 }

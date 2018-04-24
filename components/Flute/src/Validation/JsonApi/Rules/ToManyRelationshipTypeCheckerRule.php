@@ -17,16 +17,13 @@
  */
 
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
-use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
-use Limoncello\Validation\Execution\BlockReplies;
-use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
  * @package Limoncello\Flute
  */
-final class ToManyRelationshipTypeChecker extends BaseRule
+final class ToManyRelationshipTypeCheckerRule extends ExecuteRule
 {
     /**
      * Property key.
@@ -34,25 +31,13 @@ final class ToManyRelationshipTypeChecker extends BaseRule
     const PROPERTY_RESOURCE_TYPE = self::PROPERTY_LAST + 1;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * @param string $type
      */
     public function __construct(string $type)
     {
-        $this->type = $type;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toBlock(): ExecutionBlockInterface
-    {
-        return (new ProcedureBlock([self::class, 'execute']))
-            ->setProperties($this->getStandardProperties() + [self::PROPERTY_RESOURCE_TYPE => $this->getType()]);
+        parent::__construct([
+            static::PROPERTY_RESOURCE_TYPE => $type,
+        ]);
     }
 
     /**
@@ -71,7 +56,7 @@ final class ToManyRelationshipTypeChecker extends BaseRule
         // we will check the type of every pair and send further identities only
         $indexes          = [];
         $foundInvalidType = null;
-        $expectedType     = $context->getProperties()->getProperty(self::PROPERTY_RESOURCE_TYPE);
+        $expectedType     = $context->getProperties()->getProperty(static::PROPERTY_RESOURCE_TYPE);
         foreach ($value as $typeAndId) {
             assert(is_array($typeAndId) === true && count($typeAndId) === 1);
             $index = reset($typeAndId);
@@ -86,17 +71,9 @@ final class ToManyRelationshipTypeChecker extends BaseRule
         }
 
         $reply = $foundInvalidType === null ?
-            BlockReplies::createSuccessReply($indexes) :
-            BlockReplies::createErrorReply($context, $foundInvalidType, ErrorCodes::INVALID_RELATIONSHIP_TYPE);
+            static::createSuccessReply($indexes) :
+            static::createErrorReply($context, $foundInvalidType, ErrorCodes::INVALID_RELATIONSHIP_TYPE);
 
         return $reply;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
     }
 }

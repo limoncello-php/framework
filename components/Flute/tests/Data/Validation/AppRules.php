@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Validation\JsonApi\Rules\ExistInDatabaseTrait;
-use Limoncello\Flute\Validation\JsonApi\Rules\RelationshipsTrait;
+use Limoncello\Flute\Validation\Rules\ApiRulesTrait;
+use Limoncello\Flute\Validation\Rules\DatabaseRulesTrait;
+use Limoncello\Flute\Validation\Rules\RelationshipRulesTrait;
+use Limoncello\Tests\Flute\Data\Api\PostsApi;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
@@ -30,12 +32,12 @@ use Limoncello\Validation\Rules;
  */
 class AppRules extends Rules
 {
-    use RelationshipsTrait, ExistInDatabaseTrait;
+    use RelationshipRulesTrait, DatabaseRulesTrait, ApiRulesTrait;
 
     /**
      * @return RuleInterface
      */
-    public static function postId()
+    public static function postId(): RuleInterface
     {
         return static::stringToInt(static::exists(Post::TABLE_NAME, Post::FIELD_ID));
     }
@@ -43,7 +45,15 @@ class AppRules extends Rules
     /**
      * @return RuleInterface
      */
-    public static function commentId()
+    public static function readablePost(): RuleInterface
+    {
+        return static::stringToInt(static::readable(PostsApi::class));
+    }
+
+    /**
+     * @return RuleInterface
+     */
+    public static function commentId(): RuleInterface
     {
         return static::stringToInt(static::exists(Comment::TABLE_NAME, Comment::FIELD_ID));
     }
@@ -51,7 +61,7 @@ class AppRules extends Rules
     /**
      * @return RuleInterface
      */
-    public static function categoryId()
+    public static function categoryId(): RuleInterface
     {
         return static::stringToInt(static::exists(Category::TABLE_NAME, Category::FIELD_ID));
     }
@@ -59,7 +69,7 @@ class AppRules extends Rules
     /**
      * @return RuleInterface
      */
-    public static function emotionId()
+    public static function emotionId(): RuleInterface
     {
         return static::stringToInt(static::exists(Emotion::TABLE_NAME, Emotion::FIELD_ID));
     }
@@ -67,15 +77,25 @@ class AppRules extends Rules
     /**
      * @return RuleInterface
      */
-    public static function emotionIds()
+    public static function emotionIds(): RuleInterface
     {
-        return static::existAll(Emotion::TABLE_NAME, Emotion::FIELD_ID);
+        return static::stringArrayToIntArray(
+            static::existAll(Emotion::TABLE_NAME, Emotion::FIELD_ID)
+        );
     }
 
     /**
      * @return RuleInterface
      */
-    public static function userIdWithoutCheckInDatabase()
+    public static function readableEmotions(): RuleInterface
+    {
+        return static::stringArrayToIntArray(static::readableAll(PostsApi::class));
+    }
+
+    /**
+     * @return RuleInterface
+     */
+    public static function userIdWithoutCheckInDatabase(): RuleInterface
     {
         return static::stringToInt();
     }

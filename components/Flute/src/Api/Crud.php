@@ -205,6 +205,31 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
+    public function withIndexesFilter(array $indexes): CrudInterface
+    {
+        assert(call_user_func(function () use ($indexes) {
+            $allOk = true;
+
+            foreach ($indexes as $index) {
+                $allOk = ($allOk === true && (is_string($index) === true || is_int($index) === true));
+            }
+
+            return $allOk;
+        }) === true);
+
+        $pkName = $this->getModelSchemas()->getPrimaryKey($this->getModelClass());
+        $this->withFilters([
+            $pkName => [
+                FilterParameterInterface::OPERATION_IN => $indexes,
+            ],
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function withRelationshipFilters(string $name, iterable $filters): CrudInterface
     {
         assert($this->getModelSchemas()->hasRelationship($this->getModelClass(), $name) === true);

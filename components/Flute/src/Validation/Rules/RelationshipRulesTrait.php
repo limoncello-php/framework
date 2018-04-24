@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Flute\Validation\JsonApi\Rules;
+<?php namespace Limoncello\Flute\Validation\Rules;
 
 /**
  * Copyright 2015-2017 info@neomerx.com
@@ -16,37 +16,39 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Validation\JsonApi\Rules\ToManyRelationshipTypeCheckerRule;
+use Limoncello\Flute\Validation\JsonApi\Rules\ToOneRelationshipTypeCheckerRule;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Rules\Generic\AndOperator;
 
 /**
  * @package Limoncello\Flute
  */
-trait RelationshipsTrait
+trait RelationshipRulesTrait
 {
     /**
      * @param string             $type
-     * @param RuleInterface|null $rule
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    public static function toOneRelationship(string $type, RuleInterface $rule = null): RuleInterface
+    public static function toOneRelationship(string $type, RuleInterface $next = null): RuleInterface
     {
-        $primary = new ToOneRelationshipTypeChecker($type);
+        $primary = new ToOneRelationshipTypeCheckerRule($type);
 
-        return $rule === null ? $primary : new AndOperator($primary, $rule);
+        return $next === null ? $primary : new AndOperator($primary, $next);
     }
 
     /**
      * @param string             $type
-     * @param RuleInterface|null $rule
+     * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    public static function toManyRelationship(string $type, RuleInterface $rule = null): RuleInterface
+    public static function toManyRelationship(string $type, RuleInterface $next = null): RuleInterface
     {
-        $primary = new ToManyRelationshipTypeChecker($type);
+        $primary = new ToManyRelationshipTypeCheckerRule($type);
 
-        return $rule === null ? $primary : new AndOperator($primary, $rule);
+        return $next === null ? $primary : new AndOperator($primary, $next);
     }
 }

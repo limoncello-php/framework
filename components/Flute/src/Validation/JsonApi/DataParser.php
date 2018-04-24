@@ -24,7 +24,7 @@ use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
-use Limoncello\Flute\Validation\JsonApi\Rules\RelationshipsTrait;
+use Limoncello\Flute\Validation\Rules\RelationshipRulesTrait;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Execution\BlockInterpreter;
@@ -40,7 +40,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
  */
 class DataParser extends BaseValidator implements JsonApiDataValidatingParserInterface
 {
-    use RelationshipsTrait;
+    use RelationshipRulesTrait;
 
     /** Rule description index */
     const RULE_INDEX = 0;
