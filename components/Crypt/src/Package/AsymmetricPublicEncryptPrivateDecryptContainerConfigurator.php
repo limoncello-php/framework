@@ -32,6 +32,9 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
  */
 class AsymmetricPublicEncryptPrivateDecryptContainerConfigurator implements ContainerConfiguratorInterface
 {
+    /** @var callable */
+    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+
     /**
      * @inheritdoc
      */

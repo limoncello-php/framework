@@ -31,6 +31,9 @@ use Psr\Log\LoggerInterface;
  */
 class CorsContainerConfigurator implements ContainerConfiguratorInterface
 {
+    /** @var callable */
+    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+
     /**
      * @inheritdoc
      *

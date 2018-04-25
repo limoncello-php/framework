@@ -35,6 +35,9 @@ use Psr\Log\LoggerInterface;
 class FluteContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
+    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+
+    /** @var callable */
     const CONFIGURE_EXCEPTION_HANDLER = [self::class, 'configureExceptionHandler'];
 
     /**

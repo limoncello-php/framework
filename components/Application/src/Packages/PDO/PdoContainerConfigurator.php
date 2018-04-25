@@ -28,6 +28,9 @@ use Limoncello\Application\Packages\PDO\PdoSettings as C;
  */
 class PdoContainerConfigurator implements ContainerConfiguratorInterface
 {
+    /** @var callable */
+    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+
     /**
      * @inheritdoc
      */

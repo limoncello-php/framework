@@ -26,6 +26,9 @@ use Limoncello\Contracts\FileSystem\FileSystemInterface;
  */
 class FileSystemContainerConfigurator implements ContainerConfiguratorInterface
 {
+    /** @var callable */
+    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+
     /**
      * @inheritdoc
      */

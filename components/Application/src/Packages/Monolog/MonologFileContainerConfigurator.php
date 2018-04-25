@@ -38,6 +38,9 @@ use Psr\Log\LoggerInterface;
  */
 class MonologFileContainerConfigurator implements ContainerConfiguratorInterface
 {
+    /** @var callable */
+    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+
     /**
      * @inheritdoc
      */

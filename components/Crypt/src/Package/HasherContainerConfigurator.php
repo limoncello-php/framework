@@ -29,6 +29,9 @@ use Limoncello\Crypt\Package\HasherSettings as C;
  */
 class HasherContainerConfigurator implements ContainerConfiguratorInterface
 {
+    /** @var callable */
+    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+
     /**
      * @inheritdoc
      */
