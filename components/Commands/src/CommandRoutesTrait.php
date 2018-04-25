@@ -31,14 +31,14 @@ trait CommandRoutesTrait
     /**
      * @param GroupInterface $group
      * @param string         $commandName
-     * @param callable       $configurator
+     * @param callable[]     $configurators
      *
      * @return GroupInterface
      */
     protected static function commandContainer(
         GroupInterface $group,
         string $commandName,
-        callable $configurator
+        ...$configurators
     ): GroupInterface {
         return $group->method(
             CommandConstants::HTTP_METHOD,
@@ -46,7 +46,7 @@ trait CommandRoutesTrait
             [static::class, 'handlerStub'],
             [
                 RouteInterface::PARAM_REQUEST_FACTORY         => null,
-                RouteInterface::PARAM_CONTAINER_CONFIGURATORS => [$configurator],
+                RouteInterface::PARAM_CONTAINER_CONFIGURATORS => $configurators,
             ]
         );
     }
