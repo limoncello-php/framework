@@ -17,7 +17,6 @@
  */
 
 use Closure;
-use Iterator;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
@@ -32,7 +31,15 @@ use Limoncello\Core\Routing\Traits\UriTrait;
  */
 abstract class BaseGroup implements GroupInterface
 {
-    use CallableTrait, UriTrait, HasConfiguratorsTrait, HasMiddlewareTrait, HasRequestFactoryTrait, CheckCallableTrait;
+    use CallableTrait, UriTrait, HasRequestFactoryTrait, CheckCallableTrait;
+
+    use HasMiddlewareTrait {
+        addMiddleware as private addMiddlewareImpl;
+    }
+
+    use HasConfiguratorsTrait {
+        addConfigurators as private addConfiguratorsImpl;
+    }
 
     /** Default value if routes should use request factory from its group */
     const USE_FACTORY_FROM_GROUP_DEFAULT = true;
@@ -63,9 +70,9 @@ abstract class BaseGroup implements GroupInterface
     private $trailSlashes = false;
 
     /**
-     * @return BaseGroup
+     * @return self
      */
-    abstract protected function createGroup(): BaseGroup;
+    abstract protected function createGroup(): self;
 
     /**
      * @param GroupInterface $parent
@@ -82,9 +89,9 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @param string $uriPrefix
      *
-     * @return BaseGroup
+     * @return self
      */
-    public function setUriPrefix(string $uriPrefix): BaseGroup
+    public function setUriPrefix(string $uriPrefix): self
     {
         $this->uriPrefix = $uriPrefix;
 
@@ -92,11 +99,11 @@ abstract class BaseGroup implements GroupInterface
     }
 
     /**
-     * @param string|null $name
+     * @param string $name
      *
-     * @return BaseGroup
+     * @return self
      */
-    public function setName(string $name = null): BaseGroup
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -104,11 +111,21 @@ abstract class BaseGroup implements GroupInterface
     }
 
     /**
+     * @return self
+     */
+    public function clearName(): self
+    {
+        $this->name = null;
+
+        return $this;
+    }
+
+    /**
      * @param bool $trailSlashes
      *
-     * @return BaseGroup
+     * @return self
      */
-    public function setHasTrailSlash(bool $trailSlashes): BaseGroup
+    public function setHasTrailSlash(bool $trailSlashes): self
     {
         $this->trailSlashes = $trailSlashes;
 
@@ -157,11 +174,27 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
+    public function addMiddleware(array $middleware): GroupInterface
+    {
+        return $this->addMiddlewareImpl($middleware);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getContainerConfigurators(): array
     {
         $result = array_merge($this->getParentConfigurators(), $this->configurators);
 
         return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addContainerConfigurators(array $configurators): GroupInterface
+    {
+        return $this->addConfiguratorsImpl($configurators);
     }
 
     /**
@@ -182,7 +215,7 @@ abstract class BaseGroup implements GroupInterface
     /**
      * @inheritdoc
      */
-    public function getRoutes(): Iterator
+    public function getRoutes(): iterable
     {
         foreach ($this->items as $routeOrGroup) {
             if ($routeOrGroup instanceof RouteInterface) {
@@ -209,8 +242,8 @@ abstract class BaseGroup implements GroupInterface
         $group = $this->createGroup()
             ->setUriPrefix($prefix)
             ->setMiddleware($middleware)
-            ->setConfigurators($configurators)
-            ->setName($name);
+            ->setConfigurators($configurators);
+        $name === null ? $group->clearName() : $group->setName($name);
 
         $factoryWasGiven === false ?: $group->setRequestFactory($requestFactory);
 
@@ -329,24 +362,16 @@ abstract class BaseGroup implements GroupInterface
      */
     protected function normalizeRouteParameters(array $parameters): array
     {
-        $defaults = [
-            RouteInterface::PARAM_NAME                    => null,
-            RouteInterface::PARAM_REQUEST_FACTORY         => null,
-            RouteInterface::PARAM_FACTORY_FROM_GROUP      => self::USE_FACTORY_FROM_GROUP_DEFAULT,
-            RouteInterface::PARAM_MIDDLEWARE_LIST         => [],
-            RouteInterface::PARAM_CONTAINER_CONFIGURATORS => [],
-        ];
-
-        $result = array_merge($defaults, $parameters);
-
         $factoryWasGiven = array_key_exists(RouteInterface::PARAM_REQUEST_FACTORY, $parameters);
+        $useGroupFactory =
+            $parameters[RouteInterface::PARAM_FACTORY_FROM_GROUP] ?? self::USE_FACTORY_FROM_GROUP_DEFAULT;
 
         return [
-            $result[RouteInterface::PARAM_MIDDLEWARE_LIST],
-            $result[RouteInterface::PARAM_CONTAINER_CONFIGURATORS],
-            $result[RouteInterface::PARAM_REQUEST_FACTORY],
-            $factoryWasGiven === true ? false : $result[RouteInterface::PARAM_FACTORY_FROM_GROUP],
-            $result[RouteInterface::PARAM_NAME],
+            $parameters[RouteInterface::PARAM_MIDDLEWARE_LIST] ?? [],
+            $parameters[RouteInterface::PARAM_CONTAINER_CONFIGURATORS] ?? [],
+            $parameters[RouteInterface::PARAM_REQUEST_FACTORY] ?? null,
+            $factoryWasGiven === true ? false : $useGroupFactory,
+            $parameters[RouteInterface::PARAM_NAME] ?? null,
         ];
     }
 
@@ -357,23 +382,14 @@ abstract class BaseGroup implements GroupInterface
      */
     protected function normalizeGroupParameters(array $parameters): array
     {
-        $defaults = [
-            GroupInterface::PARAM_NAME_PREFIX             => null,
-            GroupInterface::PARAM_REQUEST_FACTORY         => null,
-            GroupInterface::PARAM_MIDDLEWARE_LIST         => [],
-            GroupInterface::PARAM_CONTAINER_CONFIGURATORS => [],
-        ];
-
-        $result = array_merge($defaults, $parameters);
-
         $factoryWasGiven = array_key_exists(GroupInterface::PARAM_REQUEST_FACTORY, $parameters);
 
         return [
-            $result[GroupInterface::PARAM_MIDDLEWARE_LIST],
-            $result[GroupInterface::PARAM_CONTAINER_CONFIGURATORS],
+            $parameters[GroupInterface::PARAM_MIDDLEWARE_LIST] ?? [],
+            $parameters[GroupInterface::PARAM_CONTAINER_CONFIGURATORS] ?? [],
             $factoryWasGiven,
-            $result[GroupInterface::PARAM_REQUEST_FACTORY],
-            $result[GroupInterface::PARAM_NAME_PREFIX],
+            $parameters[GroupInterface::PARAM_REQUEST_FACTORY] ?? null,
+            $parameters[GroupInterface::PARAM_NAME_PREFIX] ?? null,
         ];
     }
 

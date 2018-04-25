@@ -17,7 +17,6 @@
  */
 
 use Closure;
-use Iterator;
 
 /**
  * @package Limoncello\Contracts
@@ -57,9 +56,23 @@ interface GroupInterface
     public function getMiddleware(): array;
 
     /**
+     * @param array $middleware
+     *
+     * @return self
+     */
+    public function addMiddleware(array $middleware): self;
+
+    /**
      * @return callable[]
      */
     public function getContainerConfigurators(): array;
+
+    /**
+     * @param callable[] $configurators
+     *
+     * @return self
+     */
+    public function addContainerConfigurators(array $configurators): self;
 
     /**
      * @return callable|null
@@ -67,33 +80,33 @@ interface GroupInterface
     public function getRequestFactory(): ?callable;
 
     /**
-     * @return Iterator
+     * @return iterable
      */
-    public function getRoutes(): Iterator;
+    public function getRoutes(): iterable;
 
     /**
      * @param string  $prefix
      * @param Closure $closure
      * @param array   $parameters
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function group(string $prefix, Closure $closure, array $parameters = []): GroupInterface;
+    public function group(string $prefix, Closure $closure, array $parameters = []): self;
 
     /**
      * @param Closure        $closure
      * @param GroupInterface $group
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function addGroup(Closure $closure, GroupInterface $group): GroupInterface;
+    public function addGroup(Closure $closure, GroupInterface $group): self;
 
     /**
      * @param RouteInterface $route
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function addRoute(RouteInterface $route): GroupInterface;
+    public function addRoute(RouteInterface $route): self;
 
     /**
      * @param string   $method
@@ -101,54 +114,54 @@ interface GroupInterface
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function method(string $method, string $uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function method(string $method, string $uriPath, callable $handler, array $parameters = []): self;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function get(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function get(string $uriPath, callable $handler, array $parameters = []): self;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function post(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function post(string $uriPath, callable $handler, array $parameters = []): self;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function put(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function put(string $uriPath, callable $handler, array $parameters = []): self;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function patch(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function patch(string $uriPath, callable $handler, array $parameters = []): self;
 
     /**
      * @param string   $uriPath
      * @param callable $handler
      * @param array    $parameters
      *
-     * @return GroupInterface
+     * @return self
      */
-    public function delete(string $uriPath, callable $handler, array $parameters = []): GroupInterface;
+    public function delete(string $uriPath, callable $handler, array $parameters = []): self;
 
     /**
      * @return bool

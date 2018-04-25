@@ -20,7 +20,7 @@ use Closure;
 use Exception;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Routing\GroupInterface as GI;
-use Limoncello\Contracts\Routing\RouteInterface;
+use Limoncello\Contracts\Routing\RouteInterface as RI;
 use Limoncello\Core\Application\Application;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Traits\CallableTrait;
@@ -52,18 +52,18 @@ class GroupTest extends TestCase
             ->group('posts', function (GI $group) {
                 $group
                     ->get('', [self::class, 'postsIndex'])
-                    ->post('', [self::class, 'postsCreate'], [RouteInterface::PARAM_NAME => 'createPost'])
+                    ->post('', [self::class, 'postsCreate'], [RI::PARAM_NAME => 'createPost'])
                     ->delete('{id}', [self::class, 'postsDelete'])
                     ->group('edit', function (GI $group) {
-                        $group->get('', [self::class, 'postEdit'], [RouteInterface::PARAM_NAME => 'editPost']);
+                        $group->get('', [self::class, 'postEdit'], [RI::PARAM_NAME => 'editPost']);
                     }, [GI::PARAM_NAME_PREFIX => 'edit::']);
             })
             ->post('', [self::class, 'createNews']);
 
-        /** @var RouteInterface[] $routes */
+        /** @var RI[] $routes */
         $routes = [];
         foreach ($topGroup->getRoutes() as $route) {
-            /** @var RouteInterface $route */
+            /** @var RI $route */
             $routes[] = $route;
         }
         $this->assertCount(6, $routes);
@@ -138,24 +138,27 @@ class GroupTest extends TestCase
                     $group
                         ->put('/', [self::class, 'postsCreate'])
                         ->patch('/', self::class . '::postsUpdate', [
-                            GI::PARAM_MIDDLEWARE_LIST         => [self::class . '::methodMiddlewareHandler'],
-                            GI::PARAM_CONTAINER_CONFIGURATORS => [self::class . '::methodContainerConfigurator'],
-                            GI::PARAM_REQUEST_FACTORY         => self::class . '::patchRequestFactory',
+                            RI::PARAM_MIDDLEWARE_LIST         => [self::class . '::methodMiddlewareHandler'],
+                            RI::PARAM_CONTAINER_CONFIGURATORS => [self::class . '::methodContainerConfigurator'],
+                            RI::PARAM_REQUEST_FACTORY         => self::class . '::patchRequestFactory',
                         ])->get('/search', [self::class, 'postsSearch'])
                         ->delete('/kill-all/', [self::class, 'postsDeleteAll']);
+
+                    // group Middleware could be set via params as for the top group or with dedicated methods
+                    $group->addMiddleware([self::class . '::groupMiddlewareHandler']);
+                    // container configurators can be added as well
+                    $group->addContainerConfigurators([self::class . '::groupContainerConfigurator']);
                 },
                 [
-                    GI::PARAM_MIDDLEWARE_LIST => [self::class . '::groupMiddlewareHandler'],
-                    GI::PARAM_CONTAINER_CONFIGURATORS => [self::class . '::groupContainerConfigurator'],
                     GI::PARAM_REQUEST_FACTORY => [self::class, 'requestFactory'],
                 ]
             )
             ->post('', [self::class, 'createNews']);
 
-        /** @var RouteInterface[] $routes */
+        /** @var RI[] $routes */
         $routes = [];
         foreach ($topGroup->getRoutes() as $route) {
-            /** @var RouteInterface $route */
+            /** @var RI $route */
             $routes[] = $route;
         }
         $this->assertCount(6, $routes);
@@ -239,10 +242,10 @@ class GroupTest extends TestCase
             })
             ->post('', [self::class, 'homeIndex']);
 
-        /** @var RouteInterface[] $routes */
+        /** @var RI[] $routes */
         $routes = [];
         foreach ($topGroup->getRoutes() as $route) {
-            /** @var RouteInterface $route */
+            /** @var RI $route */
             $routes[] = $route;
         }
         $this->assertCount(9, $routes);

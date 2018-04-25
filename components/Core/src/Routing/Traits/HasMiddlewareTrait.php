@@ -56,4 +56,14 @@ trait HasMiddlewareTrait
 
         return $this;
     }
+
+    /**
+     * @param callable[] $middleware
+     *
+     * @return self
+     */
+    public function addMiddleware(array $middleware): self
+    {
+        return $this->setMiddleware(array_merge($this->middleware, $middleware));
+    }
 }

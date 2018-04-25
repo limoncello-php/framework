@@ -49,4 +49,14 @@ trait HasConfiguratorsTrait
 
         return $this;
     }
+
+    /**
+     * @param callable[] $configurators
+     *
+     * @return self
+     */
+    public function addConfigurators(array $configurators): self
+    {
+        return $this->setConfigurators(array_merge($this->configurators, $configurators));
+    }
 }
