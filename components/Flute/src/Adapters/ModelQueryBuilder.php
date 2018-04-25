@@ -522,6 +522,10 @@ class ModelQueryBuilder extends QueryBuilder
     public function applyFilters(CompositeExpression $expression, string $tableOrAlias, iterable $filters): self
     {
         foreach ($filters as $columnName => $operationsWithArgs) {
+            assert(
+                is_string($columnName) === true && empty($columnName) === false,
+                "Haven't you forgotten to specify a column name in a relationship that joins `$tableOrAlias` table?"
+            );
             $fullColumnName = $this->buildColumnName($tableOrAlias, $columnName);
             foreach ($operationsWithArgs as $operation => $arguments) {
                 $expression->add($this->createFilterExpression($fullColumnName, $operation, $arguments));
