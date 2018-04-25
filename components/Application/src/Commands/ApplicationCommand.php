@@ -31,6 +31,11 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class ApplicationCommand implements CommandInterface
 {
+    /**
+     * Command name.
+     */
+    const NAME = 'l:app';
+
     /** Argument name */
     const ARG_ACTION = 'action';
 
@@ -45,7 +50,7 @@ class ApplicationCommand implements CommandInterface
      */
     public static function getName(): string
     {
-        return 'l:app';
+        return static::NAME;
     }
 
     /**
