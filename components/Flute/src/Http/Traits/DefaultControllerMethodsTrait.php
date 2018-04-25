@@ -29,6 +29,9 @@ use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
+use Limoncello\Flute\Contracts\Validation\FormRulesInterface;
+use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
+use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
@@ -623,6 +626,28 @@ trait DefaultControllerMethodsTrait
         /** @var JsonApiParserFactoryInterface $factory */
         $factory   = $container->get(JsonApiParserFactoryInterface::class);
         $validator = $factory->createDataParser($rulesClass);
+
+        return $validator;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param string             $rulesClass
+     *
+     * @return FormValidatorInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected static function defaultCreateFormValidator(
+        ContainerInterface $container,
+        string $rulesClass
+    ): FormValidatorInterface {
+        static::assertClassImplements($rulesClass, FormRulesInterface::class);
+
+        /** @var FormValidatorFactoryInterface $factory */
+        $factory   = $container->get(FormValidatorFactoryInterface::class);
+        $validator = $factory->createValidator($rulesClass);
 
         return $validator;
     }

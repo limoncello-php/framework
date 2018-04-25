@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Flute\Contracts\Http\Controller\ControllerCreateInterface;
-use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
+use Limoncello\Flute\Http\Traits\DefaultControllerMethodsTrait;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Validation\Forms\CreateCommentRules;
 use Psr\Container\ContainerInterface;
@@ -30,6 +30,8 @@ use Zend\Diactoros\Response\HtmlResponse;
  */
 class FormCommentsController implements ControllerCreateInterface
 {
+    use DefaultControllerMethodsTrait;
+
     /**
      * @inheritdoc
      */
@@ -38,9 +40,7 @@ class FormCommentsController implements ControllerCreateInterface
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        /** @var FormValidatorFactoryInterface $factory */
-        $factory   = $container->get(FormValidatorFactoryInterface::class);
-        $validator = $factory->createValidator(CreateCommentRules::class);
+        $validator = static::defaultCreateFormValidator($container, CreateCommentRules::class);
 
         $isOk = $validator->validate([
             Comment::FIELD_TEXT => 'some text',
