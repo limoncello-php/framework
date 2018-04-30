@@ -38,7 +38,7 @@ trait CommandRoutesTrait
     protected static function commandContainer(
         GroupInterface $group,
         string $commandName,
-        ...$configurators
+        $configurators
     ): GroupInterface {
         return $group->method(
             CommandConstants::HTTP_METHOD,
