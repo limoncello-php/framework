@@ -28,7 +28,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 class WhoopsContainerConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
-    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+    const CONFIGURATOR = self::CONFIGURE_EXCEPTION_HANDLER;
 
     /** Configurator callable */
     const CONFIGURE_EXCEPTION_HANDLER = [self::class, self::CONTAINER_METHOD_NAME];
