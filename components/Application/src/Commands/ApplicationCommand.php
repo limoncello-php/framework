@@ -25,6 +25,7 @@ use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionMethod;
 
 /**
  * @package Limoncello\Application
@@ -141,23 +142,21 @@ class ApplicationCommand implements CommandInterface
         assert($inOut);
 
         $appConfig     = $this->getApplicationConfiguration($container);
-        $cacheDir      = $appConfig[ApplicationConfigurationInterface::KEY_CACHE_FOLDER];
         $cacheCallable = $appConfig[ApplicationConfigurationInterface::KEY_CACHE_CALLABLE];
-        list (, $class) = $this->parseCacheCallable($cacheCallable);
+        assert(is_string($cacheCallable));
 
-        if ($class === null) {
-            // parsing of cache callable failed (most likely error in settings)
-            throw new ConfigurationException();
-        }
+        // if exists
+        if (is_callable($cacheCallable) === true) {
+            // location of the cache file
+            $path = (new ReflectionMethod($cacheCallable))->getDeclaringClass()->getFileName();
 
-        $path = $cacheDir . DIRECTORY_SEPARATOR . $class . '.php';
+            $fileSystem = $this->getFileSystem($container);
+            if ($fileSystem->exists($path) === true) {
+                $fileSystem->delete($path);
+                $inOut->writeInfo("Cache file deleted `$path`." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
 
-        $fileSystem = $this->getFileSystem($container);
-        if ($fileSystem->exists($path) === true) {
-            $fileSystem->delete($path);
-            $inOut->writeInfo("Cache file deleted `$path`." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
-
-            return;
+                return;
+            }
         }
 
         $inOut->writeInfo('Cache already clean.' . PHP_EOL);

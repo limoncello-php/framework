@@ -138,8 +138,8 @@ class ApplicationCommandTest extends TestCase
         $container[CacheSettingsProviderInterface::class] = $providerMock;
         $providerMock->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()
             ->andReturn([
-                ApplicationConfigurationInterface::KEY_CACHE_FOLDER   => '/some/path',
-                ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
+                // the code requires real existing method
+                ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => __METHOD__,
             ]);
         /** @var Mock $fsMock */
         $container[FileSystemInterface::class] = $fsMock = Mockery::mock(FileSystemInterface::class);
@@ -170,12 +170,9 @@ class ApplicationCommandTest extends TestCase
         $container[CacheSettingsProviderInterface::class] = $providerMock;
         $providerMock->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()
             ->andReturn([
-                ApplicationConfigurationInterface::KEY_CACHE_FOLDER   => '/some/path',
                 ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => 'Namespace\\ClassName::methodName',
             ]);
         /** @var Mock $fsMock */
-        $container[FileSystemInterface::class] = $fsMock = Mockery::mock(FileSystemInterface::class);
-        $fsMock->shouldReceive('exists')->once()->withAnyArgs()->andReturn(false);
 
         $inOut = $this->createInOutMock(ApplicationCommand::ARG_ACTION, ApplicationCommand::ACTION_CLEAR_CACHE);
 
@@ -231,38 +228,6 @@ class ApplicationCommandTest extends TestCase
         $result = $method->invoke($command, $mightBeCallable);
 
         $this->assertEquals([null, null, null], $result);
-    }
-
-    /**
-     * Test action.
-     *
-     * @expectedException \Limoncello\Application\Exceptions\ConfigurationException
-     */
-    public function testClearInvalidCallable(): void
-    {
-        $container = new Container();
-
-        /** @var Mock $providerMock */
-        $providerMock                                     = Mockery::mock(CacheSettingsProviderInterface::class);
-        $container[SettingsProviderInterface::class]      = $providerMock;
-        $container[CacheSettingsProviderInterface::class] = $providerMock;
-        $providerMock->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()
-            ->andReturn([
-                ApplicationConfigurationInterface::KEY_CACHE_FOLDER   => '/some/path',
-                ApplicationConfigurationInterface::KEY_CACHE_CALLABLE => '', // <-- invalid value
-            ]);
-        /** @var Mock $fsMock */
-        $container[FileSystemInterface::class] = $fsMock = Mockery::mock(FileSystemInterface::class);
-
-        $inOut = $this->createInOutMock(ApplicationCommand::ARG_ACTION, ApplicationCommand::ACTION_CLEAR_CACHE);
-
-        $method = new ReflectionMethod(ApplicationCommand::class, 'run');
-        $method->setAccessible(true);
-        $command = new ApplicationCommand();
-        $method->invoke($command, $container, $inOut);
-
-        // Mockery will do checks when the test finishes
-        $this->assertTrue(true);
     }
 
     /**
