@@ -22,13 +22,20 @@ use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Templates\Contracts\TemplatesCacheInterface;
 use Limoncello\Templates\Package\TemplatesSettings;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Templates
  */
 class TemplatesCommand implements CommandInterface
 {
+    /**
+     * Command name.
+     */
+    const NAME = 'l:templates';
+
     /** Argument name */
     const ARG_ACTION = 'action';
 
@@ -43,7 +50,7 @@ class TemplatesCommand implements CommandInterface
      */
     public static function getName(): string
     {
-        return 'l:templates';
+        return static::NAME;
     }
 
     /**
@@ -113,6 +120,9 @@ class TemplatesCommand implements CommandInterface
      * @param ContainerInterface $container
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function executeClear(IoInterface $inOut, ContainerInterface $container): void
     {
@@ -133,6 +143,9 @@ class TemplatesCommand implements CommandInterface
      * @param ContainerInterface $container
      *
      * @return void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -164,6 +177,9 @@ class TemplatesCommand implements CommandInterface
      * @param ContainerInterface $container
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getTemplatesSettings(ContainerInterface $container): array
     {
