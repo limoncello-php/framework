@@ -27,4 +27,16 @@ interface RequestStorageInterface
      * @return ServerRequestInterface
      */
     public function get(): ServerRequestInterface;
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return self
+     */
+    public function set(ServerRequestInterface $request): self;
+
+    /**
+     * @return bool
+     */
+    public function has(): bool;
 }
