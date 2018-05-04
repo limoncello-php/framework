@@ -40,6 +40,21 @@
             "@composer install --no-dev --quiet",
             "@composer l:app cache",
             "@composer dumpautoload --optimize --quiet"
-        ]
+        ],
+        "settings-cache": [
+            "@composer dump-autoload --optimize --quiet",
+            "@composer l:app cache",
+            "@composer dump-autoload --optimize --quiet"
+        ],
+        "clear-settings-cache": [
+            "@composer dump-autoload --optimize --quiet",
+            "@composer l:app clear-cache",
+            "@composer dump-autoload --optimize --quiet"
+        ],
+        "refresh-settings-cache": ["@clear-settings-cache", "@settings-cache"],
+        "app-cache": ["@settings-cache"],
+        "clear-app-cache": ["@clear-settings-cache"],
+        "refresh-app-cache": ["@clear-app-cache", "@app-cache"]
     }
 }
+
