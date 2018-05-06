@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Application\ExceptionHandlers\WhoopsThrowableHandler;
+use Limoncello\Application\ExceptionHandlers\WhoopsThrowableHtmlHandler;
+use Limoncello\Application\ExceptionHandlers\WhoopsThrowableTextHandler;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
@@ -40,7 +41,9 @@ class WhoopsContainerConfigurator implements ContainerConfiguratorInterface
     {
         $container[ThrowableHandlerInterface::class] =
             function (PsrContainerInterface $container): ThrowableHandlerInterface {
-                return new WhoopsThrowableHandler();
+                $isCli = php_sapi_name() === 'cli';
+
+                return $isCli === true ? new WhoopsThrowableTextHandler() : new WhoopsThrowableHtmlHandler();
             };
     }
 }

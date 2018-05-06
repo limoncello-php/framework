@@ -17,7 +17,7 @@
  */
 
 use Exception;
-use Limoncello\Application\ExceptionHandlers\WhoopsThrowableHtmlHandler;
+use Limoncello\Application\ExceptionHandlers\WhoopsThrowableTextHandler;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
@@ -33,19 +33,19 @@ use Psr\Log\NullLogger;
 /**
  * @package Limoncello\Tests\Application
  */
-class ExceptionHandlersTest extends TestCase
+class TextExceptionHandlersTest extends TestCase
 {
     /**
      * Test handler.
      */
     public function testDefaultExceptionHandler(): void
     {
-        $handler = new WhoopsThrowableHtmlHandler();
+        $handler = new WhoopsThrowableTextHandler();
 
-        $response = $handler->createResponse(new Exception('Error for HTML'), $this->createContainer(true));
+        $response = $handler->createResponse(new Exception('Error for Text handler'), $this->createContainer(true));
         $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
-        $this->assertEquals(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
-        $this->assertStringStartsWith('<!DOCTYPE html>', (string)$response->getBody());
+        $this->assertEquals(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
+        $this->assertStringStartsWith('Exception: Error for Text handler in file', (string)$response->getBody());
     }
 
     /**
@@ -53,9 +53,9 @@ class ExceptionHandlersTest extends TestCase
      */
     public function testDefaultExceptionHandlerDebugDisabled(): void
     {
-        $handler = new WhoopsThrowableHtmlHandler();
+        $handler = new WhoopsThrowableTextHandler();
 
-        $response = $handler->createResponse(new Exception('Error for Text'), $this->createContainer(false));
+        $response = $handler->createResponse(new Exception('Error for Text handler'), $this->createContainer(false));
         $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
         $this->assertEquals(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
         $this->assertEquals('Internal Server Error', (string)$response->getBody());
@@ -66,12 +66,12 @@ class ExceptionHandlersTest extends TestCase
      */
     public function testFaultyLoggerOnError(): void
     {
-        $handler = new WhoopsThrowableHtmlHandler();
+        $handler = new WhoopsThrowableTextHandler();
 
         $response = $handler->createResponse(new Exception(), $this->createContainerWithFaultyLogger());
         $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
-        $this->assertEquals(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
-        $this->assertStringStartsWith('<!DOCTYPE html>', (string)$response->getBody());
+        $this->assertEquals(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
+        $this->assertStringStartsWith('Exception:  in file', (string)$response->getBody());
     }
 
     /**
