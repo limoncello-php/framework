@@ -1,0 +1,14 @@
+{
+    "name": "slim/slim-skeleton",
+    "description": "A Slim Framework skeleton application.",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.6.0",
+        "slim/slim": "^3.1",
+        "respect/validation": "^1.1"
+    },
+    "scripts": {
+        "develop": ["php -r \"@unlink('routes.cache.php');\"", "@composer update --optimize-autoloader --quiet"],
+        "build": ["@composer install --no-dev --optimize-autoloader --quiet"]
+    }
+}

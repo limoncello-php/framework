@@ -1,0 +1,34 @@
+{
+  "name": "limoncello-client-demo",
+  "version": "0.9.0",
+  "description": "Limoncello Client Demo Application",
+  "main": "./public/assets/index.js",
+  "scripts": {
+    "dev-serve": "webpack-dev-server --config ./client/webpack/development.config.js --open",
+    "php-serve": "php -d zend.assertions=1 -d assert.exception=1 -S 0.0.0.0:8090 -t public",
+    "serve": "npm run php-serve & npm run dev-serve",
+    "watch": "webpack --config ./client/webpack/development.config.js --watch",
+    "build": "webpack --config ./client/webpack/production.config.js"
+  },
+  "author": "info@neomerx.com",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^8.3.0",
+    "bootstrap": "^4.1.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "css-loader": "^0.28.11",
+    "file-loader": "^1.1.11",
+    "jquery": "^3.3.1",
+    "node-sass": "^4.8.3",
+    "popper.js": "^1.14.3",
+    "postcss-loader": "^2.1.4",
+    "precss": "^3.1.2",
+    "sass-loader": "^7.0.1",
+    "style-loader": "^0.21.0",
+    "ts-loader": "^4.2.0",
+    "typescript": "^2.8.1",
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.14",
+    "webpack-dev-server": "^3.1.3"
+  }
+}
