@@ -445,6 +445,7 @@ class MakeCommand implements CommandInterface
             $this->getTemplatePath('ValidationRules.txt'),
             [
                 '{%SINGULAR_CC%}' => $singular,
+                '{%PLURAL_CC%}'   => $plural,
                 '{%SINGULAR_LC%}' => strtolower($singular),
                 '{%PLURAL_LC%}'   => strtolower($plural),
             ]
