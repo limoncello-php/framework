@@ -17,10 +17,12 @@
  */
 
 use Composer\Command\BaseCommand;
+use Exception;
 use Limoncello\Commands\Traits\CommandSerializationTrait;
 use Limoncello\Commands\Traits\CommandTrait;
 use Limoncello\Commands\Wrappers\DataArgumentWrapper;
 use Limoncello\Commands\Wrappers\DataOptionWrapper;
+use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -116,8 +118,28 @@ class LimoncelloCommand extends BaseCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->createContainer($this->getComposer(), $this->getName());
+        $container =  null;
 
-        call_user_func($this->callable, $container, $this->wrapIo($input, $output));
+        try {
+            $container = $this->createContainer($this->getComposer(), $this->getName());
+            call_user_func($this->callable, $container, $this->wrapIo($input, $output));
+        } catch (Exception $exception) {
+            if ($container !== null && $container->has(ThrowableHandlerInterface::class) === true) {
+                /** @var ThrowableHandlerInterface $handler */
+                $handler  = $container->get(ThrowableHandlerInterface::class);
+                $response = $handler->createResponse($exception, $container);
+
+                $output->writeln((string)$response->getBody());
+            } else {
+                $message = $exception->getMessage();
+                $file    = $exception->getFile();
+                $line    = $exception->getLine();
+                $trace   = $exception->getTraceAsString();
+
+                $output->writeln("$message at $file#$line" . PHP_EOL . $trace);
+            }
+
+            throw $exception;
+        }
     }
 }
