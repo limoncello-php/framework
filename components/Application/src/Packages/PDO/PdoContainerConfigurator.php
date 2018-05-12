@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Application\Packages\PDO;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
+use Limoncello\Application\Packages\PDO\PdoSettings as C;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use PDO;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Limoncello\Application\Packages\PDO\PdoSettings as C;
 
 /**
  * @package Limoncello\Application
