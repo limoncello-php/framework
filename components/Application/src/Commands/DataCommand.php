@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Limoncello\Application\Data\BaseMigrationRunner;
 use Limoncello\Application\Data\FileMigrationRunner;
@@ -121,13 +122,14 @@ class DataCommand implements CommandInterface
 
     /**
      * @param ContainerInterface $container
-     * @param IoInterface        $inOut
+     * @param IoInterface $inOut
      *
      * @return void
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws InvalidArgumentException
+     * @throws DBALException
      */
     protected function run(ContainerInterface $container, IoInterface $inOut): void
     {

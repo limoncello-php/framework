@@ -18,6 +18,7 @@
 
 use Limoncello\Application\Authorization\AuthorizationRulesLoader;
 use Limoncello\Contracts\Settings\Packages\AuthorizationSettingsInterface;
+use ReflectionException;
 
 /**
  * @package Limoncello\Application
@@ -26,6 +27,8 @@ abstract class AuthorizationSettings implements AuthorizationSettingsInterface
 {
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     final public function get(array $appConfig): array
     {

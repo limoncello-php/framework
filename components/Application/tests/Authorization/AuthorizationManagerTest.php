@@ -39,6 +39,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Application
@@ -91,6 +92,7 @@ class AuthorizationManagerTest extends TestCase
      * @return void
      *
      * @throws AuthorizationExceptionInterface
+     * @throws ReflectionException
      */
     public function testAuthorize(): void
     {

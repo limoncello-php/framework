@@ -29,6 +29,7 @@ use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Application
@@ -45,6 +46,8 @@ class AuthorizationPackageTest extends TestCase
 
     /**
      * Test container configurator.
+     *
+     * @throws ReflectionException
      */
     public function testContainerConfigurator(): void
     {

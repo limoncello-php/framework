@@ -32,6 +32,7 @@ use Limoncello\Tests\Application\Data\Config\SampleSettingsAA;
 use Limoncello\Tests\Application\Data\Config\SampleSettingsB;
 use Limoncello\Tests\Application\Data\Config\SampleSettingsBB;
 use Limoncello\Tests\Application\TestCase;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -144,6 +145,8 @@ class FileSettingsProviderTest extends TestCase
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
+     *
+     * @throws ReflectionException
      */
     public function testCheckClassWithPrivateConstructor(): void
     {
@@ -152,6 +155,8 @@ class FileSettingsProviderTest extends TestCase
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
+     *
+     * @throws ReflectionException
      */
     public function testCheckClassWithNonDefaultConstructor(): void
     {
@@ -160,6 +165,8 @@ class FileSettingsProviderTest extends TestCase
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
+     *
+     * @throws ReflectionException
      */
     public function testCheckNotAClass(): void
     {
@@ -170,6 +177,8 @@ class FileSettingsProviderTest extends TestCase
      * @param string $className
      *
      * @return bool
+     *
+     * @throws ReflectionException
      */
     private function invokeCheckMethod(string $className): bool
     {

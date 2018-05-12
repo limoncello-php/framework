@@ -26,6 +26,7 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -35,6 +36,8 @@ class DataCommandTest extends TestCase
 {
     /**
      * Test and add coverage for methods we would mock in main tests.
+     *
+     * @throws ReflectionException
      */
     public function testCoverCreateRunnerMethods(): void
     {
@@ -88,6 +91,8 @@ class DataCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testMigrate(): void
     {
@@ -114,6 +119,8 @@ class DataCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testRollback(): void
     {
@@ -140,6 +147,8 @@ class DataCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testSeed(): void
     {

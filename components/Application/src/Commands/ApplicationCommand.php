@@ -25,6 +25,7 @@ use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -105,12 +106,13 @@ class ApplicationCommand implements CommandInterface
 
     /**
      * @param ContainerInterface $container
-     * @param IoInterface        $inOut
+     * @param IoInterface $inOut
      *
      * @return void
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
     protected function run(ContainerInterface $container, IoInterface $inOut): void
     {
@@ -130,12 +132,13 @@ class ApplicationCommand implements CommandInterface
 
     /**
      * @param ContainerInterface $container
-     * @param IoInterface        $inOut
+     * @param IoInterface $inOut
      *
      * @return void
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
     protected function executeClear(ContainerInterface $container, IoInterface $inOut): void
     {

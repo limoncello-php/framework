@@ -18,9 +18,11 @@
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Generator;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Data\SeedInterface;
@@ -87,6 +89,7 @@ abstract class BaseSeedRunner
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws DBALException
      */
     public function run(ContainerInterface $container): void
     {
@@ -109,6 +112,7 @@ abstract class BaseSeedRunner
      * @throws NotFoundExceptionInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @throws DBALException
      */
     protected function getSeeds(ContainerInterface $container): Generator
     {
@@ -180,6 +184,8 @@ abstract class BaseSeedRunner
      * @param AbstractSchemaManager $manager
      *
      * @return void
+     *
+     * @throws DBALException
      */
     private function createSeedsTable(AbstractSchemaManager $manager): void
     {
@@ -230,9 +236,12 @@ abstract class BaseSeedRunner
 
     /**
      * @param Connection $connection
-     * @param string     $class
+     * @param string $class
      *
      * @return void
+     *
+     * @throws DBALException
+     * @throws Exception
      */
     private function saveSeed(Connection $connection, string $class): void
     {

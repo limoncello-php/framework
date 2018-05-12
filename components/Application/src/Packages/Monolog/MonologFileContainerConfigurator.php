@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Application\Packages\Monolog\MonologFileSettings as C;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
@@ -66,6 +67,8 @@ class MonologFileContainerConfigurator implements ContainerConfiguratorInterface
      * @param array $settings
      *
      * @return HandlerInterface
+     *
+     * @throws Exception
      */
     protected static function createHandler(array $settings): HandlerInterface
     {

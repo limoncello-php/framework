@@ -18,10 +18,12 @@
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Generator;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Data\MigrationInterface;
@@ -74,6 +76,7 @@ abstract class BaseMigrationRunner
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws DBALException
      */
     public function migrate(ContainerInterface $container): void
     {
@@ -95,6 +98,7 @@ abstract class BaseMigrationRunner
      * @throws ContainerExceptionInterface
      * @throws InvalidArgumentException
      * @throws NotFoundExceptionInterface
+     * @throws DBALException
      */
     public function rollback(ContainerInterface $container): void
     {
@@ -145,6 +149,7 @@ abstract class BaseMigrationRunner
      * @throws NotFoundExceptionInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @throws DBALException
      */
     private function getMigrations(ContainerInterface $container): Generator
     {
@@ -174,6 +179,7 @@ abstract class BaseMigrationRunner
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws InvalidArgumentException
+     * @throws DBALException
      */
     private function getRollbacks(ContainerInterface $container): Generator
     {
@@ -203,6 +209,8 @@ abstract class BaseMigrationRunner
      * @param AbstractSchemaManager $manager
      *
      * @return void
+     *
+     * @throws DBALException
      */
     private function createMigrationsTable(AbstractSchemaManager $manager): void
     {
@@ -253,9 +261,12 @@ abstract class BaseMigrationRunner
 
     /**
      * @param Connection $connection
-     * @param string     $class
+     * @param string $class
      *
      * @return void
+     *
+     * @throws DBALException
+     * @throws Exception
      */
     private function saveMigration(Connection $connection, string $class): void
     {
@@ -269,11 +280,13 @@ abstract class BaseMigrationRunner
 
     /**
      * @param Connection $connection
-     * @param int        $index
+     * @param int $index
      *
      * @return void
      *
      * @throws InvalidArgumentException
+     *
+     * @throws DBALException
      */
     private function removeMigration(Connection $connection, int $index): void
     {

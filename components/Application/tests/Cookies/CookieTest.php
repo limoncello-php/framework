@@ -18,6 +18,7 @@
 
 use DateInterval;
 use DateTime;
+use Exception;
 use Limoncello\Application\Cookies\Cookie;
 use Limoncello\Application\Exceptions\InvalidArgumentException;
 use Limoncello\Tests\Application\TestCase;
@@ -29,6 +30,8 @@ class CookieTest extends TestCase
 {
     /**
      * Test basic cookie properties.
+     *
+     * @throws Exception
      */
     public function testBasicCookieProperties(): void
     {

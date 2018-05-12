@@ -34,6 +34,7 @@ use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetInterface
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
 use ReflectionClass;
+use ReflectionException;
 
 /**
  * @package Limoncello\Application
@@ -52,6 +53,8 @@ class AuthorizationRulesLoader
     /**
      * @param string $path
      * @param string $name
+     *
+     * @throws ReflectionException
      */
     public function __construct(string $path, string $name)
     {
@@ -63,6 +66,8 @@ class AuthorizationRulesLoader
      * @param string $name
      *
      * @return array
+     *
+     * @throws ReflectionException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -94,6 +99,7 @@ class AuthorizationRulesLoader
      * @param string $policyClass
      *
      * @return string[]
+     * @throws ReflectionException
      */
     private function getActions(string $policyClass): array
     {

@@ -26,6 +26,7 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -65,6 +66,8 @@ class ApplicationCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testCache(): void
     {
@@ -99,6 +102,8 @@ class ApplicationCommandTest extends TestCase
      * Test action.
      *
      * @expectedException \Limoncello\Application\Exceptions\ConfigurationException
+     *
+     * @throws ReflectionException
      */
     public function testCacheInvalidCallable(): void
     {
@@ -127,6 +132,8 @@ class ApplicationCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testClear(): void
     {
@@ -159,6 +166,8 @@ class ApplicationCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testClearNonExistingCache(): void
     {
@@ -187,6 +196,8 @@ class ApplicationCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testParseCacheCallable1(): void
     {
@@ -202,6 +213,8 @@ class ApplicationCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testParseCacheCallable2(): void
     {
@@ -217,6 +230,8 @@ class ApplicationCommandTest extends TestCase
 
     /**
      * Test action.
+     *
+     * @throws ReflectionException
      */
     public function testParseCacheCallable3(): void
     {
