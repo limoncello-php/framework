@@ -31,7 +31,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class CookieMiddleware implements MiddlewareInterface
 {
     /** Middleware handler */
-    const HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
+    const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
 
     /**
      * @inheritdoc
