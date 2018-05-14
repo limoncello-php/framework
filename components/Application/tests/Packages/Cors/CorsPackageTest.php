@@ -21,12 +21,11 @@ use Limoncello\Application\Packages\Cors\CorsProvider;
 use Limoncello\Application\Packages\Cors\CorsSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
-use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -61,11 +60,9 @@ class CorsPackageTest extends TestCase
         ];
 
         /** @var Mock $provider */
-        $provider                                         = Mockery::mock(CacheSettingsProviderInterface::class);
-        $container[SettingsProviderInterface::class]      = $provider;
-        $container[CacheSettingsProviderInterface::class] = $provider;
-        $container[LoggerInterface::class]                = new NullLogger();
-        $provider->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()->andReturn($appConfig);
+        $provider                                    = Mockery::mock(SettingsProviderInterface::class);
+        $container[SettingsProviderInterface::class] = $provider;
+        $container[LoggerInterface::class]           = new NullLogger();
 
         $corsConfig = (new C())->get($appConfig);
         // check CORS config uses application configuration

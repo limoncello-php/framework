@@ -21,13 +21,11 @@ use Limoncello\Application\Packages\Cookies\CookieContainerConfigurator;
 use Limoncello\Application\Packages\Cookies\CookieProvider;
 use Limoncello\Application\Packages\Cookies\CookieSettings as C;
 use Limoncello\Container\Container;
-use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
-use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Cookies\CookieJarInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -54,15 +52,11 @@ class CookiesPackageTest extends TestCase
         $container = new Container();
 
         /** @var Mock $provider */
-        $provider                                         = Mockery::mock(CacheSettingsProviderInterface::class);
-        $container[SettingsProviderInterface::class]      = $provider;
-        $container[CacheSettingsProviderInterface::class] = $provider;
-        $container[LoggerInterface::class]                = new NullLogger();
-        $provider->shouldReceive('getApplicationConfiguration')->once()->withNoArgs()->andReturn([
-            A::KEY_IS_DEBUG => true,
-        ]);
-        $appSettings = [];
-        $corsConfig  = (new C())->get($appSettings);
+        $provider                                    = Mockery::mock(SettingsProviderInterface::class);
+        $container[SettingsProviderInterface::class] = $provider;
+        $container[LoggerInterface::class]           = new NullLogger();
+        $appSettings                                 = [];
+        $corsConfig                                  = (new C())->get($appSettings);
         $provider->shouldReceive('get')->once()->with(C::class)->andReturn($corsConfig);
 
         CookieContainerConfigurator::configureContainer($container);

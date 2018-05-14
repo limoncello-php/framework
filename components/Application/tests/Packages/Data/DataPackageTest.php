@@ -26,9 +26,9 @@ use Limoncello\Application\Packages\Data\DoctrineSettings as S;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
-use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**

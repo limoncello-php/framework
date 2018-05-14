@@ -20,9 +20,9 @@ use ArrayIterator;
 use Limoncello\Application\Contracts\Session\SessionFunctionsInterface;
 use Limoncello\Application\Session\Session;
 use Limoncello\Application\Session\SessionFunctions;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Application

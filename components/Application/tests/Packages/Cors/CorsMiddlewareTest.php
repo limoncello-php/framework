@@ -19,11 +19,11 @@
 use Closure;
 use Limoncello\Application\Packages\Cors\CorsMiddleware;
 use Limoncello\Container\Container;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
 use Neomerx\Cors\Contracts\AnalysisResultInterface;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
-use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;

@@ -22,10 +22,10 @@ use Limoncello\Application\Packages\PDO\PdoSettings;
 use Limoncello\Application\Packages\PDO\PdoSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
 use PDO;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Application

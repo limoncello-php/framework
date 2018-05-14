@@ -24,9 +24,9 @@ use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Application

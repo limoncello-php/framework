@@ -17,9 +17,9 @@
  */
 
 use Limoncello\Application\FileSystem\FileSystem;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @package Limoncello\Tests\Application

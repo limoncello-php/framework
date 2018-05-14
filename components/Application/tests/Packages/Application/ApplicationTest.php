@@ -21,7 +21,7 @@ use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\InstanceSettingsProvider;
 use Limoncello\Tests\Application\CoreData\CoreDataTest;
 use Limoncello\Tests\Application\Data\Application\Settings\Application as ApplicationConfiguration;
-use PHPUnit\Framework\TestCase;
+use Limoncello\Tests\Application\TestCase;
 
 /**
  * @package Limoncello\Tests\Application

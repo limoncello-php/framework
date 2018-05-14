@@ -19,13 +19,9 @@
 use Limoncello\Application\Contracts\Session\SessionFunctionsInterface;
 use Limoncello\Application\Packages\Session\SessionContainerConfigurator;
 use Limoncello\Application\Packages\Session\SessionProvider;
-use Limoncello\Application\Packages\Session\SessionSettings as C;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Session\SessionInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Mockery;
-use Mockery\Mock;
-use PHPUnit\Framework\TestCase;
+use Limoncello\Tests\Application\TestCase;
 
 /**
  * @package Limoncello\Tests\Application
@@ -48,13 +44,6 @@ class SessionPackageTest extends TestCase
     public function testContainerConfigurator(): void
     {
         $container = new Container();
-
-        /** @var Mock $provider */
-        $container[SettingsProviderInterface::class] = $provider = Mockery::mock(SettingsProviderInterface::class);
-
-        $appSettings = [];
-        $corsConfig  = (new C())->get($appSettings);
-        $provider->shouldReceive('get')->once()->with(C::class)->andReturn($corsConfig);
 
         SessionContainerConfigurator::configureContainer($container);
 

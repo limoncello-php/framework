@@ -20,7 +20,7 @@ use Limoncello\Application\Packages\FileSystem\FileSystemContainerConfigurator;
 use Limoncello\Application\Packages\FileSystem\FileSystemProvider;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
-use PHPUnit\Framework\TestCase;
+use Limoncello\Tests\Application\TestCase;
 
 /**
  * @package Limoncello\Tests\Application

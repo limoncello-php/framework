@@ -50,7 +50,8 @@ class CorsMiddleware implements MiddlewareInterface
         $analyzer = $container->get(AnalyzerInterface::class);
         $analysis = $analyzer->analyze($request);
 
-        switch ($analysis->getRequestType()) {
+        $requestType = $analysis->getRequestType();
+        switch ($requestType) {
             case AnalysisResultInterface::TYPE_REQUEST_OUT_OF_CORS_SCOPE:
                 // call next middleware handler
                 return $next($request);
@@ -84,7 +85,7 @@ class CorsMiddleware implements MiddlewareInterface
 
             case AnalysisResultInterface::ERR_NO_HOST_HEADER:
             default:
-                assert($analysis->getRequestType() === AnalysisResultInterface::ERR_NO_HOST_HEADER);
+                assert($requestType === AnalysisResultInterface::ERR_NO_HOST_HEADER);
 
                 return static::getErrorNoHostHeaderResponse($analysis);
         }

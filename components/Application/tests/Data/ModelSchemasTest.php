@@ -24,7 +24,7 @@ use Limoncello\Tests\Application\Data\Models\Comment;
 use Limoncello\Tests\Application\Data\Models\CommentEmotion;
 use Limoncello\Tests\Application\Data\Models\Emotion;
 use Limoncello\Tests\Application\Data\Models\User;
-use PHPUnit\Framework\TestCase;
+use Limoncello\Tests\Application\TestCase;
 
 /**
  * @package Limoncello\Tests\Application

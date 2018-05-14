@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Application\Http\RequestStorage;
-use PHPUnit\Framework\TestCase;
+use Limoncello\Tests\Application\TestCase;
 use Zend\Diactoros\ServerRequest;
 
 /**

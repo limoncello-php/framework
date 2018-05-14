@@ -23,8 +23,8 @@ use Limoncello\Application\Cookies\CookieJar;
 use Limoncello\Application\Packages\Cookies\CookieMiddleware;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Cookies\CookieJarInterface;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

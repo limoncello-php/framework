@@ -25,9 +25,9 @@ use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
+use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
