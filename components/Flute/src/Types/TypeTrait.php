@@ -18,6 +18,7 @@
 
 use DateTimeInterface;
 use Doctrine\DBAL\Types\ConversionException;
+use Exception;
 use Limoncello\Flute\Types\DateTime as JsonApiDateTime;
 
 /**
@@ -29,6 +30,8 @@ trait TypeTrait
      * @param DateTimeInterface $dateTime
      *
      * @return JsonApiDateTime
+     *
+     * @throws Exception
      */
     private function convertToJsonApiDateTime(DateTimeInterface $dateTime): JsonApiDateTime
     {

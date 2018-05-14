@@ -841,6 +841,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function createIndexBuilder(iterable $columns = null): QueryBuilder
     {
@@ -849,6 +851,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function createDeleteBuilder(): QueryBuilder
     {
@@ -908,6 +912,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function index(): PaginatedDataInterface
     {
@@ -919,6 +925,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function indexIdentities(): array
     {
@@ -933,6 +941,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function read($index)
     {
@@ -946,6 +956,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function count(): ?int
     {
@@ -1014,6 +1026,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function indexRelationship(
         string $name,
@@ -1041,6 +1055,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function indexRelationshipIdentities(
         string $name,
@@ -1116,6 +1132,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function delete(): int
     {
@@ -1128,6 +1146,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function remove($index): bool
     {
@@ -1142,6 +1162,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function create($index, iterable $attributes, iterable $toMany): string
     {
@@ -1184,6 +1206,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function update($index, iterable $attributes, iterable $toMany): int
     {
@@ -1288,6 +1312,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function fetchResources(QueryBuilder $builder, string $modelClass): PaginatedDataInterface
     {
@@ -1303,6 +1329,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function fetchResource(QueryBuilder $builder, string $modelClass)
     {
@@ -1318,6 +1346,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -1345,6 +1375,8 @@ class Crud implements CrudInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)

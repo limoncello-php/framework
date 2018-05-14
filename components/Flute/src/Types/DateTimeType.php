@@ -18,7 +18,9 @@
 
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType as BaseDateTimeType;
+use Exception;
 
 /**
  * @package Limoncello\Flute
@@ -32,6 +34,9 @@ class DateTimeType extends BaseDateTimeType
 
     /**
      * @inheritdoc
+     *
+     * @throws ConversionException
+     * @throws Exception
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -49,6 +54,8 @@ class DateTimeType extends BaseDateTimeType
 
     /**
      * @inheritdoc
+     *
+     * @throws ConversionException
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {

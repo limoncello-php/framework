@@ -1,5 +1,6 @@
 <?php namespace Limoncello\Flute\Package;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
@@ -42,6 +43,8 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
