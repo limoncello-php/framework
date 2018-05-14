@@ -18,12 +18,11 @@
 
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as CCI;
 use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as MI;
-use Limoncello\Contracts\Provider\ProvidesSettingsInterface as SI;
 
 /**
  * @package Limoncello\Application
  */
-class CookieProvider implements SI, CCI, MI
+class CookieProvider extends CookieMinimalProvider implements CCI, MI
 {
     /**
      * @inheritdoc
@@ -42,16 +41,6 @@ class CookieProvider implements SI, CCI, MI
     {
         return [
             CookieMiddleware::class,
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getSettings(): array
-    {
-        return [
-            new CookieSettings(),
         ];
     }
 }

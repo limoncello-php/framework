@@ -18,12 +18,11 @@
 
 use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as CCI;
 use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as MI;
-use Limoncello\Contracts\Provider\ProvidesSettingsInterface as SI;
 
 /**
  * @package Limoncello\Application
  */
-class SessionProvider implements SI, CCI, MI
+class SessionProvider extends SessionMinimalProvider implements CCI, MI
 {
     /**
      * @inheritdoc
@@ -42,16 +41,6 @@ class SessionProvider implements SI, CCI, MI
     {
         return [
             SessionMiddleware::class,
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getSettings(): array
-    {
-        return [
-            new SessionSettings(),
         ];
     }
 }

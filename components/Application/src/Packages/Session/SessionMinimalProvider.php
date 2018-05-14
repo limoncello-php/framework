@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Application\Packages\Cors;
+<?php namespace Limoncello\Application\Packages\Session;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -16,31 +16,20 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Provider\ProvidesContainerConfiguratorsInterface as CCI;
-use Limoncello\Contracts\Provider\ProvidesMiddlewareInterface as MI;
+use Limoncello\Contracts\Provider\ProvidesSettingsInterface as SI;
 
 /**
  * @package Limoncello\Application
  */
-class CorsProvider extends CorsMinimalProvider implements CCI, MI
+class SessionMinimalProvider implements SI
 {
     /**
      * @inheritdoc
      */
-    public static function getContainerConfigurators(): array
+    public static function getSettings(): array
     {
         return [
-            CorsContainerConfigurator::class,
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getMiddleware(): array
-    {
-        return [
-            CorsMiddleware::class,
+            new SessionSettings(),
         ];
     }
 }
