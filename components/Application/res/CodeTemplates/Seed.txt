@@ -2,6 +2,7 @@
 
 use App\Data\Models\{%SINGULAR_CC%} as Model;
 //use App\Data\Models\User;
+use Doctrine\DBAL\DBALException;
 use Faker\Generator;
 use Limoncello\Contracts\Data\SeedInterface;
 use Limoncello\Data\Seeds\SeedTrait;
@@ -18,6 +19,8 @@ class {%PLURAL_CC%}Seed implements SeedInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function run(): void
     {
