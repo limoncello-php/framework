@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Flute\Data\Migrations;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Closure;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -84,6 +85,8 @@ abstract class Migration
      * @param Closure[] $expressions
      *
      * @return Table
+     *
+     * @throws DBALException
      */
     protected function createTable(string $name, array $expressions = [])
     {

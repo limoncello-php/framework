@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Adaptors\MySql;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function removeDatabaseSchema(Connection $connection, DatabaseSchemaInterface $schema): void
     {
@@ -70,6 +72,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function createDatabaseViews(Connection $connection, DatabaseSchemaInterface $schema): void
     {
@@ -84,6 +88,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function removeDatabaseViews(Connection $connection, DatabaseSchemaInterface $schema): void
     {

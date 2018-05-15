@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Commands;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -99,6 +100,8 @@ class CommandsCommand extends BaseCommand
 
     /** @noinspection PhpMissingParentCallCommonInspection
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Flute\Data\Api;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Doctrine\DBAL\DBALException;
 use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Tests\Flute\Data\Models\Comment;
@@ -34,6 +35,8 @@ class CommentsApi extends AppCrud
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     protected function builderOnIndex(ModelQueryBuilder $builder): ModelQueryBuilder
     {

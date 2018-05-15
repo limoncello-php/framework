@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Reflection;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 use Closure;
 use InvalidArgumentException;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -33,6 +34,8 @@ trait CheckCallableTrait
      * @param string|null $returnType
      *
      * @return bool
+     *
+     * @throws ReflectionException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.NPathComplexity)

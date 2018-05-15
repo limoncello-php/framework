@@ -1,7 +1,7 @@
 <?php namespace Sample;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ class Application
         // Param `address1` failed for `` with: The value is required.
         // Invalid data (captures)
         // No captures
-        
+
         // Valid data (errors)
         // No errors
         // Valid data (captures)
@@ -132,7 +132,7 @@ class Application
             $errorMsg   = Errors::MESSAGES[$error->getMessageCode()];
             $context    = $error->getMessageContext();
             $errorMsg   = MessageFormatter::formatMessage('en', $errorMsg, $context !== null ? $context : []);
-    
+
             $this->console("$entry failed for `$paramValue` with: $errorMsg" . PHP_EOL);
         }
 

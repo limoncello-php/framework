@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Flute\Http;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ class ParametersMapperTest extends TestCase
 
         /** @var FilterParameterInterface[] $filters */
         $filters = $this->iterableToArray($mapper->getMappedFilters());
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(4, $filters);
 
         $filter = $filters[0];
@@ -140,6 +141,7 @@ class ParametersMapperTest extends TestCase
 
         /** @var FilterParameterInterface[] $filters */
         $filters = $this->iterableToArray($mapper->getMappedFilters());
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $filters);
 
         $filter = reset($filters);
@@ -182,6 +184,7 @@ class ParametersMapperTest extends TestCase
 
         /** @var FilterParameterInterface[] $filters */
         $filters = $this->iterableToArray($mapper->getMappedFilters());
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $filters);
 
         $filter = reset($filters);
@@ -205,6 +208,7 @@ class ParametersMapperTest extends TestCase
 
         /** @var FilterParameterInterface[] $filters */
         $filters = $this->iterableToArray($mapper->getMappedFilters());
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $filters);
 
         $filter = reset($filters);
@@ -228,6 +232,7 @@ class ParametersMapperTest extends TestCase
         $mapper = $this->createMapper(BoardSchema::class)->withSorts($sortParameters);
         /** @var SortParameter[] $sorts */
         $sorts = $this->iterableToArray($mapper->getMappedSorts());
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(4, $sorts);
 
         $sort = $sorts[0];
@@ -287,6 +292,7 @@ class ParametersMapperTest extends TestCase
 
         /** @var RelationshipInterface[] $include */
         $include = $includes[0];
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $include);
         $this->assertEquals(BoardSchema::REL_POSTS, $include[0]->getNameInSchema());
         $this->assertEquals(BoardSchema::TYPE, $include[0]->getFromSchema()::TYPE);

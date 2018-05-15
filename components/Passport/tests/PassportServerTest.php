@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Passport;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ConnectionException;
 use Exception;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\OAuthServer\Contracts\GrantTypes;
@@ -51,6 +52,8 @@ class PassportServerTest extends TestCase
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     protected function setUp()
     {
@@ -714,6 +717,8 @@ class PassportServerTest extends TestCase
 
     /**
      * @return PassportServerInterface
+     *
+     * @throws ConnectionException
      */
     private function createPassportServer(): PassportServerInterface
     {

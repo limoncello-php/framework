@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Adaptors\Generic;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
@@ -153,6 +154,8 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function readPassport(string $tokenValue, int $expirationInSeconds): ?array
     {
@@ -192,6 +195,8 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      * @param int    $expirationInSeconds
      *
      * @return QueryBuilder
+     *
+     * @throws DBALException
      */
     private function createPassportDataQuery(
         string $tokenValue,
@@ -223,6 +228,8 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      * @param TokenInterface $token
      *
      * @return void
+     *
+     * @throws DBALException
      */
     private function addScope(TokenInterface $token)
     {

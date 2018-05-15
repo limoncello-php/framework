@@ -18,6 +18,7 @@
 
 use Closure;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -92,6 +93,8 @@ trait MigrationTrait
      * @param Closure[] $expressions
      *
      * @return Table
+     *
+     * @throws DBALException
      */
     protected function createTable(string $modelClass, array $expressions = []): Table
     {

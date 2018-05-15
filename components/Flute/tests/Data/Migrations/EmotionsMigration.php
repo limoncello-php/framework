@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Flute\Data\Migrations;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Doctrine\DBAL\DBALException;
 use Limoncello\Tests\Flute\Data\Models\Emotion as Model;
 
 /**
@@ -28,6 +29,8 @@ class EmotionsMigration extends Migration
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function migrate()
     {

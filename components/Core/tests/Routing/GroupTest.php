@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Core\Routing;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ use Limoncello\Tests\Core\TestCase;
 use Mockery;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Core
@@ -66,6 +67,7 @@ class GroupTest extends TestCase
             /** @var RI $route */
             $routes[] = $route;
         }
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(6, $routes);
 
         $this->assertEquals('GET', $routes[0]->getMethod());
@@ -161,6 +163,7 @@ class GroupTest extends TestCase
             /** @var RI $route */
             $routes[] = $route;
         }
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(6, $routes);
 
         $this->assertEquals('GET', $routes[0]->getMethod());
@@ -248,6 +251,7 @@ class GroupTest extends TestCase
             /** @var RI $route */
             $routes[] = $route;
         }
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(9, $routes);
 
         $this->assertEquals('/', $routes[0]->getUriPath());
@@ -288,6 +292,8 @@ class GroupTest extends TestCase
 
     /**
      * @expectedException \LogicException
+     *
+     * @throws ReflectionException
      */
     public function testInvalidCallable4(): void
     {
@@ -297,6 +303,8 @@ class GroupTest extends TestCase
 
     /**
      * @expectedException \LogicException
+     *
+     * @throws ReflectionException
      */
     public function testInvalidCallable5(): void
     {
@@ -309,6 +317,8 @@ class GroupTest extends TestCase
 
     /**
      * @expectedException \LogicException
+     *
+     * @throws ReflectionException
      */
     public function testInvalidCallable6(): void
     {
@@ -321,6 +331,8 @@ class GroupTest extends TestCase
 
     /**
      * @expectedException \LogicException
+     *
+     * @throws ReflectionException
      */
     public function testInvalidCallable7(): void
     {

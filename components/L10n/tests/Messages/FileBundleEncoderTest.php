@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\l10n\Messages;
+<?php /** @noinspection SpellCheckingInspection */
+
+namespace Limoncello\Tests\l10n\Messages;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +35,7 @@ class FileBundleEncoderTest extends TestCase
         $encoder = new FileBundleEncoder(null, __DIR__ . DIRECTORY_SEPARATOR . 'Resources');
 
         $storageData = $encoder->getStorageData('en');
+        /** @noinspection SpellCheckingInspection */
         $this->assertEquals([
             BundleStorage::INDEX_DEFAULT_LOCALE => 'en',
             BundleStorage::INDEX_DATA           => [

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Commands;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ use Limoncello\Tests\Commands\Data\TestCommand;
 use Mockery;
 use Mockery\Mock;
 use Psr\Container\ContainerInterface;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -54,6 +55,8 @@ class CommandsCommandTest extends TestCase
 
     /**
      * Test execution for Connect.
+     *
+     * @throws ReflectionException
      */
     public function testConnect()
     {
@@ -84,6 +87,8 @@ class CommandsCommandTest extends TestCase
 
     /**
      * Test execution for Connect.
+     *
+     * @throws ReflectionException
      */
     public function testConnectWithInvalidCommand()
     {
@@ -110,6 +115,8 @@ class CommandsCommandTest extends TestCase
 
     /**
      * Test execution for Connect.
+     *
+     * @throws ReflectionException
      */
     public function testConnectWithEmptyCachePath()
     {
@@ -137,6 +144,8 @@ class CommandsCommandTest extends TestCase
 
     /**
      * Test execution for Create.
+     *
+     * @throws ReflectionException
      */
     public function testCreate()
     {
@@ -175,6 +184,8 @@ class CommandsCommandTest extends TestCase
 
     /**
      * Test execution for Create.
+     *
+     * @throws ReflectionException
      */
     public function testCreateNoArgClass()
     {
@@ -200,6 +211,8 @@ class CommandsCommandTest extends TestCase
 
     /**
      * Test execution for Create.
+     *
+     * @throws ReflectionException
      */
     public function testCreateInvalidCommandsFolder()
     {
@@ -232,6 +245,8 @@ class CommandsCommandTest extends TestCase
 
     /**
      * Test execution for Create.
+     *
+     * @throws ReflectionException
      */
     public function testCreateCommandAlreadyExists()
     {
@@ -266,6 +281,8 @@ class CommandsCommandTest extends TestCase
 
     /**
      * Test execution for Connect.
+     *
+     * @throws ReflectionException
      */
     public function testInvalidAction()
     {

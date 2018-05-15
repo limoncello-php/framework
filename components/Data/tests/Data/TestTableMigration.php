@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Doctrine\DBAL\DBALException;
 use Limoncello\Contracts\Data\MigrationInterface;
 use Limoncello\Data\Migrations\MigrationTrait;
 
@@ -48,6 +49,8 @@ class TestTableMigration implements MigrationInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function migrate(): void
     {

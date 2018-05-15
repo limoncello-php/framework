@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Repositories;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 use Closure;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ConnectionException;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
@@ -63,6 +65,8 @@ abstract class BaseRepository
      * @param Closure $closure
      *
      * @return void
+     *
+     * @throws ConnectionException
      */
     public function inTransaction(Closure $closure): void
     {
@@ -119,6 +123,8 @@ abstract class BaseRepository
      * @param array $values
      *
      * @return int
+     *
+     * @throws DBALException
      */
     protected function createResource(array $values): int
     {
@@ -142,6 +148,8 @@ abstract class BaseRepository
      * @param array      $columns
      *
      * @return mixed
+     *
+     * @throws DBALException
      */
     protected function readResource($identifier, array $columns = ['*'])
     {
@@ -154,6 +162,8 @@ abstract class BaseRepository
      * @param array      $columns
      *
      * @return mixed
+     *
+     * @throws DBALException
      */
     protected function readResourceByColumn($identifier, string $column, array $columns = ['*'])
     {
@@ -176,6 +186,8 @@ abstract class BaseRepository
      * @param array      $values
      *
      * @return int
+     *
+     * @throws DBALException
      */
     protected function updateResource($identifier, array $values): int
     {
@@ -198,6 +210,8 @@ abstract class BaseRepository
      * @param string|int $identifier
      *
      * @return int
+     *
+     * @throws DBALException
      */
     protected function deleteResource($identifier): int
     {
@@ -221,6 +235,8 @@ abstract class BaseRepository
      * @param string     $intForeignKeyName
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function createBelongsToManyRelationship(
         $primaryKey,
@@ -249,6 +265,8 @@ abstract class BaseRepository
      * @param string     $intForeignKeyName
      *
      * @return string[]
+     *
+     * @throws DBALException
      */
     protected function readBelongsToManyRelationshipIdentifiers(
         $identifier,
@@ -278,6 +296,8 @@ abstract class BaseRepository
      * @param string     $hasManyFkName
      *
      * @return string[]
+     *
+     * @throws DBALException
      */
     protected function readHasManyRelationshipColumn(
         $identifier,
@@ -306,6 +326,8 @@ abstract class BaseRepository
      * @param string|int $identifier
      *
      * @return int
+     *
+     * @throws DBALException
      */
     protected function deleteBelongsToManyRelationshipIdentifiers(
         string $intTableName,
@@ -329,6 +351,8 @@ abstract class BaseRepository
      * @param DateTimeInterface $dateTime
      *
      * @return string
+     *
+     * @throws DBALException
      */
     protected function getDateTimeForDb(DateTimeInterface $dateTime): string
     {
@@ -363,6 +387,8 @@ abstract class BaseRepository
      * @return string
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     *
+     * @throws DBALException
      */
     protected function createTypedParameter(QueryBuilder $query, $value): string
     {

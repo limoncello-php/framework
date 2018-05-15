@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Repositories;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
  */
 
 use DateTimeImmutable;
+use Doctrine\DBAL\DBALException;
+use Exception;
 use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
@@ -36,6 +38,9 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
+     * @throws DBALException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -75,6 +80,8 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function bindScopes(string $identifier, array $scopes): void
     {
@@ -93,6 +100,8 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
      * @param string[] $scopeIdentifiers
      *
      * @return void
+     *
+     * @throws DBALException
      */
     public function bindScopeIdentifiers(string $identifier, array $scopeIdentifiers): void
     {
@@ -110,6 +119,8 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function unbindScopes(string $identifier): void
     {
@@ -123,6 +134,8 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function read(string $identifier): ?ClientInterface
     {
@@ -131,6 +144,8 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function readScopeIdentifiers(string $identifier): array
     {
@@ -145,6 +160,8 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function readRedirectUriStrings(string $identifier): array
     {
@@ -159,6 +176,9 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
+     * @throws DBALException
      */
     public function update(ClientInterface $client): void
     {
@@ -182,6 +202,8 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function delete(string $identifier): void
     {

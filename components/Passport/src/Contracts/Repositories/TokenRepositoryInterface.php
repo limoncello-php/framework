@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Contracts\Repositories;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ interface TokenRepositoryInterface
      * @return array
      */
     public function readByUser(int $userId, int $expirationInSeconds, int $limit = null): array;
-    
+
     /**
      * @param int $identifier
      *

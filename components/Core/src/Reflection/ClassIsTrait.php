@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Reflection;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ use Exception;
 use Generator;
 use GlobIterator;
 use ReflectionClass;
+use ReflectionException;
 
 /**
  * @package Limoncello\Core
@@ -126,6 +127,8 @@ trait ClassIsTrait
      * @param string $classOrInterface
      *
      * @return Generator
+     *
+     * @throws ReflectionException
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */

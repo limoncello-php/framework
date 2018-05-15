@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\l10n\Format;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('Hello World', $translator->translateMessage('en_US', 'Messages', 'Hello World'));
         $this->assertEquals('Hallo Welt', $translator->translateMessage('DE', 'Messages', 'Hello World'));
         $this->assertEquals('Hallo Welt', $translator->translateMessage('dE_Lu', 'Messages', 'Hello World'));
+        /** @noinspection SpellCheckingInspection */
         $this->assertEquals(
             'Hallo Welt aus Österreich',
             $translator->translateMessage('de_AT', 'Messages', 'Hello World')
@@ -68,6 +69,8 @@ class TranslatorTest extends TestCase
         // Then it searches a value for that key in `de` resources and finds it.
         $this->assertEquals('Hallo Welt', $translator->translateMessage('en_US', 'Messages', 'Hello World'));
 
+        /** @noinspection SpellCheckingInspection */
+
         // Same story here but we don't have any values for a key 'Guten Morgen' so it returns the key itself.
         $this->assertEquals('Guten Morgen', $translator->translateMessage('en_US', 'Messages', 'Guten Morgen'));
 
@@ -79,6 +82,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('Hallo Welt', $translator->translateMessage('DE', 'Messages', 'Hello World'));
 
         $this->assertEquals('Hallo Welt', $translator->translateMessage('dE_Lu', 'Messages', 'Hello World'));
+        /** @noinspection SpellCheckingInspection */
         $this->assertEquals(
             'Hallo Welt aus Österreich',
             $translator->translateMessage('de_AT', 'Messages', 'Hello World')

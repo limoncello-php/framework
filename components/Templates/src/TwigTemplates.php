@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Templates;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@
 use Limoncello\Contracts\Templates\TemplatesInterface;
 use Limoncello\Templates\Contracts\TemplatesCacheInterface;
 use Twig_Environment;
+use Twig_Error_Loader;
+use Twig_Error_Runtime;
+use Twig_Error_Syntax;
 use Twig_Loader_Filesystem;
 
 /**
@@ -64,7 +67,14 @@ class TwigTemplates implements TemplatesInterface, TemplatesCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * @param string $name
+     * @param array  $context
+     *
+     * @return string
+     *
+     * @throws Twig_Error_Loader
+     * @throws Twig_Error_Syntax
+     * @throws Twig_Error_Runtime
      */
     public function render(string $name, array $context = []): string
     {
@@ -72,7 +82,10 @@ class TwigTemplates implements TemplatesInterface, TemplatesCacheInterface
     }
 
     /**
-     * @inheritdoc
+     * @param string $name
+     *
+     * @throws Twig_Error_Loader
+     * @throws Twig_Error_Syntax
      */
     public function cache(string $name): void
     {

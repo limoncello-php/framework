@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Flute\Data\Http;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ class WebCategoriesController implements WebControllerInterface
 {
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     public static function create(
         array $routeParams,
@@ -40,6 +42,8 @@ class WebCategoriesController implements WebControllerInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     public static function delete(
         array $routeParams,
@@ -51,6 +55,8 @@ class WebCategoriesController implements WebControllerInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     public static function index(
         array $routeParams,
@@ -62,6 +68,8 @@ class WebCategoriesController implements WebControllerInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     public static function instance(
         array $routeParams,
@@ -73,6 +81,8 @@ class WebCategoriesController implements WebControllerInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     public static function read(
         array $routeParams,
@@ -84,6 +94,8 @@ class WebCategoriesController implements WebControllerInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     public static function update(
         array $routeParams,

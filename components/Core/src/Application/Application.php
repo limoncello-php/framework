@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Application;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
 use Throwable;
 use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Diactoros\Response\TextResponse;
@@ -264,6 +265,8 @@ abstract class Application implements ApplicationInterface
      * @param callable[]|null              $routeConfigurators
      *
      * @return void
+     *
+     * @throws ReflectionException
      */
     protected function configureContainer(
         LimoncelloContainerInterface $container,
@@ -291,6 +294,8 @@ abstract class Application implements ApplicationInterface
      * @param array|null            $routeMiddleware
      *
      * @return Closure
+     *
+     * @throws ReflectionException
      */
     protected function addMiddlewareChain(
         Closure $handler,
@@ -311,6 +316,8 @@ abstract class Application implements ApplicationInterface
      * @param ServerRequestInterface|null $request
      *
      * @return ResponseInterface
+     *
+     * @throws ReflectionException
      */
     protected function callHandler(
         callable $handler,
@@ -385,6 +392,8 @@ abstract class Application implements ApplicationInterface
      * @param callable              $requestFactory
      *
      * @return ServerRequestInterface
+     *
+     * @throws ReflectionException
      */
     private function createRequest(
         SapiInterface $sapi,
@@ -437,6 +446,8 @@ abstract class Application implements ApplicationInterface
      * @param array|null            $middleware
      *
      * @return Closure
+     *
+     * @throws ReflectionException
      */
     private function createMiddlewareChainImpl(
         Closure $handler,
@@ -459,6 +470,8 @@ abstract class Application implements ApplicationInterface
      * @param PsrContainerInterface $container
      *
      * @return Closure
+     *
+     * @throws ReflectionException
      */
     private function createMiddlewareChainLink(
         Closure $next,

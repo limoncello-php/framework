@@ -1,7 +1,7 @@
 <?php namespace Sample\Validation;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ interface Errors extends ErrorCodes
 
     /** Custom error code */
     const IS_DELIVERY_DATE = self::IS_VALID_SKU + 1;
-    
+
     const MESSAGES = EnUsLocale::MESSAGES + [
         self::IS_EMAIL         => 'The value should be a valid email address.',
         self::IS_VALID_SKU     => 'The value should be a valid SKU.',

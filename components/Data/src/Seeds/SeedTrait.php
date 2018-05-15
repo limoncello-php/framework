@@ -19,8 +19,10 @@
 use Closure;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Exception;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\SeedInterface;
 use PDO;
@@ -87,6 +89,8 @@ trait SeedTrait
 
     /**
      * @return string
+     *
+     * @throws Exception
      */
     protected function now(): string
     {
@@ -135,6 +139,8 @@ trait SeedTrait
      * @param Closure $dataClosure
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function seedTableData(int $records, $tableName, Closure $dataClosure): void
     {
@@ -150,6 +156,8 @@ trait SeedTrait
      * @param Closure $dataClosure
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function seedModelsData(int $records, string $modelClass, Closure $dataClosure): void
     {
@@ -161,6 +169,8 @@ trait SeedTrait
      * @param array  $data
      *
      * @return string|null
+     *
+     * @throws DBALException
      */
     protected function seedRowData(string $tableName, array $data): ?string
     {
@@ -172,6 +182,8 @@ trait SeedTrait
      * @param array  $data
      *
      * @return string|null
+     *
+     * @throws DBALException
      */
     protected function seedModelData(string $modelClass, array $data): ?string
     {
@@ -192,6 +204,8 @@ trait SeedTrait
      * @param array      $data
      *
      * @return string|null
+     *
+     * @throws DBALException
      */
     private function insertRow($tableName, Connection $connection, array $data): ?string
     {
@@ -205,7 +219,7 @@ trait SeedTrait
             $result = $connection->insert($tableName, $quotedFields);
             assert($result !== false, 'Insert failed');
             $index  = $connection->lastInsertId();
-        } catch (UniqueConstraintViolationException $e) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $e) {
             // ignore non-unique records
         }
 

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Passport;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -84,6 +85,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     protected function setUp()
     {
@@ -95,6 +98,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @inheritdoc
+     *
+     * @throws ConnectionException
      */
     protected function tearDown()
     {
@@ -361,6 +366,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     ) {
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $response->getHeader('Location'));
         list($location) = $response->getHeader('Location');
 

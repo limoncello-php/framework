@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Adaptors\Generic;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 
@@ -46,6 +47,8 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function index(): array
     {
@@ -85,6 +88,8 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
      * @param Client $client
      *
      * @return void
+     *
+     * @throws DBALException
      */
     private function addScopeAndRedirectUris(Client $client): void
     {

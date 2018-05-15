@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Repositories;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
  */
 
 use DateTimeImmutable;
+use Doctrine\DBAL\DBALException;
+use Exception;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
 
@@ -35,6 +37,9 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
+     * @throws DBALException
      */
     public function create(ScopeInterface $scope): ScopeInterface
     {
@@ -53,6 +58,8 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function read(string $identifier): ScopeInterface
     {
@@ -61,6 +68,9 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
+     * @throws DBALException
      */
     public function update(ScopeInterface $scope): void
     {
@@ -75,6 +85,8 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function delete(string $identifier): void
     {

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Events;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ use Limoncello\Tests\Events\Data\TestContainer;
 use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Events
@@ -35,6 +36,8 @@ class ContainerConfiguratorTest extends TestCase
 {
     /**
      * Test provider.
+     *
+     * @throws ReflectionException
      */
     public function testEventProvider()
     {

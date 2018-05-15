@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Events;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ use Limoncello\Tests\Events\Data\Subscribers\GenericSubscribers;
 use Limoncello\Tests\Events\Data\Subscribers\OrderSubscribers;
 use Limoncello\Tests\Events\Data\Subscribers\UserSubscribers;
 use PHPUnit\Framework\TestCase;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -173,6 +174,8 @@ class SimpleEventEmitterTest extends TestCase
 
     /**
      * Test invalid subscribers are handled correctly.
+     *
+     * @throws ReflectionException
      */
     public function testCheckInvalidSubscribers1()
     {
@@ -184,6 +187,8 @@ class SimpleEventEmitterTest extends TestCase
 
     /**
      * Test event dispatch.
+     *
+     * @throws ReflectionException
      */
     public function testEventDispatch()
     {
@@ -266,6 +271,8 @@ class SimpleEventEmitterTest extends TestCase
      * @param array $subscribers
      *
      * @return bool
+     *
+     * @throws ReflectionException
      */
     private function callCheckSubscribers(array $subscribers): bool
     {

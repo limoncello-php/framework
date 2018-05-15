@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Data\Migrations\EnumType;
@@ -28,6 +29,8 @@ class EnumTypeTest extends TestCase
 {
     /**
      * Test SQL declaration.
+     *
+     * @throws DBALException
      */
     public function testSqlDeclaration()
     {

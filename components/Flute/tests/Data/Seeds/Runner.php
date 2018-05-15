@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Flute\Data\Seeds;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 use Closure;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Faker\Factory;
 use Limoncello\Tests\Flute\Data\Models\Board;
@@ -39,6 +40,8 @@ class Runner
      * @param Connection $connection
      *
      * @return void
+     *
+     * @throws DBALException
      */
     public function run(Connection $connection)
     {
@@ -137,6 +140,8 @@ class Runner
      * @param int        $records
      * @param string     $tableName
      * @param Closure    $fieldsClosure
+     *
+     * @throws DBALException
      */
     private function seedTable(Connection $connection, $records, $tableName, Closure $fieldsClosure)
     {
@@ -161,6 +166,8 @@ class Runner
      * @param array      $fields
      *
      * @return void
+     *
+     * @throws DBALException
      */
     private function seedRow(Connection $connection, $tableName, array $fields)
     {
@@ -188,6 +195,8 @@ class Runner
      * @param array      $rows
      *
      * @return void
+     *
+     * @throws DBALException
      */
     private function seedRows(Connection $connection, $tableName, array $rows)
     {

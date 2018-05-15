@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Flute\Api;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -947,6 +947,7 @@ class CrudTest extends TestCase
                 if (in_array($columnName, $dateTimeColumns) === true) {
                     // emulate output datetime in JSON API as 2015-05-22T14:56:29.000Z
                     // this function is specific for SQLite
+                    /** @noinspection SpellCheckingInspection */
                     return "strftime('%Y-%m-%dT%H:%M:%fZ', $quotedColumnName) as $columnName";
                 }
 

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Routing;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,12 @@ use Limoncello\Core\Routing\Traits\HasConfiguratorsTrait;
 use Limoncello\Core\Routing\Traits\HasMiddlewareTrait;
 use Limoncello\Core\Routing\Traits\HasRequestFactoryTrait;
 use Limoncello\Core\Routing\Traits\UriTrait;
+use ReflectionException;
 
 /**
  * @package Limoncello\Core
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class BaseGroup implements GroupInterface
 {
@@ -274,6 +277,8 @@ abstract class BaseGroup implements GroupInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function method(string $method, string $uriPath, callable $handler, array $parameters = []): GroupInterface
     {
@@ -294,6 +299,8 @@ abstract class BaseGroup implements GroupInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function get(string $uriPath, callable $handler, array $parameters = []): GroupInterface
     {
@@ -302,6 +309,8 @@ abstract class BaseGroup implements GroupInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function post(string $uriPath, callable $handler, array $parameters = []): GroupInterface
     {
@@ -310,6 +319,8 @@ abstract class BaseGroup implements GroupInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function put(string $uriPath, callable $handler, array $parameters = []): GroupInterface
     {
@@ -318,6 +329,8 @@ abstract class BaseGroup implements GroupInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function patch(string $uriPath, callable $handler, array $parameters = []): GroupInterface
     {
@@ -326,6 +339,8 @@ abstract class BaseGroup implements GroupInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function delete(string $uriPath, callable $handler, array $parameters = []): GroupInterface
     {
@@ -347,6 +362,8 @@ abstract class BaseGroup implements GroupInterface
      * @param callable       $handler
      *
      * @return Route
+     *
+     * @throws ReflectionException
      */
     protected function createRoute(GroupInterface $group, string $method, string $uriPath, callable $handler): Route
     {

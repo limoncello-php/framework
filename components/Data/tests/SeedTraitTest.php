@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
@@ -45,6 +46,8 @@ class SeedTraitTest extends TestCase
 
     /**
      * Test seeds.
+     *
+     * @throws DBALException
      */
     public function testSeeds()
     {
@@ -128,6 +131,8 @@ class SeedTraitTest extends TestCase
      * @param MockInterface $modelSchemas
      *
      * @return ContainerInterface
+     *
+     * @throws DBALException
      */
     private function createContainer(MockInterface $modelSchemas): ContainerInterface
     {
@@ -141,6 +146,8 @@ class SeedTraitTest extends TestCase
 
     /**
      * @return Connection
+     *
+     * @throws DBALException
      */
     private function createConnection(): Connection
     {

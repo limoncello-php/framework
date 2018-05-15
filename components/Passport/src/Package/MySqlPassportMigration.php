@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Package;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Limoncello\Contracts\Data\MigrationInterface;
 use Limoncello\Passport\Adaptors\MySql\DatabaseSchemaMigrationTrait;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
@@ -46,6 +47,8 @@ class MySqlPassportMigration implements MigrationInterface
 
     /**
      * @return void
+     *
+     * @throws DBALException
      */
     public function migrate(): void
     {
@@ -54,6 +57,8 @@ class MySqlPassportMigration implements MigrationInterface
 
     /**
      * @return void
+     *
+     * @throws DBALException
      */
     public function rollback(): void
     {

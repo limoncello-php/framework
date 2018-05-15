@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -46,6 +47,8 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
 
     /**
      * Test columns migration.
+     *
+     * @throws DBALException
      */
     public function testColumns()
     {
@@ -105,6 +108,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $this->assertTrue($manager->tablesExist([$tableName]));
         $columnsCreated = $manager->listTableColumns($tableName);
         // +2 for timestamps and -2 for searchable and unique
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(count($columnToCreate), $columnsCreated);
 
         $this->assertEquals('integer', $columnsCreated[$columnIntPrimary]->getType()->getName());
@@ -164,6 +168,8 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
 
     /**
      * Test relationship migration.
+     *
+     * @throws DBALException
      */
     public function testRelationships()
     {
@@ -212,6 +218,9 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $migration2->init($container)->migrate();
     }
 
+    /**
+     * @throws DBALException
+     */
     public function testEnum()
     {
         $connection = $this->createConnection();
@@ -223,6 +232,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         ($this->nullableEnum('enum2', ['val21', 'val22']))($table);
 
         $columns = $table->getColumns();
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(2, $columns);
         $this->assertEquals("ENUM('val21','val22')", $columns['enum1']->getType()->getSQLDeclaration([], $platform));
         $this->assertTrue($columns['enum1']->getNotnull());
@@ -234,6 +244,8 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
      * @param MockInterface $modelSchemas
      *
      * @return ContainerInterface
+     *
+     * @throws DBALException
      */
     private function createContainer(MockInterface $modelSchemas): ContainerInterface
     {
@@ -247,6 +259,8 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
 
     /**
      * @return Connection
+     *
+     * @throws DBALException
      */
     private function createConnection(): Connection
     {

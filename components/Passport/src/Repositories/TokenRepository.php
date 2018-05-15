@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Repositories;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@
 
 use DateInterval;
 use DateTimeImmutable;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Exception;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
@@ -33,6 +35,9 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 {
     /**
      * @inheritdoc
+     *
+     * @throws Exception
+     * @throws DBALException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -65,6 +70,9 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
+     * @throws DBALException
      */
     public function assignValuesToCode(TokenInterface $token, int $expirationInSeconds): void
     {
@@ -96,6 +104,9 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
+     * @throws DBALException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -144,6 +155,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function bindScopes(int $identifier, array $scopes): void
     {
@@ -159,6 +172,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function bindScopeIdentifiers(int $identifier, array $scopeIdentifiers): void
     {
@@ -176,6 +191,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function unbindScopes(int $identifier): void
     {
@@ -189,6 +206,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function read(int $identifier): ?TokenInterface
     {
@@ -197,6 +216,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function readByCode(string $code, int $expirationInSeconds): ?TokenInterface
     {
@@ -211,6 +232,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function readByValue(string $tokenValue, int $expirationInSeconds): ?TokenInterface
     {
@@ -225,6 +248,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function readByRefresh(string $refreshValue, int $expirationInSeconds): ?TokenInterface
     {
@@ -239,6 +264,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function readByUser(int $userId, int $expirationInSeconds, int $limit = null): array
     {
@@ -258,6 +285,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function readScopeIdentifiers(int $identifier): array
     {
@@ -272,6 +301,9 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
+     * @throws Exception
      */
     public function updateValues(TokenInterface $token): void
     {
@@ -303,6 +335,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function delete(int $identifier): void
     {
@@ -311,6 +345,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws DBALException
      */
     public function disable(int $identifier): void
     {
@@ -350,6 +386,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      * @param array  $columns
      *
      * @return TokenInterface|null
+     *
+     * @throws DBALException
      */
     protected function readEnabledTokenByColumnWithExpirationCheck(
         string $identifier,
@@ -382,6 +420,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      * @param int|null $limit
      *
      * @return array
+     *
+     * @throws DBALException
      */
     protected function readEnabledTokensByColumnWithExpirationCheck(
         string $identifier,
@@ -420,6 +460,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      * @param array  $columns
      *
      * @return QueryBuilder
+     *
+     * @throws DBALException
      */
     protected function createEnabledTokenByColumnWithExpirationCheckQuery(
         string $identifier,
@@ -447,6 +489,9 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      * @param string       $createdAtColumn
      *
      * @return QueryBuilder
+     *
+     * @throws DBALException
+     * @throws Exception
      */
     protected function addExpirationCondition(
         QueryBuilder $query,

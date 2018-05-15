@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\OAuthServer;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -249,6 +249,7 @@ abstract class ServerTestCase extends TestCase
     ) {
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertTrue($response->hasHeader('Location'));
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $response->getHeader('Location'));
         list($location) = $response->getHeader('Location');
 

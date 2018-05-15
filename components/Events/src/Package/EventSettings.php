@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Events\Package;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ use Limoncello\Events\Contracts\EventHandlerInterface;
 use Limoncello\Events\Contracts\EventInterface;
 use Limoncello\Events\SimpleEventEmitter;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -36,6 +37,8 @@ abstract class EventSettings implements EventSettingsInterface
      * @param array $appConfig
      *
      * @return array
+     *
+     * @throws ReflectionException
      */
     final public function get(array $appConfig): array
     {
@@ -96,6 +99,8 @@ abstract class EventSettings implements EventSettingsInterface
      * @param array $handlerClasses
      *
      * @return Generator
+     *
+     * @throws ReflectionException
      */
     private function getEventSubscribers(array $eventClasses, array $handlerClasses): Generator
     {
@@ -112,6 +117,8 @@ abstract class EventSettings implements EventSettingsInterface
      * @param string $handlerClass
      *
      * @return Generator
+     *
+     * @throws ReflectionException
      */
     private function selectEvenHandlers(string $handlerClass): Generator
     {
@@ -130,6 +137,8 @@ abstract class EventSettings implements EventSettingsInterface
      * @param array  $eventClasses
      *
      * @return Generator
+     *
+     * @throws ReflectionException
      */
     private function getChildEvents(string $eventClass, array $eventClasses): Generator
     {

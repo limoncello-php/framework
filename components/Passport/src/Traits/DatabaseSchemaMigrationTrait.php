@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Traits;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function createScopesTable(Connection $connection, DatabaseSchemaInterface $schema): void
     {
@@ -108,6 +110,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function createClientsTable(Connection $connection, DatabaseSchemaInterface $schema): void
     {
@@ -137,6 +141,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function createRedirectUrisTable(Connection $connection, DatabaseSchemaInterface $schema): void
     {
@@ -166,6 +172,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function createTokensTable(Connection $connection, DatabaseSchemaInterface $schema): void
     {
@@ -214,6 +222,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function createClientsScopesTable(Connection $connection, DatabaseSchemaInterface $schema): void
     {
@@ -252,6 +262,8 @@ trait DatabaseSchemaMigrationTrait
      * @param DatabaseSchemaInterface $schema
      *
      * @return void
+     *
+     * @throws DBALException
      */
     protected function createTokensScopesTable(Connection $connection, DatabaseSchemaInterface $schema): void
     {

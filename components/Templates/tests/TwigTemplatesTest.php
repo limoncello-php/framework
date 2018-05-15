@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Templates;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Twig_Environment;
+use Twig_Error_Loader;
+use Twig_Error_Runtime;
+use Twig_Error_Syntax;
 
 /**
  * @package Limoncello\Tests\Templates
@@ -74,6 +77,10 @@ class TwigTemplatesTest extends TestCase
 
     /**
      * Test render.
+     *
+     * @throws Twig_Error_Loader
+     * @throws Twig_Error_Runtime
+     * @throws Twig_Error_Syntax
      */
     public function testRender()
     {
@@ -101,6 +108,9 @@ class TwigTemplatesTest extends TestCase
 
     /**
      * Test render.
+     *
+     * @throws Twig_Error_Loader
+     * @throws Twig_Error_Syntax
      */
     public function testCache()
     {

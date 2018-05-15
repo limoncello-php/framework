@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Core\Routing;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ use Limoncello\Tests\Core\TestCase;
 use Mockery;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
 
@@ -195,6 +196,8 @@ class RouterTest extends TestCase
 
     /**
      * @return GroupInterface
+     *
+     * @throws ReflectionException
      */
     private function createGroup(): GroupInterface
     {

@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Passport\Integration;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
@@ -173,6 +174,8 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     public function generateCodeValue(TokenInterface $token): string
     {
@@ -185,6 +188,8 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     public function generateTokenValues(TokenInterface $token): array
     {

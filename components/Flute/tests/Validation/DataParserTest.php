@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Flute\Validation;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,6 +258,7 @@ EOT;
 
         /** @var Error[] $errors */
         $errors = $exception->getErrors();
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(3, $errors);
 
         $this->assertEquals(422, $errors[0]->getStatus());
@@ -321,6 +322,7 @@ EOT;
 
         /** @var Error[] $errors */
         $errors = $exception->getErrors()->getArrayCopy();
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(6, $errors);
 
         $this->assertEquals(422, $errors[0]->getStatus());
@@ -407,6 +409,7 @@ EOT;
 
         /** @var Error[] $errors */
         $errors = $exception->getErrors()->getArrayCopy();
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(3, $errors);
 
         $this->assertEquals(422, $errors[0]->getStatus());
@@ -480,6 +483,7 @@ EOT;
 
         /** @var Error[] $errors */
         $errors = $exception->getErrors()->getArrayCopy();
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(3, $errors);
 
         $this->assertEquals(422, $errors[0]->getStatus());
@@ -534,6 +538,7 @@ EOT;
 
         /** @var Error[] $errors */
         $errors = $exception->getErrors()->getArrayCopy();
+        /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $errors);
 
         $this->assertEquals(422, $errors[0]->getStatus());

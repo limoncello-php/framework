@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Commands\Traits;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\Core\ApplicationInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -48,6 +49,8 @@ trait CommandTrait
      * @param string   $commandName
      *
      * @return ContainerInterface
+     *
+     * @throws ReflectionException
      */
     protected function createContainer(Composer $composer, string $commandName): ContainerInterface
     {
@@ -98,6 +101,8 @@ trait CommandTrait
      * @param string $className
      *
      * @return bool
+     *
+     * @throws ReflectionException
      */
     protected function isValidApplicationClass(string $className): bool
     {

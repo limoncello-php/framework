@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Core\Routing;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
 
 /**
  * @package Limoncello\Core
@@ -75,6 +76,8 @@ class Route implements RouteInterface
      * @param string         $method
      * @param string         $uriPath
      * @param callable       $handler
+     *
+     * @throws ReflectionException
      */
     public function __construct(GroupInterface $group, string $method, string $uriPath, callable $handler)
     {
@@ -193,6 +196,8 @@ class Route implements RouteInterface
      * @param callable $handler
      *
      * @return self
+     *
+     * @throws ReflectionException
      */
     protected function setHandler(callable $handler): self
     {
