@@ -1,7 +1,7 @@
 <?php namespace Limoncello\Tests\Auth\Authorization\PolicyEnforcement;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+use Exception;
 use Limoncello\Auth\Authorization\PolicyAdministration\Policy;
 use Limoncello\Auth\Authorization\PolicyAdministration\Rule;
 use Limoncello\Auth\Authorization\PolicyDecision\Algorithms\BasePolicyOrSetAlgorithm;
@@ -430,6 +431,8 @@ class PolicyEnforcementTest extends TestCase
 
     /**
      * @inheritdoc
+     *
+     * @throws Exception
      */
     protected function setUp()
     {

@@ -32,6 +32,8 @@ use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 abstract class BaseSeedRunner
 {
