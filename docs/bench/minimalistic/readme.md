@@ -122,7 +122,7 @@ Transfer/sec:      8.49MB
 Initially, the built-in PHP server (aka development server) was used for testing which could be run with
 
 ```bash
-$ php -d zend.assertions=1 -d assert.exception=1 -S 0.0.0.0:8080 -t ./public/
+$ php -d zend.assertions=-1 -d assert.exception=1 -S 0.0.0.0:8080 -t ./public/
 ```
 
 However it provided very unstable results. For example it could give 3 000 RPS for the first run and a half of that for next one. For this reason, it looked to be a good idea to run multiple tests and select only the best result. From such testing `limoncello` had the best result, `slim` the second and `lumen` the third. As this performance test shows, PHP development server should not be used in performance testing as it can lead to inaccurate results and a dedicated server with production software stack should be used instead.
