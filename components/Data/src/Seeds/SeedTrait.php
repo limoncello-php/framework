@@ -168,26 +168,26 @@ trait SeedTrait
      * @param string $tableName
      * @param array  $data
      *
-     * @return string|null
+     * @return void
      *
      * @throws DBALException
      */
-    protected function seedRowData(string $tableName, array $data): ?string
+    protected function seedRowData(string $tableName, array $data): void
     {
-        return $this->insertRow($tableName, $this->getConnection(), $data);
+        $this->insertRow($tableName, $this->getConnection(), $data);
     }
 
     /**
      * @param string $modelClass
      * @param array  $data
      *
-     * @return string|null
+     * @return void
      *
      * @throws DBALException
      */
-    protected function seedModelData(string $modelClass, array $data): ?string
+    protected function seedModelData(string $modelClass, array $data): void
     {
-        return $this->seedRowData($this->getModelSchemas()->getTable($modelClass), $data);
+        $this->seedRowData($this->getModelSchemas()->getTable($modelClass), $data);
     }
 
     /**
@@ -203,26 +203,22 @@ trait SeedTrait
      * @param Connection $connection
      * @param array      $data
      *
-     * @return string|null
+     * @return void
      *
      * @throws DBALException
      */
-    private function insertRow($tableName, Connection $connection, array $data): ?string
+    private function insertRow($tableName, Connection $connection, array $data): void
     {
         $quotedFields = [];
         foreach ($data as $column => $value) {
-            $quotedFields["`$column`"] = $value;
+            $quotedFields[$connection->quoteIdentifier($column)] = $value;
         }
 
-        $index = null;
         try {
             $result = $connection->insert($tableName, $quotedFields);
             assert($result !== false, 'Insert failed');
-            $index  = $connection->lastInsertId();
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $e) {
             // ignore non-unique records
         }
-
-        return $index;
     }
 }
