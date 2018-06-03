@@ -29,37 +29,49 @@
 # $ docker-compose -f <file_name.yml> down
 # $ docker-compose -f <file_name.yml> stop
 
-db:
-  image: percona
-  container_name: db_passport
-  ports:
-    - "3306:3306"
-  environment:
-    MYSQL_ROOT_PASSWORD: root
-    MYSQL_USER: passport
-    MYSQL_PASSWORD: secret
-    MYSQL_DATABASE: passport
+version: '3'
+services:
+  db_postgres:
+    image: postgres
+    container_name: db_passport_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: passport
+      POSTGRES_DB: passport
+      POSTGRES_PASSWORD: secret
 
-cli_7_1_php:
-  build: ./../../docker/7_1_cli
-  container_name: cli_7_1_php_limoncello
-  volumes:
-    - .:/app
-  working_dir: /app
-  tty: true
-
-cli_7_2_php:
-  build: ./../../docker/7_2_cli
-  container_name: cli_7_2_php_limoncello
-  volumes:
-    - .:/app
-  working_dir: /app
-  tty: true
-
-cli_hhvm:
-  image: hhvm/hhvm
-  container_name: cli_hhvm_limoncello
-  volumes:
-    - .:/app
-  working_dir: /app
-  tty: true
+  db_percona:
+    image: percona
+    container_name: db_passport_percona
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: passport
+      MYSQL_DATABASE: passport
+      MYSQL_PASSWORD: secret
+#
+#cli_7_1_php:
+#  build: ./../../docker/7_1_cli
+#  container_name: cli_7_1_php_limoncello
+#  volumes:
+#    - .:/app
+#  working_dir: /app
+#  tty: true
+#
+#cli_7_2_php:
+#  build: ./../../docker/7_2_cli
+#  container_name: cli_7_2_php_limoncello
+#  volumes:
+#    - .:/app
+#  working_dir: /app
+#  tty: true
+#
+#cli_hhvm:
+#  image: hhvm/hhvm
+#  container_name: cli_hhvm_limoncello
+#  volumes:
+#    - .:/app
+#  working_dir: /app
+#  tty: true

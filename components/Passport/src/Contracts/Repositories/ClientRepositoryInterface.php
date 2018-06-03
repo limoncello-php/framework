@@ -45,20 +45,20 @@ interface ClientRepositoryInterface
     public function create(ClientInterface $client): ClientInterface;
 
     /**
-     * @param string           $identifier
-     * @param ScopeInterface[] $scopes
+     * @param string                    $identifier
+     * @param iterable|ScopeInterface[] $scopes
      *
      * @return void
      */
-    public function bindScopes(string $identifier, array $scopes): void;
+    public function bindScopes(string $identifier, iterable $scopes): void;
 
     /**
-     * @param string   $identifier
-     * @param string[] $scopeIdentifiers
+     * @param string            $identifier
+     * @param iterable|string[] $scopeIdentifiers
      *
      * @return void
      */
-    public function bindScopeIdentifiers(string $identifier, array $scopeIdentifiers): void;
+    public function bindScopeIdentifiers(string $identifier, iterable $scopeIdentifiers): void;
 
     /**
      * @param string $identifier

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\MySql;
+<?php namespace Limoncello\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -121,7 +121,7 @@ trait DatabaseSchemaMigrationTrait
 CREATE OR REPLACE VIEW {$view} AS
     SELECT
       t.*,
-      GROUP_CONCAT(DISTINCT s.{$intermediateScopeId} ORDER BY s.{$intermediateScopeId} ASC SEPARATOR ' ') AS {$scopes}
+      array_remove(array_agg(s.{$intermediateScopeId}), NULL) AS {$scopes}
     FROM {$tokens} AS t
       LEFT JOIN {$intermediate} AS s ON t.{$tokensTokenId} = s.{$intermediateTokenId}
     GROUP BY t.{$tokensTokenId};
@@ -208,8 +208,8 @@ EOT;
 CREATE VIEW {$view} AS
     SELECT
       c.*,
-      GROUP_CONCAT(DISTINCT s.{$scopesScopeId} ORDER BY s.{$scopesScopeId} ASC SEPARATOR ' ') AS {$scopes},
-      GROUP_CONCAT(DISTINCT u.{$urisValue}     ORDER BY u.{$urisValue} ASC SEPARATOR ' ')     AS {$redirectUris}
+      array_remove(array_agg(s.{$scopesScopeId}), NULL) AS {$scopes},
+      array_remove(array_agg(u.{$urisValue}), NULL)     AS {$redirectUris}
     FROM {$clients} AS c
       LEFT JOIN {$clientsScopes} AS s ON c.{$clientsClientId} = s.{$clScopesClientId}
       LEFT JOIN {$clientsUris}   AS u ON c.{$clientsClientId} = u.{$clUrisClientId}

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Passport\Adaptors\MySql;
+<?php namespace Limoncello\Tests\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com

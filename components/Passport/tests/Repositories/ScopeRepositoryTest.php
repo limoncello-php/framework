@@ -41,7 +41,7 @@ class ScopeRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->initSqliteDatabase();
+        $this->initDatabase();
     }
 
     /**

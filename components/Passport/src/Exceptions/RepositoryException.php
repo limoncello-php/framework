@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\MySql;
+<?php namespace Limoncello\Passport\Exceptions;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -19,19 +19,6 @@
 /**
  * @package Limoncello\Passport
  */
-class Token extends \Limoncello\Passport\Entities\Token
+class RepositoryException extends PassportException
 {
-    use ArrayParserTrait, DbDateFormatTrait;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        if ($this->hasDynamicProperty(static::FIELD_ID) === true) {
-            $this->setScopeIdentifiers($this->parseArray($this->{static::FIELD_SCOPES}));
-        }
-    }
 }

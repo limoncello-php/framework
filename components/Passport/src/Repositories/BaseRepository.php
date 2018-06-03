@@ -19,15 +19,19 @@
 use Closure;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
+use Doctrine\DBAL\ConnectionException as ConEx;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
+use Limoncello\Passport\Exceptions\RepositoryException;
 use PDO;
 
 /**
  * @package Limoncello\Passport
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 abstract class BaseRepository
 {
@@ -66,7 +70,7 @@ abstract class BaseRepository
      *
      * @return void
      *
-     * @throws ConnectionException
+     * @throws RepositoryException
      */
     public function inTransaction(Closure $closure): void
     {
@@ -75,7 +79,16 @@ abstract class BaseRepository
         try {
             $isOk = ($closure() === false ? null : true);
         } finally {
-            isset($isOk) === true ? $connection->commit() : $connection->rollBack();
+            $isCommitting = (isset($isOk) === true);
+            try {
+                $isCommitting === true ? $connection->commit() : $connection->rollBack();
+            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (ConEx | DBALException $exception) {
+                throw new RepositoryException(
+                    $isCommitting === true ? 'Failed to commit a transaction.' : 'Failed to rollback a transaction.',
+                    0,
+                    $exception
+                );
+            }
         }
     }
 
@@ -103,41 +116,59 @@ abstract class BaseRepository
      * @param array $columns
      *
      * @return array
+     *
+     * @throws RepositoryException
      */
     protected function indexResources(array $columns = ['*']): array
     {
-        $query = $this->getConnection()->createQueryBuilder();
+        try {
+            $query = $this->getConnection()->createQueryBuilder();
 
-        $statement = $query
-            ->select($columns)
-            ->from($this->getTableNameForReading())
-            ->execute();
+            $statement = $query
+                ->select($columns)
+                ->from($this->getTableNameForReading())
+                ->execute();
 
-        $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
-        $result = $statement->fetchAll();
+            $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
+            $result = $statement->fetchAll();
 
-        return $result;
+            return $result;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Resource reading failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
-     * @param array $values
+     * @param iterable $values
      *
-     * @return int
+     * @return void
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
-    protected function createResource(array $values): int
+    protected function createResource(iterable $values): void
     {
-        $query = $this->getConnection()->createQueryBuilder();
+        try {
+            $query = $this->getConnection()->createQueryBuilder();
 
-        $query->insert($this->getTableNameForWriting());
-        foreach ($values as $key => $value) {
-            $query->setValue($key, $this->createTypedParameter($query, $value));
+            $query->insert($this->getTableNameForWriting());
+            foreach ($values as $key => $value) {
+                $query->setValue($key, $this->createTypedParameter($query, $value));
+            }
+
+            $numberOfAdded = $query->execute();
+            assert(is_int($numberOfAdded) === true);
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Resource creation failed.';
+            throw new RepositoryException($message, 0, $exception);
         }
+    }
 
-        $numberOfAdded = $query->execute();
-        assert(is_int($numberOfAdded) === true);
-
+    /**
+     * @return string
+     */
+    protected function getLastInsertId(): string
+    {
         $lastInsertId = $this->getConnection()->lastInsertId();
 
         return $lastInsertId;
@@ -149,7 +180,7 @@ abstract class BaseRepository
      *
      * @return mixed
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function readResource($identifier, array $columns = ['*'])
     {
@@ -163,22 +194,27 @@ abstract class BaseRepository
      *
      * @return mixed
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function readResourceByColumn($identifier, string $column, array $columns = ['*'])
     {
-        $query = $this->getConnection()->createQueryBuilder();
+        try {
+            $query = $this->getConnection()->createQueryBuilder();
 
-        $statement = $query
-            ->select($columns)
-            ->from($this->getTableNameForReading())
-            ->where($column . '=' . $this->createTypedParameter($query, $identifier))
-            ->execute();
+            $statement = $query
+                ->select($columns)
+                ->from($this->getTableNameForReading())
+                ->where($column . '=' . $this->createTypedParameter($query, $identifier))
+                ->execute();
 
-        $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
-        $result = $statement->fetch();
+            $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
+            $result = $statement->fetch();
 
-        return $result === false ? null : $result;
+            return $result === false ? null : $result;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Resource reading failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
@@ -187,23 +223,28 @@ abstract class BaseRepository
      *
      * @return int
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function updateResource($identifier, array $values): int
     {
-        $query = $this->getConnection()->createQueryBuilder();
+        try {
+            $query = $this->getConnection()->createQueryBuilder();
 
-        $query
-            ->update($this->getTableNameForWriting())
-            ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $identifier));
-        foreach ($values as $key => $value) {
-            $query->set($key, $this->createTypedParameter($query, $value));
+            $query
+                ->update($this->getTableNameForWriting())
+                ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $identifier));
+            foreach ($values as $key => $value) {
+                $query->set($key, $this->createTypedParameter($query, $value));
+            }
+
+            $numberOfUpdated = $query->execute();
+            assert(is_int($numberOfUpdated) === true);
+
+            return $numberOfUpdated;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Resource update failed.';
+            throw new RepositoryException($message, 0, $exception);
         }
-
-        $numberOfUpdated = $query->execute();
-        assert(is_int($numberOfUpdated) === true);
-
-        return $numberOfUpdated;
     }
 
     /**
@@ -211,50 +252,71 @@ abstract class BaseRepository
      *
      * @return int
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function deleteResource($identifier): int
     {
-        $query = $this->getConnection()->createQueryBuilder();
+        try {
+            $query = $this->getConnection()->createQueryBuilder();
 
-        $query
-            ->delete($this->getTableNameForWriting())
-            ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $identifier));
+            $query
+                ->delete($this->getTableNameForWriting())
+                ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $identifier));
 
-        $numberOfDeleted = $query->execute();
-        assert(is_int($numberOfDeleted) === true);
+            $numberOfDeleted = $query->execute();
+            assert(is_int($numberOfDeleted) === true);
 
-        return $numberOfDeleted;
+            return $numberOfDeleted;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Resource deletion failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @param string|int $primaryKey
-     * @param array      $foreignKeys
+     * @param iterable   $foreignKeys
      * @param string     $intTableName
      * @param string     $intPrimaryKeyName
      * @param string     $intForeignKeyName
      *
      * @return void
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function createBelongsToManyRelationship(
         $primaryKey,
-        array $foreignKeys,
+        iterable $foreignKeys,
         string $intTableName,
         string $intPrimaryKeyName,
         string $intForeignKeyName
     ): void {
-        $connection = $this->getConnection();
-        $query      = $connection->createQueryBuilder();
+        assert(is_string($primaryKey) === true || is_int($primaryKey) === true);
 
-        $query->insert($intTableName)->values([$intPrimaryKeyName => '?', $intForeignKeyName => '?']);
-        $statement = $connection->prepare($query->getSQL());
+        try {
+            $this->inTransaction(function () use (
+                $intTableName,
+                $intPrimaryKeyName,
+                $intForeignKeyName,
+                $primaryKey,
+                $foreignKeys
+            ): void {
+                $connection = $this->getConnection();
+                $query      = $connection->createQueryBuilder();
 
-        foreach ($foreignKeys as $value) {
-            $statement->bindValue(1, $primaryKey);
-            $statement->bindValue(2, $value);
-            $statement->execute();
+                $query->insert($intTableName)->values([$intPrimaryKeyName => '?', $intForeignKeyName => '?']);
+                $statement = $connection->prepare($query->getSQL());
+
+                foreach ($foreignKeys as $value) {
+                    assert(is_string($value) === true || is_int($value) === true);
+                    $statement->bindValue(1, $primaryKey);
+                    $statement->bindValue(2, $value);
+                    $statement->execute();
+                }
+            });
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Belongs-to-Many relationship creation failed.';
+            throw new RepositoryException($message, 0, $exception);
         }
     }
 
@@ -266,7 +328,7 @@ abstract class BaseRepository
      *
      * @return string[]
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function readBelongsToManyRelationshipIdentifiers(
         $identifier,
@@ -274,19 +336,56 @@ abstract class BaseRepository
         string $intPrimaryKeyName,
         string $intForeignKeyName
     ): array {
-        $connection = $this->getConnection();
-        $query      = $connection->createQueryBuilder();
+        try {
+            $connection = $this->getConnection();
+            $query      = $connection->createQueryBuilder();
 
-        $query
-            ->select($intForeignKeyName)
-            ->from($intTableName)
-            ->where($intPrimaryKeyName . '=' . $this->createTypedParameter($query, $identifier));
+            $query
+                ->select($intForeignKeyName)
+                ->from($intTableName)
+                ->where($intPrimaryKeyName . '=' . $this->createTypedParameter($query, $identifier));
 
-        $statement = $query->execute();
-        $statement->setFetchMode(PDO::FETCH_NUM);
-        $result = array_column($statement->fetchAll(), 0);
+            $statement = $query->execute();
+            $statement->setFetchMode(PDO::FETCH_NUM);
+            $result = array_column($statement->fetchAll(), 0);
 
-        return $result;
+            return $result;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Belongs-to-Many relationship reading failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
+    }
+
+    /**
+     * @param string     $intTableName
+     * @param string     $intPrimaryKeyName
+     * @param string|int $identifier
+     *
+     * @return int
+     *
+     * @throws RepositoryException
+     */
+    protected function deleteBelongsToManyRelationshipIdentifiers(
+        string $intTableName,
+        string $intPrimaryKeyName,
+        $identifier
+    ): int {
+        try {
+            $connection = $this->getConnection();
+            $query      = $connection->createQueryBuilder();
+
+            $query
+                ->delete($intTableName)
+                ->where($intPrimaryKeyName . '=' . $this->createTypedParameter($query, $identifier));
+
+            $numberOfDeleted = $query->execute();
+            assert(is_int($numberOfDeleted) === true);
+
+            return $numberOfDeleted;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Belongs-to-Many relationship deletion failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
@@ -297,7 +396,7 @@ abstract class BaseRepository
      *
      * @return string[]
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function readHasManyRelationshipColumn(
         $identifier,
@@ -305,46 +404,24 @@ abstract class BaseRepository
         string $hasManyColumn,
         string $hasManyFkName
     ): array {
-        $connection = $this->getConnection();
-        $query      = $connection->createQueryBuilder();
+        try {
+            $connection = $this->getConnection();
+            $query      = $connection->createQueryBuilder();
 
-        $query
-            ->select($hasManyColumn)
-            ->from($hasManyTableName)
-            ->where($hasManyFkName . '=' . $this->createTypedParameter($query, $identifier));
+            $query
+                ->select($hasManyColumn)
+                ->from($hasManyTableName)
+                ->where($hasManyFkName . '=' . $this->createTypedParameter($query, $identifier));
 
-        $statement = $query->execute();
-        $statement->setFetchMode(PDO::FETCH_NUM);
-        $result = array_column($statement->fetchAll(), 0);
+            $statement = $query->execute();
+            $statement->setFetchMode(PDO::FETCH_NUM);
+            $result = array_column($statement->fetchAll(), 0);
 
-        return $result;
-    }
-
-    /**
-     * @param string     $intTableName
-     * @param string     $intPrimaryKeyName
-     * @param string|int $identifier
-     *
-     * @return int
-     *
-     * @throws DBALException
-     */
-    protected function deleteBelongsToManyRelationshipIdentifiers(
-        string $intTableName,
-        string $intPrimaryKeyName,
-        $identifier
-    ): int {
-        $connection = $this->getConnection();
-        $query      = $connection->createQueryBuilder();
-
-        $query
-            ->delete($intTableName)
-            ->where($intPrimaryKeyName . '=' . $this->createTypedParameter($query, $identifier));
-
-        $numberOfDeleted = $query->execute();
-        assert(is_int($numberOfDeleted) === true);
-
-        return $numberOfDeleted;
+            return $result;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Has-Many relationship reading failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
@@ -352,12 +429,17 @@ abstract class BaseRepository
      *
      * @return string
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function getDateTimeForDb(DateTimeInterface $dateTime): string
     {
-        return Type::getType(Type::DATETIME)
-            ->convertToDatabaseValue($dateTime, $this->getConnection()->getDatabasePlatform());
+        try {
+            return Type::getType(Type::DATETIME)
+                ->convertToDatabaseValue($dateTime, $this->getConnection()->getDatabasePlatform());
+        } catch (DBALException $exception) {
+            $message = 'DateTime conversion to database format failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
@@ -388,7 +470,7 @@ abstract class BaseRepository
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function createTypedParameter(QueryBuilder $query, $value): string
     {
@@ -400,11 +482,29 @@ abstract class BaseRepository
             $type = PDO::PARAM_NULL;
         } elseif ($value instanceof DateTimeInterface) {
             $value = $this->getDateTimeForDb($value);
-            $type = PDO::PARAM_STR;
+            $type  = PDO::PARAM_STR;
         } else {
             $type = PDO::PARAM_STR;
         }
 
         return $query->createNamedParameter($value, $type);
+    }
+
+    /**
+     * Helps to ignore exception handling for cases when they do not arise (e.g. having current date and time).
+     *
+     * @param Closure $closure
+     * @param mixed   $defaultValue
+     *
+     * @return mixed|null
+     */
+    protected function ignoreException(Closure $closure, $defaultValue = null)
+    {
+        try {
+            $defaultValue = call_user_func($closure);
+        } catch (Exception $exception) {
+        }
+
+        return $defaultValue;
     }
 }

@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Passport\Adaptors\MySql;
+<?php namespace Limoncello\Tests\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -20,7 +20,7 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Exception;
-use Limoncello\Passport\Adaptors\MySql\TokenRepository;
+use Limoncello\Passport\Adaptors\PostgreSql\TokenRepository;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Entities\DatabaseSchema;
 
@@ -87,7 +87,7 @@ class TokenRepositoryTest extends TestCase
         $data  = [
             $schema->getTokensIdentityColumn()       => 1,
             $schema->getTokensValueColumn()          => self::TEST_TOKEN_VALUE,
-            $schema->getTokensViewScopesColumn()     => 'one two three',
+            $schema->getTokensViewScopesColumn()     => '{one,two,three}',
             $schema->getTokensIsEnabledColumn()      => true,
             $schema->getTokensValueCreatedAtColumn() => new DateTimeImmutable(),
         ];

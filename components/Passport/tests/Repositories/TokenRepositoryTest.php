@@ -46,7 +46,7 @@ class TokenRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->initSqliteDatabase();
+        $this->initDatabase();
     }
 
     /**
@@ -120,7 +120,9 @@ class TokenRepositoryTest extends TestCase
 
         /** @var TokenInterface[] $tokensByUser */
         $this->assertCount(1, $tokensByUser = $tokenRepo->readByUser(PassportServerTest::TEST_USER_ID, 10));
-        $this->assertEquals('scope1 scope2', array_shift($tokensByUser)->getScopeList());
+        $scopeIdentifiers = array_shift($tokensByUser)->getScopeIdentifiers();
+        sort($scopeIdentifiers);
+        $this->assertEquals(['scope1', 'scope2'], $scopeIdentifiers);
 
         $this->assertNotEmpty($tokenRepo->readPassport($sameToken->getValue(), 10));
 

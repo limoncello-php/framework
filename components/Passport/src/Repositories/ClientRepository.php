@@ -17,11 +17,10 @@
  */
 
 use DateTimeImmutable;
-use Doctrine\DBAL\DBALException;
-use Exception;
 use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Repositories\ClientRepositoryInterface;
+use Limoncello\Passport\Exceptions\RepositoryException;
 
 /**
  * @package Limoncello\Passport
@@ -39,73 +38,80 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
     /**
      * @inheritdoc
      *
-     * @throws Exception
-     * @throws DBALException
+     * @throws RepositoryException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function create(ClientInterface $client): ClientInterface
     {
-        $now    = new DateTimeImmutable();
-        $schema = $this->getDatabaseSchema();
-        $values = [
-            $schema->getClientsIdentityColumn()               => $client->getIdentifier(),
-            $schema->getClientsNameColumn()                   => $client->getName(),
-            $schema->getClientsDescriptionColumn()            => $client->getDescription(),
-            $schema->getClientsCredentialsColumn()            => $client->getCredentials(),
-            $schema->getClientsIsConfidentialColumn()         => $client->isConfidential(),
-            $schema->getClientsIsScopeExcessAllowedColumn()   => $client->isScopeExcessAllowed(),
-            $schema->getClientsIsUseDefaultScopeColumn()      => $client->isUseDefaultScopesOnEmptyRequest(),
-            $schema->getClientsIsCodeGrantEnabledColumn()     => $client->isCodeGrantEnabled(),
-            $schema->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
-            $schema->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
-            $schema->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
-            $schema->getClientsIsRefreshGrantEnabledColumn()  => $client->isRefreshGrantEnabled(),
-            $schema->getClientsCreatedAtColumn()              => $now,
-        ];
-
-        $identifier = $client->getIdentifier();
-        if (empty($scopeIdentifiers = $client->getScopeIdentifiers()) === true) {
-            $this->createResource($values);
-        } else {
-            $this->inTransaction(function () use ($identifier, $values, $scopeIdentifiers) {
-                $this->createResource($values);
-                $this->bindScopeIdentifiers($identifier, $scopeIdentifiers);
+        try {
+            $now    = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
             });
-        }
-        $client->setCreatedAt($now);
+            $schema = $this->getDatabaseSchema();
+            $values = [
+                $schema->getClientsIdentityColumn()               => $client->getIdentifier(),
+                $schema->getClientsNameColumn()                   => $client->getName(),
+                $schema->getClientsDescriptionColumn()            => $client->getDescription(),
+                $schema->getClientsCredentialsColumn()            => $client->getCredentials(),
+                $schema->getClientsIsConfidentialColumn()         => $client->isConfidential(),
+                $schema->getClientsIsScopeExcessAllowedColumn()   => $client->isScopeExcessAllowed(),
+                $schema->getClientsIsUseDefaultScopeColumn()      => $client->isUseDefaultScopesOnEmptyRequest(),
+                $schema->getClientsIsCodeGrantEnabledColumn()     => $client->isCodeGrantEnabled(),
+                $schema->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
+                $schema->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
+                $schema->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
+                $schema->getClientsIsRefreshGrantEnabledColumn()  => $client->isRefreshGrantEnabled(),
+                $schema->getClientsCreatedAtColumn()              => $now,
+            ];
 
-        return $client;
+            $identifier = $client->getIdentifier();
+            if (empty($scopeIdentifiers = $client->getScopeIdentifiers()) === true) {
+                $this->createResource($values);
+            } else {
+                $this->inTransaction(function () use ($identifier, $values, $scopeIdentifiers) {
+                    $this->createResource($values);
+                    $this->bindScopeIdentifiers($identifier, $scopeIdentifiers);
+                });
+            }
+            $client->setCreatedAt($now);
+
+            return $client;
+        } catch (RepositoryException $exception) {
+            $message = 'Client creation failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
-    public function bindScopes(string $identifier, array $scopes): void
+    public function bindScopes(string $identifier, iterable $scopes): void
     {
-        $scopeIdentifiers = [];
-        foreach ($scopes as $scope) {
-            /** @var ScopeInterface $scope */
-            assert($scope instanceof ScopeInterface);
-            $scopeIdentifiers[] = $scope->getIdentifier();
-        }
+        $getIdentifiers = function (iterable $scopes): iterable {
+            foreach ($scopes as $scope) {
+                /** @var ScopeInterface $scope */
+                assert($scope instanceof ScopeInterface);
+                yield $scope->getIdentifier();
+            }
+        };
 
-        $this->bindScopeIdentifiers($identifier, $scopeIdentifiers);
+        $this->bindScopeIdentifiers($identifier, $getIdentifiers($scopes));
     }
 
     /**
      * @param string   $identifier
-     * @param string[] $scopeIdentifiers
+     * @param iterable $scopeIdentifiers
      *
      * @return void
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
-    public function bindScopeIdentifiers(string $identifier, array $scopeIdentifiers): void
+    public function bindScopeIdentifiers(string $identifier, iterable $scopeIdentifiers): void
     {
-        if (empty($scopeIdentifiers) === false) {
+        try {
             $schema = $this->getDatabaseSchema();
             $this->createBelongsToManyRelationship(
                 $identifier,
@@ -114,100 +120,132 @@ abstract class ClientRepository extends BaseRepository implements ClientReposito
                 $schema->getClientsScopesClientIdentityColumn(),
                 $schema->getClientsScopesScopeIdentityColumn()
             );
+        } catch (RepositoryException $exception) {
+            $message = 'Binding client scopes failed.';
+            throw new RepositoryException($message, 0, $exception);
         }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function unbindScopes(string $identifier): void
     {
-        $schema = $this->getDatabaseSchema();
-        $this->deleteBelongsToManyRelationshipIdentifiers(
-            $schema->getClientsScopesTable(),
-            $schema->getClientsScopesClientIdentityColumn(),
-            $identifier
-        );
+        try {
+            $schema = $this->getDatabaseSchema();
+            $this->deleteBelongsToManyRelationshipIdentifiers(
+                $schema->getClientsScopesTable(),
+                $schema->getClientsScopesClientIdentityColumn(),
+                $identifier
+            );
+        } catch (RepositoryException $exception) {
+            $message = 'Unbinding client scopes failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function read(string $identifier): ?ClientInterface
     {
-        return $this->readResource($identifier);
+        try {
+            return $this->readResource($identifier);
+        } catch (RepositoryException $exception) {
+            $message = 'Reading client failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function readScopeIdentifiers(string $identifier): array
     {
-        $schema = $this->getDatabaseSchema();
-        return $this->readBelongsToManyRelationshipIdentifiers(
-            $identifier,
-            $schema->getClientsScopesTable(),
-            $schema->getClientsScopesClientIdentityColumn(),
-            $schema->getClientsScopesScopeIdentityColumn()
-        );
+        try {
+            $schema = $this->getDatabaseSchema();
+            return $this->readBelongsToManyRelationshipIdentifiers(
+                $identifier,
+                $schema->getClientsScopesTable(),
+                $schema->getClientsScopesClientIdentityColumn(),
+                $schema->getClientsScopesScopeIdentityColumn()
+            );
+        } catch (RepositoryException $exception) {
+            $message = 'Reading client scope identifiers failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function readRedirectUriStrings(string $identifier): array
     {
-        $schema = $this->getDatabaseSchema();
-        return $this->readHasManyRelationshipColumn(
-            $identifier,
-            $schema->getRedirectUrisTable(),
-            $schema->getRedirectUrisValueColumn(),
-            $schema->getRedirectUrisClientIdentityColumn()
-        );
+        try {
+            $schema = $this->getDatabaseSchema();
+            return $this->readHasManyRelationshipColumn(
+                $identifier,
+                $schema->getRedirectUrisTable(),
+                $schema->getRedirectUrisValueColumn(),
+                $schema->getRedirectUrisClientIdentityColumn()
+            );
+        } catch (RepositoryException $exception) {
+            $message = 'Reading client redirect URIs failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
-     *
-     * @throws Exception
-     * @throws DBALException
      */
     public function update(ClientInterface $client): void
     {
-        $now    = new DateTimeImmutable();
-        $schema = $this->getDatabaseSchema();
-        $this->updateResource($client->getIdentifier(), [
-            $schema->getClientsNameColumn()                   => $client->getName(),
-            $schema->getClientsDescriptionColumn()            => $client->getDescription(),
-            $schema->getClientsCredentialsColumn()            => $client->getCredentials(),
-            $schema->getClientsIsConfidentialColumn()         => $client->isConfidential(),
-            $schema->getClientsIsScopeExcessAllowedColumn()   => $client->isScopeExcessAllowed(),
-            $schema->getClientsIsUseDefaultScopeColumn()      => $client->isUseDefaultScopesOnEmptyRequest(),
-            $schema->getClientsIsCodeGrantEnabledColumn()     => $client->isCodeGrantEnabled(),
-            $schema->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
-            $schema->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
-            $schema->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
-            $schema->getClientsUpdatedAtColumn()              => $now,
-        ]);
-        $client->setUpdatedAt($now);
+        try {
+            $now    = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
+            });
+            $schema = $this->getDatabaseSchema();
+            $this->updateResource($client->getIdentifier(), [
+                $schema->getClientsNameColumn()                   => $client->getName(),
+                $schema->getClientsDescriptionColumn()            => $client->getDescription(),
+                $schema->getClientsCredentialsColumn()            => $client->getCredentials(),
+                $schema->getClientsIsConfidentialColumn()         => $client->isConfidential(),
+                $schema->getClientsIsScopeExcessAllowedColumn()   => $client->isScopeExcessAllowed(),
+                $schema->getClientsIsUseDefaultScopeColumn()      => $client->isUseDefaultScopesOnEmptyRequest(),
+                $schema->getClientsIsCodeGrantEnabledColumn()     => $client->isCodeGrantEnabled(),
+                $schema->getClientsIsImplicitGrantEnabledColumn() => $client->isImplicitGrantEnabled(),
+                $schema->getClientsIsPasswordGrantEnabledColumn() => $client->isPasswordGrantEnabled(),
+                $schema->getClientsIsClientGrantEnabledColumn()   => $client->isClientGrantEnabled(),
+                $schema->getClientsUpdatedAtColumn()              => $now,
+            ]);
+            $client->setUpdatedAt($now);
+        } catch (RepositoryException $exception) {
+            $message = 'Client update failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function delete(string $identifier): void
     {
-        $this->deleteResource($identifier);
+        try {
+            $this->deleteResource($identifier);
+        } catch (RepositoryException $exception) {
+            $message = 'Client deletion failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**

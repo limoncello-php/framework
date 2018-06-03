@@ -18,9 +18,9 @@
 
 use DateTimeImmutable;
 use Doctrine\DBAL\DBALException;
-use Exception;
 use Limoncello\Passport\Contracts\Entities\RedirectUriInterface;
 use Limoncello\Passport\Contracts\Repositories\RedirectUriRepositoryInterface;
+use Limoncello\Passport\Exceptions\RepositoryException;
 use PDO;
 
 /**
@@ -31,82 +31,110 @@ abstract class RedirectUriRepository extends BaseRepository implements RedirectU
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function indexClientUris(string $clientIdentifier): array
     {
-        $query = $this->getConnection()->createQueryBuilder();
+        try {
+            $query = $this->getConnection()->createQueryBuilder();
 
-        $clientIdColumn = $this->getDatabaseSchema()->getRedirectUrisClientIdentityColumn();
-        $statement      = $query
-            ->select(['*'])
-            ->from($this->getTableNameForWriting())
-            ->where($clientIdColumn . '=' . $this->createTypedParameter($query, $clientIdentifier))
-            ->execute();
+            $clientIdColumn = $this->getDatabaseSchema()->getRedirectUrisClientIdentityColumn();
+            $statement      = $query
+                ->select(['*'])
+                ->from($this->getTableNameForWriting())
+                ->where($clientIdColumn . '=' . $this->createTypedParameter($query, $clientIdentifier))
+                ->execute();
 
-        $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
-        $result = $statement->fetchAll();
+            $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
+            $result = $statement->fetchAll();
 
-        return $result;
+            return $result;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Reading client redirect URIs failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws Exception
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function create(RedirectUriInterface $redirectUri): RedirectUriInterface
     {
-        $now        = new DateTimeImmutable();
-        $schema     = $this->getDatabaseSchema();
-        $identifier = $this->createResource([
-            $schema->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
-            $schema->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
-            $schema->getRedirectUrisCreatedAtColumn()      => $now,
-        ]);
+        try {
+            $now    = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
+            });
+            $schema = $this->getDatabaseSchema();
+            $this->createResource([
+                $schema->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
+                $schema->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
+                $schema->getRedirectUrisCreatedAtColumn()      => $now,
+            ]);
+            $identifier = $this->getLastInsertId();
 
-        $redirectUri->setIdentifier($identifier)->setCreatedAt($now);
+            $redirectUri->setIdentifier($identifier)->setCreatedAt($now);
 
-        return $redirectUri;
+            return $redirectUri;
+        } catch (RepositoryException $exception) {
+            $message = 'Client redirect URI creation failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function read(int $identifier): RedirectUriInterface
     {
-        return $this->readResource($identifier);
+        try {
+            return $this->readResource($identifier);
+        } catch (RepositoryException $exception) {
+            $message = 'Reading client redirect URIs failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws Exception
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function update(RedirectUriInterface $redirectUri): void
     {
-        $now    = new DateTimeImmutable();
-        $schema = $this->getDatabaseSchema();
-        $this->updateResource($redirectUri->getIdentifier(), [
-            $schema->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
-            $schema->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
-            $schema->getRedirectUrisUpdatedAtColumn()      => $now,
-        ]);
-        $redirectUri->setUpdatedAt($now);
+        try {
+            $now    = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
+            });
+            $schema = $this->getDatabaseSchema();
+            $this->updateResource($redirectUri->getIdentifier(), [
+                $schema->getRedirectUrisClientIdentityColumn() => $redirectUri->getClientIdentifier(),
+                $schema->getRedirectUrisValueColumn()          => $redirectUri->getValue(),
+                $schema->getRedirectUrisUpdatedAtColumn()      => $now,
+            ]);
+            $redirectUri->setUpdatedAt($now);
+        } catch (RepositoryException $exception) {
+            $message = 'Client redirect URI update failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function delete(int $identifier): void
     {
-        $this->deleteResource($identifier);
+        try {
+            $this->deleteResource($identifier);
+        } catch (RepositoryException $exception) {
+            $message = 'Client redirect URI deletion failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**

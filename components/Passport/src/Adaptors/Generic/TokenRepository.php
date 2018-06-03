@@ -17,10 +17,11 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\DBALException as DBALEx;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
+use Limoncello\Passport\Exceptions\RepositoryException;
 use PDO;
 
 /**
@@ -102,76 +103,89 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
 
     /**
      * @inheritdoc
+     *
+     * @throws RepositoryException
      */
     public function readByUser(int $userId, int $expirationInSeconds, int $limit = null): array
     {
-        /** @var TokenInterface[] $tokens */
-        $tokens = parent::readByUser($userId, $expirationInSeconds, $limit);
+        try {
+            /** @var TokenInterface[] $tokens */
+            $tokens = parent::readByUser($userId, $expirationInSeconds, $limit);
 
-        // select scope identifiers for tokens
-        if (empty($tokens) === false) {
-            $schema        = $this->getDatabaseSchema();
-            $tokenIdColumn = $schema->getTokensScopesTokenIdentityColumn();
-            $scopeIdColumn = $schema->getTokensScopesScopeIdentityColumn();
+            // select scope identifiers for tokens
+            if (empty($tokens) === false) {
+                $schema        = $this->getDatabaseSchema();
+                $tokenIdColumn = $schema->getTokensScopesTokenIdentityColumn();
+                $scopeIdColumn = $schema->getTokensScopesScopeIdentityColumn();
 
-            $connection = $this->getConnection();
-            $query      = $connection->createQueryBuilder();
+                $connection = $this->getConnection();
+                $query      = $connection->createQueryBuilder();
 
-            $tokenIds = array_keys($tokens);
-            $query
-                ->select([$tokenIdColumn, $scopeIdColumn])
-                ->from($schema->getTokensScopesTable())
-                ->where($query->expr()->in($tokenIdColumn, $tokenIds))
-                ->orderBy($tokenIdColumn);
+                $tokenIds = array_keys($tokens);
+                $query
+                    ->select([$tokenIdColumn, $scopeIdColumn])
+                    ->from($schema->getTokensScopesTable())
+                    ->where($query->expr()->in($tokenIdColumn, $tokenIds))
+                    ->orderBy($tokenIdColumn);
 
-            $statement = $query->execute();
-            $statement->setFetchMode(PDO::FETCH_ASSOC);
-            $tokenScopePairs = $statement->fetchAll();
+                $statement = $query->execute();
+                $statement->setFetchMode(PDO::FETCH_ASSOC);
+                $tokenScopePairs = $statement->fetchAll();
 
-            $curTokenId = null;
-            $curScopes  = null;
-            // set selected scopes to tokens
-            foreach ($tokenScopePairs as $pair) {
-                $tokenId = $pair[$tokenIdColumn];
-                $scopeId = $pair[$scopeIdColumn];
+                $curTokenId = null;
+                $curScopes  = null;
+                // set selected scopes to tokens
+                foreach ($tokenScopePairs as $pair) {
+                    $tokenId = $pair[$tokenIdColumn];
+                    $scopeId = $pair[$scopeIdColumn];
 
-                if ($curTokenId !== $tokenId) {
-                    $assignScopes = $curTokenId !== null && empty($curScopes) === false;
-                    $assignScopes ? $tokens[$curTokenId]->setScopeIdentifiers($curScopes) : null;
-                    $curTokenId = $tokenId;
-                    $curScopes  = [$scopeId];
+                    if ($curTokenId !== $tokenId) {
+                        $assignScopes = $curTokenId !== null && empty($curScopes) === false;
+                        $assignScopes ? $tokens[$curTokenId]->setScopeIdentifiers($curScopes) : null;
+                        $curTokenId = $tokenId;
+                        $curScopes  = [$scopeId];
 
-                    continue;
+                        continue;
+                    }
+
+                    $curScopes[] = $scopeId;
                 }
-
-                $curScopes[] = $scopeId;
+                $curTokenId === null || empty($curScopes) === true ?:
+                    $tokens[$curTokenId]->setScopeIdentifiers($curScopes);
             }
-            $curTokenId === null || empty($curScopes) === true ?: $tokens[$curTokenId]->setScopeIdentifiers($curScopes);
-        }
 
-        return $tokens;
+            return $tokens;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (RepositoryException | DBALEx $exception) {
+            $message = 'Token reading failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function readPassport(string $tokenValue, int $expirationInSeconds): ?array
     {
-        $statement = $this->createPassportDataQuery($tokenValue, $expirationInSeconds)->execute();
-        $statement->setFetchMode(PDO::FETCH_ASSOC);
-        $data = $statement->fetch();
-        $result = null;
-        if ($data !== false) {
-            $schema  = $this->getDatabaseSchema();
-            $tokenId = $data[$schema->getTokensIdentityColumn()];
-            $scopes  =  $this->readScopeIdentifiers($tokenId);
-            $data[$schema->getTokensViewScopesColumn()] = $scopes;
-            $result = $data;
-        }
+        try {
+            $statement = $this->createPassportDataQuery($tokenValue, $expirationInSeconds)->execute();
+            $statement->setFetchMode(PDO::FETCH_ASSOC);
+            $data   = $statement->fetch();
+            $result = null;
+            if ($data !== false) {
+                $schema                                     = $this->getDatabaseSchema();
+                $tokenId                                    = $data[$schema->getTokensIdentityColumn()];
+                $scopes                                     = $this->readScopeIdentifiers($tokenId);
+                $data[$schema->getTokensViewScopesColumn()] = $scopes;
+                $result                                     = $data;
+            }
 
-        return $result;
+            return $result;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALEx $exception) {
+            $message = 'Passport reading failed';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
@@ -195,8 +209,6 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      * @param int    $expirationInSeconds
      *
      * @return QueryBuilder
-     *
-     * @throws DBALException
      */
     private function createPassportDataQuery(
         string $tokenValue,
@@ -210,15 +222,16 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
             $schema->getTokensValueCreatedAtColumn()
         );
 
-        $tokensTable = $this->getTableNameForReading();
-        $usersTable  = $aliased = $schema->getUsersTable();
-        $usersFk     = $schema->getTokensUserIdentityColumn();
-        $usersPk     = $schema->getUsersIdentityColumn();
+        $connection       = $query->getConnection();
+        $tokensTableAlias = $this->getTableNameForReading();
+        $usersTable       = $connection->quoteIdentifier($usersTableAlias = $schema->getUsersTable());
+        $usersFk          = $connection->quoteIdentifier($schema->getTokensUserIdentityColumn());
+        $usersPk          = $connection->quoteIdentifier($schema->getUsersIdentityColumn());
         $query->innerJoin(
-            $tokensTable,
+            $tokensTableAlias,
             $usersTable,
-            $aliased,
-            "`$tokensTable`.`$usersFk` = `$aliased`.`$usersPk`"
+            $usersTableAlias,
+            "$tokensTableAlias.$usersFk = $usersTableAlias.$usersPk"
         );
 
         return $query;
@@ -229,7 +242,7 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
      *
      * @return void
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     private function addScope(TokenInterface $token)
     {

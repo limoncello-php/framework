@@ -19,19 +19,17 @@
 /**
  * @package Limoncello\Passport
  */
-class Token extends \Limoncello\Passport\Entities\Token
+trait ArrayParserTrait
 {
-    use ArrayParserTrait, DbDateFormatTrait;
-
     /**
-     * Constructor.
+     * @param string $values
+     *
+     * @return string[]
      */
-    public function __construct()
+    protected function parseArray(string $values): array
     {
-        parent::__construct();
+        $parsed = empty($values) === false ? explode(' ', $values) : [];
 
-        if ($this->hasDynamicProperty(static::FIELD_ID) === true) {
-            $this->setScopeIdentifiers($this->parseArray($this->{static::FIELD_SCOPES}));
-        }
+        return $parsed;
     }
 }

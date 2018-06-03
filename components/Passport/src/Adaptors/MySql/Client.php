@@ -21,7 +21,7 @@
  */
 class Client extends \Limoncello\Passport\Entities\Client
 {
-    use DbDateFormatTrait;
+    use ArrayParserTrait, DbDateFormatTrait;
 
     /**
      * Constructor.
@@ -31,12 +31,8 @@ class Client extends \Limoncello\Passport\Entities\Client
         parent::__construct();
 
         if ($this->hasDynamicProperty(static::FIELD_ID) === true) {
-            $this->setScopeIdentifiers(
-                empty($scope = $this->{static::FIELD_SCOPES}) === false ? explode(' ', $scope) : []
-            );
-            $this->setRedirectUriStrings(
-                empty($uris = $this->{static::FIELD_REDIRECT_URIS}) === false ? explode(' ', $uris) : []
-            );
+            $this->setScopeIdentifiers($this->parseArray($this->{static::FIELD_SCOPES}));
+            $this->setRedirectUriStrings($this->parseArray($this->{static::FIELD_REDIRECT_URIS}));
         }
     }
 }

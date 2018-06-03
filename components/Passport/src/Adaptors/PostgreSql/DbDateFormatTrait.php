@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\MySql;
+<?php namespace Limoncello\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -19,19 +19,13 @@
 /**
  * @package Limoncello\Passport
  */
-class Token extends \Limoncello\Passport\Entities\Token
+trait DbDateFormatTrait
 {
-    use ArrayParserTrait, DbDateFormatTrait;
-
     /**
-     * Constructor.
+     * @return string
      */
-    public function __construct()
+    protected function getDbDateFormat(): string
     {
-        parent::__construct();
-
-        if ($this->hasDynamicProperty(static::FIELD_ID) === true) {
-            $this->setScopeIdentifiers($this->parseArray($this->{static::FIELD_SCOPES}));
-        }
+        return 'Y-m-d H:i:s';
     }
 }

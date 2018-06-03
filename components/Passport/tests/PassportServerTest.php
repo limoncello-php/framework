@@ -59,7 +59,7 @@ class PassportServerTest extends TestCase
     {
         parent::setUp();
 
-        $this->initSqliteDatabase();
+        $this->initDatabase();
     }
 
     const TEST_DEFAULT_CLIENT_PASS = 'secret';

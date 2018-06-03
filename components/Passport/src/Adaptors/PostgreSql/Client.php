@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\MySql;
+<?php namespace Limoncello\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -19,7 +19,7 @@
 /**
  * @package Limoncello\Passport
  */
-class Token extends \Limoncello\Passport\Entities\Token
+class Client extends \Limoncello\Passport\Entities\Client
 {
     use ArrayParserTrait, DbDateFormatTrait;
 
@@ -32,6 +32,7 @@ class Token extends \Limoncello\Passport\Entities\Token
 
         if ($this->hasDynamicProperty(static::FIELD_ID) === true) {
             $this->setScopeIdentifiers($this->parseArray($this->{static::FIELD_SCOPES}));
+            $this->setRedirectUriStrings($this->parseArray($this->{static::FIELD_REDIRECT_URIS}));
         }
     }
 }

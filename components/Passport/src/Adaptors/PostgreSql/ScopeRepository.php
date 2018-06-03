@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\Generic;
+<?php namespace Limoncello\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -17,14 +17,12 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
-use Limoncello\Passport\Exceptions\RepositoryException;
 
 /**
  * @package Limoncello\Passport
  */
-class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepository
+class ScopeRepository extends \Limoncello\Passport\Repositories\ScopeRepository
 {
     /**
      * @var string
@@ -39,41 +37,10 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
     public function __construct(
         Connection $connection,
         DatabaseSchemaInterface $databaseSchema,
-        string $modelClass = Client::class
+        string $modelClass = Scope::class
     ) {
         $this->setConnection($connection)->setDatabaseSchema($databaseSchema);
         $this->modelClass = $modelClass;
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @throws RepositoryException
-     */
-    public function index(): array
-    {
-        /** @var Client[] $clients */
-        $clients = parent::index();
-        foreach ($clients as $client) {
-            $this->addScopeAndRedirectUris($client);
-        }
-
-        return $clients;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function read(string $identifier): ?ClientInterface
-    {
-        /** @var Client|null $client */
-        $client = parent::read($identifier);
-
-        if ($client !== null) {
-            $this->addScopeAndRedirectUris($client);
-        }
-
-        return $client;
     }
 
     /**
@@ -82,19 +49,6 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
     protected function getClassName(): string
     {
         return $this->modelClass;
-    }
-
-    /**
-     * @param Client $client
-     *
-     * @return void
-     *
-     * @throws RepositoryException
-     */
-    private function addScopeAndRedirectUris(Client $client): void
-    {
-        $client->setScopeIdentifiers($this->readScopeIdentifiers($client->getIdentifier()));
-        $client->setRedirectUriStrings($this->readRedirectUriStrings($client->getIdentifier()));
     }
 
     /**

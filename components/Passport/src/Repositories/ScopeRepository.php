@@ -17,10 +17,9 @@
  */
 
 use DateTimeImmutable;
-use Doctrine\DBAL\DBALException;
-use Exception;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Repositories\ScopeRepositoryInterface;
+use Limoncello\Passport\Exceptions\RepositoryException;
 
 /**
  * @package Limoncello\Passport
@@ -29,68 +28,97 @@ abstract class ScopeRepository extends BaseRepository implements ScopeRepository
 {
     /**
      * @inheritdoc
+     *
+     * @throws RepositoryException
      */
     public function index(): array
     {
-        return parent::indexResources();
+        try {
+            return parent::indexResources();
+        } catch (RepositoryException $exception) {
+            $message = 'Reading scopes failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws Exception
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function create(ScopeInterface $scope): ScopeInterface
     {
-        $now    = new DateTimeImmutable();
-        $schema = $this->getDatabaseSchema();
-        $this->createResource([
-            $schema->getScopesIdentityColumn()    => $scope->getIdentifier(),
-            $schema->getScopesDescriptionColumn() => $scope->getDescription(),
-            $schema->getScopesCreatedAtColumn()   => $now,
-        ]);
+        try {
+            $now    = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
+            });
+            $schema = $this->getDatabaseSchema();
+            $this->createResource([
+                $schema->getScopesIdentityColumn()    => $scope->getIdentifier(),
+                $schema->getScopesDescriptionColumn() => $scope->getDescription(),
+                $schema->getScopesCreatedAtColumn()   => $now,
+            ]);
 
-        $scope->setCreatedAt($now);
+            $scope->setCreatedAt($now);
 
-        return $scope;
+            return $scope;
+        } catch (RepositoryException $exception) {
+            $message = 'Scope creation failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function read(string $identifier): ScopeInterface
     {
-        return $this->readResource($identifier);
+        try {
+            return $this->readResource($identifier);
+        } catch (RepositoryException $exception) {
+            $message = 'Scope reading failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws Exception
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function update(ScopeInterface $scope): void
     {
-        $now    = new DateTimeImmutable();
-        $schema = $this->getDatabaseSchema();
-        $this->updateResource($scope->getIdentifier(), [
-            $schema->getScopesDescriptionColumn() => $scope->getDescription(),
-            $schema->getScopesUpdatedAtColumn()   => $now,
-        ]);
-        $scope->setUpdatedAt($now);
+        try {
+            $now    = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
+            });
+            $schema = $this->getDatabaseSchema();
+            $this->updateResource($scope->getIdentifier(), [
+                $schema->getScopesDescriptionColumn() => $scope->getDescription(),
+                $schema->getScopesUpdatedAtColumn()   => $now,
+            ]);
+            $scope->setUpdatedAt($now);
+        } catch (RepositoryException $exception) {
+            $message = 'Scope update failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function delete(string $identifier): void
     {
-        $this->deleteResource($identifier);
+        try {
+            $this->deleteResource($identifier);
+        } catch (RepositoryException $exception) {
+            $message = 'Scope deletion failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**

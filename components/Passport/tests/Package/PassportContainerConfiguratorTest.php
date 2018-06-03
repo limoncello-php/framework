@@ -29,6 +29,7 @@ use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Package\MySqlPassportContainerConfigurator;
 use Limoncello\Passport\Package\PassportContainerConfigurator;
 use Limoncello\Passport\Package\PassportSettings as C;
+use Limoncello\Passport\Package\PostgreSqlPassportContainerConfigurator;
 use Limoncello\Tests\Passport\Data\TestContainer;
 use Limoncello\Tests\Passport\PassportServerTest;
 use Mockery;
@@ -89,6 +90,33 @@ class PassportContainerConfiguratorTest extends TestCase
         $container[LoggerInterface::class]           = new NullLogger();
 
         MySqlPassportContainerConfigurator::configureContainer($container);
+
+        $this->assertNotNull($container->get(TokenRepositoryInterface::class));
+        /** @var PassportServerIntegrationInterface $integration */
+        $this->assertNotNull($integration = $container->get(PassportServerIntegrationInterface::class));
+        $this->assertInternalType(
+            'int',
+            $userId = $integration->validateUserId(
+                PassportServerTest::TEST_USER_NAME,
+                PassportServerTest::TEST_USER_PASSWORD
+            )
+        );
+        $integration->verifyAllowedUserScope($userId, []);
+    }
+
+    /**
+     * Test container configurator.
+     *
+     * @throws Exception
+     */
+    public function testPostgreSqlContainerConfigurator()
+    {
+        $container                                   = new TestContainer();
+        $container[SettingsProviderInterface::class] = $this->createSettingsProvider();
+        $container[Connection::class]                = Mockery::mock(Connection::class);
+        $container[LoggerInterface::class]           = new NullLogger();
+
+        PostgreSqlPassportContainerConfigurator::configureContainer($container);
 
         $this->assertNotNull($container->get(TokenRepositoryInterface::class));
         /** @var PassportServerIntegrationInterface $integration */

@@ -22,6 +22,7 @@ use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use ReflectionException;
 use ReflectionParameter;
 
 /**
@@ -38,6 +39,8 @@ class PassportSettings implements PassportSettingsInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     final public function get(array $appConfig): array
     {

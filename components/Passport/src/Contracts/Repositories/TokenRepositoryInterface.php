@@ -55,20 +55,20 @@ interface TokenRepositoryInterface
     public function createToken(TokenInterface $token): TokenInterface;
 
     /**
-     * @param int              $identifier
-     * @param ScopeInterface[] $scopes
+     * @param int                       $identifier
+     * @param iterable|ScopeInterface[] $scopes
      *
      * @return void
      */
-    public function bindScopes(int $identifier, array $scopes): void;
+    public function bindScopes(int $identifier, iterable $scopes): void;
 
     /**
-     * @param int      $identifier
-     * @param string[] $scopeIdentifiers
+     * @param int               $identifier
+     * @param iterable|string[] $scopeIdentifiers
      *
      * @return void
      */
-    public function bindScopeIdentifiers(int $identifier, array $scopeIdentifiers): void;
+    public function bindScopeIdentifiers(int $identifier, iterable $scopeIdentifiers): void;
 
     /**
      * @param int $identifier

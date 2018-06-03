@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\Generic;
+<?php namespace Limoncello\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -17,9 +17,7 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Limoncello\Passport\Contracts\Entities\ClientInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
-use Limoncello\Passport\Exceptions\RepositoryException;
 
 /**
  * @package Limoncello\Passport
@@ -47,37 +45,6 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
 
     /**
      * @inheritdoc
-     *
-     * @throws RepositoryException
-     */
-    public function index(): array
-    {
-        /** @var Client[] $clients */
-        $clients = parent::index();
-        foreach ($clients as $client) {
-            $this->addScopeAndRedirectUris($client);
-        }
-
-        return $clients;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function read(string $identifier): ?ClientInterface
-    {
-        /** @var Client|null $client */
-        $client = parent::read($identifier);
-
-        if ($client !== null) {
-            $this->addScopeAndRedirectUris($client);
-        }
-
-        return $client;
-    }
-
-    /**
-     * @inheritdoc
      */
     protected function getClassName(): string
     {
@@ -85,23 +52,10 @@ class ClientRepository extends \Limoncello\Passport\Repositories\ClientRepositor
     }
 
     /**
-     * @param Client $client
-     *
-     * @return void
-     *
-     * @throws RepositoryException
-     */
-    private function addScopeAndRedirectUris(Client $client): void
-    {
-        $client->setScopeIdentifiers($this->readScopeIdentifiers($client->getIdentifier()));
-        $client->setRedirectUriStrings($this->readRedirectUriStrings($client->getIdentifier()));
-    }
-
-    /**
      * @inheritdoc
      */
     protected function getTableNameForReading(): string
     {
-        return $this->getTableNameForWriting();
+        return $this->getDatabaseSchema()->getClientsView();
     }
 }

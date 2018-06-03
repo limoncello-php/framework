@@ -20,10 +20,10 @@ use DateInterval;
 use DateTimeImmutable;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Exception;
 use Limoncello\Passport\Contracts\Entities\ScopeInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
+use Limoncello\Passport\Exceptions\RepositoryException;
 use PDO;
 
 /**
@@ -36,148 +36,179 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      *
-     * @throws Exception
-     * @throws DBALException
+     * @throws RepositoryException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function createCode(TokenInterface $code): TokenInterface
     {
-        $now    = new DateTimeImmutable();
-        $schema = $this->getDatabaseSchema();
-        $values = [
-            $schema->getTokensClientIdentityColumn() => $code->getClientIdentifier(),
-            $schema->getTokensUserIdentityColumn()   => $code->getUserIdentifier(),
-            $schema->getTokensCodeColumn()           => $code->getCode(),
-            $schema->getTokensIsScopeModified()      => $code->isScopeModified(),
-            $schema->getTokensCodeCreatedAtColumn()  => $now,
-        ];
-
-        $tokenIdentifier = null;
-        if (empty($scopeIdentifiers = $code->getScopeIdentifiers()) === false) {
-            $this->inTransaction(function () use ($values, $scopeIdentifiers, &$tokenIdentifier) {
-                $tokenIdentifier = $this->createResource($values);
-                $this->bindScopeIdentifiers($tokenIdentifier, $scopeIdentifiers);
+        try {
+            $now    = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
             });
-        } else {
-            $tokenIdentifier = $this->createResource($values);
+            $schema = $this->getDatabaseSchema();
+            $values = [
+                $schema->getTokensClientIdentityColumn() => $code->getClientIdentifier(),
+                $schema->getTokensUserIdentityColumn()   => $code->getUserIdentifier(),
+                $schema->getTokensCodeColumn()           => $code->getCode(),
+                $schema->getTokensIsScopeModified()      => $code->isScopeModified(),
+                $schema->getTokensCodeCreatedAtColumn()  => $now,
+            ];
+
+            $tokenIdentifier = null;
+            if (empty($scopeIdentifiers = $code->getScopeIdentifiers()) === false) {
+                $this->inTransaction(function () use ($values, $scopeIdentifiers, &$tokenIdentifier) {
+                    $this->createResource($values);
+                    $tokenIdentifier = $this->getLastInsertId();
+                    $this->bindScopeIdentifiers($tokenIdentifier, $scopeIdentifiers);
+                });
+            } else {
+                $this->createResource($values);
+                $tokenIdentifier = $this->getLastInsertId();
+            }
+
+            $code->setIdentifier($tokenIdentifier)->setCodeCreatedAt($now);
+
+            return $code;
+        } catch (RepositoryException $exception) {
+            $message = 'Token code creation failed.';
+            throw new RepositoryException($message, 0, $exception);
         }
-
-        $code->setIdentifier($tokenIdentifier)->setCodeCreatedAt($now);
-
-        return $code;
     }
 
     /**
      * @inheritdoc
      *
-     * @throws Exception
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function assignValuesToCode(TokenInterface $token, int $expirationInSeconds): void
     {
-        $query = $this->getConnection()->createQueryBuilder();
+        try {
+            $query = $this->getConnection()->createQueryBuilder();
 
-        $now             = new DateTimeImmutable();
-        $dbNow           = $this->createTypedParameter($query, $now);
-        $earliestExpired = $now->sub(new DateInterval("PT{$expirationInSeconds}S"));
-        $schema          = $this->getDatabaseSchema();
-        $query
-            ->update($this->getTableNameForWriting())
-            ->where($schema->getTokensCodeColumn() . '=' . $this->createTypedParameter($query, $token->getCode()))
-            ->andWhere(
-                $schema->getTokensCodeCreatedAtColumn() . '>' . $this->createTypedParameter($query, $earliestExpired)
-            )
-            ->set($schema->getTokensValueColumn(), $this->createTypedParameter($query, $token->getValue()))
-            ->set($schema->getTokensTypeColumn(), $this->createTypedParameter($query, $token->getType()))
-            ->set($schema->getTokensValueCreatedAtColumn(), $dbNow);
+            $now   = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
+            });
+            $dbNow = $this->createTypedParameter($query, $now);
 
-        if ($token->getRefreshValue() !== null) {
+            $earliestExpired = $this->ignoreException(function () use ($now, $expirationInSeconds) : DateTimeImmutable {
+                /** @var DateTimeImmutable $now */
+                return $now->sub(new DateInterval("PT{$expirationInSeconds}S"));
+            });
+
+            $schema = $this->getDatabaseSchema();
             $query
-                ->set($schema->getTokensRefreshColumn(), $this->createTypedParameter($query, $token->getRefreshValue()))
-                ->set($schema->getTokensRefreshCreatedAtColumn(), $dbNow);
-        }
+                ->update($this->getTableNameForWriting())
+                ->where($schema->getTokensCodeColumn() . '=' . $this->createTypedParameter($query, $token->getCode()))
+                ->andWhere(
+                    $schema->getTokensCodeCreatedAtColumn() . '>' .
+                    $this->createTypedParameter($query, $earliestExpired)
+                )
+                ->set($schema->getTokensValueColumn(), $this->createTypedParameter($query, $token->getValue()))
+                ->set($schema->getTokensTypeColumn(), $this->createTypedParameter($query, $token->getType()))
+                ->set($schema->getTokensValueCreatedAtColumn(), $dbNow);
 
-        $numberOfUpdated = $query->execute();
-        assert(is_int($numberOfUpdated) === true);
+            if ($token->getRefreshValue() !== null) {
+                $query
+                    ->set(
+                        $schema->getTokensRefreshColumn(),
+                        $this->createTypedParameter($query, $token->getRefreshValue())
+                    )->set($schema->getTokensRefreshCreatedAtColumn(), $dbNow);
+            }
+
+            $numberOfUpdated = $query->execute();
+            assert(is_int($numberOfUpdated) === true);
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Assigning token values by code failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws Exception
-     * @throws DBALException
+     * @throws RepositoryException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function createToken(TokenInterface $token): TokenInterface
     {
-        $now        = new DateTimeImmutable();
-        $schema     = $this->getDatabaseSchema();
-        $hasRefresh = $token->getRefreshValue() !== null;
-        $values     = $hasRefresh === false ? [
-            $schema->getTokensClientIdentityColumn()   => $token->getClientIdentifier(),
-            $schema->getTokensUserIdentityColumn()     => $token->getUserIdentifier(),
-            $schema->getTokensValueColumn()            => $token->getValue(),
-            $schema->getTokensTypeColumn()             => $token->getType(),
-            $schema->getTokensIsScopeModified()        => $token->isScopeModified(),
-            $schema->getTokensIsEnabledColumn()        => $token->isEnabled(),
-            $schema->getTokensValueCreatedAtColumn()   => $now,
-        ] : [
-            $schema->getTokensClientIdentityColumn()   => $token->getClientIdentifier(),
-            $schema->getTokensUserIdentityColumn()     => $token->getUserIdentifier(),
-            $schema->getTokensValueColumn()            => $token->getValue(),
-            $schema->getTokensTypeColumn()             => $token->getType(),
-            $schema->getTokensIsScopeModified()        => $token->isScopeModified(),
-            $schema->getTokensIsEnabledColumn()        => $token->isEnabled(),
-            $schema->getTokensValueCreatedAtColumn()   => $now,
-            $schema->getTokensRefreshColumn()          => $token->getRefreshValue(),
-            $schema->getTokensRefreshCreatedAtColumn() => $now,
-        ];
-
-        $tokenIdentifier = null;
-        if (empty($scopeIdentifiers = $token->getScopeIdentifiers()) === false) {
-            $this->inTransaction(function () use ($values, $scopeIdentifiers, &$tokenIdentifier) {
-                $tokenIdentifier = $this->createResource($values);
-                $this->bindScopeIdentifiers($tokenIdentifier, $scopeIdentifiers);
+        try {
+            $now        = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
             });
-        } else {
-            $tokenIdentifier = $this->createResource($values);
-        }
+            $schema     = $this->getDatabaseSchema();
+            $hasRefresh = $token->getRefreshValue() !== null;
+            $values     = $hasRefresh === false ? [
+                $schema->getTokensClientIdentityColumn() => $token->getClientIdentifier(),
+                $schema->getTokensUserIdentityColumn()   => $token->getUserIdentifier(),
+                $schema->getTokensValueColumn()          => $token->getValue(),
+                $schema->getTokensTypeColumn()           => $token->getType(),
+                $schema->getTokensIsScopeModified()      => $token->isScopeModified(),
+                $schema->getTokensIsEnabledColumn()      => $token->isEnabled(),
+                $schema->getTokensValueCreatedAtColumn() => $now,
+            ] : [
+                $schema->getTokensClientIdentityColumn()   => $token->getClientIdentifier(),
+                $schema->getTokensUserIdentityColumn()     => $token->getUserIdentifier(),
+                $schema->getTokensValueColumn()            => $token->getValue(),
+                $schema->getTokensTypeColumn()             => $token->getType(),
+                $schema->getTokensIsScopeModified()        => $token->isScopeModified(),
+                $schema->getTokensIsEnabledColumn()        => $token->isEnabled(),
+                $schema->getTokensValueCreatedAtColumn()   => $now,
+                $schema->getTokensRefreshColumn()          => $token->getRefreshValue(),
+                $schema->getTokensRefreshCreatedAtColumn() => $now,
+            ];
 
-        $token->setIdentifier($tokenIdentifier)->setValueCreatedAt($now);
-        if ($hasRefresh === true) {
-            $token->setRefreshCreatedAt($now);
-        }
+            $tokenIdentifier = null;
+            if (empty($scopeIdentifiers = $token->getScopeIdentifiers()) === false) {
+                $this->inTransaction(function () use ($values, $scopeIdentifiers, &$tokenIdentifier) {
+                    $this->createResource($values);
+                    $tokenIdentifier = $this->getLastInsertId();
+                    $this->bindScopeIdentifiers($tokenIdentifier, $scopeIdentifiers);
+                });
+            } else {
+                $this->createResource($values);
+                $tokenIdentifier = $this->getLastInsertId();
+            }
 
-        return $token;
+            $token->setIdentifier($tokenIdentifier)->setValueCreatedAt($now);
+            if ($hasRefresh === true) {
+                $token->setRefreshCreatedAt($now);
+            }
+
+            return $token;
+        } catch (RepositoryException $exception) {
+            $message = 'Token creation failed';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
-    public function bindScopes(int $identifier, array $scopes): void
+    public function bindScopes(int $identifier, iterable $scopes): void
     {
-        $scopeIdentifiers = [];
-        foreach ($scopes as $scope) {
-            /** @var ScopeInterface $scope */
-            assert($scope instanceof ScopeInterface);
-            $scopeIdentifiers[] = $scope->getIdentifier();
-        }
+        $getIdentifiers = function (iterable $scopes): iterable {
+            foreach ($scopes as $scope) {
+                /** @var ScopeInterface $scope */
+                assert($scope instanceof ScopeInterface);
+                yield $scope->getIdentifier();
+            }
+        };
 
-        $this->bindScopeIdentifiers($identifier, $scopeIdentifiers);
+        $this->bindScopeIdentifiers($identifier, $getIdentifiers($scopes));
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
-    public function bindScopeIdentifiers(int $identifier, array $scopeIdentifiers): void
+    public function bindScopeIdentifiers(int $identifier, iterable $scopeIdentifiers): void
     {
-        if (empty($scopeIdentifiers) === false) {
+        try {
             $schema = $this->getDatabaseSchema();
             $this->createBelongsToManyRelationship(
                 $identifier,
@@ -186,38 +217,51 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
                 $schema->getTokensScopesTokenIdentityColumn(),
                 $schema->getTokensScopesScopeIdentityColumn()
             );
+        } catch (RepositoryException $exception) {
+            $message = 'Binding token scopes failed.';
+            throw new RepositoryException($message, 0, $exception);
         }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function unbindScopes(int $identifier): void
     {
-        $schema = $this->getDatabaseSchema();
-        $this->deleteBelongsToManyRelationshipIdentifiers(
-            $schema->getTokensScopesTable(),
-            $schema->getTokensScopesTokenIdentityColumn(),
-            $identifier
-        );
+        try {
+            $schema = $this->getDatabaseSchema();
+            $this->deleteBelongsToManyRelationshipIdentifiers(
+                $schema->getTokensScopesTable(),
+                $schema->getTokensScopesTokenIdentityColumn(),
+                $identifier
+            );
+        } catch (RepositoryException $exception) {
+            $message = 'Unbinding token scopes failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function read(int $identifier): ?TokenInterface
     {
-        return $this->readResource($identifier);
+        try {
+            return $this->readResource($identifier);
+        } catch (RepositoryException $exception) {
+            $message = 'Token reading failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function readByCode(string $code, int $expirationInSeconds): ?TokenInterface
     {
@@ -233,7 +277,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function readByValue(string $tokenValue, int $expirationInSeconds): ?TokenInterface
     {
@@ -249,7 +293,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function readByRefresh(string $refreshValue, int $expirationInSeconds): ?TokenInterface
     {
@@ -265,7 +309,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function readByUser(int $userId, int $expirationInSeconds, int $limit = null): array
     {
@@ -286,57 +330,70 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function readScopeIdentifiers(int $identifier): array
     {
-        $schema = $this->getDatabaseSchema();
-        return $this->readBelongsToManyRelationshipIdentifiers(
-            $identifier,
-            $schema->getTokensScopesTable(),
-            $schema->getTokensScopesTokenIdentityColumn(),
-            $schema->getTokensScopesScopeIdentityColumn()
-        );
+        try {
+            $schema = $this->getDatabaseSchema();
+            return $this->readBelongsToManyRelationshipIdentifiers(
+                $identifier,
+                $schema->getTokensScopesTable(),
+                $schema->getTokensScopesTokenIdentityColumn(),
+                $schema->getTokensScopesScopeIdentityColumn()
+            );
+        } catch (RepositoryException $exception) {
+            $message = 'Reading scopes for a token failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
-     * @throws Exception
+     * @throws RepositoryException
      */
     public function updateValues(TokenInterface $token): void
     {
-        $query = $this->getConnection()->createQueryBuilder();
+        try {
+            $query = $this->getConnection()->createQueryBuilder();
 
-        $schema = $this->getDatabaseSchema();
-        $now    = new DateTimeImmutable();
-        $dbNow  = $this->createTypedParameter($query, $now);
-        $query
-            ->update($this->getTableNameForWriting())
-            ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $token->getIdentifier()))
-            ->set($schema->getTokensValueColumn(), $this->createTypedParameter($query, $token->getValue()))
-            ->set($schema->getTokensValueCreatedAtColumn(), $dbNow);
-        if ($token->getRefreshValue() !== null) {
+            $schema = $this->getDatabaseSchema();
+            $now    = $this->ignoreException(function (): DateTimeImmutable {
+                return new DateTimeImmutable();
+            });
+            $dbNow  = $this->createTypedParameter($query, $now);
             $query
-                ->set($schema->getTokensRefreshColumn(), $this->createTypedParameter($query, $token->getRefreshValue()))
-                ->set($schema->getTokensRefreshCreatedAtColumn(), $dbNow);
-        }
-
-        $numberOfUpdated = $query->execute();
-        assert(is_int($numberOfUpdated) === true);
-        if ($numberOfUpdated > 0) {
-            $token->setValueCreatedAt($now);
+                ->update($this->getTableNameForWriting())
+                ->where($this->getPrimaryKeyName() . '=' . $this->createTypedParameter($query, $token->getIdentifier()))
+                ->set($schema->getTokensValueColumn(), $this->createTypedParameter($query, $token->getValue()))
+                ->set($schema->getTokensValueCreatedAtColumn(), $dbNow);
             if ($token->getRefreshValue() !== null) {
-                $token->setRefreshCreatedAt($now);
+                $query
+                    ->set(
+                        $schema->getTokensRefreshColumn(),
+                        $this->createTypedParameter($query, $token->getRefreshValue())
+                    )->set($schema->getTokensRefreshCreatedAtColumn(), $dbNow);
             }
+
+            $numberOfUpdated = $query->execute();
+            assert(is_int($numberOfUpdated) === true);
+            if ($numberOfUpdated > 0) {
+                $token->setValueCreatedAt($now);
+                if ($token->getRefreshValue() !== null) {
+                    $token->setRefreshCreatedAt($now);
+                }
+            }
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Token update failed.';
+            throw new RepositoryException($message, 0, $exception);
         }
     }
 
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function delete(int $identifier): void
     {
@@ -346,7 +403,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
     /**
      * @inheritdoc
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     public function disable(int $identifier): void
     {
@@ -387,7 +444,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      *
      * @return TokenInterface|null
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function readEnabledTokenByColumnWithExpirationCheck(
         string $identifier,
@@ -396,19 +453,24 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         string $createdAtColumn,
         array $columns = ['*']
     ): ?TokenInterface {
-        $query = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
-            $identifier,
-            $column,
-            $expirationInSeconds,
-            $createdAtColumn,
-            $columns
-        );
+        try {
+            $query = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
+                $identifier,
+                $column,
+                $expirationInSeconds,
+                $createdAtColumn,
+                $columns
+            );
 
-        $statement = $query->execute();
-        $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
-        $result = $statement->fetch();
+            $statement = $query->execute();
+            $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
+            $result = $statement->fetch();
 
-        return $result === false ? null : $result;
+            return $result === false ? null : $result;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Reading token failed.';
+            throw new RepositoryException($message, 0, $exception);
+        }
     }
 
     /** @noinspection PhpTooManyParametersInspection
@@ -421,7 +483,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      *
      * @return array
      *
-     * @throws DBALException
+     * @throws RepositoryException
      */
     protected function readEnabledTokensByColumnWithExpirationCheck(
         string $identifier,
@@ -431,25 +493,30 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         array $columns = ['*'],
         int $limit = null
     ): array {
-        $query = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
-            $identifier,
-            $column,
-            $expirationInSeconds,
-            $createdAtColumn,
-            $columns
-        );
-        $limit === null ?: $query->setMaxResults($limit);
+        try {
+            $query = $this->createEnabledTokenByColumnWithExpirationCheckQuery(
+                $identifier,
+                $column,
+                $expirationInSeconds,
+                $createdAtColumn,
+                $columns
+            );
+            $limit === null ?: $query->setMaxResults($limit);
 
-        $statement = $query->execute();
-        $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
+            $statement = $query->execute();
+            $statement->setFetchMode(PDO::FETCH_CLASS, $this->getClassName());
 
-        $result = [];
-        while (($token = $statement->fetch()) !== false) {
-            /** @var TokenInterface $token */
-            $result[$token->getIdentifier()] = $token;
+            $result = [];
+            while (($token = $statement->fetch()) !== false) {
+                /** @var TokenInterface $token */
+                $result[$token->getIdentifier()] = $token;
+            }
+
+            return $result;
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DBALException $exception) {
+            $message = 'Reading tokens failed.';
+            throw new RepositoryException($message, 0, $exception);
         }
-
-        return $result;
     }
 
     /**
@@ -460,8 +527,6 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      * @param array  $columns
      *
      * @return QueryBuilder
-     *
-     * @throws DBALException
      */
     protected function createEnabledTokenByColumnWithExpirationCheckQuery(
         string $identifier,
@@ -475,7 +540,8 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
             $query->select($columns)
                 ->from($this->getTableNameForReading())
                 ->where($column . '=' . $this->createTypedParameter($query, $identifier))
-                ->andWhere($query->expr()->eq($this->getDatabaseSchema()->getTokensIsEnabledColumn(), '1')),
+                // SQLite and MySQL work fine with just 1 but PostgreSQL wants it to be a string '1'
+                ->andWhere($query->expr()->eq($this->getDatabaseSchema()->getTokensIsEnabledColumn(), "'1'")),
             $expirationInSeconds,
             $createdAtColumn
         );
@@ -489,16 +555,16 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
      * @param string       $createdAtColumn
      *
      * @return QueryBuilder
-     *
-     * @throws DBALException
-     * @throws Exception
      */
     protected function addExpirationCondition(
         QueryBuilder $query,
         int $expirationInSeconds,
         string $createdAtColumn
     ): QueryBuilder {
-        $earliestExpired = (new DateTimeImmutable())->sub(new DateInterval("PT{$expirationInSeconds}S"));
+        $earliestExpired = $this->ignoreException(function () use ($expirationInSeconds) : DateTimeImmutable {
+            return (new DateTimeImmutable())->sub(new DateInterval("PT{$expirationInSeconds}S"));
+        });
+
         $query->andWhere($createdAtColumn . '>' . $this->createTypedParameter($query, $earliestExpired));
 
         return $query;

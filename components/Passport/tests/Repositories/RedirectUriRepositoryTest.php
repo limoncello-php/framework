@@ -45,7 +45,7 @@ class RedirectUriRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->initSqliteDatabase();
+        $this->initDatabase();
     }
 
     /**

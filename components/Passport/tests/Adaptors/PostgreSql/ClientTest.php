@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Passport\Adaptors\MySql;
+<?php namespace Limoncello\Tests\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -18,7 +18,7 @@
 
 use Doctrine\DBAL\Types\Type;
 use Exception;
-use Limoncello\Passport\Adaptors\MySql\Client;
+use Limoncello\Passport\Adaptors\PostgreSql\Client;
 use Limoncello\Passport\Entities\DatabaseSchema;
 use PDO;
 
@@ -67,14 +67,14 @@ class ClientTest extends TestCase
             Client::FIELD_IS_PASSWORD_GRANT_ENABLED => false,
             Client::FIELD_IS_CLIENT_GRANT_ENABLED   => false,
             Client::FIELD_IS_REFRESH_GRANT_ENABLED  => false,
-            Client::FIELD_SCOPES                    => 'one two three',
-            Client::FIELD_REDIRECT_URIS             => 'https://acme.foo/redirect',
+            Client::FIELD_SCOPES                    => '{one,two,three}',
+            Client::FIELD_REDIRECT_URIS             => '{https://acme.foo/redirect}',
         ];
 
         $this->createTable($connection, DatabaseSchema::TABLE_CLIENTS, $types);
         $connection->insert(DatabaseSchema::TABLE_CLIENTS, $columns, $types);
 
-        // now read from SqLite table as it was MySql view or table
+        // now read from SqLite table as it was PostgreSql view or table
         $query     = $connection->createQueryBuilder();
         $statement = $query
             ->select(['*'])

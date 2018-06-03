@@ -44,7 +44,7 @@ class ClientRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->initSqliteDatabase();
+        $this->initDatabase();
     }
 
     /**
@@ -118,7 +118,9 @@ class ClientRepositoryTest extends TestCase
 
         $this->assertNotNull($client = $clientRepo->read('client1'));
         $this->assertCount(2, $client->getScopeIdentifiers());
-        $this->assertEquals(['scope1', 'scope2'], $client->getScopeIdentifiers());
+        $scopeIdentifiers = $client->getScopeIdentifiers();
+        sort($scopeIdentifiers);
+        $this->assertEquals(['scope1', 'scope2'], $scopeIdentifiers);
 
         $clientRepo->unbindScopes($client->getIdentifier());
         $this->assertNotNull($client = $clientRepo->read($client->getIdentifier()));

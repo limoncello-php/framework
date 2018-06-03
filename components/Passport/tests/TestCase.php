@@ -17,7 +17,6 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -98,15 +97,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @inheritdoc
-     *
-     * @throws ConnectionException
      */
     protected function tearDown()
     {
         parent::tearDown();
         if ($this->getConnection() !== null && $this->getDatabaseSchema() !== null) {
             $this->removeDatabaseSchema($this->getConnection(), $this->getDatabaseSchema());
-            $this->getConnection()->rollBack();
             $this->getConnection()->close();
             $this->connection     = null;
             $this->databaseSchema = null;
@@ -120,51 +116,25 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Init MySQL database.
-     *
-     * @throws Exception
-     */
-    protected function initMySqlDatabase()
-    {
-        $this->setDatabaseSchema(new DatabaseSchema(User::TABLE_NAME, User::FIELD_ID));
-
-        $this->setConnection($this->createMySqlDatabaseConnection());
-        $this->getConnection()->beginTransaction();
-
-        // create users table
-        $table = new Table(User::TABLE_NAME);
-        $table->addColumn(User::FIELD_ID, Type::INTEGER)->setNotnull(true)->setAutoincrement(true)->setUnsigned(true);
-        $table->addColumn(User::FIELD_NAME, Type::STRING)->setNotnull(true);
-        $table->setPrimaryKey([User::FIELD_ID]);
-        $this->getConnection()->getSchemaManager()->dropAndCreateTable($table);
-
-        $this->createDatabaseSchema($this->getConnection(), $this->getDatabaseSchema());
-
-        $this->getConnection()->insert(User::TABLE_NAME, [
-            User::FIELD_NAME => 'John Dow',
-        ]);
-    }
-
-    /**
      * Init SQLite database.
      *
      * @throws Exception
      */
-    protected function initSqliteDatabase()
+    protected function initDatabase(): void
     {
-        $this->setDatabaseSchema($schema = new DatabaseSchema(User::TABLE_NAME, User::FIELD_ID));
+        $connection = static::createConnection();
 
-        $this->setConnection($this->createSqliteDatabaseConnection());
-        $this->getConnection()->beginTransaction();
+        //$connection->beginTransaction();
+        $this->setConnection($connection);
 
-        $manager = $this->getConnection()->getSchemaManager();
+        $schema = $this->initDefaultDatabaseSchema();
 
         $table = new Table($schema->getUsersTable());
-        $table->addColumn($schema->getUsersIdentityColumn(), Type::INTEGER)->setNotnull(true);
+        $table->addColumn($schema->getUsersIdentityColumn(), Type::INTEGER)->setNotnull(true)->setUnsigned(true);
         $table->addColumn(self::USERS_COLUMN_NAME, Type::STRING)->setNotnull(false);
         $table->setPrimaryKey([$schema->getUsersIdentityColumn()]);
 
-        $manager->dropAndCreateTable($table);
+        $this->getConnection()->getSchemaManager()->dropAndCreateTable($table);
 
         $this->getConnection()->insert($schema->getUsersTable(), [
             $schema->getUsersIdentityColumn()     => PassportServerTest::TEST_USER_ID,
@@ -179,7 +149,28 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      *
      * @throws Exception
      */
-    public static function createSqliteDatabaseConnection(): Connection
+    public static function createConnection(): Connection
+    {
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //
+        // You can choose here which database (e.g. MySQL, SQLite, PostgreSQL) to use for testing.
+        //
+        // Some of the tests (very few) may fail for a database other than SQLite.
+        //
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //$connection = static::createMySqlDatabaseConnection();
+        //$connection = static::createPostgreSqlDatabaseConnection();
+        $connection = static::createSqliteDatabaseConnection();
+
+        return $connection;
+    }
+
+    /**
+     * @return Connection
+     *
+     * @throws Exception
+     */
+    protected static function createSqliteDatabaseConnection(): Connection
     {
         $connection = DriverManager::getConnection(['url' => 'sqlite:///', 'memory' => true]);
         static::assertNotSame(false, $connection->exec('PRAGMA foreign_keys = ON;'));
@@ -192,7 +183,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      *
      * @throws Exception
      */
-    protected function createMySqlDatabaseConnection(): Connection
+    protected static function createMySqlDatabaseConnection(): Connection
     {
         (new Dotenv(__DIR__ . DIRECTORY_SEPARATOR . '..'))->load();
         $connection = DriverManager::getConnection([
@@ -203,6 +194,27 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
             'user'     => getenv('DB_MY_SQL_USER_NAME'),
             'password' => getenv('DB_MY_SQL_PASSWORD'),
             'charset'  => getenv('DB_MY_SQL_CHARSET'),
+        ]);
+
+        return $connection;
+    }
+
+    /**
+     * @return Connection
+     *
+     * @throws Exception
+     */
+    protected static function createPostgreSqlDatabaseConnection(): Connection
+    {
+        (new Dotenv(__DIR__ . DIRECTORY_SEPARATOR . '..'))->load();
+        $connection = DriverManager::getConnection([
+            'driver'   => getenv('DB_POSTGRESQL_DRIVER'),
+            'host'     => getenv('DB_POSTGRESQL_HOST'),
+            'port'     => getenv('DB_POSTGRESQL_PORT'),
+            'dbname'   => getenv('DB_POSTGRESQL_DATABASE'),
+            'user'     => getenv('DB_POSTGRESQL_USER_NAME'),
+            'password' => getenv('DB_POSTGRESQL_PASSWORD'),
+            'charset'  => getenv('DB_POSTGRESQL_CHARSET'),
         ]);
 
         return $connection;
@@ -229,9 +241,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Connection
+     * @return Connection|null
      */
-    protected function getConnection(): Connection
+    protected function getConnection(): ?Connection
     {
         return $this->connection;
     }
@@ -382,5 +394,15 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
             $this->assertEquals([$value], $response->getHeader($header));
         }
         $this->assertEmpty((string)$response->getBody());
+    }
+
+    /**
+     * @return DatabaseSchema
+     */
+    protected function initDefaultDatabaseSchema(): DatabaseSchema
+    {
+        $this->setDatabaseSchema($schema = new DatabaseSchema(User::TABLE_NAME, User::FIELD_ID));
+
+        return $schema;
     }
 }

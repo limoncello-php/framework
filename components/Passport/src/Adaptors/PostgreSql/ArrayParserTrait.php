@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Adaptors\MySql;
+<?php namespace Limoncello\Passport\Adaptors\PostgreSql;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -19,19 +19,23 @@
 /**
  * @package Limoncello\Passport
  */
-class Token extends \Limoncello\Passport\Entities\Token
+trait ArrayParserTrait
 {
-    use ArrayParserTrait, DbDateFormatTrait;
-
     /**
-     * Constructor.
+     * @param string $values
+     *
+     * @return string[]
      */
-    public function __construct()
+    protected function parseArray(string $values): array
     {
-        parent::__construct();
+        // PostgreSql arrays represented as strings
+        // '{}' - empty array
+        // '{scope1}' or '{scope1,scope2}' - non-empty array
+        // so it should always start with '{' and end with '}'.
+        assert(substr($values, 0, 1) === '{' && substr($values, -1) === '}');
 
-        if ($this->hasDynamicProperty(static::FIELD_ID) === true) {
-            $this->setScopeIdentifiers($this->parseArray($this->{static::FIELD_SCOPES}));
-        }
+        $parsed = strlen($values) === 2 ? [] : explode(',', substr($values, 1, -1));
+
+        return $parsed;
     }
 }
