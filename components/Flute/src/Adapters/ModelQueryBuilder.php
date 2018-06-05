@@ -560,7 +560,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function buildColumnName(string $table, string $column): string
     {
-        return "`$table`.`$column`";
+        return $this->quoteTableName($table) . '.' . $this->quoteColumnName($column);
     }
 
     /**
@@ -702,7 +702,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     private function quoteTableName(string $tableName): string
     {
-        return "`$tableName`";
+        return $this->getConnection()->quoteIdentifier($tableName);
     }
 
     /**
@@ -712,7 +712,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     private function quoteColumnName(string $columnName): string
     {
-        return "`$columnName`";
+        return $this->getConnection()->quoteIdentifier($columnName);
     }
 
     /**

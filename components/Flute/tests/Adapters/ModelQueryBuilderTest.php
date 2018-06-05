@@ -75,12 +75,12 @@ class ModelQueryBuilderTest extends TestCase
             ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
 
         $expected =
-            'SELECT `posts1`.`id_post`, `posts1`.`id_board_fk`, `posts1`.`id_user_fk`, `posts1`.`id_editor_fk`, ' .
-            '`posts1`.`title`, `posts1`.`text`, `posts1`.`created_at`, `posts1`.`updated_at`, `posts1`.`deleted_at` ' .
-            'FROM `posts` `posts1` ' .
-            'INNER JOIN `users` `users2` ON `posts1`.`id_user_fk`=`users2`.`id_user` ' .
-            'WHERE `users2`.`id_user` = :dcValue1 ' .
-            'ORDER BY `users2`.`first_name` DESC';
+            'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
+            '"posts1"."title", "posts1"."text", "posts1"."created_at", "posts1"."updated_at", "posts1"."deleted_at" ' .
+            'FROM "posts" "posts1" ' .
+            'INNER JOIN "users" "users2" ON "posts1"."id_user_fk"="users2"."id_user" ' .
+            'WHERE "users2"."id_user" = :dcValue1 ' .
+            'ORDER BY "users2"."first_name" DESC';
         $this->assertEquals($expected, $builder->getSQL());
 
         $this->migrateDatabase($this->connection);
@@ -110,11 +110,11 @@ class ModelQueryBuilderTest extends TestCase
             ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
 
         $expected =
-            'SELECT `posts1`.`id_post`, `posts1`.`id_board_fk`, `posts1`.`id_user_fk`, `posts1`.`id_editor_fk`, ' .
-            '`posts1`.`title`, `posts1`.`text`, `posts1`.`created_at`, `posts1`.`updated_at`, `posts1`.`deleted_at` ' .
-            'FROM `posts` `posts1` ' .
-            'INNER JOIN `users` `users2` ON `posts1`.`id_user_fk`=`users2`.`id_user` ' .
-            'WHERE `users2`.`id_user` = :dcValue1';
+            'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
+            '"posts1"."title", "posts1"."text", "posts1"."created_at", "posts1"."updated_at", "posts1"."deleted_at" ' .
+            'FROM "posts" "posts1" ' .
+            'INNER JOIN "users" "users2" ON "posts1"."id_user_fk"="users2"."id_user" ' .
+            'WHERE "users2"."id_user" = :dcValue1';
         $this->assertEquals($expected, $builder->getSQL());
 
         $this->migrateDatabase($this->connection);
@@ -143,11 +143,11 @@ class ModelQueryBuilderTest extends TestCase
             ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
 
         $expected =
-            'SELECT `posts1`.`id_post`, `posts1`.`id_board_fk`, `posts1`.`id_user_fk`, `posts1`.`id_editor_fk`, ' .
-            '`posts1`.`title`, `posts1`.`text`, `posts1`.`created_at`, `posts1`.`updated_at`, `posts1`.`deleted_at` ' .
-            'FROM `posts` `posts1` ' .
-            'INNER JOIN `users` `users2` ON `posts1`.`id_user_fk`=`users2`.`id_user` ' .
-            'ORDER BY `users2`.`first_name` DESC';
+            'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
+            '"posts1"."title", "posts1"."text", "posts1"."created_at", "posts1"."updated_at", "posts1"."deleted_at" ' .
+            'FROM "posts" "posts1" ' .
+            'INNER JOIN "users" "users2" ON "posts1"."id_user_fk"="users2"."id_user" ' .
+            'ORDER BY "users2"."first_name" DESC';
         $this->assertEquals($expected, $builder->getSQL());
 
         $this->migrateDatabase($this->connection);
@@ -181,12 +181,12 @@ class ModelQueryBuilderTest extends TestCase
             ->addRelationshipFiltersAndSortsWithAnd(Post::REL_COMMENTS, $filters, $sorts);
 
         $expected =
-            'SELECT `posts1`.`id_post`, `posts1`.`id_board_fk`, `posts1`.`id_user_fk`, `posts1`.`id_editor_fk`, ' .
-            '`posts1`.`title`, `posts1`.`text`, `posts1`.`created_at`, `posts1`.`updated_at`, `posts1`.`deleted_at` ' .
-            'FROM `posts` `posts1` ' .
-            'INNER JOIN `comments` `comments2` ON `posts1`.`id_post`=`comments2`.`id_post_fk` ' .
-            'WHERE (`comments2`.`id_comment` >= :dcValue1) AND (`comments2`.`id_comment` <= :dcValue2) ' .
-            'ORDER BY `comments2`.`text` ASC';
+            'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
+            '"posts1"."title", "posts1"."text", "posts1"."created_at", "posts1"."updated_at", "posts1"."deleted_at" ' .
+            'FROM "posts" "posts1" ' .
+            'INNER JOIN "comments" "comments2" ON "posts1"."id_post"="comments2"."id_post_fk" ' .
+            'WHERE ("comments2"."id_comment" >= :dcValue1) AND ("comments2"."id_comment" <= :dcValue2) ' .
+            'ORDER BY "comments2"."text" ASC';
         $this->assertEquals($expected, $builder->getSQL());
 
         $this->migrateDatabase($this->connection);
@@ -220,12 +220,12 @@ class ModelQueryBuilderTest extends TestCase
             ->addRelationshipFiltersAndSortsWithOr(Post::REL_COMMENTS, $filters, $sorts);
 
         $expected =
-            'SELECT `posts1`.`id_post`, `posts1`.`id_board_fk`, `posts1`.`id_user_fk`, `posts1`.`id_editor_fk`, ' .
-            '`posts1`.`title`, `posts1`.`text`, `posts1`.`created_at`, `posts1`.`updated_at`, `posts1`.`deleted_at` ' .
-            'FROM `posts` `posts1` ' .
-            'INNER JOIN `comments` `comments2` ON `posts1`.`id_post`=`comments2`.`id_post_fk` ' .
-            'WHERE (`comments2`.`id_comment` >= :dcValue1) OR (`comments2`.`id_comment` <= :dcValue2) ' .
-            'ORDER BY `comments2`.`text` ASC';
+            'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
+            '"posts1"."title", "posts1"."text", "posts1"."created_at", "posts1"."updated_at", "posts1"."deleted_at" ' .
+            'FROM "posts" "posts1" ' .
+            'INNER JOIN "comments" "comments2" ON "posts1"."id_post"="comments2"."id_post_fk" ' .
+            'WHERE ("comments2"."id_comment" >= :dcValue1) OR ("comments2"."id_comment" <= :dcValue2) ' .
+            'ORDER BY "comments2"."text" ASC';
         $this->assertEquals($expected, $builder->getSQL());
 
         $this->migrateDatabase($this->connection);
@@ -259,16 +259,16 @@ class ModelQueryBuilderTest extends TestCase
             ->addRelationshipFiltersAndSortsWithAnd(Comment::REL_EMOTIONS, $filters, $sorts);
 
         $expected =
-            'SELECT `comments1`.`id_comment`, `comments1`.`id_post_fk`, `comments1`.`id_user_fk`, ' .
-            '`comments1`.`text`, `comments1`.`int_value`, `comments1`.`float_value`, `comments1`.`bool_value`, ' .
-            '`comments1`.`datetime_value`, `comments1`.`created_at`, `comments1`.`updated_at`, ' .
-            '`comments1`.`deleted_at` ' .
-            'FROM `comments` `comments1` ' .
-            'INNER JOIN `comments_emotions` `comments_emotions2` ON ' .
-            '`comments1`.`id_comment`=`comments_emotions2`.`id_comment_fk` ' .
-            'INNER JOIN `emotions` `emotions3` ON `comments_emotions2`.`id_emotion_fk`=`emotions3`.`id_emotion` ' .
-            'WHERE `emotions3`.`id_emotion` = :dcValue1 ' .
-            'ORDER BY `emotions3`.`name` ASC, `emotions3`.`id_emotion` DESC';
+            'SELECT "comments1"."id_comment", "comments1"."id_post_fk", "comments1"."id_user_fk", ' .
+            '"comments1"."text", "comments1"."int_value", "comments1"."float_value", "comments1"."bool_value", ' .
+            '"comments1"."datetime_value", "comments1"."created_at", "comments1"."updated_at", ' .
+            '"comments1"."deleted_at" ' .
+            'FROM "comments" "comments1" ' .
+            'INNER JOIN "comments_emotions" "comments_emotions2" ON ' .
+            '"comments1"."id_comment"="comments_emotions2"."id_comment_fk" ' .
+            'INNER JOIN "emotions" "emotions3" ON "comments_emotions2"."id_emotion_fk"="emotions3"."id_emotion" ' .
+            'WHERE "emotions3"."id_emotion" = :dcValue1 ' .
+            'ORDER BY "emotions3"."name" ASC, "emotions3"."id_emotion" DESC';
         $this->assertEquals($expected, $builder->getSQL());
 
         $this->migrateDatabase($this->connection);
@@ -300,11 +300,11 @@ class ModelQueryBuilderTest extends TestCase
             ->addFiltersWithAndToAlias($filters)
             ->addSorts($sorts);
         $expected =
-            'SELECT `boards1`.`id_board`, `boards1`.`title`, `boards1`.`created_at`, ' .
-            '`boards1`.`updated_at`, `boards1`.`deleted_at` ' .
-            'FROM `boards` `boards1` ' .
-            'WHERE `boards1`.`created_at` = :dcValue1 ' .
-            'ORDER BY `boards1`.`title` ASC';
+            'SELECT "boards1"."id_board", "boards1"."title", "boards1"."created_at", ' .
+            '"boards1"."updated_at", "boards1"."deleted_at" ' .
+            'FROM "boards" "boards1" ' .
+            'WHERE "boards1"."created_at" = :dcValue1 ' .
+            'ORDER BY "boards1"."title" ASC';
 
         $this->assertEquals($expected, $builder->getSQL());
     }
@@ -322,9 +322,9 @@ class ModelQueryBuilderTest extends TestCase
             ->selectModelColumns()
             ->fromModelTable();
         $expected =
-            'SELECT `boards1`.`id_board`, `boards1`.`title`, `boards1`.`created_at`, ' .
-            '`boards1`.`updated_at`, `boards1`.`deleted_at` ' .
-            'FROM `boards` `boards1`';
+            'SELECT "boards1"."id_board", "boards1"."title", "boards1"."created_at", ' .
+            '"boards1"."updated_at", "boards1"."deleted_at" ' .
+            'FROM "boards" "boards1"';
 
         $this->assertEquals($expected, $builder->getSQL());
     }
@@ -361,22 +361,22 @@ class ModelQueryBuilderTest extends TestCase
             ->addFiltersWithAndToAlias($filters);
 
         $expected =
-            'SELECT `boards1`.`id_board`, `boards1`.`title`, `boards1`.`created_at`, ' .
-            '`boards1`.`updated_at`, `boards1`.`deleted_at` ' .
-            'FROM `boards` `boards1` ' .
+            'SELECT "boards1"."id_board", "boards1"."title", "boards1"."created_at", ' .
+            '"boards1"."updated_at", "boards1"."deleted_at" ' .
+            'FROM "boards" "boards1" ' .
             'WHERE ' .
-            '(`boards1`.`title` = :dcValue1) AND ' .
-            '(`boards1`.`title` <> :dcValue2) AND ' .
-            '(`boards1`.`title` < :dcValue3) AND ' .
-            '(`boards1`.`title` <= :dcValue4) AND ' .
-            '(`boards1`.`title` > :dcValue5) AND ' .
-            '(`boards1`.`title` >= :dcValue6) AND ' .
-            '(`boards1`.`title` LIKE :dcValue7) AND ' .
-            '(`boards1`.`title` NOT LIKE :dcValue8) AND ' .
-            '(`boards1`.`title` IN (:dcValue9)) AND ' .
-            '(`boards1`.`title` NOT IN (:dcValue10, :dcValue11)) AND ' .
-            '(`boards1`.`title` IS NULL) AND ' .
-            '(`boards1`.`title` IS NOT NULL)';
+            '("boards1"."title" = :dcValue1) AND ' .
+            '("boards1"."title" <> :dcValue2) AND ' .
+            '("boards1"."title" < :dcValue3) AND ' .
+            '("boards1"."title" <= :dcValue4) AND ' .
+            '("boards1"."title" > :dcValue5) AND ' .
+            '("boards1"."title" >= :dcValue6) AND ' .
+            '("boards1"."title" LIKE :dcValue7) AND ' .
+            '("boards1"."title" NOT LIKE :dcValue8) AND ' .
+            '("boards1"."title" IN (:dcValue9)) AND ' .
+            '("boards1"."title" NOT IN (:dcValue10, :dcValue11)) AND ' .
+            '("boards1"."title" IS NULL) AND ' .
+            '("boards1"."title" IS NOT NULL)';
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
@@ -416,10 +416,10 @@ class ModelQueryBuilderTest extends TestCase
             ->addFiltersWithOrToAlias($filters);
 
         $expected =
-            'SELECT `boards1`.`id_board`, `boards1`.`title`, `boards1`.`created_at`, ' .
-            '`boards1`.`updated_at`, `boards1`.`deleted_at` ' .
-            'FROM `boards` `boards1` ' .
-            'WHERE (`boards1`.`title` = :dcValue1) OR (`boards1`.`title` <= :dcValue2)';
+            'SELECT "boards1"."id_board", "boards1"."title", "boards1"."created_at", ' .
+            '"boards1"."updated_at", "boards1"."deleted_at" ' .
+            'FROM "boards" "boards1" ' .
+            'WHERE ("boards1"."title" = :dcValue1) OR ("boards1"."title" <= :dcValue2)';
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
@@ -474,8 +474,8 @@ class ModelQueryBuilderTest extends TestCase
             ]);
 
         $expected =
-            'UPDATE `boards` SET `title` = :dcValue3 ' .
-            'WHERE (`boards`.`id_board` >= :dcValue1) OR (`boards`.`id_board` <= :dcValue2)';
+            'UPDATE "boards" SET "title" = :dcValue3 ' .
+            'WHERE ("boards"."id_board" >= :dcValue1) OR ("boards"."id_board" <= :dcValue2)';
 
         $this->assertEquals($expected, $builder->getSQL());
         $this->assertEquals([
@@ -494,8 +494,8 @@ class ModelQueryBuilderTest extends TestCase
     {
         $builder = $this->createModelQueryBuilder(Board::class);
 
-        $this->assertEquals('`boards`.`title`', $builder->getQuotedMainTableColumn(Board::FIELD_TITLE));
-        $this->assertEquals('`boards1`.`title`', $builder->getQuotedMainAliasColumn(Board::FIELD_TITLE));
+        $this->assertEquals('"boards"."title"', $builder->getQuotedMainTableColumn(Board::FIELD_TITLE));
+        $this->assertEquals('"boards1"."title"', $builder->getQuotedMainAliasColumn(Board::FIELD_TITLE));
     }
 
     /**
