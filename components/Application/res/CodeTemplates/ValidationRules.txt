@@ -32,7 +32,7 @@ final class {%SINGULAR_CC%}Rules extends BaseRules
      */
     public static function {%SINGULAR_LC%}Id(RuleInterface $next = null): RuleInterface
     {
-        return self::stringToInt(self::readable({%PLURAL_LC%}Api::class, $next));
+        return self::stringToInt(self::readable({%PLURAL_CC%}Api::class, $next));
     }
 
     /**
@@ -56,7 +56,7 @@ final class {%SINGULAR_CC%}Rules extends BaseRules
      */
     public static function {%PLURAL_LC%}Relationship(RuleInterface $next = null): RuleInterface
     {
-        $readableAll = self::stringArrayToIntArray(self::readableAll({%PLURAL_LC%}Api::class, $next));
+        $readableAll = self::stringArrayToIntArray(self::readableAll({%PLURAL_CC%}Api::class, $next));
 
         return self::toManyRelationship({%SINGULAR_CC%}Schema::TYPE, $readableAll);
     }
