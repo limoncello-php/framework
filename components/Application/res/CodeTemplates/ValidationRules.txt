@@ -20,7 +20,7 @@ final class {%SINGULAR_CC%}Rules extends BaseRules
      */
     public static function {%SINGULAR_LC%}Type(RuleInterface $next = null): RuleInterface
     {
-        return self::equals({%SINGULAR_CC%}Schema::TYPE);
+        return self::equals({%SINGULAR_CC%}Schema::TYPE, $next);
     }
 
     /**
