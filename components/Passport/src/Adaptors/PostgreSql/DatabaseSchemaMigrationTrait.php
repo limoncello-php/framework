@@ -63,8 +63,8 @@ trait DatabaseSchemaMigrationTrait
      */
     protected function removeDatabaseSchema(Connection $connection, DatabaseSchemaInterface $schema): void
     {
-        $this->removeDatabaseTables($connection, $schema);
         $this->removeDatabaseViews($connection, $schema);
+        $this->removeDatabaseTables($connection, $schema);
     }
 
     /**
@@ -94,12 +94,12 @@ trait DatabaseSchemaMigrationTrait
     protected function removeDatabaseViews(Connection $connection, DatabaseSchemaInterface $schema): void
     {
         $this->removePassportView($connection, $schema);
-        $this->removeClientsView($connection, $schema);
-        $this->removeTokensView($connection, $schema);
         $this->removeUsersView($connection, $schema);
+        $this->removeTokensView($connection, $schema);
+        $this->removeClientsView($connection, $schema);
     }
 
-    /**
+    /** @noinspection PhpUnusedPrivateMethodInspection
      * @param Connection              $connection
      * @param DatabaseSchemaInterface $schema
      *
@@ -129,7 +129,7 @@ EOT;
         $connection->exec($sql);
     }
 
-    /**
+    /** @noinspection PhpUnusedPrivateMethodInspection
      * @param Connection              $connection
      * @param DatabaseSchemaInterface $schema
      *
@@ -144,7 +144,7 @@ EOT;
         $connection->exec($sql);
     }
 
-    /**
+    /** @noinspection PhpUnusedPrivateMethodInspection
      * @param Connection              $connection
      * @param DatabaseSchemaInterface $schema
      *
@@ -168,7 +168,7 @@ EOT;
         $connection->exec($sql);
     }
 
-    /**
+    /** @noinspection PhpUnusedPrivateMethodInspection
      * @param Connection              $connection
      * @param DatabaseSchemaInterface $schema
      *
@@ -183,7 +183,7 @@ EOT;
         $connection->exec($sql);
     }
 
-    /**
+    /** @noinspection PhpUnusedPrivateMethodInspection
      * @param Connection              $connection
      * @param DatabaseSchemaInterface $schema
      *
@@ -218,7 +218,7 @@ EOT;
         $connection->exec($sql);
     }
 
-    /**
+    /** @noinspection PhpUnusedPrivateMethodInspection
      * @param Connection              $connection
      * @param DatabaseSchemaInterface $schema
      *
@@ -233,7 +233,7 @@ EOT;
         $connection->exec($sql);
     }
 
-    /**
+    /** @noinspection PhpUnusedPrivateMethodInspection
      * @param Connection              $connection
      * @param DatabaseSchemaInterface $schema
      *
@@ -266,7 +266,7 @@ EOT;
         }
     }
 
-    /**
+    /** @noinspection PhpUnusedPrivateMethodInspection
      * @param Connection              $connection
      * @param DatabaseSchemaInterface $schema
      *
