@@ -226,6 +226,11 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getAttributeLength(string $class, string $name): int
     {
+        assert(
+            $this->hasAttributeLength($class, $name) === true,
+            "Length not found for column `$name` in class `$class`."
+        );
+
         $result = $this->attributeLengths[$class][$name];
 
         return $result;
@@ -256,6 +261,11 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getRelationshipType(string $class, string $name): int
     {
+        assert(
+            $this->hasRelationship($class, $name) === true,
+            "Relationship `$name` not found in class `$class`."
+        );
+
         $result = $this->relationshipTypes[$class][$name];
 
         return $result;
