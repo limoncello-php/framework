@@ -19,6 +19,7 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Data\MigrationInterface;
@@ -26,6 +27,7 @@ use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\Data\TimestampFields as TSF;
 use Limoncello\Data\Migrations\MigrationTrait;
+use Limoncello\Data\Migrations\RawNameType;
 use Limoncello\Tests\Data\Data\TestContainer;
 use Limoncello\Tests\Data\Data\TestTableMigration;
 use Mockery;
@@ -50,7 +52,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
      *
      * @throws DBALException
      */
-    public function testColumns()
+    public function testColumns(): void
     {
         $modelClass             = 'TestModel1';
         $columnIntPrimary       = 'col_int_id';
@@ -89,7 +91,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
 
             $this->searchable([$columnNonNullText]),
         ];
-        $migration = new TestTableMigration($modelClass, $columnToCreate);
+        $migration      = new TestTableMigration($modelClass, $columnToCreate);
 
         $modelSchemas = Mockery::mock(ModelSchemaInfoInterface::class);
         $this->prepareTable($modelSchemas, $modelClass, $tableName, 2);
@@ -171,7 +173,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
      *
      * @throws DBALException
      */
-    public function testRelationships()
+    public function testRelationships(): void
     {
         $modelClass1 = 'TestModel1';
         $table1      = 'table_1';
@@ -204,7 +206,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $columnToCreate1 = [
             $this->primaryInt($pk1),
         ];
-        $migration1 = new TestTableMigration($modelClass1, $columnToCreate1);
+        $migration1      = new TestTableMigration($modelClass1, $columnToCreate1);
         $migration1->init($container)->migrate();
 
         $columnToCreate2 = [
@@ -214,45 +216,138 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
             $this->nullableRelationship($rel2_3),
             $this->nullableForeignRelationship($fk2_4, $modelClass1),
         ];
-        $migration2 = new TestTableMigration($modelClass2, $columnToCreate2);
+        $migration2      = new TestTableMigration($modelClass2, $columnToCreate2);
         $migration2->init($container)->migrate();
     }
 
     /**
      * @throws DBALException
      */
-    public function testEnum()
+    public function testEnum(): void
     {
+        $container = $this->createContainer();
+        $this->init($container);
         $connection = $this->createConnection();
         $platform   = $connection->getDatabasePlatform();
 
         $table = new Table('table_name');
 
-        ($this->enum('enum1', ['val11', 'val21']))($table);
+        ($this->enum('enum1', ['val11', 'val12']))($table);
         ($this->nullableEnum('enum2', ['val21', 'val22']))($table);
 
         $columns = $table->getColumns();
         /** @noinspection PhpParamsInspection */
         $this->assertCount(2, $columns);
-        $this->assertEquals("ENUM('val21','val22')", $columns['enum1']->getType()->getSQLDeclaration([], $platform));
+        $this->assertEquals(
+            "ENUM('val11','val12')",
+            $columns['enum1']->getType()->getSQLDeclaration($columns['enum1']->toArray(), $platform)
+        );
         $this->assertTrue($columns['enum1']->getNotnull());
-        $this->assertEquals("ENUM('val21','val22')", $columns['enum2']->getType()->getSQLDeclaration([], $platform));
+        $this->assertEquals(
+            "ENUM('val21','val22')",
+            $columns['enum2']->getType()->getSQLDeclaration($columns['enum2']->toArray(), $platform)
+        );
         $this->assertFalse($columns['enum2']->getNotnull());
     }
 
     /**
-     * @param MockInterface $modelSchemas
+     * @throws DBALException
+     */
+    public function testCreatePgEnum(): void
+    {
+        $expectedSql = "CREATE TYPE myEnum AS ENUM ('value1', 'value2');";
+
+        $container = new TestContainer();
+        $this->init($container);
+
+        $container[Connection::class] = $mockConnection = Mockery::mock(Connection::class);
+        $mockConnection->shouldReceive('getDriver')->once()->withNoArgs()->andReturnSelf();
+        $mockConnection->shouldReceive('getName')->once()->withNoArgs()->andReturn('pdo_pgsql');
+        $mockConnection->shouldReceive('exec')->once()->with($expectedSql)->andReturnUndefined();
+
+        $this->createEnum('myEnum', ['value1', 'value2']);
+
+        // the mock will be checked
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function testDropPgEnumIfExists(): void
+    {
+        $expectedSql = 'DROP TYPE IF EXISTS myEnum;';
+
+        $container = new TestContainer();
+        $this->init($container);
+
+        $container[Connection::class] = $mockConnection = Mockery::mock(Connection::class);
+        $mockConnection->shouldReceive('getDriver')->once()->withNoArgs()->andReturnSelf();
+        $mockConnection->shouldReceive('getName')->once()->withNoArgs()->andReturn('pdo_pgsql');
+        $mockConnection->shouldReceive('quoteIdentifier')->once()->with('myEnum')->andReturn('myEnum');
+        $mockConnection->shouldReceive('exec')->once()->with($expectedSql)->andReturnUndefined();
+
+        $this->dropEnumIfExists('myEnum');
+
+        // the mock will be checked
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function testUsePgEnum(): void
+    {
+        $container = new TestContainer();
+        $this->init($container);
+
+        $container[Connection::class] = $mockConnection = Mockery::mock(Connection::class);
+        $mockConnection->shouldReceive('getDriver')->once()->withNoArgs()->andReturnSelf();
+        $mockConnection->shouldReceive('getName')->once()->withNoArgs()->andReturn('pdo_pgsql');
+
+        $closure = $this->useEnum('my_column', 'myEnum');
+        $table   = new Table('table_name');
+        call_user_func($closure, $table);
+
+        $columns = $table->getColumns();
+        /** @noinspection PhpParamsInspection */
+        $this->assertCount(1, $columns);
+        $column = $columns['my_column'];
+        $this->assertEquals(RawNameType::class, get_class($column->getType()));
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function testRawNameType(): void
+    {
+        $typeName = RawNameType::TYPE_NAME;
+        Type::hasType($typeName) === true ?: Type::addType($typeName, RawNameType::class);
+
+        $type = Type::getType($typeName);
+
+        $platform = Mockery::mock(AbstractPlatform::class);
+        /** @var AbstractPlatform $platform */
+        $declaration = $type->getSQLDeclaration([RawNameType::TYPE_NAME => 'myEnum'], $platform);
+        $this->assertEquals('myEnum', $declaration);
+        $this->assertEquals(RawNameType::TYPE_NAME, $type->getName());
+    }
+
+    /**
+     * @param MockInterface|null $modelSchemas
      *
      * @return ContainerInterface
      *
      * @throws DBALException
      */
-    private function createContainer(MockInterface $modelSchemas): ContainerInterface
+    private function createContainer(MockInterface $modelSchemas = null): ContainerInterface
     {
         $container                    = new TestContainer();
         $container[Connection::class] = $this->connection = $this->createConnection();
 
-        $container[ModelSchemaInfoInterface::class] = $modelSchemas;
+        if ($modelSchemas !== null) {
+            $container[ModelSchemaInfoInterface::class] = $modelSchemas;
+        }
 
         return $container;
     }
@@ -285,7 +380,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
      *
      * @return Mock
      */
-    private function prepareTable($mock, string $modelClass, string $tableName, int $times = 1)
+    private function prepareTable(MockInterface $mock, string $modelClass, string $tableName, int $times = 1)
     {
         /** @var Mock $mock */
         $mock->shouldReceive('getTable')->times($times)->with($modelClass)->andReturn($tableName);
@@ -315,7 +410,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
      *
      * @return Mock
      */
-    private function prepareTimestamps($mock, string $modelClass)
+    private function prepareTimestamps(MockInterface $mock, string $modelClass)
     {
         /** @var Mock $mock */
         $mock->shouldReceive('hasAttributeType')->once()
@@ -342,7 +437,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
      * @return Mock
      */
     private function prepareRelationship(
-        $mock,
+        MockInterface $mock,
         string $modelClass,
         string $relName,
         string $fkName,
@@ -376,7 +471,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
      * @return Mock
      */
     private function prepareForeignRelationship(
-        $mock,
+        MockInterface $mock,
         string $modelClass,
         string $fkName,
         string $reverseClass,

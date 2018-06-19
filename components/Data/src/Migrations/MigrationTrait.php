@@ -40,6 +40,11 @@ trait MigrationTrait
     private $container;
 
     /**
+     * @var array
+     */
+    private $enumerations = [];
+
+    /**
      * @inheritdoc
      */
     public function init(ContainerInterface $container): MigrationInterface
@@ -123,6 +128,95 @@ trait MigrationTrait
 
         if ($schemaManager->tablesExist([$tableName]) === true) {
             $schemaManager->dropTable($tableName);
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param array  $values
+     *
+     * @return void
+     *
+     * @throws DBALException
+     */
+    protected function createEnum(string $name, array $values): void
+    {
+        assert(empty($name) === false);
+
+        // check all values are strings
+        assert(
+            call_user_func(function () use ($values): bool {
+                $allAreStrings = true;
+                foreach ($values as $value) {
+                    $allAreStrings = $allAreStrings && is_string($value);
+                }
+
+                return $allAreStrings;
+            }) === true,
+            'All enum values should be strings.'
+        );
+
+        assert(array_key_exists($name, $this->enumerations) === false, "Enum name `$name` has already been used.");
+        $this->enumerations[$name] = $values;
+
+        $connection = $this->getConnection();
+        if ($connection->getDriver()->getName() === 'pdo_pgsql') {
+            $valueList = implode("', '", $values);
+            $sql       = "CREATE TYPE $name AS ENUM ('$valueList');";
+            $connection->exec($sql);
+        }
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return void
+     *
+     * @throws DBALException
+     */
+    protected function dropEnumIfExists(string $name): void
+    {
+        unset($this->enumerations[$name]);
+
+        $connection = $this->getConnection();
+        if ($connection->getDriver()->getName() === 'pdo_pgsql') {
+            $name = $connection->quoteIdentifier($name);
+            $sql  = "DROP TYPE IF EXISTS $name;";
+            $connection->exec($sql);
+        }
+    }
+
+    /**
+     * @param string $columnName
+     * @param string $enumName
+     * @param bool   $notNullable
+     *
+     * @return Closure
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    protected function useEnum(string $columnName, string $enumName, bool $notNullable = true): Closure
+    {
+        if ($this->getConnection()->getDriver()->getName() === 'pdo_pgsql') {
+            return function (Table $table) use ($columnName, $enumName): void {
+                $typeName = RawNameType::TYPE_NAME;
+                Type::hasType($typeName) === true ?: Type::addType($typeName, RawNameType::class);
+                $table
+                    ->addColumn($columnName, $typeName)
+                    ->setCustomSchemaOption($typeName, $enumName);
+            };
+        } else {
+            $enumValues = $this->enumerations[$enumName];
+
+            return function (Table $table) use ($columnName, $enumValues, $notNullable) {
+                Type::hasType(EnumType::TYPE_NAME) === true ?: Type::addType(EnumType::TYPE_NAME, EnumType::class);
+                $table
+                    ->addColumn($columnName, EnumType::TYPE_NAME)
+                    ->setCustomSchemaOption(EnumType::TYPE_NAME, $enumValues)
+                    ->setNotnull($notNullable);
+            };
         }
     }
 
@@ -260,10 +354,14 @@ trait MigrationTrait
      * @param array  $values
      *
      * @return Closure
+     *
+     * @throws DBALException
      */
     protected function enum(string $name, array $values): Closure
     {
-        return $this->enumImpl($name, $values, true);
+        $this->createEnum($name, $values);
+
+        return $this->useEnum($name, $name, true);
     }
 
     /**
@@ -271,10 +369,14 @@ trait MigrationTrait
      * @param array  $values
      *
      * @return Closure
+     *
+     * @throws DBALException
      */
     protected function nullableEnum(string $name, array $values): Closure
     {
-        return $this->enumImpl($name, $values, false);
+        $this->createEnum($name, $values);
+
+        return $this->useEnum($name, $name, false);
     }
 
     /**
@@ -401,11 +503,13 @@ trait MigrationTrait
             $referredClass,
             $cascadeDelete
         ) {
-            $tableName  = $this->getTableNameForClass($referredClass);
-            $pkName     = $this->getModelSchemas()->getPrimaryKey($referredClass);
-            $columnType = $this->getModelSchemas()->getAttributeType($context->getModelClass(), $column);
+            $tableName    = $this->getTableNameForClass($referredClass);
+            $pkName       = $this->getModelSchemas()->getPrimaryKey($referredClass);
+            $columnType   = $this->getModelSchemas()->getAttributeType($context->getModelClass(), $column);
+            $columnLength = $columnType === Type::STRING ?
+                $this->getModelSchemas()->getAttributeLength($context->getModelClass(), $column) : null;
 
-            $closure = $this->foreignColumn($column, $tableName, $pkName, $columnType, $cascadeDelete);
+            $closure = $this->foreignColumn($column, $tableName, $pkName, $columnType, $columnLength, $cascadeDelete);
 
             return $closure($table, $context);
         };
@@ -433,22 +537,26 @@ trait MigrationTrait
             $referredClass,
             $cascadeDelete
         ) {
-            $tableName  = $this->getTableNameForClass($referredClass);
-            $pkName     = $this->getModelSchemas()->getPrimaryKey($referredClass);
-            $columnType = $this->getModelSchemas()->getAttributeType($context->getModelClass(), $column);
+            $tableName    = $this->getTableNameForClass($referredClass);
+            $pkName       = $this->getModelSchemas()->getPrimaryKey($referredClass);
+            $columnType   = $this->getModelSchemas()->getAttributeType($context->getModelClass(), $column);
+            $columnLength = $columnType === Type::STRING ?
+                $this->getModelSchemas()->getAttributeLength($context->getModelClass(), $column) : null;
 
-            $closure = $this->nullableForeignColumn($column, $tableName, $pkName, $columnType, $cascadeDelete);
+            $closure = $this
+                ->nullableForeignColumn($column, $tableName, $pkName, $columnType, $columnLength, $cascadeDelete);
 
             return $closure($table, $context);
         };
     }
 
-    /**
-     * @param string $localKey
-     * @param string $foreignTable
-     * @param string $foreignKey
-     * @param string $type
-     * @param bool   $cascadeDelete
+    /** @noinspection PhpTooManyParametersInspection
+     * @param string   $localKey
+     * @param string   $foreignTable
+     * @param string   $foreignKey
+     * @param string   $type
+     * @param int|null $length
+     * @param bool     $cascadeDelete
      *
      * @return Closure
      *
@@ -459,17 +567,19 @@ trait MigrationTrait
         string $foreignTable,
         string $foreignKey,
         string $type,
+        ?int $length = null,
         bool $cascadeDelete = false
     ): Closure {
-        return $this->foreignColumnImpl($localKey, $foreignTable, $foreignKey, $type, true, $cascadeDelete);
+        return $this->foreignColumnImpl($localKey, $foreignTable, $foreignKey, $type, $length, true, $cascadeDelete);
     }
 
-    /**
-     * @param string $localKey
-     * @param string $foreignTable
-     * @param string $foreignKey
-     * @param string $type
-     * @param bool   $cascadeDelete
+    /** @noinspection PhpTooManyParametersInspection
+     * @param string   $localKey
+     * @param string   $foreignTable
+     * @param string   $foreignKey
+     * @param string   $type
+     * @param int|null $length
+     * @param bool     $cascadeDelete
      *
      * @return Closure
      *
@@ -480,9 +590,10 @@ trait MigrationTrait
         string $foreignTable,
         string $foreignKey,
         string $type,
+        ?int $length = null,
         bool $cascadeDelete = false
     ): Closure {
-        return $this->foreignColumnImpl($localKey, $foreignTable, $foreignKey, $type, false, $cascadeDelete);
+        return $this->foreignColumnImpl($localKey, $foreignTable, $foreignKey, $type, $length, false, $cascadeDelete);
     }
 
     /**
@@ -535,7 +646,7 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    private function unsignedIntImpl($name, $notNullable, $default = null): Closure
+    private function unsignedIntImpl(string $name, bool $notNullable, $default = null): Closure
     {
         return function (Table $table) use ($name, $notNullable, $default) {
             $column = $table->addColumn($name, Type::INTEGER)->setUnsigned(true)->setNotnull($notNullable);
@@ -543,31 +654,14 @@ trait MigrationTrait
         };
     }
 
-    /**
-     * @param string $name
-     * @param array  $values
-     * @param bool   $notNullable
-     *
-     * @return Closure
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    private function enumImpl($name, array $values, $notNullable): Closure
-    {
-        return function (Table $table) use ($name, $values, $notNullable) {
-            Type::hasType(EnumType::TYPE_NAME) === true ?: Type::addType(EnumType::TYPE_NAME, EnumType::class);
-            EnumType::setValues($values);
-            $table->addColumn($name, EnumType::TYPE_NAME)->setNotnull($notNullable);
-        };
-    }
-
     /** @noinspection PhpTooManyParametersInspection
-     * @param string $localKey
-     * @param string $foreignTable
-     * @param string $foreignKey
-     * @param string $type
-     * @param bool   $notNullable
-     * @param bool   $cascadeDelete
+     * @param string   $localKey
+     * @param string   $foreignTable
+     * @param string   $foreignKey
+     * @param string   $type
+     * @param int|null $length
+     * @param bool     $notNullable
+     * @param bool     $cascadeDelete
      *
      * @return Closure
      */
@@ -576,6 +670,7 @@ trait MigrationTrait
         string $foreignTable,
         string $foreignKey,
         string $type,
+        ?int $length,
         bool $notNullable,
         bool $cascadeDelete
     ): Closure {
@@ -585,10 +680,12 @@ trait MigrationTrait
             $foreignKey,
             $notNullable,
             $cascadeDelete,
-            $type
+            $type,
+            $length
         ) {
             $options = $cascadeDelete === true ? ['onDelete' => 'CASCADE'] : [];
-            $table->addColumn($localKey, $type)->setUnsigned(true)->setNotnull($notNullable);
+            $column  = $table->addColumn($localKey, $type)->setNotnull($notNullable);
+            $length === null ? $column->setUnsigned(true) : $column->setLength($length);
             $table->addForeignKeyConstraint($foreignTable, [$localKey], [$foreignKey], $options);
         };
     }
@@ -621,8 +718,10 @@ trait MigrationTrait
                 "Relationship `$name` for model `$modelClass` must be `belongsTo`."
             );
 
-            $localKey   = $this->getModelSchemas()->getForeignKey($modelClass, $name);
-            $columnType = $this->getModelSchemas()->getAttributeType($modelClass, $localKey);
+            $localKey     = $this->getModelSchemas()->getForeignKey($modelClass, $name);
+            $columnType   = $this->getModelSchemas()->getAttributeType($modelClass, $localKey);
+            $columnLength = $columnType === Type::STRING ?
+                $this->getModelSchemas()->getAttributeLength($modelClass, $localKey) : null;
 
             $otherModelClass = $this->getModelSchemas()->getReverseModelClass($modelClass, $name);
             $foreignTable    = $this->getModelSchemas()->getTable($otherModelClass);
@@ -633,6 +732,7 @@ trait MigrationTrait
                 $foreignTable,
                 $foreignKey,
                 $columnType,
+                $columnLength,
                 $notNullable,
                 $cascadeDelete
             );

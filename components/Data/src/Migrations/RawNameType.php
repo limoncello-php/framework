@@ -20,12 +20,14 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 
 /**
+ * The type could be used for referring custom database types in table columns.
+ *
  * @package Limoncello\Data
  */
-class EnumType extends Type
+class RawNameType extends Type
 {
     /** Type name */
-    const TYPE_NAME = 'EnumValues';
+    const TYPE_NAME = 'RawName';
 
     /**
      * @inheritdoc
@@ -34,17 +36,12 @@ class EnumType extends Type
     {
         assert(
             array_key_exists(static::TYPE_NAME, $fieldDeclaration),
-            'Enum values are not set. Use `Column::setCustomSchemaOption` to set them.'
+            'Raw type name is not set. Use `Column::setCustomSchemaOption` to set the name.'
         );
-        $values = $fieldDeclaration[static::TYPE_NAME];
+        $rawName = $fieldDeclaration[static::TYPE_NAME];
+        assert(empty($rawName) === false);
 
-        $quotedValues = array_map(function (string $value) use ($platform, $values) : string {
-            return $platform->quoteStringLiteral($value);
-        }, $values);
-
-        $valueList = implode(',', $quotedValues);
-
-        return "ENUM($valueList)";
+        return $rawName;
     }
 
     /**

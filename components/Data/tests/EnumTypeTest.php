@@ -34,9 +34,6 @@ class EnumTypeTest extends TestCase
      */
     public function testSqlDeclaration()
     {
-        EnumType::resetValues();
-        EnumType::setValues(['value1', 'value2']);
-
         if (Type::hasType(EnumType::TYPE_NAME) === false) {
             Type::addType(EnumType::TYPE_NAME, EnumType::class);
         }
@@ -45,9 +42,13 @@ class EnumTypeTest extends TestCase
         $type = Type::getType(EnumType::TYPE_NAME);
         $this->assertEquals(EnumType::TYPE_NAME, $type->getName());
 
-        /** @var AbstractPlatform $platform */
         $platform = Mockery::mock(AbstractPlatform::class);
-        $sqlDeclaration = $type->getSQLDeclaration([], $platform);
+        $quoteValue = function (string $value): string {
+            return "'$value'";
+        };
+        $platform->shouldReceive('quoteStringLiteral')->zeroOrMoreTimes()->withAnyArgs()->andReturnUsing($quoteValue);
+        /** @var AbstractPlatform $platform */
+        $sqlDeclaration = $type->getSQLDeclaration([EnumType::TYPE_NAME => ['value1', 'value2']], $platform);
 
         $this->assertEquals("ENUM('value1','value2')", $sqlDeclaration);
     }
