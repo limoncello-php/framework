@@ -596,6 +596,19 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
+     * @param string $tableName
+     *
+     * @return string
+     */
+    public function createAlias(string $tableName): string
+    {
+        $alias                          = $tableName . (++$this->aliasIdCounter);
+        $this->knownAliases[$tableName] = $alias;
+
+        return $alias;
+    }
+
+    /**
      * @param string $name
      *
      * @return Type
@@ -680,19 +693,6 @@ class ModelQueryBuilder extends QueryBuilder
         $targetAlias = $this->innerJoinOneTable($intAlias, $intToTargetColumn, $targetTable, $targetColumn);
 
         return $targetAlias;
-    }
-
-    /**
-     * @param string $tableName
-     *
-     * @return string
-     */
-    private function createAlias(string $tableName): string
-    {
-        $alias                          = $tableName . (++$this->aliasIdCounter);
-        $this->knownAliases[$tableName] = $alias;
-
-        return $alias;
     }
 
     /**
