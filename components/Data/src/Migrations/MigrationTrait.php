@@ -640,6 +640,20 @@ trait MigrationTrait
     }
 
     /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return Closure
+     */
+    protected function defaultValue(string $name, $value): Closure
+    {
+        return function (Table $table) use ($name, $value) {
+            assert($table->hasColumn($name));
+            $table->getColumn($name)->setDefault($value);
+        };
+    }
+
+    /**
      * @param string     $name
      * @param bool       $notNullable
      * @param null|mixed $default

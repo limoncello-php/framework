@@ -71,6 +71,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $columnNonNullDateTime  = 'col_non_null_datetime';
         $columnNullableDateTime = 'col_nullable_datetime';
 
+        $defaultUInt    = 123;
         $columnToCreate = [
             $this->primaryInt($columnIntPrimary),
             $this->string($columnNonNullString),
@@ -90,6 +91,8 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
             $this->unique([$columnNonNullString]),
 
             $this->searchable([$columnNonNullText]),
+
+            $this->defaultValue($columnUInt, $defaultUInt)
         ];
         $migration      = new TestTableMigration($modelClass, $columnToCreate);
 
@@ -109,9 +112,9 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $manager = $this->connection->getSchemaManager();
         $this->assertTrue($manager->tablesExist([$tableName]));
         $columnsCreated = $manager->listTableColumns($tableName);
-        // +2 for timestamps and -2 for searchable and unique
+        // +2 for timestamps and -3 for searchable, unique and default value
         /** @noinspection PhpParamsInspection */
-        $this->assertCount(count($columnToCreate), $columnsCreated);
+        $this->assertCount(count($columnToCreate) - 1, $columnsCreated);
 
         $this->assertEquals('integer', $columnsCreated[$columnIntPrimary]->getType()->getName());
         $this->assertTrue($columnsCreated[$columnIntPrimary]->getAutoincrement());
@@ -133,6 +136,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $this->assertEquals('integer', $columnsCreated[$columnUInt]->getType()->getName());
         $this->assertTrue($columnsCreated[$columnUInt]->getUnsigned());
         $this->assertTrue($columnsCreated[$columnUInt]->getNotnull());
+        $this->assertEquals($defaultUInt, $columnsCreated[$columnUInt]->getDefault());
 
         $this->assertEquals('integer', $columnsCreated[$columnNullableUInt]->getType()->getName());
         $this->assertTrue($columnsCreated[$columnNullableUInt]->getUnsigned());
