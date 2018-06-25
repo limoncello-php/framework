@@ -19,6 +19,7 @@
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Events\Contracts\EventDispatcherInterface;
 use Limoncello\Events\Contracts\EventEmitterInterface;
 use Limoncello\Events\Package\EventProvider;
 use Limoncello\Events\Package\EventSettings as BaseEventSettings;
@@ -51,6 +52,7 @@ class ContainerConfiguratorTest extends TestCase
         $configuratorClass::configureContainer($container);
 
         $this->assertNotNull($container->get(EventEmitterInterface::class));
+        $this->assertNotNull($container->get(EventDispatcherInterface::class));
     }
 
     /**

@@ -19,6 +19,7 @@
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use Limoncello\Events\Contracts\EventDispatcherInterface;
 use Limoncello\Events\Contracts\EventEmitterInterface;
 use Limoncello\Events\Package\EventSettings as C;
 use Limoncello\Events\SimpleEventEmitter;
@@ -37,12 +38,27 @@ class EventsContainerConfigurator implements ContainerConfiguratorInterface
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {
-        $container[EventEmitterInterface::class] = function (PsrContainerInterface $container): EventEmitterInterface {
-            $emitter   = new SimpleEventEmitter();
-            $cacheData = $container->get(SettingsProviderInterface::class)->get(C::class)[C::KEY_CACHED_DATA];
-            $emitter->setStaticSubscribers($cacheData);
+        $emitter            = null;
+        $getOrCreateEmitter = function (PsrContainerInterface $container) use (&$emitter): SimpleEventEmitter {
+            if ($emitter === null) {
+                $emitter   = new SimpleEventEmitter();
+                $cacheData = $container->get(SettingsProviderInterface::class)->get(C::class)[C::KEY_CACHED_DATA];
+                $emitter->setStaticSubscribers($cacheData);
+            }
 
             return $emitter;
         };
+
+        $container[EventEmitterInterface::class] =
+            function (PsrContainerInterface $container) use ($getOrCreateEmitter): EventEmitterInterface
+            {
+                return call_user_func($getOrCreateEmitter, $container);
+            };
+
+        $container[EventDispatcherInterface::class] =
+            function (PsrContainerInterface $container) use ($getOrCreateEmitter): EventDispatcherInterface
+            {
+                return call_user_func($getOrCreateEmitter, $container);
+            };
     }
 }
