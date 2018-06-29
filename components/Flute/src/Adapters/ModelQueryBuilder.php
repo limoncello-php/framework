@@ -528,6 +528,11 @@ class ModelQueryBuilder extends QueryBuilder
             );
             $fullColumnName = $this->buildColumnName($tableOrAlias, $columnName);
             foreach ($operationsWithArgs as $operation => $arguments) {
+                assert(
+                    is_iterable($arguments) === true || is_array($arguments) === true,
+                    "Operation arguments are missing for `$columnName` column. " .
+                    'Use an empty array as an empty argument list.'
+                );
                 $expression->add($this->createFilterExpression($fullColumnName, $operation, $arguments));
             }
         }

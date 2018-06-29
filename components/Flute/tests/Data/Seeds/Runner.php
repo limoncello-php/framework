@@ -120,6 +120,17 @@ class Runner
             [Category::FIELD_NAME => 'Sub1', Category::FIELD_ID_PARENT => 1],
             [Category::FIELD_NAME => 'Sub2', Category::FIELD_ID_PARENT => 1],
         ]);
+
+        // there will be one more post without any comments
+        $this->seedTable($connection, 1, Post::TABLE_NAME, function () use ($faker, $allBoards, $allUsers) {
+            return [
+                Post::FIELD_ID_BOARD  => $faker->randomElement($allBoards)[Board::FIELD_ID],
+                Post::FIELD_ID_USER   => $faker->randomElement($allUsers)[User::FIELD_ID],
+                Post::FIELD_ID_EDITOR => null,
+                Post::FIELD_TITLE     => $faker->text(50),
+                Post::FIELD_TEXT      => $faker->text(),
+            ];
+        });
     }
 
     /**

@@ -448,6 +448,45 @@ class CrudTest extends TestCase
      * @throws Exception
      * @throws DBALException
      */
+    public function testReadWithDeepIncludesWhenIntermediateRelationshipIsEmpty(): void
+    {
+        $crud       = $this->createCrud(PostsApi::class);
+        $connection = $crud->createIndexBuilder()->getConnection();
+
+        $postsTable        = Post::TABLE_NAME;
+        $postsIdPost       = Post::FIELD_ID;
+        $postsIdEditor     = Post::FIELD_ID_EDITOR;
+        $commentsTable     = Comment::TABLE_NAME;
+        $commentsIdPost    = Comment::FIELD_ID_POST;
+        $commentsNumberSql = "SELECT COUNT(*) " .
+            "FROM $commentsTable " .
+            "WHERE $commentsTable.$commentsIdPost = $postsTable.$postsIdPost";
+        $noCommentsPostId  = (int)$connection->fetchColumn(
+            "SELECT $postsIdPost, ($commentsNumberSql) AS comments_number " .
+            "FROM $postsTable " .
+            "WHERE comments_number = 0 AND $postsIdEditor IS NULL LIMIT 1"
+        );
+        assert($noCommentsPostId !== 0, 'A post without any comments is not found.');
+
+        $includePaths = [
+            [Post::REL_EDITOR, User::REL_COMMENTS],
+            [Post::REL_COMMENTS, Comment::REL_EMOTIONS],
+            [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER],
+        ];
+        $this->assertNotNull(
+            $model = $crud->withIncludes($includePaths)->read($noCommentsPostId)
+        );
+
+        self::assertNull($model->{Post::REL_EDITOR});
+        self::assertEmpty($model->{Post::REL_COMMENTS}->getData());
+    }
+
+    /**
+     * Check 'read' with included paths.
+     *
+     * @throws Exception
+     * @throws DBALException
+     */
     public function testUntypedReadWithIncludes(): void
     {
         /** @var Crud $crud */
@@ -1033,7 +1072,7 @@ class CrudTest extends TestCase
 
         $result = $crud->withFilters($filters)->count();
 
-        $this->assertEquals(14, $result);
+        $this->assertEquals(15, $result);
     }
 
     /**
@@ -1088,8 +1127,8 @@ class CrudTest extends TestCase
         $container[FactoryInterface::class]          = $factory = new Factory($container);
         $container[ModelSchemaInfoInterface::class]  = $modelSchemas = $this->getModelSchemas();
 
-        $container[RelationshipPaginationStrategyInterface::class] =
-            new BasicRelationshipPaginationStrategy(self::DEFAULT_PAGE);
+        $container[RelationshipPaginationStrategyInterface::class]
+            = new BasicRelationshipPaginationStrategy(self::DEFAULT_PAGE);
 
         if (Type::hasType(SystemDateTimeType::NAME) === false) {
             Type::addType(SystemDateTimeType::NAME, SystemDateTimeType::class);

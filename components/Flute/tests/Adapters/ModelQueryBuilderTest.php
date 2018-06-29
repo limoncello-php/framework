@@ -152,7 +152,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $this->migrateDatabase($this->connection);
         $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
-        $this->assertCount(20, $posts);
+        $this->assertCount(21, $posts);
     }
 
     /**
