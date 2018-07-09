@@ -59,6 +59,10 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $tableName              = 'table_name';
         $columnNonNullString    = 'col_non_null_string';
         $columnNullableString   = 'col_nullable_string';
+        $columnInt              = 'col_int';
+        $columnNullableInt      = 'col_nullable_int';
+        $columnInt2              = 'col_int_2';
+        $columnNullableInt2      = 'col_nullable_int_2';
         $columnStringLength     = 100;
         $columnNonNullText      = 'col_non_null_text';
         $columnNullableText     = 'col_nullable_text';
@@ -76,6 +80,8 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
             $this->primaryInt($columnIntPrimary),
             $this->string($columnNonNullString),
             $this->nullableString($columnNullableString),
+            $this->int($columnInt),
+            $this->nullableInt($columnNullableInt),
             $this->text($columnNonNullText),
             $this->nullableText($columnNullableText),
             $this->unsignedInt($columnUInt),
@@ -87,6 +93,11 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
             $this->nullableDate($columnNullableDate),
             $this->datetime($columnNonNullDateTime),
             $this->nullableDatetime($columnNullableDateTime),
+
+            $this->nullableInt($columnInt2),
+            $this->int($columnNullableInt2),
+            $this->notNullableValue($columnInt2),
+            $this->nullableValue($columnNullableInt2),
 
             $this->unique([$columnNonNullString]),
 
@@ -112,9 +123,9 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $manager = $this->connection->getSchemaManager();
         $this->assertTrue($manager->tablesExist([$tableName]));
         $columnsCreated = $manager->listTableColumns($tableName);
-        // +2 for timestamps and -3 for searchable, unique and default value
+        // +2 for timestamps and -5 for searchable, unique, default value, nullable and not nullable value.
         /** @noinspection PhpParamsInspection */
-        $this->assertCount(count($columnToCreate) - 1, $columnsCreated);
+        $this->assertCount(count($columnToCreate) - 3, $columnsCreated);
 
         $this->assertEquals('integer', $columnsCreated[$columnIntPrimary]->getType()->getName());
         $this->assertTrue($columnsCreated[$columnIntPrimary]->getAutoincrement());
@@ -126,6 +137,16 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $this->assertEquals('string', $columnsCreated[$columnNullableString]->getType()->getName());
         $this->assertEquals($columnStringLength, $columnsCreated[$columnNullableString]->getLength());
         $this->assertFalse($columnsCreated[$columnNullableString]->getNotnull());
+
+        $this->assertEquals('integer', $columnsCreated[$columnInt]->getType()->getName());
+        $this->assertTrue($columnsCreated[$columnInt]->getNotnull());
+        $this->assertEquals('integer', $columnsCreated[$columnInt2]->getType()->getName());
+        $this->assertTrue($columnsCreated[$columnInt2]->getNotnull());
+
+        $this->assertEquals('integer', $columnsCreated[$columnNullableInt]->getType()->getName());
+        $this->assertFalse($columnsCreated[$columnNullableInt]->getNotnull());
+        $this->assertEquals('integer', $columnsCreated[$columnNullableInt2]->getType()->getName());
+        $this->assertFalse($columnsCreated[$columnNullableInt2]->getNotnull());
 
         $this->assertEquals('text', $columnsCreated[$columnNonNullText]->getType()->getName());
         $this->assertTrue($columnsCreated[$columnNonNullText]->getNotnull());

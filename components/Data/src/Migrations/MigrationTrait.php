@@ -253,6 +253,33 @@ trait MigrationTrait
      *
      * @return Closure
      */
+    protected function int(string $name, int $default = null): Closure
+    {
+        return function (Table $table) use ($name, $default) {
+            $column = $table->addColumn($name, Type::INTEGER)->setUnsigned(false)->setNotnull(true);
+            $default === null ?: $column->setDefault($default);
+        };
+    }
+
+    /**
+     * @param string   $name
+     * @param null|int $default
+     *
+     * @return Closure
+     */
+    protected function nullableInt(string $name, int $default = null): Closure
+    {
+        return function (Table $table) use ($name, $default) {
+            $table->addColumn($name, Type::INTEGER)->setUnsigned(false)->setNotnull(false)->setDefault($default);
+        };
+    }
+
+    /**
+     * @param string   $name
+     * @param null|int $default
+     *
+     * @return Closure
+     */
     protected function unsignedInt(string $name, int $default = null): Closure
     {
         return $this->unsignedIntImpl($name, true, $default);
@@ -650,6 +677,32 @@ trait MigrationTrait
         return function (Table $table) use ($name, $value) {
             assert($table->hasColumn($name));
             $table->getColumn($name)->setDefault($value);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableValue(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            assert($table->hasColumn($name));
+            $table->getColumn($name)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function notNullableValue(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            assert($table->hasColumn($name));
+            $table->getColumn($name)->setNotnull(true);
         };
     }
 
