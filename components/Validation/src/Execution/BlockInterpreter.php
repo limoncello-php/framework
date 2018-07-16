@@ -59,7 +59,7 @@ final class BlockInterpreter
     }
 
     /**
-     * @param int[]                    $indexes
+     * @param iterable|int[]           $indexes
      * @param array                    $blocks
      * @param ContextStorageInterface  $context
      * @param ErrorAggregatorInterface $errors
@@ -69,7 +69,7 @@ final class BlockInterpreter
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public static function executeStarts(
-        array $indexes,
+        iterable $indexes,
         array $blocks,
         ContextStorageInterface $context,
         ErrorAggregatorInterface $errors
@@ -90,7 +90,7 @@ final class BlockInterpreter
     }
 
     /**
-     * @param int[]                    $indexes
+     * @param iterable|int[]           $indexes
      * @param array                    $blocks
      * @param ContextStorageInterface  $context
      * @param ErrorAggregatorInterface $errors
@@ -100,7 +100,7 @@ final class BlockInterpreter
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public static function executeEnds(
-        array $indexes,
+        iterable $indexes,
         array $blocks,
         ContextStorageInterface $context,
         ErrorAggregatorInterface $errors
@@ -457,26 +457,26 @@ final class BlockInterpreter
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private static function executeProcedureEnd(array $procedureBlock, ContextInterface $context): array
+    private static function executeProcedureEnd(array $procedureBlock, ContextInterface $context): iterable
     {
         assert(static::getBlockType($procedureBlock) === BlockSerializer::TYPE__PROCEDURE);
         $callable = $procedureBlock[BlockSerializer::PROCEDURE_END_CALLABLE];
         assert(is_callable($callable) === true);
         $errors = call_user_func($callable, $context);
-        assert(is_array($errors));
+        assert(is_iterable($errors));
 
         return $errors;
     }
 
     /**
-     * @param array                    $errorsInfo
+     * @param iterable                 $errorsInfo
      * @param ContextStorageInterface  $context
      * @param ErrorAggregatorInterface $errors
      *
      * @return void
      */
     private static function addBlockErrors(
-        array $errorsInfo,
+        iterable $errorsInfo,
         ContextStorageInterface $context,
         ErrorAggregatorInterface $errors
     ): void {
@@ -493,13 +493,13 @@ final class BlockInterpreter
     }
 
     /**
-     * @param array $blocks
+     * @param iterable $blocks
      *
      * @return bool
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private static function debugCheckLooksLikeBlocksArray(array $blocks): bool
+    private static function debugCheckLooksLikeBlocksArray(iterable $blocks): bool
     {
         foreach ($blocks as $index => $block) {
             if (is_int($index) === false ||
@@ -514,15 +514,15 @@ final class BlockInterpreter
     }
 
     /**
-     * @param array $blockIndexes
-     * @param array $blockList
-     * @param int   $blockType
+     * @param iterable|int[] $blockIndexes
+     * @param array          $blockList
+     * @param int            $blockType
      *
      * @return bool
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private static function debugCheckBlocksExist(array $blockIndexes, array $blockList, int $blockType): bool
+    private static function debugCheckBlocksExist(iterable $blockIndexes, array $blockList, int $blockType): bool
     {
         foreach ($blockIndexes as $index) {
             if (array_key_exists($index, $blockList) === false ||
