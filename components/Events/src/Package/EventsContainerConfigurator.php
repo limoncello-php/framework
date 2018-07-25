@@ -50,14 +50,12 @@ class EventsContainerConfigurator implements ContainerConfiguratorInterface
         };
 
         $container[EventEmitterInterface::class] =
-            function (PsrContainerInterface $container) use ($getOrCreateEmitter): EventEmitterInterface
-            {
+            function (PsrContainerInterface $container) use ($getOrCreateEmitter): EventEmitterInterface {
                 return call_user_func($getOrCreateEmitter, $container);
             };
 
         $container[EventDispatcherInterface::class] =
-            function (PsrContainerInterface $container) use ($getOrCreateEmitter): EventDispatcherInterface
-            {
+            function (PsrContainerInterface $container) use ($getOrCreateEmitter): EventDispatcherInterface {
                 return call_user_func($getOrCreateEmitter, $container);
             };
     }

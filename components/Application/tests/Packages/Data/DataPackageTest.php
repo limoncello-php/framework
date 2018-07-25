@@ -30,6 +30,7 @@ use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
 use Psr\Container\ContainerInterface;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Application
@@ -46,6 +47,8 @@ class DataPackageTest extends TestCase
 
     /**
      * Test container configurator.
+     *
+     * @throws ReflectionException
      */
     public function testContainerConfigurator(): void
     {
@@ -71,6 +74,8 @@ class DataPackageTest extends TestCase
 
     /**
      * Test settings.
+     *
+     * @throws ReflectionException
      */
     public function testSettings(): void
     {

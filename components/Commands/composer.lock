@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1488d73d4ef8927bfd2adc5e799a6f36",
+    "content-hash": "5f94a64b9f9b6d54edb2a499f36e8a3c",
     "packages": [
         {
             "name": "limoncello-php/contracts",
-            "version": "0.9.3",
+            "version": "0.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/limoncello-php-dist/contracts.git",
-                "reference": "37147806394e0463b1b7e07ea279208438870b69"
+                "reference": "c0f23d274e36644a1e391e20299d67421da027e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limoncello-php-dist/contracts/zipball/37147806394e0463b1b7e07ea279208438870b69",
-                "reference": "37147806394e0463b1b7e07ea279208438870b69",
+                "url": "https://api.github.com/repos/limoncello-php-dist/contracts/zipball/c0f23d274e36644a1e391e20299d67421da027e0",
+                "reference": "c0f23d274e36644a1e391e20299d67421da027e0",
                 "shasum": ""
             },
             "require": {
@@ -32,7 +32,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-develop": "0.9.x-dev"
+                    "dev-develop": "0.10.x-dev"
                 }
             },
             "autoload": {
@@ -58,7 +58,7 @@
                 "interfaces",
                 "limoncello"
             ],
-            "time": "2018-05-15T15:33:26+00:00"
+            "time": "2018-07-25T20:11:50+00:00"
         },
         {
             "name": "psr/container",

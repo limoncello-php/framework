@@ -44,6 +44,8 @@ class FileSettingsProviderTest extends TestCase
 {
     /**
      * Test loading from folder.
+     *
+     * @throws ReflectionException
      */
     public function testLoadFromFolder(): void
     {
@@ -121,6 +123,8 @@ class FileSettingsProviderTest extends TestCase
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\NotRegisteredSettingsException
+     *
+     * @throws ReflectionException
      */
     public function testGetNotRegistered(): void
     {
@@ -129,6 +133,8 @@ class FileSettingsProviderTest extends TestCase
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\AmbiguousSettingsException
+     *
+     * @throws ReflectionException
      */
     public function testGetAmbiguous(): void
     {
@@ -137,6 +143,8 @@ class FileSettingsProviderTest extends TestCase
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\AlreadyRegisteredSettingsException
+     *
+     * @throws ReflectionException
      */
     public function testRegisterTwice(): void
     {
@@ -193,6 +201,8 @@ class FileSettingsProviderTest extends TestCase
 
     /**
      * @return FileSettingsProvider
+     *
+     * @throws ReflectionException
      */
     private function createProvider(): FileSettingsProvider
     {

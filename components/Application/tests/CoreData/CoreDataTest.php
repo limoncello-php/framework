@@ -19,6 +19,7 @@
 use Limoncello\Application\CoreSettings\CoreData;
 use Limoncello\Tests\Application\Data\CoreSettings\Providers\Provider1;
 use Limoncello\Tests\Application\TestCase;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Application
@@ -27,6 +28,8 @@ class CoreDataTest extends TestCase
 {
     /**
      * Test compose settings.
+     *
+     * @throws ReflectionException
      */
     public function testSettings(): void
     {

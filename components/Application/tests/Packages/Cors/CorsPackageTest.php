@@ -67,7 +67,6 @@ class CorsPackageTest extends TestCase
         $corsConfig = (new C())->get($appConfig);
         // check CORS config uses application configuration
         $this->assertEquals([
-            C::KEY_SERVER_ORIGIN_SCHEMA => 'http',
             C::KEY_SERVER_ORIGIN_HOST   => 'localhost',
             C::KEY_SERVER_ORIGIN_PORT   => '8080',
         ], $corsConfig[C::KEY_SERVER_ORIGIN]);

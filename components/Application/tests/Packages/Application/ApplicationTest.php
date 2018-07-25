@@ -22,6 +22,7 @@ use Limoncello\Application\Settings\InstanceSettingsProvider;
 use Limoncello\Tests\Application\CoreData\CoreDataTest;
 use Limoncello\Tests\Application\Data\Application\Settings\Application as ApplicationConfiguration;
 use Limoncello\Tests\Application\TestCase;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Application
@@ -30,6 +31,8 @@ class ApplicationTest extends TestCase
 {
     /**
      * Test create container.
+     *
+     * @throws ReflectionException
      */
     public function testCreateContainerOnTheFly(): void
     {
@@ -40,6 +43,8 @@ class ApplicationTest extends TestCase
 
     /**
      * Test create container.
+     *
+     * @throws ReflectionException
      */
     public function testCreateContainerFromCache(): void
     {
@@ -52,6 +57,8 @@ class ApplicationTest extends TestCase
 
     /**
      * @return array
+     *
+     * @throws ReflectionException
      */
     public static function getCachedSettings(): array
     {

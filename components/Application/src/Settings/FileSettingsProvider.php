@@ -33,6 +33,8 @@ class FileSettingsProvider extends InstanceSettingsProvider
      * @param string $path
      *
      * @return FileSettingsProvider
+     *
+     * @throws ReflectionException
      */
     public function load(string $path): FileSettingsProvider
     {

@@ -25,6 +25,7 @@ use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
 use Psr\Http\Message\ResponseInterface;
+use ReflectionException;
 use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Diactoros\ServerRequest;
 
@@ -38,6 +39,8 @@ class CsrfMiddlewareTest extends TestCase
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     protected function setUp()
     {
@@ -95,6 +98,8 @@ class CsrfMiddlewareTest extends TestCase
 
     /**
      * @return array
+     *
+     * @throws ReflectionException
      */
     private function getDefaultCsrfSettings(): array
     {

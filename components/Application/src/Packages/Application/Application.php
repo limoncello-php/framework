@@ -30,7 +30,8 @@ use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Sapi;
 use Limoncello\Core\Reflection\ClassIsTrait;
-use Zend\Diactoros\Response\SapiEmitter;
+use ReflectionException;
+use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 /**
  * @package Limoncello\Application
@@ -76,6 +77,8 @@ class Application extends \Limoncello\Core\Application\Application
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     protected function getCoreData(): array
     {
@@ -90,6 +93,8 @@ class Application extends \Limoncello\Core\Application\Application
      * @param string|null $path
      *
      * @return LimoncelloContainerInterface
+     *
+     * @throws ReflectionException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -113,6 +118,8 @@ class Application extends \Limoncello\Core\Application\Application
 
     /**
      * @return LimoncelloContainerInterface
+     *
+     * @throws ReflectionException
      */
     protected function createContainerInstance(): LimoncelloContainerInterface
     {
@@ -146,6 +153,8 @@ class Application extends \Limoncello\Core\Application\Application
      * @return CacheSettingsProviderInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     *
+     * @throws ReflectionException
      */
     private function getCacheSettingsProvider(): CacheSettingsProviderInterface
     {
@@ -175,6 +184,8 @@ class Application extends \Limoncello\Core\Application\Application
 
     /**
      * @return A
+     *
+     * @throws ReflectionException
      */
     private function createApplicationConfiguration(): A
     {
@@ -198,6 +209,8 @@ class Application extends \Limoncello\Core\Application\Application
      * @param array $applicationData
      *
      * @return InstanceSettingsProvider
+     *
+     * @throws ReflectionException
      */
     private function createInstanceSettingsProvider(array $applicationData): InstanceSettingsProvider
     {

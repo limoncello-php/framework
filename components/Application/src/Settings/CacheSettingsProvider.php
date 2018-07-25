@@ -21,6 +21,7 @@ use Limoncello\Application\Exceptions\AmbiguousSettingsException;
 use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
+use ReflectionException;
 
 /**
  * @package Limoncello\Application
@@ -126,6 +127,8 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
      * @param InstanceSettingsProvider          $provider
      *
      * @return self
+     *
+     * @throws ReflectionException
      */
     public function setInstanceSettings(
         ApplicationConfigurationInterface $appConfig,

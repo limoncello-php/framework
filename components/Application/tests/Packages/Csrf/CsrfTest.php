@@ -28,6 +28,7 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Application
@@ -42,6 +43,8 @@ class CsrfTest extends TestCase
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     protected function setUp()
     {
@@ -127,6 +130,8 @@ class CsrfTest extends TestCase
 
     /**
      * Test create token.
+     *
+     * @throws ReflectionException
      */
     public function testCreateAndCheckToken(): void
     {
@@ -146,6 +151,8 @@ class CsrfTest extends TestCase
 
     /**
      * Test create token.
+     *
+     * @throws ReflectionException
      */
     public function testCreateTokenWithGarbageCollection(): void
     {
@@ -168,6 +175,8 @@ class CsrfTest extends TestCase
 
     /**
      * @return array
+     *
+     * @throws ReflectionException
      */
     private function getTokenStorageFromSession(): array
     {
@@ -179,6 +188,7 @@ class CsrfTest extends TestCase
 
     /**
      * @return array
+     * @throws ReflectionException
      */
     private function getDefaultCsrfSettings(): array
     {

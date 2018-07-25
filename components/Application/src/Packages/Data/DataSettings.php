@@ -24,6 +24,7 @@ use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Reflection\ClassIsTrait;
 use Psr\Container\ContainerInterface;
+use ReflectionException;
 
 /**
  * @package Limoncello\Application
@@ -34,6 +35,8 @@ abstract class DataSettings implements SettingsInterface, DataSettingsInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     final public function get(array $appConfig): array
     {
@@ -95,6 +98,8 @@ abstract class DataSettings implements SettingsInterface, DataSettingsInterface
      * @return array
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @throws ReflectionException
      */
     private function getModelsSchemaInfo(string $modelsPath): array
     {

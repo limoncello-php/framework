@@ -33,6 +33,7 @@ use Limoncello\Core\Reflection\ClassIsTrait;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;
+use ReflectionException;
 
 /**
  * @package Limoncello\Application
@@ -72,6 +73,8 @@ class CoreData extends BaseCoreData
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function get(): array
     {
@@ -105,6 +108,8 @@ class CoreData extends BaseCoreData
 
     /**
      * @return Generator
+     *
+     * @throws ReflectionException
      */
     protected function getGlobalContainerConfigurators(): Generator
     {
@@ -130,6 +135,8 @@ class CoreData extends BaseCoreData
      * @param GroupInterface $group
      *
      * @return GroupInterface
+     *
+     * @throws ReflectionException
      */
     protected function addRoutes(GroupInterface $group): GroupInterface
     {
@@ -153,6 +160,8 @@ class CoreData extends BaseCoreData
 
     /**
      * @return Generator
+     *
+     * @throws ReflectionException
      */
     protected function getGlobalMiddleWareHandlers(): Generator
     {
@@ -223,6 +232,8 @@ class CoreData extends BaseCoreData
      * @param string|array|callable $mightBeConfigurator
      *
      * @return bool
+     *
+     * @throws ReflectionException
      */
     private function isValidContainerConfigurator($mightBeConfigurator): bool
     {

@@ -32,9 +32,6 @@ class CorsSettings implements SettingsInterface
     const KEY_SERVER_ORIGIN = Settings::KEY_SERVER_ORIGIN;
 
     /** @see Settings */
-    const KEY_SERVER_ORIGIN_SCHEMA = Settings::KEY_SERVER_ORIGIN_SCHEME;
-
-    /** @see Settings */
     const KEY_SERVER_ORIGIN_HOST = Settings::KEY_SERVER_ORIGIN_HOST;
 
     /** @see Settings */
@@ -119,9 +116,8 @@ class CorsSettings implements SettingsInterface
              * @see http://php.net/manual/function.parse-url.php
              */
             $defaults[static::KEY_SERVER_ORIGIN] = [
-                static::KEY_SERVER_ORIGIN_SCHEMA => (string)$appConfig[A::KEY_APP_ORIGIN_SCHEMA],
-                static::KEY_SERVER_ORIGIN_HOST   => (string)$appConfig[A::KEY_APP_ORIGIN_HOST],
-                static::KEY_SERVER_ORIGIN_PORT   => (string)$appConfig[A::KEY_APP_ORIGIN_PORT],
+                static::KEY_SERVER_ORIGIN_HOST => (string)$appConfig[A::KEY_APP_ORIGIN_HOST],
+                static::KEY_SERVER_ORIGIN_PORT => (string)$appConfig[A::KEY_APP_ORIGIN_PORT],
             ];
         }
 

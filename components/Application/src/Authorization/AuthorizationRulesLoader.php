@@ -89,6 +89,8 @@ class AuthorizationRulesLoader
      * @param string $policiesPath
      *
      * @return array
+     *
+     * @throws ReflectionException
      */
     private function getAuthorizationRulesClasses(string $policiesPath): array
     {

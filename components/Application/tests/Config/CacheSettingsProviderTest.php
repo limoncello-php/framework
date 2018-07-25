@@ -24,6 +24,7 @@ use Limoncello\Tests\Application\Data\Config\MarkerInterfaceChild1;
 use Limoncello\Tests\Application\Data\Config\MarkerInterfaceTop;
 use Limoncello\Tests\Application\Data\Config\SampleSettingsAA;
 use Limoncello\Tests\Application\TestCase;
+use ReflectionException;
 
 /**
  * @package Limoncello\Tests\Application
@@ -32,6 +33,8 @@ class CacheSettingsProviderTest extends TestCase
 {
     /**
      * Test loading from folder.
+     *
+     * @throws ReflectionException
      */
     public function testLoadFromFolder(): void
     {
@@ -51,6 +54,8 @@ class CacheSettingsProviderTest extends TestCase
 
     /**
      * @return CacheSettingsProvider
+     *
+     * @throws ReflectionException
      */
     private function createProvider(): CacheSettingsProvider
     {
@@ -69,6 +74,8 @@ class CacheSettingsProviderTest extends TestCase
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\NotRegisteredSettingsException
+     *
+     * @throws ReflectionException
      */
     public function testGetNotRegistered(): void
     {
@@ -77,6 +84,8 @@ class CacheSettingsProviderTest extends TestCase
 
     /**
      * @expectedException \Limoncello\Application\Exceptions\AmbiguousSettingsException
+     *
+     * @throws ReflectionException
      */
     public function testGetAmbiguous(): void
     {
@@ -85,6 +94,8 @@ class CacheSettingsProviderTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws ReflectionException
      */
     public function testGetAppConfig(): void
     {

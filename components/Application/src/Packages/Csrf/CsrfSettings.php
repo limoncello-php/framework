@@ -21,6 +21,7 @@ use Limoncello\Core\Reflection\CheckCallableTrait;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
 
 /**
  * @package Limoncello\Application
@@ -58,6 +59,8 @@ class CsrfSettings implements SettingsInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     final public function get(array $appConfig): array
     {
