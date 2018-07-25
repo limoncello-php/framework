@@ -218,6 +218,64 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    public function parseRelationship(string $name, array $jsonData): bool
+    {
+        $this->reInitAggregatorsIfNeeded();
+
+        $isFoundInToOne  = array_key_exists($name, $this->getSerializer()::readRulesIndexes($this->getToOneRules()));
+        $isFoundInToMany = $isFoundInToOne === false &&
+            array_key_exists($name, $this->getSerializer()::readRulesIndexes($this->getToManyRules()));
+
+        if ($isFoundInToOne === false && $isFoundInToMany === false) {
+            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $details = $this->formatMessage(ErrorCodes::UNKNOWN_RELATIONSHIP);
+            $status  = $this->getErrorStatus();
+            $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $status);
+        } else {
+            assert($isFoundInToOne xor $isFoundInToMany);
+            $ruleIndexes = $this->getSerializer()::readSingleRuleIndexes(
+                $isFoundInToOne === true ? $this->getToOneRules() : $this->getToManyRules(),
+                $name
+            );
+
+            // now execute validation rules
+            $this->executeStarts($this->getSerializer()::readRuleStartIndexes($ruleIndexes));
+            $ruleIndex = $this->getSerializer()::readRuleIndex($ruleIndexes);
+            $isFoundInToOne === true ?
+                $this->validateAsToOneRelationship($ruleIndex, $name, $jsonData) :
+                $this->validateAsToManyRelationship($ruleIndex, $name, $jsonData);
+            $this->executeEnds($this->getSerializer()::readRuleEndIndexes($ruleIndexes));
+
+            if (count($this->getErrorAggregator()) > 0) {
+                foreach ($this->getErrorAggregator()->get() as $error) {
+                    $this->getJsonApiErrorCollection()->addValidationRelationshipError($error);
+                }
+                $this->getErrorAggregator()->clear();
+            }
+        }
+
+        $hasNoErrors = count($this->getJsonApiErrorCollection()) <= 0;
+
+        return $hasNoErrors;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function assertRelationship(string $name, array $jsonData): JsonApiDataValidatingParserInterface
+    {
+        if ($this->parseRelationship($name, $jsonData) === false) {
+            throw new JsonApiException($this->getJsonApiErrorCollection(), $this->getErrorStatus());
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getJsonApiErrors(): array
     {

@@ -30,6 +30,14 @@ class ReadBoardsQueryRules implements JsonApiQueryRulesInterface
     /**
      * @inheritdoc
      */
+    public static function getIdentityRule(): ?RuleInterface
+    {
+        return v::success();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function getFilterRules(): ?array
     {
         return [];

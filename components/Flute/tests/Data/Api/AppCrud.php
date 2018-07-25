@@ -86,6 +86,20 @@ abstract class AppCrud extends Crud
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function builderOnCreateInBelongsToManyRelationship(
+        $relationshipName,
+        ModelQueryBuilder $builder
+    ): ModelQueryBuilder {
+        $builder = parent::builderOnCreateInBelongsToManyRelationship($relationshipName, $builder);
+
+        $builder->setValue(Model::FIELD_CREATED_AT, $builder->createNamedParameter($this->now()));
+
+        return $builder;
+    }
+
+    /**
      * @return string
      */
     private function now(): string

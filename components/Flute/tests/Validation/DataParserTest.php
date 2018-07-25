@@ -142,6 +142,136 @@ EOT;
      *
      * @throws Exception
      */
+    public function testCaptureValidToOneData(): void
+    {
+        $jsonInput = <<<EOT
+        {
+             "data" : { "type" : "users", "id" : "9" }
+        }
+EOT;
+        $input = json_decode($jsonInput, true);
+
+        $container = $this->createContainer();
+        $validator = $this->createParser(
+            $container,
+            'some_rule_name',
+            v::success(),
+            v::success(),
+            [],
+            [
+                CommentSchema::REL_USER => v::toOneRelationship(UserSchema::TYPE, v::stringToInt(v::between(0, 15))),
+            ],
+            []
+        );
+        $validator->assertRelationship(CommentSchema::REL_USER, $input);
+
+        $captures = $validator->getJsonApiCaptures();
+        $this->assertEmpty($validator->getJsonApiErrors());
+        $this->assertCount(1, $captures);
+        $this->assertSame(9, $captures[CommentSchema::REL_USER]);
+    }
+
+    /**
+     * Validation test.
+     *
+     * @throws Exception
+     */
+    public function testCaptureValidToManyData(): void
+    {
+        $jsonInput = <<<EOT
+        {
+             "data" : [
+                  { "type": "emotions", "id":"5" },
+                  { "type": "emotions", "id":"12" }
+              ]
+        }
+EOT;
+        $input = json_decode($jsonInput, true);
+
+        $container = $this->createContainer();
+        $validator = $this->createParser(
+            $container,
+            'some_rule_name',
+            v::success(),
+            v::success(),
+            [],
+            [],
+            [
+                CommentSchema::REL_EMOTIONS => v::toManyRelationship(EmotionSchema::TYPE, v::isArray()),
+            ]
+        );
+        $validator->assertRelationship(CommentSchema::REL_EMOTIONS, $input);
+
+        $captures = $validator->getJsonApiCaptures();
+        $this->assertEmpty($validator->getJsonApiErrors());
+        $this->assertCount(1, $captures);
+        // note we didn't converted strings to int.
+        $this->assertSame(['5', '12'], $captures[CommentSchema::REL_EMOTIONS]);
+    }
+
+    /**
+     * Validation test.
+     *
+     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
+     */
+    public function testParseNonExistingRelationship(): void
+    {
+        $jsonInput = <<<EOT
+        {
+             "data" : { "type": "abc", "id":"123" }
+        }
+EOT;
+        $input = json_decode($jsonInput, true);
+
+        $container = $this->createContainer();
+        $validator = $this->createParser(
+            $container,
+            'some_rule_name',
+            v::success(),
+            v::success(),
+            [],
+            [],
+            []
+        );
+        $validator->assertRelationship(CommentSchema::REL_EMOTIONS, $input);
+    }
+
+    /**
+     * Validation test.
+     *
+     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
+     */
+    public function testCaptureInvalidToManyData(): void
+    {
+        $jsonInput = <<<EOT
+        {
+             "data" : [ { "type" : "emotions", "id" : "1" } ]
+        }
+EOT;
+        $input = json_decode($jsonInput, true);
+
+        $container = $this->createContainer();
+        $validator = $this->createParser(
+            $container,
+            'some_rule_name',
+            v::success(),
+            v::success(),
+            [],
+            [],
+            [
+                CommentSchema::REL_EMOTIONS => v::fail(), // <-- any input will fail validation
+            ]
+        );
+        $validator->assertRelationship(CommentSchema::REL_EMOTIONS, $input);
+
+        $validator->getJsonApiCaptures();
+    }
+
+    /**
+     * Validation test.
+     *
+     * @throws Exception
+     */
     public function testCaptureNullOrEmptyInRelationships(): void
     {
         $text      = 'Outside every fat man there was an even fatter man trying to close in';

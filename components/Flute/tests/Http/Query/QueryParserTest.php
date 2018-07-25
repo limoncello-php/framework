@@ -51,7 +51,7 @@ class QueryParserTest extends TestCase
         $parser = $this->createParser(CommentsIndexRules::class);
 
         // check both in the input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_PAGE => [
                 JsonApiQueryValidatingParserInterface::PARAM_PAGING_OFFSET => '10',
                 JsonApiQueryValidatingParserInterface::PARAM_PAGING_LIMIT  => '20',
@@ -62,7 +62,7 @@ class QueryParserTest extends TestCase
         $this->assertTrue($parser->hasPaging());
 
         // check no offset in the input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_PAGE => [
                 JsonApiQueryValidatingParserInterface::PARAM_PAGING_LIMIT => '20',
             ],
@@ -71,7 +71,7 @@ class QueryParserTest extends TestCase
         $this->assertSame(20, $parser->getPagingLimit());
 
         // check no offset & limit in the input
-        $parser->parse([]);
+        $parser->parse(null, []);
         $this->assertSame(0, $parser->getPagingOffset());
         $this->assertSame(30, $parser->getPagingLimit());
         $this->assertFalse($parser->hasPaging());
@@ -88,7 +88,7 @@ class QueryParserTest extends TestCase
         $relPost = Comment::REL_POST;
 
         // check with valid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_INCLUDE => "$relUser,$relPost",
         ]);
         $includes = $this->iterableToArray($parser->getIncludes());
@@ -100,7 +100,7 @@ class QueryParserTest extends TestCase
         ], $includes);
 
         // check with invalid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_INCLUDE => "$relUser,foo,$relPost,boo",
         ]);
 
@@ -133,7 +133,7 @@ class QueryParserTest extends TestCase
         $fieldFloat = Comment::FIELD_FLOAT;
 
         // check with valid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_SORT => "+$fieldText,-$fieldFloat",
         ]);
         $sorts = $this->iterableToArray($parser->getSorts());
@@ -145,7 +145,7 @@ class QueryParserTest extends TestCase
         ], $sorts);
 
         // check with invalid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_SORT => "-$fieldText,foo,$fieldFloat,boo",
         ]);
 
@@ -182,7 +182,7 @@ class QueryParserTest extends TestCase
         $postComments = PostSchema::REL_COMMENTS;
 
         // check with valid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_FIELDS => [
                 CommentSchema::TYPE => "$commentText,$commentUser,$commentPost",
                 PostSchema::TYPE    => "$postTitle,$postUser,$postComments",
@@ -196,7 +196,7 @@ class QueryParserTest extends TestCase
         ], $fieldSets);
 
         // check with invalid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_FIELDS => [
                 CommentSchema::TYPE => "$commentText,foo,$commentUser,$commentPost",
                 PostSchema::TYPE    => "$postTitle,$postUser,boo,$postComments",
@@ -238,7 +238,7 @@ class QueryParserTest extends TestCase
         $commentBool = CommentSchema::ATTR_BOOL;
 
         // check with valid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_FILTER => [
                 $commentText => ['like' => '%foo%', 'not_in' => 'food,foolish'],
                 $commentInt  => ['gte' => '3', 'lte' => '9'],
@@ -255,7 +255,7 @@ class QueryParserTest extends TestCase
         ], $filters);
 
         // check with invalid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_FILTER => [
                 $commentText => ['like' => '%', 'not_in' => 'f,g'],
                 $commentInt  => ['gte' => '0', 'lte' => '11'],
@@ -287,7 +287,7 @@ class QueryParserTest extends TestCase
         $commentText = CommentSchema::ATTR_TEXT;
 
         // check with valid input
-        $parser->parse([
+        $parser->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_FILTER => [
                 $commentText => ['not_in' => ''],
             ],
@@ -312,7 +312,9 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $this->iterableToArray($this->createParser(CommentsIndexRules::class)->parse($queryParameters)->getFilters());
+        $this->iterableToArray(
+            $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->getFilters()
+        );
     }
 
     /**
@@ -328,7 +330,9 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $this->iterableToArray($this->createParser(CommentsIndexRules::class)->parse($queryParameters)->getFilters());
+        $this->iterableToArray(
+            $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->getFilters()
+        );
     }
 
     /**
@@ -346,7 +350,9 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $this->iterableToArray($this->createParser(CommentsIndexRules::class)->parse($queryParameters)->getFilters());
+        $this->iterableToArray(
+            $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->getFilters()
+        );
     }
 
     /**
@@ -360,7 +366,7 @@ class QueryParserTest extends TestCase
 
         $parser = $this->createParser(CommentsIndexRules::class);
 
-        $this->assertTrue($parser->parse($queryParameters)->areFiltersWithAnd());
+        $this->assertTrue($parser->parse(null, $queryParameters)->areFiltersWithAnd());
     }
 
     /**
@@ -374,7 +380,7 @@ class QueryParserTest extends TestCase
             JsonApiQueryValidatingParserInterface::PARAM_FILTER => '',
         ];
 
-        $this->createParser(CommentsIndexRules::class)->parse($queryParameters)->areFiltersWithAnd();
+        $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->areFiltersWithAnd();
     }
 
     /**
@@ -388,7 +394,7 @@ class QueryParserTest extends TestCase
             JsonApiQueryValidatingParserInterface::PARAM_FILTER => [],
         ];
 
-        $this->createParser(CommentsIndexRules::class)->parse($queryParameters)->areFiltersWithAnd();
+        $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->areFiltersWithAnd();
     }
 
     /**
@@ -409,7 +415,7 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $this->createParser(CommentsIndexRules::class)->parse($queryParameters)->areFiltersWithAnd();
+        $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->areFiltersWithAnd();
     }
 
     /**
@@ -429,7 +435,7 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $parser = $this->createParser(CommentsIndexRules::class)->parse($queryParameters);
+        $parser = $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters);
 
         $this->assertFalse($parser->areFiltersWithAnd());
 
@@ -454,7 +460,7 @@ class QueryParserTest extends TestCase
         $fieldFloat = Comment::FIELD_FLOAT;
         $fieldInt   = Comment::FIELD_INT;
 
-        $parser = $this->createParser(AllowEverythingRules::class)->parse([
+        $parser = $this->createParser(AllowEverythingRules::class)->parse(null, [
             JsonApiQueryValidatingParserInterface::PARAM_FILTER  => [
                 $fieldText => ['like' => '%foo%', 'not_in' => 'food,foolish'],
                 $fieldInt  => ['gte' => '3', 'lte' => '9'],

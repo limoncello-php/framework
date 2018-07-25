@@ -161,6 +161,14 @@ interface JsonApiDataRulesSerializerInterface
     public static function readRulesEndIndexes(array $arrayRuleIndexes): array;
 
     /**
+     * @param array  $arrayRuleIndexes
+     * @param string $name
+     *
+     * @return array
+     */
+    public static function readSingleRuleIndexes(array $arrayRuleIndexes, string $name): array;
+
+    /**
      * @param int   $index
      * @param array $blocks
      *

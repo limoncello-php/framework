@@ -18,14 +18,14 @@
 
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
-use Limoncello\Tests\Flute\Data\Schemas\EmotionSchema as Schema;
+use Limoncello\Tests\Flute\Data\Schemas\PostSchema as Schema;
 use Limoncello\Tests\Flute\Data\Validation\AppRules as v;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 
 /**
  * @package Limoncello\Tests\Flute
  */
-class ReadEmotionsFromCommentsQueryRules implements JsonApiQueryRulesInterface
+class ReadPostsQueryRules implements JsonApiQueryRulesInterface
 {
     /**
      * @inheritdoc
@@ -40,7 +40,13 @@ class ReadEmotionsFromCommentsQueryRules implements JsonApiQueryRulesInterface
      */
     public static function getFilterRules(): ?array
     {
-        return [];
+        return [
+            Schema::RESOURCE_ID => v::stringToInt(v::moreThan(0)),
+            Schema::ATTR_TEXT   => v::isString(v::stringLengthMin(1)),
+            Schema::REL_EDITOR  => v::stringToInt(v::moreThan(0)),
+            Schema::REL_BOARD   => v::stringToInt(v::moreThan(0)),
+            Schema::REL_USER    => v::stringToInt(v::moreThan(0)),
+        ];
     }
 
     /**
@@ -57,7 +63,7 @@ class ReadEmotionsFromCommentsQueryRules implements JsonApiQueryRulesInterface
     public static function getSortsRule(): ?RuleInterface
     {
         return v::isString(v::inValues([
-            Schema::ATTR_NAME,
+            Schema::RESOURCE_ID,
         ]));
     }
 
@@ -66,7 +72,10 @@ class ReadEmotionsFromCommentsQueryRules implements JsonApiQueryRulesInterface
      */
     public static function getIncludesRule(): ?RuleInterface
     {
-        return v::fail();
+        return v::isString(v::inValues([
+            Schema::REL_EDITOR,
+            Schema::REL_USER,
+        ]));
     }
 
     /**

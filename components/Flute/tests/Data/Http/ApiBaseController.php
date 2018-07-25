@@ -23,6 +23,4 @@ use Limoncello\Flute\Http\JsonApiBaseController;
  */
 abstract class ApiBaseController extends JsonApiBaseController
 {
-    /** URI key used in routing table */
-    const ROUTE_KEY_CHILD_INDEX = 'child_idx';
 }

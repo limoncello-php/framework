@@ -176,6 +176,7 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
         $response = static::defaultDeleteHandler(
             $routeParams[static::ROUTE_KEY_INDEX],
             $request->getUri(),
+            static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemasInterface::class),
@@ -213,6 +214,7 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
         };
 
         return static::defaultReadRelationshipWithClosureHandler(
+            $index,
             $handler,
             $request->getQueryParams(),
             $request->getUri(),
@@ -253,6 +255,7 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
         };
 
         return static::defaultReadRelationshipIdentifiersWithClosureHandler(
+            $index,
             $handler,
             $request->getQueryParams(),
             $request->getUri(),
@@ -265,85 +268,123 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
         );
     }
 
-    /** @noinspection PhpTooManyParametersInspection
-     * @param                        $parentIndex
+    /**
+     * @param string                 $parentIndex
+     * @param string                 $jsonRelName
      * @param string                 $modelRelName
-     * @param                        $childIndex
-     * @param string                 $childSchemaClass
-     * @param string                 $childValidatorClass
-     * @param string                 $childApiClass
      * @param ContainerInterface     $container
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
-    protected static function updateInRelationship(
-        $parentIndex,
+    protected static function addInRelationship(
+        string $parentIndex,
+        string $jsonRelName,
         string $modelRelName,
-        string $childIndex,
-        string $childSchemaClass,
-        string $childValidatorClass,
-        string $childApiClass,
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
         static::assertClassValueDefined(static::API_CLASS);
+        static::assertClassValueDefined(static::SCHEMA_CLASS);
+        static::assertClassValueDefined(static::ON_READ_QUERY_VALIDATION_RULES_CLASS);
+        static::assertClassValueDefined(static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS);
 
-        $response = static::defaultUpdateInRelationshipHandler(
+        return static::defaultAddInRelationshipHandler(
             $parentIndex,
+            $jsonRelName,
             $modelRelName,
-            $childIndex,
             $request->getUri(),
             $request->getBody(),
-            $childSchemaClass,
+            static::SCHEMA_CLASS,
             $container->get(ModelSchemaInfoInterface::class),
-            static::defaultCreateDataParser($container, $childValidatorClass),
+            static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
+            static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            static::defaultCreateApi($container, $childApiClass),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
             $container->get(FormatterFactoryInterface::class)
         );
-
-        return $response;
     }
 
     /**
      * @param string                 $parentIndex
+     * @param string                 $jsonRelName
      * @param string                 $modelRelName
-     * @param string                 $childIndex
-     * @param string                 $childApiClass
      * @param ContainerInterface     $container
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     protected static function deleteInRelationship(
         string $parentIndex,
+        string $jsonRelName,
         string $modelRelName,
-        string $childIndex,
-        string $childApiClass,
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
         static::assertClassValueDefined(static::API_CLASS);
+        static::assertClassValueDefined(static::SCHEMA_CLASS);
+        static::assertClassValueDefined(static::ON_READ_QUERY_VALIDATION_RULES_CLASS);
+        static::assertClassValueDefined(static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS);
 
         return static::defaultDeleteInRelationshipHandler(
             $parentIndex,
+            $jsonRelName,
             $modelRelName,
-            $childIndex,
             $request->getUri(),
+            $request->getBody(),
+            static::SCHEMA_CLASS,
+            $container->get(ModelSchemaInfoInterface::class),
+            static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
+            static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            static::defaultCreateApi($container, $childApiClass),
             $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemasInterface::class),
-            $container->get(EncoderInterface::class)
+            $container->get(EncoderInterface::class),
+            $container->get(FactoryInterface::class),
+            $container->get(FormatterFactoryInterface::class)
+        );
+    }
+
+    /**
+     * @param string                 $parentIndex
+     * @param string                 $jsonRelName
+     * @param string                 $modelRelName
+     * @param ContainerInterface     $container
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    protected static function replaceInRelationship(
+        string $parentIndex,
+        string $jsonRelName,
+        string $modelRelName,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
+        static::assertClassValueDefined(static::API_CLASS);
+        static::assertClassValueDefined(static::SCHEMA_CLASS);
+        static::assertClassValueDefined(static::ON_READ_QUERY_VALIDATION_RULES_CLASS);
+        static::assertClassValueDefined(static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS);
+
+        return static::defaultReplaceInRelationship(
+            $parentIndex,
+            $jsonRelName,
+            $modelRelName,
+            $request->getUri(),
+            $request->getBody(),
+            static::SCHEMA_CLASS,
+            $container->get(ModelSchemaInfoInterface::class),
+            static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
+            static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
+            static::defaultCreateApi($container, static::API_CLASS),
+            $container->get(SettingsProviderInterface::class),
+            $container->get(JsonSchemasInterface::class),
+            $container->get(EncoderInterface::class),
+            $container->get(FactoryInterface::class),
+            $container->get(FormatterFactoryInterface::class)
         );
     }
 }

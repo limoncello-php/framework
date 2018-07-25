@@ -247,6 +247,24 @@ interface CrudInterface
     public function hasInRelationship($parentId, string $name, $childId): bool;
 
     /**
+     * @param string   $parentId
+     * @param string   $name
+     * @param iterable $childIds
+     *
+     * @return int
+     */
+    public function createInBelongsToManyRelationship(string $parentId, string $name, iterable $childIds): int;
+
+    /**
+     * @param string   $parentId
+     * @param string   $name
+     * @param iterable $childIds
+     *
+     * @return int
+     */
+    public function removeInBelongsToManyRelationship(string $parentId, string $name, iterable $childIds): int;
+
+    /**
      * @param Closure $closure
      */
     public function inTransaction(Closure $closure): void;

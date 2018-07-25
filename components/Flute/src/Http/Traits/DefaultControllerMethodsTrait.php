@@ -81,7 +81,7 @@ trait DefaultControllerMethodsTrait
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
-        $queryParser->parse($queryParams);
+        $queryParser->parse(null, $queryParams);
 
         $models = $mapper->applyQueryParameters($queryParser, $crud)->index();
 
@@ -117,9 +117,10 @@ trait DefaultControllerMethodsTrait
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
-        $queryParser->parse($queryParams);
+        $queryParser->parse($index, $queryParams);
+        $validatedIndex = $queryParser->getIdentity();
 
-        $model = $mapper->applyQueryParameters($queryParser, $crud)->read($index);
+        $model = $mapper->applyQueryParameters($queryParser, $crud)->read($validatedIndex);
         assert(!($model instanceof PaginatedDataInterface));
 
         $encParams = self::defaultCreateEncodingParameters($queryParser);
@@ -131,6 +132,7 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
+     * @param string                                $index
      * @param Closure                               $apiHandler
      * @param array                                 $queryParams
      * @param UriInterface                          $requestUri
@@ -142,8 +144,11 @@ trait DefaultControllerMethodsTrait
      * @param EncoderInterface                      $encoder
      *
      * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     protected static function defaultReadRelationshipWithClosureHandler(
+        string $index,
         Closure $apiHandler,
         array $queryParams,
         UriInterface $requestUri,
@@ -154,7 +159,7 @@ trait DefaultControllerMethodsTrait
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
-        $queryParser->parse($queryParams);
+        $queryParser->parse($index, $queryParams);
         $mapper->applyQueryParameters($queryParser, $crud);
 
         $relData = call_user_func($apiHandler);
@@ -169,6 +174,7 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
+     * @param string                                $index
      * @param Closure                               $apiHandler
      * @param array                                 $queryParams
      * @param UriInterface                          $requestUri
@@ -180,8 +186,11 @@ trait DefaultControllerMethodsTrait
      * @param EncoderInterface                      $encoder
      *
      * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     protected static function defaultReadRelationshipIdentifiersWithClosureHandler(
+        string $index,
         Closure $apiHandler,
         array $queryParams,
         UriInterface $requestUri,
@@ -192,7 +201,7 @@ trait DefaultControllerMethodsTrait
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
-        $queryParser->parse($queryParams);
+        $queryParser->parse($index, $queryParams);
         $mapper->applyQueryParameters($queryParser, $crud);
 
         $relData = call_user_func($apiHandler);
@@ -451,92 +460,28 @@ trait DefaultControllerMethodsTrait
         return $response;
     }
 
-    /** @noinspection PhpTooManyParametersInspection
-     * @param string                               $parentIndex
-     * @param string                               $modelRelName
-     * @param string                               $childIndex
-     * @param UriInterface                         $requestUri
-     * @param string                               $requestBody
-     * @param string                               $childSchemaClass
-     * @param ModelSchemaInfoInterface             $schemaInfo
-     * @param JsonApiDataValidatingParserInterface $childValidator
-     * @param CrudInterface                        $parentCrud
-     * @param CrudInterface                        $childCrud
-     * @param SettingsProviderInterface            $provider
-     * @param JsonSchemasInterface                 $jsonSchemas
-     * @param EncoderInterface                     $encoder
-     * @param FactoryInterface                     $errorFactory
-     * @param FormatterFactoryInterface            $formatterFactory
-     * @param string                               $messagesNamespace
-     * @param string                               $errorMessage
-     *
-     * @return ResponseInterface
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
-     */
-    protected static function defaultUpdateInRelationshipHandler(
-        string $parentIndex,
-        string $modelRelName,
-        string $childIndex,
-        UriInterface $requestUri,
-        string $requestBody,
-        string $childSchemaClass,
-        ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataValidatingParserInterface $childValidator,
-        CrudInterface $parentCrud,
-        CrudInterface $childCrud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
-        EncoderInterface $encoder,
-        FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory,
-        string $messagesNamespace = S::GENERIC_NAMESPACE,
-        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
-    ): ResponseInterface {
-        if ($parentCrud->hasInRelationship($parentIndex, $modelRelName, $childIndex) === true) {
-            return static::defaultUpdateHandler(
-                $childIndex,
-                $requestUri,
-                $requestBody,
-                $childSchemaClass,
-                $schemaInfo,
-                $childValidator,
-                $childCrud,
-                $provider,
-                $jsonSchemas,
-                $encoder,
-                $errorFactory,
-                $formatterFactory,
-                $messagesNamespace,
-                $errorMessage
-            );
-        }
-
-        $encParams = null;
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
-
-        return $responses->getCodeResponse(404);
-    }
-
     /**
-     * @param string                    $index
-     * @param UriInterface              $requestUri
-     * @param CrudInterface             $crud
-     * @param SettingsProviderInterface $provider
-     * @param JsonSchemasInterface      $jsonSchemas
-     * @param EncoderInterface          $encoder
+     * @param string                                $index
+     * @param UriInterface                          $requestUri
+     * @param JsonApiQueryValidatingParserInterface $queryParser
+     * @param CrudInterface                         $crud
+     * @param SettingsProviderInterface             $provider
+     * @param JsonSchemasInterface                  $jsonSchemas
+     * @param EncoderInterface                      $encoder
      *
      * @return ResponseInterface
      */
     protected static function defaultDeleteHandler(
         string $index,
         UriInterface $requestUri,
+        JsonApiQueryValidatingParserInterface $queryParser,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
-        $crud->remove($index);
+        $validatedIndex = $queryParser->parse($index)->getIdentity();
+        $crud->remove($validatedIndex);
 
         $encParams = null;
         $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
@@ -546,44 +491,179 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                    $parentIndex
-     * @param string                    $modelRelName
-     * @param string                    $childIndex
-     * @param UriInterface              $requestUri
-     * @param CrudInterface             $parentCrud
-     * @param CrudInterface             $childCrud
-     * @param SettingsProviderInterface $provider
-     * @param JsonSchemasInterface      $jsonSchemas
-     * @param EncoderInterface          $encoder
+     * @param string                                $parentIndex
+     * @param string                                $jsonRelName
+     * @param string                                $modelRelName
+     * @param UriInterface                          $requestUri
+     * @param string                                $requestBody
+     * @param string                                $schemaClass
+     * @param ModelSchemaInfoInterface              $schemaInfo
+     * @param JsonApiQueryValidatingParserInterface $queryParser
+     * @param JsonApiDataValidatingParserInterface  $dataValidator
+     * @param CrudInterface                         $parentCrud
+     * @param SettingsProviderInterface             $provider
+     * @param JsonSchemasInterface                  $jsonSchemas
+     * @param EncoderInterface                      $encoder
+     * @param FactoryInterface                      $errorFactory
+     * @param FormatterFactoryInterface             $formatterFactory
      *
      * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
-    protected static function defaultDeleteInRelationshipHandler(
+    protected static function defaultAddInRelationshipHandler(
         string $parentIndex,
+        string $jsonRelName,
         string $modelRelName,
-        string $childIndex,
         UriInterface $requestUri,
+        string $requestBody,
+        string $schemaClass,
+        ModelSchemaInfoInterface $schemaInfo,
+        JsonApiQueryValidatingParserInterface $queryParser,
+        JsonApiDataValidatingParserInterface $dataValidator,
         CrudInterface $parentCrud,
-        CrudInterface $childCrud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
-        EncoderInterface $encoder
+        EncoderInterface $encoder,
+        FactoryInterface $errorFactory,
+        FormatterFactoryInterface $formatterFactory
     ): ResponseInterface {
-        if ($parentCrud->hasInRelationship($parentIndex, $modelRelName, $childIndex) === true) {
-            return static::defaultDeleteHandler(
-                $childIndex,
-                $requestUri,
-                $childCrud,
-                $provider,
-                $jsonSchemas,
-                $encoder
-            );
-        }
+        /** @var SchemaInterface $schemaClass */
+        assert(array_key_exists(SchemaInterface::class, class_implements($schemaClass)) === true);
+        $modelClass = $schemaClass::MODEL;
+        assert($schemaInfo->hasRelationship($modelClass, $modelRelName));
+        assert($schemaInfo->getRelationshipType($modelClass, $modelRelName) === RelationshipTypes::BELONGS_TO_MANY);
+
+        $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
+        $captures = $dataValidator->assertRelationship($jsonRelName, $jsonData)->getJsonApiCaptures();
+        $relIds   = $captures[$jsonRelName];
+
+        $validatedIndex = $queryParser->parse($parentIndex)->getIdentity();
+        $parentCrud->createInBelongsToManyRelationship($validatedIndex, $modelRelName, $relIds);
 
         $encParams = null;
         $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        $response  = $responses->getCodeResponse(204);
 
-        return $responses->getCodeResponse(404);
+        return $response;
+    }
+
+    /** @noinspection PhpTooManyParametersInspection
+     * @param string                                $parentIndex
+     * @param string                                $jsonRelName
+     * @param string                                $modelRelName
+     * @param UriInterface                          $requestUri
+     * @param string                                $requestBody
+     * @param string                                $schemaClass
+     * @param ModelSchemaInfoInterface              $schemaInfo
+     * @param JsonApiQueryValidatingParserInterface $queryParser
+     * @param JsonApiDataValidatingParserInterface  $dataValidator
+     * @param CrudInterface                         $parentCrud
+     * @param SettingsProviderInterface             $provider
+     * @param JsonSchemasInterface                  $jsonSchemas
+     * @param EncoderInterface                      $encoder
+     * @param FactoryInterface                      $errorFactory
+     * @param FormatterFactoryInterface             $formatterFactory
+     *
+     * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
+    protected static function defaultDeleteInRelationshipHandler(
+        string $parentIndex,
+        string $jsonRelName,
+        string $modelRelName,
+        UriInterface $requestUri,
+        string $requestBody,
+        string $schemaClass,
+        ModelSchemaInfoInterface $schemaInfo,
+        JsonApiQueryValidatingParserInterface $queryParser,
+        JsonApiDataValidatingParserInterface $dataValidator,
+        CrudInterface $parentCrud,
+        SettingsProviderInterface $provider,
+        JsonSchemasInterface $jsonSchemas,
+        EncoderInterface $encoder,
+        FactoryInterface $errorFactory,
+        FormatterFactoryInterface $formatterFactory
+    ): ResponseInterface {
+        /** @var SchemaInterface $schemaClass */
+        assert(array_key_exists(SchemaInterface::class, class_implements($schemaClass)) === true);
+        $modelClass = $schemaClass::MODEL;
+        assert($schemaInfo->hasRelationship($modelClass, $modelRelName));
+        assert($schemaInfo->getRelationshipType($modelClass, $modelRelName) === RelationshipTypes::BELONGS_TO_MANY);
+
+        $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
+        $captures = $dataValidator->assertRelationship($jsonRelName, $jsonData)->getJsonApiCaptures();
+        $relIds   = $captures[$jsonRelName];
+
+        $validatedIndex = $queryParser->parse($parentIndex)->getIdentity();
+        $parentCrud->removeInBelongsToManyRelationship($validatedIndex, $modelRelName, $relIds);
+
+        $encParams = null;
+        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        $response  = $responses->getCodeResponse(204);
+
+        return $response;
+    }
+
+    /** @noinspection PhpTooManyParametersInspection
+     * @param string                                $index
+     * @param string                                $jsonRelName
+     * @param string                                $modelRelName
+     * @param UriInterface                          $requestUri
+     * @param string                                $requestBody
+     * @param string                                $schemaClass
+     * @param ModelSchemaInfoInterface              $schemaInfo
+     * @param JsonApiQueryValidatingParserInterface $queryParser
+     * @param JsonApiDataValidatingParserInterface  $dataValidator
+     * @param CrudInterface                         $crud
+     * @param SettingsProviderInterface             $provider
+     * @param JsonSchemasInterface                  $jsonSchemas
+     * @param EncoderInterface                      $encoder
+     * @param FactoryInterface                      $errorFactory
+     * @param FormatterFactoryInterface             $formatterFactory
+     *
+     * @return ResponseInterface
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
+    protected static function defaultReplaceInRelationship(
+        string $index,
+        string $jsonRelName,
+        string $modelRelName,
+        UriInterface $requestUri,
+        string $requestBody,
+        string $schemaClass,
+        ModelSchemaInfoInterface $schemaInfo,
+        JsonApiQueryValidatingParserInterface $queryParser,
+        JsonApiDataValidatingParserInterface $dataValidator,
+        CrudInterface $crud,
+        SettingsProviderInterface $provider,
+        JsonSchemasInterface $jsonSchemas,
+        EncoderInterface $encoder,
+        FactoryInterface $errorFactory,
+        FormatterFactoryInterface $formatterFactory
+    ): ResponseInterface {
+        /** @var SchemaInterface $schemaClass */
+        assert(array_key_exists(SchemaInterface::class, class_implements($schemaClass)) === true);
+        $modelClass = $schemaClass::MODEL;
+        assert($schemaInfo->hasRelationship($modelClass, $modelRelName));
+        assert(
+            ($type =$schemaInfo->getRelationshipType($modelClass, $modelRelName)) === RelationshipTypes::BELONGS_TO ||
+            $type === RelationshipTypes::BELONGS_TO_MANY
+        );
+
+        $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
+        $captures = $dataValidator->assertRelationship($jsonRelName, $jsonData)->getJsonApiCaptures();
+
+        // If we are here then we have something in 'data' section.
+
+        $validatedIndex = $queryParser->parse($index)->getIdentity();
+        list (, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
+
+        $updated = $crud->update($validatedIndex, $attributes, $toMany);
+
+        return static::defaultUpdateResponse($updated, $index, $requestUri, $crud, $provider, $jsonSchemas, $encoder);
     }
 
     /**

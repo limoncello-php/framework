@@ -17,12 +17,11 @@
  */
 
 use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
-use Limoncello\Tests\Flute\Data\Api\CommentsApi;
 use Limoncello\Tests\Flute\Data\Api\PostsApi as Api;
 use Limoncello\Tests\Flute\Data\Models\Post as Model;
-use Limoncello\Tests\Flute\Data\Schemas\CommentSchema;
 use Limoncello\Tests\Flute\Data\Schemas\PostSchema as Schema;
-use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdatePostRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadPostsQueryRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -39,6 +38,12 @@ class ApiPostsController extends ApiBaseController
 
     /** @inheritdoc */
     const SCHEMA_CLASS = Schema::class;
+
+    /** @inheritdoc */
+    const ON_READ_QUERY_VALIDATION_RULES_CLASS = ReadPostsQueryRules::class;
+
+    /** @inheritdoc */
+    const ON_UPDATE_DATA_VALIDATION_RULES_CLASS = UpdatePostRules::class;
 
     /**
      * @param array                  $routeParams
@@ -70,49 +75,16 @@ class ApiPostsController extends ApiBaseController
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
-    public static function updateComment(
+    public static function replaceEditor(
         array $routeParams,
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $response = static::updateInRelationship(
+        $response = static::replaceInRelationship(
             $routeParams[static::ROUTE_KEY_INDEX],
-            Model::REL_COMMENTS,
-            $routeParams[static::ROUTE_KEY_CHILD_INDEX],
-            CommentSchema::class,
-            UpdateCommentRules::class,
-            CommentsApi::class,
-            $container,
-            $request
-        );
-
-        return $response;
-    }
-
-    /**
-     * @param array                  $routeParams
-     * @param ContainerInterface     $container
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public static function deleteComment(
-        array $routeParams,
-        ContainerInterface $container,
-        ServerRequestInterface $request
-    ): ResponseInterface {
-        $response = static::deleteInRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
-            Model::REL_COMMENTS,
-            $routeParams[static::ROUTE_KEY_CHILD_INDEX],
-            CommentsApi::class,
+            Schema::REL_EDITOR,
+            Model::REL_EDITOR,
             $container,
             $request
         );

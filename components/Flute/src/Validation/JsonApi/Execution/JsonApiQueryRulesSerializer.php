@@ -18,9 +18,9 @@
 
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesSerializerInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
 use Limoncello\Flute\Validation\Serialize\RulesSerializer;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
-use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 
 /**
  * @package Limoncello\Flute
@@ -35,7 +35,10 @@ class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQuer
     private $serializedRules = [];
 
     /** Index key */
-    protected const FILTER_RULES = 0;
+    protected const IDENTITY_RULE= 0;
+
+    /** Index key */
+    protected const FILTER_RULES = self::IDENTITY_RULE + 1;
 
     /** Index key */
     protected const FIELD_SET_RULES = self::FILTER_RULES + 1;
@@ -74,6 +77,7 @@ class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQuer
 
         return $this->addQueryRules(
             $name,
+            $rulesClass::getIdentityRule(),
             $rulesClass::getFilterRules(),
             $rulesClass::getFieldSetRules(),
             $rulesClass::getSortsRule(),
@@ -83,22 +87,15 @@ class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQuer
         );
     }
 
-    /**
-     * @param string               $name
-     * @param RuleInterface[]|null $filterRules
-     * @param RuleInterface[]|null $fieldSetRules
-     * @param RuleInterface|null   $sortsRule
-     * @param RuleInterface|null   $includesRule
-     * @param RuleInterface|null   $pageOffsetRule
-     * @param RuleInterface|null   $pageLimitRule
-     *
-     * @return self
+    /** @noinspection PhpTooManyParametersInspection
+     * @inheritdoc
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function addQueryRules(
         string $name,
+        ?RuleInterface $identityRule,
         ?array $filterRules,
         ?array $fieldSetRules,
         ?RuleInterface $sortsRule,
@@ -109,12 +106,15 @@ class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQuer
         assert(!empty($name));
         assert(static::hasRules($name, $this->serializedRules) === false);
 
-        $sortsRule === null ?: $sortsRule->setName(BaseQueryParserInterface::PARAM_SORT);
-        $includesRule === null ?: $includesRule->setName(BaseQueryParserInterface::PARAM_INCLUDE);
-        $pageOffsetRule === null ?: $pageOffsetRule->setName(BaseQueryParserInterface::PARAM_PAGE);
-        $pageLimitRule === null ?: $pageLimitRule->setName(BaseQueryParserInterface::PARAM_PAGE);
+        $identityRule === null ?: $identityRule->setName(JsonApiQueryValidatingParserInterface::PARAM_IDENTITY);
+        $sortsRule === null ?: $sortsRule->setName(JsonApiQueryValidatingParserInterface::PARAM_SORT);
+        $includesRule === null ?: $includesRule->setName(JsonApiQueryValidatingParserInterface::PARAM_INCLUDE);
+        $pageOffsetRule === null ?: $pageOffsetRule->setName(JsonApiQueryValidatingParserInterface::PARAM_PAGE);
+        $pageLimitRule === null ?: $pageLimitRule->setName(JsonApiQueryValidatingParserInterface::PARAM_PAGE);
 
         $this->serializedRules[$name] = [
+            static::IDENTITY_RULE     =>
+                $identityRule === null ? null : $this->addRules([static::SINGLE_RULE_INDEX => $identityRule]),
             static::FILTER_RULES     =>
                 $filterRules === null ? null : $this->addRules($filterRules),
             static::FIELD_SET_RULES  =>
@@ -170,6 +170,14 @@ class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQuer
         assert(static::hasRules($name, $serializedData) === true);
 
         return $serializedData[static::SERIALIZED_RULES][$name];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function readIdentityRuleIndexes(array $serializedRules): ?array
+    {
+        return $serializedRules[static::IDENTITY_RULE];
     }
 
     /**

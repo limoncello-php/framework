@@ -24,6 +24,11 @@ use Limoncello\Validation\Contracts\Rules\RuleInterface;
 interface JsonApiQueryRulesInterface
 {
     /**
+     * @return RuleInterface
+     */
+    public static function getIdentityRule(): ?RuleInterface;
+
+    /**
      * @return RuleInterface[]|null
      */
     public static function getFilterRules(): ?array;

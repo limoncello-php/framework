@@ -149,4 +149,50 @@ class ApiCommentsControllerApi extends ApiBaseController
             $request
         );
     }
+
+    /**
+     * @param array                  $routeParams
+     * @param ContainerInterface     $container
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public static function addEmotions(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
+        $response = static::addInRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Schema::REL_EMOTIONS,
+            Model::REL_EMOTIONS,
+            $container,
+            $request
+        );
+
+        return $response;
+    }
+
+    /**
+     * @param array                  $routeParams
+     * @param ContainerInterface     $container
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public static function deleteEmotions(
+        array $routeParams,
+        ContainerInterface $container,
+        ServerRequestInterface $request
+    ): ResponseInterface {
+        $response = static::deleteInRelationship(
+            $routeParams[static::ROUTE_KEY_INDEX],
+            Schema::REL_EMOTIONS,
+            Model::REL_EMOTIONS,
+            $container,
+            $request
+        );
+
+        return $response;
+    }
 }

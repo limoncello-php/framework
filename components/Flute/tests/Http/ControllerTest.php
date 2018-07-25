@@ -51,6 +51,7 @@ use Limoncello\Tests\Flute\Data\Http\FormCommentsController;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
+use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Package\CacheSettingsProvider;
 use Limoncello\Tests\Flute\Data\Package\Flute;
 use Limoncello\Tests\Flute\Data\Schemas\BoardSchema;
@@ -1028,128 +1029,54 @@ EOT;
      * @throws NotFoundExceptionInterface
      * @throws DBALException
      */
-    public function testUpdateInRelationship(): void
+    public function testAddInRelationship(): void
     {
-        $tableName = Comment::TABLE_NAME;
-        $idColumn  = Comment::FIELD_ID;
-        $column    = Comment::FIELD_TEXT;
-        $attribute = CommentSchema::ATTR_TEXT;
+        $intTable     = CommentEmotion::TABLE_NAME;
+        $intCommentFk = CommentEmotion::FIELD_ID_COMMENT;
+        $intEmotionFk = CommentEmotion::FIELD_ID_EMOTION;
 
         $container = $this->createContainer();
         /** @var Connection $connection */
         $connection = $container->get(Connection::class);
 
-        // add comment to update
-        $postId = 2;
-        $this->assertEquals(1, $connection->insert($tableName, [
-            Comment::FIELD_TEXT       => 'Some text',
-            Comment::FIELD_ID_USER    => '1',
-            Comment::FIELD_ID_POST    => "$postId",
-            Comment::FIELD_CREATED_AT => '2000-01-02',
-        ]));
-        $commentId = $connection->lastInsertId();
-
-        // check the item is in the database
-        $this->assertNotEmpty(
-            $connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $commentId")->fetch()
-        );
-
-        $routeParams = [
-            ApiCommentsControllerApi::ROUTE_KEY_INDEX       => (string)$postId,
-            ApiCommentsControllerApi::ROUTE_KEY_CHILD_INDEX => (string)$commentId,
-        ];
-
-        $newValue  = 'New text';
-        $jsonInput = <<<EOT
-        {
-            "data" : {
-                "type"  : "comments",
-                "id"    : "$commentId",
-                "attributes" : {
-                    "$attribute" : "$newValue"
-                }
-            }
-        }
-EOT;
-
-        /** @var Mock $request */
-        $request = Mockery::mock(ServerRequestInterface::class);
-        $uri     = "http://localhost.local/posts/$postId/comments/$commentId";
-        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri($uri));
-        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
-
-        /** @var ServerRequestInterface $request */
-
-        $this->assertNotNull($response = ApiPostsController::updateComment($routeParams, $container, $request));
-        $this->assertEquals(200, $response->getStatusCode());
-
-        // check value saved in the database
-        $this->assertEquals(
-            $newValue,
-            $connection->executeQuery("SELECT $column FROM $tableName WHERE $idColumn = $commentId")->fetchColumn()
-        );
-    }
-
-    /**
-     * Controller test.
-     *
-     * @throws Exception
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws DBALException
-     */
-    public function testUpdateNonBelongingInRelationship(): void
-    {
-        $tableName    = Comment::TABLE_NAME;
-        $idColumn     = Comment::FIELD_ID;
-        $postIdColumn = Comment::FIELD_TEXT;
-        $attribute    = CommentSchema::ATTR_TEXT;
-
-        $container = $this->createContainer();
-        /** @var Connection $connection */
-        $connection = $container->get(Connection::class);
-
-        // add comment to update
-        $postId = 2;
-        // this comment id do not belong to post
         $commentId = 1;
-
+        $emotionId = 3;
         // check the item is in the database
-        $postIdInDb = $connection
-            ->executeQuery("SELECT $postIdColumn FROM $tableName WHERE $idColumn = $commentId")->fetchColumn();
-        $this->assertNotEquals(
-            $postId,
-            $postIdInDb
-        );
+        $this->assertEmpty($connection->executeQuery(
+            "SELECT * FROM $intTable WHERE $intCommentFk = $commentId AND $intEmotionFk = $emotionId"
+        )->fetchAll());
 
         $routeParams = [
-            ApiCommentsControllerApi::ROUTE_KEY_INDEX       => (string)$postId,
-            ApiCommentsControllerApi::ROUTE_KEY_CHILD_INDEX => (string)$commentId,
+            ApiCommentsControllerApi::ROUTE_KEY_INDEX => $commentId,
         ];
-
-        $newValue  = 'New text';
-        $jsonInput = <<<EOT
-        {
-            "data" : {
-                "type"  : "comments",
-                "id"    : "$commentId",
-                "attributes" : {
-                    "$attribute" : "$newValue"
-                }
-            }
-        }
-EOT;
 
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
-        $uri     = "http://localhost.local/posts/$postId/comments/$commentId";
-        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri($uri));
-        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
+        $uri     = "http://localhost.local/posts/$commentId/relationships/emotions";
+        $request->shouldReceive('getUri')->twice()->withNoArgs()->andReturn(new Uri($uri));
+
+        $requestBody = <<<EOT
+        {
+            "data": [
+                { "type": "emotions", "id": "$emotionId" }
+            ]
+        }
+EOT;
+        $request->shouldReceive('getBody')->twice()->withNoArgs()->andReturn($requestBody);
 
         /** @var ServerRequestInterface $request */
 
-        $this->assertNotNull($response = ApiPostsController::updateComment($routeParams, $container, $request));
-        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertNotNull($response = ApiCommentsControllerApi::addEmotions($routeParams, $container, $request));
+        $this->assertEquals(204, $response->getStatusCode());
+
+        // check the item is in the database
+        $this->assertNotEmpty($connection->executeQuery(
+            "SELECT * FROM $intTable WHERE $intCommentFk = $commentId AND $intEmotionFk = $emotionId"
+        )->fetchAll());
+
+        // try to add same relationship second time (server must return a successful response)
+        $this->assertNotNull($response = ApiCommentsControllerApi::addEmotions($routeParams, $container, $request));
+        $this->assertEquals(204, $response->getStatusCode());
     }
 
     /**
@@ -1162,49 +1089,107 @@ EOT;
      */
     public function testDeleteInRelationship(): void
     {
-        $tableName = Comment::TABLE_NAME;
-        $idColumn  = Comment::FIELD_ID;
+        $intTable     = CommentEmotion::TABLE_NAME;
+        $intCommentFk = CommentEmotion::FIELD_ID_COMMENT;
+        $intEmotionFk = CommentEmotion::FIELD_ID_EMOTION;
 
         $container = $this->createContainer();
         /** @var Connection $connection */
         $connection = $container->get(Connection::class);
 
-        // add comment to delete
-        $postId = 2;
-        $this->assertEquals(1, $connection->insert($tableName, [
-            Comment::FIELD_TEXT       => 'Some text',
-            Comment::FIELD_ID_USER    => '1',
-            Comment::FIELD_ID_POST    => "$postId",
-            Comment::FIELD_CREATED_AT => '2000-01-02',
-        ]));
-        $commentId = $connection->lastInsertId();
-
+        $commentId = 1;
+        $emotionId = 4;
         // check the item is in the database
-        $this->assertNotEmpty(
-            $connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $commentId")->fetch()
-        );
+        $this->assertNotEmpty($connection->executeQuery(
+            "SELECT * FROM $intTable WHERE $intCommentFk = $commentId AND $intEmotionFk = $emotionId"
+        )->fetchAll());
 
         $routeParams = [
-            ApiCommentsControllerApi::ROUTE_KEY_INDEX       => $postId,
-            ApiCommentsControllerApi::ROUTE_KEY_CHILD_INDEX => $commentId,
+            ApiCommentsControllerApi::ROUTE_KEY_INDEX => $commentId,
         ];
 
         /** @var Mock $request */
         $request = Mockery::mock(ServerRequestInterface::class);
-        $uri     = "http://localhost.local/posts/$postId/comments/$commentId";
+        $uri     = "http://localhost.local/posts/$commentId/relationships/emotions";
         $request->shouldReceive('getUri')->twice()->withNoArgs()->andReturn(new Uri($uri));
+
+        $requestBody = <<<EOT
+        {
+            "data": [
+                { "type": "emotions", "id": "$emotionId" }
+            ]
+        }
+EOT;
+        $request->shouldReceive('getBody')->twice()->withNoArgs()->andReturn($requestBody);
 
         /** @var ServerRequestInterface $request */
 
-        $this->assertNotNull($response = ApiPostsController::deleteComment($routeParams, $container, $request));
+        $this->assertNotNull($response = ApiCommentsControllerApi::deleteEmotions($routeParams, $container, $request));
         $this->assertEquals(204, $response->getStatusCode());
 
         // check the item is not in the database
-        $this->assertFalse($connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $commentId")->fetch());
+        $this->assertEmpty($connection->executeQuery(
+            "SELECT * FROM $intTable WHERE $intCommentFk = $commentId AND $intEmotionFk = $emotionId"
+        )->fetchAll());
 
-        // calling `delete` again should return 404 as the resource has already been removed
-        $this->assertNotNull($response = ApiPostsController::deleteComment($routeParams, $container, $request));
-        $this->assertEquals(404, $response->getStatusCode());
+        // calling `delete` on non-existing resource should not cause any errors
+        $this->assertNotNull($response = ApiCommentsControllerApi::deleteEmotions($routeParams, $container, $request));
+        $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    /**
+     * Controller test.
+     *
+     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws DBALException
+     */
+    public function testReplaceInRelationship(): void
+    {
+        $tableName = Post::TABLE_NAME;
+        $idColumn  = Post::FIELD_ID;
+
+        $container = $this->createContainer();
+        /** @var Connection $connection */
+        $connection = $container->get(Connection::class);
+
+        // add comment to update
+        $postId      = 2;
+        $newEditorId = 1;
+
+        // check old editor value do not match the new one
+        $this->assertNotEmpty(
+            $post = $connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $postId")->fetch()
+        );
+        $this->assertNotEquals($newEditorId, $post[Post::FIELD_ID_EDITOR]);
+
+        $routeParams = [
+            ApiCommentsControllerApi::ROUTE_KEY_INDEX => $postId,
+        ];
+
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        $uri     = "http://localhost.local/posts/$postId/relationships/editor";
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri($uri));
+
+        $requestBody = <<<EOT
+        {
+            "data": { "type": "users", "id": "1" }
+        }
+EOT;
+        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($requestBody);
+
+        /** @var ServerRequestInterface $request */
+
+        $this->assertNotNull($response = ApiPostsController::replaceEditor($routeParams, $container, $request));
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // check the value has been changed
+        $this->assertNotEmpty(
+            $post = $connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $postId")->fetch()
+        );
+        $this->assertEquals($newEditorId, $post[Post::FIELD_ID_EDITOR]);
     }
 
     /**

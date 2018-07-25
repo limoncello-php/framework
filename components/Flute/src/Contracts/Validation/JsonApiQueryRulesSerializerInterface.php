@@ -32,10 +32,11 @@ interface JsonApiQueryRulesSerializerInterface
      */
     public function addRulesFromClass(string $rulesClass): self;
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * Add rules manually.
      *
      * @param string               $name
+     * @param RuleInterface|null   $identityRule
      * @param RuleInterface[]|null $filterRules
      * @param RuleInterface[]|null $fieldSetRules
      * @param RuleInterface|null   $sortsRule
@@ -47,6 +48,7 @@ interface JsonApiQueryRulesSerializerInterface
      */
     public function addQueryRules(
         string $name,
+        ?RuleInterface $identityRule,
         ?array $filterRules,
         ?array $fieldSetRules,
         ?RuleInterface $sortsRule,
@@ -90,6 +92,15 @@ interface JsonApiQueryRulesSerializerInterface
      * @return array
      */
     public static function readRules(string $name, array $serializedData): array;
+
+    /**
+     * Reads serialized identity validation rule indexes from rules.
+     *
+     * @param array $serializedRules
+     *
+     * @return array
+     */
+    public static function readIdentityRuleIndexes(array $serializedRules): ?array;
 
     /**
      * Reads serialized filter validation rule indexes from rules.

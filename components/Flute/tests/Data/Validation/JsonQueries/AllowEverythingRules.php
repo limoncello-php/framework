@@ -27,6 +27,14 @@ class AllowEverythingRules implements JsonApiQueryRulesInterface
     /**
      * @inheritdoc
      */
+    public static function getIdentityRule(): ?RuleInterface
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function getFilterRules(): ?array
     {
         return null;

@@ -56,9 +56,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     private $serializedRules = [];
 
     /**
-     * @param string $rulesClass
-     *
-     * @return self
+     * @inheritdoc
      */
     public function addRulesFromClass(string $rulesClass): JsonApiDataRulesSerializerInterface
     {
@@ -121,10 +119,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param string $rulesClass
-     * @param array  $serializedData
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readRules(string $rulesClass, array $serializedData): array
     {
@@ -147,9 +142,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $serializedData
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readBlocks(array $serializedData): array
     {
@@ -161,9 +154,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $serializedRules
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readIdRuleIndexes(array $serializedRules): array
     {
@@ -175,9 +166,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $serializedRules
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readTypeRuleIndexes(array $serializedRules): array
     {
@@ -189,9 +178,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $serializedRules
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readAttributeRulesIndexes(array $serializedRules): array
     {
@@ -203,9 +190,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $serializedRules
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readToOneRulesIndexes(array $serializedRules): array
     {
@@ -217,9 +202,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $serializedRules
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readToManyRulesIndexes(array $serializedRules): array
     {
@@ -231,9 +214,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $ruleIndexes
-     *
-     * @return int
+     * @inheritdoc
      */
     public static function readRuleIndex(array $ruleIndexes): int
     {
@@ -241,9 +222,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $ruleIndexes
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readRuleStartIndexes(array $ruleIndexes): array
     {
@@ -251,9 +230,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $ruleIndexes
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readRuleEndIndexes(array $ruleIndexes): array
     {
@@ -261,9 +238,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $arrayRuleIndexes
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readRulesIndexes(array $arrayRuleIndexes): array
     {
@@ -271,9 +246,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $arrayRuleIndexes
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readRulesStartIndexes(array $arrayRuleIndexes): array
     {
@@ -281,9 +254,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param array $arrayRuleIndexes
-     *
-     * @return array
+     * @inheritdoc
      */
     public static function readRulesEndIndexes(array $arrayRuleIndexes): array
     {
@@ -291,10 +262,15 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
     }
 
     /**
-     * @param int   $index
-     * @param array $blocks
-     *
-     * @return bool
+     * @inheritdoc
+     */
+    public static function readSingleRuleIndexes(array $arrayRuleIndexes, string $name): array
+    {
+        return parent::geSingleRuleIndexes($arrayRuleIndexes, $name);
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function hasRule(int $index, array $blocks): bool
     {

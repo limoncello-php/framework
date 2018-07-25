@@ -21,6 +21,7 @@ use Closure;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\PDOConnection;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException as UcvException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
@@ -689,6 +690,36 @@ class Crud implements CrudInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    protected function builderOnCreateInBelongsToManyRelationship(/** @noinspection PhpUnusedParameterInspection */
+        $relationshipName,
+        ModelQueryBuilder $builder
+    ): ModelQueryBuilder {
+        return $builder;
+    }
+
+    /**
+     * @param string            $relationshipName
+     * @param ModelQueryBuilder $builder
+     *
+     * @return ModelQueryBuilder
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function builderOnRemoveInBelongsToManyRelationship(/** @noinspection PhpUnusedParameterInspection */
+        $relationshipName,
+        ModelQueryBuilder $builder
+    ): ModelQueryBuilder {
+        return $builder;
+    }
+
+    /**
+     * @param string            $relationshipName
+     * @param ModelQueryBuilder $builder
+     *
+     * @return ModelQueryBuilder
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function builderCleanRelationshipOnUpdate(/** @noinspection PhpUnusedParameterInspection */
         $relationshipName,
         ModelQueryBuilder $builder
@@ -1164,6 +1195,8 @@ class Crud implements CrudInterface
      * @inheritdoc
      *
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function create($index, iterable $attributes, iterable $toMany): string
     {
@@ -1184,20 +1217,12 @@ class Crud implements CrudInterface
             $saveMain->execute();
 
             // if no index given will use last insert ID as index
-            $index !== null ?: $index = $saveMain->getConnection()->lastInsertId();
+            $connection = $saveMain->getConnection();
+            $index !== null ?: $index = $connection->lastInsertId();
 
-            $inserted = 0;
+            $builderHook = Closure::fromCallable([$this, 'builderSaveRelationshipOnCreate']);
             foreach ($toMany as $relationshipName => $secondaryIds) {
-                $secondaryIdBindName = ':secondaryId';
-                $saveToMany          = $this->builderSaveRelationshipOnCreate(
-                    $relationshipName,
-                    $this
-                        ->createBuilderFromConnection($saveMain->getConnection(), $this->getModelClass())
-                        ->prepareCreateInToManyRelationship($relationshipName, $index, $secondaryIdBindName)
-                );
-                foreach ($secondaryIds as $secondaryId) {
-                    $inserted += (int)$saveToMany->setParameter($secondaryIdBindName, $secondaryId)->execute();
-                }
+                $this->addInToManyRelationship($connection, $index, $relationshipName, $secondaryIds, $builderHook);
             }
         });
 
@@ -1208,6 +1233,8 @@ class Crud implements CrudInterface
      * @inheritdoc
      *
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function update($index, iterable $attributes, iterable $toMany): int
     {
@@ -1235,29 +1262,80 @@ class Crud implements CrudInterface
         $this->inTransaction(function () use ($saveMain, $toMany, $index, &$updated) {
             $updated = $saveMain->execute();
 
+            $builderHook = Closure::fromCallable([$this, 'builderSaveRelationshipOnUpdate']);
             foreach ($toMany as $relationshipName => $secondaryIds) {
-                $cleanToMany = $this->builderCleanRelationshipOnUpdate(
-                    $relationshipName,
-                    $this
-                        ->createBuilderFromConnection($saveMain->getConnection(), $this->getModelClass())
-                        ->clearToManyRelationship($relationshipName, $index)
-                );
-                $cleanToMany->execute();
+                $connection = $saveMain->getConnection();
 
-                $secondaryIdBindName = ':secondaryId';
-                $saveToMany          = $this->builderSaveRelationshipOnUpdate(
+                // clear existing
+                $this->builderCleanRelationshipOnUpdate(
                     $relationshipName,
                     $this
-                        ->createBuilderFromConnection($saveMain->getConnection(), $this->getModelClass())
-                        ->prepareCreateInToManyRelationship($relationshipName, $index, $secondaryIdBindName)
+                        ->createBuilderFromConnection($this->getConnection(), $this->getModelClass())
+                        ->clearToManyRelationship($relationshipName, $index)
+                )->execute();
+
+                // add new ones
+                $updated   += $this->addInToManyRelationship(
+                    $connection,
+                    $index,
+                    $relationshipName,
+                    $secondaryIds,
+                    $builderHook
                 );
-                foreach ($secondaryIds as $secondaryId) {
-                    $updated += (int)$saveToMany->setParameter($secondaryIdBindName, $secondaryId)->execute();
-                }
             }
         });
 
         return (int)$updated;
+    }
+
+    /**
+     * @param string   $parentId
+     * @param string   $name
+     * @param iterable $childIds
+     *
+     * @return int
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function createInBelongsToManyRelationship(string $parentId, string $name, iterable $childIds): int
+    {
+        // Check that relationship is `BelongsToMany`
+        assert(call_user_func(function () use ($name): bool {
+            $relType = $this->getModelSchemas()->getRelationshipType($this->getModelClass(), $name);
+            $errMsg  = "Relationship `$name` of class `" . $this->getModelClass() .
+                '` either is not `belongsToMany` or do not exist in the class.';
+            $isOk = $relType === RelationshipTypes::BELONGS_TO_MANY;
+
+            assert($isOk, $errMsg);
+
+            return $isOk;
+        }));
+
+        $builderHook = Closure::fromCallable([$this, 'builderOnCreateInBelongsToManyRelationship']);
+
+        return $this->addInToManyRelationship($this->getConnection(), $parentId, $name, $childIds, $builderHook);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws DBALException
+     */
+    public function removeInBelongsToManyRelationship(string $parentId, string $name, iterable $childIds): int
+    {
+        // Check that relationship is `BelongsToMany`
+        assert(call_user_func(function () use ($name): bool {
+            $relType = $this->getModelSchemas()->getRelationshipType($this->getModelClass(), $name);
+            $errMsg  = "Relationship `$name` of class `" . $this->getModelClass() .
+                '` either is not `belongsToMany` or do not exist in the class.';
+            $isOk = $relType === RelationshipTypes::BELONGS_TO_MANY;
+
+            assert($isOk, $errMsg);
+
+            return $isOk;
+        }));
+
+        return $this->removeInToManyRelationship($this->getConnection(), $parentId, $name, $childIds);
     }
 
     /**
@@ -1419,6 +1497,74 @@ class Crud implements CrudInterface
         $countBuilder->select('COUNT(*)')->from('(' . $builder->getSQL() . ') AS RESULT');
 
         return $countBuilder;
+    }
+
+    /**
+     * @param Connection $connection
+     * @param string     $primaryIdentity
+     * @param string     $name
+     * @param iterable   $secondaryIdentities
+     * @param Closure    $builderHook
+     *
+     * @return int
+     */
+    private function addInToManyRelationship(
+        Connection $connection,
+        string $primaryIdentity,
+        string $name,
+        iterable $secondaryIdentities,
+        Closure $builderHook
+    ): int {
+        $inserted = 0;
+
+        $secondaryIdBindName = ':secondaryId';
+        $saveToMany          = $this
+            ->createBuilderFromConnection($connection, $this->getModelClass())
+            ->prepareCreateInToManyRelationship($name, $primaryIdentity, $secondaryIdBindName);
+
+        $saveToMany = call_user_func($builderHook, $name, $saveToMany);
+
+        foreach ($secondaryIdentities as $secondaryId) {
+            try {
+                $inserted += (int)$saveToMany->setParameter($secondaryIdBindName, $secondaryId)->execute();
+            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UcvException $exception) {
+                // Spec: If all of the specified resources can be added to, or are already present in,
+                // the relationship then the server MUST return a successful response.
+                //
+                // Currently DBAL cannot do insert or update in the same request.
+                // https://github.com/doctrine/dbal/issues/1320
+                continue;
+            }
+        }
+
+        return $inserted;
+    }
+
+    /**
+     * @param Connection $connection
+     * @param string     $primaryIdentity
+     * @param string     $name
+     * @param iterable   $secondaryIdentities
+     *
+     * @return int
+     *
+     * @throws DBALException
+     */
+    private function removeInToManyRelationship(
+        Connection $connection,
+        string $primaryIdentity,
+        string $name,
+        iterable $secondaryIdentities
+    ): int {
+        $removeToMany = $this->builderOnRemoveInBelongsToManyRelationship(
+            $name,
+            $this
+                ->createBuilderFromConnection($connection, $this->getModelClass())
+                ->prepareDeleteInToManyRelationship($name, $primaryIdentity, $secondaryIdentities)
+        );
+        $removed = $removeToMany->execute();
+
+        return $removed;
     }
 
     /**

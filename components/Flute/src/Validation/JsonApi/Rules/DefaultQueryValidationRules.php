@@ -28,6 +28,16 @@ class DefaultQueryValidationRules implements JsonApiQueryRulesInterface
 {
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public static function getIdentityRule(): ?RuleInterface
+    {
+        return r::success();
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function getFilterRules(): ?array
     {

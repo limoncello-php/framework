@@ -44,6 +44,7 @@ use Neomerx\JsonApi\Http\Query\BaseQueryParserTrait;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class QueryParser implements JsonApiQueryValidatingParserInterface
 {
@@ -65,6 +66,11 @@ class QueryParser implements JsonApiQueryValidatingParserInterface
      * @var string[]|null
      */
     private $messages;
+
+    /**
+     * @var null|string
+     */
+    private $identityParameter;
 
     /**
      * @var array
@@ -122,6 +128,11 @@ class QueryParser implements JsonApiQueryValidatingParserInterface
      * @var JsonApiErrorCollection
      */
     private $jsonErrors;
+
+    /**
+     * @var null|mixed
+     */
+    private $cachedIdentity = null;
 
     /**
      * @var null|array
@@ -199,11 +210,11 @@ class QueryParser implements JsonApiQueryValidatingParserInterface
     /**
      * @inheritdoc
      */
-    public function parse(array $parameters): JsonApiQueryValidatingParserInterface
+    public function parse(?string $identity, array $parameters = []): JsonApiQueryValidatingParserInterface
     {
         $this->clear();
 
-        $this->setParameters($parameters);
+        $this->setIdentityParameter($identity)->setParameters($parameters);
 
         $this->parsePagingParameters()->parseFilterLink();
 
@@ -256,6 +267,18 @@ class QueryParser implements JsonApiQueryValidatingParserInterface
     public function hasPaging(): bool
     {
         return $this->hasParameter(static::PARAM_PAGE);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentity()
+    {
+        if ($this->cachedIdentity === null) {
+            $this->cachedIdentity = $this->getValidatedIdentity();
+        }
+
+        return $this->cachedIdentity;
     }
 
     /**
@@ -445,6 +468,30 @@ class QueryParser implements JsonApiQueryValidatingParserInterface
     protected function hasParameter(string $name): bool
     {
         return array_key_exists($name, $this->getParameters());
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getValidatedIdentity()
+    {
+        // without validation
+        $result = $this->getIdentityParameter();
+
+        $ruleIndexes = $this->serializerClass::readIdentityRuleIndexes($this->getSerializedRuleSet());
+        if ($ruleIndexes !== null) {
+            // with validation
+            $ruleIndex = $this->serializerClass::readRuleMainIndex($ruleIndexes);
+
+
+            $this->validationStarts(static::PARAM_IDENTITY, $ruleIndexes);
+            $this->validateAndThrowOnError(static::PARAM_IDENTITY, $result, $ruleIndex);
+            $this->validateEnds(static::PARAM_IDENTITY, $ruleIndexes);
+
+            $result = $this->readSingleCapturedValue();
+        }
+
+        return $result;
     }
 
     /**
@@ -818,6 +865,26 @@ class QueryParser implements JsonApiQueryValidatingParserInterface
     }
 
     /**
+     * @param string|null $value
+     *
+     * @return self
+     */
+    private function setIdentityParameter(?string $value): self
+    {
+        $this->identityParameter = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    private function getIdentityParameter(): ?string
+    {
+        return $this->identityParameter;
+    }
+
+    /**
      * @param array $values
      *
      * @return self
@@ -862,11 +929,13 @@ class QueryParser implements JsonApiQueryValidatingParserInterface
      */
     private function clear(): self
     {
+        $this->identityParameter = null;
         $this->filterParameters  = [];
         $this->areFiltersWithAnd = true;
         $this->pagingOffset      = null;
         $this->pagingLimit       = null;
 
+        $this->cachedIdentity = null;
         $this->cachedFilters  = null;
         $this->cachedFields   = null;
         $this->cachedIncludes = null;

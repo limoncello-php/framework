@@ -45,6 +45,7 @@ use Limoncello\Tests\Flute\Data\Schemas\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\CreateCommentRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdatePostRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateUserMinimalRules;
 use Mockery;
 
@@ -250,6 +251,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         return [
             CreateCommentRules::class,
             UpdateCommentRules::class,
+            UpdatePostRules::class,
             UpdateUserMinimalRules::class,
         ];
     }
@@ -278,6 +280,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             Data\Validation\JsonQueries\ReadCategoriesQueryRules::class,
             Data\Validation\JsonQueries\ReadUsersQueryRules::class,
             Data\Validation\JsonQueries\ReadEmotionsFromCommentsQueryRules::class,
+            Data\Validation\JsonQueries\ReadPostsQueryRules::class,
         ];
     }
 }

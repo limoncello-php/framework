@@ -275,6 +275,38 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
+     * @param string   $relationshipName
+     * @param string   $identity
+     * @param iterable $secondaryIds
+     *
+     * @return ModelQueryBuilder
+     *
+     * @throws DBALException
+     */
+    public function prepareDeleteInToManyRelationship(
+        string $relationshipName,
+        string $identity,
+        iterable $secondaryIds
+    ): self {
+        list ($intermediateTable, $primaryKey, $secondaryKey) =
+            $this->getModelSchemas()->getBelongsToManyRelationship($this->getModelClass(), $relationshipName);
+
+        $filters = [
+            $primaryKey   => [FilterParameterInterface::OPERATION_EQUALS => [$identity]],
+            $secondaryKey => [FilterParameterInterface::OPERATION_IN     => $secondaryIds],
+        ];
+
+        $addWith = $this->expr()->andX();
+        $this
+            ->delete($this->quoteTableName($intermediateTable))
+            ->applyFilters($addWith, $intermediateTable, $filters);
+
+        $addWith->count() <= 0 ?: $this->andWhere($addWith);
+
+        return $this;
+    }
+
+    /**
      * @param string $relationshipName
      * @param string $identity
      *

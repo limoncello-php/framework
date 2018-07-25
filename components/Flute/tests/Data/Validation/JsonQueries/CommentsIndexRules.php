@@ -31,6 +31,14 @@ class CommentsIndexRules implements JsonApiQueryRulesInterface
     /**
      * @inheritdoc
      */
+    public static function getIdentityRule(): ?RuleInterface
+    {
+        return r::success();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function getFilterRules(): ?array
     {
         return [

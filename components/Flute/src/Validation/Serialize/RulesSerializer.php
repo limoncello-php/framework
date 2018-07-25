@@ -47,6 +47,9 @@ class RulesSerializer
     /** Index key */
     protected const RULES_ARRAY_END_INDEXES = self::RULES_ARRAY_START_INDEXES + 1;
 
+    /** Index key. Every rule is serialized independently */
+    protected const RULES_ARRAY_SINGLE_INDEXES = self::RULES_ARRAY_END_INDEXES + 1;
+
     /**
      * @var BlockSerializerInterface
      */
@@ -85,6 +88,8 @@ class RulesSerializer
      */
     public function addRules(array $rules): array
     {
+        // serialize the rules altogether
+
         $this->getSerializer()->clearBlocksWithStart()->clearBlocksWithEnd();
 
         $indexes = [];
@@ -107,6 +112,15 @@ class RulesSerializer
         ];
 
         $this->getSerializer()->clearBlocksWithStart()->clearBlocksWithEnd();
+
+        // sometimes (e.g. update in relationship) an individual validation rule is needed
+        // so we should have a second serialization of each rule individually
+
+        $individualRules = [];
+        foreach ($rules as $name => $rule) {
+            $individualRules[$name] = $this->addRule($rule);
+        }
+        $ruleIndexes[static::RULES_ARRAY_SINGLE_INDEXES] = $individualRules;
 
         return $ruleIndexes;
     }
@@ -197,6 +211,22 @@ class RulesSerializer
     {
         assert(array_key_exists(static::RULES_ARRAY_END_INDEXES, $arrayRulesIndexes));
         $result = $arrayRulesIndexes[static::RULES_ARRAY_END_INDEXES];
+
+        return $result;
+    }
+
+    /**
+     * @param array  $arrayRulesIndexes
+     * @param string $name
+     *
+     * @return array
+     */
+    public static function geSingleRuleIndexes(array $arrayRulesIndexes, string $name): array
+    {
+        assert(array_key_exists(static::RULES_ARRAY_SINGLE_INDEXES, $arrayRulesIndexes));
+        $rules = $arrayRulesIndexes[static::RULES_ARRAY_SINGLE_INDEXES];
+        assert(array_key_exists($name, $rules));
+        $result = $rules[$name];
 
         return $result;
     }

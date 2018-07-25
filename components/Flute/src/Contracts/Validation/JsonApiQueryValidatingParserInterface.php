@@ -24,17 +24,21 @@ use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 interface JsonApiQueryValidatingParserInterface extends BaseQueryParserInterface
 {
     /** Query parameter */
+    const PARAM_IDENTITY = 'id';
+
+    /** Query parameter */
     const PARAM_PAGING_LIMIT = 'limit';
 
     /** Query parameter */
     const PARAM_PAGING_OFFSET = 'offset';
 
     /**
-     * @param array $parameters
+     * @param null|string $identity
+     * @param array       $parameters
      *
      * @return self
      */
-    public function parse(array $parameters): self;
+    public function parse(?string $identity, array $parameters = []): self;
 
     /**
      * If filters are joined with `AND` (or with `OR` otherwise).
@@ -67,6 +71,11 @@ interface JsonApiQueryValidatingParserInterface extends BaseQueryParserInterface
      * @return bool
      */
     public function hasPaging(): bool;
+
+    /**
+     * @return mixed
+     */
+    public function getIdentity();
 
     /**
      * @return iterable
