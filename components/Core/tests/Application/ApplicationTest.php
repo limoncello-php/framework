@@ -43,9 +43,9 @@ use Psr\Http\Message\StreamInterface;
 use ReflectionException;
 use ReflectionMethod;
 use Throwable;
-use Zend\Diactoros\Response\EmitterInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequestFactory;
+use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
 
 /**
  * @package Limoncello\Tests\Core

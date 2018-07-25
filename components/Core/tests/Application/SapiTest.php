@@ -21,7 +21,7 @@ use Limoncello\Core\Application\Sapi;
 use Limoncello\Tests\Core\TestCase;
 use Mockery;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Response\EmitterInterface;
+use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
 
 /**
  * @package Limoncello\Tests\Core
@@ -40,7 +40,7 @@ class SapiTest extends TestCase
         /** @var Mockery\Mock $response */
         $response = Mockery::mock(ResponseInterface::class);
 
-        $emitter->shouldReceive('emit')->once()->with($response)->andReturnUndefined();
+        $emitter->shouldReceive('emit')->once()->with($response)->andReturn(true);
 
         /** @var EmitterInterface $emitter */
         /** @var ResponseInterface $response */

@@ -20,8 +20,8 @@ use Limoncello\Contracts\Core\SapiInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
-use Zend\Diactoros\Response\EmitterInterface;
 use Zend\Diactoros\ServerRequestFactory;
+use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
 
 /**
  * @package Limoncello\Core
@@ -112,10 +112,10 @@ class Sapi implements SapiInterface
 
         // Code below based on ServerRequestFactory::fromGlobals
         $this->server          = ServerRequestFactory::normalizeServer($server ?? $_SERVER);
-        $this->files           = ServerRequestFactory::normalizeFiles($files ?? $_FILES);
-        $this->headers         = ServerRequestFactory::marshalHeaders($this->server);
-        $this->uri             = ServerRequestFactory::marshalUriFromServer($this->server, $this->headers);
-        $this->method          = ServerRequestFactory::get('REQUEST_METHOD', $this->server, 'GET');
+        $this->files           = \Zend\Diactoros\normalizeUploadedFiles($files ?? $_FILES);
+        $this->headers         = \Zend\Diactoros\marshalHeadersFromSapi($this->server);
+        $this->uri             = \Zend\Diactoros\marshalUriFromSapi($this->server, $this->headers);
+        $this->method          = \Zend\Diactoros\marshalMethodFromSapi($this->server);
         $this->cookies         = $cookies ?? $_COOKIE;
         $this->queryParams     = $queryParams ?? $_GET;
         $this->parsedBody      = $parsedBody ?? $_POST;

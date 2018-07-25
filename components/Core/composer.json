@@ -17,6 +17,7 @@
         "php": ">=7.1.0",
         "nikic/fast-route": "^1.0",
         "zendframework/zend-diactoros": "^1.7",
+        "zendframework/zend-httphandlerrunner": "^1.0",
         "limoncello-php/contracts": "^0.9.0"
     },
     "require-dev": {
@@ -40,7 +41,7 @@
     "scripts": {
         "test": ["@test-unit-with-coverage", "@test-cs", "@test-md"],
         "test-unit": "./vendor/bin/phpunit",
-        "test-unit-with-coverage": "phpdbg -qrr ./vendor/bin/phpunit --coverage-text",
+        "test-unit-with-coverage": "./vendor/bin/phpunit --coverage-text",
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
         "test-unit-php-7-2": "docker-compose run --rm cli_7_2_php php ./vendor/bin/phpunit",
