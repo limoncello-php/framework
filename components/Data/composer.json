@@ -16,7 +16,7 @@
     "require": {
         "php": ">=7.1.0",
         "doctrine/dbal": "^2.6.3",
-        "limoncello-php/contracts": "^0.9.0"
+        "limoncello-php/contracts": "^0.10.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9",
@@ -47,7 +47,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "0.9.x-dev"
+            "dev-develop": "0.10.x-dev"
         }
     }
 }
