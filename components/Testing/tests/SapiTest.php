@@ -19,7 +19,7 @@
 use Limoncello\Testing\Sapi;
 use Mockery;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Response\EmitterInterface;
+use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
 
 /**
  * @package Limoncello\Tests\Testing
