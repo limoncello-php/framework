@@ -491,7 +491,7 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                                $parentIndex
+     * @param string                                $index
      * @param string                                $jsonRelName
      * @param string                                $modelRelName
      * @param UriInterface                          $requestUri
@@ -512,7 +512,7 @@ trait DefaultControllerMethodsTrait
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     protected static function defaultAddInRelationshipHandler(
-        string $parentIndex,
+        string $index,
         string $jsonRelName,
         string $modelRelName,
         UriInterface $requestUri,
@@ -535,10 +535,10 @@ trait DefaultControllerMethodsTrait
         assert($schemaInfo->getRelationshipType($modelClass, $modelRelName) === RelationshipTypes::BELONGS_TO_MANY);
 
         $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
-        $captures = $dataValidator->assertRelationship($jsonRelName, $jsonData)->getJsonApiCaptures();
+        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getJsonApiCaptures();
         $relIds   = $captures[$jsonRelName];
 
-        $validatedIndex = $queryParser->parse($parentIndex)->getIdentity();
+        $validatedIndex = $queryParser->parse($index)->getIdentity();
         $parentCrud->createInBelongsToManyRelationship($validatedIndex, $modelRelName, $relIds);
 
         $encParams = null;
@@ -549,7 +549,7 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                                $parentIndex
+     * @param string                                $index
      * @param string                                $jsonRelName
      * @param string                                $modelRelName
      * @param UriInterface                          $requestUri
@@ -570,7 +570,7 @@ trait DefaultControllerMethodsTrait
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     protected static function defaultDeleteInRelationshipHandler(
-        string $parentIndex,
+        string $index,
         string $jsonRelName,
         string $modelRelName,
         UriInterface $requestUri,
@@ -593,10 +593,10 @@ trait DefaultControllerMethodsTrait
         assert($schemaInfo->getRelationshipType($modelClass, $modelRelName) === RelationshipTypes::BELONGS_TO_MANY);
 
         $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
-        $captures = $dataValidator->assertRelationship($jsonRelName, $jsonData)->getJsonApiCaptures();
+        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getJsonApiCaptures();
         $relIds   = $captures[$jsonRelName];
 
-        $validatedIndex = $queryParser->parse($parentIndex)->getIdentity();
+        $validatedIndex = $queryParser->parse($index)->getIdentity();
         $parentCrud->removeInBelongsToManyRelationship($validatedIndex, $modelRelName, $relIds);
 
         $encParams = null;
@@ -654,7 +654,7 @@ trait DefaultControllerMethodsTrait
         );
 
         $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
-        $captures = $dataValidator->assertRelationship($jsonRelName, $jsonData)->getJsonApiCaptures();
+        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getJsonApiCaptures();
 
         // If we are here then we have something in 'data' section.
 

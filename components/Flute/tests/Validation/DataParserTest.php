@@ -163,7 +163,7 @@ EOT;
             ],
             []
         );
-        $validator->assertRelationship(CommentSchema::REL_USER, $input);
+        $validator->assertRelationship('some_id', CommentSchema::REL_USER, $input);
 
         $captures = $validator->getJsonApiCaptures();
         $this->assertEmpty($validator->getJsonApiErrors());
@@ -200,7 +200,7 @@ EOT;
                 CommentSchema::REL_EMOTIONS => v::toManyRelationship(EmotionSchema::TYPE, v::isArray()),
             ]
         );
-        $validator->assertRelationship(CommentSchema::REL_EMOTIONS, $input);
+        $validator->assertRelationship('some_id', CommentSchema::REL_EMOTIONS, $input);
 
         $captures = $validator->getJsonApiCaptures();
         $this->assertEmpty($validator->getJsonApiErrors());
@@ -233,7 +233,7 @@ EOT;
             [],
             []
         );
-        $validator->assertRelationship(CommentSchema::REL_EMOTIONS, $input);
+        $validator->assertRelationship('some_id', CommentSchema::REL_EMOTIONS, $input);
     }
 
     /**
@@ -262,7 +262,7 @@ EOT;
                 CommentSchema::REL_EMOTIONS => v::fail(), // <-- any input will fail validation
             ]
         );
-        $validator->assertRelationship(CommentSchema::REL_EMOTIONS, $input);
+        $validator->assertRelationship('some_id', CommentSchema::REL_EMOTIONS, $input);
 
         $validator->getJsonApiCaptures();
     }

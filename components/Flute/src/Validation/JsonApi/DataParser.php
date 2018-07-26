@@ -221,7 +221,7 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function parseRelationship(string $name, array $jsonData): bool
+    public function parseRelationship(string $index, string $name, array $jsonData): bool
     {
         $this->reInitAggregatorsIfNeeded();
 
@@ -265,9 +265,12 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
     /**
      * @inheritdoc
      */
-    public function assertRelationship(string $name, array $jsonData): JsonApiDataValidatingParserInterface
-    {
-        if ($this->parseRelationship($name, $jsonData) === false) {
+    public function assertRelationship(
+        string $index,
+        string $name,
+        array $jsonData
+    ): JsonApiDataValidatingParserInterface {
+        if ($this->parseRelationship($index, $name, $jsonData) === false) {
             throw new JsonApiException($this->getJsonApiErrorCollection(), $this->getErrorStatus());
         }
 

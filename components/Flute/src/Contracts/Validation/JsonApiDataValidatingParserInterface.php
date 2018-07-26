@@ -31,12 +31,13 @@ interface JsonApiDataValidatingParserInterface
     public function parse(array $jsonData): bool;
 
     /**
+     * @param string $index
      * @param string $name
      * @param array  $jsonData
      *
      * @return bool
      */
-    public function parseRelationship(string $name, array $jsonData): bool;
+    public function parseRelationship(string $index, string $name, array $jsonData): bool;
 
     /**
      * @param mixed $jsonData
@@ -46,12 +47,13 @@ interface JsonApiDataValidatingParserInterface
     public function assert($jsonData): self;
 
     /**
+     * @param string $index
      * @param string $name
      * @param array  $jsonData
      *
      * @return self
      */
-    public function assertRelationship(string $name, array $jsonData): self;
+    public function assertRelationship(string $index, string $name, array $jsonData): self;
 
     /**
      * @return array
