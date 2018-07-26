@@ -32,7 +32,25 @@
         "limoncello-php/validation": "self.version"
     },
     "scripts": {
-        "test": ["@test-unit-with-coverage", "@test-cs", "@test-md"],
+        "test": ["@clean-vendor-folders", "@test-unit-with-coverage", "@test-cs", "@test-md"],
+
+        "clean-vendor-folders": [
+            "php -r \"system('rm -rf ./components/Application/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Auth/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Commands/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Container/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Core/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Crypt/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Data/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Events/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Flute/vendor/');\"",
+            "php -r \"system('rm -rf ./components/L10n/vendor/');\"",
+            "php -r \"system('rm -rf ./components/OAuthServer/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Passport/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Templates/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Testing/vendor/');\"",
+            "php -r \"system('rm -rf ./components/Validation/vendor/');\""
+        ],
 
         "test-unit": [
             "@test-unit-component-Application",
@@ -48,6 +66,7 @@
             "@test-unit-component-OAuthServer",
             "@test-unit-component-Passport",
             "@test-unit-component-Templates",
+            "@test-unit-component-Testing",
             "@test-unit-component-Validation"
         ],
         "test-unit-with-coverage": [
@@ -64,6 +83,7 @@
             "@test-unit-with-coverage-component-OAuthServer",
             "@test-unit-with-coverage-component-Passport",
             "@test-unit-with-coverage-component-Templates",
+            "@test-unit-with-coverage-component-Testing",
             "@test-unit-with-coverage-component-Validation"
         ],
         "update-component-Application": "@composer update --working-dir=./components/Application/ --optimize-autoloader --quiet",
@@ -80,6 +100,7 @@
         "update-component-OAuthServer": "@composer update --working-dir=./components/OAuthServer/ --optimize-autoloader --quiet",
         "update-component-Passport":    "@composer update --working-dir=./components/Passport/ --optimize-autoloader --quiet",
         "update-component-Templates":   "@composer update --working-dir=./components/Templates/ --optimize-autoloader --quiet",
+        "update-component-Testing":     "@composer update --working-dir=./components/Testing/ --optimize-autoloader --quiet",
         "update-component-Validation":  "@composer update --working-dir=./components/Validation/ --optimize-autoloader --quiet",
         "test-unit-component-Application": ["@update-component-Application", "@composer --working-dir=./components/Application/ test-unit"],
         "test-unit-component-Auth":        ["@update-component-Auth", "@composer --working-dir=./components/Auth/ test-unit"],
@@ -95,6 +116,7 @@
         "test-unit-component-OAuthServer": ["@update-component-OAuthServer", "@composer --working-dir=./components/OAuthServer/ test-unit"],
         "test-unit-component-Passport":    ["@update-component-Passport", "@composer --working-dir=./components/Passport/ test-unit"],
         "test-unit-component-Templates":   ["@update-component-Templates", "@composer --working-dir=./components/Templates/ test-unit"],
+        "test-unit-component-Testing":     ["@update-component-Testing", "@composer --working-dir=./components/Testing/ test-unit"],
         "test-unit-component-Validation":  ["@update-component-Validation", "@composer --working-dir=./components/Validation/ test-unit"],
         "test-unit-with-coverage-component-Application": ["@update-component-Application", "@composer --working-dir=./components/Application/ test-unit-with-coverage"],
         "test-unit-with-coverage-component-Auth":        ["@update-component-Auth", "@composer --working-dir=./components/Auth/ test-unit-with-coverage"],
@@ -109,6 +131,7 @@
         "test-unit-with-coverage-component-OAuthServer": ["@update-component-OAuthServer", "@composer --working-dir=./components/OAuthServer/ test-unit-with-coverage"],
         "test-unit-with-coverage-component-Passport":    ["@update-component-Passport", "@composer --working-dir=./components/Passport/ test-unit-with-coverage"],
         "test-unit-with-coverage-component-Templates":   ["@update-component-Templates", "@composer --working-dir=./components/Templates/ test-unit-with-coverage"],
+        "test-unit-with-coverage-component-Testing":     ["@update-component-Testing", "@composer --working-dir=./components/Testing/ test-unit-with-coverage"],
         "test-unit-with-coverage-component-Validation":  ["@update-component-Validation", "@composer --working-dir=./components/Validation/ test-unit-with-coverage"],
 
         "test-cs": [
@@ -126,6 +149,7 @@
             "@test-cs-component-OAuthServer",
             "@test-cs-component-Passport",
             "@test-cs-component-Templates",
+            "@test-cs-component-Testing",
             "@test-cs-component-Validation"
         ],
         "test-cs-component-Application": "@composer test-cs --working-dir=./components/Application/",
@@ -142,6 +166,7 @@
         "test-cs-component-OAuthServer": "@composer test-cs --working-dir=./components/OAuthServer/",
         "test-cs-component-Passport":    "@composer test-cs --working-dir=./components/Passport/",
         "test-cs-component-Templates":   "@composer test-cs --working-dir=./components/Templates/",
+        "test-cs-component-Testing":     "@composer test-cs --working-dir=./components/Testing/",
         "test-cs-component-Validation":  "@composer test-cs --working-dir=./components/Validation/",
 
         "test-md": [
@@ -159,6 +184,7 @@
             "@test-md-component-OAuthServer",
             "@test-md-component-Passport",
             "@test-md-component-Templates",
+            "@test-md-component-Testing",
             "@test-md-component-Validation"
         ],
         "test-md-component-Application": "@composer test-md --working-dir=./components/Application/",
@@ -175,6 +201,7 @@
         "test-md-component-OAuthServer": "@composer test-md --working-dir=./components/OAuthServer/",
         "test-md-component-Passport":    "@composer test-md --working-dir=./components/Passport/",
         "test-md-component-Templates":   "@composer test-md --working-dir=./components/Templates/",
+        "test-md-component-Testing":     "@composer test-md --working-dir=./components/Testing/",
         "test-md-component-Validation":  "@composer test-md --working-dir=./components/Validation/"
     },
     "extra": {
