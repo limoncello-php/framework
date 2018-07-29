@@ -58,10 +58,10 @@ interface JsonApiDataValidatingParserInterface
     /**
      * @return array
      */
-    public function getJsonApiCaptures(): array;
+    public function getCaptures(): array;
 
     /**
      * @return ErrorInterface[]
      */
-    public function getJsonApiErrors(): array;
+    public function getErrors(): array;
 }

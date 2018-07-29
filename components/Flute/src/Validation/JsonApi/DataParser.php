@@ -25,10 +25,13 @@ use Limoncello\Flute\Http\JsonApiResponse;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Flute\Validation\Rules\RelationshipRulesTrait;
+use Limoncello\Validation\Captures\CaptureAggregator;
+use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
+use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
+use Limoncello\Validation\Errors\ErrorAggregator;
 use Limoncello\Validation\Execution\BlockInterpreter;
-use Limoncello\Validation\Validator\BaseValidator;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
@@ -38,7 +41,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DataParser extends BaseValidator implements JsonApiDataValidatingParserInterface
+class DataParser implements JsonApiDataValidatingParserInterface
 {
     use RelationshipRulesTrait;
 
@@ -128,6 +131,16 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
     private $formatterFactory;
 
     /**
+     * @var ErrorAggregatorInterface
+     */
+    private $errorAggregator;
+
+    /**
+     * @var CaptureAggregatorInterface
+     */
+    private $captureAggregator;
+
+    /**
      * @param string                    $rulesClass
      * @param string                    $serializerClass
      * @param array                     $serializedData
@@ -165,7 +178,8 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
             ->setToManyIndexes($this->getSerializer()::readToManyRulesIndexes($ruleSet))
             ->disableIgnoreUnknowns();
 
-        parent::__construct();
+        $this->errorAggregator   = new ErrorAggregator();
+        $this->captureAggregator = new CaptureAggregator();
     }
 
     /**
@@ -203,7 +217,7 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
      */
     public function parse(array $input): bool
     {
-        $this->reInitAggregatorsIfNeeded();
+        $this->resetAggregators();
 
         $this
             ->validateType($input)
@@ -223,7 +237,7 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
      */
     public function parseRelationship(string $index, string $name, array $jsonData): bool
     {
-        $this->reInitAggregatorsIfNeeded();
+        $this->resetAggregators();
 
         $isFoundInToOne  = array_key_exists($name, $this->getSerializer()::readRulesIndexes($this->getToOneRules()));
         $isFoundInToMany = $isFoundInToOne === false &&
@@ -280,7 +294,7 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
     /**
      * @inheritdoc
      */
-    public function getJsonApiErrors(): array
+    public function getErrors(): array
     {
         return $this->getJsonApiErrorCollection()->getArrayCopy();
     }
@@ -288,21 +302,21 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
     /**
      * @inheritdoc
      */
-    public function getJsonApiCaptures(): array
+    public function getCaptures(): array
     {
-        return $this->getCaptures();
+        return $this->getCaptureAggregator()->get();
     }
 
     /**
-     * @return BaseValidator
+     * @return self
      */
-    protected function resetAggregators(): BaseValidator
+    protected function resetAggregators(): self
     {
-        $self = parent::resetAggregators();
-
+        $this->getCaptureAggregator()->clear();
+        $this->getErrorAggregator()->clear();
         $this->getContext()->clear();
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -613,14 +627,6 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
     }
 
     /**
-     * Re-initializes internal aggregators for captures, errors, etc.
-     */
-    private function reInitAggregatorsIfNeeded(): void
-    {
-        $this->areAggregatorsDirty() === false ?: $this->resetAggregators();
-    }
-
-    /**
      * @param mixed $input
      * @param int   $index
      *
@@ -904,6 +910,22 @@ class DataParser extends BaseValidator implements JsonApiDataValidatingParserInt
         $message = $this->getFormatter()->formatMessage($messageId, $args);
 
         return $message;
+    }
+
+    /**
+     * @return ErrorAggregatorInterface
+     */
+    private function getErrorAggregator(): ErrorAggregatorInterface
+    {
+        return $this->errorAggregator;
+    }
+
+    /**
+     * @return CaptureAggregatorInterface
+     */
+    private function getCaptureAggregator(): CaptureAggregatorInterface
+    {
+        return $this->captureAggregator;
     }
 
     /**

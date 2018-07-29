@@ -122,8 +122,8 @@ EOT;
         );
         $validator->assert($input);
 
-        $captures = $validator->getJsonApiCaptures();
-        $this->assertEmpty($validator->getJsonApiErrors());
+        $captures = $validator->getCaptures();
+        $this->assertEmpty($validator->getErrors());
         $this->assertCount(9, $captures);
         $this->assertSame(CommentSchema::TYPE, $captures[CommentSchema::RESOURCE_TYPE]);
         $this->assertNull($captures[CommentSchema::RESOURCE_ID]);
@@ -165,8 +165,8 @@ EOT;
         );
         $validator->assertRelationship('some_id', CommentSchema::REL_USER, $input);
 
-        $captures = $validator->getJsonApiCaptures();
-        $this->assertEmpty($validator->getJsonApiErrors());
+        $captures = $validator->getCaptures();
+        $this->assertEmpty($validator->getErrors());
         $this->assertCount(1, $captures);
         $this->assertSame(9, $captures[CommentSchema::REL_USER]);
     }
@@ -202,8 +202,8 @@ EOT;
         );
         $validator->assertRelationship('some_id', CommentSchema::REL_EMOTIONS, $input);
 
-        $captures = $validator->getJsonApiCaptures();
-        $this->assertEmpty($validator->getJsonApiErrors());
+        $captures = $validator->getCaptures();
+        $this->assertEmpty($validator->getErrors());
         $this->assertCount(1, $captures);
         // note we didn't converted strings to int.
         $this->assertSame(['5', '12'], $captures[CommentSchema::REL_EMOTIONS]);
@@ -264,7 +264,7 @@ EOT;
         );
         $validator->assertRelationship('some_id', CommentSchema::REL_EMOTIONS, $input);
 
-        $validator->getJsonApiCaptures();
+        $validator->getCaptures();
     }
 
     /**
@@ -316,7 +316,7 @@ EOT;
         );
         $validator->assert($input);
 
-        $captures = $validator->getJsonApiCaptures();
+        $captures = $validator->getCaptures();
         $this->assertCount(4, $captures);
         $this->assertSame($text, $captures[CommentSchema::ATTR_TEXT]);
         $this->assertSame([], $captures[CommentSchema::REL_EMOTIONS]);
@@ -724,9 +724,9 @@ EOT;
         $this->assertEquals([
             DocumentInterface::KEYWORD_TYPE => CommentSchema::TYPE,
             DocumentInterface::KEYWORD_ID   => null,
-        ], $validator->getJsonApiCaptures());
+        ], $validator->getCaptures());
 
-        $this->assertCount(3, $validator->getJsonApiErrors());
+        $this->assertCount(3, $validator->getErrors());
     }
 
     /**
@@ -768,9 +768,9 @@ EOT;
         $this->assertEquals([
             DocumentInterface::KEYWORD_TYPE => CommentSchema::TYPE,
             DocumentInterface::KEYWORD_ID   => null,
-        ], $validator->getJsonApiCaptures());
+        ], $validator->getCaptures());
 
-        $this->assertCount(1, $validator->getJsonApiErrors());
+        $this->assertCount(1, $validator->getErrors());
     }
 
     /**
@@ -821,9 +821,9 @@ EOT;
         $this->assertEquals([
             DocumentInterface::KEYWORD_TYPE => CommentSchema::TYPE,
             DocumentInterface::KEYWORD_ID   => null,
-        ], $validator->getJsonApiCaptures());
+        ], $validator->getCaptures());
 
-        $this->assertCount(2, $validator->getJsonApiErrors());
+        $this->assertCount(2, $validator->getErrors());
     }
 
     /**

@@ -281,7 +281,7 @@ trait DefaultControllerMethodsTrait
         FormatterFactoryInterface $formatterFactory
     ): string {
         $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
-        $captures = $validator->assert($jsonData)->getJsonApiCaptures();
+        $captures = $validator->assert($jsonData)->getCaptures();
 
         list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
@@ -417,7 +417,7 @@ trait DefaultControllerMethodsTrait
             $jsonData[DI::KEYWORD_DATA][DI::KEYWORD_ID] = $index;
         }
         // validate the data
-        $captures = $validator->assert($jsonData)->getJsonApiCaptures();
+        $captures = $validator->assert($jsonData)->getCaptures();
 
         list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
@@ -535,7 +535,7 @@ trait DefaultControllerMethodsTrait
         assert($schemaInfo->getRelationshipType($modelClass, $modelRelName) === RelationshipTypes::BELONGS_TO_MANY);
 
         $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
-        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getJsonApiCaptures();
+        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getCaptures();
         $relIds   = $captures[$jsonRelName];
 
         $validatedIndex = $queryParser->parse($index)->getIdentity();
@@ -593,7 +593,7 @@ trait DefaultControllerMethodsTrait
         assert($schemaInfo->getRelationshipType($modelClass, $modelRelName) === RelationshipTypes::BELONGS_TO_MANY);
 
         $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
-        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getJsonApiCaptures();
+        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getCaptures();
         $relIds   = $captures[$jsonRelName];
 
         $validatedIndex = $queryParser->parse($index)->getIdentity();
@@ -654,7 +654,7 @@ trait DefaultControllerMethodsTrait
         );
 
         $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
-        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getJsonApiCaptures();
+        $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getCaptures();
 
         // If we are here then we have something in 'data' section.
 
