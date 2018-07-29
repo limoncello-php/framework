@@ -25,7 +25,7 @@ use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Factory;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Resources\Messages\En\Generic;
@@ -918,7 +918,7 @@ EOT;
      * @param array              $toOneRules
      * @param array              $toManyRules
      *
-     * @return JsonApiDataValidatingParserInterface
+     * @return JsonApiDataParserInterface
      */
     private function createParser(
         ContainerInterface $container,
@@ -928,7 +928,7 @@ EOT;
         array $attributeRules,
         array $toOneRules,
         array $toManyRules
-    ): JsonApiDataValidatingParserInterface {
+    ): JsonApiDataParserInterface {
         $serializedData = (new JsonApiDataRulesSerializer(new BlockSerializer()))->addDataRules(
             $rulesClass,
             $idRule,

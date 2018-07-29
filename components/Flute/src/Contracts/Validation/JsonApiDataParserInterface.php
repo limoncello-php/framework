@@ -21,7 +21,7 @@ use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 /**
  * @package Limoncello\Flute
  */
-interface JsonApiDataValidatingParserInterface
+interface JsonApiDataParserInterface
 {
     /**
      * @param array $jsonData

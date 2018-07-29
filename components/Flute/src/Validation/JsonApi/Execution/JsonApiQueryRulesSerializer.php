@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesSerializerInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
 use Limoncello\Flute\Validation\Serialize\RulesSerializer;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 
@@ -106,11 +106,11 @@ class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQuer
         assert(!empty($name));
         assert(static::hasRules($name, $this->serializedRules) === false);
 
-        $identityRule === null ?: $identityRule->setName(JsonApiQueryValidatingParserInterface::PARAM_IDENTITY);
-        $sortsRule === null ?: $sortsRule->setName(JsonApiQueryValidatingParserInterface::PARAM_SORT);
-        $includesRule === null ?: $includesRule->setName(JsonApiQueryValidatingParserInterface::PARAM_INCLUDE);
-        $pageOffsetRule === null ?: $pageOffsetRule->setName(JsonApiQueryValidatingParserInterface::PARAM_PAGE);
-        $pageLimitRule === null ?: $pageLimitRule->setName(JsonApiQueryValidatingParserInterface::PARAM_PAGE);
+        $identityRule === null ?: $identityRule->setName(JsonApiQueryParserInterface::PARAM_IDENTITY);
+        $sortsRule === null ?: $sortsRule->setName(JsonApiQueryParserInterface::PARAM_SORT);
+        $includesRule === null ?: $includesRule->setName(JsonApiQueryParserInterface::PARAM_INCLUDE);
+        $pageOffsetRule === null ?: $pageOffsetRule->setName(JsonApiQueryParserInterface::PARAM_PAGE);
+        $pageLimitRule === null ?: $pageLimitRule->setName(JsonApiQueryParserInterface::PARAM_PAGE);
 
         $this->serializedRules[$name] = [
             static::IDENTITY_RULE     =>

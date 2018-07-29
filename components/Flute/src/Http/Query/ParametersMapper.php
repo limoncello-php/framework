@@ -24,7 +24,7 @@ use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
 use Limoncello\Flute\Contracts\Http\Query\RelationshipInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
 use Limoncello\Flute\Exceptions\LogicException;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
@@ -278,7 +278,7 @@ class ParametersMapper implements ParametersMapperInterface
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function applyQueryParameters(
-        JsonApiQueryValidatingParserInterface $parser,
+        JsonApiQueryParserInterface $parser,
         CrudInterface $api
     ): CrudInterface {
         //

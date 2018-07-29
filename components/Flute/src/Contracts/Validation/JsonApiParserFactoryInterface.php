@@ -24,14 +24,14 @@ interface JsonApiParserFactoryInterface
     /**
      * @param string $rulesClass
      *
-     * @return JsonApiDataValidatingParserInterface
+     * @return JsonApiDataParserInterface
      */
-    public function createDataParser(string $rulesClass): JsonApiDataValidatingParserInterface;
+    public function createDataParser(string $rulesClass): JsonApiDataParserInterface;
 
     /**
      * @param string $rulesClass
      *
-     * @return JsonApiQueryValidatingParserInterface
+     * @return JsonApiQueryParserInterface
      */
-    public function createQueryParser(string $rulesClass): JsonApiQueryValidatingParserInterface;
+    public function createQueryParser(string $rulesClass): JsonApiQueryParserInterface;
 }

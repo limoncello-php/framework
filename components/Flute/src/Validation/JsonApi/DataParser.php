@@ -19,8 +19,8 @@
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
+use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesSerializerInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
@@ -41,7 +41,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DataParser implements JsonApiDataValidatingParserInterface
+class DataParser implements JsonApiDataParserInterface
 {
     use RelationshipRulesTrait;
 
@@ -185,7 +185,7 @@ class DataParser implements JsonApiDataValidatingParserInterface
     /**
      * @inheritdoc
      */
-    public function assert($jsonData): JsonApiDataValidatingParserInterface
+    public function assert($jsonData): JsonApiDataParserInterface
     {
         if ($this->validate($jsonData) === false) {
             throw new JsonApiException($this->getJsonApiErrorCollection(), $this->getErrorStatus());
@@ -283,7 +283,7 @@ class DataParser implements JsonApiDataValidatingParserInterface
         string $index,
         string $name,
         array $jsonData
-    ): JsonApiDataValidatingParserInterface {
+    ): JsonApiDataParserInterface {
         if ($this->parseRelationship($index, $name, $jsonData) === false) {
             throw new JsonApiException($this->getJsonApiErrorCollection(), $this->getErrorStatus());
         }

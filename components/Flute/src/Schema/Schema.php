@@ -20,7 +20,7 @@ use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
@@ -214,8 +214,8 @@ abstract class Schema extends BaseSchema implements SchemaInterface
 
         $buildUrl = function ($offset) use ($data, $uri) {
             $paramsWithPaging = [
-                JsonApiQueryValidatingParserInterface::PARAM_PAGING_OFFSET => $offset,
-                JsonApiQueryValidatingParserInterface::PARAM_PAGING_LIMIT  => $data->getLimit(),
+                JsonApiQueryParserInterface::PARAM_PAGING_OFFSET => $offset,
+                JsonApiQueryParserInterface::PARAM_PAGING_LIMIT  => $data->getLimit(),
             ];
             $fullUrl          = $uri . '?' . http_build_query($paramsWithPaging);
 

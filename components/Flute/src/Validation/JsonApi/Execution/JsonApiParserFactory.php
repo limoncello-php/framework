@@ -19,9 +19,9 @@
 use Limoncello\Container\Traits\HasContainerTrait;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\JsonApi\DataParser;
 use Limoncello\Flute\Validation\JsonApi\QueryParser;
@@ -54,7 +54,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function createDataParser(string $rulesClass): JsonApiDataValidatingParserInterface
+    public function createDataParser(string $rulesClass): JsonApiDataParserInterface
     {
         $serializedData = FluteSettings::getJsonDataSerializedRules($this->getFluteSettings());
 
@@ -77,7 +77,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function createQueryParser(string $rulesClass): JsonApiQueryValidatingParserInterface
+    public function createQueryParser(string $rulesClass): JsonApiQueryParserInterface
     {
         $serializedData = FluteSettings::getJsonQuerySerializedRules($this->getFluteSettings());
 

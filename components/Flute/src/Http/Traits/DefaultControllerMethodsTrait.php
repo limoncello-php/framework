@@ -32,11 +32,11 @@ use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Contracts\Validation\FormRulesInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiDataValidatingParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
 use Limoncello\Flute\Http\Responses;
 use Limoncello\Flute\Package\FluteSettings as S;
 use Limoncello\Flute\Resources\Messages\En\Generic;
@@ -60,21 +60,21 @@ use Psr\Http\Message\UriInterface;
 trait DefaultControllerMethodsTrait
 {
     /** @noinspection PhpTooManyParametersInspection
-     * @param array                                 $queryParams
-     * @param UriInterface                          $requestUri
-     * @param JsonApiQueryValidatingParserInterface $queryParser
-     * @param ParametersMapperInterface             $mapper
-     * @param CrudInterface                         $crud
-     * @param SettingsProviderInterface             $provider
-     * @param JsonSchemasInterface                  $jsonSchemas
-     * @param EncoderInterface                      $encoder
+     * @param array                       $queryParams
+     * @param UriInterface                $requestUri
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param ParametersMapperInterface   $mapper
+     * @param CrudInterface               $crud
+     * @param SettingsProviderInterface   $provider
+     * @param JsonSchemasInterface        $jsonSchemas
+     * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
      */
     protected static function defaultIndexHandler(
         array $queryParams,
         UriInterface $requestUri,
-        JsonApiQueryValidatingParserInterface $queryParser,
+        JsonApiQueryParserInterface $queryParser,
         ParametersMapperInterface $mapper,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
@@ -94,15 +94,15 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                                $index
-     * @param array                                 $queryParams
-     * @param UriInterface                          $requestUri
-     * @param JsonApiQueryValidatingParserInterface $queryParser
-     * @param ParametersMapperInterface             $mapper
-     * @param CrudInterface                         $crud
-     * @param SettingsProviderInterface             $provider
-     * @param JsonSchemasInterface                  $jsonSchemas
-     * @param EncoderInterface                      $encoder
+     * @param string                      $index
+     * @param array                       $queryParams
+     * @param UriInterface                $requestUri
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param ParametersMapperInterface   $mapper
+     * @param CrudInterface               $crud
+     * @param SettingsProviderInterface   $provider
+     * @param JsonSchemasInterface        $jsonSchemas
+     * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
      */
@@ -110,7 +110,7 @@ trait DefaultControllerMethodsTrait
         string $index,
         array $queryParams,
         UriInterface $requestUri,
-        JsonApiQueryValidatingParserInterface $queryParser,
+        JsonApiQueryParserInterface $queryParser,
         ParametersMapperInterface $mapper,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
@@ -132,16 +132,16 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                                $index
-     * @param Closure                               $apiHandler
-     * @param array                                 $queryParams
-     * @param UriInterface                          $requestUri
-     * @param JsonApiQueryValidatingParserInterface $queryParser
-     * @param ParametersMapperInterface             $mapper
-     * @param CrudInterface                         $crud
-     * @param SettingsProviderInterface             $provider
-     * @param JsonSchemasInterface                  $jsonSchemas
-     * @param EncoderInterface                      $encoder
+     * @param string                      $index
+     * @param Closure                     $apiHandler
+     * @param array                       $queryParams
+     * @param UriInterface                $requestUri
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param ParametersMapperInterface   $mapper
+     * @param CrudInterface               $crud
+     * @param SettingsProviderInterface   $provider
+     * @param JsonSchemasInterface        $jsonSchemas
+     * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
      *
@@ -152,7 +152,7 @@ trait DefaultControllerMethodsTrait
         Closure $apiHandler,
         array $queryParams,
         UriInterface $requestUri,
-        JsonApiQueryValidatingParserInterface $queryParser,
+        JsonApiQueryParserInterface $queryParser,
         ParametersMapperInterface $mapper,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
@@ -174,16 +174,16 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                                $index
-     * @param Closure                               $apiHandler
-     * @param array                                 $queryParams
-     * @param UriInterface                          $requestUri
-     * @param JsonApiQueryValidatingParserInterface $queryParser
-     * @param ParametersMapperInterface             $mapper
-     * @param CrudInterface                         $crud
-     * @param SettingsProviderInterface             $provider
-     * @param JsonSchemasInterface                  $jsonSchemas
-     * @param EncoderInterface                      $encoder
+     * @param string                      $index
+     * @param Closure                     $apiHandler
+     * @param array                       $queryParams
+     * @param UriInterface                $requestUri
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param ParametersMapperInterface   $mapper
+     * @param CrudInterface               $crud
+     * @param SettingsProviderInterface   $provider
+     * @param JsonSchemasInterface        $jsonSchemas
+     * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
      *
@@ -194,7 +194,7 @@ trait DefaultControllerMethodsTrait
         Closure $apiHandler,
         array $queryParams,
         UriInterface $requestUri,
-        JsonApiQueryValidatingParserInterface $queryParser,
+        JsonApiQueryParserInterface $queryParser,
         ParametersMapperInterface $mapper,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
@@ -216,17 +216,17 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param UriInterface                         $requestUri
-     * @param string                               $requestBody
-     * @param string                               $schemaClass
-     * @param ModelSchemaInfoInterface             $schemaInfo
-     * @param JsonApiDataValidatingParserInterface $validator
-     * @param CrudInterface                        $crud
-     * @param SettingsProviderInterface            $provider
-     * @param JsonSchemasInterface                 $jsonSchemas
-     * @param EncoderInterface                     $encoder
-     * @param FactoryInterface                     $errorFactory
-     * @param FormatterFactoryInterface            $formatterFactory
+     * @param UriInterface               $requestUri
+     * @param string                     $requestBody
+     * @param string                     $schemaClass
+     * @param ModelSchemaInfoInterface   $schemaInfo
+     * @param JsonApiDataParserInterface $validator
+     * @param CrudInterface              $crud
+     * @param SettingsProviderInterface  $provider
+     * @param JsonSchemasInterface       $jsonSchemas
+     * @param EncoderInterface           $encoder
+     * @param FactoryInterface           $errorFactory
+     * @param FormatterFactoryInterface  $formatterFactory
      *
      * @return ResponseInterface
      *
@@ -237,7 +237,7 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataValidatingParserInterface $validator,
+        JsonApiDataParserInterface $validator,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
@@ -261,13 +261,13 @@ trait DefaultControllerMethodsTrait
     }
 
     /**
-     * @param string                               $requestBody
-     * @param string                               $schemaClass
-     * @param ModelSchemaInfoInterface             $schemaInfo
-     * @param JsonApiDataValidatingParserInterface $validator
-     * @param CrudInterface                        $crud
-     * @param FactoryInterface                     $errorFactory
-     * @param FormatterFactoryInterface            $formatterFactory
+     * @param string                     $requestBody
+     * @param string                     $schemaClass
+     * @param ModelSchemaInfoInterface   $schemaInfo
+     * @param JsonApiDataParserInterface $validator
+     * @param CrudInterface              $crud
+     * @param FactoryInterface           $errorFactory
+     * @param FormatterFactoryInterface  $formatterFactory
      *
      * @return ResponseInterface
      */
@@ -275,7 +275,7 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataValidatingParserInterface $validator,
+        JsonApiDataParserInterface $validator,
         CrudInterface $crud,
         FactoryInterface $errorFactory,
         FormatterFactoryInterface $formatterFactory
@@ -319,20 +319,20 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                               $index
-     * @param UriInterface                         $requestUri
-     * @param string                               $requestBody
-     * @param string                               $schemaClass
-     * @param ModelSchemaInfoInterface             $schemaInfo
-     * @param JsonApiDataValidatingParserInterface $validator
-     * @param CrudInterface                        $crud
-     * @param SettingsProviderInterface            $provider
-     * @param JsonSchemasInterface                 $jsonSchemas
-     * @param EncoderInterface                     $encoder
-     * @param FactoryInterface                     $errorFactory
-     * @param FormatterFactoryInterface            $formatterFactory
-     * @param string                               $messagesNamespace
-     * @param string                               $errorMessage
+     * @param string                     $index
+     * @param UriInterface               $requestUri
+     * @param string                     $requestBody
+     * @param string                     $schemaClass
+     * @param ModelSchemaInfoInterface   $schemaInfo
+     * @param JsonApiDataParserInterface $validator
+     * @param CrudInterface              $crud
+     * @param SettingsProviderInterface  $provider
+     * @param JsonSchemasInterface       $jsonSchemas
+     * @param EncoderInterface           $encoder
+     * @param FactoryInterface           $errorFactory
+     * @param FormatterFactoryInterface  $formatterFactory
+     * @param string                     $messagesNamespace
+     * @param string                     $errorMessage
      *
      * @return ResponseInterface
      *
@@ -344,7 +344,7 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataValidatingParserInterface $validator,
+        JsonApiDataParserInterface $validator,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
@@ -373,16 +373,16 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                               $index
-     * @param string                               $requestBody
-     * @param string                               $schemaClass
-     * @param ModelSchemaInfoInterface             $schemaInfo
-     * @param JsonApiDataValidatingParserInterface $validator
-     * @param CrudInterface                        $crud
-     * @param FactoryInterface                     $errorFactory
-     * @param FormatterFactoryInterface            $formatterFactory
-     * @param string                               $messagesNamespace
-     * @param string                               $errorMessage
+     * @param string                     $index
+     * @param string                     $requestBody
+     * @param string                     $schemaClass
+     * @param ModelSchemaInfoInterface   $schemaInfo
+     * @param JsonApiDataParserInterface $validator
+     * @param CrudInterface              $crud
+     * @param FactoryInterface           $errorFactory
+     * @param FormatterFactoryInterface  $formatterFactory
+     * @param string                     $messagesNamespace
+     * @param string                     $errorMessage
      *
      * @return int
      *
@@ -394,7 +394,7 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataValidatingParserInterface $validator,
+        JsonApiDataParserInterface $validator,
         CrudInterface $crud,
         FactoryInterface $errorFactory,
         FormatterFactoryInterface $formatterFactory,
@@ -461,20 +461,20 @@ trait DefaultControllerMethodsTrait
     }
 
     /**
-     * @param string                                $index
-     * @param UriInterface                          $requestUri
-     * @param JsonApiQueryValidatingParserInterface $queryParser
-     * @param CrudInterface                         $crud
-     * @param SettingsProviderInterface             $provider
-     * @param JsonSchemasInterface                  $jsonSchemas
-     * @param EncoderInterface                      $encoder
+     * @param string                      $index
+     * @param UriInterface                $requestUri
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param CrudInterface               $crud
+     * @param SettingsProviderInterface   $provider
+     * @param JsonSchemasInterface        $jsonSchemas
+     * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
      */
     protected static function defaultDeleteHandler(
         string $index,
         UriInterface $requestUri,
-        JsonApiQueryValidatingParserInterface $queryParser,
+        JsonApiQueryParserInterface $queryParser,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
@@ -491,21 +491,21 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                                $index
-     * @param string                                $jsonRelName
-     * @param string                                $modelRelName
-     * @param UriInterface                          $requestUri
-     * @param string                                $requestBody
-     * @param string                                $schemaClass
-     * @param ModelSchemaInfoInterface              $schemaInfo
-     * @param JsonApiQueryValidatingParserInterface $queryParser
-     * @param JsonApiDataValidatingParserInterface  $dataValidator
-     * @param CrudInterface                         $parentCrud
-     * @param SettingsProviderInterface             $provider
-     * @param JsonSchemasInterface                  $jsonSchemas
-     * @param EncoderInterface                      $encoder
-     * @param FactoryInterface                      $errorFactory
-     * @param FormatterFactoryInterface             $formatterFactory
+     * @param string                      $index
+     * @param string                      $jsonRelName
+     * @param string                      $modelRelName
+     * @param UriInterface                $requestUri
+     * @param string                      $requestBody
+     * @param string                      $schemaClass
+     * @param ModelSchemaInfoInterface    $schemaInfo
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param JsonApiDataParserInterface  $dataValidator
+     * @param CrudInterface               $parentCrud
+     * @param SettingsProviderInterface   $provider
+     * @param JsonSchemasInterface        $jsonSchemas
+     * @param EncoderInterface            $encoder
+     * @param FactoryInterface            $errorFactory
+     * @param FormatterFactoryInterface   $formatterFactory
      *
      * @return ResponseInterface
      *
@@ -519,8 +519,8 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiQueryValidatingParserInterface $queryParser,
-        JsonApiDataValidatingParserInterface $dataValidator,
+        JsonApiQueryParserInterface $queryParser,
+        JsonApiDataParserInterface $dataValidator,
         CrudInterface $parentCrud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
@@ -549,21 +549,21 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                                $index
-     * @param string                                $jsonRelName
-     * @param string                                $modelRelName
-     * @param UriInterface                          $requestUri
-     * @param string                                $requestBody
-     * @param string                                $schemaClass
-     * @param ModelSchemaInfoInterface              $schemaInfo
-     * @param JsonApiQueryValidatingParserInterface $queryParser
-     * @param JsonApiDataValidatingParserInterface  $dataValidator
-     * @param CrudInterface                         $parentCrud
-     * @param SettingsProviderInterface             $provider
-     * @param JsonSchemasInterface                  $jsonSchemas
-     * @param EncoderInterface                      $encoder
-     * @param FactoryInterface                      $errorFactory
-     * @param FormatterFactoryInterface             $formatterFactory
+     * @param string                      $index
+     * @param string                      $jsonRelName
+     * @param string                      $modelRelName
+     * @param UriInterface                $requestUri
+     * @param string                      $requestBody
+     * @param string                      $schemaClass
+     * @param ModelSchemaInfoInterface    $schemaInfo
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param JsonApiDataParserInterface  $dataValidator
+     * @param CrudInterface               $parentCrud
+     * @param SettingsProviderInterface   $provider
+     * @param JsonSchemasInterface        $jsonSchemas
+     * @param EncoderInterface            $encoder
+     * @param FactoryInterface            $errorFactory
+     * @param FormatterFactoryInterface   $formatterFactory
      *
      * @return ResponseInterface
      *
@@ -577,8 +577,8 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiQueryValidatingParserInterface $queryParser,
-        JsonApiDataValidatingParserInterface $dataValidator,
+        JsonApiQueryParserInterface $queryParser,
+        JsonApiDataParserInterface $dataValidator,
         CrudInterface $parentCrud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
@@ -607,21 +607,21 @@ trait DefaultControllerMethodsTrait
     }
 
     /** @noinspection PhpTooManyParametersInspection
-     * @param string                                $index
-     * @param string                                $jsonRelName
-     * @param string                                $modelRelName
-     * @param UriInterface                          $requestUri
-     * @param string                                $requestBody
-     * @param string                                $schemaClass
-     * @param ModelSchemaInfoInterface              $schemaInfo
-     * @param JsonApiQueryValidatingParserInterface $queryParser
-     * @param JsonApiDataValidatingParserInterface  $dataValidator
-     * @param CrudInterface                         $crud
-     * @param SettingsProviderInterface             $provider
-     * @param JsonSchemasInterface                  $jsonSchemas
-     * @param EncoderInterface                      $encoder
-     * @param FactoryInterface                      $errorFactory
-     * @param FormatterFactoryInterface             $formatterFactory
+     * @param string                      $index
+     * @param string                      $jsonRelName
+     * @param string                      $modelRelName
+     * @param UriInterface                $requestUri
+     * @param string                      $requestBody
+     * @param string                      $schemaClass
+     * @param ModelSchemaInfoInterface    $schemaInfo
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param JsonApiDataParserInterface  $dataValidator
+     * @param CrudInterface               $crud
+     * @param SettingsProviderInterface   $provider
+     * @param JsonSchemasInterface        $jsonSchemas
+     * @param EncoderInterface            $encoder
+     * @param FactoryInterface            $errorFactory
+     * @param FormatterFactoryInterface   $formatterFactory
      *
      * @return ResponseInterface
      *
@@ -635,8 +635,8 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiQueryValidatingParserInterface $queryParser,
-        JsonApiDataValidatingParserInterface $dataValidator,
+        JsonApiQueryParserInterface $queryParser,
+        JsonApiDataParserInterface $dataValidator,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
@@ -670,7 +670,7 @@ trait DefaultControllerMethodsTrait
      * @param ContainerInterface $container
      * @param string             $rulesClass
      *
-     * @return JsonApiQueryValidatingParserInterface
+     * @return JsonApiQueryParserInterface
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -678,7 +678,7 @@ trait DefaultControllerMethodsTrait
     protected static function defaultCreateQueryParser(
         ContainerInterface $container,
         string $rulesClass = DefaultQueryValidationRules::class
-    ): JsonApiQueryValidatingParserInterface {
+    ): JsonApiQueryParserInterface {
         static::assertClassImplements($rulesClass, JsonApiQueryRulesInterface::class);
 
         /** @var JsonApiParserFactoryInterface $factory */
@@ -692,7 +692,7 @@ trait DefaultControllerMethodsTrait
      * @param ContainerInterface $container
      * @param string             $rulesClass
      *
-     * @return JsonApiDataValidatingParserInterface
+     * @return JsonApiDataParserInterface
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -700,7 +700,7 @@ trait DefaultControllerMethodsTrait
     protected static function defaultCreateDataParser(
         ContainerInterface $container,
         string $rulesClass
-    ): JsonApiDataValidatingParserInterface {
+    ): JsonApiDataParserInterface {
         static::assertClassImplements($rulesClass, JsonApiDataRulesInterface::class);
 
         /** @var JsonApiParserFactoryInterface $factory */
@@ -758,12 +758,12 @@ trait DefaultControllerMethodsTrait
     }
 
     /**
-     * @param JsonApiQueryValidatingParserInterface $queryParser
+     * @param JsonApiQueryParserInterface $queryParser
      *
      * @return EncodingParametersInterface
      */
     protected static function defaultCreateEncodingParameters(
-        JsonApiQueryValidatingParserInterface $queryParser
+        JsonApiQueryParserInterface $queryParser
     ): EncodingParametersInterface {
         return new EncodingParameters(
             $queryParser->hasIncludes() === true ? array_keys($queryParser->getIncludes()) : null,

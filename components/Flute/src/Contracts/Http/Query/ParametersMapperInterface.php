@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Flute\Contracts\Api\CrudInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 
 /**
  * @package Limoncello\Flute
@@ -68,13 +68,13 @@ interface ParametersMapperInterface
     public function getMappedIncludes(): iterable;
 
     /**
-     * @param JsonApiQueryValidatingParserInterface $parser
-     * @param CrudInterface                         $api
+     * @param JsonApiQueryParserInterface $parser
+     * @param CrudInterface               $api
      *
      * @return CrudInterface
      */
     public function applyQueryParameters(
-        JsonApiQueryValidatingParserInterface $parser,
+        JsonApiQueryParserInterface $parser,
         CrudInterface $api
     ): CrudInterface;
 }

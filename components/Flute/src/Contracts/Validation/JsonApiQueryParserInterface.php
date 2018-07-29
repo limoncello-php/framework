@@ -21,7 +21,7 @@ use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 /**
  * @package Limoncello\Application
  */
-interface JsonApiQueryValidatingParserInterface extends BaseQueryParserInterface
+interface JsonApiQueryParserInterface extends BaseQueryParserInterface
 {
     /** Query parameter */
     const PARAM_IDENTITY = 'id';

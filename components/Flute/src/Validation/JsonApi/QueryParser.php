@@ -20,8 +20,8 @@ use Generator;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesSerializerInterface;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryValidatingParserInterface;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Resources\Messages\En\Validation;
@@ -46,7 +46,7 @@ use Neomerx\JsonApi\Http\Query\BaseQueryParserTrait;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class QueryParser implements JsonApiQueryValidatingParserInterface
+class QueryParser implements JsonApiQueryParserInterface
 {
     use BaseQueryParserTrait {
         BaseQueryParserTrait::getFields as getFieldsImpl;
@@ -210,7 +210,7 @@ class QueryParser implements JsonApiQueryValidatingParserInterface
     /**
      * @inheritdoc
      */
-    public function parse(?string $identity, array $parameters = []): JsonApiQueryValidatingParserInterface
+    public function parse(?string $identity, array $parameters = []): JsonApiQueryParserInterface
     {
         $this->clear();
 
