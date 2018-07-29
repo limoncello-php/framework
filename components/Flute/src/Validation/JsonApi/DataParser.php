@@ -185,29 +185,13 @@ class DataParser implements JsonApiDataParserInterface
     /**
      * @inheritdoc
      */
-    public function assert($jsonData): JsonApiDataParserInterface
+    public function assert(array $jsonData): JsonApiDataParserInterface
     {
-        if ($this->validate($jsonData) === false) {
+        if ($this->parse($jsonData) === false) {
             throw new JsonApiException($this->getJsonApiErrorCollection(), $this->getErrorStatus());
         }
 
         return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validate($input): bool
-    {
-        if (is_array($input) === true) {
-            return $this->parse($input);
-        }
-
-        $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-        $details = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-        $this->getJsonApiErrorCollection()->addDataError($title, $details, $this->getErrorStatus());
-
-        return false;
     }
 
     /**
