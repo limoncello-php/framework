@@ -49,6 +49,7 @@ use Limoncello\Tests\Flute\Data\Http\ApiPostsController;
 use Limoncello\Tests\Flute\Data\Http\ApiUsersController;
 use Limoncello\Tests\Flute\Data\Http\FormCommentsController;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
+use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\CommentEmotion;
 use Limoncello\Tests\Flute\Data\Models\Post;
@@ -617,6 +618,56 @@ EOT;
     }
 
     /**
+     * Controller test.
+     *
+     * @throws Exception
+     * @throws DBALException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testCreateDuplicate(): void
+    {
+        $container = $this->createContainer();
+        /** @var Connection $connection */
+        $connection = $container->get(Connection::class);
+
+        // existing role name
+        $boardsTable  = Board::TABLE_NAME;
+        $boardsTitle  = Board::FIELD_TITLE;
+        $existingName = $connection
+            ->executeQuery("SELECT $boardsTitle FROM $boardsTable LIMIT 1")->fetchColumn();
+
+        $jsonInput = <<<EOT
+        {
+            "data" : {
+                "type"  : "boards",
+                "attributes" : {
+                    "title-attribute" : "$existingName"
+                }
+            }
+        }
+EOT;
+
+        $routeParams = [];
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
+        //$request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn([]);
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri('http://localhost.local/comments'));
+
+        /** @var ServerRequestInterface $request */
+
+        $exception = null;
+        try {
+            ApiBoardsController::create($routeParams, $container, $request);
+        } catch (JsonApiException $exception) {
+        }
+        $this->assertNotNull($exception);
+        $this->assertCount(1, $exception->getErrors());
+        $this->assertSame('409', $exception->getErrors()->offsetGet(0)->getStatus());
+    }
+
+    /**
      * Controller test (form validator).
      *
      * @throws Exception
@@ -738,6 +789,58 @@ EOT;
             [[CommentEmotion::FIELD_ID_EMOTION => '2'], [CommentEmotion::FIELD_ID_EMOTION => '3']],
             $emotionIds
         );
+    }
+
+    /**
+     * Controller test.
+     *
+     * @throws Exception
+     * @throws DBALException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testUpdateDuplicate(): void
+    {
+        $container = $this->createContainer();
+        /** @var Connection $connection */
+        $connection = $container->get(Connection::class);
+
+        // existing role name
+        $boardsTable  = Board::TABLE_NAME;
+        $first2boards = $connection->executeQuery("SELECT * FROM $boardsTable LIMIT 2")->fetchAll();
+        $this->assertCount(2, $first2boards);
+        $firstId     = $first2boards[0][Board::FIELD_ID];
+        $secondTitle = $first2boards[1][Board::FIELD_TITLE];
+
+        $jsonInput = <<<EOT
+        {
+            "data" : {
+                "type" : "boards",
+                "id"   : "$firstId",
+                "attributes" : {
+                    "title-attribute" : "$secondTitle"
+                }
+            }
+        }
+EOT;
+
+        $routeParams = [ApiBoardsController::ROUTE_KEY_INDEX => $firstId];
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($jsonInput);
+        //$request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn([]);
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri('http://localhost.local/comments'));
+
+        /** @var ServerRequestInterface $request */
+
+        $exception = null;
+        try {
+            ApiBoardsController::update($routeParams, $container, $request);
+        } catch (JsonApiException $exception) {
+        }
+        $this->assertNotNull($exception);
+        $this->assertCount(1, $exception->getErrors());
+        $this->assertSame('409', $exception->getErrors()->offsetGet(0)->getStatus());
     }
 
     /**

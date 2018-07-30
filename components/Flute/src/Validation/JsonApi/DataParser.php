@@ -71,7 +71,7 @@ class DataParser implements JsonApiDataParserInterface
     private $serializerClass;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $errorStatus;
 
@@ -147,7 +147,6 @@ class DataParser implements JsonApiDataParserInterface
      * @param ContextStorageInterface   $context
      * @param JsonApiErrorCollection    $jsonErrors
      * @param FormatterFactoryInterface $formatterFactory
-     * @param int                       $errorStatus
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -157,8 +156,7 @@ class DataParser implements JsonApiDataParserInterface
         array $serializedData,
         ContextStorageInterface $context,
         JsonApiErrorCollection $jsonErrors,
-        FormatterFactoryInterface $formatterFactory,
-        int $errorStatus = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY
+        FormatterFactoryInterface $formatterFactory
     ) {
         $this
             ->setSerializerClass($serializerClass)
@@ -170,7 +168,7 @@ class DataParser implements JsonApiDataParserInterface
         $ruleSet           = $this->getSerializer()::readRules($rulesClass, $serializedData);
         $this->idRule      = $this->getSerializer()::readIdRuleIndexes($ruleSet);
         $this->typeRule    = $this->getSerializer()::readTypeRuleIndexes($ruleSet);
-        $this->errorStatus = $errorStatus;
+        $this->errorStatus = null;
 
         $this
             ->setAttributeRules($this->getSerializer()::readAttributeRulesIndexes($ruleSet))
@@ -230,8 +228,9 @@ class DataParser implements JsonApiDataParserInterface
         if ($isFoundInToOne === false && $isFoundInToMany === false) {
             $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
             $details = $this->formatMessage(ErrorCodes::UNKNOWN_RELATIONSHIP);
-            $status  = $this->getErrorStatus();
+            $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
             $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $status);
+            $this->addErrorStatus($status);
         } else {
             assert($isFoundInToOne xor $isFoundInToMany);
             $ruleIndexes = $this->getSerializer()::readSingleRuleIndexes(
@@ -248,8 +247,10 @@ class DataParser implements JsonApiDataParserInterface
             $this->executeEnds($this->getSerializer()::readRuleEndIndexes($ruleIndexes));
 
             if (count($this->getErrorAggregator()) > 0) {
+                $status  = JsonApiResponse::HTTP_CONFLICT;
                 foreach ($this->getErrorAggregator()->get() as $error) {
-                    $this->getJsonApiErrorCollection()->addValidationRelationshipError($error);
+                    $this->getJsonApiErrorCollection()->addValidationRelationshipError($error, $status);
+                    $this->addErrorStatus($status);
                 }
                 $this->getErrorAggregator()->clear();
             }
@@ -269,7 +270,8 @@ class DataParser implements JsonApiDataParserInterface
         array $jsonData
     ): JsonApiDataParserInterface {
         if ($this->parseRelationship($index, $name, $jsonData) === false) {
-            throw new JsonApiException($this->getJsonApiErrorCollection(), $this->getErrorStatus());
+            $status = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
+            throw new JsonApiException($this->getJsonApiErrorCollection(), $status);
         }
 
         return $this;
@@ -351,7 +353,9 @@ class DataParser implements JsonApiDataParserInterface
         } else {
             $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
             $details = $this->formatMessage(ErrorCodes::TYPE_MISSING);
-            $this->getJsonApiErrorCollection()->addDataTypeError($title, $details, $this->getErrorStatus());
+            $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
+            $this->getJsonApiErrorCollection()->addDataTypeError($title, $details, $status);
+            $this->addErrorStatus($status);
         }
 
         // execute end(s)
@@ -360,10 +364,12 @@ class DataParser implements JsonApiDataParserInterface
 
         if (count($this->getErrorAggregator()) > 0) {
             $title = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $status  = JsonApiResponse::HTTP_CONFLICT;
             foreach ($this->getErrorAggregator()->get() as $error) {
-                $this->getJsonApiErrorCollection()
-                    ->addDataTypeError($title, $this->getMessage($error), $this->getErrorStatus());
+                $details = $this->getMessage($error);
+                $this->getJsonApiErrorCollection()->addDataTypeError($title, $details, $status);
             }
+            $this->addErrorStatus($status);
             $this->getErrorAggregator()->clear();
         }
 
@@ -396,11 +402,13 @@ class DataParser implements JsonApiDataParserInterface
         $this->executeEnds($ends);
 
         if (count($this->getErrorAggregator()) > 0) {
-            $title = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $title  = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $status = JsonApiResponse::HTTP_CONFLICT;
             foreach ($this->getErrorAggregator()->get() as $error) {
-                $this->getJsonApiErrorCollection()
-                    ->addDataIdError($title, $this->getMessage($error), $this->getErrorStatus());
+                $details = $this->getMessage($error);
+                $this->getJsonApiErrorCollection()->addDataIdError($title, $details, $status);
             }
+            $this->addErrorStatus($status);
             $this->getErrorAggregator()->clear();
         }
 
@@ -427,7 +435,9 @@ class DataParser implements JsonApiDataParserInterface
             if (is_array($attributes = $data[DI::KEYWORD_ATTRIBUTES]) === false) {
                 $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
                 $details = $this->formatMessage(ErrorCodes::INVALID_ATTRIBUTES);
-                $this->getJsonApiErrorCollection()->addAttributesError($title, $details, $this->getErrorStatus());
+                $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
+                $this->getJsonApiErrorCollection()->addAttributesError($title, $details, $status);
+                $this->addErrorStatus($status);
             } else {
                 // execute main validation block(s)
                 foreach ($attributes as $name => $value) {
@@ -436,8 +446,9 @@ class DataParser implements JsonApiDataParserInterface
                     } elseif ($this->isIgnoreUnknowns() === false) {
                         $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
                         $details = $this->formatMessage(ErrorCodes::UNKNOWN_ATTRIBUTE);
-                        $status  = $this->getErrorStatus();
+                        $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
                         $this->getJsonApiErrorCollection()->addDataAttributeError($name, $title, $details, $status);
+                        $this->addErrorStatus($status);
                     }
                 }
             }
@@ -448,9 +459,11 @@ class DataParser implements JsonApiDataParserInterface
         $this->executeEnds($ends);
 
         if (count($this->getErrorAggregator()) > 0) {
+            $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
             foreach ($this->getErrorAggregator()->get() as $error) {
-                $this->getJsonApiErrorCollection()->addValidationAttributeError($error);
+                $this->getJsonApiErrorCollection()->addValidationAttributeError($error, $status);
             }
+            $this->addErrorStatus($status);
             $this->getErrorAggregator()->clear();
         }
 
@@ -480,7 +493,9 @@ class DataParser implements JsonApiDataParserInterface
             if (is_array($relationships = $data[DI::KEYWORD_RELATIONSHIPS]) === false) {
                 $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
                 $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP_TYPE);
-                $this->getJsonApiErrorCollection()->addRelationshipsError($title, $details, $this->getErrorStatus());
+                $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
+                $this->getJsonApiErrorCollection()->addRelationshipsError($title, $details, $status);
+                $this->addErrorStatus($status);
             } else {
                 // ok we got to something that could be null or a valid relationship
                 $toOneIndexes  = $this->getSerializer()::readRulesIndexes($this->getToOneRules());
@@ -497,8 +512,9 @@ class DataParser implements JsonApiDataParserInterface
                         // unknown relationship
                         $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
                         $details = $this->formatMessage(ErrorCodes::UNKNOWN_RELATIONSHIP);
-                        $status  = $this->getErrorStatus();
+                        $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
                         $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $status);
+                        $this->addErrorStatus($status);
                     }
                 }
             }
@@ -512,9 +528,11 @@ class DataParser implements JsonApiDataParserInterface
         $this->executeEnds($ends);
 
         if (count($this->getErrorAggregator()) > 0) {
+            $status  = JsonApiResponse::HTTP_CONFLICT;
             foreach ($this->getErrorAggregator()->get() as $error) {
-                $this->getJsonApiErrorCollection()->addValidationRelationshipError($error);
+                $this->getJsonApiErrorCollection()->addValidationRelationshipError($error, $status);
             }
+            $this->addErrorStatus($status);
             $this->getErrorAggregator()->clear();
         }
 
@@ -541,7 +559,9 @@ class DataParser implements JsonApiDataParserInterface
         } else {
             $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
             $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP);
-            $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $this->getErrorStatus());
+            $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
+            $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $status);
+            $this->addErrorStatus($status);
         }
     }
 
@@ -581,7 +601,9 @@ class DataParser implements JsonApiDataParserInterface
         } else {
             $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
             $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP);
-            $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $this->getErrorStatus());
+            $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
+            $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, $status);
+            $this->addErrorStatus($status);
         }
     }
 
@@ -735,14 +757,6 @@ class DataParser implements JsonApiDataParserInterface
     }
 
     /**
-     * @return int
-     */
-    protected function getErrorStatus(): int
-    {
-        return $this->errorStatus;
-    }
-
-    /**
      * @return bool
      */
     protected function isIgnoreUnknowns(): bool
@@ -768,6 +782,42 @@ class DataParser implements JsonApiDataParserInterface
         $this->isIgnoreUnknowns = false;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    private function getErrorStatus(): int
+    {
+        assert($this->errorStatus !== null, 'Check error code was set');
+
+        return $this->errorStatus;
+    }
+
+    /**
+     * @param int $status
+     */
+    private function addErrorStatus(int $status): void
+    {
+        // Currently (at the moment of writing) the spec is vague about how error status should be set.
+        // On the one side it says, for example, 'A server MUST return 409 Conflict when processing a POST
+        // request to create a resource with a client-generated ID that already exists.'
+        // So you might think 'simple, that should be HTTP status, right?'
+        // But on the other
+        // - 'it [server] MAY continue processing and encounter multiple problems.'
+        // - 'When a server encounters multiple problems for a single request, the most generally applicable
+        //    HTTP error code SHOULD be used in the response. For instance, 400 Bad Request might be appropriate
+        //    for multiple 4xx errors'
+
+        // So, as we might return multiple errors, we have to figure out what is the best status for response.
+
+        // The strategy is the following: for the first error its error code becomes the Response's status.
+        // If any following error code do not match the previous the status becomes generic 400.
+        if ($this->errorStatus === null) {
+            $this->errorStatus = $status;
+        } elseif ($this->errorStatus !== JsonApiResponse::HTTP_BAD_REQUEST && $this->errorStatus !== $status) {
+            $this->errorStatus = JsonApiResponse::HTTP_BAD_REQUEST;
+        }
     }
 
     /**

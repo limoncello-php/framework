@@ -20,6 +20,7 @@ use Limoncello\Flute\Validation\Rules\ApiRulesTrait;
 use Limoncello\Flute\Validation\Rules\DatabaseRulesTrait;
 use Limoncello\Flute\Validation\Rules\RelationshipRulesTrait;
 use Limoncello\Tests\Flute\Data\Api\PostsApi;
+use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Category;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
@@ -33,6 +34,14 @@ use Limoncello\Validation\Rules;
 class AppRules extends Rules
 {
     use RelationshipRulesTrait, DatabaseRulesTrait, ApiRulesTrait;
+
+    /**
+     * @return RuleInterface
+     */
+    public static function boardId(): RuleInterface
+    {
+        return static::stringToInt(static::exists(Board::TABLE_NAME, Board::FIELD_ID));
+    }
 
     /**
      * @return RuleInterface

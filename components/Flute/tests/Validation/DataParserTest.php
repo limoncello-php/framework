@@ -383,7 +383,7 @@ EOT;
         }
         $this->assertTrue($gotException);
 
-        $this->assertEquals(422, $exception->getHttpCode());
+        $this->assertEquals(400, $exception->getHttpCode());
 
         /** @var Error[] $errors */
         $errors = $exception->getErrors();
@@ -397,11 +397,11 @@ EOT;
             $errors[0]->getDetail()
         );
 
-        $this->assertEquals(422, $errors[1]->getStatus());
+        $this->assertEquals(409, $errors[1]->getStatus());
         $this->assertEquals('/data/relationships/user-relationship', $errors[1]->getSource()[Error::SOURCE_POINTER]);
         $this->assertEquals('The value should be between 0 and 5.', $errors[1]->getDetail());
 
-        $this->assertEquals(422, $errors[2]->getStatus());
+        $this->assertEquals(409, $errors[2]->getStatus());
         $this->assertEquals(
             '/data/relationships/emotions-relationship',
             $errors[2]->getSource()[Error::SOURCE_POINTER]
@@ -447,7 +447,7 @@ EOT;
         }
         $this->assertTrue($gotException);
 
-        $this->assertEquals(422, $exception->getHttpCode());
+        $this->assertEquals(400, $exception->getHttpCode());
 
         /** @var Error[] $errors */
         $errors = $exception->getErrors()->getArrayCopy();
@@ -458,11 +458,11 @@ EOT;
         $this->assertEquals('/data/type', $errors[0]->getSource()[Error::SOURCE_POINTER]);
         $this->assertEquals('JSON API type should be specified.', $errors[0]->getDetail());
 
-        $this->assertEquals(422, $errors[1]->getStatus());
+        $this->assertEquals(409, $errors[1]->getStatus());
         $this->assertEquals('/data/type', $errors[1]->getSource()[Error::SOURCE_POINTER]);
         $this->assertEquals('The value is required.', $errors[1]->getDetail());
 
-        $this->assertEquals(422, $errors[2]->getStatus());
+        $this->assertEquals(409, $errors[2]->getStatus());
         $this->assertEquals('/data/id', $errors[2]->getSource()[Error::SOURCE_POINTER]);
         $this->assertEquals('The value is required.', $errors[2]->getDetail());
 
@@ -470,11 +470,11 @@ EOT;
         $this->assertEquals('/data/attributes/text-attribute', $errors[3]->getSource()[Error::SOURCE_POINTER]);
         $this->assertEquals('The value is required.', $errors[3]->getDetail());
 
-        $this->assertEquals(422, $errors[4]->getStatus());
+        $this->assertEquals(409, $errors[4]->getStatus());
         $this->assertEquals('/data/relationships/user-relationship', $errors[4]->getSource()[Error::SOURCE_POINTER]);
         $this->assertEquals('The value is required.', $errors[4]->getDetail());
 
-        $this->assertEquals(422, $errors[5]->getStatus());
+        $this->assertEquals(409, $errors[5]->getStatus());
         $this->assertEquals(
             '/data/relationships/emotions-relationship',
             $errors[5]->getSource()[Error::SOURCE_POINTER]
@@ -534,7 +534,7 @@ EOT;
         }
         $this->assertTrue($gotException);
 
-        $this->assertEquals(422, $exception->getHttpCode());
+        $this->assertEquals(400, $exception->getHttpCode());
 
         /** @var Error[] $errors */
         $errors = $exception->getErrors()->getArrayCopy();
@@ -552,7 +552,7 @@ EOT;
         );
         $this->assertEquals('Invalid JSON API relationship.', $errors[1]->getDetail());
 
-        $this->assertEquals(422, $errors[2]->getStatus());
+        $this->assertEquals(409, $errors[2]->getStatus());
         $this->assertEquals(
             '/data/relationships/user-relationship',
             $errors[2]->getSource()[Error::SOURCE_POINTER]

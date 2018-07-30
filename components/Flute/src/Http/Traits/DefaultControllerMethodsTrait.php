@@ -17,6 +17,7 @@
  */
 
 use Closure;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
@@ -37,6 +38,7 @@ use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
+use Limoncello\Flute\Http\JsonApiResponse;
 use Limoncello\Flute\Http\Responses;
 use Limoncello\Flute\Package\FluteSettings as S;
 use Limoncello\Flute\Resources\Messages\En\Generic;
@@ -227,6 +229,8 @@ trait DefaultControllerMethodsTrait
      * @param EncoderInterface           $encoder
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
+     * @param string                     $messagesNamespace
+     * @param string                     $errorMessage
      *
      * @return ResponseInterface
      *
@@ -243,7 +247,9 @@ trait DefaultControllerMethodsTrait
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder,
         FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory
+        FormatterFactoryInterface $formatterFactory,
+        string $messagesNamespace = S::GENERIC_NAMESPACE,
+        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
     ): ResponseInterface {
         // some of the users want to reuse default `create` but have a custom part for responses
         // to meet this requirement it is split into two parts.
@@ -254,13 +260,15 @@ trait DefaultControllerMethodsTrait
             $validator,
             $crud,
             $errorFactory,
-            $formatterFactory
+            $formatterFactory,
+            $messagesNamespace,
+            $errorMessage
         );
 
         return static::defaultCreateResponse($index, $requestUri, $crud, $provider, $jsonSchemas, $encoder);
     }
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @param string                     $requestBody
      * @param string                     $schemaClass
      * @param ModelSchemaInfoInterface   $schemaInfo
@@ -268,6 +276,8 @@ trait DefaultControllerMethodsTrait
      * @param CrudInterface              $crud
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
+     * @param string                     $messagesNamespace
+     * @param string                     $errorMessage
      *
      * @return ResponseInterface
      */
@@ -278,14 +288,34 @@ trait DefaultControllerMethodsTrait
         JsonApiDataParserInterface $validator,
         CrudInterface $crud,
         FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory
+        FormatterFactoryInterface $formatterFactory,
+        string $messagesNamespace = S::GENERIC_NAMESPACE,
+        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
     ): string {
-        $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
+        $jsonData = static::readJsonFromRequest(
+            $requestBody,
+            $errorFactory,
+            $formatterFactory,
+            $messagesNamespace,
+            $errorMessage
+        );
+
         $captures = $validator->assert($jsonData)->getCaptures();
 
         list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
-        $index = $crud->create($index, $attributes, $toMany);
+        try {
+            $index = $crud->create($index, $attributes, $toMany);
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $exception) {
+            $errors    = $errorFactory->createErrorCollection();
+            $formatter = $formatterFactory->createFormatter($messagesNamespace);
+            $title     = $formatter->formatMessage($errorMessage);
+            $details   = null;
+            $errorCode = JsonApiResponse::HTTP_CONFLICT;
+            $errors->addDataError($title, $details, $errorCode);
+
+            throw new JsonApiException($errors);
+        }
 
         return $index;
     }
@@ -401,7 +431,14 @@ trait DefaultControllerMethodsTrait
         string $messagesNamespace = S::GENERIC_NAMESPACE,
         string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
     ): int {
-        $jsonData = static::readJsonFromRequest($requestBody, $errorFactory, $formatterFactory);
+        $jsonData = static::readJsonFromRequest(
+            $requestBody,
+            $errorFactory,
+            $formatterFactory,
+            $messagesNamespace,
+            $errorMessage
+        );
+
         // check that index in data and URL are identical
         $indexValue = $jsonData[DI::KEYWORD_DATA][DI::KEYWORD_ID] ?? null;
         if (empty($indexValue) === false) {
@@ -421,7 +458,18 @@ trait DefaultControllerMethodsTrait
 
         list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
-        $updated = $crud->update($index, $attributes, $toMany);
+        try {
+            $updated = $crud->update($index, $attributes, $toMany);
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $exception) {
+            $errors    = $errorFactory->createErrorCollection();
+            $formatter = $formatterFactory->createFormatter($messagesNamespace);
+            $title     = $formatter->formatMessage($errorMessage);
+            $details   = null;
+            $errorCode = JsonApiResponse::HTTP_CONFLICT;
+            $errors->addDataError($title, $details, $errorCode);
+
+            throw new JsonApiException($errors);
+        }
 
         return $updated;
     }

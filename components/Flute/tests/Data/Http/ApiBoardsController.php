@@ -20,6 +20,8 @@ use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Tests\Flute\Data\Api\BoardsApi as Api;
 use Limoncello\Tests\Flute\Data\Models\Board as Model;
 use Limoncello\Tests\Flute\Data\Schemas\BoardSchema as Schema;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\CreateBoardRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateBoardRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonQueries\ReadBoardsQueryRules;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -43,6 +45,12 @@ class ApiBoardsController extends ApiBaseController
 
     /** @inheritdoc */
     const ON_READ_QUERY_VALIDATION_RULES_CLASS = ReadBoardsQueryRules::class;
+
+    /** @inheritdoc */
+    const ON_CREATE_DATA_VALIDATION_RULES_CLASS = CreateBoardRules::class;
+
+    /** @inheritdoc */
+    const ON_UPDATE_DATA_VALIDATION_RULES_CLASS = UpdateBoardRules::class;
 
     /**
      * @param array                  $routeParams

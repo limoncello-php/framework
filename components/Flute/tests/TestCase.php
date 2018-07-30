@@ -43,7 +43,9 @@ use Limoncello\Tests\Flute\Data\Schemas\PostSchema;
 use Limoncello\Tests\Flute\Data\Schemas\RoleSchema;
 use Limoncello\Tests\Flute\Data\Schemas\UserSchema;
 use Limoncello\Tests\Flute\Data\Seeds\Runner as SeedRunner;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\CreateBoardRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\CreateCommentRules;
+use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateBoardRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateCommentRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdatePostRules;
 use Limoncello\Tests\Flute\Data\Validation\JsonData\UpdateUserMinimalRules;
@@ -249,6 +251,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function getJsonValidationRuleSets()
     {
         return [
+            CreateBoardRules::class,
+            UpdateBoardRules::class,
             CreateCommentRules::class,
             UpdateCommentRules::class,
             UpdatePostRules::class,
