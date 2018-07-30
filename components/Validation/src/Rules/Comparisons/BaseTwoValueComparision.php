@@ -40,6 +40,11 @@ abstract class BaseTwoValueComparision extends BaseRule implements ComparisionIn
     const PROPERTY_UPPER_VALUE = self::PROPERTY_LOWER_VALUE + 1;
 
     /**
+     * Property key.
+     */
+    const PROPERTY_TWO_VALUE_LAST = self::PROPERTY_UPPER_VALUE;
+
+    /**
      * @var mixed
      */
     private $lowerValue;

@@ -37,6 +37,11 @@ abstract class BaseOneValueComparision extends BaseRule implements ComparisionIn
     const PROPERTY_VALUE = self::PROPERTY_LAST + 1;
 
     /**
+     * Property key.
+     */
+    const PROPERTY_ONE_VALUE_LAST = self::PROPERTY_VALUE;
+
+    /**
      * @var mixed
      */
     private $value;
