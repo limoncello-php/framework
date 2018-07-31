@@ -106,6 +106,58 @@ class FluteRoutesTraitTest extends TestCase
     }
 
     /**
+     * Test helper method.
+     *
+     * @throws Exception
+     */
+    public function testAddInRelationshipMethod(): void
+    {
+        /** @var Mock $group */
+        $group = Mockery::mock(GroupInterface::class);
+
+        $group->shouldReceive('post')->once()->withAnyArgs()->andReturnSelf();
+
+        /** @var GroupInterface $group */
+
+        $this->addInRelationship(
+            $group,
+            CategorySchema::TYPE,
+            CategorySchema::REL_CHILDREN,
+            ApiCategoriesController::class,
+            'readChildren'
+        );
+
+        // mockery will do checks when the test finished
+        $this->assertTrue(true);
+    }
+
+    /**
+     * Test helper method.
+     *
+     * @throws Exception
+     */
+    public function testRemoveInRelationshipMethod(): void
+    {
+        /** @var Mock $group */
+        $group = Mockery::mock(GroupInterface::class);
+
+        $group->shouldReceive('delete')->once()->withAnyArgs()->andReturnSelf();
+
+        /** @var GroupInterface $group */
+
+        $this->removeInRelationship(
+            $group,
+            CategorySchema::TYPE,
+            CategorySchema::REL_CHILDREN,
+            ApiCategoriesController::class,
+            'readChildren'
+        );
+
+        // mockery will do checks when the test finished
+        $this->assertTrue(true);
+    }
+
+    /**
      * Test how predictable/stable generated route names are.
      *
      * @return void

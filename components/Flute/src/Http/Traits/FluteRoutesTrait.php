@@ -147,9 +147,6 @@ trait FluteRoutesTrait
         string $controllerClass,
         string $selfGetMethod
     ): GroupInterface {
-        /** @var string $controllerClass */
-        /** @var string $schemaClass */
-
         $resourceIdUri = $resourceName . '/{' . JCI::ROUTE_KEY_INDEX . '}/';
         $selfUri       = $resourceIdUri . DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $relationshipName;
 
@@ -158,6 +155,50 @@ trait FluteRoutesTrait
             ->get($selfUri, [$controllerClass, $selfGetMethod])
             // `related`
             ->get($resourceIdUri . $relationshipName, [$controllerClass, $selfGetMethod]);
+    }
+
+    /**
+     * @param GroupInterface $group
+     * @param string         $resourceName
+     * @param string         $relationshipName
+     * @param string         $controllerClass
+     * @param string         $addMethod
+     *
+     * @return GroupInterface
+     */
+    protected static function addInRelationship(
+        GroupInterface $group,
+        string $resourceName,
+        string $relationshipName,
+        string $controllerClass,
+        string $addMethod
+    ): GroupInterface {
+        $url = $resourceName . '/{' . JCI::ROUTE_KEY_INDEX . '}/' .
+            DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $relationshipName;
+
+        return $group->post($url, [$controllerClass, $addMethod]);
+    }
+
+    /**
+     * @param GroupInterface $group
+     * @param string         $resourceName
+     * @param string         $relationshipName
+     * @param string         $controllerClass
+     * @param string         $deleteMethod
+     *
+     * @return GroupInterface
+     */
+    protected static function removeInRelationship(
+        GroupInterface $group,
+        string $resourceName,
+        string $relationshipName,
+        string $controllerClass,
+        string $deleteMethod
+    ): GroupInterface {
+        $url = $resourceName . '/{' . JCI::ROUTE_KEY_INDEX . '}/' .
+            DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $relationshipName;
+
+        return $group->delete($url, [$controllerClass, $deleteMethod]);
     }
 
     /**
