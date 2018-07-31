@@ -172,6 +172,19 @@ class CallTraitsTest extends TestCase
     }
 
     /**
+     * Test call web method.
+     */
+    public function testJsonApiDelete(): void
+    {
+        $json   = '{}';
+        $server = ['CONTENT_TYPE' => 'application/vnd.api+json'];
+
+        $this->willBeCalled('DELETE', $server, $json);
+
+        $this->deleteJsonApi(self::URI, $json);
+    }
+
+    /**
      * Test subscriptions to internal app events.
      */
     public function testEvenSubscriptions(): void

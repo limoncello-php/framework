@@ -86,6 +86,25 @@ trait JsonApiCallsTrait
     }
 
     /**
+     * @param string $uri
+     * @param string $json
+     * @param array  $headers
+     * @param array  $cookies
+     *
+     * @return ResponseInterface
+     */
+    protected function deleteJsonApi(
+        string $uri,
+        string $json,
+        array $headers = [],
+        array $cookies = []
+    ): ResponseInterface {
+        $headers['CONTENT_TYPE'] = 'application/vnd.api+json';
+
+        return $this->call('DELETE', $uri, [], [], $headers, $cookies, [], [], $this->streamFromString($json));
+    }
+
+    /**
      * @param string $content
      *
      * @return StreamInterface
