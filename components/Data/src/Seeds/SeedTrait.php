@@ -22,6 +22,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Types\Type;
 use Exception;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\SeedInterface;
@@ -137,16 +138,19 @@ trait SeedTrait
      * @param int     $records
      * @param string  $tableName
      * @param Closure $dataClosure
+     * @param array   $columnTypes
      *
      * @return void
      *
      * @throws DBALException
      */
-    protected function seedTableData(int $records, $tableName, Closure $dataClosure): void
+    protected function seedTableData(int $records, $tableName, Closure $dataClosure, array $columnTypes = []): void
     {
+        $attributeTypeGetter = $this->createAttributeTypeGetter($columnTypes);
+
         $connection = $this->getConnection();
         for ($i = 0; $i !== $records; $i++) {
-            $this->insertRow($tableName, $connection, $dataClosure($this->getContainer()));
+            $this->insertRow($tableName, $connection, $dataClosure($this->getContainer()), $attributeTypeGetter);
         }
     }
 
@@ -161,20 +165,25 @@ trait SeedTrait
      */
     protected function seedModelsData(int $records, string $modelClass, Closure $dataClosure): void
     {
-        $this->seedTableData($records, $this->getModelSchemas()->getTable($modelClass), $dataClosure);
+        $attributeTypes = $this->getModelSchemas()->getAttributeTypes($modelClass);
+
+        $this->seedTableData($records, $this->getModelSchemas()->getTable($modelClass), $dataClosure, $attributeTypes);
     }
 
     /**
      * @param string $tableName
      * @param array  $data
+     * @param array  $columnTypes
      *
      * @return void
      *
      * @throws DBALException
      */
-    protected function seedRowData(string $tableName, array $data): void
+    protected function seedRowData(string $tableName, array $data, array $columnTypes = []): void
     {
-        $this->insertRow($tableName, $this->getConnection(), $data);
+        $attributeTypeGetter = $this->createAttributeTypeGetter($columnTypes);
+
+        $this->insertRow($tableName, $this->getConnection(), $data, $attributeTypeGetter);
     }
 
     /**
@@ -187,7 +196,9 @@ trait SeedTrait
      */
     protected function seedModelData(string $modelClass, array $data): void
     {
-        $this->seedRowData($this->getModelSchemas()->getTable($modelClass), $data);
+        $attributeTypes = $this->getModelSchemas()->getAttributeTypes($modelClass);
+
+        $this->seedRowData($this->getModelSchemas()->getTable($modelClass), $data, $attributeTypes);
     }
 
     /**
@@ -202,23 +213,40 @@ trait SeedTrait
      * @param string     $tableName
      * @param Connection $connection
      * @param array      $data
+     * @param Closure    $getColumnType
      *
      * @return void
      *
      * @throws DBALException
      */
-    private function insertRow($tableName, Connection $connection, array $data): void
+    private function insertRow($tableName, Connection $connection, array $data, Closure $getColumnType): void
     {
+        $types        = [];
         $quotedFields = [];
         foreach ($data as $column => $value) {
-            $quotedFields[$connection->quoteIdentifier($column)] = $value;
+            $name                = $connection->quoteIdentifier($column);
+            $quotedFields[$name] = $value;
+            $types[$name]        = $getColumnType($column);
         }
 
         try {
-            $result = $connection->insert($tableName, $quotedFields);
+            $result = $connection->insert($tableName, $quotedFields, $types);
             assert($result !== false, 'Insert failed');
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $e) {
             // ignore non-unique records
         }
+    }
+
+    /**
+     * @param array $attributeTypes
+     *
+     * @return Closure
+     */
+    private function createAttributeTypeGetter(array $attributeTypes): Closure
+    {
+        return function (string $attributeType) use ($attributeTypes) : string {
+            return array_key_exists($attributeType, $attributeTypes) === true ?
+                $attributeTypes[$attributeType] : Type::STRING;
+        };
     }
 }

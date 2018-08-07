@@ -53,11 +53,12 @@ class SeedTraitTest extends TestCase
     {
         $tableName  = 'table_name';
         $columnName = self::TEST_COLUMN_NAME;
+        $types      = [$columnName => Type::STRING];
 
         $modelSchemas = Mockery::mock(ModelSchemaInfoInterface::class);
 
         $container = $this->createContainer($modelSchemas);
-        $this->prepareTable($modelSchemas, self::TEST_MODEL_CLASS, $tableName);
+        $this->prepareTable($modelSchemas, self::TEST_MODEL_CLASS, $tableName, $types);
 
         $manager = $this->connection->getSchemaManager();
         $table   = new Table(
@@ -161,13 +162,15 @@ class SeedTraitTest extends TestCase
      * @param MockInterface $mock
      * @param string        $modelClass
      * @param string        $tableName
+     * @param array         $attributeTypes
      *
      * @return Mock
      */
-    private function prepareTable($mock, string $modelClass, string $tableName)
+    private function prepareTable($mock, string $modelClass, string $tableName, array $attributeTypes)
     {
         /** @var Mock $mock */
         $mock->shouldReceive('getTable')->zeroOrMoreTimes()->with($modelClass)->andReturn($tableName);
+        $mock->shouldReceive('getAttributeTypes')->zeroOrMoreTimes()->with($modelClass)->andReturn($attributeTypes);
 
         return $mock;
     }
