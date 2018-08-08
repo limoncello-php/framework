@@ -36,7 +36,8 @@ final class {%SINGULAR_CC%}Rules extends BaseRules
     }
 
     /**
-     * NOTE: It recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
+     * NOTE: If you plan to use this resource in `belongs-to` relationship,
+     *       it is recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
      *
      * @param RuleInterface|null $next
      *
@@ -48,7 +49,8 @@ final class {%SINGULAR_CC%}Rules extends BaseRules
     }
 
     /**
-     * NOTE: It recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
+     * NOTE: If you plan to use this resource in `belongs-to-many` relationship,
+     *       it is recommended to move this method to `BaseRules` so it will be accessible in all validation rule sets.
      *
      * @param RuleInterface|null $next
      *
