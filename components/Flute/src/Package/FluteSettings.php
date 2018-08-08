@@ -203,16 +203,16 @@ abstract class FluteSettings implements FluteSettingsInterface
     }
 
     /**
-     * @param string $validatorsPath
+     * @param string $rulesPath
      * @param string $queriesValPath
      *
      * @return array
      */
-    private function serializeJsonValidationRules(string $validatorsPath, string $queriesValPath): array
+    private function serializeJsonValidationRules(string $rulesPath, string $queriesValPath): array
     {
         // JSON API data validation rules
         $dataSerializer = new JsonApiDataRulesSerializer(new BlockSerializer());
-        foreach ($this->selectClasses($validatorsPath, JsonApiDataRulesInterface::class) as $rulesClass) {
+        foreach ($this->selectClasses($rulesPath, JsonApiDataRulesInterface::class) as $rulesClass) {
             $dataSerializer->addRulesFromClass($rulesClass);
         }
 

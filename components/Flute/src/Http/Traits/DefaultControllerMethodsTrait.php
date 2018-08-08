@@ -222,7 +222,7 @@ trait DefaultControllerMethodsTrait
      * @param string                     $requestBody
      * @param string                     $schemaClass
      * @param ModelSchemaInfoInterface   $schemaInfo
-     * @param JsonApiDataParserInterface $validator
+     * @param JsonApiDataParserInterface $parser
      * @param CrudInterface              $crud
      * @param SettingsProviderInterface  $provider
      * @param JsonSchemasInterface       $jsonSchemas
@@ -241,7 +241,7 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataParserInterface $validator,
+        JsonApiDataParserInterface $parser,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
@@ -257,7 +257,7 @@ trait DefaultControllerMethodsTrait
             $requestBody,
             $schemaClass,
             $schemaInfo,
-            $validator,
+            $parser,
             $crud,
             $errorFactory,
             $formatterFactory,
@@ -272,7 +272,7 @@ trait DefaultControllerMethodsTrait
      * @param string                     $requestBody
      * @param string                     $schemaClass
      * @param ModelSchemaInfoInterface   $schemaInfo
-     * @param JsonApiDataParserInterface $validator
+     * @param JsonApiDataParserInterface $parser
      * @param CrudInterface              $crud
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
@@ -285,7 +285,7 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataParserInterface $validator,
+        JsonApiDataParserInterface $parser,
         CrudInterface $crud,
         FactoryInterface $errorFactory,
         FormatterFactoryInterface $formatterFactory,
@@ -300,7 +300,7 @@ trait DefaultControllerMethodsTrait
             $errorMessage
         );
 
-        $captures = $validator->assert($jsonData)->getCaptures();
+        $captures = $parser->assert($jsonData)->getCaptures();
 
         list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
@@ -354,7 +354,7 @@ trait DefaultControllerMethodsTrait
      * @param string                     $requestBody
      * @param string                     $schemaClass
      * @param ModelSchemaInfoInterface   $schemaInfo
-     * @param JsonApiDataParserInterface $validator
+     * @param JsonApiDataParserInterface $parser
      * @param CrudInterface              $crud
      * @param SettingsProviderInterface  $provider
      * @param JsonSchemasInterface       $jsonSchemas
@@ -374,7 +374,7 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataParserInterface $validator,
+        JsonApiDataParserInterface $parser,
         CrudInterface $crud,
         SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
@@ -391,7 +391,7 @@ trait DefaultControllerMethodsTrait
             $requestBody,
             $schemaClass,
             $schemaInfo,
-            $validator,
+            $parser,
             $crud,
             $errorFactory,
             $formatterFactory,
@@ -407,7 +407,7 @@ trait DefaultControllerMethodsTrait
      * @param string                     $requestBody
      * @param string                     $schemaClass
      * @param ModelSchemaInfoInterface   $schemaInfo
-     * @param JsonApiDataParserInterface $validator
+     * @param JsonApiDataParserInterface $parser
      * @param CrudInterface              $crud
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
@@ -424,7 +424,7 @@ trait DefaultControllerMethodsTrait
         string $requestBody,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo,
-        JsonApiDataParserInterface $validator,
+        JsonApiDataParserInterface $parser,
         CrudInterface $crud,
         FactoryInterface $errorFactory,
         FormatterFactoryInterface $formatterFactory,
@@ -454,7 +454,7 @@ trait DefaultControllerMethodsTrait
             $jsonData[DI::KEYWORD_DATA][DI::KEYWORD_ID] = $index;
         }
         // validate the data
-        $captures = $validator->assert($jsonData)->getCaptures();
+        $captures = $parser->assert($jsonData)->getCaptures();
 
         list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
@@ -730,10 +730,10 @@ trait DefaultControllerMethodsTrait
         static::assertClassImplements($rulesClass, JsonApiQueryRulesInterface::class);
 
         /** @var JsonApiParserFactoryInterface $factory */
-        $factory   = $container->get(JsonApiParserFactoryInterface::class);
-        $validator = $factory->createQueryParser($rulesClass);
+        $factory = $container->get(JsonApiParserFactoryInterface::class);
+        $parser  = $factory->createQueryParser($rulesClass);
 
-        return $validator;
+        return $parser;
     }
 
     /**
@@ -752,10 +752,10 @@ trait DefaultControllerMethodsTrait
         static::assertClassImplements($rulesClass, JsonApiDataRulesInterface::class);
 
         /** @var JsonApiParserFactoryInterface $factory */
-        $factory   = $container->get(JsonApiParserFactoryInterface::class);
-        $validator = $factory->createDataParser($rulesClass);
+        $factory = $container->get(JsonApiParserFactoryInterface::class);
+        $parser  = $factory->createDataParser($rulesClass);
 
-        return $validator;
+        return $parser;
     }
 
     /**

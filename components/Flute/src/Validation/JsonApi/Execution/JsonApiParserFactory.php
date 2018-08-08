@@ -60,7 +60,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
 
         /** @var FormatterFactoryInterface $formatterFactory */
         $formatterFactory = $this->getContainer()->get(FormatterFactoryInterface::class);
-        $validator = new DataParser(
+        $parser           = new DataParser(
             $rulesClass,
             JsonApiDataRulesSerializer::class,
             $serializedData,
@@ -69,7 +69,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
             $this->getContainer()->get(FormatterFactoryInterface::class)
         );
 
-        return $validator;
+        return $parser;
     }
 
     /**
@@ -83,7 +83,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
 
         /** @var FormatterFactoryInterface $formatterFactory */
         $formatterFactory = $this->getContainer()->get(FormatterFactoryInterface::class);
-        $validator        = new QueryParser(
+        $parser           = new QueryParser(
             $rulesClass,
             JsonApiQueryRulesSerializer::class,
             $serializedData,
@@ -94,7 +94,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
             $this->getContainer()->get(FormatterFactoryInterface::class)
         );
 
-        return $validator;
+        return $parser;
     }
 
     /**
