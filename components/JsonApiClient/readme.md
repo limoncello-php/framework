@@ -28,6 +28,7 @@ const query = (new QueryBuilder('comments'))
         operation: 'greater-than',
         parameters: '10'
     })
+    .combineFiltersWithAnd() // default and could be omitted
     .withSorts({
         field: 'title',
         isAscending: false
@@ -65,6 +66,10 @@ interface QueryBuilderInterface {
 
     withFilters(...filters: FilterParameterInterface[]): QueryBuilderInterface;
 
+    combineFiltersWithAnd(): QueryBuilderInterface;
+
+    combineFiltersWithOr(): QueryBuilderInterface;
+
     withSorts(...sorts: SortParameterInterface[]): QueryBuilderInterface;
 
     withIncludes(...relationships: RelationshipName[]): QueryBuilderInterface;
@@ -82,6 +87,8 @@ interface QueryBuilderInterface {
 ```
 
 Methods `onlyFields`, `withFilters`, `withSorts` and `withPagination` are fully shown in the example above and can accept 1 or more input parameters.
+
+Methods `combineFiltersWithAnd` / `combineFiltersWithOr` switch combining filter arguments either with `AND` (default) / `OR` clauses.
 
 Methods `enableEncodeUri` / `disableEncodeUri` enable and disable encoding query parameters after `?` mark in accordance with [RFC 3986](https://tools.ietf.org/html/rfc3986). By default query parameters will be encoded.
 

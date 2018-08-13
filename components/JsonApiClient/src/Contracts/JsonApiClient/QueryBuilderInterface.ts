@@ -25,6 +25,10 @@ export interface QueryBuilderInterface {
 
     withFilters(...filters: FilterParameterInterface[]): QueryBuilderInterface;
 
+    combineFiltersWithAnd(): QueryBuilderInterface;
+
+    combineFiltersWithOr(): QueryBuilderInterface;
+
     withSorts(...sorts: SortParameterInterface[]): QueryBuilderInterface;
 
     withIncludes(...relationships: RelationshipName[]): QueryBuilderInterface;

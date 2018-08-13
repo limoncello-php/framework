@@ -41,6 +41,11 @@ export class QueryBuilder implements QueryBuilderInterface {
     /**
      * @internal
      */
+    private useAndWithFilters: boolean;
+
+    /**
+     * @internal
+     */
     private sorts: SortParameterInterface[] | undefined;
 
     /**
@@ -61,6 +66,7 @@ export class QueryBuilder implements QueryBuilderInterface {
     private isEncodeUriEnabled: boolean;
 
     constructor(type: ResourceType) {
+        this.useAndWithFilters = true;
         this.isEncodeUriEnabled = true;
         this.type = type;
     }
@@ -73,6 +79,18 @@ export class QueryBuilder implements QueryBuilderInterface {
 
     public withFilters(...filters: FilterParameterInterface[]): QueryBuilderInterface {
         this.filters = filters;
+
+        return this;
+    }
+
+    public combineFiltersWithAnd(): QueryBuilderInterface {
+        this.useAndWithFilters = true;
+
+        return this;
+    }
+
+    public combineFiltersWithOr(): QueryBuilderInterface {
+        this.useAndWithFilters = false;
 
         return this;
     }
@@ -151,14 +169,16 @@ export class QueryBuilder implements QueryBuilderInterface {
         }
 
         // add filter parameters to get URL like 'filter[id][greater-than]=10&filter[id][less-than]=20&filter[title][like]=%Typ%'
+        // filters could be joined with `AND` (default) / `OR` (e.g. filter[or][field][operation]=...&filter[or][...]...)
         // note: the spec do not specify format for filters http://jsonapi.org/format/#fetching-filtering
         if (isIncludeNonFields === true && this.filters !== undefined && this.filters.length > 0) {
             let filtersResult = '';
+            const operationPrefix = this.useAndWithFilters === true ? '' : '[or]';
             for (let filter of this.filters) {
                 const params = filter.parameters;
                 const curResult = params === undefined ?
-                    `filter[${filter.field}][${filter.operation}]` :
-                    `filter[${filter.field}][${filter.operation}]=${QueryBuilder.separateByComma(params)}`;
+                    `filter${operationPrefix}[${filter.field}][${filter.operation}]` :
+                    `filter${operationPrefix}[${filter.field}][${filter.operation}]=${QueryBuilder.separateByComma(params)}`;
                 filtersResult = filtersResult.length === 0 ? curResult : `${filtersResult}&${curResult}`;
             }
             params = params === null ? filtersResult : `${params}&${filtersResult}`;

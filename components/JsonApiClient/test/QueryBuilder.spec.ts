@@ -122,6 +122,48 @@ describe('Query builder', () => {
         expect(actualUrl).to.equal(expectedUrl);
     });
 
+    it('should silently combine index filter parameters for AND operation', () => {
+        const builder = new QueryBuilder('comments');
+
+        const expectedUrl = '/comments?filter[id][greater-than]=10&filter[id][less-than]=20';
+        const actualUrl = builder
+            .combineFiltersWithAnd()
+            .withFilters({
+                field: 'id',
+                operation: 'greater-than',
+                parameters: '10'
+            }, {
+                field: 'id',
+                operation: 'less-than',
+                parameters: '20'
+            })
+            .disableEncodeUri()
+            .index();
+
+        expect(actualUrl).to.equal(expectedUrl);
+    });
+
+    it('should combine index filter parameters for OR operation', () => {
+        const builder = new QueryBuilder('comments');
+
+        const expectedUrl = '/comments?filter[or][id][greater-than]=10&filter[or][id][less-than]=20';
+        const actualUrl = builder
+            .combineFiltersWithOr()
+            .withFilters({
+                field: 'id',
+                operation: 'greater-than',
+                parameters: '10'
+            }, {
+                field: 'id',
+                operation: 'less-than',
+                parameters: '20'
+            })
+            .disableEncodeUri()
+            .index();
+
+        expect(actualUrl).to.equal(expectedUrl);
+    });
+
     it('should build index URLs with one sorting parameter', () => {
         const builder = new QueryBuilder('comments');
 
