@@ -48,6 +48,7 @@ trait HttpCallsTrait
      * @param array  $data
      * @param array  $headers
      * @param array  $cookies
+     * @param array  $files
      *
      * @return ResponseInterface
      */
@@ -55,11 +56,12 @@ trait HttpCallsTrait
         string $uri,
         array $data = [],
         array $headers = [],
-        array $cookies = []
+        array $cookies = [],
+        array $files = []
     ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
 
-        return $this->call('POST', $uri, [], $data, $headers, $cookies);
+        return $this->call('POST', $uri, [], $data, $headers, $cookies, $files);
     }
 
     /**
@@ -67,6 +69,7 @@ trait HttpCallsTrait
      * @param array  $data
      * @param array  $headers
      * @param array  $cookies
+     * @param array  $files
      *
      * @return ResponseInterface
      */
@@ -74,11 +77,12 @@ trait HttpCallsTrait
         string $uri,
         array $data = [],
         array $headers = [],
-        array $cookies = []
+        array $cookies = [],
+        array $files = []
     ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
 
-        return $this->call('PUT', $uri, [], $data, $headers, $cookies);
+        return $this->call('PUT', $uri, [], $data, $headers, $cookies, $files);
     }
 
     /**
@@ -86,6 +90,7 @@ trait HttpCallsTrait
      * @param array  $data
      * @param array  $headers
      * @param array  $cookies
+     * @param array  $files
      *
      * @return ResponseInterface
      */
@@ -93,11 +98,12 @@ trait HttpCallsTrait
         string $uri,
         array $data = [],
         array $headers = [],
-        array $cookies = []
+        array $cookies = [],
+        array $files = []
     ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
 
-        return $this->call('PATCH', $uri, [], $data, $headers, $cookies);
+        return $this->call('PATCH', $uri, [], $data, $headers, $cookies, $files);
     }
 
     /**

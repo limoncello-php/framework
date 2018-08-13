@@ -33,6 +33,7 @@ trait JsonApiCallsTrait
      * @param string $json
      * @param array  $headers
      * @param array  $cookies
+     * @param array  $files
      *
      * @return ResponseInterface
      */
@@ -40,11 +41,12 @@ trait JsonApiCallsTrait
         string $uri,
         string $json,
         array $headers = [],
-        array $cookies = []
+        array $cookies = [],
+        array $files = []
     ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/vnd.api+json';
 
-        return $this->call('POST', $uri, [], [], $headers, $cookies, [], [], $this->streamFromString($json));
+        return $this->call('POST', $uri, [], [], $headers, $cookies, $files, [], $this->streamFromString($json));
     }
 
     /**
@@ -52,6 +54,7 @@ trait JsonApiCallsTrait
      * @param string $json
      * @param array  $headers
      * @param array  $cookies
+     * @param array  $files
      *
      * @return ResponseInterface
      */
@@ -59,11 +62,12 @@ trait JsonApiCallsTrait
         string $uri,
         string $json,
         array $headers = [],
-        array $cookies = []
+        array $cookies = [],
+        array $files = []
     ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/vnd.api+json';
 
-        return $this->call('PUT', $uri, [], [], $headers, $cookies, [], [], $this->streamFromString($json));
+        return $this->call('PUT', $uri, [], [], $headers, $cookies, $files, [], $this->streamFromString($json));
     }
 
     /**
@@ -71,6 +75,7 @@ trait JsonApiCallsTrait
      * @param string $json
      * @param array  $headers
      * @param array  $cookies
+     * @param array  $files
      *
      * @return ResponseInterface
      */
@@ -78,11 +83,12 @@ trait JsonApiCallsTrait
         string $uri,
         string $json,
         array $headers = [],
-        array $cookies = []
+        array $cookies = [],
+        array $files = []
     ): ResponseInterface {
         $headers['CONTENT_TYPE'] = 'application/vnd.api+json';
 
-        return $this->call('PATCH', $uri, [], [], $headers, $cookies, [], [], $this->streamFromString($json));
+        return $this->call('PATCH', $uri, [], [], $headers, $cookies, $files, [], $this->streamFromString($json));
     }
 
     /**
