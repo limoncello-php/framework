@@ -1,5 +1,5 @@
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import { SortParameterInterface } from './SortParameterInterface';
 export interface QueryBuilderInterface {
     onlyFields(...fields: FieldParameterInterface[]): QueryBuilderInterface;
     withFilters(...filters: FilterParameterInterface[]): QueryBuilderInterface;
+    combineFiltersWithAnd(): QueryBuilderInterface;
+    combineFiltersWithOr(): QueryBuilderInterface;
     withSorts(...sorts: SortParameterInterface[]): QueryBuilderInterface;
     withIncludes(...relationships: RelationshipName[]): QueryBuilderInterface;
     withPagination(offset: number, limit: number): QueryBuilderInterface;
