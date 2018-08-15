@@ -378,6 +378,18 @@ trait MigrationTrait
 
     /**
      * @param string $name
+     *
+     * @return Closure
+     */
+    protected function binary(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, Type::BINARY)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
      * @param array  $values
      *
      * @return Closure

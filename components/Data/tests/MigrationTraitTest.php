@@ -70,6 +70,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         $columnNullableUInt     = 'col_nullable_u_int';
         $columnFloat            = 'col_float';
         $columnBool             = 'col_bool';
+        $columnBinary           = 'col_binary';
         $columnNonNullDate      = 'col_non_null_date';
         $columnNullableDate     = 'col_nullable_date';
         $columnNonNullDateTime  = 'col_non_null_datetime';
@@ -88,6 +89,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
             $this->nullableUnsignedInt($columnNullableUInt),
             $this->float($columnFloat),
             $this->bool($columnBool, true),
+            $this->binary($columnBinary),
             $this->timestamps(),
             $this->date($columnNonNullDate),
             $this->nullableDate($columnNullableDate),
@@ -169,6 +171,9 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
 
         $this->assertEquals('boolean', $columnsCreated[$columnBool]->getType()->getName());
         $this->assertTrue($columnsCreated[$columnBool]->getNotnull());
+
+        $this->assertEquals('blob', $columnsCreated[$columnBinary]->getType()->getName());
+        $this->assertTrue($columnsCreated[$columnBinary]->getNotnull());
 
         $this->assertEquals('datetime', $columnsCreated[TSF::FIELD_CREATED_AT]->getType()->getName());
         $this->assertTrue($columnsCreated[TSF::FIELD_CREATED_AT]->getNotnull());
