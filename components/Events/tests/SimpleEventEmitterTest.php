@@ -20,6 +20,7 @@ use Limoncello\Events\SimpleEventEmitter;
 use Limoncello\Tests\Events\Data\Events\OrderCreatedEvent;
 use Limoncello\Tests\Events\Data\Events\OrderUpdatedEvent;
 use Limoncello\Tests\Events\Data\Events\UserCreatedEvent;
+use Limoncello\Tests\Events\Data\Events\NoHandlerEvent;
 use Limoncello\Tests\Events\Data\Events\UserUpdatedEvent;
 use Limoncello\Tests\Events\Data\EventSettings;
 use Limoncello\Tests\Events\Data\Subscribers\GenericSubscribers;
@@ -99,8 +100,9 @@ class SimpleEventEmitterTest extends TestCase
         $emitter->subscribe('event2', [$this, self::PUBLIC_NON_STATIC_NAME]);
 
         $this->assertEquals([
-            'event1' => [[self::class, self::PUBLIC_STATIC_NAME], ],
-        ], $emitter->getStaticSubscribers());
+            ['event1' => true, 'event2' => true],
+            ['event1' => [[self::class, self::PUBLIC_STATIC_NAME], ],]
+        ], $emitter->getData());
 
         $emitter->emit('event1');
         $this->assertTrue(static::$publicStaticCalled);
@@ -153,9 +155,9 @@ class SimpleEventEmitterTest extends TestCase
         $emitter1->subscribe($eventName, [$this, self::PUBLIC_NON_STATIC_NAME]);
         $emitter1->subscribe($eventName, self::class . '::' . self::PUBLIC_STATIC_NAME);
 
-        $cache = $emitter1->getStaticSubscribers();
+        $cache = $emitter1->getData();
 
-        $emitter2 = (new SimpleEventEmitter())->disableCancelling()->setStaticSubscribers($cache);
+        $emitter2 = (new SimpleEventEmitter())->disableCancelling()->setData($cache);
 
         $emitter2->emit($eventName);
         $this->assertTrue(static::$publicStaticCalled);
@@ -196,10 +198,12 @@ class SimpleEventEmitterTest extends TestCase
         $cacheData = (new EventSettings())->get($appConfig)[EventSettings::KEY_CACHED_DATA];
 
         // it has 4 sections for each non-abstract event we have described
-        $this->assertCount(4, $cacheData);
+        $this->assertCount(2, $cacheData);
+        $this->assertCount(9, $cacheData[0]);
+        $this->assertCount(4, $cacheData[1]);
 
         // now do some actual event testing
-        $events = (new SimpleEventEmitter())->setStaticSubscribers($cacheData);
+        $events = (new SimpleEventEmitter())->setData($cacheData);
 
         // 1
         $this->resetSubscribers();
@@ -256,6 +260,20 @@ class SimpleEventEmitterTest extends TestCase
         $this->assertTrue(UserSubscribers::isOnBaseUser());
         $this->assertFalse(UserSubscribers::isOnUserCreated());
         $this->assertTrue(UserSubscribers::isOnUserUpdated());
+
+        // check sending event with no handlers works fine
+        $this->resetSubscribers();
+        $events->dispatch(new NoHandlerEvent());
+        $this->assertFalse(GenericSubscribers::isOnCreated());
+        $this->assertFalse(GenericSubscribers::isOnUpdated());
+        $this->assertFalse(OrderSubscribers::isOnOrder());
+        $this->assertFalse(OrderSubscribers::isOnBaseOrder());
+        $this->assertFalse(OrderSubscribers::isOnOrderCreated());
+        $this->assertFalse(OrderSubscribers::isOnOrderUpdated());
+        $this->assertFalse(UserSubscribers::isOnUser());
+        $this->assertFalse(UserSubscribers::isOnBaseUser());
+        $this->assertFalse(UserSubscribers::isOnUserCreated());
+        $this->assertFalse(UserSubscribers::isOnUserUpdated());
     }
 
     /**

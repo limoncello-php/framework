@@ -30,6 +30,13 @@ use ReflectionMethod;
 class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterface
 {
     /**
+     * All events known to system with or without corresponding event handler.
+     *
+     * @var array
+     */
+    private $allowedEvents = [];
+
+    /**
      * @var array
      */
     private $subscribers = [];
@@ -58,6 +65,32 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
     }
 
     /**
+     * @param string $eventName
+     *
+     * @return SimpleEventEmitter
+     */
+    public function addAllowedEvent(string $eventName): self
+    {
+        $this->allowedEvents[$eventName] = true;
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $eventNames
+     *
+     * @return SimpleEventEmitter
+     */
+    public function addAllowedEvents(array $eventNames): self
+    {
+        foreach ($eventNames as $eventName) {
+            $this->addAllowedEvent($eventName);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string   $eventName
      * @param callable $subscriber
      *
@@ -73,6 +106,8 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
             assert($staticMethod !== null);
             $this->subscribers[$eventName][] = $this->getUnifiedStaticMethodRepresentation($staticMethod);
         }
+
+        $this->addAllowedEvent($eventName);
 
         return $this;
     }
@@ -128,23 +163,27 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
     }
 
     /**
-     * @param array $subscribers
+     * @param array $data
      *
      * @return self
      */
-    public function setStaticSubscribers(array $subscribers): self
+    public function setData(array $data): self
     {
+        assert(count($data) == 2);
+
+        [$allowedEvents, $subscribers] = $data;
+
         assert($this->checkAllSubscribersAreStatic($subscribers) === true);
 
-        return $this->setSubscribers($subscribers);
+        return $this->setAllowedEvents($allowedEvents)->setSubscribers($subscribers);
     }
 
     /**
      * @return array
      */
-    public function getStaticSubscribers(): array
+    public function getData(): array
     {
-        $result = [];
+        $subscribers = [];
 
         foreach ($this->getSubscribers() as $eventName => $subscribersList) {
             $eventSubscribers = [];
@@ -155,11 +194,43 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
             }
 
             if (empty($eventSubscribers) === false) {
-                $result[$eventName] = $eventSubscribers;
+                $subscribers[$eventName] = $eventSubscribers;
             }
         }
 
-        return $result;
+        $data = [$this->getAllowedEvents(), $subscribers];
+
+        return $data;
+    }
+
+    /**
+     * @param string $eventName
+     *
+     * @return bool
+     */
+    protected function isEventAllowed(string $eventName): bool
+    {
+        return array_key_exists($eventName, $this->allowedEvents);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAllowedEvents(): array
+    {
+        return $this->allowedEvents;
+    }
+
+    /**
+     * @param array $allowedEvents
+     *
+     * @return self
+     */
+    protected function setAllowedEvents(array $allowedEvents): self
+    {
+        $this->allowedEvents = $allowedEvents;
+
+        return $this;
     }
 
     /**
@@ -217,12 +288,11 @@ class SimpleEventEmitter implements EventEmitterInterface, EventDispatcherInterf
      */
     private function getEventSubscribers(string $eventName): array
     {
-        $subscribers = $this->getSubscribers();
-        if (array_key_exists($eventName, $subscribers) === false) {
+        if ($this->isEventAllowed($eventName) === false) {
             throw new EventNotFoundException($eventName);
         }
 
-        $result = $subscribers[$eventName];
+        $result = $this->getSubscribers()[$eventName] ?? [];
 
         return $result;
     }

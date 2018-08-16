@@ -43,7 +43,7 @@ class EventsContainerConfigurator implements ContainerConfiguratorInterface
             if ($emitter === null) {
                 $emitter   = new SimpleEventEmitter();
                 $cacheData = $container->get(SettingsProviderInterface::class)->get(C::class)[C::KEY_CACHED_DATA];
-                $emitter->setStaticSubscribers($cacheData);
+                $emitter->setData($cacheData);
             }
 
             return $emitter;

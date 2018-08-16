@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Generator;
 use Limoncello\Contracts\Settings\Packages\EventSettingsInterface;
 use Limoncello\Core\Reflection\ClassIsTrait;
 use Limoncello\Events\Contracts\EventHandlerInterface;
@@ -67,18 +66,22 @@ abstract class EventSettings implements EventSettingsInterface
         $eventsPath      = $eventsFolder . DIRECTORY_SEPARATOR . $eventsFileMask;
         $subscribersPath = $subscribersFolder . DIRECTORY_SEPARATOR . $subscribersFileMask;
 
-        $emitter        = new SimpleEventEmitter();
-        $eventClasses   = iterator_to_array(
+        $emitter      = new SimpleEventEmitter();
+        $eventClasses = iterator_to_array(
             $this->selectClasses($eventsPath, EventInterface::class)
         );
         $handlerClasses = iterator_to_array(
             $this->selectClasses($subscribersPath, EventHandlerInterface::class)
         );
+
+        $allowedEvents = $this->getParentEvents($eventClasses);
+        $emitter->addAllowedEvents($allowedEvents);
+
         foreach ($this->getEventSubscribers($eventClasses, $handlerClasses) as $eventClass => $subscriber) {
             $emitter->subscribe($eventClass, $subscriber);
         }
 
-        $cacheData = $emitter->getStaticSubscribers();
+        $cacheData = $emitter->getData();
 
         return $defaults + [static::KEY_CACHED_DATA => $cacheData];
     }
@@ -95,14 +98,14 @@ abstract class EventSettings implements EventSettingsInterface
     }
 
     /**
-     * @param array $eventClasses
-     * @param array $handlerClasses
+     * @param iterable $eventClasses
+     * @param iterable $handlerClasses
      *
-     * @return Generator
+     * @return iterable
      *
      * @throws ReflectionException
      */
-    private function getEventSubscribers(array $eventClasses, array $handlerClasses): Generator
+    private function getEventSubscribers(iterable $eventClasses, iterable $handlerClasses): iterable
     {
         foreach ($handlerClasses as $handlerClass) {
             foreach ($this->selectEvenHandlers($handlerClass) as $eventClass => $subscriber) {
@@ -116,11 +119,11 @@ abstract class EventSettings implements EventSettingsInterface
     /**
      * @param string $handlerClass
      *
-     * @return Generator
+     * @return iterable
      *
      * @throws ReflectionException
      */
-    private function selectEvenHandlers(string $handlerClass): Generator
+    private function selectEvenHandlers(string $handlerClass): iterable
     {
         $reflection = new ReflectionClass($handlerClass);
         foreach ($reflection->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC) as $method) {
@@ -133,14 +136,14 @@ abstract class EventSettings implements EventSettingsInterface
     }
 
     /**
-     * @param string $eventClass
-     * @param array  $eventClasses
+     * @param string   $eventClass
+     * @param iterable $eventClasses
      *
-     * @return Generator
+     * @return iterable
      *
      * @throws ReflectionException
      */
-    private function getChildEvents(string $eventClass, array $eventClasses): Generator
+    private function getChildEvents(string $eventClass, iterable $eventClasses): iterable
     {
         $reflection = new ReflectionClass($eventClass);
         foreach ($eventClasses as $curEventClass) {
@@ -157,6 +160,31 @@ abstract class EventSettings implements EventSettingsInterface
     }
 
     /**
+     * @param iterable $eventClasses
+     *
+     * @return array
+     */
+    private function getParentEvents(iterable $eventClasses): array
+    {
+        $matches = [];
+
+        foreach ($eventClasses as $eventClass) {
+            // class itself
+            if ($this->doesImplementEventInterface($eventClass) === true) {
+                $matches[$eventClass] = true;
+            }
+            // parent classes or interfaces
+            foreach (class_implements($eventClass, true) as $classOrInterface) {
+                if ($this->doesImplementEventInterface($classOrInterface) === true) {
+                    $matches[$classOrInterface] = true;
+                }
+            }
+        }
+
+        return array_keys($matches);
+    }
+
+    /**
      * @param ReflectionMethod $method
      *
      * @return bool
@@ -170,5 +198,21 @@ abstract class EventSettings implements EventSettingsInterface
             $params[0]->getClass()->implementsInterface(EventInterface::class) === true;
 
         return $result;
+    }
+
+    /**
+     * @param string $classOrInterface
+     *
+     * @return bool
+     */
+    private function doesImplementEventInterface(string $classOrInterface): bool
+    {
+        $isClass     = class_exists($classOrInterface, true);
+        $isInterface = interface_exists($classOrInterface, true);
+        assert($isClass xor $isInterface);
+
+        $isEvent = in_array(EventInterface::class, class_implements($classOrInterface));
+
+        return $isEvent;
     }
 }
