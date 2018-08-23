@@ -105,8 +105,6 @@ class Application extends \Limoncello\Core\Application\Application
         $routeConfigurators = [];
         $coreData           = $this->getCoreData();
         if (empty($method) === false && empty($path) === false) {
-            // for console command things like `Request` and `Response` do not have much sense
-            // thus we take only container configurators and ignore everything else (e.g. middleware).
             list(, , , , , $routeConfigurators) = $this->initRouter($coreData)->match($method, $path);
         }
 
