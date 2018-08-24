@@ -23,6 +23,9 @@ use Psr\Container\ContainerInterface;
  */
 interface CommandInterface
 {
+    /** @var string Command's handler method name */
+    const COMMAND_METHOD_NAME = 'execute';
+
     /** Data argument key */
     const ARGUMENT_NAME = 0;
 

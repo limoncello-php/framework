@@ -37,7 +37,7 @@ trait CommandSerializationTrait
             $commandClass::getHelp(),
             $commandClass::getArguments(),
             $commandClass::getOptions(),
-            [$commandClass, 'execute'],
+            [$commandClass, CommandInterface::COMMAND_METHOD_NAME],
         ];
     }
 }
