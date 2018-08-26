@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Contracts\Settings\SettingsInterface;
-use Limoncello\Core\Reflection\CheckCallableTrait;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

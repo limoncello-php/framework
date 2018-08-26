@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
-use Limoncello\Core\Reflection\ClassIsTrait;
 
 /**
  * @package Limoncello\Application

@@ -717,8 +717,6 @@ class PassportServerTest extends TestCase
 
     /**
      * @return PassportServerInterface
-     *
-     * @throws ConnectionException
      */
     private function createPassportServer(): PassportServerInterface
     {

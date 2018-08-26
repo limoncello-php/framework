@@ -32,7 +32,7 @@ use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\PolicyInterface
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\RuleInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
-use Limoncello\Core\Reflection\ClassIsTrait;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use ReflectionClass;
 use ReflectionException;
 
@@ -94,6 +94,7 @@ class AuthorizationRulesLoader
      */
     private function getAuthorizationRulesClasses(string $policiesPath): array
     {
+        /** @noinspection PhpParamsInspection */
         return iterator_to_array($this->selectClasses($policiesPath, AuthorizationRulesInterface::class));
     }
 

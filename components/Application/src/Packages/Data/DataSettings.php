@@ -17,12 +17,12 @@
  */
 
 use Limoncello\Application\Data\ModelSchemaInfo;
+use Limoncello\Common\Reflection\CheckCallableTrait;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\Settings\Packages\DataSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsInterface;
-use Limoncello\Core\Reflection\CheckCallableTrait;
-use Limoncello\Core\Reflection\ClassIsTrait;
 use Psr\Container\ContainerInterface;
 use ReflectionException;
 
@@ -176,6 +176,7 @@ abstract class DataSettings implements SettingsInterface, DataSettingsInterface
             }
         };
 
+        /** @noinspection PhpParamsInspection */
         $modelClasses = iterator_to_array($this->selectClasses($modelsPath, ModelInterface::class));
         array_map($registerModel, $modelClasses);
 

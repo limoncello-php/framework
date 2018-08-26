@@ -18,6 +18,8 @@
 
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
 use Generator;
+use Limoncello\Common\Reflection\CheckCallableTrait;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
 use Limoncello\Contracts\Application\MiddlewareInterface;
 use Limoncello\Contracts\Application\RoutesConfiguratorInterface;
@@ -28,8 +30,6 @@ use Limoncello\Contracts\Provider\ProvidesRouteConfiguratorsInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Core\Application\BaseCoreData;
-use Limoncello\Core\Reflection\CheckCallableTrait;
-use Limoncello\Core\Reflection\ClassIsTrait;
 use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;

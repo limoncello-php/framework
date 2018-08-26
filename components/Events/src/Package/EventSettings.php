@@ -17,7 +17,7 @@
  */
 
 use Limoncello\Contracts\Settings\Packages\EventSettingsInterface;
-use Limoncello\Core\Reflection\ClassIsTrait;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Events\Contracts\EventHandlerInterface;
 use Limoncello\Events\Contracts\EventInterface;
 use Limoncello\Events\SimpleEventEmitter;
@@ -67,9 +67,11 @@ abstract class EventSettings implements EventSettingsInterface
         $subscribersPath = $subscribersFolder . DIRECTORY_SEPARATOR . $subscribersFileMask;
 
         $emitter      = new SimpleEventEmitter();
+        /** @noinspection PhpParamsInspection */
         $eventClasses = iterator_to_array(
             $this->selectClasses($eventsPath, EventInterface::class)
         );
+        /** @noinspection PhpParamsInspection */
         $handlerClasses = iterator_to_array(
             $this->selectClasses($subscribersPath, EventHandlerInterface::class)
         );

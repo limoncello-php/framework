@@ -18,7 +18,7 @@
 
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\Packages\PassportSettingsInterface;
-use Limoncello\Core\Reflection\CheckCallableTrait;
+use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;

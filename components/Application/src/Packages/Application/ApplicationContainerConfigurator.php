@@ -17,6 +17,7 @@
  */
 
 use Limoncello\Application\Commands\CommandStorage;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as S;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Application\ContainerConfiguratorInterface;
@@ -24,7 +25,6 @@ use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\CommandStorageInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Provider\ProvidesCommandsInterface;
-use Limoncello\Core\Reflection\ClassIsTrait;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 
 /**

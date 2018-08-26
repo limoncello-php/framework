@@ -17,8 +17,8 @@
  */
 
 use Limoncello\Application\Exceptions\InvalidSettingsClassException;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Settings\SettingsInterface;
-use Limoncello\Core\Reflection\ClassIsTrait;
 use ReflectionClass;
 use ReflectionException;
 

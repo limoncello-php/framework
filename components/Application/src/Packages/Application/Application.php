@@ -20,6 +20,7 @@ use Limoncello\Application\CoreSettings\CoreData;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
 use Limoncello\Application\Settings\InstanceSettingsProvider;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
@@ -29,7 +30,6 @@ use Limoncello\Contracts\Provider\ProvidesSettingsInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Core\Application\Sapi;
-use Limoncello\Core\Reflection\ClassIsTrait;
 use ReflectionException;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
@@ -189,6 +189,7 @@ class Application extends \Limoncello\Core\Application\Application
      */
     private function createApplicationConfiguration(): A
     {
+        /** @noinspection PhpParamsInspection */
         $classes = iterator_to_array(static::selectClasses($this->getSettingsPath(), A::class));
         assert(
             count($classes) > 0,
