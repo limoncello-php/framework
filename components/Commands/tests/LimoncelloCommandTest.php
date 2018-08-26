@@ -19,7 +19,6 @@
 use Composer\Composer;
 use Exception;
 use Limoncello\Commands\CommandConstants;
-use Limoncello\Commands\CommandRoutesTrait;
 use Limoncello\Commands\LimoncelloCommand;
 use Limoncello\Commands\Traits\CacheFilePathTrait;
 use Limoncello\Commands\Traits\CommandSerializationTrait;
@@ -31,14 +30,11 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
-use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Tests\Commands\Data\TestApplication;
 use Limoncello\Tests\Commands\Data\TestCliRoutesConfigurator;
 use Limoncello\Tests\Commands\Data\TestCommand;
 use Mockery;
 use Mockery\MockInterface;
-use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -48,7 +44,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class LimoncelloCommandTest extends TestCase
 {
-    use CacheFilePathTrait, CommandSerializationTrait, CommandTrait, CommandRoutesTrait;
+    use CacheFilePathTrait, CommandSerializationTrait, CommandTrait;
 
     /** @var bool */
     private static $executedFlag = false;
@@ -274,37 +270,6 @@ class LimoncelloCommandTest extends TestCase
         /** @var Composer $composer */
 
         $this->createContainer($composer);
-    }
-
-    /**
-     * Test trait method.
-     *
-     * @throws Exception
-     */
-    public function testCommandContainer(): void
-    {
-        /** @var Mockery\Mock $group */
-        $group = Mockery::mock(GroupInterface::class);
-        $group->shouldReceive('method')->once()->withAnyArgs()->andReturnSelf();
-
-        /** @var GroupInterface $group */
-
-        $commandName = 'some_command';
-        $this->assertSame($group, static::commandContainer($group, $commandName, [self::class, 'callback1']));
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testHandlerStubShouldFail()
-    {
-        $request   = Mockery::mock(ServerRequestInterface::class);
-        $container = Mockery::mock(PsrContainerInterface::class);
-
-        /** @var PsrContainerInterface $container */
-        /** @var ServerRequestInterface $request */
-
-        static::handlerStub([], $container, $request);
     }
 
     /**

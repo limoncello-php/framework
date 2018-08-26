@@ -17,7 +17,6 @@
  */
 
 use Composer\Composer;
-use Limoncello\Commands\CommandRoutesTrait;
 use Limoncello\Commands\CommandsCommand;
 use Limoncello\Commands\Traits\CacheFilePathTrait;
 use Limoncello\Commands\Traits\CommandSerializationTrait;
@@ -39,7 +38,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CommandsCommandTest extends TestCase
 {
-    use CacheFilePathTrait, CommandSerializationTrait, CommandTrait, CommandRoutesTrait;
+    use CacheFilePathTrait, CommandSerializationTrait, CommandTrait;
 
     /** @var bool */
     private static $executedFlag = false;
