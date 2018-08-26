@@ -132,7 +132,7 @@ class LimoncelloCommand extends BaseCommand
             $container = $this->createContainer($this->getComposer());
             assert($container instanceof LimoncelloContainerInterface);
 
-            $this->executeCommand($this->callable, $this->wrapIo($input, $output), $container);
+            $this->executeCommand($this->getName(), $this->callable, $this->wrapIo($input, $output), $container);
         } catch (Exception $exception) {
             if ($container !== null && $container->has(ThrowableHandlerInterface::class) === true) {
                 /** @var ThrowableHandlerInterface $handler */

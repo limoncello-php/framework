@@ -42,16 +42,23 @@ trait ExecuteCommandTrait
     use ClassIsTrait;
 
     /**
+     * @param string                       $name
      * @param callable                     $handler
      * @param IoInterface                  $inOut
      * @param LimoncelloContainerInterface $container
+     *
+     * @return void
      *
      * @throws ReflectionException
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function executeCommand(callable $handler, IoInterface $inOut, LimoncelloContainerInterface $container): void
-    {
+    public function executeCommand(
+        string $name,
+        callable $handler,
+        IoInterface $inOut,
+        LimoncelloContainerInterface $container
+    ): void {
         // This method does bootstrap for every command (e.g. configure containers)
         // and then calls the actual command handler.
 
@@ -86,7 +93,7 @@ trait ExecuteCommandTrait
         }
 
         [$configurators, $middleware]
-            = $this->readExtraContainerConfiguratorsAndMiddleware($routesPath, $this->getName());
+            = $this->readExtraContainerConfiguratorsAndMiddleware($routesPath, $name);
 
         $this->executeContainerConfigurators($configurators, $container);
 
