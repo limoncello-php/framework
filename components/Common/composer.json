@@ -1,0 +1,52 @@
+{
+    "name": "limoncello-php/common",
+    "description": "PHP framework common (PSR-7).",
+    "keywords": ["limoncello", "framework", "PSR-7", "PSR7"],
+    "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Common",
+    "support": {
+        "issues": "https://github.com/limoncello-php/framework/issues"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "neomerx",
+            "email": "info@neomerx.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "limoncello-php/contracts": "^0.10.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^2.9",
+        "phpmd/phpmd": "^2.6",
+        "scrutinizer/ocular": "^1.4",
+        "phpunit/phpunit": "^7.0",
+        "mockery/mockery": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Limoncello\\Common\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Limoncello\\Tests\\Common\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": ["@test-unit-with-coverage", "@test-cs", "@test-md"],
+        "test-unit": "./vendor/bin/phpunit",
+        "test-unit-with-coverage": "./vendor/bin/phpunit --coverage-text",
+        "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
+        "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
+        "test-unit-php-7-2": "docker-compose run --rm cli_7_2_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-1": "docker-compose run --rm cli_7_1_php php ./vendor/bin/phpunit",
+        "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php -d hhvm.php7.all=1 ./vendor/bin/phpunit"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "0.10.x-dev"
+        }
+    }
+}
