@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Generator;
 use Limoncello\Flute\Contracts\Validation\FormRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
@@ -27,6 +26,14 @@ use Limoncello\Flute\Package\FluteSettings;
  */
 class Flute extends FluteSettings
 {
+    /**
+     * During the test we need to replace one of the static methods we inherit but non-static
+     * replacement is more preferable for us so we keep last instance as a static variable.
+     *
+     * @var self
+     */
+    private static $currentInstance;
+
     /**
      * @var string[]
      */
@@ -106,6 +113,8 @@ class Flute extends FluteSettings
         $this->jsonValRuleSets  = $jsonRuleSets;
         $this->formValRuleSets  = $formRuleSets;
         $this->queryValRuleSets = $queryRuleSets;
+
+        static::$currentInstance = $this;
     }
 
     /**
@@ -124,10 +133,18 @@ class Flute extends FluteSettings
             ];
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection
+     * @inheritdoc
+     */
+    protected static function selectClasses(string $path, string $implementClassName): iterable
+    {
+        return static::$currentInstance->selectClassesCustom($path, $implementClassName);
+    }
+
     /**
      * @inheritdoc
      */
-    protected function selectClasses(string $path, string $implementClassName): Generator
+    protected function selectClassesCustom(string $path, string $implementClassName): iterable
     {
         $settings      = parent::getSettings();
         $schemasPath   = $this->schemasPath . DIRECTORY_SEPARATOR . $settings[static::KEY_SCHEMAS_FILE_MASK];
