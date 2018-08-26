@@ -19,6 +19,7 @@
         "zendframework/zend-diactoros": "^1.7",
         "doctrine/dbal": "^2.6.3",
         "neomerx/json-api": "^2.0.0",
+        "limoncello-php/common": "^0.10.0",
         "limoncello-php/contracts": "^0.10.0",
         "limoncello-php/l10n": "^0.10.0",
         "limoncello-php/validation": "^0.10.0"

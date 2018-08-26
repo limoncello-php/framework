@@ -1,6 +1,6 @@
 <?php namespace Limoncello\Flute\Package;
 
-use Generator;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Settings\Packages\FluteSettingsInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
@@ -14,12 +14,15 @@ use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiQueryRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Limoncello\Validation\Execution\BlockSerializer;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use ReflectionException;
 
 /**
  * @package Limoncello\Flute
  */
 abstract class FluteSettings implements FluteSettingsInterface
 {
+    use ClassIsTrait;
+
     /**
      * Namespace for string resources.
      */
@@ -47,17 +50,11 @@ abstract class FluteSettings implements FluteSettingsInterface
     protected const JSON_API_QUERIES_VALIDATION_RULES_SERIALIZED = self::JSON_API_DATA_VALIDATION_RULES_SERIALIZED + 1;
 
     /**
-     * @param string $path
-     * @param string $implementClassName
-     *
-     * @return Generator
-     */
-    abstract protected function selectClasses(string $path, string $implementClassName): Generator;
-
-    /**
      * @param array $appConfig
      *
      * @return array
+     *
+     * @throws ReflectionException
      */
     final public function get(array $appConfig): array
     {
@@ -168,6 +165,8 @@ abstract class FluteSettings implements FluteSettingsInterface
      * @param bool   $requireUniqueTypes
      *
      * @return array
+     *
+     * @throws ReflectionException
      */
     private function createModelToSchemaMap(string $schemasPath, bool $requireUniqueTypes): array
     {
@@ -207,6 +206,8 @@ abstract class FluteSettings implements FluteSettingsInterface
      * @param string $queriesValPath
      *
      * @return array
+     *
+     * @throws ReflectionException
      */
     private function serializeJsonValidationRules(string $rulesPath, string $queriesValPath): array
     {
@@ -235,6 +236,8 @@ abstract class FluteSettings implements FluteSettingsInterface
      * @param string $formsValPath
      *
      * @return array
+     *
+     * @throws ReflectionException
      */
     private function serializeFormValidationRules(string $formsValPath): array
     {
