@@ -369,7 +369,7 @@ class LimoncelloCommandTest extends TestCase
         $container = Mockery::mock(LimoncelloContainerInterface::class);
 
         // add some app settings to container
-        $routesPath = implode(DIRECTORY_SEPARATOR, [__DIR__, 'Data', '*.php']);
+        $routesFolder = implode(DIRECTORY_SEPARATOR, [__DIR__, 'Data',]);
         $container
             ->shouldReceive('get')->once()
             ->with(CacheSettingsProviderInterface::class)
@@ -378,7 +378,8 @@ class LimoncelloCommandTest extends TestCase
             ->shouldReceive('getApplicationConfiguration')->once()
             ->withNoArgs()
             ->andReturn([
-                ApplicationConfigurationInterface::KEY_ROUTES_FOLDER => $routesPath,
+                ApplicationConfigurationInterface::KEY_ROUTES_FOLDER    => $routesFolder,
+                ApplicationConfigurationInterface::KEY_ROUTES_FILE_MASK => '*.php',
             ]);
         // add FileSystem to container
         $container
@@ -387,7 +388,7 @@ class LimoncelloCommandTest extends TestCase
             ->andReturnSelf();
         $container
             ->shouldReceive('exists')->once()
-            ->with($routesPath)
+            ->with($routesFolder)
             ->andReturn(true);
 
         return $container;

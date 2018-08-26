@@ -151,7 +151,7 @@ class LimoncelloCommand extends BaseCommand
             // anything to it (technically we can but in some cases it might cause an exception).
             // So, what's the solution? We clone the container, read from the clone everything we need,
             // and then continue with the original unchanged container.
-            $routesFolder = null;
+            $routesPath = null;
             if (true) {
                 $containerClone = clone $container;
 
@@ -159,20 +159,24 @@ class LimoncelloCommand extends BaseCommand
                 $provider  = $container->get(CacheSettingsProviderInterface::class);
                 $appConfig = $provider->getApplicationConfiguration();
 
-                $routesFolder = $appConfig[ApplicationConfigurationInterface::KEY_ROUTES_FOLDER] ?? null;
+                $routesFolder = $appConfig[ApplicationConfigurationInterface::KEY_ROUTES_FOLDER] ?? '';
+                $routesMask   = $appConfig[ApplicationConfigurationInterface::KEY_ROUTES_FILE_MASK] ?? '';
 
                 /** @var FileSystemInterface $files */
                 assert(
                     ($files = $containerClone->get(FileSystemInterface::class)) !== null &&
-                    $routesFolder !== null && $files->exists($routesFolder) === true,
-                    'Routes folder must be defined in application settings.'
+                    empty($routesFolder) === false && empty($routesMask) === false &&
+                    $files->exists($routesFolder) === true,
+                    'Routes folder and mask must be defined in application settings.'
                 );
 
                 unset($containerClone);
+
+                $routesPath = $routesFolder . DIRECTORY_SEPARATOR . $routesMask;
             }
 
             [$configurators, $middleware] =
-                $this->readExtraContainerConfiguratorsAndMiddleware($routesFolder, $this->getName());
+                $this->readExtraContainerConfiguratorsAndMiddleware($routesPath, $this->getName());
 
             $this->executeContainerConfigurators($configurators, $container);
 
