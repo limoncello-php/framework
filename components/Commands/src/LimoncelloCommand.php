@@ -40,6 +40,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @package Limoncello\Commands
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class LimoncelloCommand extends BaseCommand
 {
@@ -206,6 +208,8 @@ class LimoncelloCommand extends BaseCommand
      * @return array
      *
      * @throws ReflectionException
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function readExtraContainerConfiguratorsAndMiddleware(string $routesFolder, string $commandName): array
     {
@@ -373,15 +377,13 @@ class LimoncelloCommand extends BaseCommand
         callable $command,
         PsrContainerInterface $container
     ): Closure {
-        $next = function (IoInterface $inOut) use ($command, $container): void
-        {
+        $next = function (IoInterface $inOut) use ($command, $container): void {
             call_user_func($command, $container, $inOut);
         };
 
         for ($index = count($middleware) - 1; $index >= 0; $index--) {
             $currentMiddleware = $middleware[$index];
-            $next = function(IoInterface $inOut) use ($currentMiddleware, $next, $container): void
-            {
+            $next = function (IoInterface $inOut) use ($currentMiddleware, $next, $container): void {
                 call_user_func($currentMiddleware, $inOut, $next, $container);
             };
         }
