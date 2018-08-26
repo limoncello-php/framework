@@ -18,8 +18,8 @@
 
 use FastRoute\DataGenerator;
 use FastRoute\Dispatcher;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Core\Contracts\CoreDataInterface;
-use Limoncello\Core\Reflection\ClassIsTrait;
 
 /**
  * @package Limoncello\Core

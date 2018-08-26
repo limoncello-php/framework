@@ -18,6 +18,7 @@
         "nikic/fast-route": "^1.0",
         "zendframework/zend-diactoros": "^1.7",
         "zendframework/zend-httphandlerrunner": "^1.0",
+        "limoncello-php/common": "^0.10.0",
         "limoncello-php/contracts": "^0.10.0"
     },
     "require-dev": {

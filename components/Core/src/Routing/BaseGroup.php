@@ -17,9 +17,9 @@
  */
 
 use Closure;
+use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
-use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Routing\Traits\CallableTrait;
 use Limoncello\Core\Routing\Traits\HasConfiguratorsTrait;
 use Limoncello\Core\Routing\Traits\HasMiddlewareTrait;

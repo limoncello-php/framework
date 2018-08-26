@@ -17,13 +17,13 @@
  */
 
 use Closure;
+use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Core\ApplicationInterface;
 use Limoncello\Contracts\Core\SapiInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
-use Limoncello\Core\Reflection\CheckCallableTrait;
 use Limoncello\Core\Routing\Router;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;

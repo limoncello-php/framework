@@ -20,11 +20,11 @@ use FastRoute\DataGenerator;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Routing\DispatcherInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
-use Limoncello\Core\Reflection\ClassIsTrait;
 use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 
