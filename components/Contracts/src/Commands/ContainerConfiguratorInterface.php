@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Tests\Core\Reflection;
+<?php namespace Limoncello\Contracts\Commands;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -16,7 +16,22 @@
  * limitations under the License.
  */
 
-// This file is used for testing how the code deals with incorrect PHP files.
+use Limoncello\Contracts\Container\ContainerInterface;
 
-/** @noinspection PhpIncludeInspection */
-include_once 'non_existing_file.php';
+/**
+ * @package Limoncello\Contracts
+ */
+interface ContainerConfiguratorInterface
+{
+    /**
+     * Configurator's method name.
+     */
+    const CONTAINER_METHOD_NAME = 'configureContainer';
+
+    /**
+     * @param ContainerInterface $container
+     *
+     * @return void
+     */
+    public static function configureContainer(ContainerInterface $container): void;
+}

@@ -24,14 +24,20 @@ use Limoncello\Commands\LimoncelloCommand;
 use Limoncello\Commands\Traits\CacheFilePathTrait;
 use Limoncello\Commands\Traits\CommandSerializationTrait;
 use Limoncello\Commands\Traits\CommandTrait;
+use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
+use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use Limoncello\Contracts\Commands\CommandInterface;
+use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
+use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Contracts\Routing\GroupInterface;
 use Limoncello\Tests\Commands\Data\TestApplication;
+use Limoncello\Tests\Commands\Data\TestCliRoutesConfigurator;
 use Limoncello\Tests\Commands\Data\TestCommand;
 use Mockery;
-use Psr\Container\ContainerInterface;
+use Mockery\MockInterface;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -54,6 +60,7 @@ class LimoncelloCommandTest extends TestCase
     {
         parent::setUp();
         static::$executedFlag = false;
+        TestCliRoutesConfigurator::clearTestFlags();
     }
 
     /**
@@ -63,11 +70,10 @@ class LimoncelloCommandTest extends TestCase
      */
     public function testCommand(): void
     {
-        $name    = 'name';
+        $name    = TestCliRoutesConfigurator::COMMAND_NAME_1;
         $command = $this->createCommandMock($name);
 
-        $container = Mockery::mock(ContainerInterface::class);
-        $command->shouldReceive('createContainer')->once()->withAnyArgs()->andReturn($container);
+        $command->shouldReceive('createContainer')->once()->withAnyArgs()->andReturn($this->createContainerMock());
 
         /** @var LimoncelloCommand $command */
 
@@ -82,9 +88,15 @@ class LimoncelloCommandTest extends TestCase
         /** @var Composer $composer */
 
         $command->setComposer($composer);
+
+        $this->assertFalse(TestCliRoutesConfigurator::areHandlersExecuted1());
+        $this->assertFalse(TestCliRoutesConfigurator::areHandlersExecuted2());
+
         $command->execute($input, $output);
 
         $this->assertTrue(static::$executedFlag);
+        $this->assertTrue(TestCliRoutesConfigurator::areHandlersExecuted1());
+        $this->assertFalse(TestCliRoutesConfigurator::areHandlersExecuted2());
     }
 
     /**
@@ -135,7 +147,7 @@ class LimoncelloCommandTest extends TestCase
 
         $handler   = Mockery::mock(ThrowableHandlerInterface::class);
         $response  = Mockery::mock(ThrowableResponseInterface::class);
-        $container = Mockery::mock(ContainerInterface::class);
+        $container = $this->createContainerMock();
         $container->shouldReceive('has')->withArgs([ThrowableHandlerInterface::class])->andReturn(true);
         $container->shouldReceive('get')->withArgs([ThrowableHandlerInterface::class])->andReturn($handler);
         $handler->shouldReceive('createResponse')->once()->withAnyArgs()->andReturn($response);
@@ -232,8 +244,7 @@ class LimoncelloCommandTest extends TestCase
 
         /** @var Composer $composer */
 
-        $commandName = 'some_command';
-        $this->assertNotNull($this->createContainer($composer, $commandName));
+        $this->assertNotNull($this->createContainer($composer));
     }
 
     /**
@@ -262,8 +273,7 @@ class LimoncelloCommandTest extends TestCase
 
         /** @var Composer $composer */
 
-        $commandName = 'some_command';
-        $this->createContainer($composer, $commandName);
+        $this->createContainer($composer);
     }
 
     /**
@@ -289,9 +299,9 @@ class LimoncelloCommandTest extends TestCase
     public function testHandlerStubShouldFail()
     {
         $request   = Mockery::mock(ServerRequestInterface::class);
-        $container = Mockery::mock(ContainerInterface::class);
+        $container = Mockery::mock(PsrContainerInterface::class);
 
-        /** @var ContainerInterface $container */
+        /** @var PsrContainerInterface $container */
         /** @var ServerRequestInterface $request */
 
         static::handlerStub([], $container, $request);
@@ -349,5 +359,37 @@ class LimoncelloCommandTest extends TestCase
         $command->shouldAllowMockingProtectedMethods();
 
         return $command;
+    }
+
+    /**
+     * @return MockInterface
+     */
+    private function createContainerMock(): MockInterface
+    {
+        $container = Mockery::mock(LimoncelloContainerInterface::class);
+
+        // add some app settings to container
+        $routesPath = implode(DIRECTORY_SEPARATOR, [__DIR__, 'Data', '*.php']);
+        $container
+            ->shouldReceive('get')->once()
+            ->with(CacheSettingsProviderInterface::class)
+            ->andReturnSelf();
+        $container
+            ->shouldReceive('getApplicationConfiguration')->once()
+            ->withNoArgs()
+            ->andReturn([
+                ApplicationConfigurationInterface::KEY_ROUTES_FOLDER => $routesPath,
+            ]);
+        // add FileSystem to container
+        $container
+            ->shouldReceive('get')->once()
+            ->with(FileSystemInterface::class)
+            ->andReturnSelf();
+        $container
+            ->shouldReceive('exists')->once()
+            ->with($routesPath)
+            ->andReturn(true);
+
+        return $container;
     }
 }

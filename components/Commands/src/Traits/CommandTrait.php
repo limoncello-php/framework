@@ -46,13 +46,12 @@ trait CommandTrait
 
     /**
      * @param Composer $composer
-     * @param string   $commandName
      *
      * @return ContainerInterface
      *
      * @throws ReflectionException
      */
-    protected function createContainer(Composer $composer, string $commandName): ContainerInterface
+    protected function createContainer(Composer $composer): ContainerInterface
     {
         // use application auto loader otherwise no app classes will be visible for us
         $autoLoaderPath = $this->getAutoloadPath($composer);
@@ -72,7 +71,7 @@ trait CommandTrait
             );
         }
 
-        $container = $this->createApplicationContainer($this->createApplication($appClass), $commandName);
+        $container = $this->createApplication($appClass)->createContainer();
 
         return $container;
     }
@@ -111,19 +110,6 @@ trait CommandTrait
         return
             $reflectionClass->isInstantiable() === true &&
             $reflectionClass->implementsInterface(ApplicationInterface::class) === true;
-    }
-
-    /**
-     * @param ApplicationInterface $application
-     * @param string               $commandName
-     *
-     * @return ContainerInterface
-     */
-    protected function createApplicationContainer(
-        ApplicationInterface $application,
-        string $commandName
-    ): ContainerInterface {
-        return $application->createContainer(CommandConstants::HTTP_METHOD, '/' . $commandName);
     }
 
     /**
