@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Contracts\Authentication;
+<?php namespace Limoncello\Contracts\Passport;
 
 /**
  * Copyright 2015-2018 info@neomerx.com

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
+use Limoncello\Contracts\Passport\PassportAccountInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 
 /**

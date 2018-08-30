@@ -17,7 +17,6 @@
  */
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
 use Exception;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\OAuthServer\Contracts\GrantTypes;

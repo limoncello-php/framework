@@ -18,9 +18,9 @@
 
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
+use Limoncello\Contracts\Passport\PassportAccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Authentication\AccountManager;
-use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Limoncello\Passport\Contracts\PassportServerInterface;

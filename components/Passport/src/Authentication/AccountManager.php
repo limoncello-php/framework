@@ -18,9 +18,9 @@
 
 use Limoncello\Contracts\Authentication\AccountInterface;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
+use Limoncello\Contracts\Passport\PassportAccountInterface;
+use Limoncello\Contracts\Passport\PassportAccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
-use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Exceptions\AuthenticationException;

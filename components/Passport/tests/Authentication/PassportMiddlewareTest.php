@@ -17,10 +17,10 @@
  */
 
 use Exception;
+use Limoncello\Contracts\Passport\PassportAccountInterface;
+use Limoncello\Contracts\Passport\PassportAccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Passport\Authentication\PassportMiddleware;
-use Limoncello\Passport\Contracts\Authentication\PassportAccountInterface;
-use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
 use Limoncello\Passport\Exceptions\AuthenticationException;
 use Limoncello\Tests\Passport\Data\TestContainer;
 use Limoncello\Tests\Passport\Package\PassportContainerConfiguratorTest;

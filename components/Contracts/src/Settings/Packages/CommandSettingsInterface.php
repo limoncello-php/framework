@@ -1,4 +1,4 @@
-<?php namespace Limoncello\Passport\Contracts\Authentication;
+<?php namespace Limoncello\Contracts\Settings\Packages;
 
 /**
  * Copyright 2015-2018 info@neomerx.com
@@ -16,22 +16,21 @@
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Authentication\AccountManagerInterface;
+use Limoncello\Contracts\Settings\SettingsInterface;
 
 /**
- * @package Limoncello\Passport
+ * Provides individual settings for a component.
+ *
+ * @package Limoncello\Contracts
  */
-interface PassportAccountManagerInterface extends AccountManagerInterface
+interface CommandSettingsInterface extends SettingsInterface
 {
-    /**
-     * @param string $value
-     *
-     * @return PassportAccountInterface
-     */
-    public function setAccountWithTokenValue(string $value): PassportAccountInterface;
+    /** Settings key */
+    const KEY_IMPERSONATE_AS_USER_IDENTITY = 0;
 
-    /**
-     * @return PassportAccountInterface|null
-     */
-    public function getPassport(): ?PassportAccountInterface;
+    /** Settings key */
+    const KEY_IMPERSONATE_WITH_USER_PROPERTIES = self::KEY_IMPERSONATE_AS_USER_IDENTITY + 1;
+
+    /** Settings key */
+    const KEY_LAST = self::KEY_IMPERSONATE_WITH_USER_PROPERTIES;
 }

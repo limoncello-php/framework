@@ -19,8 +19,8 @@
 use Doctrine\DBAL\Connection;
 use Exception;
 use Limoncello\Contracts\Authentication\AccountManagerInterface;
+use Limoncello\Contracts\Passport\PassportAccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;

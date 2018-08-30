@@ -18,8 +18,8 @@
 
 use Closure;
 use Limoncello\Contracts\Application\MiddlewareInterface;
+use Limoncello\Contracts\Passport\PassportAccountManagerInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
-use Limoncello\Passport\Contracts\Authentication\PassportAccountManagerInterface;
 use Limoncello\Passport\Exceptions\AuthenticationException;
 use Limoncello\Passport\Package\PassportSettings as S;
 use Psr\Container\ContainerInterface;
