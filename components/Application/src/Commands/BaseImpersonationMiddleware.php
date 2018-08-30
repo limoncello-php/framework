@@ -37,9 +37,6 @@ abstract class BaseImpersonationMiddleware implements MiddlewareInterface
      */
     abstract protected static function createReadScopesClosure(ContainerInterface $container): Closure;
 
-    /** Middleware handler */
-    const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
-
     /**
      * @inheritdoc
      */
