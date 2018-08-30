@@ -69,6 +69,8 @@ abstract class BaseImpersonationMiddleware implements MiddlewareInterface
      * @param array      $properties
      *
      * @return PassportAccountInterface
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected static function createCliPassport(
         $userIdentity,
@@ -99,7 +101,7 @@ abstract class BaseImpersonationMiddleware implements MiddlewareInterface
              */
             public function __construct($userIdentity, Closure $readUserScopes, array $properties)
             {
-                assert (is_int($userIdentity) === true || is_string($userIdentity) === true);
+                assert(is_int($userIdentity) === true || is_string($userIdentity) === true);
 
                 $this->userIdentity   = $userIdentity;
                 $this->properties     = $properties;

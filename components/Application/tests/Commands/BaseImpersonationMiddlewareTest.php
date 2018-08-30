@@ -46,7 +46,7 @@ class BaseImpersonationMiddlewareTest extends TestCase
         /** @var IoInterface $inOut */
 
         $isNextCalled = false;
-        $next = function () use(&$isNextCalled): void {
+        $next = function () use (&$isNextCalled): void {
             $isNextCalled = true;
         };
 
@@ -103,7 +103,8 @@ class BaseImpersonationMiddlewareTest extends TestCase
 
                     /** @var AccountManagerInterface $manager */
                     return $manager;
-                });
+                }
+            );
 
         return $container;
     }
@@ -124,7 +125,7 @@ class BaseImpersonationMiddlewareTest extends TestCase
              */
             protected static function createReadScopesClosure(ContainerInterface $container): Closure
             {
-                return function (): array  {
+                return function (): array {
                     return static::$scopes;
                 };
             }
