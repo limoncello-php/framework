@@ -46,7 +46,7 @@ interface CodeIntegrationInterface extends IntegrationInterface
      *
      * @return ResponseInterface
      *
-     * @link https://tools.ietf.org/html/rfc6749#section-4.1.2
+     * @link https://tools.ietf.org/html/rfc6749#section-4.1.1
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
