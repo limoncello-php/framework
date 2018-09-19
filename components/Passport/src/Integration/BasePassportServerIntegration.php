@@ -148,7 +148,7 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     public function validateUserId(string $userName, string $password)
     {
         $validator    = $this->settings[C::KEY_USER_CREDENTIALS_VALIDATOR];
-        $nullOrUserId = call_user_func($validator, $this->container, $userName, $password);
+        $nullOrUserId = call_user_func($validator, $this->getContainer(), $userName, $password);
 
         return $nullOrUserId;
     }
@@ -159,7 +159,7 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
     public function verifyAllowedUserScope(int $userIdentity, array $scope = null): ?array
     {
         $validator   = $this->settings[C::KEY_USER_SCOPE_VALIDATOR];
-        $nullOrScope = call_user_func($validator, $this->container, $userIdentity, $scope);
+        $nullOrScope = call_user_func($validator, $this->getContainer(), $userIdentity, $scope);
 
         return $nullOrScope;
     }
@@ -303,6 +303,14 @@ abstract class BasePassportServerIntegration implements PassportServerIntegratio
         $result = (new Uri($uri))->withQuery($query);
 
         return $result;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 
     /**
