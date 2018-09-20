@@ -159,10 +159,16 @@ class SessionFunctions implements SessionFunctionsInterface
      * @var callable
      */
     private $idCallable;
+
     /**
      * @var callable
      */
     private $cacheExpireCallable;
+
+    /**
+     * @var callable
+     */
+    private $couldBeStartedCallable;
 
     /**
      * Constructor.
@@ -184,6 +190,9 @@ class SessionFunctions implements SessionFunctionsInterface
             })
             ->setIteratorCallable(function (): Iterator {
                 return new ArrayIterator($_SESSION);
+            })
+            ->setCouldBeStartedCallable(function (): bool {
+                return session_status() === PHP_SESSION_NONE;
             })
             ->setAbortCallable('\session_abort')
             ->setCacheLimiterCallable('\session_cache_limiter')
@@ -691,6 +700,24 @@ class SessionFunctions implements SessionFunctionsInterface
     public function setWriteCloseCallable(callable $callable): SessionFunctionsInterface
     {
         $this->writeCloseCallable = $callable;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCouldBeStartedCallable(): callable
+    {
+        return $this->couldBeStartedCallable;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCouldBeStartedCallable(callable $callable): SessionFunctionsInterface
+    {
+        $this->couldBeStartedCallable = $callable;
 
         return $this;
     }

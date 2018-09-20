@@ -47,9 +47,12 @@ class SessionMiddleware implements MiddlewareInterface
         ContainerInterface $container
     ): ResponseInterface {
 
-        $sessionFunctions = static::getSessionFunction($container);
+        $sessionFunctions = static::getSessionFunctions($container);
 
-        call_user_func($sessionFunctions->getStartCallable(), static::getSessionSettings($container));
+        $couldBeStarted = call_user_func($sessionFunctions->getCouldBeStartedCallable());
+        if ($couldBeStarted === true) {
+            call_user_func($sessionFunctions->getStartCallable(), static::getSessionSettings($container));
+        }
 
         $response = $next($request);
 
@@ -66,7 +69,7 @@ class SessionMiddleware implements MiddlewareInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    protected static function getSessionFunction(ContainerInterface $container): SessionFunctionsInterface
+    protected static function getSessionFunctions(ContainerInterface $container): SessionFunctionsInterface
     {
         /** @var SessionFunctionsInterface $sessionFunctions */
         $sessionFunctions = $container->get(SessionFunctionsInterface::class);

@@ -346,4 +346,16 @@ interface SessionFunctionsInterface
      * @return self
      */
     public function setWriteCloseCallable(callable $callable): self;
+
+    /**
+     * @return callable
+     */
+    public function getCouldBeStartedCallable(): callable;
+
+    /**
+     * @param callable $callable
+     *
+     * @return self
+     */
+    public function setCouldBeStartedCallable(callable $callable): self;
 }
