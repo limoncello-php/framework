@@ -113,13 +113,7 @@ class CoreData extends BaseCoreData
      */
     protected function getGlobalContainerConfigurators(): Generator
     {
-        $interfaceName = ContainerConfiguratorInterface::class;
-        foreach ($this->selectClasses($this->getConfiguratorsPath(), $interfaceName) as $configuratorClass) {
-            $configurator = [$configuratorClass, ContainerConfiguratorInterface::CONTAINER_METHOD_NAME];
-            assert($this->isValidContainerConfigurator($configurator) === true);
-            yield $configurator;
-        }
-
+        // configurators from providers first
         $interfaceName = ProvidesContainerConfiguratorsInterface::class;
         foreach ($this->selectClassImplements($this->getProviderClasses(), $interfaceName) as $providerClass) {
             /** @var ProvidesContainerConfiguratorsInterface $providerClass */
@@ -128,6 +122,14 @@ class CoreData extends BaseCoreData
                 assert($this->isValidContainerConfigurator($configurator) === true);
                 yield $configurator;
             }
+        }
+
+        // then configurators from the application so they can override providers
+        $interfaceName = ContainerConfiguratorInterface::class;
+        foreach ($this->selectClasses($this->getConfiguratorsPath(), $interfaceName) as $configuratorClass) {
+            $configurator = [$configuratorClass, ContainerConfiguratorInterface::CONTAINER_METHOD_NAME];
+            assert($this->isValidContainerConfigurator($configurator) === true);
+            yield $configurator;
         }
     }
 
