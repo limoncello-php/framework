@@ -34,6 +34,8 @@ class RequestStorage implements RequestStorageInterface
      */
     public function get(): ServerRequestInterface
     {
+        assert($this->has(), 'Request has not been assigned yet.');
+
         return $this->request;
     }
 
