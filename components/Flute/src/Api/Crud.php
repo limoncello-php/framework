@@ -531,7 +531,7 @@ class Crud implements CrudInterface
 
         foreach ($this->relFiltersAndSorts as $relationshipName => $filtersAndSorts) {
             assert(is_string($relationshipName) === true && is_array($filtersAndSorts) === true);
-            $builder->addRelationshipFiltersAndSortsWithAnd(
+            $builder->addRelationshipFiltersAndSorts(
                 $relationshipName,
                 $filtersAndSorts[self::REL_FILTERS_AND_SORTS__FILTERS] ?? [],
                 $filtersAndSorts[self::REL_FILTERS_AND_SORTS__SORTS] ?? []
@@ -1035,9 +1035,8 @@ class Crud implements CrudInterface
         if ($this->hasFilters() === true) {
             $filters = $this->getFilters();
             $sorts   = $this->getSorts();
-            $this->areFiltersWithAnd() ?
-                $builder->addRelationshipFiltersAndSortsWithAnd($reverseRelName, $filters, $sorts) :
-                $builder->addRelationshipFiltersAndSortsWithOr($reverseRelName, $filters, $sorts);
+            $joinCondition = $this->areFiltersWithAnd() === true ? ModelQueryBuilder::AND : ModelQueryBuilder::OR;
+            $builder->addRelationshipFiltersAndSorts($reverseRelName, $filters, $sorts, $joinCondition);
         }
         // ... and the input filters to actual data we select
         if ($relationshipFilters !== null) {
@@ -1807,7 +1806,7 @@ class Crud implements CrudInterface
                     }
                     // for 'belongsTo' relationship all resources could be read at once.
                     $parentIds            = $idsAtPath[$parentsPath];
-                    $clonedBuilder        = (clone $builder)->addRelationshipFiltersAndSortsWithAnd(
+                    $clonedBuilder        = (clone $builder)->addRelationshipFiltersAndSorts(
                         $reverseRelName,
                         [$pkName => [FilterParameterInterface::OPERATION_IN => $parentIds]],
                         null
@@ -1835,7 +1834,7 @@ class Crud implements CrudInterface
                         ->getParameters($rootClass, $parentClass, $parentsPath, $name);
                     $builder->setFirstResult($queryOffset)->setMaxResults($queryLimit + 1);
                     foreach ($parents as $parent) {
-                        $clonedBuilder = (clone $builder)->addRelationshipFiltersAndSortsWithAnd(
+                        $clonedBuilder = (clone $builder)->addRelationshipFiltersAndSorts(
                             $reverseRelName,
                             [$pkName => [FilterParameterInterface::OPERATION_EQUALS => [$parent->{$pkName}]]],
                             []

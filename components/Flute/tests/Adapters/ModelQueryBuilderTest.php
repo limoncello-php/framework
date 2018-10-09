@@ -72,7 +72,7 @@ class ModelQueryBuilderTest extends TestCase
         $builder
             ->selectModelColumns()
             ->fromModelTable()
-            ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
+            ->addRelationshipFiltersAndSorts(Post::REL_USER, $filters, $sorts);
 
         $expected =
             'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
@@ -107,7 +107,7 @@ class ModelQueryBuilderTest extends TestCase
         $builder
             ->selectModelColumns()
             ->fromModelTable()
-            ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
+            ->addRelationshipFiltersAndSorts(Post::REL_USER, $filters, $sorts);
 
         $expected =
             'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
@@ -140,7 +140,7 @@ class ModelQueryBuilderTest extends TestCase
         $builder
             ->selectModelColumns()
             ->fromModelTable()
-            ->addRelationshipFiltersAndSortsWithAnd(Post::REL_USER, $filters, $sorts);
+            ->addRelationshipFiltersAndSorts(Post::REL_USER, $filters, $sorts);
 
         $expected =
             'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
@@ -178,7 +178,7 @@ class ModelQueryBuilderTest extends TestCase
         $builder
             ->selectModelColumns()
             ->fromModelTable()
-            ->addRelationshipFiltersAndSortsWithAnd(Post::REL_COMMENTS, $filters, $sorts);
+            ->addRelationshipFiltersAndSorts(Post::REL_COMMENTS, $filters, $sorts);
 
         $expected =
             'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
@@ -217,7 +217,7 @@ class ModelQueryBuilderTest extends TestCase
         $builder
             ->selectModelColumns()
             ->fromModelTable()
-            ->addRelationshipFiltersAndSortsWithOr(Post::REL_COMMENTS, $filters, $sorts);
+            ->addRelationshipFiltersAndSorts(Post::REL_COMMENTS, $filters, $sorts, ModelQueryBuilder::OR);
 
         $expected =
             'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
@@ -256,7 +256,7 @@ class ModelQueryBuilderTest extends TestCase
         $builder
             ->selectModelColumns()
             ->fromModelTable()
-            ->addRelationshipFiltersAndSortsWithAnd(Comment::REL_EMOTIONS, $filters, $sorts);
+            ->addRelationshipFiltersAndSorts(Comment::REL_EMOTIONS, $filters, $sorts);
 
         $expected =
             'SELECT "comments1"."id_comment", "comments1"."id_post_fk", "comments1"."id_user_fk", ' .

@@ -41,6 +41,16 @@ use PDO;
 class ModelQueryBuilder extends QueryBuilder
 {
     /**
+     * Condition joining method.
+     */
+    public const AND = 0;
+
+    /**
+     * Condition joining method.
+     */
+    public const OR = self::AND + 1;
+
+    /**
      * @var string
      */
     private $modelClass;
@@ -398,49 +408,28 @@ class ModelQueryBuilder extends QueryBuilder
      * @param string        $relationshipName
      * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
+     * @param int           $joinIndividuals
+     * @param int           $joinRelationship
      *
      * @return self
      *
      * @throws DBALException
      */
-    public function addRelationshipFiltersAndSortsWithAnd(
+    public function addRelationshipFiltersAndSorts(
         string $relationshipName,
         ?iterable $relationshipFilters,
-        ?iterable $relationshipSorts
+        ?iterable $relationshipSorts,
+        int $joinIndividuals = self::AND,
+        int $joinRelationship = self::AND
     ): self {
         $targetAlias = $this->createRelationshipAlias($relationshipName);
 
         if ($relationshipFilters !== null) {
-            $addWith = $this->expr()->andX();
+            $addWith = $joinIndividuals === self::AND ? $this->expr()->andX() : $this->expr()->orX();
             $this->applyFilters($addWith, $targetAlias, $relationshipFilters);
-            $addWith->count() <= 0 ?: $this->andWhere($addWith);
-        }
-
-        $relationshipSorts === null ?: $this->applySorts($targetAlias, $relationshipSorts);
-
-        return $this;
-    }
-
-    /**
-     * @param string        $relationshipName
-     * @param iterable      $relationshipFilters
-     * @param iterable|null $relationshipSorts
-     *
-     * @return self
-     *
-     * @throws DBALException
-     */
-    public function addRelationshipFiltersAndSortsWithOr(
-        string $relationshipName,
-        ?iterable $relationshipFilters,
-        ?iterable $relationshipSorts
-    ): self {
-        $targetAlias = $this->createRelationshipAlias($relationshipName);
-
-        if ($relationshipFilters !== null) {
-            $addWith = $this->expr()->orX();
-            $this->applyFilters($addWith, $targetAlias, $relationshipFilters);
-            $addWith->count() <= 0 ?: $this->andWhere($addWith);
+            if($addWith->count() > 0) {
+                $joinRelationship === self::AND ? $this->andWhere($addWith) : $this->orWhere($addWith);
+            }
         }
 
         $relationshipSorts === null ?: $this->applySorts($targetAlias, $relationshipSorts);
