@@ -17,6 +17,8 @@
  */
 
 use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
 use JsonSerializable;
 
 /**
@@ -28,6 +30,23 @@ class DateTime extends DateTimeImmutable implements JsonSerializable
 {
     /** DateTime format */
     const JSON_API_FORMAT = \DateTime::ISO8601;
+
+    /**
+     * @param DateTimeInterface $dateTime
+     *
+     * @return DateTime
+     *
+     * @throws Exception
+     */
+    public static function createFromDateTime(DateTimeInterface $dateTime): self
+    {
+        $utcTimestamp = $dateTime->getTimestamp();
+
+        // yes, PHP DateTime can accept integer timestamp only as a string ¯\_( ͡° ͜ʖ ͡°)_/¯
+        $result = (new self("@$utcTimestamp"))->setTimezone($dateTime->getTimezone());
+
+        return $result;
+    }
 
     /**
      * @inheritdoc

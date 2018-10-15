@@ -95,10 +95,10 @@ class DateTimeTypesTest extends TestCase
         $type     = Type::getType(JsonApiDateTimeType::NAME);
         $platform = $this->createConnection()->getDatabasePlatform();
 
-        $jsonDate = new DateTime('2001-02-03 04:05:06');
+        $dateTime = new DateTime('2001-02-03 04:05:06');
 
         /** @var string $phpValue */
-        $phpValue = $type->convertToDatabaseValue($jsonDate, $platform);
+        $phpValue = $type->convertToDatabaseValue($dateTime, $platform);
         $this->assertEquals('2001-02-03 04:05:06', $phpValue);
     }
 
@@ -267,5 +267,24 @@ class DateTimeTypesTest extends TestCase
         $jsonDate = new \stdClass();
 
         $type->convertToDatabaseValue($jsonDate, $platform);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testDateTimeKeepsTimeZone(): void
+    {
+        // switch timezone
+        $currentTimeZone = date_default_timezone_get();
+        date_default_timezone_set('Antarctica/Casey');
+
+        $dateTime     = new DateTime('2001-02-03 04:05:06');
+        $jsonDateTime = JsonApiDateTime::createFromDateTime($dateTime);
+
+        $this->assertEquals('"2001-02-03T04:05:06+0800"', json_encode($jsonDateTime));
+
+
+        // return timezone back
+        date_default_timezone_set($currentTimeZone);
     }
 }

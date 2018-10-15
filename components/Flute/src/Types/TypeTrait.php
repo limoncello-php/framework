@@ -18,29 +18,12 @@
 
 use DateTimeInterface;
 use Doctrine\DBAL\Types\ConversionException;
-use Exception;
-use Limoncello\Flute\Types\DateTime as JsonApiDateTime;
 
 /**
  * @package Limoncello\Flute
  */
 trait TypeTrait
 {
-    /**
-     * @param DateTimeInterface $dateTime
-     *
-     * @return JsonApiDateTime
-     *
-     * @throws Exception
-     */
-    private function convertToJsonApiDateTime(DateTimeInterface $dateTime): JsonApiDateTime
-    {
-        $utcTimestamp = $dateTime->getTimestamp();
-
-        // yes, PHP DateTime constructor can only accept timestamp as a string ¯\_( ͡° ͜ʖ ͡°)_/¯
-        return new JsonApiDateTime("@$utcTimestamp");
-    }
-
     /**
      * @param string|DateTimeInterface $value
      * @param string                   $nonJsonFormat
@@ -61,9 +44,9 @@ trait TypeTrait
         if ($value instanceof DateTimeInterface || $value === null) {
             $result = $value;
         } elseif (is_string($value) === true) {
-            $result = JsonApiDateTime::createFromFormat($nonJsonFormat, $value);
+            $result = DateTime::createFromFormat($nonJsonFormat, $value);
             $result = $result !== false ?
-                $result : JsonApiDateTime::createFromFormat(JsonApiDateTime::JSON_API_FORMAT, $value);
+                $result : DateTime::createFromFormat(DateTime::JSON_API_FORMAT, $value);
             if ($result === false) {
                 throw ConversionException::conversionFailed($value, $typeName);
             }
@@ -71,7 +54,7 @@ trait TypeTrait
             throw ConversionException::conversionFailedInvalidType(
                 $value,
                 DateTimeInterface::class,
-                [DateTimeInterface::class, JsonApiDateTime::class, 'string']
+                [DateTimeInterface::class, DateTime::class, 'string']
             );
         }
 

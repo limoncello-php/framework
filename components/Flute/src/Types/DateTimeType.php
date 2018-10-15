@@ -35,6 +35,8 @@ class DateTimeType extends BaseDateTimeType
     /**
      * @inheritdoc
      *
+     * @return DateTime|null
+     *
      * @throws ConversionException
      * @throws Exception
      *
@@ -46,7 +48,8 @@ class DateTimeType extends BaseDateTimeType
 
         if ($value !== null && ($dateTimeOrNull = parent::convertToPHPValue($value, $platform)) !== null) {
             assert($dateTimeOrNull instanceof DateTimeInterface);
-            $result = $this->convertToJsonApiDateTime($dateTimeOrNull);
+            // despite the name it's not null already
+            $result = DateTime::createFromDateTime($dateTimeOrNull);
         }
 
         return $result;

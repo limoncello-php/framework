@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateType as BaseDateType;
@@ -35,6 +34,8 @@ class DateType extends BaseDateType
     /**
      * @inheritdoc
      *
+     * @return DateTime|null
+     *
      * @throws ConversionException
      * @throws Exception
      *
@@ -45,8 +46,8 @@ class DateType extends BaseDateType
         $result = null;
 
         if ($value !== null && ($dateOrNull = parent::convertToPHPValue($value, $platform)) !== null) {
-            assert($dateOrNull instanceof DateTimeInterface);
-            $result = $this->convertToJsonApiDateTime($dateOrNull);
+            // despite the name it's not null already
+            $result = DateTime::createFromDateTime($dateOrNull);
         }
 
         return $result;
