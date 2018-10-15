@@ -427,7 +427,7 @@ class ModelQueryBuilder extends QueryBuilder
         if ($relationshipFilters !== null) {
             $addWith = $joinIndividuals === self::AND ? $this->expr()->andX() : $this->expr()->orX();
             $this->applyFilters($addWith, $targetAlias, $relationshipFilters);
-            if($addWith->count() > 0) {
+            if ($addWith->count() > 0) {
                 $joinRelationship === self::AND ? $this->andWhere($addWith) : $this->orWhere($addWith);
             }
         }
