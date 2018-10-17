@@ -60,7 +60,7 @@ class AuthorizationManagerTest extends TestCase
     {
         $actionName       = 'some_action';
         $resourceType     = 'some_type';
-        $resourceIdentity = 'some_identity';
+        $resourceIdentity = ['some_identity'];
         $container        = new Container();
 
         /** @var Mock $managerMock */

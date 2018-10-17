@@ -147,10 +147,10 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
     }
 
     /**
-     * @param string          $action
-     * @param string|null     $type
-     * @param string|int|null $identity
-     * @param array           $extraParams
+     * @param string                $action
+     * @param string|null           $type
+     * @param string|int|array|null $identity
+     * @param array                 $extraParams
      *
      * @return RequestInterface
      */
@@ -160,7 +160,7 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
         $identity = null,
         array $extraParams = []
     ): RequestInterface {
-        assert($identity === null || is_string($identity) || is_int($identity));
+        assert($identity === null || is_string($identity) || is_array($identity) || is_int($identity));
         return new Request([
             RequestProperties::REQ_ACTION            => $action,
             RequestProperties::REQ_RESOURCE_TYPE     => $type,

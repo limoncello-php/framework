@@ -91,7 +91,7 @@ trait AuthorizationRulesTrait
     /**
      * @param ContextInterface $context
      *
-     * @return string|int|null
+     * @return string|int|array|null
      */
     protected static function reqGetResourceIdentity(ContextInterface $context)
     {
@@ -99,7 +99,7 @@ trait AuthorizationRulesTrait
 
         $value = $context->get(RequestProperties::REQ_RESOURCE_IDENTITY);
 
-        assert($value === null || is_string($value) || is_int($value));
+        assert($value === null || is_string($value) || is_array($value) || is_int($value));
 
         return $value;
     }
