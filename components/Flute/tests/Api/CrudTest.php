@@ -947,6 +947,20 @@ class CrudTest extends TestCase
     }
 
     /**
+     * Test invalid argument.
+     *
+     * @throws DBALException
+     *
+     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
+     */
+    public function testInvalidInputWithEmptyIndexList(): void
+    {
+        $crud = $this->createCrud(PostsApi::class);
+
+        $crud->withIndexesFilter([]);
+    }
+
+    /**
      * Test read typed row.
      *
      * @throws Exception

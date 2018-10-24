@@ -208,6 +208,10 @@ class Crud implements CrudInterface
      */
     public function withIndexesFilter(array $indexes): CrudInterface
     {
+        if (empty($indexes) === true) {
+            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
+        }
+
         assert(call_user_func(function () use ($indexes) {
             $allOk = true;
 
