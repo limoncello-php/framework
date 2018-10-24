@@ -63,9 +63,10 @@ final class ExistInDbTableMultipleWithDoctrineRule extends ExecuteRule
      */
     public static function execute($values, ContextInterface $context): array
     {
-        $count = 0;
+        // let's consider an empty index list as `exists`
+        $result = is_array($values);
 
-        if (is_array($values) === true && empty($values) === false) {
+        if ($result === true && empty($values) === false) {
             $tableName   = $context->getProperties()->getProperty(static::PROPERTY_TABLE_NAME);
             $primaryName = $context->getProperties()->getProperty(static::PROPERTY_PRIMARY_NAME);
 
@@ -82,10 +83,11 @@ final class ExistInDbTableMultipleWithDoctrineRule extends ExecuteRule
                 ->where($builder->expr()->in($primaryName, $placeholders))
                 ->execute();
 
-            $count = $statement->fetchColumn();
+            $count  = (int)$statement->fetchColumn();
+            $result = $count === count($values);
         }
 
-        $reply = $count > 0 ?
+        $reply = $result === true ?
             static::createSuccessReply($values) :
             static::createErrorReply($context, $values, ErrorCodes::EXIST_IN_DATABASE_MULTIPLE);
 

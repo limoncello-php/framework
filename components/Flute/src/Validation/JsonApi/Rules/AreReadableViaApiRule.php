@@ -64,17 +64,22 @@ final class AreReadableViaApiRule extends ExecuteRule
     {
         assert(is_array($values));
 
-        $apiClass = $context->getProperties()->getProperty(static::PROPERTY_API_CLASS);
+        // let's consider an empty index list as `readable`
+        $result = true;
 
-        /** @var FactoryInterface $apiFactory */
-        $apiFactory = $context->getContainer()->get(FactoryInterface::class);
+        if (empty($values) === false) {
+            $apiClass = $context->getProperties()->getProperty(static::PROPERTY_API_CLASS);
 
-        /** @var CrudInterface $api */
-        $api = $apiFactory->createApi($apiClass);
+            /** @var FactoryInterface $apiFactory */
+            $apiFactory = $context->getContainer()->get(FactoryInterface::class);
 
-        $readIndexes = $api->withIndexesFilter($values)->indexIdentities();
+            /** @var CrudInterface $api */
+            $api = $apiFactory->createApi($apiClass);
 
-        $result = count($readIndexes) === count($values);
+            $readIndexes = $api->withIndexesFilter($values)->indexIdentities();
+
+            $result = count($readIndexes) === count($values);
+        }
 
         return $result === true ?
             static::createSuccessReply($values) :
