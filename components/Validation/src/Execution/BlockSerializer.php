@@ -215,8 +215,6 @@ final class BlockSerializer implements BlockSerializerInterface
     {
         $index = $this->allocateIndex();
 
-        // TODO add signature checks for callable
-
         $serialized = [
             static::TYPE                       => static::TYPE__PROCEDURE,
             static::PROCEDURE_EXECUTE_CALLABLE => $procedure->getExecuteCallable(),
@@ -246,8 +244,6 @@ final class BlockSerializer implements BlockSerializerInterface
     private function serializeIfExpression(IfExpressionInterface $ifExpression): int
     {
         $index = $this->allocateIndex();
-
-        // TODO add signature checks for callable
 
         $serialized = [
             static::TYPE                             => static::TYPE__IF_EXPRESSION,

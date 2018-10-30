@@ -16,13 +16,17 @@
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Validation\Contracts\Blocks\ProcedureBlockInterface;
+use Limoncello\Validation\Contracts\Execution\ContextInterface;
 
 /**
  * @package Limoncello\Validation
  */
 final class ProcedureBlock implements ProcedureBlockInterface
 {
+    use CheckCallableTrait;
+
     /**
      * @var callable|null
      */
@@ -55,10 +59,7 @@ final class ProcedureBlock implements ProcedureBlockInterface
         callable $startCallable = null,
         callable $endCallable = null
     ) {
-        // TODO add checks for callable signatures
-
-        $this->executeCallable = $executeCallable;
-        $this->setProperties($properties);
+        $this->setExecuteCallable($executeCallable)->setProperties($properties);
 
         if ($startCallable !== null) {
             $this->setStartCallable($startCallable);
@@ -120,7 +121,7 @@ final class ProcedureBlock implements ProcedureBlockInterface
      */
     public function setStartCallable(callable $startCallable): self
     {
-        // TODO add signature check?
+        assert($this->checkProcedureStartOrEndCallableSignature($startCallable));
 
         $this->startCallable = $startCallable;
 
@@ -128,16 +129,52 @@ final class ProcedureBlock implements ProcedureBlockInterface
     }
 
     /**
-     * @param callable|null $endCallable
+     * @param callable $endCallable
      *
      * @return self
      */
     public function setEndCallable(callable $endCallable): self
     {
-        // TODO add signature check?
+        assert($this->checkProcedureStartOrEndCallableSignature($endCallable));
 
         $this->endCallable = $endCallable;
 
         return $this;
+    }
+
+    /**
+     * @param callable $executeCallable
+     *
+     * @return self
+     */
+    private function setExecuteCallable(callable $executeCallable): self
+    {
+        assert($this->checkProcedureExecuteCallableSignature($executeCallable));
+
+        $this->executeCallable = $executeCallable;
+
+        return $this;
+    }
+
+    /** @noinspection PhpDocMissingThrowsInspection
+     * @param callable $procedureCallable
+     *
+     * @return bool
+     */
+    private function checkProcedureExecuteCallableSignature(callable $procedureCallable): bool
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return static::checkPublicStaticCallable($procedureCallable, [null, ContextInterface::class], 'array');
+    }
+
+    /** @noinspection PhpDocMissingThrowsInspection
+     * @param callable $procedureCallable
+     *
+     * @return bool
+     */
+    private function checkProcedureStartOrEndCallableSignature(callable $procedureCallable): bool
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return static::checkPublicStaticCallable($procedureCallable, [ContextInterface::class], 'array');
     }
 }

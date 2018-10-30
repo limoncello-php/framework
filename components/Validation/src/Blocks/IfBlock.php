@@ -16,14 +16,18 @@
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Blocks\IfExpressionInterface;
+use Limoncello\Validation\Contracts\Execution\ContextInterface;
 
 /**
  * @package Limoncello\Validation
  */
 final class IfBlock implements IfExpressionInterface
 {
+    use CheckCallableTrait;
+
     /**
      * @var callable
      */
@@ -56,7 +60,7 @@ final class IfBlock implements IfExpressionInterface
         ExecutionBlockInterface $onFalse,
         array $properties = []
     ) {
-        // TODO add check callable could be serialized
+        assert($this->checkConditionCallableSignature($condition));
 
         $this->condition  = $condition;
         $this->onTrue     = $onTrue;
@@ -94,5 +98,16 @@ final class IfBlock implements IfExpressionInterface
     public function getProperties(): array
     {
         return $this->properties;
+    }
+
+    /** @noinspection PhpDocMissingThrowsInspection
+     * @param callable $procedureCallable
+     *
+     * @return bool
+     */
+    private function checkConditionCallableSignature(callable $procedureCallable): bool
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return static::checkPublicStaticCallable($procedureCallable, [null, ContextInterface::class], 'bool');
     }
 }

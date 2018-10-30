@@ -465,18 +465,20 @@ class BlockSerializationAndInterpretationTest extends TestCase
      *
      * @return array
      */
-    public static function procedureEndError(ContextInterface $context)
+    public static function procedureEndError(ContextInterface $context): array
     {
         return BlockReplies::createEndErrorReply($context, ErrorCodes::INVALID_VALUE, ['some_value__end']);
     }
 
     /**
+     * @param mixed            $value
      * @param ContextInterface $context
      *
      * @return bool
      */
-    public static function ifBlockCondition(ContextInterface $context): bool
+    public static function ifBlockCondition($value, ContextInterface $context): bool
     {
+        assert($value);
         assert($context);
 
         return true;

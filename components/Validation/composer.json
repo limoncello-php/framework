@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": ">=7.1.0",
+        "limoncello-php/common" : "^0.10.0",
         "limoncello-php/contracts" : "^0.10.0"
     },
     "require-dev": {
