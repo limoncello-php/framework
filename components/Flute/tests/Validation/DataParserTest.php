@@ -42,9 +42,14 @@ use Limoncello\Tests\Flute\Data\Schemas\EmotionSchema;
 use Limoncello\Tests\Flute\Data\Schemas\UserSchema;
 use Limoncello\Tests\Flute\Data\Validation\AppRules as v;
 use Limoncello\Tests\Flute\TestCase;
+use Limoncello\Validation\Blocks\ProcedureBlock;
+use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
+use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Execution\BlockSerializer;
 use Limoncello\Validation\Execution\ContextStorage;
+use Limoncello\Validation\Rules\BaseRule;
+use Limoncello\Validation\Rules\Generic\Success;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
@@ -865,6 +870,64 @@ EOT;
     {
         $this->assertNotEmpty(Generic::getMessages());
         $this->assertNotEmpty(Validation::getMessages());
+    }
+
+    /**
+     * Add some test coverage for rarely used functionality.
+     *
+     * @throws Exception
+     */
+    public function testAddTestCoverToExecuteEnds(): void
+    {
+        $passThroughRule = new class extends BaseRule
+        {
+            /**
+             * @inheritdoc
+             */
+            public function toBlock(): ExecutionBlockInterface
+            {
+                $startOrEndCallable = [DataParserTest::class, 'successValidationStartOrEnd'];
+                $passThrough = (new ProcedureBlock([Success::class, 'execute']))
+                    ->setStartCallable($startOrEndCallable)
+                    ->setProperties($this->composeStandardProperties($this->getName(), false))
+                    ->setEndCallable($startOrEndCallable);
+
+                return $passThrough;
+            }
+        };
+
+        $jsonInput = <<<EOT
+        {
+            "data" : {
+                "type"  : "comments",
+                "id"    : null
+            }
+        }
+EOT;
+        $input = json_decode($jsonInput, true);
+
+        $container = $this->createContainer();
+        $validator = $this->createParser($container, 'some_rule_name', $passThroughRule, v::success(), [], [], []);
+        $validator->assert($input);
+
+        $captures = $validator->getCaptures();
+        $this->assertEmpty($validator->getErrors());
+        $this->assertCount(1, $captures);
+        $this->assertSame('comments', $captures['type']);
+    }
+
+    /**
+     * A dummy rule for validation testing.
+     *
+     * @param ContextInterface $context
+     *
+     * @return array
+     */
+    public static function successValidationStartOrEnd(ContextInterface $context): array
+    {
+        assert($context);
+
+        return [];
     }
 
     /** @noinspection PhpTooManyParametersInspection

@@ -341,8 +341,7 @@ class DataParser implements JsonApiDataParserInterface
     private function validateType(array $jsonData): self
     {
         // execute start(s)
-        $starts = $this->getSerializer()::readRuleStartIndexes($this->getTypeRule());
-        $this->executeStarts($starts);
+        $this->executeStarts($this->getSerializer()::readRuleStartIndexes($this->getTypeRule()));
 
         if (array_key_exists(DI::KEYWORD_DATA, $jsonData) === true &&
             array_key_exists(DI::KEYWORD_TYPE, $data = $jsonData[DI::KEYWORD_DATA]) === true
@@ -359,8 +358,7 @@ class DataParser implements JsonApiDataParserInterface
         }
 
         // execute end(s)
-        $ends = $this->getSerializer()::readRuleEndIndexes($this->getTypeRule());
-        $this->executeEnds($ends);
+        $this->executeEnds($this->getSerializer()::readRuleEndIndexes($this->getTypeRule()));
 
         if (count($this->getErrorAggregator()) > 0) {
             $title = $this->formatMessage(ErrorCodes::INVALID_VALUE);
@@ -386,8 +384,7 @@ class DataParser implements JsonApiDataParserInterface
     private function validateId(array $jsonData): self
     {
         // execute start(s)
-        $starts = $this->getSerializer()::readRuleStartIndexes($this->getIdRule());
-        $this->executeStarts($starts);
+        $this->executeStarts($this->getSerializer()::readRuleStartIndexes($this->getIdRule()));
 
         // execute main validation block(s)
         if (array_key_exists(DI::KEYWORD_DATA, $jsonData) === true &&
@@ -398,8 +395,7 @@ class DataParser implements JsonApiDataParserInterface
         }
 
         // execute end(s)
-        $ends = $this->getSerializer()::readRuleEndIndexes($this->getIdRule());
-        $this->executeEnds($ends);
+        $this->executeEnds($this->getSerializer()::readRuleEndIndexes($this->getIdRule()));
 
         if (count($this->getErrorAggregator()) > 0) {
             $title  = $this->formatMessage(ErrorCodes::INVALID_VALUE);
@@ -426,8 +422,7 @@ class DataParser implements JsonApiDataParserInterface
     private function validateAttributes(array $jsonData): self
     {
         // execute start(s)
-        $starts = $this->getSerializer()::readRulesStartIndexes($this->getAttributeRules());
-        $this->executeStarts($starts);
+        $this->executeStarts($this->getSerializer()::readRulesStartIndexes($this->getAttributeRules()));
 
         if (array_key_exists(DI::KEYWORD_DATA, $jsonData) === true &&
             array_key_exists(DI::KEYWORD_ATTRIBUTES, $data = $jsonData[DI::KEYWORD_DATA]) === true
@@ -455,8 +450,7 @@ class DataParser implements JsonApiDataParserInterface
         }
 
         // execute end(s)
-        $ends = $this->getSerializer()::readRulesEndIndexes($this->getAttributeRules());
-        $this->executeEnds($ends);
+        $this->executeEnds($this->getSerializer()::readRulesEndIndexes($this->getAttributeRules()));
 
         if (count($this->getErrorAggregator()) > 0) {
             $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
@@ -481,11 +475,10 @@ class DataParser implements JsonApiDataParserInterface
     private function validateRelationships(array $jsonData): self
     {
         // execute start(s)
-        $starts = array_merge(
+        $this->executeStarts(array_merge(
             $this->getSerializer()::readRulesStartIndexes($this->getToOneRules()),
             $this->getSerializer()::readRulesStartIndexes($this->getToManyRules())
-        );
-        $this->executeStarts($starts);
+        ));
 
         if (array_key_exists(DI::KEYWORD_DATA, $jsonData) === true &&
             array_key_exists(DI::KEYWORD_RELATIONSHIPS, $data = $jsonData[DI::KEYWORD_DATA]) === true
@@ -521,11 +514,10 @@ class DataParser implements JsonApiDataParserInterface
         }
 
         // execute end(s)
-        $ends = array_merge(
+        $this->executeEnds(array_merge(
             $this->getSerializer()::readRulesEndIndexes($this->getToOneRules()),
             $this->getSerializer()::readRulesEndIndexes($this->getToManyRules())
-        );
-        $this->executeEnds($ends);
+        ));
 
         if (count($this->getErrorAggregator()) > 0) {
             $status  = JsonApiResponse::HTTP_CONFLICT;
@@ -661,12 +653,14 @@ class DataParser implements JsonApiDataParserInterface
      */
     private function executeStarts(array $indexes): void
     {
-        BlockInterpreter::executeStarts(
-            $indexes,
-            $this->getBlocks(),
-            $this->getContext(),
-            $this->getErrorAggregator()
-        );
+        if (empty($indexes) === false) {
+            BlockInterpreter::executeStarts(
+                $indexes,
+                $this->getBlocks(),
+                $this->getContext(),
+                $this->getErrorAggregator()
+            );
+        }
     }
 
     /**
@@ -678,12 +672,14 @@ class DataParser implements JsonApiDataParserInterface
      */
     private function executeEnds(array $indexes): void
     {
-        BlockInterpreter::executeEnds(
-            $indexes,
-            $this->getBlocks(),
-            $this->getContext(),
-            $this->getErrorAggregator()
-        );
+        if (empty($indexes) === false) {
+            BlockInterpreter::executeEnds(
+                $indexes,
+                $this->getBlocks(),
+                $this->getContext(),
+                $this->getErrorAggregator()
+            );
+        }
     }
 
     /**
