@@ -901,14 +901,14 @@ trait DefaultControllerMethodsTrait
     /**
      * Developers can override the method in order to use custom data mapping from a Schema to Model.
      *
-     * @param array                    $captures
+     * @param iterable                 $captures
      * @param string                   $schemaClass
      * @param ModelSchemaInfoInterface $schemaInfo
      *
      * @return array
      */
     protected static function mapSchemaDataToModelData(
-        array $captures,
+        iterable $captures,
         string $schemaClass,
         ModelSchemaInfoInterface $schemaInfo
     ): array {
