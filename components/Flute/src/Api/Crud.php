@@ -1201,7 +1201,7 @@ class Crud implements CrudInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function create($index, iterable $attributes, iterable $toMany): string
+    public function create($index, array $attributes, array $toMany): string
     {
         if ($index !== null && is_int($index) === false && is_string($index) === false) {
             throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
@@ -1239,7 +1239,7 @@ class Crud implements CrudInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function update($index, iterable $attributes, iterable $toMany): int
+    public function update($index, array $attributes, array $toMany): int
     {
         if (is_int($index) === false && is_string($index) === false) {
             throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));

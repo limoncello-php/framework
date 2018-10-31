@@ -60,19 +60,12 @@ class CommentsApi extends AppCrud
     /**
      * @inheritdoc
      */
-    public function create($index, iterable $attributes, iterable $toMany): string
+    public function create($index, array $attributes, array $toMany): string
     {
         // suppose we want to create comments using current user as an author.
-        $updatedAttributes = function () use ($attributes) {
-            $curUserId = 1;
-            foreach ($attributes as $attribute => $value) {
-                if ($attribute !== Comment::FIELD_ID_USER) {
-                    yield $attribute => $value;
-                }
-            }
-            yield Comment::FIELD_ID_USER => $curUserId;
-        };
+        $curUserId                          = 1;
+        $attributes[Comment::FIELD_ID_USER] = $curUserId;
 
-        return parent::create($index, $updatedAttributes(), $toMany);
+        return parent::create($index, $attributes, $toMany);
     }
 }

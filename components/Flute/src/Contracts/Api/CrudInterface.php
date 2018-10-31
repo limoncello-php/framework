@@ -180,21 +180,21 @@ interface CrudInterface
 
     /**
      * @param null|string $index
-     * @param iterable    $attributes
-     * @param iterable    $toMany
+     * @param array       $attributes
+     * @param array       $toMany
      *
      * @return string
      */
-    public function create($index, iterable $attributes, iterable $toMany): string;
+    public function create($index, array $attributes, array $toMany): string;
 
     /**
      * @param int|string $index
-     * @param iterable   $attributes
-     * @param iterable   $toMany
+     * @param array      $attributes
+     * @param array      $toMany
      *
      * @return int
      */
-    public function update($index, iterable $attributes, iterable $toMany): int;
+    public function update($index, array $attributes, array $toMany): int;
 
     /**
      * @param string        $name
