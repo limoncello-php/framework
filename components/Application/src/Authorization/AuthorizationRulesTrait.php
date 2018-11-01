@@ -35,7 +35,7 @@ trait AuthorizationRulesTrait
      */
     protected static function reqHasAction(ContextInterface $context): bool
     {
-        return $context->has(RequestProperties::REQ_ACTION);
+        return $context->getRequest()->has(RequestProperties::REQ_ACTION);
     }
 
     /**
@@ -47,7 +47,7 @@ trait AuthorizationRulesTrait
     {
         assert(static::reqHasAction($context));
 
-        $value = $context->get(RequestProperties::REQ_ACTION);
+        $value = $context->getRequest()->get(RequestProperties::REQ_ACTION);
 
         return $value;
     }
@@ -59,7 +59,7 @@ trait AuthorizationRulesTrait
      */
     protected static function reqHasResourceType(ContextInterface $context): bool
     {
-        return $context->has(RequestProperties::REQ_RESOURCE_TYPE);
+        return $context->getRequest()->has(RequestProperties::REQ_RESOURCE_TYPE);
     }
 
     /**
@@ -71,7 +71,7 @@ trait AuthorizationRulesTrait
     {
         assert(static::reqHasResourceType($context));
 
-        $value = $context->get(RequestProperties::REQ_RESOURCE_TYPE);
+        $value = $context->getRequest()->get(RequestProperties::REQ_RESOURCE_TYPE);
 
         assert($value === null || is_string($value));
 
@@ -85,7 +85,7 @@ trait AuthorizationRulesTrait
      */
     protected static function reqHasResourceIdentity(ContextInterface $context): bool
     {
-        return $context->has(RequestProperties::REQ_RESOURCE_IDENTITY);
+        return $context->getRequest()->has(RequestProperties::REQ_RESOURCE_IDENTITY);
     }
 
     /**
@@ -97,9 +97,61 @@ trait AuthorizationRulesTrait
     {
         assert(static::reqHasResourceIdentity($context));
 
-        $value = $context->get(RequestProperties::REQ_RESOURCE_IDENTITY);
+        $value = $context->getRequest()->get(RequestProperties::REQ_RESOURCE_IDENTITY);
 
         assert($value === null || is_string($value) || is_array($value) || is_int($value));
+
+        return $value;
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return bool
+     */
+    protected static function reqHasResourceAttributes(ContextInterface $context): bool
+    {
+        return $context->getRequest()->has(RequestProperties::REQ_RESOURCE_ATTRIBUTES);
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return string|int|array|null
+     */
+    protected static function reqGetResourceAttributes(ContextInterface $context): array
+    {
+        assert(static::reqHasResourceAttributes($context));
+
+        $value = $context->getRequest()->get(RequestProperties::REQ_RESOURCE_ATTRIBUTES);
+
+        assert(is_array($value));
+
+        return $value;
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return bool
+     */
+    protected static function reqHasResourceRelationships(ContextInterface $context): bool
+    {
+        return $context->getRequest()->has(RequestProperties::REQ_RESOURCE_RELATIONSHIPS);
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return string|int|array|null
+     */
+    protected static function reqGetResourceRelationships(ContextInterface $context): array
+    {
+        assert(static::reqHasResourceRelationships($context));
+
+        $value = $context->getRequest()->get(RequestProperties::REQ_RESOURCE_RELATIONSHIPS);
+
+        assert(is_array($value));
 
         return $value;
     }

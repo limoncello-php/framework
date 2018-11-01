@@ -22,14 +22,17 @@
 interface ContextProperties extends RequestProperties
 {
     /** Context key */
-    const PARAM_CURRENT_USER_ID = 'current_user_id';
+    const CONTEXT_CURRENT_USER_ID = self::REQUEST_LAST + 1;
 
     /** Context key */
-    const PARAM_CURRENT_USER_ROLE = 'current_user_role';
+    const CONTEXT_CURRENT_USER_ROLE = self::CONTEXT_CURRENT_USER_ID + 1;
 
     /** Context key */
-    const PARAM_IS_WORK_TIME = 'is_work_time';
+    const CONTEXT_IS_WORK_TIME = self::CONTEXT_CURRENT_USER_ROLE + 1;
 
     /** Context key */
-    const PARAM_USER_IS_SIGNED_IN = 'user_is_signed_in';
+    const CONTEXT_USER_IS_SIGNED_IN = self::CONTEXT_IS_WORK_TIME + 1;
+
+    /** Context key */
+    const CONTEXT_LAST = self::CONTEXT_USER_IS_SIGNED_IN;
 }

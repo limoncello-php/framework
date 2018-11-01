@@ -36,7 +36,7 @@ class Context extends Container implements ContextInterface
      */
     public function __construct(RequestInterface $request, array $contextDefinitions = [])
     {
-        parent::__construct($contextDefinitions);
+        parent::__construct([RequestInterface::class => $request] + $contextDefinitions);
 
         $this->request = $request;
     }
@@ -64,7 +64,7 @@ class Context extends Container implements ContextInterface
     /**
      * @return RequestInterface
      */
-    protected function getRequest(): RequestInterface
+    public function getRequest(): RequestInterface
     {
         return $this->request;
     }

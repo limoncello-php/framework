@@ -17,50 +17,11 @@
  */
 
 use Limoncello\Auth\Contracts\Authorization\PolicyEnforcement\RequestInterface;
+use Limoncello\Container\Container;
 
 /**
  * @package Limoncello\Auth
  */
-class Request implements RequestInterface
+class Request extends Container implements RequestInterface
 {
-    /**
-     * @var array
-     */
-    private $properties;
-
-    /**
-     * @param array $properties
-     */
-    public function __construct(array $properties)
-    {
-        $this->properties = $properties;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function has($key): bool
-    {
-        $result = array_key_exists($key, $this->getProperties());
-
-        return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function get($key)
-    {
-        $result = $this->getProperties()[$key];
-
-        return $result;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getProperties(): array
-    {
-        return $this->properties;
-    }
 }

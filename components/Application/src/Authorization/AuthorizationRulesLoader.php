@@ -162,7 +162,7 @@ class AuthorizationRulesLoader
         }
 
         $policy = (new Policy($rules, RuleAlgorithm::firstApplicable()))
-            ->setName($policiesName . ' -> ' . RequestProperties::REQ_RESOURCE_TYPE . "=`$resourcesType`")
+            ->setName($policiesName . ' -> ResourceType' . "=`$resourcesType`")
             ->setTarget($this->target(RequestProperties::REQ_RESOURCE_TYPE, $resourcesType));
 
         return $policy;

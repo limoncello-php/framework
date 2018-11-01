@@ -86,8 +86,8 @@ class PolicySwitchOptimizationTest extends TestCase
 
         // send authorization request
         $authRequest = new Request([
-            RequestProperties::PARAM_OPERATION     => Posts::OPERATION_INDEX,
-            RequestProperties::PARAM_RESOURCE_TYPE => Posts::RESOURCE_TYPE,
+            RequestProperties::REQUEST_OPERATION     => Posts::OPERATION_INDEX,
+            RequestProperties::REQUEST_RESOURCE_TYPE => Posts::RESOURCE_TYPE,
         ]);
         $this->assertTrue($policyEnforcement->authorize($authRequest));
 
@@ -117,8 +117,8 @@ class PolicySwitchOptimizationTest extends TestCase
 
         // send authorization request
         $authRequest = new Request([
-            RequestProperties::PARAM_OPERATION     => Posts::OPERATION_CREATE,
-            RequestProperties::PARAM_RESOURCE_TYPE => Posts::RESOURCE_TYPE,
+            RequestProperties::REQUEST_OPERATION     => Posts::OPERATION_CREATE,
+            RequestProperties::REQUEST_RESOURCE_TYPE => Posts::RESOURCE_TYPE,
         ]);
 
         // we expect it to fail because operation `create` is not defined in Policies.
@@ -251,12 +251,12 @@ class PolicySwitchOptimizationTest extends TestCase
     private function getContextDefinitions()
     {
         return [
-            LoggerInterface::class                     => $this->getLogger(),
-            ContextProperties::PARAM_CURRENT_USER_ID   => $this->currentUserId,
-            ContextProperties::PARAM_CURRENT_USER_ROLE => $this->currentUserRole,
-            ContextProperties::PARAM_USER_IS_SIGNED_IN => $this->currentUserId !== null &&
+            LoggerInterface::class                       => $this->getLogger(),
+            ContextProperties::CONTEXT_CURRENT_USER_ID   => $this->currentUserId,
+            ContextProperties::CONTEXT_CURRENT_USER_ROLE => $this->currentUserRole,
+            ContextProperties::CONTEXT_USER_IS_SIGNED_IN => $this->currentUserId !== null &&
                 $this->currentUserRole !== null,
-            ContextProperties::PARAM_IS_WORK_TIME      => function () {
+            ContextProperties::CONTEXT_IS_WORK_TIME      => function () {
                 return $this->isWorkTime;
             },
         ];

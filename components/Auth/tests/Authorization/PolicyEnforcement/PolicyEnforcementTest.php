@@ -95,7 +95,7 @@ class PolicyEnforcementTest extends TestCase
 
         // send authorization request
         $authRequest = new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]);
         $this->assertTrue($policyEnforcement->authorize($authRequest));
     }
@@ -113,7 +113,7 @@ class PolicyEnforcementTest extends TestCase
 
         // send authorization request
         $authRequest = new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]);
         $this->assertFalse($policyEnforcement->authorize($authRequest));
     }
@@ -130,8 +130,8 @@ class PolicyEnforcementTest extends TestCase
 
         // send authorization request
         $authRequest = new Request([
-            RequestProperties::PARAM_OPERATION     => Comments::OPERATION_CREATE,
-            RequestProperties::PARAM_RESOURCE_TYPE => Comments::RESOURCE_TYPE,
+            RequestProperties::REQUEST_OPERATION     => Comments::OPERATION_CREATE,
+            RequestProperties::REQUEST_RESOURCE_TYPE => Comments::RESOURCE_TYPE,
         ]);
         $this->assertTrue($policyEnforcement->authorize($authRequest));
         $this->assertTrue(static::$obligationCalled);
@@ -151,8 +151,8 @@ class PolicyEnforcementTest extends TestCase
 
         // send authorization request
         $authRequest = new Request([
-            RequestProperties::PARAM_OPERATION     => Comments::OPERATION_CREATE,
-            RequestProperties::PARAM_RESOURCE_TYPE => Comments::RESOURCE_TYPE,
+            RequestProperties::REQUEST_OPERATION     => Comments::OPERATION_CREATE,
+            RequestProperties::REQUEST_RESOURCE_TYPE => Comments::RESOURCE_TYPE,
         ]);
         $this->assertFalse($policyEnforcement->authorize($authRequest));
     }
@@ -169,17 +169,17 @@ class PolicyEnforcementTest extends TestCase
 
         // send authorization request
         $authRequest = new Request([
-            RequestProperties::PARAM_OPERATION         => Comments::OPERATION_UPDATE,
-            RequestProperties::PARAM_RESOURCE_TYPE     => Comments::RESOURCE_TYPE,
-            RequestProperties::PARAM_RESOURCE_IDENTITY => 123, // <- ID 123 is owned
+            RequestProperties::REQUEST_OPERATION         => Comments::OPERATION_UPDATE,
+            RequestProperties::REQUEST_RESOURCE_TYPE     => Comments::RESOURCE_TYPE,
+            RequestProperties::REQUEST_RESOURCE_IDENTITY => 123, // <- ID 123 is owned
         ]);
         $this->assertTrue($policyEnforcement->authorize($authRequest));
 
         // send authorization request
         $authRequest = new Request([
-            RequestProperties::PARAM_OPERATION         => Comments::OPERATION_UPDATE,
-            RequestProperties::PARAM_RESOURCE_TYPE     => Comments::RESOURCE_TYPE,
-            RequestProperties::PARAM_RESOURCE_IDENTITY => 1234, // <- ID 1234 is not owned
+            RequestProperties::REQUEST_OPERATION         => Comments::OPERATION_UPDATE,
+            RequestProperties::REQUEST_RESOURCE_TYPE     => Comments::RESOURCE_TYPE,
+            RequestProperties::REQUEST_RESOURCE_IDENTITY => 1234, // <- ID 1234 is not owned
         ]);
         $this->assertFalse($policyEnforcement->authorize($authRequest));
     }
@@ -194,9 +194,9 @@ class PolicyEnforcementTest extends TestCase
         $this->currentUserId   = 789;
         $policyEnforcement     = $this->createPolicyEnforcementPoint();
         $authRequest           = new Request([
-            RequestProperties::PARAM_OPERATION         => Comments::OPERATION_UPDATE,
-            RequestProperties::PARAM_RESOURCE_TYPE     => Comments::RESOURCE_TYPE,
-            RequestProperties::PARAM_RESOURCE_IDENTITY => 1234, // <- ID 1234 is not owned
+            RequestProperties::REQUEST_OPERATION         => Comments::OPERATION_UPDATE,
+            RequestProperties::REQUEST_RESOURCE_TYPE     => Comments::RESOURCE_TYPE,
+            RequestProperties::REQUEST_RESOURCE_IDENTITY => 1234, // <- ID 1234 is not owned
         ]);
         $this->assertTrue($policyEnforcement->authorize($authRequest));
     }
@@ -210,7 +210,7 @@ class PolicyEnforcementTest extends TestCase
         $policy                    = new Policy([(new Rule())], new TestRuleAlgorithm());
         $encodedPolicy             = Encoder::encodePolicy($policy);
         $context                   = new Context(new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
         $result = BasePolicyOrSetAlgorithm::evaluatePolicy(
@@ -235,7 +235,7 @@ class PolicyEnforcementTest extends TestCase
         $policy                    = new Policy([(new Rule())], new TestRuleAlgorithm());
         $encodedPolicy             = Encoder::encodePolicy($policy);
         $context                   = new Context(new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
         $result = BasePolicyOrSetAlgorithm::evaluatePolicy(
@@ -260,7 +260,7 @@ class PolicyEnforcementTest extends TestCase
         $policy                    = new Policy([(new Rule())], new TestRuleAlgorithm());
         $encodedPolicy             = Encoder::encodePolicy($policy);
         $context                   = new Context(new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
         $result = BasePolicyOrSetAlgorithm::evaluatePolicy(
@@ -285,7 +285,7 @@ class PolicyEnforcementTest extends TestCase
         $policy                    = new Policy([(new Rule())], new TestRuleAlgorithm());
         $encodedPolicy             = Encoder::encodePolicy($policy);
         $context                   = new Context(new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
         $result = BasePolicyOrSetAlgorithm::evaluatePolicy(
@@ -310,7 +310,7 @@ class PolicyEnforcementTest extends TestCase
         $policy                    = new Policy([(new Rule())], new TestRuleAlgorithm());
         $encodedPolicy             = Encoder::encodePolicy($policy);
         $context                   = new Context(new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
         $result = BasePolicyOrSetAlgorithm::evaluatePolicy(
@@ -335,7 +335,7 @@ class PolicyEnforcementTest extends TestCase
         $policy                    = new Policy([(new Rule())], new TestRuleAlgorithm());
         $encodedPolicy             = Encoder::encodePolicy($policy);
         $context                   = new Context(new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
         $result = BasePolicyOrSetAlgorithm::evaluatePolicy(
@@ -359,7 +359,7 @@ class PolicyEnforcementTest extends TestCase
         $set           = Application::getApplicationPolicy();
         $encodedPolicy = Encoder::encodePolicySet($set);
         $context       = new Context(new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
         $logger = null;
@@ -385,7 +385,7 @@ class PolicyEnforcementTest extends TestCase
         $set           = Application::getApplicationPolicy();
         $encodedPolicy = Encoder::encodePolicySet($set);
         $context       = new Context(new Request([
-            RequestProperties::PARAM_OPERATION => Messaging::OPERATION_SEND,
+            RequestProperties::REQUEST_OPERATION => Messaging::OPERATION_SEND,
         ]), $this->getContextDefinitions());
 
         $logger = null;
@@ -527,12 +527,12 @@ class PolicyEnforcementTest extends TestCase
     private function getContextDefinitions()
     {
         return [
-            LoggerInterface::class                     => $this->getLogger(),
-            ContextProperties::PARAM_CURRENT_USER_ID   => $this->currentUserId,
-            ContextProperties::PARAM_CURRENT_USER_ROLE => $this->currentUserRole,
-            ContextProperties::PARAM_USER_IS_SIGNED_IN => $this->currentUserId !== null &&
+            LoggerInterface::class                       => $this->getLogger(),
+            ContextProperties::CONTEXT_CURRENT_USER_ID   => $this->currentUserId,
+            ContextProperties::CONTEXT_CURRENT_USER_ROLE => $this->currentUserRole,
+            ContextProperties::CONTEXT_USER_IS_SIGNED_IN => $this->currentUserId !== null &&
                 $this->currentUserRole !== null,
-            ContextProperties::PARAM_IS_WORK_TIME      => function () {
+            ContextProperties::CONTEXT_IS_WORK_TIME      => function () {
                 return $this->isWorkTime;
             },
         ];

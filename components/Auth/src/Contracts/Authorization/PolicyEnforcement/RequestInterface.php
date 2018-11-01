@@ -16,22 +16,11 @@
  * limitations under the License.
  */
 
+use Psr\Container\ContainerInterface;
+
 /**
  * @package Limoncello\Auth
  */
-interface RequestInterface
+interface RequestInterface extends ContainerInterface
 {
-    /**
-     * @param string|int $key
-     *
-     * @return bool
-     */
-    public function has($key): bool;
-
-    /**
-     * @param string|int $key
-     *
-     * @return mixed
-     */
-    public function get($key);
 }

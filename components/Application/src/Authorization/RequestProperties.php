@@ -19,17 +19,26 @@
 /**
  * @package Limoncello\Application
  */
-class RequestProperties
+interface RequestProperties
 {
     /** Request key */
-    const REQ_ACTION = 'action';
+    const REQ_FIRST = 0;
+
+   /** Request key */
+    const REQ_ACTION = self::REQ_FIRST;
 
     /** Request key */
-    const REQ_RESOURCE_TYPE = 'type';
+    const REQ_RESOURCE_TYPE = self::REQ_ACTION + 1;
 
     /** Request key */
-    const REQ_RESOURCE_IDENTITY = 'id';
+    const REQ_RESOURCE_IDENTITY = self::REQ_RESOURCE_TYPE + 1;
 
     /** Request key */
-    const REQ_LAST = 0;
+    const REQ_RESOURCE_ATTRIBUTES = self::REQ_RESOURCE_IDENTITY + 1;
+
+    /** Request key */
+    const REQ_RESOURCE_RELATIONSHIPS = self::REQ_RESOURCE_ATTRIBUTES + 1;
+
+    /** Request key */
+    const REQ_LAST = self::REQ_RESOURCE_RELATIONSHIPS;
 }

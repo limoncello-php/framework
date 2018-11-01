@@ -46,8 +46,8 @@ abstract class Messaging extends General
     protected static function targetSendMessage()
     {
         return static::targetMulti([
-            ContextProperties::PARAM_OPERATION    => static::OPERATION_SEND,
-            ContextProperties::PARAM_IS_WORK_TIME => true,
+            ContextProperties::REQUEST_OPERATION    => static::OPERATION_SEND,
+            ContextProperties::CONTEXT_IS_WORK_TIME => true,
         ]);
     }
 }

@@ -59,8 +59,10 @@ class AuthorizationManagerTest extends TestCase
     public function testTraitWrappers(): void
     {
         $actionName       = 'some_action';
-        $resourceType     = 'some_type';
-        $resourceIdentity = ['some_identity'];
+        $resType          = 'some_type';
+        $resIdentity      = ['some_identity'];
+        $resAttributes    = ['attribute_name' => 'value'];
+        $resRelationships = ['relationships_name1' => 'value1', 'relationships_name2' => ['value2', 'value3']];
         $container        = new Container();
 
         /** @var Mock $managerMock */
@@ -73,15 +75,20 @@ class AuthorizationManagerTest extends TestCase
         ];
         $reqProperties  = [
             RequestProperties::REQ_ACTION            => $actionName,
-            RequestProperties::REQ_RESOURCE_TYPE     => $resourceType,
-            RequestProperties::REQ_RESOURCE_IDENTITY => $resourceIdentity,
+            RequestProperties::REQ_RESOURCE_TYPE     => $resType,
+            RequestProperties::REQ_RESOURCE_IDENTITY => $resIdentity,
+
+            RequestProperties::REQ_RESOURCE_ATTRIBUTES    => $resAttributes,
+            RequestProperties::REQ_RESOURCE_RELATIONSHIPS => $resRelationships,
         ];
 
         $context = new Context(new Request($reqProperties), $ctxDefinitions);
 
         $this->assertEquals($actionName, $this->reqGetAction($context));
-        $this->assertEquals($resourceType, $this->reqGetResourceType($context));
-        $this->assertEquals($resourceIdentity, $this->reqGetResourceIdentity($context));
+        $this->assertEquals($resType, $this->reqGetResourceType($context));
+        $this->assertEquals($resIdentity, $this->reqGetResourceIdentity($context));
+        $this->assertEquals($resAttributes, $this->reqGetResourceAttributes($context));
+        $this->assertEquals($resRelationships, $this->reqGetResourceRelationships($context));
         $this->assertEquals($container, $this->ctxGetContainer($context));
         $this->assertEquals($curAccount, $this->ctxGetCurrentAccount($context));
     }

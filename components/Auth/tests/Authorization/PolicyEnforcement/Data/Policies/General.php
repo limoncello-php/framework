@@ -52,7 +52,7 @@ abstract class General
      */
     public static function isAdmin(ContextInterface $context)
     {
-        $curUserRole = $context->get(ContextProperties::PARAM_CURRENT_USER_ROLE);
+        $curUserRole = $context->get(ContextProperties::CONTEXT_CURRENT_USER_ROLE);
         $result      = $curUserRole === 'admin';
 
         return $result;
@@ -93,7 +93,7 @@ abstract class General
      */
     protected static function targetOperationRead()
     {
-        return static::target(ContextProperties::PARAM_OPERATION, static::OPERATION_READ);
+        return static::target(ContextProperties::REQUEST_OPERATION, static::OPERATION_READ);
     }
 
     /**
@@ -101,7 +101,7 @@ abstract class General
      */
     protected static function targetOperationUpdate()
     {
-        return static::target(ContextProperties::PARAM_OPERATION, static::OPERATION_UPDATE);
+        return static::target(ContextProperties::REQUEST_OPERATION, static::OPERATION_UPDATE);
     }
 
     /**
@@ -109,7 +109,7 @@ abstract class General
      */
     protected static function targetOperationDelete()
     {
-        return static::target(ContextProperties::PARAM_OPERATION, static::OPERATION_DELETE);
+        return static::target(ContextProperties::REQUEST_OPERATION, static::OPERATION_DELETE);
     }
 
     /**
@@ -117,7 +117,7 @@ abstract class General
      */
     protected static function targetOperationIndex()
     {
-        return static::target(ContextProperties::PARAM_OPERATION, static::OPERATION_INDEX);
+        return static::target(ContextProperties::REQUEST_OPERATION, static::OPERATION_INDEX);
     }
 
     /**

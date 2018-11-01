@@ -45,7 +45,7 @@ abstract class Posts extends General
             static::onDelete(),
         ], RuleAlgorithm::firstApplicable())
         )
-            ->setTarget(static::target(ContextProperties::PARAM_RESOURCE_TYPE, static::RESOURCE_TYPE))
+            ->setTarget(static::target(ContextProperties::REQUEST_RESOURCE_TYPE, static::RESOURCE_TYPE))
             ->setName('Posts');
     }
 

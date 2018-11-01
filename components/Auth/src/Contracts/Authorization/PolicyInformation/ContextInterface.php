@@ -17,10 +17,15 @@
  */
 
 use Limoncello\Auth\Contracts\Authorization\PolicyEnforcement\RequestInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package Limoncello\Auth
  */
-interface ContextInterface extends RequestInterface
+interface ContextInterface extends ContainerInterface
 {
+    /**
+     * @return RequestInterface
+     */
+    public function getRequest(): RequestInterface;
 }

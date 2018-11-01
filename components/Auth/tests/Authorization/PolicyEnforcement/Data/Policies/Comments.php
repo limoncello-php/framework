@@ -51,7 +51,7 @@ abstract class Comments extends General
             static::onDelete(),
         ], RuleAlgorithm::permitOverrides())
         )
-            ->setTarget(static::target(ContextProperties::PARAM_RESOURCE_TYPE, static::RESOURCE_TYPE))
+            ->setTarget(static::target(ContextProperties::REQUEST_RESOURCE_TYPE, static::RESOURCE_TYPE))
             ->setName('Comments');
     }
 
@@ -80,8 +80,8 @@ abstract class Comments extends General
         $advice     = new Advice(EvaluationEnum::PERMIT, [PolicyEnforcementTest::class, 'markAdviceAsCalled']);
 
         return (new Rule())->setTarget(static::targetMulti([
-            ContextProperties::PARAM_OPERATION         => static::OPERATION_CREATE,
-            ContextProperties::PARAM_USER_IS_SIGNED_IN => true,
+            ContextProperties::REQUEST_OPERATION         => static::OPERATION_CREATE,
+            ContextProperties::CONTEXT_USER_IS_SIGNED_IN => true,
         ]))->setName('create')->setObligations([$obligation])->setAdvice([$advice]);
     }
 
@@ -92,8 +92,8 @@ abstract class Comments extends General
     {
         return (new Rule())
             ->setTarget(static::targetMulti([
-                ContextProperties::PARAM_OPERATION         => static::OPERATION_UPDATE,
-                ContextProperties::PARAM_USER_IS_SIGNED_IN => true,
+                ContextProperties::REQUEST_OPERATION         => static::OPERATION_UPDATE,
+                ContextProperties::CONTEXT_USER_IS_SIGNED_IN => true,
             ]))
             ->setCondition(static::conditionIsCommentOwnerOrAdmin())
             ->setName('update');
@@ -114,8 +114,8 @@ abstract class Comments extends General
     {
         return (new Rule())
             ->setTarget(static::targetMulti([
-                ContextProperties::PARAM_OPERATION         => static::OPERATION_DELETE,
-                ContextProperties::PARAM_USER_IS_SIGNED_IN => true,
+                ContextProperties::REQUEST_OPERATION         => static::OPERATION_DELETE,
+                ContextProperties::CONTEXT_USER_IS_SIGNED_IN => true,
             ]))
             ->setCondition(static::conditionIsCommentOwnerOrAdmin())
             ->setName('delete');
@@ -128,7 +128,7 @@ abstract class Comments extends General
      */
     public static function isCommentOwnerOrAdmin(ContextInterface $context)
     {
-        $commentId = $context->get(ContextProperties::PARAM_RESOURCE_IDENTITY);
+        $commentId = $context->get(ContextProperties::REQUEST_RESOURCE_IDENTITY);
         // for testing purposes let's pretend current user is owner of comment with ID 123
         $isOwner = $commentId === 123;
         $result  = $isOwner === true || static::isAdmin($context) === true;
