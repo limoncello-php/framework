@@ -422,17 +422,58 @@ class ModelQueryBuilder extends QueryBuilder
         int $joinIndividuals = self::AND,
         int $joinRelationship = self::AND
     ): self {
-        $targetAlias = $this->createRelationshipAlias($relationshipName);
+        $targetAlias = null;
 
         if ($relationshipFilters !== null) {
+            $isBelongsTo = $this->getModelSchemas()
+                    ->getRelationshipType($this->getModelClass(), $relationshipName) === RelationshipTypes::BELONGS_TO;
+
+            // it will have non-null value only in a `belongsTo` relationship
+            $reversePk = $isBelongsTo === true ?
+                $this->getModelSchemas()->getReversePrimaryKey($this->getModelClass(), $relationshipName)[0] : null;
+
             $addWith = $joinIndividuals === self::AND ? $this->expr()->andX() : $this->expr()->orX();
-            $this->applyFilters($addWith, $targetAlias, $relationshipFilters);
-            if ($addWith->count() > 0) {
-                $joinRelationship === self::AND ? $this->andWhere($addWith) : $this->orWhere($addWith);
+
+            foreach ($relationshipFilters as $columnName => $operationsWithArgs) {
+                if ($columnName === $reversePk) {
+                    // We are applying a filter to a primary key in `belongsTo` relationship
+                    // It could be replaced with a filter to a value in main table. Why might we need it?
+                    // Filter could be 'IS NULL' so joining a table will not work because there are no
+                    // related records with 'NULL` key. For plain values it will produce shorter SQL.
+                    $fkName         = $this->getModelSchemas()->getForeignKey($this->getModelClass(), $relationshipName);
+                    $fullColumnName = $this->getQuotedMainAliasColumn($fkName);
+                } else {
+                    // Will apply filters to a joined table.
+                    $targetAlias    = $targetAlias ?: $this->createRelationshipAlias($relationshipName);
+                    $fullColumnName = $this->buildColumnName($targetAlias, $columnName);
+                }
+
+                foreach ($operationsWithArgs as $operation => $arguments) {
+                    assert(
+                        is_iterable($arguments) === true || is_array($arguments) === true,
+                        "Operation arguments are missing for `$columnName` column. " .
+                        'Use an empty array as an empty argument list.'
+                    );
+                    $addWith->add($this->createFilterExpression($fullColumnName, $operation, $arguments));
+                }
+
+                if ($addWith->count() > 0) {
+                    $joinRelationship === self::AND ? $this->andWhere($addWith) : $this->orWhere($addWith);
+                }
             }
         }
 
-        $relationshipSorts === null ?: $this->applySorts($targetAlias, $relationshipSorts);
+
+        if ($relationshipSorts !== null) {
+            foreach ($relationshipSorts as $columnName => $isAsc) {
+                // we join the table only once and only if we have at least one 'sort' or non-belongsToPK filter.
+                $targetAlias = $targetAlias ?: $this->createRelationshipAlias($relationshipName);
+
+                assert(is_string($columnName) === true && is_bool($isAsc) === true);
+                $fullColumnName = $this->buildColumnName($targetAlias, $columnName);
+                $this->addOrderBy($fullColumnName, $isAsc === true ? 'ASC' : 'DESC');
+            }
+        }
 
         return $this;
     }

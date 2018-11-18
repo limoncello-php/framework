@@ -79,7 +79,7 @@ class ModelQueryBuilderTest extends TestCase
             '"posts1"."title", "posts1"."text", "posts1"."created_at", "posts1"."updated_at", "posts1"."deleted_at" ' .
             'FROM "posts" "posts1" ' .
             'INNER JOIN "users" "users2" ON "posts1"."id_user_fk"="users2"."id_user" ' .
-            'WHERE "users2"."id_user" = :dcValue1 ' .
+            'WHERE "posts1"."id_user_fk" = :dcValue1 ' .
             'ORDER BY "users2"."first_name" DESC';
         $this->assertEquals($expected, $builder->getSQL());
 
@@ -113,8 +113,7 @@ class ModelQueryBuilderTest extends TestCase
             'SELECT "posts1"."id_post", "posts1"."id_board_fk", "posts1"."id_user_fk", "posts1"."id_editor_fk", ' .
             '"posts1"."title", "posts1"."text", "posts1"."created_at", "posts1"."updated_at", "posts1"."deleted_at" ' .
             'FROM "posts" "posts1" ' .
-            'INNER JOIN "users" "users2" ON "posts1"."id_user_fk"="users2"."id_user" ' .
-            'WHERE "users2"."id_user" = :dcValue1';
+            'WHERE "posts1"."id_user_fk" = :dcValue1';
         $this->assertEquals($expected, $builder->getSQL());
 
         $this->migrateDatabase($this->connection);
