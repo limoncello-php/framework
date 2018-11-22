@@ -78,6 +78,14 @@ class {%SINGULAR_CC%} implements ModelInterface
     /**
      * @inheritdoc
      */
+    public static function getRawAttributes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function getAttributeLengths(): array
     {
         return [
