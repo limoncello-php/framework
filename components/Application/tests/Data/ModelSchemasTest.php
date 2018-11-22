@@ -71,6 +71,7 @@ class ModelSchemasTest extends TestCase
             Comment::FIELD_TEXT,
             Comment::FIELD_CREATED_AT,
         ], $this->schemas->getAttributes(Comment::class));
+        $this->assertEquals([], $this->schemas->getRawAttributes(Comment::class));
         $this->assertTrue($this->schemas->hasAttributeType(Comment::class, Comment::FIELD_TEXT));
         $this->assertFalse($this->schemas->hasAttributeType(Comment::class, 'non-existing-field'));
         $this->assertTrue($this->schemas->hasAttributeLength(Comment::class, Comment::FIELD_TEXT));
