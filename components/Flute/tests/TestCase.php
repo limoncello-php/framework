@@ -32,6 +32,7 @@ use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\ModelSchemas;
 use Limoncello\Tests\Flute\Data\Models\Post;
+use Limoncello\Tests\Flute\Data\Models\PostExtended;
 use Limoncello\Tests\Flute\Data\Models\Role;
 use Limoncello\Tests\Flute\Data\Models\StringPKModel;
 use Limoncello\Tests\Flute\Data\Models\User;
@@ -75,7 +76,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
                 $modelClass::getTableName(),
                 $modelClass::getPrimaryKeyName(),
                 $modelClass::getAttributeTypes(),
-                $modelClass::getAttributeLengths()
+                $modelClass::getAttributeLengths(),
+                $modelClass::getRawAttributes()
             );
 
             $relationships = $modelClass::getRelationships();
@@ -211,6 +213,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             User::class,
             Category::class,
             StringPKModel::class,
+            PostExtended::class,
         ]);
 
         return $modelSchemas;

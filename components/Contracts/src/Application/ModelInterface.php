@@ -45,4 +45,9 @@ interface ModelInterface
      * @return array
      */
     public static function getRelationships(): array;
+
+    /**
+     * @return array
+     */
+    public static function getRawAttributes(): array;
 }

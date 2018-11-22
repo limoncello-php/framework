@@ -26,6 +26,7 @@ use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Emotion;
 use Limoncello\Tests\Flute\Data\Models\Post;
+use Limoncello\Tests\Flute\Data\Models\PostExtended;
 use Limoncello\Tests\Flute\Data\Models\User;
 use Limoncello\Tests\Flute\TestCase;
 
@@ -495,6 +496,31 @@ class ModelQueryBuilderTest extends TestCase
 
         $this->assertEquals('"boards"."title"', $builder->getQuotedMainTableColumn(Board::FIELD_TITLE));
         $this->assertEquals('"boards1"."title"', $builder->getQuotedMainAliasColumn(Board::FIELD_TITLE));
+    }
+
+    /**
+     * Test reading models with extra properties.
+     *
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function testIndexExtendedModels(): void
+    {
+        $builder = $this->createModelQueryBuilder(PostExtended::class);
+
+        $builder
+            ->selectModelColumns()
+            ->fromModelTable();
+
+        $expected =
+            'SELECT "posts_extended1"."id_post", "posts_extended1"."id_board_fk", "posts_extended1"."id_user_fk", ' .
+            '"posts_extended1"."id_editor_fk", "posts_extended1"."title", "posts_extended1"."text", ' .
+            '"posts_extended1"."created_at", "posts_extended1"."updated_at", "posts_extended1"."deleted_at", ' .
+            '(SELECT first_name FROM users WHERE id_user = "posts_extended1"."id_user_fk") AS user_name ' .
+            'FROM "posts_extended" "posts_extended1"';
+        $this->assertEquals($expected, $builder->getSQL());
+
+        $this->migrateDatabase($this->connection);
     }
 
     /**

@@ -99,6 +99,11 @@ class ModelSchemas implements ModelSchemaInfoInterface
     private $attributes = [];
 
     /**
+     * @var array
+     */
+    private $rawAttributes = [];
+
+    /**
      * @inheritdoc
      */
     public function getData(): array
@@ -113,6 +118,7 @@ class ModelSchemas implements ModelSchemaInfoInterface
             $this->attributeTypes,
             $this->attributeLengths,
             $this->attributes,
+            $this->rawAttributes,
             $this->reversedClasses,
         ];
 
@@ -126,7 +132,8 @@ class ModelSchemas implements ModelSchemaInfoInterface
     {
         list($this->foreignKeys, $this->belongsToMany, $this->relationshipTypes,
             $this->reversedRelationships,$this->tableNames, $this->primaryKeys,
-            $this->attributeTypes, $this->attributeLengths, $this->attributes, $this->reversedClasses) = $data;
+            $this->attributeTypes, $this->attributeLengths, $this->attributes, $this->rawAttributes,
+            $this->reversedClasses) = $data;
     }
 
     /**
@@ -137,7 +144,8 @@ class ModelSchemas implements ModelSchemaInfoInterface
         string $tableName,
         string $primaryKey,
         array $attributeTypes,
-        array $attributeLengths
+        array $attributeLengths,
+        array $rawAttributes = []
     ): ModelSchemaInfoInterface {
         if (empty($class) === true) {
             throw new InvalidArgumentException('class');
@@ -156,6 +164,7 @@ class ModelSchemas implements ModelSchemaInfoInterface
         $this->attributeTypes[$class]   = $attributeTypes;
         $this->attributeLengths[$class] = $attributeLengths;
         $this->attributes[$class]       = array_keys($attributeTypes);
+        $this->rawAttributes[$class]    = $rawAttributes;
 
         return $this;
     }
@@ -256,6 +265,16 @@ class ModelSchemas implements ModelSchemaInfoInterface
     public function getAttributes(string $class): array
     {
         $result = $this->attributes[$class];
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRawAttributes(string $class): array
+    {
+        $result = $this->rawAttributes[$class];
 
         return $result;
     }

@@ -129,13 +129,22 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function selectModelColumns(iterable $columns = null): self
     {
-        $selectedColumns =
-            $columns === null ? $this->getModelSchemas()->getAttributes($this->getModelClass()) : $columns;
+        if ($columns !== null) {
+            $selectedColumns = $columns;
+            $extraColumns    = [];
+        } else {
+            $selectedColumns = $this->getModelSchemas()->getAttributes($this->getModelClass());
+            $extraColumns    = $this->getModelSchemas()->getRawAttributes($this->getModelClass());
+        }
 
         $quotedColumns = [];
         $columnMapper  = $this->getColumnToDatabaseMapper();
         foreach ($selectedColumns as $column) {
             $quotedColumns[] = call_user_func($columnMapper, $column, $this);
+        }
+        foreach ($extraColumns as $columnOrCallable) {
+            $isCallable      = is_callable($columnOrCallable) === true;
+            $quotedColumns[] = $isCallable ? call_user_func($columnOrCallable, $this) : $columnOrCallable;
         }
 
         $this->select($quotedColumns);

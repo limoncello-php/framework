@@ -1,6 +1,6 @@
 <?php namespace Limoncello\Contracts\Data;
 
-    /**
+/**
  * Copyright 2015-2018 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,13 @@
  */
 interface ModelSchemaInfoInterface
 {
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @param string $class
      * @param string $tableName
      * @param string $primaryKey
      * @param array  $attributeTypes
      * @param array  $attributeLengths
+     * @param array  $rawAttributes
      *
      * @return self
      */
@@ -35,7 +36,8 @@ interface ModelSchemaInfoInterface
         string $tableName,
         string $primaryKey,
         array $attributeTypes,
-        array $attributeLengths
+        array $attributeLengths,
+        array $rawAttributes = []
     ): self;
 
     /**
@@ -105,6 +107,13 @@ interface ModelSchemaInfoInterface
      * @return array
      */
     public function getAttributes(string $class): array;
+
+    /**
+     * @param string $class
+     *
+     * @return array
+     */
+    public function getRawAttributes(string $class): array;
 
     /**
      * Check if it has attribute length.

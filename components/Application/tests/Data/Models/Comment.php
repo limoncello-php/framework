@@ -98,4 +98,21 @@ class Comment extends Model
             ],
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getRawAttributes(): array
+    {
+        $usersTable = User::TABLE_NAME;
+        $userId     = User::FIELD_ID;
+        $userName   = User::FIELD_FIRST_NAME;
+        $authorId   = self::FIELD_ID_USER;
+
+        return [
+
+            "(SELECT $userName FROM $usersTable WHERE $userId = $authorId) AS user_name",
+
+        ] + parent::getRawAttributes();
+    }
 }

@@ -76,6 +76,11 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
     private $attributes = [];
 
     /**
+     * @var array
+     */
+    private $rawAttributes = [];
+
+    /**
      * @return array
      */
     public function getData(): array
@@ -90,6 +95,7 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
             $this->attributeTypes,
             $this->attributeLengths,
             $this->attributes,
+            $this->rawAttributes,
             $this->reversedClasses,
         ];
 
@@ -105,12 +111,13 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
     {
         list($this->foreignKeys, $this->belongsToMany, $this->relationshipTypes,
             $this->reversedRelationships,$this->tableNames, $this->primaryKeys,
-            $this->attributeTypes, $this->attributeLengths, $this->attributes, $this->reversedClasses) = $data;
+            $this->attributeTypes, $this->attributeLengths, $this->attributes, $this->rawAttributes,
+            $this->reversedClasses) = $data;
 
         return $this;
     }
 
-    /**
+    /** @noinspection PhpTooManyParametersInspection
      * @inheritdoc
      */
     public function registerClass(
@@ -118,7 +125,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
         string $tableName,
         string $primaryKey,
         array $attributeTypes,
-        array $attributeLengths
+        array $attributeLengths,
+        array $rawAttributes = []
     ): ModelSchemaInfoInterface {
         if (empty($class) === true) {
             throw new InvalidArgumentException('class');
@@ -137,6 +145,7 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
         $this->attributeTypes[$class]   = $attributeTypes;
         $this->attributeLengths[$class] = $attributeLengths;
         $this->attributes[$class]       = array_keys($attributeTypes);
+        $this->rawAttributes[$class]    = $rawAttributes;
 
         return $this;
     }
@@ -242,6 +251,16 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
     public function getAttributes(string $class): array
     {
         $result = $this->attributes[$class];
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRawAttributes(string $class): array
+    {
+        $result = $this->rawAttributes[$class];
 
         return $result;
     }

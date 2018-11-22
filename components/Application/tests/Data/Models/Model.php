@@ -53,4 +53,13 @@ abstract class Model implements ModelInterface
     {
         return static::FIELD_ID;
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public static function getRawAttributes(): array
+    {
+        return [];
+    }
 }

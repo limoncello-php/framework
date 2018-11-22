@@ -115,7 +115,8 @@ abstract class DataSettings implements SettingsInterface, DataSettingsInterface
                 $modelClass::getTableName(),
                 $modelClass::getPrimaryKeyName(),
                 $modelClass::getAttributeTypes(),
-                $modelClass::getAttributeLengths()
+                $modelClass::getAttributeLengths(),
+                $modelClass::getRawAttributes()
             );
 
             $relationships = $modelClass::getRelationships();
