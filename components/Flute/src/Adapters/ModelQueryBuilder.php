@@ -126,6 +126,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable|null $columns
      *
      * @return self
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function selectModelColumns(iterable $columns = null): self
     {
@@ -423,6 +425,10 @@ class ModelQueryBuilder extends QueryBuilder
      * @return self
      *
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addRelationshipFiltersAndSorts(
         string $relationshipName,
@@ -449,7 +455,8 @@ class ModelQueryBuilder extends QueryBuilder
                     // It could be replaced with a filter to a value in main table. Why might we need it?
                     // Filter could be 'IS NULL' so joining a table will not work because there are no
                     // related records with 'NULL` key. For plain values it will produce shorter SQL.
-                    $fkName         = $this->getModelSchemas()->getForeignKey($this->getModelClass(), $relationshipName);
+                    $fkName         =
+                        $this->getModelSchemas()->getForeignKey($this->getModelClass(), $relationshipName);
                     $fullColumnName = $this->getQuotedMainAliasColumn($fkName);
                 } else {
                     // Will apply filters to a joined table.
