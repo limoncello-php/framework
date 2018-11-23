@@ -692,39 +692,6 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
-     * @param string $name
-     *
-     * @return Type
-     *
-     * @throws DBALException
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    protected function getDbalType(string $name): Type
-    {
-        assert(Type::hasType($name), "Type `$name` either do not exist or registered.");
-        $type = Type::getType($name);
-
-        return $type;
-    }
-
-    /**
-     * @return string
-     */
-    private function getTableName(): string
-    {
-        return $this->mainTableName;
-    }
-
-    /**
-     * @return ModelSchemaInfoInterface
-     */
-    private function getModelSchemas(): ModelSchemaInfoInterface
-    {
-        return $this->modelSchemas;
-    }
-
-    /**
      * @param string $fromAlias
      * @param string $fromColumn
      * @param string $targetTable
@@ -732,7 +699,7 @@ class ModelQueryBuilder extends QueryBuilder
      *
      * @return string
      */
-    private function innerJoinOneTable(
+    public function innerJoinOneTable(
         string $fromAlias,
         string $fromColumn,
         string $targetTable,
@@ -763,7 +730,7 @@ class ModelQueryBuilder extends QueryBuilder
      *
      * @return string
      */
-    private function innerJoinTwoSequentialTables(
+    public function innerJoinTwoSequentialTables(
         string $fromAlias,
         string $fromColumn,
         string $intTable,
@@ -776,6 +743,39 @@ class ModelQueryBuilder extends QueryBuilder
         $targetAlias = $this->innerJoinOneTable($intAlias, $intToTargetColumn, $targetTable, $targetColumn);
 
         return $targetAlias;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Type
+     *
+     * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    protected function getDbalType(string $name): Type
+    {
+        assert(Type::hasType($name), "Type `$name` either do not exist or registered.");
+        $type = Type::getType($name);
+
+        return $type;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTableName(): string
+    {
+        return $this->mainTableName;
+    }
+
+    /**
+     * @return ModelSchemaInfoInterface
+     */
+    private function getModelSchemas(): ModelSchemaInfoInterface
+    {
+        return $this->modelSchemas;
     }
 
     /**
