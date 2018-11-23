@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
+use Limoncello\Application\Data\BaseMigrationRunner;
 use Limoncello\Application\Data\FileMigrationRunner;
 use Limoncello\Application\Data\FileSeedRunner;
 use Limoncello\Application\FileSystem\FileSystem;
@@ -32,6 +33,8 @@ use Mockery\Mock;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
+use ReflectionMethod;
 
 /**
  * @package Limoncello\Tests\Application
@@ -87,6 +90,40 @@ class MigrationAndSeedRunnersTest extends TestCase
 
         $this->assertFalse($manager->tablesExist([FileMigrationRunner::MIGRATIONS_TABLE]));
         $this->assertFalse($manager->tablesExist([FileMigrationRunner::SEEDS_TABLE]));
+    }
+
+    /**
+     * Test migration. Sometimes migration are renamed and rollback fails as it can't find the original class.
+     * It needs to handle such situations.
+     *
+     * @throws DBALException
+     * @throws ReflectionException
+     */
+    public function testInvalidMigrationClass(): void
+    {
+        // This test is designed to test/cover specific implementation rather than functionality and
+        // needed to simulate very specific situation.
+
+        /** @var Mock $inOut */
+        $inOut = Mockery::mock(IoInterface::class);
+        $inOut->shouldReceive('writeWarning')->once()->withAnyArgs()->andReturnSelf();
+
+        /** @var IoInterface $inOut */
+
+        $runner = Mockery::mock(BaseMigrationRunner::class);
+        $runner->makePartial();
+
+        $container  = $this->createContainer();
+
+        $method = new ReflectionMethod(BaseMigrationRunner::class, 'setIO');
+        $method->setAccessible(true);
+        $method->invoke($runner, $inOut);
+
+        $method = new ReflectionMethod(BaseMigrationRunner::class, 'createMigration');
+        $method->setAccessible(true);
+        $nullMigration = $method->invoke($runner, 'non-existing-class', $container);
+
+        $this->assertNull($nullMigration);
     }
 
     /**

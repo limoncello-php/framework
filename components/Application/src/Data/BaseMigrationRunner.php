@@ -23,6 +23,7 @@ use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Error;
 use Exception;
 use Generator;
 use Limoncello\Contracts\Commands\IoInterface;
@@ -85,10 +86,10 @@ abstract class BaseMigrationRunner
         foreach ($this->getMigrations($container) as $class) {
             assert(is_string($class));
             $this->getIO()->writeInfo("Starting migration for `$class`..." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
-            /** @var MigrationInterface $migration */
-            $migration = new $class($container);
-            $migration->init($container)->migrate();
-            $this->getIO()->writeInfo("Migration finished for `$class`." . PHP_EOL, IoInterface::VERBOSITY_NORMAL);
+            if (($migration = $this->createMigration($class, $container)) !== null) {
+                $migration->init($container)->migrate();
+                $this->getIO()->writeInfo("Migration finished for `$class`." . PHP_EOL, IoInterface::VERBOSITY_NORMAL);
+            }
         }
     }
 
@@ -107,10 +108,10 @@ abstract class BaseMigrationRunner
         foreach ($this->getRollbacks($container) as $class) {
             assert(is_string($class));
             $this->getIO()->writeInfo("Starting rollback for `$class`..." . PHP_EOL, IoInterface::VERBOSITY_VERBOSE);
-            /** @var MigrationInterface $migration */
-            $migration = new $class($container);
-            $migration->init($container)->rollback();
-            $this->getIO()->writeInfo("Rollback finished for `$class`." . PHP_EOL, IoInterface::VERBOSITY_NORMAL);
+            if (($migration = $this->createMigration($class, $container)) !== null) {
+                $migration->init($container)->rollback();
+                $this->getIO()->writeInfo("Rollback finished for `$class`." . PHP_EOL, IoInterface::VERBOSITY_NORMAL);
+            }
         }
 
         $manager = $this->getConnection($container)->getSchemaManager();
@@ -293,5 +294,25 @@ abstract class BaseMigrationRunner
     private function removeMigration(Connection $connection, int $index): void
     {
         $connection->delete(static::MIGRATIONS_TABLE, [static::MIGRATIONS_COLUMN_ID => $index]);
+    }
+
+    /**
+     * @param string             $class
+     * @param ContainerInterface $container
+     *
+     * @return MigrationInterface|null
+     */
+    private function createMigration(string $class, ContainerInterface $container): ?MigrationInterface
+    {
+        $migration = null;
+
+        try {
+            /** @var MigrationInterface $migration */
+            $migration = new $class($container);
+        } catch (Error $exception) {
+            $this->getIO()->writeWarning("Migration `$class` not found." . PHP_EOL);
+        }
+
+        return $migration;
     }
 }
