@@ -1806,7 +1806,7 @@ class Crud implements CrudInterface
                     // some paths might not have any records in the database
                     $areParentsLoaded = $idsAtPath->offsetExists($parentsPath);
                     if ($areParentsLoaded === false) {
-                        continue;
+                        break;
                     }
                     // for 'belongsTo' relationship all resources could be read at once.
                     $parentIds            = $idsAtPath[$parentsPath];
