@@ -109,7 +109,7 @@ class ModelQueryBuilder extends QueryBuilder
         $this->mainTableName = $this->getModelSchemas()->getTable($this->getModelClass());
         $this->mainAlias     = $this->createAlias($this->getTableName());
 
-        $this->setColumnToDatabaseMapper(Closure::fromCallable([$this, 'getQuotedMainAliasColumn']));
+        $this->setColumnToDatabaseMapper(Closure::fromCallable([$this, 'buildColumnName']));
     }
 
     /**
@@ -118,6 +118,34 @@ class ModelQueryBuilder extends QueryBuilder
     public function getModelClass(): string
     {
         return $this->modelClass;
+    }
+
+    /**
+     * @param string|null $tableAlias
+     * @param string|null $modelClass
+     *
+     * @return array
+     */
+    public function getModelColumns(string $tableAlias = null, string $modelClass = null): array
+    {
+        $modelClass = $modelClass ?? $this->getModelClass();
+        $tableAlias = $tableAlias ?? $this->getAlias();
+
+        $quotedColumns = [];
+
+        $columnMapper    = $this->getColumnToDatabaseMapper();
+        $selectedColumns = $this->getModelSchemas()->getAttributes($modelClass);
+        foreach ($selectedColumns as $column) {
+            $quotedColumns[] = call_user_func($columnMapper, $tableAlias, $column, $this);
+        }
+
+        $rawColumns = $this->getModelSchemas()->getRawAttributes($modelClass);
+        foreach ($rawColumns as $columnOrCallable) {
+            $quotedColumns[] = is_callable($columnOrCallable) === true ?
+                call_user_func($columnOrCallable, $this) : $columnOrCallable;
+        }
+
+        return $quotedColumns;
     }
 
     /**
@@ -132,21 +160,12 @@ class ModelQueryBuilder extends QueryBuilder
     public function selectModelColumns(iterable $columns = null): self
     {
         if ($columns !== null) {
-            $selectedColumns = $columns;
-            $extraColumns    = [];
+            $quotedColumns = [];
+            foreach ($columns as $column) {
+                $quotedColumns[] = $this->buildColumnName($this->getAlias(), $column);
+            }
         } else {
-            $selectedColumns = $this->getModelSchemas()->getAttributes($this->getModelClass());
-            $extraColumns    = $this->getModelSchemas()->getRawAttributes($this->getModelClass());
-        }
-
-        $quotedColumns = [];
-        $columnMapper  = $this->getColumnToDatabaseMapper();
-        foreach ($selectedColumns as $column) {
-            $quotedColumns[] = call_user_func($columnMapper, $column, $this);
-        }
-        foreach ($extraColumns as $columnOrCallable) {
-            $isCallable      = is_callable($columnOrCallable) === true;
-            $quotedColumns[] = $isCallable ? call_user_func($columnOrCallable, $this) : $columnOrCallable;
+            $quotedColumns = $this->getModelColumns();
         }
 
         $this->select($quotedColumns);
@@ -478,7 +497,6 @@ class ModelQueryBuilder extends QueryBuilder
                 }
             }
         }
-
 
         if ($relationshipSorts !== null) {
             foreach ($relationshipSorts as $columnName => $isAsc) {

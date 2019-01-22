@@ -277,7 +277,7 @@ class CrudTest extends TestCase
             'SELECT * FROM ' . CommentEmotion::TABLE_NAME . ' WHERE ' . CommentEmotion::FIELD_ID_COMMENT . " = $index"
         )->fetchAll(PDO::FETCH_ASSOC);
         $this->assertNotEquals(false, $res);
-        $this->assertCount(2, $res);
+        $this->assertCount(2, (array)$res);
 
         // same checks but this time via API
         $includePaths = [
@@ -993,9 +993,9 @@ class CrudTest extends TestCase
 
         $model = $crud
             ->shouldBeUntyped()
-            ->withColumnMapper(function (string $columnName, ModelQueryBuilder $builder): string {
+            ->withColumnMapper(function (string $aliasName, string $columnName, ModelQueryBuilder $builder): string {
                 // a bit naive implementation but fine for testing purposes
-                $quotedColumnName = $builder->getQuotedMainAliasColumn($columnName);
+                $quotedColumnName = $builder->buildColumnName($aliasName, $columnName);
                 $dateTimeColumns  = [Post::FIELD_CREATED_AT, Post::FIELD_UPDATED_AT, Post::FIELD_DELETED_AT];
                 if (in_array($columnName, $dateTimeColumns) === true) {
                     // emulate output datetime in JSON API as 2015-05-22T14:56:29.000Z
