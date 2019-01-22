@@ -20,6 +20,14 @@ cli_7_2_php:
   working_dir: /app
   tty: true
 
+cli_7_3_php:
+  build: ./../../docker/7_3_cli
+  container_name: cli_7_3_php_limoncello
+  volumes:
+    - .:/app
+  working_dir: /app
+  tty: true
+
 cli_hhvm:
   image: hhvm/hhvm
   container_name: cli_hhvm_limoncello
