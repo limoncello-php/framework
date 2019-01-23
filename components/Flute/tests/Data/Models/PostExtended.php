@@ -104,11 +104,11 @@ class PostExtended extends Model
     {
         return [
 
-            function (ModelQueryBuilder $builder): string {
+            function (string $tableAlias, ModelQueryBuilder $builder): string {
                 $usersTable = User::TABLE_NAME;
                 $userId     = User::FIELD_ID;
                 $userName   = User::FIELD_FIRST_NAME;
-                $authorId   = $builder->getQuotedMainAliasColumn(self::FIELD_ID_USER);
+                $authorId = $builder->buildColumnName($tableAlias, self::FIELD_ID_USER);
 
                 return "(SELECT $userName FROM $usersTable WHERE $userId = $authorId) AS user_name";
             },

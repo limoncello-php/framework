@@ -142,7 +142,7 @@ class ModelQueryBuilder extends QueryBuilder
         $rawColumns = $this->getModelSchemas()->getRawAttributes($modelClass);
         foreach ($rawColumns as $columnOrCallable) {
             $quotedColumns[] = is_callable($columnOrCallable) === true ?
-                call_user_func($columnOrCallable, $this) : $columnOrCallable;
+                call_user_func($columnOrCallable, $tableAlias, $this) : $columnOrCallable;
         }
 
         return $quotedColumns;
