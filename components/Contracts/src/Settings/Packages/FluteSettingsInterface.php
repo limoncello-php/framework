@@ -88,7 +88,10 @@ interface FluteSettingsInterface extends SettingsInterface
     const KEY_MODEL_TO_SCHEMA_MAP = self::KEY_THROWABLE_TO_JSON_API_EXCEPTION_CONVERTER + 1;
 
     /** Config key */
-    const KEY_JSON_VALIDATION_RULE_SETS_DATA = self::KEY_MODEL_TO_SCHEMA_MAP + 1;
+    const KEY_TYPE_TO_SCHEMA_MAP = self::KEY_MODEL_TO_SCHEMA_MAP + 1;
+
+    /** Config key */
+    const KEY_JSON_VALIDATION_RULE_SETS_DATA = self::KEY_TYPE_TO_SCHEMA_MAP + 1;
 
     /** Config key */
     const KEY_ATTRIBUTE_VALIDATION_RULE_SETS_DATA = self::KEY_JSON_VALIDATION_RULE_SETS_DATA + 1;
