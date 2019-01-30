@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Contracts\Schema\ErrorInterface;
 
 /**
  * @package Limoncello\Flute

@@ -24,7 +24,6 @@ use Limoncello\Flute\Types\DateTimeType;
 use Limoncello\Flute\Types\DateType;
 use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiParserFactory;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -58,7 +57,11 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             $settings     = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
             $modelSchemas = $container->get(ModelSchemaInfoInterface::class);
 
-            return $factory->createJsonSchemas($settings[FluteSettings::KEY_MODEL_TO_SCHEMA_MAP], $modelSchemas);
+            return $factory->createJsonSchemas(
+                $settings[FluteSettings::KEY_MODEL_TO_SCHEMA_MAP],
+                $settings[FluteSettings::KEY_TYPE_TO_SCHEMA_MAP],
+                $modelSchemas
+            );
         };
 
         $container[ParametersMapperInterface::class] = function (PsrContainerInterface $container) {
@@ -69,13 +72,14 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             /** @var JsonSchemasInterface $jsonSchemas */
             $jsonSchemas = $container->get(JsonSchemasInterface::class);
             $settings    = $container->get(SettingsProviderInterface::class)->get(FluteSettings::class);
-            $encoder     = $factory->createEncoder($jsonSchemas, new EncoderOptions(
-                $settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS],
-                $settings[FluteSettings::KEY_URI_PREFIX],
-                $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
-            ));
+            $encoder     = $factory
+                ->createEncoder($jsonSchemas)
+                ->withEncodeOptions($settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS])
+                ->withEncodeDepth($settings[FluteSettings::KEY_JSON_ENCODE_DEPTH])
+                ->withUrlPrefix($settings[FluteSettings::KEY_URI_PREFIX]);
             isset($settings[FluteSettings::KEY_META]) ? $encoder->withMeta($settings[FluteSettings::KEY_META]) : null;
-            ($settings[FluteSettings::KEY_IS_SHOW_VERSION] ?? false) ? $encoder->withJsonApiVersion() : null;
+            ($settings[FluteSettings::KEY_IS_SHOW_VERSION] ?? false) ?
+                $encoder->withJsonApiVersion(FluteSettings::DEFAULT_JSON_API_VERSION) : null;
 
             return $encoder;
         };

@@ -32,7 +32,7 @@ use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Errors\ErrorAggregator;
 use Limoncello\Validation\Execution\BlockInterpreter;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface as DI;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**

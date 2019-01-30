@@ -20,9 +20,8 @@ use Closure;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -48,21 +47,21 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
     /**
      * @inheritdoc
      */
-    public function encodeData($data, EncodingParametersInterface $parameters = null): string
+    public function encodeData($data): string
     {
         $data = $this->handleRelationshipStorageAndPagingData($data);
 
-        return parent::encodeData($data, $parameters);
+        return parent::encodeData($data);
     }
 
     /**
      * @inheritdoc
      */
-    public function encodeIdentifiers($data, EncodingParametersInterface $parameters = null): string
+    public function encodeIdentifiers($data): string
     {
         $data = $this->handleRelationshipStorageAndPagingData($data);
 
-        return parent::encodeIdentifiers($data, $parameters);
+        return parent::encodeIdentifiers($data);
     }
 
     /**
@@ -132,9 +131,9 @@ class Encoder extends \Neomerx\JsonApi\Encoder\Encoder implements EncoderInterfa
                     JsonApiQueryParserInterface::PARAM_PAGING_LIMIT  => $pageSize,
                 ],
             ]);
-            $newUri           = $this->getOriginalUri()->withQuery(http_build_query($paramsWithPaging));
-            $fullUrl          = (string)$newUri;
-            $link             = $this->getFactory()->createLink($fullUrl, null, true);
+            $newUri  = $this->getOriginalUri()->withQuery(http_build_query($paramsWithPaging));
+            $fullUrl = (string)$newUri;
+            $link    = $this->getFactory()->createLink(false, $fullUrl, false);
 
             return $link;
         };

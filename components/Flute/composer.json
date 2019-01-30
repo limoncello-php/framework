@@ -16,9 +16,10 @@
     "require": {
         "php": ">=7.1.0",
         "ext-intl" : "*",
+        "psr/log": "1.1.0",
         "zendframework/zend-diactoros": "^1.7",
         "doctrine/dbal": "^2.6.3",
-        "neomerx/json-api": "^2.0.0",
+        "neomerx/json-api": "^3.0.0-rc.2",
         "limoncello-php/common": "^0.10.0",
         "limoncello-php/contracts": "^0.10.0",
         "limoncello-php/l10n": "^0.10.0",

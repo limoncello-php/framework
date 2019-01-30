@@ -17,8 +17,8 @@
  */
 
 use Limoncello\Flute\Contracts\Exceptions\JsonApiThrowableConverterInterface;
-use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Neomerx\JsonApi\Schema\Error;
 use Throwable;
 
 /**

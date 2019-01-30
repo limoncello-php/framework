@@ -16,33 +16,80 @@
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
-use Limoncello\Flute\Exceptions\InvalidSchemaFactoryException;
-use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
+use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface as JsonSchemaInterface;
-use Neomerx\JsonApi\Schema\Container;
 
 /**
  * @package Limoncello\Flute
  */
-class JsonSchemas extends Container implements JsonSchemasInterface
+class JsonSchemas implements JsonSchemasInterface
 {
+    use ClassIsTrait;
+
+    /**
+     * @var FactoryInterface
+     */
+    private $factory;
+
+    /**
+     * @var array
+     */
+    private $modelToSchemaMap;
+
+    /**
+     * @var array
+     */
+    private $typeToSchemaMap;
+
+    /**
+     * @var array
+     */
+    private $schemaInstances = [];
+
     /**
      * @var ModelSchemaInfoInterface
      */
     private $modelSchemas;
 
     /**
-     * @param SchemaFactoryInterface   $factory
-     * @param array                    $schemas
+     * @param FactoryInterface         $factory
+     * @param array                    $modelToSchemaMap
+     * @param array                    $typeToSchemaMap
      * @param ModelSchemaInfoInterface $modelSchemas
      */
-    public function __construct(SchemaFactoryInterface $factory, array $schemas, ModelSchemaInfoInterface $modelSchemas)
+    public function __construct(
+        FactoryInterface $factory,
+        array $modelToSchemaMap,
+        array $typeToSchemaMap,
+        ModelSchemaInfoInterface $modelSchemas
+    ) {
+        $this->factory          = $factory;
+        $this->modelToSchemaMap = $modelToSchemaMap;
+        $this->typeToSchemaMap  = $typeToSchemaMap;
+        $this->modelSchemas     = $modelSchemas;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSchema($resourceObject): JsonSchemaInterface
     {
-        parent::__construct($factory, $schemas);
-        $this->modelSchemas = $modelSchemas;
+        assert($this->hasSchema($resourceObject));
+
+        return $this->getSchemaByModelClass($this->getResourceClass($resourceObject));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasSchema($resourceObject): bool
+    {
+        return is_object($resourceObject) === true &&
+            array_key_exists($this->getResourceClass($resourceObject), $this->modelToSchemaMap);
     }
 
     /**
@@ -50,10 +97,7 @@ class JsonSchemas extends Container implements JsonSchemasInterface
      */
     public function hasRelationshipSchema(string $schemaClass, string $relationshipName): bool
     {
-        assert(
-            class_exists($schemaClass) === true &&
-            in_array(SchemaInterface::class, class_implements($schemaClass)) === true
-        );
+        assert(static::classImplements($schemaClass, SchemaInterface::class));
 
         /** @var SchemaInterface $schemaClass */
 
@@ -69,10 +113,7 @@ class JsonSchemas extends Container implements JsonSchemasInterface
      */
     public function getRelationshipSchema(string $schemaClass, string $relationshipName): SchemaInterface
     {
-        assert(
-            class_exists($schemaClass) === true &&
-            in_array(SchemaInterface::class, class_implements($schemaClass)) === true
-        );
+        assert(static::classImplements($schemaClass, SchemaInterface::class));
 
         /** @var SchemaInterface $schemaClass */
 
@@ -90,43 +131,82 @@ class JsonSchemas extends Container implements JsonSchemasInterface
         $reverseModelClass = $this->getModelSchemas()->getReverseModelClass($modelClass, $relationshipName);
 
         /** @var SchemaInterface $targetSchema */
-        $targetSchema = $this->getSchemaByType($reverseModelClass);
+        $targetSchema = $this->getSchemaByModelClass($reverseModelClass);
 
         return $targetSchema;
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getSchemaByResourceType(string $resourceType): SchemaInterface
+    {
+        assert(array_key_exists($resourceType, $this->typeToSchemaMap));
+
+        $schemaClass = $this->typeToSchemaMap[$resourceType];
+
+        return $this->getSchemaByClass($schemaClass);
+    }
+
+    /**
+     * @return FactoryInterface
+     */
+    private function getFactory(): FactoryInterface
+    {
+        return $this->factory;
+    }
+
+    /**
      * @return ModelSchemaInfoInterface
      */
-    protected function getModelSchemas(): ModelSchemaInfoInterface
+    private function getModelSchemas(): ModelSchemaInfoInterface
     {
         return $this->modelSchemas;
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection
-     * @param callable $callable
+    /**
+     * @param mixed $resource
      *
-     * @codeCoverageIgnore
-     *
-     * @return SchemaInterface
+     * @return string
      */
-    protected function createSchemaFromCallable(callable $callable): JsonSchemaInterface
+    private function getResourceClass($resource): string
     {
-        assert($callable);
+        assert(
+            is_object($resource) === true,
+            'Unable to get a type of the resource as it is not an object.'
+        );
 
-        // callable as Schema factory is not supported.
-        throw new InvalidSchemaFactoryException();
+        return get_class($resource);
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection
-     * @param string $className
+    /**
+     * @inheritdoc
+     */
+    private function getSchemaByModelClass(string $modelClass): JsonSchemaInterface
+    {
+        assert(array_key_exists($modelClass, $this->modelToSchemaMap));
+
+        $schemaClass = $this->modelToSchemaMap[$modelClass];
+
+        return $this->getSchemaByClass($schemaClass);
+    }
+
+    /**
+     * @param string $schemaClass
      *
      * @return SchemaInterface
      */
-    protected function createSchemaFromClassName(string $className): JsonSchemaInterface
+    private function getSchemaByClass(string $schemaClass): JsonSchemaInterface
     {
-        $schema = new $className($this->getFactory(), $this->getModelSchemas());
+        assert(static::classImplements($schemaClass, JsonSchemaInterface::class));
 
-        return $schema;
+        if (array_key_exists($schemaClass, $this->schemaInstances) === false) {
+            $this->schemaInstances[$schemaClass] =
+                ($schema = new $schemaClass($this->getFactory(), $this, $this->getModelSchemas()));
+
+            return $schema;
+        }
+
+        return $this->schemaInstances[$schemaClass];
     }
 }

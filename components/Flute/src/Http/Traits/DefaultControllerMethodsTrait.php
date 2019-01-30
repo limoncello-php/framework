@@ -22,7 +22,6 @@ use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
@@ -43,11 +42,9 @@ use Limoncello\Flute\Http\Responses;
 use Limoncello\Flute\Package\FluteSettings as S;
 use Limoncello\Flute\Resources\Messages\En\Generic;
 use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface as DI;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
-use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface as DI;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use Psr\Container\ContainerExceptionInterface;
@@ -67,8 +64,6 @@ trait DefaultControllerMethodsTrait
      * @param JsonApiQueryParserInterface $queryParser
      * @param ParametersMapperInterface   $mapper
      * @param CrudInterface               $crud
-     * @param SettingsProviderInterface   $provider
-     * @param JsonSchemasInterface        $jsonSchemas
      * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
@@ -79,16 +74,14 @@ trait DefaultControllerMethodsTrait
         JsonApiQueryParserInterface $queryParser,
         ParametersMapperInterface $mapper,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
         $queryParser->parse(null, $queryParams);
 
         $models = $mapper->applyQueryParameters($queryParser, $crud)->index();
 
-        $encParams = self::defaultCreateEncodingParameters($queryParser);
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        self::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
         $response  = ($models->getData()) === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($models);
 
@@ -102,8 +95,6 @@ trait DefaultControllerMethodsTrait
      * @param JsonApiQueryParserInterface $queryParser
      * @param ParametersMapperInterface   $mapper
      * @param CrudInterface               $crud
-     * @param SettingsProviderInterface   $provider
-     * @param JsonSchemasInterface        $jsonSchemas
      * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
@@ -115,8 +106,6 @@ trait DefaultControllerMethodsTrait
         JsonApiQueryParserInterface $queryParser,
         ParametersMapperInterface $mapper,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
         $queryParser->parse($index, $queryParams);
@@ -125,8 +114,8 @@ trait DefaultControllerMethodsTrait
         $model = $mapper->applyQueryParameters($queryParser, $crud)->read($validatedIndex);
         assert(!($model instanceof PaginatedDataInterface));
 
-        $encParams = self::defaultCreateEncodingParameters($queryParser);
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        self::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
         $response  = $model === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($model);
 
@@ -141,8 +130,6 @@ trait DefaultControllerMethodsTrait
      * @param JsonApiQueryParserInterface $queryParser
      * @param ParametersMapperInterface   $mapper
      * @param CrudInterface               $crud
-     * @param SettingsProviderInterface   $provider
-     * @param JsonSchemasInterface        $jsonSchemas
      * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
@@ -157,8 +144,6 @@ trait DefaultControllerMethodsTrait
         JsonApiQueryParserInterface $queryParser,
         ParametersMapperInterface $mapper,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
         $queryParser->parse($index, $queryParams);
@@ -166,8 +151,8 @@ trait DefaultControllerMethodsTrait
 
         $relData = call_user_func($apiHandler);
 
-        $encParams = self::defaultCreateEncodingParameters($queryParser);
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        self::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
 
         $noData   = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null);
         $response = $noData === true ? $responses->getCodeResponse(404) : $responses->getContentResponse($relData);
@@ -183,8 +168,6 @@ trait DefaultControllerMethodsTrait
      * @param JsonApiQueryParserInterface $queryParser
      * @param ParametersMapperInterface   $mapper
      * @param CrudInterface               $crud
-     * @param SettingsProviderInterface   $provider
-     * @param JsonSchemasInterface        $jsonSchemas
      * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
@@ -199,8 +182,6 @@ trait DefaultControllerMethodsTrait
         JsonApiQueryParserInterface $queryParser,
         ParametersMapperInterface $mapper,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
         $queryParser->parse($index, $queryParams);
@@ -208,8 +189,8 @@ trait DefaultControllerMethodsTrait
 
         $relData = call_user_func($apiHandler);
 
-        $encParams = self::defaultCreateEncodingParameters($queryParser);
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        self::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
 
         $noData   = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null);
         $response = $noData === true ? $responses->getCodeResponse(404) : $responses->getIdentifiersResponse($relData);
@@ -224,7 +205,6 @@ trait DefaultControllerMethodsTrait
      * @param ModelSchemaInfoInterface   $schemaInfo
      * @param JsonApiDataParserInterface $parser
      * @param CrudInterface              $crud
-     * @param SettingsProviderInterface  $provider
      * @param JsonSchemasInterface       $jsonSchemas
      * @param EncoderInterface           $encoder
      * @param FactoryInterface           $errorFactory
@@ -243,7 +223,6 @@ trait DefaultControllerMethodsTrait
         ModelSchemaInfoInterface $schemaInfo,
         JsonApiDataParserInterface $parser,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder,
         FactoryInterface $errorFactory,
@@ -265,7 +244,7 @@ trait DefaultControllerMethodsTrait
             $errorMessage
         );
 
-        return static::defaultCreateResponse($index, $requestUri, $crud, $provider, $jsonSchemas, $encoder);
+        return static::defaultCreateResponse($index, $requestUri, $crud, $jsonSchemas, $encoder);
     }
 
     /** @noinspection PhpTooManyParametersInspection
@@ -321,12 +300,11 @@ trait DefaultControllerMethodsTrait
     }
 
     /**
-     * @param string                    $index
-     * @param UriInterface              $requestUri
-     * @param CrudInterface             $crud
-     * @param SettingsProviderInterface $provider
-     * @param JsonSchemasInterface      $jsonSchemas
-     * @param EncoderInterface          $encoder
+     * @param string               $index
+     * @param UriInterface         $requestUri
+     * @param CrudInterface        $crud
+     * @param JsonSchemasInterface $jsonSchemas
+     * @param EncoderInterface     $encoder
      *
      * @return ResponseInterface
      */
@@ -334,16 +312,19 @@ trait DefaultControllerMethodsTrait
         string $index,
         UriInterface $requestUri,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
         $model = $crud->read($index);
         assert($model !== null && !($model instanceof PaginatedDataInterface));
 
-        $encParams = null;
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
-        $response  = $responses->getCreatedResponse($model);
+        $schema    = $jsonSchemas->getSchema($model);
+        $selfLink  = $schema->getSelfLink($model);
+        $urlPrefix = (string)$requestUri->withPath('')->withQuery('')->withFragment('');
+        $fullUrl   = $selfLink->getStringRepresentation($urlPrefix);
+
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
+        $response  = $responses->getCreatedResponse($model, $fullUrl);
 
         return $response;
     }
@@ -356,8 +337,6 @@ trait DefaultControllerMethodsTrait
      * @param ModelSchemaInfoInterface   $schemaInfo
      * @param JsonApiDataParserInterface $parser
      * @param CrudInterface              $crud
-     * @param SettingsProviderInterface  $provider
-     * @param JsonSchemasInterface       $jsonSchemas
      * @param EncoderInterface           $encoder
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
@@ -376,8 +355,6 @@ trait DefaultControllerMethodsTrait
         ModelSchemaInfoInterface $schemaInfo,
         JsonApiDataParserInterface $parser,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder,
         FactoryInterface $errorFactory,
         FormatterFactoryInterface $formatterFactory,
@@ -399,7 +376,7 @@ trait DefaultControllerMethodsTrait
             $errorMessage
         );
 
-        return static::defaultUpdateResponse($updated, $index, $requestUri, $crud, $provider, $jsonSchemas, $encoder);
+        return static::defaultUpdateResponse($updated, $index, $requestUri, $crud, $encoder);
     }
 
     /** @noinspection PhpTooManyParametersInspection
@@ -475,13 +452,11 @@ trait DefaultControllerMethodsTrait
     }
 
     /**
-     * @param int                       $updated
-     * @param string                    $index
-     * @param UriInterface              $requestUri
-     * @param CrudInterface             $crud
-     * @param SettingsProviderInterface $provider
-     * @param JsonSchemasInterface      $jsonSchemas
-     * @param EncoderInterface          $encoder
+     * @param int              $updated
+     * @param string           $index
+     * @param UriInterface     $requestUri
+     * @param CrudInterface    $crud
+     * @param EncoderInterface $encoder
      *
      * @return ResponseInterface
      *
@@ -492,12 +467,9 @@ trait DefaultControllerMethodsTrait
         string $index,
         UriInterface $requestUri,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
-        $encParams = null;
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
         if ($updated > 0 && ($model = $crud->read($index)) !== null) {
             assert(!($model instanceof PaginatedDataInterface));
             $response = $responses->getContentResponse($model);
@@ -513,8 +485,6 @@ trait DefaultControllerMethodsTrait
      * @param UriInterface                $requestUri
      * @param JsonApiQueryParserInterface $queryParser
      * @param CrudInterface               $crud
-     * @param SettingsProviderInterface   $provider
-     * @param JsonSchemasInterface        $jsonSchemas
      * @param EncoderInterface            $encoder
      *
      * @return ResponseInterface
@@ -524,15 +494,12 @@ trait DefaultControllerMethodsTrait
         UriInterface $requestUri,
         JsonApiQueryParserInterface $queryParser,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder
     ): ResponseInterface {
         $validatedIndex = $queryParser->parse($index)->getIdentity();
         $crud->remove($validatedIndex);
 
-        $encParams = null;
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
         $response  = $responses->getCodeResponse(204);
 
         return $response;
@@ -549,8 +516,6 @@ trait DefaultControllerMethodsTrait
      * @param JsonApiQueryParserInterface $queryParser
      * @param JsonApiDataParserInterface  $dataValidator
      * @param CrudInterface               $parentCrud
-     * @param SettingsProviderInterface   $provider
-     * @param JsonSchemasInterface        $jsonSchemas
      * @param EncoderInterface            $encoder
      * @param FactoryInterface            $errorFactory
      * @param FormatterFactoryInterface   $formatterFactory
@@ -570,8 +535,6 @@ trait DefaultControllerMethodsTrait
         JsonApiQueryParserInterface $queryParser,
         JsonApiDataParserInterface $dataValidator,
         CrudInterface $parentCrud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder,
         FactoryInterface $errorFactory,
         FormatterFactoryInterface $formatterFactory
@@ -589,8 +552,7 @@ trait DefaultControllerMethodsTrait
         $validatedIndex = $queryParser->parse($index)->getIdentity();
         $parentCrud->createInBelongsToManyRelationship($validatedIndex, $modelRelName, $relIds);
 
-        $encParams = null;
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
         $response  = $responses->getCodeResponse(204);
 
         return $response;
@@ -607,8 +569,6 @@ trait DefaultControllerMethodsTrait
      * @param JsonApiQueryParserInterface $queryParser
      * @param JsonApiDataParserInterface  $dataValidator
      * @param CrudInterface               $parentCrud
-     * @param SettingsProviderInterface   $provider
-     * @param JsonSchemasInterface        $jsonSchemas
      * @param EncoderInterface            $encoder
      * @param FactoryInterface            $errorFactory
      * @param FormatterFactoryInterface   $formatterFactory
@@ -628,8 +588,6 @@ trait DefaultControllerMethodsTrait
         JsonApiQueryParserInterface $queryParser,
         JsonApiDataParserInterface $dataValidator,
         CrudInterface $parentCrud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder,
         FactoryInterface $errorFactory,
         FormatterFactoryInterface $formatterFactory
@@ -647,8 +605,7 @@ trait DefaultControllerMethodsTrait
         $validatedIndex = $queryParser->parse($index)->getIdentity();
         $parentCrud->removeInBelongsToManyRelationship($validatedIndex, $modelRelName, $relIds);
 
-        $encParams = null;
-        $responses = static::defaultCreateResponses($requestUri, $provider, $jsonSchemas, $encoder, $encParams);
+        $responses = static::defaultCreateResponses($requestUri, $encoder);
         $response  = $responses->getCodeResponse(204);
 
         return $response;
@@ -665,8 +622,6 @@ trait DefaultControllerMethodsTrait
      * @param JsonApiQueryParserInterface $queryParser
      * @param JsonApiDataParserInterface  $dataValidator
      * @param CrudInterface               $crud
-     * @param SettingsProviderInterface   $provider
-     * @param JsonSchemasInterface        $jsonSchemas
      * @param EncoderInterface            $encoder
      * @param FactoryInterface            $errorFactory
      * @param FormatterFactoryInterface   $formatterFactory
@@ -686,8 +641,6 @@ trait DefaultControllerMethodsTrait
         JsonApiQueryParserInterface $queryParser,
         JsonApiDataParserInterface $dataValidator,
         CrudInterface $crud,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder,
         FactoryInterface $errorFactory,
         FormatterFactoryInterface $formatterFactory
@@ -711,7 +664,7 @@ trait DefaultControllerMethodsTrait
 
         $updated = $crud->update($validatedIndex, $attributes, $toMany);
 
-        return static::defaultUpdateResponse($updated, $index, $requestUri, $crud, $provider, $jsonSchemas, $encoder);
+        return static::defaultUpdateResponse($updated, $index, $requestUri, $crud, $encoder);
     }
 
     /**
@@ -807,16 +760,21 @@ trait DefaultControllerMethodsTrait
 
     /**
      * @param JsonApiQueryParserInterface $queryParser
+     * @param EncoderInterface            $encoder
      *
-     * @return EncodingParametersInterface
+     * @return void
      */
-    protected static function defaultCreateEncodingParameters(
-        JsonApiQueryParserInterface $queryParser
-    ): EncodingParametersInterface {
-        return new EncodingParameters(
-            $queryParser->hasIncludes() === true ? array_keys($queryParser->getIncludes()) : null,
-            $queryParser->hasFields() === true ? $queryParser->getFields() : null
-        );
+    protected static function defaultApplyIncludesAndFieldSetsToEncoder(
+        JsonApiQueryParserInterface $queryParser,
+        EncoderInterface $encoder
+    ): void {
+        if ($queryParser->hasIncludes() === true) {
+            $paths = array_keys($queryParser->getIncludes());
+            $encoder->withIncludedPaths($paths);
+        }
+        if ($queryParser->hasFields() === true) {
+            $encoder->withFieldSets($queryParser->getFields());
+        }
     }
 
     /**
@@ -840,30 +798,19 @@ trait DefaultControllerMethodsTrait
     }
 
     /**
-     * @param UriInterface                     $requestUri
-     * @param SettingsProviderInterface        $provider
-     * @param JsonSchemasInterface             $jsonSchemas
-     * @param EncoderInterface                 $encoder
-     * @param EncodingParametersInterface|null $parameters
+     * @param UriInterface     $requestUri
+     * @param EncoderInterface $encoder
      *
      * @return ResponsesInterface
      */
     protected static function defaultCreateResponses(
         UriInterface $requestUri,
-        SettingsProviderInterface $provider,
-        JsonSchemasInterface $jsonSchemas,
-        EncoderInterface $encoder,
-        ?EncodingParametersInterface $parameters
+        EncoderInterface $encoder
     ): ResponsesInterface {
         $encoder->forOriginalUri($requestUri);
-        $settings  = $provider->get(S::class);
         $responses = new Responses(
             new MediaType(MediaTypeInterface::JSON_API_TYPE, MediaTypeInterface::JSON_API_SUB_TYPE),
-            $encoder,
-            $jsonSchemas,
-            $parameters,
-            $settings[S::KEY_URI_PREFIX],
-            $settings[S::KEY_META]
+            $encoder
         );
 
         return $responses;

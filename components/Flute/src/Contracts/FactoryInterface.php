@@ -25,8 +25,7 @@ use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\TagStorageInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use Neomerx\JsonApi\Schema\ErrorCollection;
 
 /**
  * @package Limoncello\Flute
@@ -64,23 +63,24 @@ interface FactoryInterface
     public function createTagStorage(): TagStorageInterface;
 
     /**
-     * @param array                    $schemas
+     * @param array                    $modelToSchemaMap
+     * @param array                    $typeToSchemaMap
      * @param ModelSchemaInfoInterface $modelSchemas
      *
      * @return JsonSchemasInterface
      */
-    public function createJsonSchemas(array $schemas, ModelSchemaInfoInterface $modelSchemas): JsonSchemasInterface;
+    public function createJsonSchemas(
+        array $modelToSchemaMap,
+        array $typeToSchemaMap,
+        ModelSchemaInfoInterface $modelSchemas
+    ): JsonSchemasInterface;
 
     /**
      * @param JsonSchemasInterface $schemas
-     * @param EncoderOptions       $encoderOptions
      *
      * @return EncoderInterface
      */
-    public function createEncoder(
-        JsonSchemasInterface $schemas,
-        EncoderOptions $encoderOptions = null
-    ): EncoderInterface;
+    public function createEncoder(JsonSchemasInterface $schemas): EncoderInterface;
 
     /**
      * @param mixed $data

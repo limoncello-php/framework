@@ -29,12 +29,12 @@ use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
-use Limoncello\Validation\Errors\Error;
+use Limoncello\Validation\Errors\Error as ValidationError;
 use Limoncello\Validation\Execution\BlockInterpreter;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Document\Error as JsonApiError;
+use Neomerx\JsonApi\Contracts\Schema\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Http\Query\BaseQueryParserTrait;
+use Neomerx\JsonApi\Schema\Error as JsonApiError;
 
 /**
  * @package Limoncello\Flute
@@ -525,7 +525,7 @@ class QueryParser implements JsonApiQueryParserInterface
                 if (array_key_exists($field, $mainIndexes) === false) {
                     // unknown field set type
                     $this->getValidationErrors()->add(
-                        new Error(static::PARAM_FILTER, $field, ErrorCodes::INVALID_VALUE, null)
+                        new ValidationError(static::PARAM_FILTER, $field, ErrorCodes::INVALID_VALUE, null)
                     );
                 } else {
                     // for field a validation rule is defined so input value will be validated
@@ -566,7 +566,7 @@ class QueryParser implements JsonApiQueryParserInterface
                 } else {
                     // unknown field set type
                     $this->getValidationErrors()->add(
-                        new Error(static::PARAM_FIELDS, $type, ErrorCodes::INVALID_VALUE, null)
+                        new ValidationError(static::PARAM_FIELDS, $type, ErrorCodes::INVALID_VALUE, null)
                     );
                 }
             }
@@ -1042,7 +1042,7 @@ class QueryParser implements JsonApiQueryParserInterface
     private function createQueryError(string $paramName, string $errorTitle): ErrorInterface
     {
         $source = [ErrorInterface::SOURCE_PARAMETER => $paramName];
-        $error  = new JsonApiError(null, null, null, null, $errorTitle, null, $source);
+        $error  = new JsonApiError(null, null, null, null, null, $errorTitle, null, $source);
 
         return $error;
     }

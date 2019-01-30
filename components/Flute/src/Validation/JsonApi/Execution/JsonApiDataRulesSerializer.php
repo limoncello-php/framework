@@ -20,7 +20,7 @@ use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesSerializerInterface;
 use Limoncello\Flute\Validation\Serialize\RulesSerializer;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 
 /**
  * @package Limoncello\Flute

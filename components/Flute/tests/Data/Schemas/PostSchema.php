@@ -68,12 +68,4 @@ class PostSchema extends BaseSchema
             ],
         ];
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function isShowRelatedLinkInRelationships(): bool
-    {
-        return !parent::isShowRelatedLinkInRelationships();
-    }
 }

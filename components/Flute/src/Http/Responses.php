@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Http\BaseResponses;
 
 /**
@@ -28,11 +25,6 @@ use Neomerx\JsonApi\Http\BaseResponses;
  */
 class Responses extends BaseResponses
 {
-    /**
-     * @var EncodingParametersInterface|null
-     */
-    private $parameters;
-
     /**
      * @var EncoderInterface
      */
@@ -44,76 +36,15 @@ class Responses extends BaseResponses
     private $outputMediaType;
 
     /**
-     * @var ContainerInterface
-     */
-    private $schemas;
-
-    /**
-     * @var null|string
-     */
-    private $urlPrefix;
-
-    /**
-     * @var mixed|null
-     */
-    private $defaultMeta;
-
-    /**
-     * @param MediaTypeInterface               $outputMediaType
-     * @param EncoderInterface                 $encoder
-     * @param ContainerInterface               $schemas
-     * @param EncodingParametersInterface|null $parameters
-     * @param string|null                      $urlPrefix
-     * @param mixed|null                       $defaultMeta
+     * @param MediaTypeInterface $outputMediaType
+     * @param EncoderInterface   $encoder
      */
     public function __construct(
         MediaTypeInterface $outputMediaType,
-        EncoderInterface $encoder,
-        ContainerInterface $schemas,
-        EncodingParametersInterface $parameters = null,
-        string $urlPrefix = null,
-        $defaultMeta = null
+        EncoderInterface $encoder
     ) {
         $this->encoder         = $encoder;
         $this->outputMediaType = $outputMediaType;
-        $this->schemas         = $schemas;
-        $this->urlPrefix       = $urlPrefix;
-        $this->parameters      = $parameters;
-        $this->defaultMeta     = $defaultMeta;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getContentResponse(
-        $data,
-        int $statusCode = self::HTTP_OK,
-        array $links = null,
-        $meta = null,
-        array $headers = []
-    ) {
-        return parent::getContentResponse($data, $statusCode, $links, $this->mergeDefaultMeta($meta), $headers);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCreatedResponse($resource, array $links = null, $meta = null, array $headers = [])
-    {
-        return parent::getCreatedResponse($resource, $links, $this->mergeDefaultMeta($meta), $headers);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIdentifiersResponse(
-        $data,
-        int $statusCode = self::HTTP_OK,
-        array $links = null,
-        $meta = null,
-        array $headers = []
-    ) {
-        return parent::getIdentifiersResponse($data, $statusCode, $links, $this->mergeDefaultMeta($meta), $headers);
     }
 
     /**
@@ -135,65 +66,8 @@ class Responses extends BaseResponses
     /**
      * @inheritdoc
      */
-    protected function getUrlPrefix(): ?string
-    {
-        return $this->urlPrefix;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getEncodingParameters(): ?EncodingParametersInterface
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getSchemaContainer(): ?ContainerInterface
-    {
-        return $this->schemas;
-    }
-
-    /**
-     * @inheritdoc
-     */
     protected function getMediaType(): MediaTypeInterface
     {
         return $this->outputMediaType;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getResourceLocationUrl($resource): string
-    {
-        return parent::getResourceLocationUrl(
-            $resource instanceof PaginatedDataInterface ? $resource->getData() : $resource
-        );
-    }
-
-    /**
-     * @return mixed|null
-     */
-    protected function getDefaultMeta()
-    {
-        return $this->defaultMeta;
-    }
-
-    /**
-     * Merge with default meta if possible (if both are arrays).
-     *
-     * @param mixed $meta
-     *
-     * @return mixed|null
-     */
-    private function mergeDefaultMeta($meta)
-    {
-        $default = $this->getDefaultMeta();
-
-        return $meta === null ?
-            $default : (is_array($meta) === true && is_array($default) === true ? $meta + $default : $meta);
     }
 }

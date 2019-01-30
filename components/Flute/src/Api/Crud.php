@@ -41,7 +41,7 @@ use Limoncello\Flute\Contracts\Models\TagStorageInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
 use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Package\FluteSettings;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;

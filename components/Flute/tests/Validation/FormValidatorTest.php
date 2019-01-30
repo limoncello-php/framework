@@ -85,9 +85,12 @@ class FormValidatorTest extends TestCase
         $this->assertNotNull($validator = $this->createValidator(UpdateCommentRules::class));
 
         $this->assertTrue($validator->validate([Comment::REL_POST => '1']));
-        $this->assertFalse($validator->validate([Comment::REL_POST => '-1']));
+        $this->assertFalse($validator->validate([Comment::REL_POST => '-1', 'unknown_field' => 'some_value']));
         $this->assertEquals(
-            [Comment::REL_POST => 'The value should be a valid identifier.'],
+            [
+                Comment::REL_POST => 'The value should be a valid identifier.',
+                'unknown_field'   => 'The value is invalid.',
+            ],
             $this->iterableToArray($validator->getMessages())
         );
 

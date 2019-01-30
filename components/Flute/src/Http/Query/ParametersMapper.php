@@ -28,7 +28,8 @@ use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
 use Limoncello\Flute\Exceptions\LogicException;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
-use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Contracts\Schema\ErrorInterface;
+use Neomerx\JsonApi\Schema\Error;
 
 /**
  * @package Limoncello\Flute
@@ -532,13 +533,13 @@ class ParametersMapper implements ParametersMapperInterface
      * @param string $name
      * @param string $title
      *
-     * @return Error
+     * @return ErrorInterface
      */
-    private function createQueryError(string $name, string $title): Error
+    private function createQueryError(string $name, string $title): ErrorInterface
     {
         $title  = $this->getMessage($title);
-        $source = [Error::SOURCE_PARAMETER => $name];
-        $error  = new Error(null, null, null, null, $title, null, $source);
+        $source = [ErrorInterface::SOURCE_PARAMETER => $name];
+        $error  = new Error(null, null, null, null, null, $title, null, $source);
 
         return $error;
     }

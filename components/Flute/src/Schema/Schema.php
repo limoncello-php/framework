@@ -16,15 +16,18 @@
  * limitations under the License.
  */
 
+use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
+use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
-use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Schema\BaseSchema;
+use Neomerx\JsonApi\Schema\Identifier;
 
 /**
  * @package Limoncello\Flute
@@ -37,17 +40,34 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     private $modelSchemas;
 
     /**
+     * @var JsonSchemasInterface
+     */
+    private $jsonSchemas;
+
+    /**
      * @param FactoryInterface         $factory
+     * @param JsonSchemasInterface     $jsonSchemas
      * @param ModelSchemaInfoInterface $modelSchemas
      */
-    public function __construct(FactoryInterface $factory, ModelSchemaInfoInterface $modelSchemas)
-    {
-        /** @noinspection PhpUndefinedFieldInspection */
-        $this->resourceType = static::TYPE;
+    public function __construct(
+        FactoryInterface $factory,
+        JsonSchemasInterface $jsonSchemas,
+        ModelSchemaInfoInterface $modelSchemas
+    ) {
+        assert(empty(static::TYPE) === false);
 
         parent::__construct($factory);
 
         $this->modelSchemas = $modelSchemas;
+        $this->jsonSchemas  = $jsonSchemas;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getType(): string
+    {
+        return static::TYPE;
     }
 
     /**
@@ -93,7 +113,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     /**
      * @inheritdoc
      */
-    public function getAttributes($model, array $fieldKeysFilter = null): ?array
+    public function getAttributes($model): iterable
     {
         $attributes = [];
         $mappings   = static::getMappings();
@@ -111,85 +131,67 @@ abstract class Schema extends BaseSchema implements SchemaInterface
         return $attributes;
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection
+    /**
      * @inheritdoc
      *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function getRelationships($model, bool $isPrimary, array $includeRelationships): ?array
+    public function getRelationships($model): iterable
     {
-        $modelClass    = get_class($model);
+        assert($model instanceof ModelInterface);
+
         $relationships = [];
-        $mappings      = static::getMappings();
+
+        $mappings = static::getMappings();
         if (array_key_exists(static::SCHEMA_RELATIONSHIPS, $mappings) === true) {
-            $relMappings = $mappings[static::SCHEMA_RELATIONSHIPS];
-            foreach ($relMappings as $jsonRelName => $modelRelName) {
-                $isRelToBeIncluded = array_key_exists($jsonRelName, $includeRelationships) === true;
-
-                $hasRelData = $this->hasRelationship($model, $modelRelName);
-                $relType    = $this->getModelSchemas()->getRelationshipType($modelClass, $modelRelName);
-
-                $isShowAsLink = false;
-
-                // there is a case for `to-1` relationship when we can return identity resource (type + id)
-                if ($relType === RelationshipTypes::BELONGS_TO) {
-                    if ($isRelToBeIncluded === true && $hasRelData === true) {
-                        $relationships[$jsonRelName] = [static::DATA => $model->{$modelRelName}];
-                        continue;
-                    } else {
-                        $schema = $this->getModelSchemas();
-
-                        $class  = get_class($model);
-                        $fkName = $schema->getForeignKey($class, $modelRelName);
-
-                        $isShowAsLink = property_exists($model, $fkName) === false;
-
-                        if ($isShowAsLink === false) {
-                            // show as identity (type, id)
-
-                            $identity       = null;
-                            $reversePkValue = $model->{$fkName};
-                            if ($reversePkValue !== null) {
-                                $reverseClass  = $schema->getReverseModelClass($class, $modelRelName);
-                                $reversePkName = $schema->getPrimaryKey($reverseClass);
-
-                                $identity                   = new $reverseClass;
-                                $identity->{$reversePkName} = $reversePkValue;
-                            }
-
-                            $relationships[$jsonRelName] = [
-                                static::DATA  => $identity,
-                                static::LINKS => $this->getRelationshipLinks($model, $jsonRelName),
-                            ];
-                            continue;
-                        }
-
-                        // the relationship will be shown as a link
-                    }
-                }
-
-                // if our storage do not have any data for this relationship or relationship would not
-                // be included we return it as link
-                if ($hasRelData === false ||
-                    ($isRelToBeIncluded === false && $relType !== RelationshipTypes::BELONGS_TO)
-                ) {
-                    $isShowAsLink = true;
-                }
-
-                if ($isShowAsLink === true) {
-                    $relationships[$jsonRelName] = $this->getRelationshipLinkRepresentation($model, $jsonRelName);
+            foreach ($mappings[static::SCHEMA_RELATIONSHIPS] as $jsonRelName => $modelRelName) {
+                // if model has relationship data then use it
+                if ($this->hasProperty($model, $modelRelName) === true) {
+                    $relationships[$jsonRelName] = $this->createRelationshipRepresentationFromData(
+                        $model,
+                        $modelRelName,
+                        $jsonRelName
+                    );
                     continue;
                 }
 
-                // if we are here this is a `to-Many` relationship and we have to show data and got the data
+                // if relationship is `belongs-to` and has that ID we can add relationship as identifier
+                $modelClass  = get_class($model);
+                $relType = $this->getModelSchemas()->getRelationshipType($modelClass, $modelRelName);
+                if ($relType === RelationshipTypes::BELONGS_TO) {
+                    $fkName = $this->getModelSchemas()->getForeignKey($modelClass, $modelRelName);
+                    if ($this->hasProperty($model, $fkName) === true) {
+                        $reverseIndex  = $model->{$fkName};
+                        if ($reverseIndex === null) {
+                            $identifier = null;
+                        } else {
+                            $reverseSchema = $this->getJsonSchemas()
+                                ->getRelationshipSchema(static::class, $jsonRelName);
+                            $reverseType   = $reverseSchema->getType();
+                            $identifier    = new Identifier($reverseIndex, $reverseType, false, null);
+                        }
+                        $relationships[$jsonRelName] = [
+                            static::RELATIONSHIP_DATA       => $identifier,
+                            static::RELATIONSHIP_LINKS_SELF => $this->isAddSelfLinkInRelationshipWithData($jsonRelName),
+                        ];
+                        continue;
+                    }
+                }
 
-                $relUri                      = $this->getRelationshipSelfUrl($model, $jsonRelName);
-                $relationships[$jsonRelName] = $this->getRelationshipDescription($model->{$modelRelName}, $relUri);
+                // if we are here it's nothing left but show relationship as a link
+                $relationships[$jsonRelName] = [static::RELATIONSHIP_LINKS_SELF => true];
             }
         }
 
         return $relationships;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isAddSelfLinkInRelationshipWithData(string $relationshipName): bool
+    {
+        return false;
     }
 
     /**
@@ -201,122 +203,93 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     }
 
     /**
-     * @param PaginatedDataInterface $data
-     * @param string                 $uri
+     * @return JsonSchemasInterface
+     */
+    protected function getJsonSchemas(): JsonSchemasInterface
+    {
+        return $this->jsonSchemas;
+    }
+
+    /**
+     * @param ModelInterface $model
+     * @param string         $modelRelName
+     * @param string         $jsonRelName
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function getRelationshipDescription(PaginatedDataInterface $data, string $uri): array
-    {
-        if ($data->hasMoreItems() === false) {
-            return [static::DATA => $data->getData()];
+    protected function createRelationshipRepresentationFromData(
+        ModelInterface $model,
+        string $modelRelName,
+        string $jsonRelName
+    ): array {
+        assert($this->hasProperty($model, $modelRelName) === true);
+        $relationshipData = $model->{$modelRelName};
+        $isPaginatedData  = $relationshipData instanceof PaginatedDataInterface;
+
+        $description = [static::RELATIONSHIP_LINKS_SELF => $this->isAddSelfLinkInRelationshipWithData($jsonRelName)];
+
+        if ($isPaginatedData === false) {
+            $description[static::RELATIONSHIP_DATA] = $relationshipData;
+
+            return $description;
         }
 
-        $buildUrl = function ($offset) use ($data, $uri) {
+        assert($relationshipData instanceof PaginatedDataInterface);
+
+        $description[static::RELATIONSHIP_DATA] = $relationshipData->getData();
+
+        if ($relationshipData->hasMoreItems() === false) {
+            return $description;
+        }
+
+        // if we are here then relationship contains paginated data, so we have to add pagination links
+        $offset    = $relationshipData->getOffset();
+        $limit     = $relationshipData->getLimit();
+        $urlPrefix = $this->getRelationshipSelfSubUrl($model, $jsonRelName) . '?';
+        $buildLink = function (int $offset, int $limit) use ($urlPrefix) : LinkInterface {
             $paramsWithPaging = [
                 JsonApiQueryParserInterface::PARAM_PAGING_OFFSET => $offset,
-                JsonApiQueryParserInterface::PARAM_PAGING_LIMIT  => $data->getLimit(),
+                JsonApiQueryParserInterface::PARAM_PAGING_LIMIT  => $limit,
             ];
-            $fullUrl          = $uri . '?' . http_build_query($paramsWithPaging);
 
-            return $fullUrl;
+            $subUrl = $urlPrefix . http_build_query($paramsWithPaging);
+
+            return $this->getFactory()->createLink(true, $subUrl, false);
         };
 
-        $links = [];
-
-        // It looks like relationship can only hold first data rows so we might need `next` link but never `prev`
-
-        if ($data->hasMoreItems() === true) {
-            $offset                                 = $data->getOffset() + $data->getLimit();
-            $links[DocumentInterface::KEYWORD_NEXT] = $this->createLink($buildUrl($offset));
+        $nextOffset = $offset + $limit;
+        $nextLimit  = $limit;
+        if ($offset <= 0) {
+            $description[static::RELATIONSHIP_LINKS] = [
+                DocumentInterface::KEYWORD_NEXT => $buildLink($nextOffset, $nextLimit),
+            ];
+        } else {
+            $prevOffset = $offset - $limit;
+            if ($prevOffset < 0) {
+                // set offset 0 and decrease limit
+                $prevLimit  = $limit + $prevOffset;
+                $prevOffset = 0;
+            } else {
+                $prevLimit = $limit;
+            }
+            $description[static::RELATIONSHIP_LINKS] = [
+                DocumentInterface::KEYWORD_PREV => $buildLink($prevOffset, $prevLimit),
+                DocumentInterface::KEYWORD_NEXT => $buildLink($nextOffset, $nextLimit),
+            ];
         }
 
-        return [
-            static::DATA  => $data->getData(),
-            static::LINKS => $links,
-        ];
+        return $description;
     }
 
     /**
-     * @param mixed  $model
-     * @param string $jsonRelationship
-     *
-     * @return array
-     */
-    protected function getRelationshipLinkRepresentation($model, string $jsonRelationship): array
-    {
-        return [
-            static::LINKS     => $this->getRelationshipLinks($model, $jsonRelationship),
-            static::SHOW_DATA => false,
-        ];
-    }
-
-    /**
-     * @param mixed  $model
-     * @param string $jsonRelationship
-     *
-     * @return array
-     */
-    protected function getRelationshipLinks($model, string $jsonRelationship): array
-    {
-        $links = [];
-        if ($this->showSelfInRelationship($jsonRelationship) === true) {
-            $links[LinkInterface::SELF] = $this->getRelationshipSelfLink($model, $jsonRelationship);
-        }
-        if ($this->showRelatedInRelationship($jsonRelationship) === true) {
-            $links[LinkInterface::RELATED] = $this->getRelationshipRelatedLink($model, $jsonRelationship);
-        }
-
-        return $links;
-    }
-
-    /**
-     * Gets excludes from default 'show `self` link in relationships' rule.
-     *
-     * @return array Should be in ['jsonRelationship' => true] format.
-     */
-    protected function getExcludesFromDefaultShowSelfLinkInRelationships(): array
-    {
-        return [];
-    }
-
-    /**
-     * Gets excludes from default 'show `related` link in relationships' rule.
-     *
-     * @return array Should be in ['jsonRelationship' => true] format.
-     */
-    protected function getExcludesFromDefaultShowRelatedLinkInRelationships(): array
-    {
-        return [];
-    }
-
-    /**
-     * If `self` link should be shown in relationships by default.
+     * @param ModelInterface $model
+     * @param string         $name
      *
      * @return bool
      */
-    protected function isShowSelfLinkInRelationships(): bool
-    {
-        return true;
-    }
-
-    /**
-     * If `related` link should be shown in relationships by default.
-     *
-     * @return bool
-     */
-    protected function isShowRelatedLinkInRelationships(): bool
-    {
-        return true;
-    }
-
-    /**
-     * @param mixed  $model
-     * @param string $name
-     *
-     * @return bool
-     */
-    private function hasRelationship($model, string $name): bool
+    private function hasProperty(ModelInterface $model, string $name): bool
     {
         $hasRelationship = property_exists($model, $name);
 
@@ -324,30 +297,13 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     }
 
     /**
-     * @param string $jsonRelationship
+     * @param ModelInterface $model
+     * @param string         $jsonRelName
      *
-     * @return bool
+     * @return string
      */
-    private function showSelfInRelationship(string $jsonRelationship): bool
+    private function getRelationshipSelfSubUrl(ModelInterface $model, string $jsonRelName): string
     {
-        $default = $this->isShowSelfLinkInRelationships();
-        $result  = isset($this->getExcludesFromDefaultShowSelfLinkInRelationships()[$jsonRelationship]) === true ?
-            !$default : $default;
-
-        return $result;
-    }
-
-    /**
-     * @param string $jsonRelationship
-     *
-     * @return bool
-     */
-    private function showRelatedInRelationship(string $jsonRelationship): bool
-    {
-        $default = $this->isShowRelatedLinkInRelationships();
-        $result  = isset($this->getExcludesFromDefaultShowRelatedLinkInRelationships()[$jsonRelationship]) === true ?
-            !$default : $default;
-
-        return $result;
+        return $this->getSelfSubUrl($model) . '/relationships/' . $jsonRelName;
     }
 }

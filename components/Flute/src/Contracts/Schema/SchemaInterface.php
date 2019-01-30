@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface as BaseSchemaInterface;
 
 /**
@@ -41,9 +41,6 @@ interface SchemaInterface extends BaseSchemaInterface
 
     /** Mapping key */
     const SCHEMA_RELATIONSHIPS = self::SCHEMA_ATTRIBUTES + 1;
-
-    /** Mapping key */
-    const SCHEMA_INCLUDE = self::SCHEMA_RELATIONSHIPS + 1;
 
     /**
      * @return array
@@ -77,4 +74,11 @@ interface SchemaInterface extends BaseSchemaInterface
      * @return bool
      */
     public static function hasRelationshipMapping(string $jsonName): bool;
+
+    /**
+     * @param string $relationshipName
+     *
+     * @return bool
+     */
+    public function isAddSelfLinkInRelationshipWithData(string $relationshipName): bool;
 }

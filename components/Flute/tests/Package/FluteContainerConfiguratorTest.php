@@ -67,12 +67,13 @@ class FluteContainerConfiguratorTest extends TestCase
             ApplicationConfigurationInterface::KEY_WEB_CONTROLLERS_FOLDER =>
                 implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Http']),
         ];
+        [$modelToSchemaMap,                 ]             = $this->getSchemaMap();
         $cacheSettingsProvider                            = new CacheSettingsProvider(
             $appConfig,
             [
                 FluteSettings::class =>
                     (new Flute(
-                        $this->getSchemaMap(),
+                        $modelToSchemaMap,
                         $this->getJsonValidationRuleSets(),
                         $this->getFormValidationRuleSets(),
                         $this->getQueryValidationRuleSets()

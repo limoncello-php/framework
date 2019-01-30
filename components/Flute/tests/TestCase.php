@@ -20,11 +20,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Exception;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
-use Limoncello\Flute\Factory;
+use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Tests\Flute\Data\Migrations\Runner as MigrationRunner;
 use Limoncello\Tests\Flute\Data\Models\Board;
 use Limoncello\Tests\Flute\Data\Models\Category;
@@ -57,6 +59,8 @@ use Mockery;
  */
 class TestCase extends \PHPUnit\Framework\TestCase
 {
+    use ClassIsTrait;
+
     /**
      * @param array $modelClasses
      * @param bool  $requireReverseRelationships
@@ -220,14 +224,16 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param Factory                  $factory
+     * @param FactoryInterface         $factory
      * @param ModelSchemaInfoInterface $modelSchemas
      *
      * @return JsonSchemasInterface
      */
-    protected function getJsonSchemas(Factory $factory, ModelSchemaInfoInterface $modelSchemas)
+    protected function getJsonSchemas(FactoryInterface $factory, ModelSchemaInfoInterface $modelSchemas)
     {
-        $schemas = $factory->createJsonSchemas($this->getSchemaMap(), $modelSchemas);
+        [$modelToSchemaMap, $typeToSchemaMap] = $this->getSchemaMap();
+
+        $schemas = $factory->createJsonSchemas($modelToSchemaMap, $typeToSchemaMap, $modelSchemas);
 
         return $schemas;
     }
@@ -237,7 +243,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function getSchemaMap()
     {
-        return [
+        $modelToSchemaMap = [
             Board::class    => BoardSchema::class,
             Comment::class  => CommentSchema::class,
             Emotion::class  => EmotionSchema::class,
@@ -246,6 +252,16 @@ class TestCase extends \PHPUnit\Framework\TestCase
             User::class     => UserSchema::class,
             Category::class => CategorySchema::class,
         ];
+
+        $typeToSchemaMap = [];
+        foreach ($modelToSchemaMap as $modelClass => $schemaClass) {
+            assert(static::classImplements($schemaClass, SchemaInterface::class));
+            /** @var SchemaInterface $schemaClass */
+            $type                   = $schemaClass::TYPE;
+            $typeToSchemaMap[$type] = $schemaClass;
+        }
+
+        return [$modelToSchemaMap, $typeToSchemaMap];
     }
 
     /**

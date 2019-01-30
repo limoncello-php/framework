@@ -22,9 +22,9 @@ use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\Exceptions\JsonApiThrowableConverterInterface as ConverterInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
-use Neomerx\JsonApi\Document\Error;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Neomerx\JsonApi\Schema\Error;
+use Neomerx\JsonApi\Schema\ErrorCollection;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Throwable;
@@ -132,7 +132,7 @@ class FluteThrowableHandler implements ThrowableHandlerInterface
                 $message = $throwable->getMessage();
                 $details = (string)$throwable;
             }
-            $errors->add(new Error(null, null, $httpCode, null, $message, $details));
+            $errors->add(new Error(null, null, null, $httpCode, null, $message, $details));
         }
 
         // encode the error and send to client

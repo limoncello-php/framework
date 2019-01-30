@@ -20,7 +20,7 @@ use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Http\JsonApiResponse;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use Neomerx\JsonApi\Schema\ErrorCollection;
 
 /**
  * @package Limoncello\Flute

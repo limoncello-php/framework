@@ -86,7 +86,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $this->migrateDatabase($this->connection);
         $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
-        $this->assertCount(4, $posts);
+        $this->assertEquals(4, count($posts));
     }
 
     /**
@@ -119,7 +119,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $this->migrateDatabase($this->connection);
         $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
-        $this->assertCount(4, $posts);
+        $this->assertEquals(4, count($posts));
     }
 
     /**
@@ -152,7 +152,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $this->migrateDatabase($this->connection);
         $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
-        $this->assertCount(21, $posts);
+        $this->assertEquals(21, count($posts));
     }
 
     /**
@@ -191,7 +191,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $this->migrateDatabase($this->connection);
         $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
-        $this->assertCount(2, $posts);
+        $this->assertEquals(2, count($posts));
     }
 
     /**
@@ -230,7 +230,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $this->migrateDatabase($this->connection);
         $this->assertNotEmpty($posts = $builder->execute()->fetchAll());
-        $this->assertCount(100, $posts);
+        $this->assertEquals(100, count($posts));
     }
 
     /**
@@ -273,7 +273,7 @@ class ModelQueryBuilderTest extends TestCase
 
         $this->migrateDatabase($this->connection);
         $this->assertNotEmpty($comments = $builder->execute()->fetchAll());
-        $this->assertCount(35, $comments);
+        $this->assertEquals(35, count($comments));
     }
 
     /**

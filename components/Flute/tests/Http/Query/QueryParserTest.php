@@ -35,7 +35,7 @@ use Limoncello\Validation\Captures\CaptureAggregator;
 use Limoncello\Validation\Errors\ErrorAggregator;
 use Limoncello\Validation\Execution\BlockSerializer;
 use Limoncello\Validation\Execution\ContextStorage;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Contracts\Schema\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**

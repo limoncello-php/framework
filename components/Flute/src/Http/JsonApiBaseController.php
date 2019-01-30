@@ -18,7 +18,6 @@
 
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
-use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Http\JsonApiControllerInterface;
@@ -73,8 +72,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             static::defaultCreateQueryParser($container, static::ON_INDEX_QUERY_VALIDATION_RULES_CLASS),
             static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }
@@ -98,7 +95,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             $container->get(ModelSchemaInfoInterface::class),
             static::defaultCreateDataParser($container, static::ON_CREATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            $container->get(SettingsProviderInterface::class),
             $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
@@ -127,8 +123,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
             static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }
@@ -153,8 +147,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             $container->get(ModelSchemaInfoInterface::class),
             static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
             $container->get(FormatterFactoryInterface::class)
@@ -178,8 +170,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             $request->getUri(),
             static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
 
@@ -221,8 +211,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             static::defaultCreateQueryParser($container, $queryValRulesClass),
             static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             $api,
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }
@@ -262,8 +250,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             static::defaultCreateQueryParser($container, $queryValRulesClass),
             static::defaultCreateParameterMapper($container, static::SCHEMA_CLASS),
             $api,
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class)
         );
     }
@@ -300,8 +286,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
             static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
             $container->get(FormatterFactoryInterface::class)
@@ -340,8 +324,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
             static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
             $container->get(FormatterFactoryInterface::class)
@@ -380,8 +362,6 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
             static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
             static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),
-            $container->get(SettingsProviderInterface::class),
-            $container->get(JsonSchemasInterface::class),
             $container->get(EncoderInterface::class),
             $container->get(FactoryInterface::class),
             $container->get(FormatterFactoryInterface::class)

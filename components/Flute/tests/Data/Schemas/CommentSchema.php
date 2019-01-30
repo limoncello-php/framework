@@ -77,26 +77,17 @@ class CommentSchema extends BaseSchema
         ];
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection
+    /**
      * @inheritdoc
      */
-    protected function getExcludesFromDefaultShowSelfLinkInRelationships(): array
+    public function isAddRelatedLinkInRelationshipByDefault(string $relationshipName): bool
     {
-        return [
-            self::REL_USER => true,
-            self::REL_POST => true,
-        ];
-    }
-
-    /** @noinspection PhpMissingParentCallCommonInspection
-     * @inheritdoc
-     */
-    protected function getExcludesFromDefaultShowRelatedLinkInRelationships(): array
-    {
-        return [
-            self::REL_USER     => true,
-            self::REL_POST     => true,
-            self::REL_EMOTIONS => true,
-        ];
+        return
+            parent::isAddRelatedLinkInRelationshipByDefault($relationshipName) === true &&
+            in_array($relationshipName, [
+                self::REL_USER,
+                self::REL_POST,
+                self::REL_EMOTIONS,
+            ]) === false;
     }
 }

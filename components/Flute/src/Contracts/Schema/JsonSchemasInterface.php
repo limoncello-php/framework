@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 
 /**
  * @package Limoncello\Flute
  */
-interface JsonSchemasInterface extends ContainerInterface
+interface JsonSchemasInterface extends SchemaContainerInterface
 {
     /**
      * @param string $schemaClass
@@ -46,4 +46,11 @@ interface JsonSchemasInterface extends ContainerInterface
      * @return SchemaInterface
      */
     public function getModelRelationshipSchema(string $modelClass, string $relationshipName): SchemaInterface;
+
+    /**
+     * @param string $resourceType
+     *
+     * @return SchemaInterface
+     */
+    public function getSchemaByResourceType(string $resourceType): SchemaInterface;
 }

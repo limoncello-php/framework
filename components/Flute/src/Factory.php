@@ -33,9 +33,8 @@ use Limoncello\Flute\Models\PaginatedData;
 use Limoncello\Flute\Models\TagStorage;
 use Limoncello\Flute\Schema\JsonSchemas;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as JsonApiFactoryInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Factories\Factory as JsonApiFactory;
+use Neomerx\JsonApi\Schema\ErrorCollection;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -121,19 +120,20 @@ class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createJsonSchemas(array $schemas, ModelSchemaInfoInterface $modelSchemas): JsonSchemasInterface
-    {
-        return new JsonSchemas($this->getJsonApiFactory(), $schemas, $modelSchemas);
+    public function createJsonSchemas(
+        array $modelToSchemaMap,
+        array $typeToSchemaMap,
+        ModelSchemaInfoInterface $modelSchemas
+    ): JsonSchemasInterface {
+        return new JsonSchemas($this->getJsonApiFactory(), $modelToSchemaMap, $typeToSchemaMap, $modelSchemas);
     }
 
     /**
      * @inheritdoc
      */
-    public function createEncoder(
-        JsonSchemasInterface $schemas,
-        EncoderOptions $encoderOptions = null
-    ): EncoderInterface {
-        return new Encoder($this->getJsonApiFactory(), $schemas, $encoderOptions);
+    public function createEncoder(JsonSchemasInterface $schemas): EncoderInterface
+    {
+        return new Encoder($this->getJsonApiFactory(), $schemas);
     }
 
     /**

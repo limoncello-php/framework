@@ -17,11 +17,14 @@
  */
 
 use Exception;
+use Limoncello\Container\Container;
+use Limoncello\Flute\Contracts\FactoryInterface;
+use Limoncello\Flute\Factory;
+use Limoncello\Tests\Flute\Data\Models\Comment;
 use Limoncello\Tests\Flute\Data\Models\Post;
 use Limoncello\Tests\Flute\Data\Schemas\PostSchema;
 use Limoncello\Tests\Flute\TestCase;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
-use Neomerx\JsonApi\Factories\Factory;
+use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -34,14 +37,21 @@ class SchemaTest extends TestCase
     private $schema;
 
     /**
+     * @var FactoryInterface
+     */
+    private $factory;
+
+    /**
      * @inheritdoc
      */
     protected function setUp(): void
     {
         parent::setUp();
 
-        $modelSchemas = $this->getModelSchemas();
-        $this->schema = new PostSchema(new Factory(), $modelSchemas);
+        $this->factory = new Factory(new Container());
+        $this->schema  = $this
+            ->getJsonSchemas($this->factory, $this->getModelSchemas())
+            ->getSchemaByResourceType(PostSchema::TYPE);
     }
 
     /**
@@ -57,11 +67,78 @@ class SchemaTest extends TestCase
         $post->{Post::FIELD_ID_EDITOR} = null;
         $post->{Post::FIELD_ID_BOARD}  = null;
 
-        $relationships = $this->schema->getRelationships($post, true, []);
-        $this->assertNull($relationships[PostSchema::REL_USER][DocumentInterface::KEYWORD_DATA]);
-        $this->assertNull($relationships[PostSchema::REL_BOARD][DocumentInterface::KEYWORD_DATA]);
+        $relationships = $this->schema->getRelationships($post);
+        $this->assertNull($relationships[PostSchema::REL_USER][PostSchema::RELATIONSHIP_DATA]);
+        $this->assertNull($relationships[PostSchema::REL_BOARD][PostSchema::RELATIONSHIP_DATA]);
 
         $this->assertTrue($this->schema->hasAttributeMapping(PostSchema::ATTR_TEXT));
         $this->assertTrue($this->schema->hasRelationshipMapping(PostSchema::REL_USER));
+    }
+
+    /**
+     * Test how paging links are generated in relationships.
+     */
+    public function testPaginationInRelationships(): void
+    {
+        $comment = new Comment();
+        $comment->{Comment::FIELD_ID} = '1';
+
+        $post                       = new Post();
+        $post->{Post::FIELD_ID}     = '2';
+        $post->{Post::REL_COMMENTS} = $data = $this->factory->createPaginatedData([
+            $comment,
+            $comment,
+            $comment,
+        ])->markAsCollection()->setLimit(3)->markHasMoreItems();
+
+        // test with paging when it's enough place for the previous link. It starts from offset 4 with page size 3.
+        $data->setOffset(4);
+        $description = $this->schema->getRelationships($post);
+        $prev = $this->getRelationshipLinkFromDescription($description, PostSchema::REL_COMMENTS, LinkInterface::PREV);
+        $next = $this->getRelationshipLinkFromDescription($description, PostSchema::REL_COMMENTS, LinkInterface::NEXT);
+        $this->assertEquals(
+            '/posts/2/relationships/comments-relationship?offset=1&limit=3',
+            $prev->getStringRepresentation('')
+        );
+        $this->assertEquals(
+            '/posts/2/relationships/comments-relationship?offset=7&limit=3',
+            $next->getStringRepresentation('')
+        );
+
+        // test with shifted paging when it starts from offset 1 with page size 3.
+        $data->setOffset(1);
+        $description = $this->schema->getRelationships($post);
+        $prev = $this->getRelationshipLinkFromDescription($description, PostSchema::REL_COMMENTS, LinkInterface::PREV);
+        $next = $this->getRelationshipLinkFromDescription($description, PostSchema::REL_COMMENTS, LinkInterface::NEXT);
+        $this->assertEquals(
+            '/posts/2/relationships/comments-relationship?offset=0&limit=1',
+            $prev->getStringRepresentation('')
+        );
+        $this->assertEquals(
+            '/posts/2/relationships/comments-relationship?offset=4&limit=3',
+            $next->getStringRepresentation('')
+        );
+    }
+
+    /**
+     * @param array  $description
+     * @param string $relationshipName
+     * @param string $linkName
+     *
+     * @return LinkInterface
+     */
+    private function getRelationshipLinkFromDescription(
+        array $description,
+        string $relationshipName,
+        string $linkName
+    ): LinkInterface {
+        $this->assertTrue(isset($description[$relationshipName][PostSchema::RELATIONSHIP_LINKS]));
+        $links = $description[$relationshipName][PostSchema::RELATIONSHIP_LINKS];
+
+        $this->assertArrayHasKey($linkName, $links);
+        [$linkName => $link] = $links;
+        $this->assertTrue($link instanceof LinkInterface);
+
+        return $link;
     }
 }

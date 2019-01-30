@@ -57,7 +57,9 @@ class ReadCommentsQueryRules implements JsonApiQueryRulesInterface
      */
     public static function getFieldSetRules(): ?array
     {
-        return [];
+        return [
+            Schema::TYPE => v::isString(v::inValues([Schema::ATTR_TEXT, Schema::REL_USER, Schema::REL_POST])),
+        ];
     }
 
     /**

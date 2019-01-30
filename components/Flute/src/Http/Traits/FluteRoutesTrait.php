@@ -26,7 +26,7 @@ use Limoncello\Flute\Contracts\Http\Controller\ControllerReadInterface;
 use Limoncello\Flute\Contracts\Http\Controller\ControllerUpdateInterface;
 use Limoncello\Flute\Contracts\Http\JsonApiControllerInterface as JCI;
 use Limoncello\Flute\Contracts\Http\WebControllerInterface as FCI;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 
 /**
  * @package Limoncello\Flute

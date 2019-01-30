@@ -43,6 +43,11 @@ abstract class FluteSettings implements FluteSettingsInterface
      */
     public const DEFAULT_MAX_PAGE_SIZE = 30;
 
+    /**
+     * Default JSON API version.
+     */
+    public const DEFAULT_JSON_API_VERSION = '1.0';
+
     /** Serialized validation data index */
     protected const JSON_API_DATA_VALIDATION_RULES_SERIALIZED = 0;
 
@@ -118,10 +123,13 @@ abstract class FluteSettings implements FluteSettingsInterface
         $doNotLogExceptions = $defaults[static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST] ?? [];
         unset($defaults[static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST]);
 
+        [$modelToSchemaMap, $typeToSchemaMap] = $this->createSchemaMapping($schemasPath, $requireUniqueTypes);
+
         return $defaults + [
                 static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST__AS_KEYS => array_flip($doNotLogExceptions),
 
-                static::KEY_MODEL_TO_SCHEMA_MAP => $this->createModelToSchemaMap($schemasPath, $requireUniqueTypes),
+                static::KEY_MODEL_TO_SCHEMA_MAP => $modelToSchemaMap,
+                static::KEY_TYPE_TO_SCHEMA_MAP  => $typeToSchemaMap,
 
                 static::KEY_JSON_VALIDATION_RULE_SETS_DATA =>
                     $this->serializeJsonValidationRules($jsonDataValPath, $jsonQueryValPath),
@@ -152,7 +160,7 @@ abstract class FluteSettings implements FluteSettingsInterface
             static::KEY_JSON_ENCODE_DEPTH                         => 512,
             static::KEY_IS_SHOW_VERSION                           => false,
             static::KEY_META                                      => null,
-            static::KEY_URI_PREFIX                                => null,
+            static::KEY_URI_PREFIX                                => '',
 
             static::KEY_DO_NOT_LOG_EXCEPTIONS_LIST => [
                 JsonApiException::class,
@@ -168,16 +176,13 @@ abstract class FluteSettings implements FluteSettingsInterface
      *
      * @throws ReflectionException
      */
-    private function createModelToSchemaMap(string $schemasPath, bool $requireUniqueTypes): array
+    private function createSchemaMapping(string $schemasPath, bool $requireUniqueTypes): array
     {
-        $map   = [];
-        $types = [];
+        $modelMap = [];
+        $typeMap  = [];
         foreach ($this->selectClasses($schemasPath, SchemaInterface::class) as $schemaClass) {
-            assert(
-                is_string($schemaClass) &&
-                class_exists($schemaClass) &&
-                array_key_exists(SchemaInterface::class, class_implements($schemaClass))
-            );
+            assert(static::classImplements($schemaClass, SchemaInterface::class));
+
             /** @var SchemaInterface $schemaClass */
             $modelClass   = $schemaClass::MODEL;
             $resourceType = $schemaClass::TYPE;
@@ -190,15 +195,15 @@ abstract class FluteSettings implements FluteSettingsInterface
             // just forgot to set a unique one. If you do need multiple Schemas for a resource feel free
             // to set to turn off this check.
             assert(
-                $requireUniqueTypes === false || array_key_exists($resourceType, $types) === false,
+                $requireUniqueTypes === false || array_key_exists($resourceType, $typeMap) === false,
                 "Are you sure it's not an error to use resource type `$resourceType` more than once?"
             );
-            $types[$resourceType] = true;
+            $typeMap[$resourceType] = $schemaClass;
 
-            $map[$modelClass] = $schemaClass;
+            $modelMap[$modelClass] = $schemaClass;
         }
 
-        return $map;
+        return [$modelMap, $typeMap];
     }
 
     /**

@@ -64,8 +64,7 @@ use Limoncello\Tests\Flute\Data\Schemas\UserSchema;
 use Limoncello\Tests\Flute\TestCase;
 use Mockery;
 use Mockery\Mock;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -183,6 +182,10 @@ class ControllerTest extends TestCase
             ],
             'sort'    => CommentSchema::REL_POST,
             'include' => CommentSchema::REL_USER,
+            'fields'  => [
+                CommentSchema::TYPE =>
+                    CommentSchema::ATTR_TEXT . ',' . CommentSchema::REL_USER . ',' . CommentSchema::REL_POST,
+            ],
         ];
         $container   = $this->createContainer();
         $uri         = new Uri('http://localhost.local/comments?' . http_build_query($queryParams));
@@ -205,10 +208,13 @@ class ControllerTest extends TestCase
         // manually checked it should be 4 rows selected
         $this->assertCount(4, $resource[DocumentInterface::KEYWORD_DATA]);
         // check response sorted by post.id
-        $this->assertEquals(8, $resource['data'][0]['relationships']['post-relationship']['data']['id']);
-        $this->assertEquals(11, $resource['data'][1]['relationships']['post-relationship']['data']['id']);
-        $this->assertEquals(11, $resource['data'][2]['relationships']['post-relationship']['data']['id']);
-        $this->assertEquals(15, $resource['data'][3]['relationships']['post-relationship']['data']['id']);
+        $this->assertEquals(8, $resource['data'][0]['relationships'][CommentSchema::REL_POST]['data']['id']);
+        $this->assertEquals(11, $resource['data'][1]['relationships'][CommentSchema::REL_POST]['data']['id']);
+        $this->assertEquals(11, $resource['data'][2]['relationships'][CommentSchema::REL_POST]['data']['id']);
+        $this->assertEquals(15, $resource['data'][3]['relationships'][CommentSchema::REL_POST]['data']['id']);
+
+        // check some fields were filtered out
+        $this->assertFalse(isset($resource['data'][0]['relationships'][CommentSchema::REL_EMOTIONS]));
     }
 
     /**
@@ -610,7 +616,7 @@ EOT;
         $response = ApiCommentsControllerApi::create($routeParams, $container, $request);
         $this->assertNotNull($response);
         $this->assertEquals(201, $response->getStatusCode());
-        $this->assertEquals(['/comments/101'], $response->getHeader('Location'));
+        $this->assertEquals(['http://localhost.local/comments/101'], $response->getHeader('Location'));
         $this->assertNotEmpty((string)($response->getBody()));
 
         // check the item is in the database
@@ -808,7 +814,7 @@ EOT;
         // existing role name
         $boardsTable  = Board::TABLE_NAME;
         $first2boards = $connection->executeQuery("SELECT * FROM $boardsTable LIMIT 2")->fetchAll();
-        $this->assertCount(2, $first2boards);
+        $this->assertEquals(2, count($first2boards));
         $firstId     = $first2boards[0][Board::FIELD_ID];
         $secondTitle = $first2boards[1][Board::FIELD_TITLE];
 
@@ -1406,11 +1412,12 @@ EOT;
             ApplicationConfigurationInterface::KEY_WEB_CONTROLLERS_FOLDER =>
                 implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Data', 'Http']),
         ];
+        [$modelToSchemaMap]                               = $this->getSchemaMap();
         $cacheSettingsProvider                            = new CacheSettingsProvider(
             $appConfig,
             [
                 FluteSettings::class => (new Flute(
-                    $this->getSchemaMap(),
+                    $modelToSchemaMap,
                     $this->getJsonValidationRuleSets(),
                     $this->getFormValidationRuleSets(),
                     $this->getQueryValidationRuleSets()
@@ -1429,12 +1436,12 @@ EOT;
                 // meta info so we can test it adds custom properties successfully
                 $settings[FluteSettings::KEY_META] = static::DEFAULT_JSON_META;
 
-                $urlPrefix = $settings[FluteSettings::KEY_URI_PREFIX];
-                $encoder   = $factory->createEncoder($jsonSchemas, new EncoderOptions(
-                    $settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS],
-                    $urlPrefix,
-                    $settings[FluteSettings::KEY_JSON_ENCODE_DEPTH]
-                ));
+                $urlPrefix = (string)$settings[FluteSettings::KEY_URI_PREFIX];
+                $encoder   = $factory
+                    ->createEncoder($jsonSchemas)
+                ->withEncodeOptions($settings[FluteSettings::KEY_JSON_ENCODE_OPTIONS])
+                ->withEncodeDepth($settings[FluteSettings::KEY_JSON_ENCODE_DEPTH])
+                ->withUrlPrefix($urlPrefix);
                 if (isset($settings[FluteSettings::KEY_META]) === true) {
                     $meta = $settings[FluteSettings::KEY_META];
                     $encoder->withMeta($meta);
@@ -1442,7 +1449,7 @@ EOT;
                 if (isset($settings[FluteSettings::KEY_IS_SHOW_VERSION]) === true &&
                     $settings[FluteSettings::KEY_IS_SHOW_VERSION] === true
                 ) {
-                    $encoder->withJsonApiVersion();
+                    $encoder->withJsonApiVersion(FluteSettings::DEFAULT_JSON_API_VERSION);
                 }
 
                 return $encoder;
