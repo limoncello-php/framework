@@ -19,7 +19,7 @@
         "psr/log": "1.1.0",
         "zendframework/zend-diactoros": "^1.7",
         "doctrine/dbal": "^2.6.3",
-        "neomerx/json-api": "^3.0.0-rc.2",
+        "neomerx/json-api": "v3.0.0-rc.3 as v3.0.0",
         "limoncello-php/common": "^0.10.0",
         "limoncello-php/contracts": "^0.10.0",
         "limoncello-php/l10n": "^0.10.0",
