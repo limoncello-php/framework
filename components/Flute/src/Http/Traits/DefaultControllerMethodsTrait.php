@@ -318,12 +318,8 @@ trait DefaultControllerMethodsTrait
         $model = $crud->read($index);
         assert($model !== null && !($model instanceof PaginatedDataInterface));
 
-        $schema    = $jsonSchemas->getSchema($model);
-        $selfLink  = $schema->getSelfLink($model);
-        $urlPrefix = (string)$requestUri->withPath('')->withQuery('')->withFragment('');
-        $fullUrl   = $selfLink->getStringRepresentation($urlPrefix);
-
         $responses = static::defaultCreateResponses($requestUri, $encoder);
+        $fullUrl   = static::defaultGetResourceUrl($model, $requestUri, $jsonSchemas);
         $response  = $responses->getCreatedResponse($model, $fullUrl);
 
         return $response;
@@ -890,6 +886,26 @@ trait DefaultControllerMethodsTrait
         $result = [$index, $fields, $toManyIndexes];
 
         return $result;
+    }
+
+    /**
+     * @param mixed                $model
+     * @param UriInterface         $requestUri
+     * @param JsonSchemasInterface $jsonSchemas
+     *
+     * @return string
+     */
+    protected static function defaultGetResourceUrl(
+        $model,
+        UriInterface $requestUri,
+        JsonSchemasInterface $jsonSchemas
+    ): string {
+        $schema    = $jsonSchemas->getSchema($model);
+        $selfLink  = $schema->getSelfLink($model);
+        $urlPrefix = (string)$requestUri->withPath('')->withQuery('')->withFragment('');
+        $fullUrl   = $selfLink->getStringRepresentation($urlPrefix);
+
+        return $fullUrl;
     }
 
     /**
