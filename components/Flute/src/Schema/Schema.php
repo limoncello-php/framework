@@ -45,6 +45,16 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     private $jsonSchemas;
 
     /**
+     * @var array|null
+     */
+    private $attributesMapping;
+
+    /**
+     * @var array|null
+     */
+    private $relationshipsMapping;
+
+    /**
      * @param FactoryInterface         $factory
      * @param JsonSchemasInterface     $jsonSchemas
      * @param ModelSchemaInfoInterface $modelSchemas
@@ -55,11 +65,15 @@ abstract class Schema extends BaseSchema implements SchemaInterface
         ModelSchemaInfoInterface $modelSchemas
     ) {
         assert(empty(static::TYPE) === false);
+        assert(empty(static::MODEL) === false);
 
         parent::__construct($factory);
 
         $this->modelSchemas = $modelSchemas;
         $this->jsonSchemas  = $jsonSchemas;
+
+        $this->attributesMapping    = null;
+        $this->relationshipsMapping = null;
     }
 
     /**
@@ -115,21 +129,11 @@ abstract class Schema extends BaseSchema implements SchemaInterface
      */
     public function getAttributes($model): iterable
     {
-        $attributes = [];
-        $mappings   = static::getMappings();
-        if (array_key_exists(static::SCHEMA_ATTRIBUTES, $mappings) === true) {
-            $attrMappings = $mappings[static::SCHEMA_ATTRIBUTES];
-
-            // `id` is a `special` attribute and cannot be included in JSON API resource
-            unset($attrMappings[static::RESOURCE_ID]);
-
-            foreach ($attrMappings as $jsonAttrName => $modelAttrName) {
-                $attributes[$jsonAttrName] =
-                    $this->hasProperty($model, $modelAttrName) === true ? $model->{$modelAttrName} : null;
+        foreach ($this->getAttributesMapping() as $jsonAttrName => $modelAttrName) {
+            if ($this->hasProperty($model, $modelAttrName) === true) {
+                yield $jsonAttrName => $model->{$modelAttrName};
             }
         }
-
-        return $attributes;
     }
 
     /**
@@ -141,50 +145,33 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     {
         assert($model instanceof ModelInterface);
 
-        $relationships = [];
-
-        $mappings = static::getMappings();
-        if (array_key_exists(static::SCHEMA_RELATIONSHIPS, $mappings) === true) {
-            foreach ($mappings[static::SCHEMA_RELATIONSHIPS] as $jsonRelName => $modelRelName) {
-                // if model has relationship data then use it
-                if ($this->hasProperty($model, $modelRelName) === true) {
-                    $relationships[$jsonRelName] = $this->createRelationshipRepresentationFromData(
-                        $model,
-                        $modelRelName,
-                        $jsonRelName
-                    );
-                    continue;
-                }
-
-                // if relationship is `belongs-to` and has that ID we can add relationship as identifier
-                $modelClass  = get_class($model);
-                $relType = $this->getModelSchemas()->getRelationshipType($modelClass, $modelRelName);
-                if ($relType === RelationshipTypes::BELONGS_TO) {
-                    $fkName = $this->getModelSchemas()->getForeignKey($modelClass, $modelRelName);
-                    if ($this->hasProperty($model, $fkName) === true) {
-                        $reverseIndex  = $model->{$fkName};
-                        if ($reverseIndex === null) {
-                            $identifier = null;
-                        } else {
-                            $reverseSchema = $this->getJsonSchemas()
-                                ->getRelationshipSchema(static::class, $jsonRelName);
-                            $reverseType   = $reverseSchema->getType();
-                            $identifier    = new Identifier($reverseIndex, $reverseType, false, null);
-                        }
-                        $relationships[$jsonRelName] = [
-                            static::RELATIONSHIP_DATA       => $identifier,
-                            static::RELATIONSHIP_LINKS_SELF => $this->isAddSelfLinkInRelationshipWithData($jsonRelName),
-                        ];
-                        continue;
-                    }
-                }
-
-                // if we are here it's nothing left but show relationship as a link
-                $relationships[$jsonRelName] = [static::RELATIONSHIP_LINKS_SELF => true];
+        foreach ($this->getRelationshipsMapping() as $jsonRelName => [$modelRelName, $belongsToFkName, $reverseType]) {
+            // if model has relationship data then use it
+            if ($this->hasProperty($model, $modelRelName) === true) {
+                yield $jsonRelName => $this->createRelationshipRepresentationFromData(
+                    $model,
+                    $modelRelName,
+                    $jsonRelName
+                );
+                continue;
             }
-        }
 
-        return $relationships;
+            // if relationship is `belongs-to` and has that ID we can add relationship as identifier
+            if ($belongsToFkName !== null && $this->hasProperty($model, $belongsToFkName) === true) {
+                $reverseIndex = $model->{$belongsToFkName};
+                $identifier   = $reverseIndex === null ?
+                    null : new Identifier($reverseIndex, $reverseType, false, null);
+
+                yield $jsonRelName => [
+                    static::RELATIONSHIP_DATA       => $identifier,
+                    static::RELATIONSHIP_LINKS_SELF => $this->isAddSelfLinkInRelationshipWithData($jsonRelName),
+                ];
+                continue;
+            }
+
+            // if we are here it's nothing left but show relationship as a link
+            yield $jsonRelName => [static::RELATIONSHIP_LINKS_SELF => true];
+        }
     }
 
     /**
@@ -282,6 +269,55 @@ abstract class Schema extends BaseSchema implements SchemaInterface
         }
 
         return $description;
+    }
+
+    /**
+     * @return array
+     */
+    private function getAttributesMapping(): array
+    {
+        if ($this->attributesMapping !== null) {
+            return $this->attributesMapping;
+        }
+
+        $attributesMapping = static::getMappings()[static::SCHEMA_ATTRIBUTES] ?? [];
+
+        // `id` is a `special` attribute and cannot be included in JSON API resource
+        unset($attributesMapping[static::RESOURCE_ID]);
+
+        $this->attributesMapping = $attributesMapping;
+
+        return $this->attributesMapping;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRelationshipsMapping(): array
+    {
+        if ($this->relationshipsMapping !== null) {
+            return $this->relationshipsMapping;
+        }
+
+        $relationshipsMapping = [];
+        foreach (static::getMappings()[static::SCHEMA_RELATIONSHIPS] ?? [] as $jsonRelName => $modelRelName) {
+            $belongsToFkName = null;
+            $reverseJsonType = null;
+
+            $relType = $this->getModelSchemas()->getRelationshipType(static::MODEL, $modelRelName);
+            if ($relType === RelationshipTypes::BELONGS_TO) {
+                $belongsToFkName = $this->getModelSchemas()->getForeignKey(static::MODEL, $modelRelName);
+                $reverseSchema   = $this->getJsonSchemas()
+                    ->getRelationshipSchema(static::class, $jsonRelName);
+                $reverseJsonType = $reverseSchema->getType();
+            }
+
+            $relationshipsMapping[$jsonRelName] = [$modelRelName, $belongsToFkName, $reverseJsonType];
+        }
+
+        $this->relationshipsMapping = $relationshipsMapping;
+
+        return $this->relationshipsMapping;
     }
 
     /**

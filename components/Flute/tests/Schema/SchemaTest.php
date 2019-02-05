@@ -67,7 +67,7 @@ class SchemaTest extends TestCase
         $post->{Post::FIELD_ID_EDITOR} = null;
         $post->{Post::FIELD_ID_BOARD}  = null;
 
-        $relationships = $this->schema->getRelationships($post);
+        $relationships = $this->iterableToArray($this->schema->getRelationships($post));
         $this->assertNull($relationships[PostSchema::REL_USER][PostSchema::RELATIONSHIP_DATA]);
         $this->assertNull($relationships[PostSchema::REL_BOARD][PostSchema::RELATIONSHIP_DATA]);
 
@@ -93,7 +93,7 @@ class SchemaTest extends TestCase
 
         // test with paging when it's enough place for the previous link. It starts from offset 4 with page size 3.
         $data->setOffset(4);
-        $description = $this->schema->getRelationships($post);
+        $description = $this->iterableToArray($this->schema->getRelationships($post));
         $prev = $this->getRelationshipLinkFromDescription($description, PostSchema::REL_COMMENTS, LinkInterface::PREV);
         $next = $this->getRelationshipLinkFromDescription($description, PostSchema::REL_COMMENTS, LinkInterface::NEXT);
         $this->assertEquals(
@@ -107,7 +107,7 @@ class SchemaTest extends TestCase
 
         // test with shifted paging when it starts from offset 1 with page size 3.
         $data->setOffset(1);
-        $description = $this->schema->getRelationships($post);
+        $description = $this->iterableToArray($this->schema->getRelationships($post));
         $prev = $this->getRelationshipLinkFromDescription($description, PostSchema::REL_COMMENTS, LinkInterface::PREV);
         $next = $this->getRelationshipLinkFromDescription($description, PostSchema::REL_COMMENTS, LinkInterface::NEXT);
         $this->assertEquals(

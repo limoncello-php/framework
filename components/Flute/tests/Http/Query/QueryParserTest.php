@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
@@ -91,7 +90,7 @@ class QueryParserTest extends TestCase
         $parser->parse(null, [
             JsonApiQueryParserInterface::PARAM_INCLUDE => "$relUser,$relPost",
         ]);
-        $includes = $this->iterableToArray($parser->getIncludes());
+        $includes = $this->deepIterableToArray($parser->getIncludes());
 
         // that's the format of parsed path: 'some.long.path' => ['some', 'long', 'path']
         $this->assertEquals([
@@ -106,7 +105,7 @@ class QueryParserTest extends TestCase
 
         $exception = null;
         try {
-            $this->iterableToArray($parser->getIncludes());
+            $this->deepIterableToArray($parser->getIncludes());
         } catch (JsonApiException $exception) {
         }
         $this->assertNotNull($exception);
@@ -136,7 +135,7 @@ class QueryParserTest extends TestCase
         $parser->parse(null, [
             JsonApiQueryParserInterface::PARAM_SORT => "+$fieldText,-$fieldFloat",
         ]);
-        $sorts = $this->iterableToArray($parser->getSorts());
+        $sorts = $this->deepIterableToArray($parser->getSorts());
         $this->assertTrue($parser->hasSorts());
 
         $this->assertEquals([
@@ -151,7 +150,7 @@ class QueryParserTest extends TestCase
 
         $exception = null;
         try {
-            $this->iterableToArray($parser->getSorts());
+            $this->deepIterableToArray($parser->getSorts());
         } catch (JsonApiException $exception) {
         }
         $this->assertNotNull($exception);
@@ -188,7 +187,7 @@ class QueryParserTest extends TestCase
                 PostSchema::TYPE    => "$postTitle,$postUser,$postComments",
             ],
         ]);
-        $fieldSets = $this->iterableToArray($parser->getFields());
+        $fieldSets = $this->deepIterableToArray($parser->getFields());
 
         $this->assertEquals([
             CommentSchema::TYPE => [$commentText, $commentUser, $commentPost],
@@ -206,7 +205,7 @@ class QueryParserTest extends TestCase
 
         $exception = null;
         try {
-            $this->iterableToArray($parser->getFields());
+            $this->deepIterableToArray($parser->getFields());
         } catch (JsonApiException $exception) {
         }
         $this->assertNotNull($exception);
@@ -246,7 +245,7 @@ class QueryParserTest extends TestCase
             ],
         ]);
         $this->assertTrue($parser->hasFilters());
-        $filters = $this->iterableToArray($parser->getFilters());
+        $filters = $this->deepIterableToArray($parser->getFilters());
 
         $this->assertSame([
             $commentText => ['like' => ['%foo%'], 'not_in' => ['food', 'foolish']],
@@ -264,7 +263,7 @@ class QueryParserTest extends TestCase
 
         $exception = null;
         try {
-            $this->iterableToArray($parser->getFilters());
+            $this->deepIterableToArray($parser->getFilters());
         } catch (JsonApiException $exception) {
         }
         $this->assertNotNull($exception);
@@ -292,7 +291,7 @@ class QueryParserTest extends TestCase
                 $commentText => ['not_in' => ''],
             ],
         ]);
-        $filters = $this->iterableToArray($parser->getFilters());
+        $filters = $this->deepIterableToArray($parser->getFilters());
 
         $this->assertSame([
             $commentText => ['not_in' => []],
@@ -312,7 +311,7 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $this->iterableToArray(
+        $this->deepIterableToArray(
             $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->getFilters()
         );
     }
@@ -330,7 +329,7 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $this->iterableToArray(
+        $this->deepIterableToArray(
             $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->getFilters()
         );
     }
@@ -350,7 +349,7 @@ class QueryParserTest extends TestCase
             ],
         ];
 
-        $this->iterableToArray(
+        $this->deepIterableToArray(
             $this->createParser(CommentsIndexRules::class)->parse(null, $queryParameters)->getFilters()
         );
     }
@@ -439,7 +438,7 @@ class QueryParserTest extends TestCase
 
         $this->assertFalse($parser->areFiltersWithAnd());
 
-        $filters = $this->iterableToArray($parser->getFilters());
+        $filters = $this->deepIterableToArray($parser->getFilters());
         $this->assertSame([
             CommentSchema::RESOURCE_ID => [
                 'in' => [3, 5, 7],
@@ -479,18 +478,18 @@ class QueryParserTest extends TestCase
         $this->assertSame([
             $fieldText => ['like' => ['%foo%'], 'not_in' => ['food', 'foolish']],
             $fieldInt  => ['gte' => ['3'], 'lte' => ['9']],
-        ], $this->iterableToArray($parser->getFilters()));
+        ], $this->deepIterableToArray($parser->getFilters()));
         $this->assertSame([
             CommentSchema::TYPE => [$fieldText, $relUser, $relPost],
-        ], $this->iterableToArray($parser->getFields()));
+        ], $this->deepIterableToArray($parser->getFields()));
         $this->assertSame([
             $fieldText  => true,
             $fieldFloat => false,
-        ], $this->iterableToArray($parser->getSorts()));
+        ], $this->deepIterableToArray($parser->getSorts()));
         $this->assertSame([
             $relUser => [$relUser],
             $relPost => [$relPost],
-        ], $this->iterableToArray($parser->getIncludes()));
+        ], $this->deepIterableToArray($parser->getIncludes()));
         $this->assertSame(10, $parser->getPagingOffset());
         $this->assertSame(20, $parser->getPagingLimit());
     }
@@ -530,21 +529,5 @@ class QueryParserTest extends TestCase
         );
 
         return $parser;
-    }
-
-    /**
-     * @param iterable $iterable
-     *
-     * @return array
-     */
-    private function iterableToArray(iterable $iterable): array
-    {
-        $result = [];
-
-        foreach ($iterable as $key => $value) {
-            $result[$key] = $value instanceof Generator ? $this->iterableToArray($value) : $value;
-        }
-
-        return $result;
     }
 }

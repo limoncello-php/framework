@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Exception;
+use Generator;
 use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Application\ModelInterface;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
@@ -305,5 +306,30 @@ class TestCase extends \PHPUnit\Framework\TestCase
             Data\Validation\JsonQueries\ReadEmotionsFromCommentsQueryRules::class,
             Data\Validation\JsonQueries\ReadPostsQueryRules::class,
         ];
+    }
+
+    /**
+     * @param iterable $iterable
+     *
+     * @return array
+     */
+    protected function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof Generator ? iterator_to_array($iterable) : $iterable;
+    }
+    /**
+     * @param iterable $iterable
+     *
+     * @return array
+     */
+    protected function deepIterableToArray(iterable $iterable): array
+    {
+        $result = [];
+
+        foreach ($iterable as $key => $value) {
+            $result[$key] = $value instanceof Generator ? $this->deepIterableToArray($value) : $value;
+        }
+
+        return $result;
     }
 }

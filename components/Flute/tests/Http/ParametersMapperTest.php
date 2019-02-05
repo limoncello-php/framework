@@ -17,7 +17,6 @@
  */
 
 use Exception;
-use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Contracts\Http\Query\ParametersMapperInterface;
@@ -64,7 +63,7 @@ class ParametersMapperTest extends TestCase
         $mapper = $this->createMapper(BoardSchema::class)->withFilters($filterParameters);
 
         /** @var FilterParameterInterface[] $filters */
-        $filters = $this->iterableToArray($mapper->getMappedFilters());
+        $filters = $this->deepIterableToArray($mapper->getMappedFilters());
         /** @noinspection PhpParamsInspection */
         $this->assertCount(4, $filters);
 
@@ -75,7 +74,7 @@ class ParametersMapperTest extends TestCase
         $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_IN => ['10', '11'],
-        ], $this->iterableToArray($filter->getOperationsWithArguments()));
+        ], $this->deepIterableToArray($filter->getOperationsWithArguments()));
 
         $filter = $filters[1];
         $this->assertNull($filter->getRelationship());
@@ -84,7 +83,7 @@ class ParametersMapperTest extends TestCase
         $this->assertEquals(BoardSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_LIKE => ['like%'],
-        ], $this->iterableToArray($filter->getOperationsWithArguments()));
+        ], $this->deepIterableToArray($filter->getOperationsWithArguments()));
 
         $filter = $filters[2];
         $this->assertNotNull($filter->getRelationship());
@@ -97,7 +96,7 @@ class ParametersMapperTest extends TestCase
         $this->assertEquals(PostSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_EQUALS => ['1'],
-        ], $this->iterableToArray($filter->getOperationsWithArguments()));
+        ], $this->deepIterableToArray($filter->getOperationsWithArguments()));
 
         $filter = $filters[3];
         $this->assertNotNull($filter->getRelationship());
@@ -110,7 +109,7 @@ class ParametersMapperTest extends TestCase
         $this->assertEquals(PostSchema::TYPE, $filter->getAttribute()->getSchema()::TYPE);
         $this->assertEquals([
             FilterParameterInterface::OPERATION_NOT_LIKE => ['not_like%'],
-        ], $this->iterableToArray($filter->getOperationsWithArguments()));
+        ], $this->deepIterableToArray($filter->getOperationsWithArguments()));
     }
 
     /**
@@ -140,7 +139,7 @@ class ParametersMapperTest extends TestCase
         $mapper = $this->createMapper(BoardSchema::class)->withFilters($filterParameters);
 
         /** @var FilterParameterInterface[] $filters */
-        $filters = $this->iterableToArray($mapper->getMappedFilters());
+        $filters = $this->deepIterableToArray($mapper->getMappedFilters());
         /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $filters);
 
@@ -162,7 +161,7 @@ class ParametersMapperTest extends TestCase
             FilterParameterInterface::OPERATION_NOT_IN            => ['1', '2'],
             FilterParameterInterface::OPERATION_IS_NULL           => [],
             FilterParameterInterface::OPERATION_IS_NOT_NULL       => [],
-        ], $this->iterableToArray($filter->getOperationsWithArguments()));
+        ], $this->deepIterableToArray($filter->getOperationsWithArguments()));
     }
 
     /**
@@ -183,12 +182,12 @@ class ParametersMapperTest extends TestCase
         $mapper = $this->createMapper(BoardSchema::class)->withFilters($filterParameters);
 
         /** @var FilterParameterInterface[] $filters */
-        $filters = $this->iterableToArray($mapper->getMappedFilters());
+        $filters = $this->deepIterableToArray($mapper->getMappedFilters());
         /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $filters);
 
         $filter = reset($filters);
-        $this->iterableToArray($filter->getOperationsWithArguments());
+        $this->deepIterableToArray($filter->getOperationsWithArguments());
     }
 
     /**
@@ -207,12 +206,12 @@ class ParametersMapperTest extends TestCase
         $mapper = $this->createMapper(BoardSchema::class)->withFilters($filterParameters);
 
         /** @var FilterParameterInterface[] $filters */
-        $filters = $this->iterableToArray($mapper->getMappedFilters());
+        $filters = $this->deepIterableToArray($mapper->getMappedFilters());
         /** @noinspection PhpParamsInspection */
         $this->assertCount(1, $filters);
 
         $filter = reset($filters);
-        $this->iterableToArray($filter->getOperationsWithArguments());
+        $this->deepIterableToArray($filter->getOperationsWithArguments());
     }
 
     /**
@@ -231,7 +230,7 @@ class ParametersMapperTest extends TestCase
 
         $mapper = $this->createMapper(BoardSchema::class)->withSorts($sortParameters);
         /** @var SortParameter[] $sorts */
-        $sorts = $this->iterableToArray($mapper->getMappedSorts());
+        $sorts = $this->deepIterableToArray($mapper->getMappedSorts());
         /** @noinspection PhpParamsInspection */
         $this->assertCount(4, $sorts);
 
@@ -287,7 +286,7 @@ class ParametersMapperTest extends TestCase
 
         $mapper = $this->createMapper(BoardSchema::class)->withIncludes($includeParameters);
 
-        $includes = $this->iterableToArray($mapper->getMappedIncludes());
+        $includes = $this->deepIterableToArray($mapper->getMappedIncludes());
         $this->assertCount(3, $includes);
 
         /** @var RelationshipInterface[] $include */
@@ -299,13 +298,13 @@ class ParametersMapperTest extends TestCase
         $this->assertEquals(PostSchema::TYPE, $include[0]->getToSchema()::TYPE);
 
         $include = $includes[1];
-        $this->assertCount(2, $include);
+        $this->assertEquals(2, count($include));
         $this->assertEquals(PostSchema::REL_COMMENTS, $include[1]->getNameInSchema());
         $this->assertEquals(PostSchema::TYPE, $include[1]->getFromSchema()::TYPE);
         $this->assertEquals(CommentSchema::TYPE, $include[1]->getToSchema()::TYPE);
 
         $include = $includes[2];
-        $this->assertCount(3, $include);
+        $this->assertEquals(3, count($include));
         $this->assertEquals(CommentSchema::REL_EMOTIONS, $include[2]->getNameInSchema());
         $this->assertEquals(CommentSchema::TYPE, $include[2]->getFromSchema()::TYPE);
         $this->assertEquals(EmotionSchema::TYPE, $include[2]->getToSchema()::TYPE);
@@ -323,7 +322,7 @@ class ParametersMapperTest extends TestCase
         $includeParameters = [$path1];
 
         $mapper = $this->createMapper(BoardSchema::class)->withIncludes($includeParameters);
-        $this->iterableToArray($mapper->getMappedIncludes());
+        $this->deepIterableToArray($mapper->getMappedIncludes());
     }
 
     /**
@@ -333,7 +332,7 @@ class ParametersMapperTest extends TestCase
     {
         $includes = (new ParametersMapper($this->createDefaultJsonSchemas()))->getMappedIncludes();
 
-        $this->iterableToArray($includes);
+        $this->deepIterableToArray($includes);
     }
 
     /**
@@ -357,21 +356,5 @@ class ParametersMapperTest extends TestCase
     private function createDefaultJsonSchemas(): JsonSchemasInterface
     {
         return $this->getJsonSchemas(new Factory(new Container()), $this->getModelSchemas());
-    }
-
-    /**
-     * @param iterable $iterable
-     *
-     * @return array
-     */
-    private function iterableToArray(iterable $iterable): array
-    {
-        $result = [];
-
-        foreach ($iterable as $key => $value) {
-            $result[$key] = $value instanceof Generator ? $this->iterableToArray($value) : $value;
-        }
-
-        return $result;
     }
 }

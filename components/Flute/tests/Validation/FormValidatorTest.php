@@ -19,7 +19,6 @@
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Exception;
-use Generator;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Flute\Api\BasicRelationshipPaginationStrategy;
@@ -100,16 +99,6 @@ class FormValidatorTest extends TestCase
             [Comment::REL_EMOTIONS => 'The value should be valid identifiers.'],
             $this->iterableToArray($validator->getMessages())
         );
-    }
-
-    /**
-     * @param iterable $iterable
-     *
-     * @return array
-     */
-    private function iterableToArray(iterable $iterable): array
-    {
-        return $iterable instanceof Generator ? iterator_to_array($iterable) : $iterable;
     }
 
     /**
