@@ -80,7 +80,7 @@ trait DefaultControllerMethodsTrait
 
         $models = $mapper->applyQueryParameters($queryParser, $crud)->index();
 
-        self::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        static::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
         $responses = static::defaultCreateResponses($requestUri, $encoder);
         $response  = ($models->getData()) === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($models);
@@ -114,7 +114,7 @@ trait DefaultControllerMethodsTrait
         $model = $mapper->applyQueryParameters($queryParser, $crud)->read($validatedIndex);
         assert(!($model instanceof PaginatedDataInterface));
 
-        self::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        static::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
         $responses = static::defaultCreateResponses($requestUri, $encoder);
         $response  = $model === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($model);
@@ -151,7 +151,7 @@ trait DefaultControllerMethodsTrait
 
         $relData = call_user_func($apiHandler);
 
-        self::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        static::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
         $responses = static::defaultCreateResponses($requestUri, $encoder);
 
         $noData   = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null);
@@ -189,7 +189,7 @@ trait DefaultControllerMethodsTrait
 
         $relData = call_user_func($apiHandler);
 
-        self::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        static::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
         $responses = static::defaultCreateResponses($requestUri, $encoder);
 
         $noData   = $relData === null || ($relData instanceof PaginatedDataInterface && $relData->getData() === null);
