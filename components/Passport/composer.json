@@ -17,7 +17,7 @@
         "php": ">=7.1.0",
         "psr/log": "^1.0",
         "doctrine/dbal": "^2.6.3",
-        "zendframework/zend-diactoros": "^1.7",
+        "zendframework/zend-diactoros": "^2.0",
         "limoncello-php/contracts": "^0.10.0",
         "limoncello-php/oauth-server": "^0.10.0"
     },
