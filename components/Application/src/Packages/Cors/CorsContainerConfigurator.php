@@ -43,10 +43,12 @@ class CorsContainerConfigurator implements ContainerConfiguratorInterface
     {
         $container[AnalyzerInterface::class] = function (PsrContainerInterface $container) {
             $settingsProvider = $container->get(SettingsProviderInterface::class);
-            $corsSettings     = $settingsProvider->get(C::class);
-            $analyzer         = Analyzer::instance(new Settings($corsSettings));
 
-            if ($corsSettings[C::KEY_LOG_IS_ENABLED] === true && $container->has(LoggerInterface::class)) {
+            [$corsSettings, $isLogEnabled] = $settingsProvider->get(C::class);
+
+            $analyzer = Analyzer::instance((new Settings())->setData($corsSettings));
+
+            if ($isLogEnabled === true && $container->has(LoggerInterface::class)) {
                 $logger = $container->get(LoggerInterface::class);
                 $analyzer->setLogger($logger);
             }

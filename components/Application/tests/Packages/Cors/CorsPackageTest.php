@@ -26,6 +26,7 @@ use Limoncello\Tests\Application\TestCase;
 use Mockery;
 use Mockery\Mock;
 use Neomerx\Cors\Contracts\AnalyzerInterface;
+use Neomerx\Cors\Strategies\Settings;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -65,15 +66,50 @@ class CorsPackageTest extends TestCase
         $container[LoggerInterface::class]           = new NullLogger();
 
         $corsConfig = (new C())->get($appConfig);
-        // check CORS config uses application configuration
-        $this->assertEquals([
-            C::KEY_SERVER_ORIGIN_HOST   => 'localhost',
-            C::KEY_SERVER_ORIGIN_PORT   => '8080',
-        ], $corsConfig[C::KEY_SERVER_ORIGIN]);
         $provider->shouldReceive('get')->once()->with(C::class)->andReturn($corsConfig);
 
         CorsContainerConfigurator::configureContainer($container);
 
         $this->assertNotNull($container->get(AnalyzerInterface::class));
+    }
+
+    /**
+     * Test package settings.
+     */
+    public function testPackageSettings(): void
+    {
+        $appSettings = [
+            A::KEY_APP_ORIGIN_SCHEMA => 'http',
+            A::KEY_APP_ORIGIN_HOST   => 'localhost',
+            A::KEY_APP_ORIGIN_PORT   => 80,
+        ];
+
+        // add some test coverage
+
+        // emulate custom settings on application level
+        $customSettings = new class extends C
+        {
+            /**
+             * @inheritdoc
+             */
+            protected function getSettings(): array
+            {
+                return [
+                        static::KEY_IS_FORCE_ADD_METHODS => true,
+                        static::KEY_IS_FORCE_ADD_HEADERS => true,
+                    ] + parent::getSettings();
+            }
+        };
+
+        // emulate caching settings
+        $packageSettings = $customSettings->get($appSettings);
+
+        // now emulate restore settings from cache
+        [$corsCachedData, ] = $packageSettings;
+        $corsSettings       = (new Settings())->setData($corsCachedData);
+
+        // now check that settings for adding methods and headers were set
+        $this->assertTrue($corsSettings->isForceAddAllowedMethodsToPreFlightResponse());
+        $this->assertTrue($corsSettings->isForceAddAllowedHeadersToPreFlightResponse());
     }
 }
