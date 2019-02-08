@@ -378,6 +378,21 @@ class MakeCommandTest extends TestCase
     }
 
     /**
+     * @expectedException \Limoncello\Application\Exceptions\InvalidArgumentException
+     *
+     * @return void
+     */
+    public function testItShouldFailIfRootFolderIsNotWritable(): void
+    {
+        $this->fileSystemMock->shouldReceive('exists')->once()->with('/migrations')->andReturnTrue();
+
+        // this one will trigger the error
+        $this->fileSystemMock->shouldReceive('isWritable')->once()->with('/migrations')->andReturnFalse();
+
+        $this->prepareDataForDataResourceToEmulateFileSystemIssuesAndRunTheCommand();
+    }
+
+    /**
      * Run command test.
      *
      * @param string $command
