@@ -17,7 +17,7 @@
         "php": ">=7.1.0",
         "ext-intl" : "*",
         "psr/log": "1.1.0",
-        "zendframework/zend-diactoros": "^1.7",
+        "zendframework/zend-diactoros": "^2.0",
         "doctrine/dbal": "^2.6.3",
         "neomerx/json-api": "^3.0.0",
         "limoncello-php/common": "^0.10.0",
