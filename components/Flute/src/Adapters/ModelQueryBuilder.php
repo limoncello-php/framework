@@ -109,7 +109,7 @@ class ModelQueryBuilder extends QueryBuilder
         $this->mainTableName = $this->getModelSchemas()->getTable($this->getModelClass());
         $this->mainAlias     = $this->createAlias($this->getTableName());
 
-        $this->setColumnToDatabaseMapper(Closure::fromCallable([$this, 'buildColumnName']));
+        $this->setColumnToDatabaseMapper(Closure::fromCallable([$this, 'quoteDoubleIdentifier']));
     }
 
     /**
@@ -156,13 +156,15 @@ class ModelQueryBuilder extends QueryBuilder
      * @return self
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     *
+     * @throws DBALException
      */
     public function selectModelColumns(iterable $columns = null): self
     {
         if ($columns !== null) {
             $quotedColumns = [];
             foreach ($columns as $column) {
-                $quotedColumns[] = $this->buildColumnName($this->getAlias(), $column);
+                $quotedColumns[] = $this->quoteDoubleIdentifier($this->getAlias(), $column);
             }
         } else {
             $quotedColumns = $this->getModelColumns();
@@ -175,6 +177,8 @@ class ModelQueryBuilder extends QueryBuilder
 
     /**
      * @return self
+     *
+     * @throws DBALException
      */
     public function distinct(): self
     {
@@ -199,12 +203,14 @@ class ModelQueryBuilder extends QueryBuilder
 
     /**
      * @return self
+     *
+     * @throws DBALException
      */
     public function fromModelTable(): self
     {
         $this->from(
-            $this->quoteTableName($this->getTableName()),
-            $this->quoteTableName($this->getAlias())
+            $this->quoteSingleIdentifier($this->getTableName()),
+            $this->quoteSingleIdentifier($this->getAlias())
         );
 
         return $this;
@@ -221,7 +227,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function createModel(iterable $attributes): self
     {
-        $this->insert($this->quoteTableName($this->getTableName()));
+        $this->insert($this->quoteSingleIdentifier($this->getTableName()));
 
         $valuesAsParams = [];
         foreach ($this->bindAttributes($this->getModelClass(), $attributes) as $quotedColumn => $parameterName) {
@@ -243,7 +249,7 @@ class ModelQueryBuilder extends QueryBuilder
      */
     public function updateModels(iterable $attributes): self
     {
-        $this->update($this->quoteTableName($this->getTableName()));
+        $this->update($this->quoteSingleIdentifier($this->getTableName()));
 
         foreach ($this->bindAttributes($this->getModelClass(), $attributes) as $quotedColumn => $parameterName) {
             $this->set($quotedColumn, $parameterName);
@@ -270,7 +276,7 @@ class ModelQueryBuilder extends QueryBuilder
         foreach ($attributes as $column => $value) {
             assert(is_string($column) && $this->getModelSchemas()->hasAttributeType($this->getModelClass(), $column));
 
-            $quotedColumn  = $this->quoteColumnName($column);
+            $quotedColumn  = $this->quoteSingleIdentifier($column);
             $type          = $this->getDbalType($types[$column]);
             $pdoValue      = $type->convertToDatabaseValue($value, $dbPlatform);
             $parameterName = $this->createNamedParameter($pdoValue, $type->getBindingType());
@@ -281,10 +287,12 @@ class ModelQueryBuilder extends QueryBuilder
 
     /**
      * @return self
+     *
+     * @throws DBALException
      */
     public function deleteModels(): self
     {
-        $this->delete($this->quoteTableName($this->getTableName()));
+        $this->delete($this->quoteSingleIdentifier($this->getTableName()));
 
         return $this;
     }
@@ -295,6 +303,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param string $secondaryIdBindName
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function prepareCreateInToManyRelationship(
         string $relationshipName,
@@ -305,10 +315,10 @@ class ModelQueryBuilder extends QueryBuilder
             $this->getModelSchemas()->getBelongsToManyRelationship($this->getModelClass(), $relationshipName);
 
         $this
-            ->insert($this->quoteTableName($intermediateTable))
+            ->insert($this->quoteSingleIdentifier($intermediateTable))
             ->values([
-                $this->quoteColumnName($primaryKey)   => $this->createNamedParameter($identity),
-                $this->quoteColumnName($secondaryKey) => $secondaryIdBindName,
+                $this->quoteSingleIdentifier($primaryKey)   => $this->createNamedParameter($identity),
+                $this->quoteSingleIdentifier($secondaryKey) => $secondaryIdBindName,
             ]);
 
         return $this;
@@ -338,7 +348,7 @@ class ModelQueryBuilder extends QueryBuilder
 
         $addWith = $this->expr()->andX();
         $this
-            ->delete($this->quoteTableName($intermediateTable))
+            ->delete($this->quoteSingleIdentifier($intermediateTable))
             ->applyFilters($addWith, $intermediateTable, $filters);
 
         $addWith->count() <= 0 ?: $this->andWhere($addWith);
@@ -362,7 +372,7 @@ class ModelQueryBuilder extends QueryBuilder
         $filters = [$primaryKey => [FilterParameterInterface::OPERATION_EQUALS => [$identity]]];
         $addWith = $this->expr()->andX();
         $this
-            ->delete($this->quoteTableName($intermediateTable))
+            ->delete($this->quoteSingleIdentifier($intermediateTable))
             ->applyFilters($addWith, $intermediateTable, $filters);
 
         $addWith->count() <= 0 ?: $this->andWhere($addWith);
@@ -480,7 +490,7 @@ class ModelQueryBuilder extends QueryBuilder
                 } else {
                     // Will apply filters to a joined table.
                     $targetAlias    = $targetAlias ?: $this->createRelationshipAlias($relationshipName);
-                    $fullColumnName = $this->buildColumnName($targetAlias, $columnName);
+                    $fullColumnName = $this->quoteDoubleIdentifier($targetAlias, $columnName);
                 }
 
                 foreach ($operationsWithArgs as $operation => $arguments) {
@@ -504,7 +514,7 @@ class ModelQueryBuilder extends QueryBuilder
                 $targetAlias = $targetAlias ?: $this->createRelationshipAlias($relationshipName);
 
                 assert(is_string($columnName) === true && is_bool($isAsc) === true);
-                $fullColumnName = $this->buildColumnName($targetAlias, $columnName);
+                $fullColumnName = $this->quoteDoubleIdentifier($targetAlias, $columnName);
                 $this->addOrderBy($fullColumnName, $isAsc === true ? 'ASC' : 'DESC');
             }
         }
@@ -516,6 +526,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $sortParameters
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function addSorts(iterable $sortParameters): self
     {
@@ -526,26 +538,32 @@ class ModelQueryBuilder extends QueryBuilder
      * @param string $column
      *
      * @return string
+     *
+     * @throws DBALException
      */
     public function getQuotedMainTableColumn(string $column): string
     {
-        return $this->buildColumnName($this->getTableName(), $column);
+        return $this->quoteDoubleIdentifier($this->getTableName(), $column);
     }
 
     /**
      * @param string $column
      *
      * @return string
+     *
+     * @throws DBALException
      */
     public function getQuotedMainAliasColumn(string $column): string
     {
-        return $this->buildColumnName($this->getAlias(), $column);
+        return $this->quoteDoubleIdentifier($this->getAlias(), $column);
     }
 
     /**
      * @param string $name
      *
      * @return string Table alias.
+     *
+     * @throws DBALException
      */
     public function createRelationshipAlias(string $name): string
     {
@@ -622,7 +640,7 @@ class ModelQueryBuilder extends QueryBuilder
                 is_string($columnName) === true && empty($columnName) === false,
                 "Haven't you forgotten to specify a column name in a relationship that joins `$tableOrAlias` table?"
             );
-            $fullColumnName = $this->buildColumnName($tableOrAlias, $columnName);
+            $fullColumnName = $this->quoteDoubleIdentifier($tableOrAlias, $columnName);
             foreach ($operationsWithArgs as $operation => $arguments) {
                 assert(
                     is_iterable($arguments) === true || is_array($arguments) === true,
@@ -641,12 +659,14 @@ class ModelQueryBuilder extends QueryBuilder
      * @param iterable $sorts
      *
      * @return self
+     *
+     * @throws DBALException
      */
     public function applySorts(string $tableOrAlias, iterable $sorts): self
     {
         foreach ($sorts as $columnName => $isAsc) {
             assert(is_string($columnName) === true && is_bool($isAsc) === true);
-            $fullColumnName = $this->buildColumnName($tableOrAlias, $columnName);
+            $fullColumnName = $this->quoteDoubleIdentifier($tableOrAlias, $columnName);
             $this->addOrderBy($fullColumnName, $isAsc === true ? 'ASC' : 'DESC');
         }
 
@@ -654,14 +674,30 @@ class ModelQueryBuilder extends QueryBuilder
     }
 
     /**
-     * @param string $table
+     * @param string $tableOrColumn
+     *
+     * @return string
+     *
+     * @throws DBALException
+     */
+    public function quoteSingleIdentifier(string $tableOrColumn): string
+    {
+        return $this->getConnection()->getDatabasePlatform()->quoteSingleIdentifier($tableOrColumn);
+    }
+
+    /**
+     * @param string $tableOrAlias
      * @param string $column
      *
      * @return string
+     *
+     * @throws DBALException
      */
-    public function buildColumnName(string $table, string $column): string
+    public function quoteDoubleIdentifier(string $tableOrAlias, string $column): string
     {
-        return $this->quoteTableName($table) . '.' . $this->quoteColumnName($column);
+        $platform = $this->getConnection()->getDatabasePlatform();
+
+        return $platform->quoteSingleIdentifier($tableOrAlias) . '.' . $platform->quoteSingleIdentifier($column);
     }
 
     /**
@@ -716,6 +752,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param string $targetColumn
      *
      * @return string
+     *
+     * @throws DBALException
      */
     public function innerJoinOneTable(
         string $fromAlias,
@@ -724,13 +762,13 @@ class ModelQueryBuilder extends QueryBuilder
         string $targetColumn
     ): string {
         $targetAlias   = $this->createAlias($targetTable);
-        $joinCondition = $this->buildColumnName($fromAlias, $fromColumn) . '=' .
-            $this->buildColumnName($targetAlias, $targetColumn);
+        $joinCondition = $this->quoteDoubleIdentifier($fromAlias, $fromColumn) . '=' .
+            $this->quoteDoubleIdentifier($targetAlias, $targetColumn);
 
         $this->innerJoin(
-            $this->quoteTableName($fromAlias),
-            $this->quoteTableName($targetTable),
-            $this->quoteTableName($targetAlias),
+            $this->quoteSingleIdentifier($fromAlias),
+            $this->quoteSingleIdentifier($targetTable),
+            $this->quoteSingleIdentifier($targetAlias),
             $joinCondition
         );
 
@@ -747,6 +785,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param string $targetColumn
      *
      * @return string
+     *
+     * @throws DBALException
      */
     public function innerJoinTwoSequentialTables(
         string $fromAlias,
@@ -794,26 +834,6 @@ class ModelQueryBuilder extends QueryBuilder
     private function getModelSchemas(): ModelSchemaInfoInterface
     {
         return $this->modelSchemas;
-    }
-
-    /**
-     * @param string $tableName
-     *
-     * @return string
-     */
-    private function quoteTableName(string $tableName): string
-    {
-        return $this->getConnection()->quoteIdentifier($tableName);
-    }
-
-    /**
-     * @param string $columnName
-     *
-     * @return string
-     */
-    private function quoteColumnName(string $columnName): string
-    {
-        return $this->getConnection()->quoteIdentifier($columnName);
     }
 
     /**

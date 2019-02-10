@@ -995,7 +995,7 @@ class CrudTest extends TestCase
             ->shouldBeUntyped()
             ->withColumnMapper(function (string $aliasName, string $columnName, ModelQueryBuilder $builder): string {
                 // a bit naive implementation but fine for testing purposes
-                $quotedColumnName = $builder->buildColumnName($aliasName, $columnName);
+                $quotedColumnName = $builder->quoteDoubleIdentifier($aliasName, $columnName);
                 $dateTimeColumns  = [Post::FIELD_CREATED_AT, Post::FIELD_UPDATED_AT, Post::FIELD_DELETED_AT];
                 if (in_array($columnName, $dateTimeColumns) === true) {
                     // emulate output datetime in JSON API as 2015-05-22T14:56:29.000Z
