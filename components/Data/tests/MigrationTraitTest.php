@@ -413,6 +413,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
     private function prepareTable(MockInterface $mock, string $modelClass, string $tableName, int $times = 1)
     {
         /** @var Mock $mock */
+        $mock->shouldReceive('hasClass')->times($times)->with($modelClass)->andReturn(true);
         $mock->shouldReceive('getTable')->times($times)->with($modelClass)->andReturn($tableName);
 
         return $mock;
@@ -510,7 +511,7 @@ class MigrationTraitTest extends TestCase implements MigrationInterface
         string $colType = Type::INTEGER
     ) {
         /** @var Mock $mock */
-        $mock->shouldReceive('hasClass')->once()->with($reverseClass)->andReturn(true);
+        $mock->shouldReceive('hasClass')->times(2)->with($reverseClass)->andReturn(true);
         $mock->shouldReceive('getTable')->once()->with($reverseClass)->andReturn($reverseTable);
         $mock->shouldReceive('getPrimaryKey')->once()->with($reverseClass)->andReturn($reversePk);
         $mock->shouldReceive('getAttributeType')->once()->with($modelClass, $fkName)->andReturn($colType);

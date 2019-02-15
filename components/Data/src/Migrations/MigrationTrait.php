@@ -103,7 +103,11 @@ trait MigrationTrait
      */
     protected function createTable(string $modelClass, array $expressions = []): Table
     {
-        $context   = new MigrationContext($modelClass, $this->getModelSchemas());
+        $context = new MigrationContext($modelClass, $this->getModelSchemas());
+        assert(
+            $this->getModelSchemas()->hasClass($modelClass),
+            "Class `$modelClass` is not found in model Schemas."
+        );
         $tableName = $this->getModelSchemas()->getTable($modelClass);
         $table     = new Table($tableName);
         foreach ($expressions as $expression) {
@@ -123,6 +127,10 @@ trait MigrationTrait
      */
     protected function dropTableIfExists(string $modelClass): void
     {
+        assert(
+            $this->getModelSchemas()->hasClass($modelClass),
+            "Class `$modelClass` is not found in model Schemas."
+        );
         $tableName     = $this->getModelSchemas()->getTable($modelClass);
         $schemaManager = $this->getSchemaManager();
 
@@ -670,7 +678,7 @@ trait MigrationTrait
     {
         assert(
             $this->getModelSchemas()->hasClass($modelClass),
-            "Table name is not specified for model '$modelClass'."
+            "Class `$modelClass` is not found in model Schemas."
         );
 
         $tableName = $this->getModelSchemas()->getTable($modelClass);
@@ -803,8 +811,12 @@ trait MigrationTrait
                 $this->getModelSchemas()->getAttributeLength($modelClass, $localKey) : null;
 
             $otherModelClass = $this->getModelSchemas()->getReverseModelClass($modelClass, $name);
-            $foreignTable    = $this->getModelSchemas()->getTable($otherModelClass);
-            $foreignKey      = $this->getModelSchemas()->getPrimaryKey($otherModelClass);
+            assert(
+                $this->getModelSchemas()->hasClass($otherModelClass),
+                "Class `$otherModelClass` is not found in model Schemas."
+            );
+            $foreignTable = $this->getModelSchemas()->getTable($otherModelClass);
+            $foreignKey   = $this->getModelSchemas()->getPrimaryKey($otherModelClass);
 
             $fkClosure = $this->foreignColumnImpl(
                 $localKey,
