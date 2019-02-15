@@ -19,6 +19,8 @@
 use InvalidArgumentException;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * @package Limoncello\Application
@@ -119,6 +121,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
 
     /** @noinspection PhpTooManyParametersInspection
      * @inheritdoc
+     *
+     * @throws ReflectionException
      */
     public function registerClass(
         string $class,
@@ -140,6 +144,11 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
             throw new InvalidArgumentException('primaryKey');
         }
 
+        assert(
+            (new ReflectionClass($class))->getName() === $class,
+            "Please check name for class `$class`. It should be case sensitive."
+        );
+
         $this->tableNames[$class]       = $tableName;
         $this->primaryKeys[$class]      = $primaryKey;
         $this->attributeTypes[$class]   = $attributeTypes;
@@ -157,6 +166,12 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
     {
         $result = array_key_exists($class, $this->tableNames);
 
+        // check if not found it cannot be found case insensitive (protection from case insensitive values)
+        assert(
+            $result === true ||
+            in_array(strtolower($class), array_change_key_case($this->tableNames, CASE_LOWER)) === false
+        );
+
         return $result;
     }
 
@@ -165,6 +180,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getTable(string $class): string
     {
+        assert($this->hasClass($class));
+
         $result = $this->tableNames[$class];
 
         return $result;
@@ -175,6 +192,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getPrimaryKey(string $class): string
     {
+        assert($this->hasClass($class));
+
         $result = $this->primaryKeys[$class];
 
         return $result;
@@ -185,6 +204,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getAttributeTypes(string $class): array
     {
+        assert($this->hasClass($class));
+
         $result = $this->attributeTypes[$class];
 
         return $result;
@@ -195,6 +216,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getAttributeType(string $class, string $name): string
     {
+        assert($this->hasClass($class));
+
         $result = $this->attributeTypes[$class][$name];
 
         return $result;
@@ -205,6 +228,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function hasAttributeType(string $class, string $name): bool
     {
+        assert($this->hasClass($class));
+
         $result = isset($this->attributeTypes[$class][$name]);
 
         return $result;
@@ -215,6 +240,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getAttributeLengths(string $class): array
     {
+        assert($this->hasClass($class));
+
         $result = $this->attributeLengths[$class];
 
         return $result;
@@ -225,6 +252,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function hasAttributeLength(string $class, string $name): bool
     {
+        assert($this->hasClass($class));
+
         $result = isset($this->attributeLengths[$class][$name]);
 
         return $result;
@@ -250,6 +279,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getAttributes(string $class): array
     {
+        assert($this->hasClass($class));
+
         $result = $this->attributes[$class];
 
         return $result;
@@ -260,6 +291,8 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getRawAttributes(string $class): array
     {
+        assert($this->hasClass($class));
+
         $result = $this->rawAttributes[$class];
 
         return $result;
