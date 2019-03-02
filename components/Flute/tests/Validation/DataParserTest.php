@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Validation;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Validation;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +29,7 @@ use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\Package\FluteSettings;
-use Limoncello\Flute\Resources\Messages\En\Generic;
-use Limoncello\Flute\Resources\Messages\En\Validation;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Flute\Types\DateTime;
 use Limoncello\Flute\Validation\JsonApi\DataParser;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiDataRulesSerializer;
@@ -862,17 +862,6 @@ EOT;
     }
 
     /**
-     * Test string resources present.
-     *
-     * @throws Exception
-     */
-    public function testResourcesPresent(): void
-    {
-        $this->assertNotEmpty(Generic::getMessages());
-        $this->assertNotEmpty(Validation::getMessages());
-    }
-
-    /**
      * Add some test coverage for rarely used functionality.
      *
      * @throws Exception
@@ -970,7 +959,7 @@ EOT;
                 JsonApiDataRulesSerializer::class,
                 $serializedData,
                 new ContextStorage($blocks, $container),
-                new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
+                new JsonApiErrorCollection($formatterFactory->createFormatter(Validation::NAMESPACE_NAME)),
                 $container->get(FormatterFactoryInterface::class)
             );
         } catch (Exception | NotFoundExceptionInterface | ContainerExceptionInterface $exception) {

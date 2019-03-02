@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Data\L10n;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Data\L10n;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +22,9 @@ use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\l10n\Format\Formatter;
 use Limoncello\l10n\Format\Translator;
+use Limoncello\l10n\Messages\BundleEncoder;
 use Limoncello\l10n\Messages\BundleStorage;
-use Limoncello\l10n\Messages\FileBundleEncoder;
+use Limoncello\l10n\Messages\ResourceBundle;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -33,7 +36,7 @@ class FormatterFactory implements FormatterFactoryInterface
      */
     public function createFormatter(string $namespace): FormatterInterface
     {
-        return $this->createFormatterForLocale($namespace, 'En');
+        return $this->createFormatterForLocale($namespace, 'en');
     }
 
     /**
@@ -41,8 +44,10 @@ class FormatterFactory implements FormatterFactoryInterface
      */
     public function createFormatterForLocale(string $namespace, string $locale): FormatterInterface
     {
-        $dirPath   = implode(DIRECTORY_SEPARATOR, [__DIR__, 'res', 'Messages']);
-        $storage   = (new FileBundleEncoder(null, $dirPath))->getStorageData('En');
+        $bundle   = new ResourceBundle($locale, $namespace, []);
+        $encoder  = new BundleEncoder();
+        $encoder->addBundle($bundle);
+        $storage = (new BundleEncoder())->getStorageData($locale);
         $formatter = new Formatter($locale, $namespace, new Translator(new BundleStorage($storage)));
 
         return $formatter;

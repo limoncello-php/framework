@@ -1,7 +1,9 @@
-<?php namespace Limoncello\l10n\Messages;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\l10n\Messages;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +18,12 @@
  * limitations under the License.
  */
 
+use function assert;
+use function array_keys;
+use function is_scalar;
+use function is_string;
+use function locale_canonicalize;
+use function strlen;
 use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
 
 /**
@@ -75,7 +83,7 @@ class ResourceBundle implements ResourceBundleInterface
     /**
      * @inheritdoc
      */
-    public function getValue($key): string
+    public function getValue(string $key): string
     {
         $properties = $this->getProperties();
 
@@ -103,7 +111,7 @@ class ResourceBundle implements ResourceBundleInterface
      */
     public function setNamespace(string $namespace): self
     {
-        assert(is_string($namespace) === true && empty($namespace) === false);
+        assert(empty($namespace) === false);
 
         $this->namespace = $namespace;
 
@@ -118,17 +126,12 @@ class ResourceBundle implements ResourceBundleInterface
     public function setProperties(array $properties): self
     {
         // check all keys and values are non-empty strings
-        assert(call_user_func(function () use ($properties) {
-            $result = true;
-            foreach ($properties as $key => $value) {
-                $result = $result === true &&
-                    ((is_string($key) === true && empty($key) === false) || is_int($key)) &&
-                    is_string($value) === true && empty($value) === false;
-            }
-            return $result;
-        }) === true);
-
-        $this->properties = $properties;
+        $this->properties = [];
+        foreach ($properties as $key => $value) {
+            assert(is_scalar($key) === true && strlen((string)$key) > 0);
+            assert(is_string($value) === true && strlen($value) > 0);
+            $this->properties[(string)$key] = (string)$value;
+        }
 
         return $this;
     }

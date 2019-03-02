@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Http;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Http;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,22 +38,22 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
 {
     use DefaultControllerMethodsTrait;
 
-    /** API class name */
+    /** @var string|null API class name */
     const API_CLASS = null;
 
-    /** JSON API Schema class name */
+    /** @var string|null JSON API Schema class name */
     const SCHEMA_CLASS = null;
 
-    /** JSON API query validation rules class */
+    /** @var string|null @var string|null JSON API query validation rules class */
     const ON_INDEX_QUERY_VALIDATION_RULES_CLASS = null;
 
-    /** JSON API query validation rules class */
+    /** @var string|null @var string|null JSON API query validation rules class */
     const ON_READ_QUERY_VALIDATION_RULES_CLASS = null;
 
-    /** JSON API data validation rules class */
+    /** @var string|null @var string|null JSON API data validation rules class */
     const ON_CREATE_DATA_VALIDATION_RULES_CLASS = null;
 
-    /** JSON API data validation rules class */
+    /** @var string|null JSON API data validation rules class */
     const ON_UPDATE_DATA_VALIDATION_RULES_CLASS = null;
 
     /**
@@ -90,7 +92,7 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
 
         $response = static::defaultCreateHandler(
             $request->getUri(),
-            $request->getBody(),
+            (string)$request->getBody(),
             static::SCHEMA_CLASS,
             $container->get(ModelSchemaInfoInterface::class),
             static::defaultCreateDataParser($container, static::ON_CREATE_DATA_VALIDATION_RULES_CLASS),
@@ -117,7 +119,7 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
         static::assertClassValueDefined(static::ON_READ_QUERY_VALIDATION_RULES_CLASS);
 
         return static::defaultReadHandler(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             $request->getQueryParams(),
             $request->getUri(),
             static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
@@ -140,9 +142,9 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
         static::assertClassValueDefined(static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS);
 
         $response = static::defaultUpdateHandler(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             $request->getUri(),
-            $request->getBody(),
+            (string)$request->getBody(),
             static::SCHEMA_CLASS,
             $container->get(ModelSchemaInfoInterface::class),
             static::defaultCreateDataParser($container, static::ON_UPDATE_DATA_VALIDATION_RULES_CLASS),
@@ -166,7 +168,7 @@ abstract class JsonApiBaseController implements JsonApiControllerInterface
         static::assertClassValueDefined(static::API_CLASS);
 
         $response = static::defaultDeleteHandler(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             $request->getUri(),
             static::defaultCreateQueryParser($container, static::ON_READ_QUERY_VALIDATION_RULES_CLASS),
             static::defaultCreateApi($container, static::API_CLASS),

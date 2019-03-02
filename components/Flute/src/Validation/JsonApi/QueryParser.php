@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Validation\JsonApi;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Validation\JsonApi;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +25,7 @@ use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesSerializerInterface;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
-use Limoncello\Flute\Package\FluteSettings;
-use Limoncello\Flute\Resources\Messages\En\Validation;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
@@ -454,7 +455,7 @@ class QueryParser implements JsonApiQueryParserInterface
     protected function getFormatter(): FormatterInterface
     {
         if ($this->formatter === null) {
-            $this->formatter = $this->getFormatterFactory()->createFormatter(FluteSettings::VALIDATION_NAMESPACE);
+            $this->formatter = $this->getFormatterFactory()->createFormatter(Validation::NAMESPACE_NAME);
         }
 
         return $this->formatter;
@@ -1016,8 +1017,9 @@ class QueryParser implements JsonApiQueryParserInterface
             if (is_string($operationName) === false || empty($operationName) === true ||
                 is_string($arguments) === false
             ) {
-                $title = $this->getFormatter()->formatMessage(Validation::INVALID_OPERATION_ARGUMENTS);
-                $error = $this->createQueryError($parameterName, $title);
+                $defMsg = Validation::convertCodeToDefaultMessage(ErrorCodes::INVALID_OPERATION_ARGUMENTS);
+                $title  = $this->getFormatter()->formatMessage($defMsg);
+                $error  = $this->createQueryError($parameterName, $title);
                 throw new InvalidQueryParametersException($error);
             }
 

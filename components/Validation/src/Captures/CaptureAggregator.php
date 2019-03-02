@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Validation\Captures;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Validation\Captures;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +19,7 @@
  */
 
 use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
+use function count;
 
 /**
  * @package Limoncello\Validation

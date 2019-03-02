@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\L10n;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\L10n;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +23,19 @@
  */
 interface Messages
 {
-    /**
-     * Namespace for string resources.
-     */
-    const RESOURCES_NAMESPACE = 'Limoncello.Flute';
+    /** @var string Namespace name for message keys. */
+    const NAMESPACE_NAME = 'Limoncello.Flute.Messages';
 
     /** Message id */
-    const MSG_ERR_INVALID_ELEMENT = 0;
+    const MSG_ERR_INVALID_ARGUMENT = 'Invalid argument.';
 
     /** Message id */
-    const MSG_ERR_INVALID_PARAMETER = self::MSG_ERR_INVALID_ELEMENT + 1;
+    const MSG_ERR_INVALID_JSON_DATA_IN_REQUEST = 'Invalid JSON data in request.';
 
     /** Message id */
-    const MSG_ERR_INVALID_OPERATION = self::MSG_ERR_INVALID_PARAMETER + 1;
+    const MSG_ERR_CANNOT_CREATE_NON_UNIQUE_RESOURCE = 'Cannot create non unique resource.';
 
     /** Message id */
-    const MSG_ERR_INVALID_ARGUMENT = self::MSG_ERR_INVALID_OPERATION + 1;
+    const MSG_ERR_CANNOT_UPDATE_WITH_UNIQUE_CONSTRAINT_VIOLATION =
+        'Cannot update resource because unique constraint violated.';
 }

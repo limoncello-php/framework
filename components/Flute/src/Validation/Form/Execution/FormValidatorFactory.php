@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Validation\Form\Execution;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Validation\Form\Execution;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +23,7 @@ use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Flute\Package\FluteSettings as S;
 use Limoncello\Flute\Validation\Form\FormValidator;
 use Limoncello\Validation\Execution\ContextStorage;
@@ -54,7 +57,7 @@ class FormValidatorFactory implements FormValidatorFactoryInterface
 
         /** @var FormatterFactoryInterface $factory */
         $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
-        $formatter = $factory->createFormatter(S::VALIDATION_NAMESPACE);
+        $formatter = $factory->createFormatter(Validation::NAMESPACE_NAME);
 
         $validator = new FormValidator(
             $rulesClass,

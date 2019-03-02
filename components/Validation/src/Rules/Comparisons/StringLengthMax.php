@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Validation\Rules\Comparisons;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Validation\Rules\Comparisons;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +21,9 @@
 use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use function assert;
+use function is_string;
+use function strlen;
 
 /**
  * @package Limoncello\Validation

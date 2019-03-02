@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Validation\Form;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Validation\Form;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +23,7 @@ use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\FormRulesSerializerInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
@@ -124,7 +127,8 @@ class FormValidator extends BaseValidator implements FormValidatorInterface
         $formatter = $this->getMessageFormatter();
         foreach ($this->getErrors() as $error) {
             /** @var ErrorInterface $error */
-            $message = $formatter->formatMessage($error->getMessageCode(), $error->getMessageContext() ?? []);
+            $defMsg  = Validation::convertCodeToDefaultMessage($error->getMessageCode());
+            $message = $formatter->formatMessage($defMsg, $error->getMessageContext() ?? []);
 
             yield $error->getParameterName() => $message;
         }

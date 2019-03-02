@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Schema;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Schema;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,7 +162,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
             if ($belongsToFkName !== null && $this->hasProperty($model, $belongsToFkName) === true) {
                 $reverseIndex = $model->{$belongsToFkName};
                 $identifier   = $reverseIndex === null ?
-                    null : new Identifier($reverseIndex, $reverseType, false, null);
+                    null : new Identifier((string)$reverseIndex, $reverseType, false, null);
 
                 yield $jsonRelName => [
                     static::RELATIONSHIP_DATA       => $identifier,

@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Contracts\Api;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Contracts\Api;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +45,11 @@ interface CrudInterface
     public function withFilters(iterable $filterParameters): self;
 
     /**
-     * @param string|int $index
+     * @param string $index
      *
      * @return self
      */
-    public function withIndexFilter($index): self;
+    public function withIndexFilter(string $index): self;
 
     /**
      * @param array $indexes
@@ -155,11 +157,11 @@ interface CrudInterface
     public function indexIdentities(): array;
 
     /**
-     * @param null|string $index
+     * @param string $index
      *
      * @return mixed|null
      */
-    public function read($index);
+    public function read(string $index);
 
     /**
      * @return int|null
@@ -172,11 +174,11 @@ interface CrudInterface
     public function delete(): int;
 
     /**
-     * @param null|string $index
+     * @param string $index
      *
      * @return bool
      */
-    public function remove($index): bool;
+    public function remove(string $index): bool;
 
     /**
      * @param null|string $index
@@ -185,16 +187,16 @@ interface CrudInterface
      *
      * @return string
      */
-    public function create($index, array $attributes, array $toMany): string;
+    public function create(?string $index, array $attributes, array $toMany): string;
 
     /**
-     * @param int|string $index
-     * @param array      $attributes
-     * @param array      $toMany
+     * @param string $index
+     * @param array  $attributes
+     * @param array  $toMany
      *
      * @return int
      */
-    public function update($index, array $attributes, array $toMany): int;
+    public function update(string $index, array $attributes, array $toMany): int;
 
     /**
      * @param string        $name
@@ -223,7 +225,7 @@ interface CrudInterface
     ): array;
 
     /**
-     * @param int|string    $index
+     * @param string        $index
      * @param string        $name
      * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
@@ -231,20 +233,20 @@ interface CrudInterface
      * @return PaginatedDataInterface|mixed|null
      */
     public function readRelationship(
-        $index,
+        string $index,
         string $name,
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
     );
 
     /**
-     * @param int|string $parentId
-     * @param string     $name
-     * @param int|string $childId
+     * @param string $parentId
+     * @param string $name
+     * @param string $childId
      *
      * @return bool
      */
-    public function hasInRelationship($parentId, string $name, $childId): bool;
+    public function hasInRelationship(string $parentId, string $name, string $childId): bool;
 
     /**
      * @param string   $parentId

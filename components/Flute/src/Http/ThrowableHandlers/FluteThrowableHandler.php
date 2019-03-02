@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Http\ThrowableHandlers;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Http\ThrowableHandlers;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +134,7 @@ class FluteThrowableHandler implements ThrowableHandlerInterface
                 $message = $throwable->getMessage();
                 $details = (string)$throwable;
             }
-            $errors->add(new Error(null, null, null, $httpCode, null, $message, $details));
+            $errors->add(new Error(null, null, null, (string)$httpCode, null, $message, $details));
         }
 
         // encode the error and send to client

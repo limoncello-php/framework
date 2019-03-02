@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\l10n\Messages;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\l10n\Messages;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,13 +48,13 @@ class ResourceBundleTest extends TestCase
     public function testGetAndSetIntKeys()
     {
         $bundle = new ResourceBundle('de_DE', 'ErrorMessages', [
-            0 => 'Lets assume it would be german translation',
-            1 => 'And that would be another german translation',
+            '0' => 'Lets assume it would be german translation',
+            '1' => 'And that would be another german translation',
         ]);
 
         $this->assertEquals('de_DE', $bundle->getLocale());
         $this->assertEquals('ErrorMessages', $bundle->getNamespace());
-        $this->assertEquals([0, 1], $bundle->getKeys());
+        $this->assertSame([0, 1], $bundle->getKeys());
         $this->assertEquals('And that would be another german translation', $bundle->getValue('1'));
     }
 }

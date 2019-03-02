@@ -1,9 +1,11 @@
-<?php /** @noinspection SpellCheckingInspection */
+<?php declare (strict_types = 1);
+
+/** @noinspection SpellCheckingInspection */
 
 namespace Limoncello\Tests\l10n\Messages;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +20,14 @@ namespace Limoncello\Tests\l10n\Messages;
  * limitations under the License.
  */
 
+use Limoncello\l10n\Contracts\Format\TranslatorInterface;
+use Limoncello\l10n\Format\Formatter;
+use Limoncello\l10n\Format\Translator;
 use Limoncello\l10n\Messages\BundleStorage;
 use Limoncello\l10n\Messages\FileBundleEncoder;
+use Limoncello\Tests\l10n\Messages\Resources2\DeAtMessages;
+use Limoncello\Tests\l10n\Messages\Resources2\DeMessages;
+use Limoncello\Tests\l10n\Messages\Resources2\OriginalMessages;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -69,5 +77,40 @@ class FileBundleEncoderTest extends TestCase
         $encoder = new FileBundleEncoder($messageDescriptions, __DIR__ . DIRECTORY_SEPARATOR . 'Resources');
         $storage = new BundleStorage($encoder->getStorageData('en'));
         $this->assertEquals(['Hello World from US.', 'en_US'], $storage->get('en_US', 'Messages', 'Hello World'));
+    }
+
+    /**
+     * Test load resources from message descriptions.
+     */
+    public function testLoadMessageDescriptions2(): void
+    {
+        // we've got some translations for original messages...
+        $messageDescriptions = [
+            ['de', OriginalMessages::class, DeMessages::class],
+            ['de_AT', OriginalMessages::class, DeAtMessages::class],
+        ];
+
+        // pack them into a storage
+        $encoder = new FileBundleEncoder($messageDescriptions, __DIR__ . DIRECTORY_SEPARATOR . 'Resources2');
+        $storage = new BundleStorage($encoder->getStorageData('en'));
+
+        // create a translation with the actual translations...
+        /** @var TranslatorInterface $translator */
+        $translator = new Translator($storage);
+
+        // and create a formatter for some locales
+        $enUs = new Formatter('en_US', OriginalMessages::class, $translator);
+        $de   = new Formatter('de', OriginalMessages::class, $translator);
+        $deAt = new Formatter('de_AT', OriginalMessages::class, $translator);
+
+        // now usage of every formatter looks identical however it produces different translations.
+
+        // ... and check originals for any non translated locale will return original message
+        static::assertEquals(OriginalMessages::MSG_1, $enUs->formatMessage(OriginalMessages::MSG_1));
+        // where translation exist it will be returned 1
+        static::assertEquals('Hallo Welt', $de->formatMessage(OriginalMessages::MSG_1));
+        // where translation exist it will be returned 2
+        /** @noinspection SpellCheckingInspection */
+        static::assertEquals('Hallo Welt aus Österreich', $deAt->formatMessage(OriginalMessages::MSG_1));
     }
 }

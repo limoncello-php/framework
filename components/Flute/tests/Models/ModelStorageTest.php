@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Models;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Models;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,10 +49,10 @@ class ModelStorageTest extends TestCase
         $this->assertSame($post1, $storage->register($post1));
         $this->assertSame($post1, $storage->register($post2));
 
-        $this->assertTrue($storage->has(Post::class, 1));
-        $this->assertFalse($storage->has(Post::class, 2));
+        $this->assertTrue($storage->has(Post::class, '1'));
+        $this->assertFalse($storage->has(Post::class, '2'));
 
-        $this->assertSame($post1, $storage->get(Post::class, 1));
+        $this->assertSame($post1, $storage->get(Post::class, '1'));
     }
 
     /**

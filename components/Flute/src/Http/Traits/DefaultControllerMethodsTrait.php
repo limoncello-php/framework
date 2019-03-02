@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Http\Traits;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Http\Traits;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +41,7 @@ use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
 use Limoncello\Flute\Http\Responses;
-use Limoncello\Flute\Package\FluteSettings as S;
-use Limoncello\Flute\Resources\Messages\En\Generic;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
@@ -209,8 +210,6 @@ trait DefaultControllerMethodsTrait
      * @param EncoderInterface           $encoder
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
-     * @param string                     $messagesNamespace
-     * @param string                     $errorMessage
      *
      * @return ResponseInterface
      *
@@ -226,9 +225,7 @@ trait DefaultControllerMethodsTrait
         JsonSchemasInterface $jsonSchemas,
         EncoderInterface $encoder,
         FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory,
-        string $messagesNamespace = S::GENERIC_NAMESPACE,
-        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
+        FormatterFactoryInterface $formatterFactory
     ): ResponseInterface {
         // some of the users want to reuse default `create` but have a custom part for responses
         // to meet this requirement it is split into two parts.
@@ -239,9 +236,7 @@ trait DefaultControllerMethodsTrait
             $parser,
             $crud,
             $errorFactory,
-            $formatterFactory,
-            $messagesNamespace,
-            $errorMessage
+            $formatterFactory
         );
 
         return static::defaultCreateResponse($index, $requestUri, $crud, $jsonSchemas, $encoder);
@@ -255,8 +250,6 @@ trait DefaultControllerMethodsTrait
      * @param CrudInterface              $crud
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
-     * @param string                     $messagesNamespace
-     * @param string                     $errorMessage
      *
      * @return ResponseInterface
      */
@@ -267,16 +260,12 @@ trait DefaultControllerMethodsTrait
         JsonApiDataParserInterface $parser,
         CrudInterface $crud,
         FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory,
-        string $messagesNamespace = S::GENERIC_NAMESPACE,
-        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
+        FormatterFactoryInterface $formatterFactory
     ): string {
         $jsonData = static::readJsonFromRequest(
             $requestBody,
             $errorFactory,
-            $formatterFactory,
-            $messagesNamespace,
-            $errorMessage
+            $formatterFactory
         );
 
         $captures = $parser->assert($jsonData)->getCaptures();
@@ -287,11 +276,11 @@ trait DefaultControllerMethodsTrait
             $index = $crud->create($index, $attributes, $toMany);
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $exception) {
             $errors    = $errorFactory->createErrorCollection();
-            $formatter = $formatterFactory->createFormatter($messagesNamespace);
-            $title     = $formatter->formatMessage($errorMessage);
+            $formatter = $formatterFactory->createFormatter(Messages::NAMESPACE_NAME);
+            $title     = $formatter->formatMessage(Messages::MSG_ERR_CANNOT_CREATE_NON_UNIQUE_RESOURCE);
             $details   = null;
             $errorCode = JsonApiResponse::HTTP_CONFLICT;
-            $errors->addDataError($title, $details, $errorCode);
+            $errors->addDataError($title, $details, (string)$errorCode);
 
             throw new JsonApiException($errors);
         }
@@ -336,8 +325,6 @@ trait DefaultControllerMethodsTrait
      * @param EncoderInterface           $encoder
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
-     * @param string                     $messagesNamespace
-     * @param string                     $errorMessage
      *
      * @return ResponseInterface
      *
@@ -353,9 +340,7 @@ trait DefaultControllerMethodsTrait
         CrudInterface $crud,
         EncoderInterface $encoder,
         FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory,
-        string $messagesNamespace = S::GENERIC_NAMESPACE,
-        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
+        FormatterFactoryInterface $formatterFactory
     ): ResponseInterface {
         // some of the users want to reuse default `update` but have a custom part for responses
         // to meet this requirement it is split into two parts.
@@ -367,9 +352,7 @@ trait DefaultControllerMethodsTrait
             $parser,
             $crud,
             $errorFactory,
-            $formatterFactory,
-            $messagesNamespace,
-            $errorMessage
+            $formatterFactory
         );
 
         return static::defaultUpdateResponse($updated, $index, $requestUri, $crud, $encoder);
@@ -384,8 +367,6 @@ trait DefaultControllerMethodsTrait
      * @param CrudInterface              $crud
      * @param FactoryInterface           $errorFactory
      * @param FormatterFactoryInterface  $formatterFactory
-     * @param string                     $messagesNamespace
-     * @param string                     $errorMessage
      *
      * @return int
      *
@@ -400,16 +381,12 @@ trait DefaultControllerMethodsTrait
         JsonApiDataParserInterface $parser,
         CrudInterface $crud,
         FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory,
-        string $messagesNamespace = S::GENERIC_NAMESPACE,
-        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
+        FormatterFactoryInterface $formatterFactory
     ): int {
         $jsonData = static::readJsonFromRequest(
             $requestBody,
             $errorFactory,
-            $formatterFactory,
-            $messagesNamespace,
-            $errorMessage
+            $formatterFactory
         );
 
         // check that index in data and URL are identical
@@ -417,8 +394,8 @@ trait DefaultControllerMethodsTrait
         if (empty($indexValue) === false) {
             if ($indexValue !== $index) {
                 $errors    = $errorFactory->createErrorCollection();
-                $formatter = $formatterFactory->createFormatter($messagesNamespace);
-                $errors->addDataIdError($formatter->formatMessage($errorMessage));
+                $formatter = $formatterFactory->createFormatter(Messages::NAMESPACE_NAME);
+                $errors->addDataIdError($formatter->formatMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
 
                 throw new JsonApiException($errors);
             }
@@ -432,14 +409,15 @@ trait DefaultControllerMethodsTrait
         list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
         try {
-            $updated = $crud->update($index, $attributes, $toMany);
+            $updated = $crud->update((string)$index, $attributes, $toMany);
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UniqueConstraintViolationException $exception) {
             $errors    = $errorFactory->createErrorCollection();
-            $formatter = $formatterFactory->createFormatter($messagesNamespace);
-            $title     = $formatter->formatMessage($errorMessage);
+            $formatter = $formatterFactory->createFormatter(Messages::NAMESPACE_NAME);
+            $title     = $formatter
+                ->formatMessage(Messages::MSG_ERR_CANNOT_UPDATE_WITH_UNIQUE_CONSTRAINT_VIOLATION);
             $details   = null;
             $errorCode = JsonApiResponse::HTTP_CONFLICT;
-            $errors->addDataError($title, $details, $errorCode);
+            $errors->addDataError($title, $details, (string)$errorCode);
 
             throw new JsonApiException($errors);
         }
@@ -818,22 +796,18 @@ trait DefaultControllerMethodsTrait
      * @param string                    $requestBody
      * @param FactoryInterface          $errorFactory
      * @param FormatterFactoryInterface $formatterFactory
-     * @param string                    $messagesNamespace
-     * @param string                    $errorMessage
      *
      * @return array
      */
     protected static function readJsonFromRequest(
         string $requestBody,
         FactoryInterface $errorFactory,
-        FormatterFactoryInterface $formatterFactory,
-        string $messagesNamespace = S::GENERIC_NAMESPACE,
-        string $errorMessage = Generic::MSG_ERR_INVALID_ELEMENT
+        FormatterFactoryInterface $formatterFactory
     ): array {
         if (empty($requestBody) === true || ($json = json_decode($requestBody, true)) === null) {
-            $formatter = $formatterFactory->createFormatter($messagesNamespace);
+            $formatter = $formatterFactory->createFormatter(Messages::NAMESPACE_NAME);
             $errors    = $errorFactory->createErrorCollection();
-            $errors->addDataError($formatter->formatMessage($errorMessage));
+            $errors->addDataError($formatter->formatMessage(Messages::MSG_ERR_INVALID_JSON_DATA_IN_REQUEST));
 
             throw new JsonApiException($errors);
         }
@@ -859,7 +833,6 @@ trait DefaultControllerMethodsTrait
 
         /** @var SchemaInterface $schemaClass */
         static::assertClassImplements($modelClass = $schemaClass::MODEL, ModelInterface::class);
-        /** @var ModelInterface $modelClass */
 
         $index         = null;
         $fields        = [];

@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Validation\JsonApi\Rules;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Validation\JsonApi\Rules;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +74,7 @@ final class IsReadableViaApiRule extends ExecuteRule
         /** @var CrudInterface $api */
         $api = $apiFactory->createApi($apiClass);
 
-        $data   = $api->withIndexFilter($value)->indexIdentities();
+        $data   = $api->withIndexFilter((string)$value)->indexIdentities();
         $result = !empty($data);
 
         return $result === true ?

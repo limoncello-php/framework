@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Data\Api;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Data\Api;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +62,7 @@ class CommentsApi extends AppCrud
     /**
      * @inheritdoc
      */
-    public function create($index, array $attributes, array $toMany): string
+    public function create(?string $index, array $attributes, array $toMany): string
     {
         // suppose we want to create comments using current user as an author.
         $curUserId                          = 1;

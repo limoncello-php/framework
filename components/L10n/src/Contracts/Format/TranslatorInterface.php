@@ -1,7 +1,9 @@
-<?php namespace Limoncello\l10n\Contracts\Format;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\l10n\Contracts\Format;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +26,10 @@ interface TranslatorInterface
     /**
      * @param string $locale
      * @param string $namespace
-     * @param string $key
+     * @param string $message
      * @param array  $args
      *
      * @return string
      */
-    public function translateMessage(string $locale, string $namespace, string $key, array $args = []): string;
+    public function translateMessage(string $locale, string $namespace, string $message, array $args = []): string;
 }

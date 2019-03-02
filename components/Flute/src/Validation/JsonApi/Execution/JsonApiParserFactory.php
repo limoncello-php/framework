@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Validation\JsonApi\Execution;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Validation\JsonApi\Execution;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +24,7 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\JsonApi\DataParser;
 use Limoncello\Flute\Validation\JsonApi\QueryParser;
@@ -65,7 +68,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
             JsonApiDataRulesSerializer::class,
             $serializedData,
             new ContextStorage(JsonApiQueryRulesSerializer::readBlocks($serializedData), $this->getContainer()),
-            new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(Validation::NAMESPACE_NAME)),
             $this->getContainer()->get(FormatterFactoryInterface::class)
         );
 
@@ -90,7 +93,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
             new ContextStorage(JsonApiQueryRulesSerializer::readBlocks($serializedData), $this->getContainer()),
             new CaptureAggregator(),
             new ErrorAggregator(),
-            new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(Validation::NAMESPACE_NAME)),
             $this->getContainer()->get(FormatterFactoryInterface::class)
         );
 

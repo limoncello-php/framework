@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Data\Http;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Data\Http;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,10 +65,8 @@ class ApiUsersController extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
         return static::readRelationship(
-            $index,
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Model::REL_AUTHORED_POSTS,
             DefaultQueryValidationRules::class,
             $container,
@@ -89,10 +89,8 @@ class ApiUsersController extends ApiBaseController
         ContainerInterface $container,
         ServerRequestInterface $request
     ): ResponseInterface {
-        $index = $routeParams[static::ROUTE_KEY_INDEX];
-
         return static::readRelationship(
-            $index,
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Model::REL_COMMENTS,
             DefaultQueryValidationRules::class,
             $container,

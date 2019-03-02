@@ -1,4 +1,6 @@
-<?php namespace Limoncello\Flute\Package;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Package;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;

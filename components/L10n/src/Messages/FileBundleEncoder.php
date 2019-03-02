@@ -1,7 +1,9 @@
-<?php namespace Limoncello\l10n\Messages;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\l10n\Messages;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +17,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+use function assert;
+use function class_exists;
+use function class_implements;
+use function glob;
+use function in_array;
+use function is_dir;
+use function is_string;
+use function pathinfo;
+use function realpath;
+use function scandir;
 use Limoncello\Contracts\L10n\MessageStorageInterface;
 use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
 
@@ -36,7 +49,7 @@ class FileBundleEncoder extends BundleEncoder
     public function __construct(
         ?iterable $messageDescriptions,
         string $localesDir,
-        $globMessagePatterns = '*.php'
+        string $globMessagePatterns = '*.php'
     ) {
         $this
             ->setGlobMessagePatterns($globMessagePatterns)
@@ -81,7 +94,7 @@ class FileBundleEncoder extends BundleEncoder
      */
     protected function loadBundles(string $localesDir): self
     {
-        assert(is_string($localesDir) === true && empty($localesDir) === false);
+        assert(empty($localesDir) === false);
 
         $localesDir = realpath($localesDir);
         assert($localesDir !== false);

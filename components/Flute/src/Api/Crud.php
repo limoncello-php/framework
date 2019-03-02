@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Api;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Api;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +42,6 @@ use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
 use Limoncello\Flute\Contracts\Models\TagStorageInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
 use Limoncello\Flute\L10n\Messages;
-use Limoncello\Flute\Package\FluteSettings;
 use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -187,12 +188,8 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function withIndexFilter($index): CrudInterface
+    public function withIndexFilter(string $index): CrudInterface
     {
-        if (is_int($index) === false && is_string($index) === false) {
-            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
-        }
-
         $pkName = $this->getModelSchemas()->getPrimaryKey($this->getModelClass());
         $this->withFilters([
             $pkName => [
@@ -554,6 +551,8 @@ class Crud implements CrudInterface
      * @param ModelQueryBuilder $builder
      *
      * @return self
+     *
+     * @throws DBALException
      */
     protected function applySorts(ModelQueryBuilder $builder): self
     {
@@ -979,7 +978,7 @@ class Crud implements CrudInterface
      *
      * @throws DBALException
      */
-    public function read($index)
+    public function read(string $index)
     {
         $this->withIndexFilter($index);
 
@@ -1000,7 +999,7 @@ class Crud implements CrudInterface
             $this->createCountBuilderFromBuilder($this->createIndexModelBuilder())
         )->execute()->fetchColumn();
 
-        return $result === false ? null : $result;
+        return $result === false ? null : (int)$result;
     }
 
     /**
@@ -1127,7 +1126,7 @@ class Crud implements CrudInterface
      * @inheritdoc
      */
     public function readRelationship(
-        $index,
+        string $index,
         string $name,
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
@@ -1138,15 +1137,8 @@ class Crud implements CrudInterface
     /**
      * @inheritdoc
      */
-    public function hasInRelationship($parentId, string $name, $childId): bool
+    public function hasInRelationship(string $parentId, string $name, string $childId): bool
     {
-        if ($parentId !== null && is_scalar($parentId) === false) {
-            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
-        }
-        if ($childId !== null && is_scalar($childId) === false) {
-            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
-        }
-
         $parentPkName  = $this->getModelSchemas()->getPrimaryKey($this->getModelClass());
         $parentFilters = [$parentPkName => [FilterParameterInterface::OPERATION_EQUALS => [$parentId]]];
         list($childClass) = $this->getModelSchemas()->getReverseRelationship($this->getModelClass(), $name);
@@ -1183,7 +1175,7 @@ class Crud implements CrudInterface
      *
      * @throws DBALException
      */
-    public function remove($index): bool
+    public function remove(string $index): bool
     {
         $this->withIndexFilter($index);
 
@@ -1201,12 +1193,8 @@ class Crud implements CrudInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function create($index, array $attributes, array $toMany): string
+    public function create(?string $index, array $attributes, array $toMany): string
     {
-        if ($index !== null && is_int($index) === false && is_string($index) === false) {
-            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
-        }
-
         $allowedChanges = $this->filterAttributesOnCreate($index, $attributes);
         $saveMain       = $this
             ->createBuilder($this->getModelClass())
@@ -1239,12 +1227,8 @@ class Crud implements CrudInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function update($index, array $attributes, array $toMany): int
+    public function update(string $index, array $attributes, array $toMany): int
     {
-        if (is_int($index) === false && is_string($index) === false) {
-            throw new InvalidArgumentException($this->getMessage(Messages::MSG_ERR_INVALID_ARGUMENT));
-        }
-
         $updated        = 0;
         $pkName         = $this->getModelSchemas()->getPrimaryKey($this->getModelClass());
         $filters        = [
@@ -1297,6 +1281,8 @@ class Crud implements CrudInterface
      * @param iterable $childIds
      *
      * @return int
+     *
+     * @throws DBALException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -1510,6 +1496,8 @@ class Crud implements CrudInterface
      * @param Closure    $builderHook
      *
      * @return int
+     *
+     * @throws DBALException
      */
     private function addInToManyRelationship(
         Connection $connection,
@@ -1880,7 +1868,7 @@ class Crud implements CrudInterface
     {
         /** @var FormatterFactoryInterface $factory */
         $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
-        $formatter = $factory->createFormatter(FluteSettings::GENERIC_NAMESPACE);
+        $formatter = $factory->createFormatter(Messages::NAMESPACE_NAME);
         $result    = $formatter->formatMessage($message);
 
         return $result;

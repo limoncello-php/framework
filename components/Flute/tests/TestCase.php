@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,10 +76,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
     ): ModelSchemaInfoInterface {
         $registered    = [];
         $modelSchemas  = new ModelSchemas();
-        $registerModel = function ($modelClass) use ($modelSchemas, &$registered, $requireReverseRelationships) {
+        $registerModel = function (string $modelClass) use ($modelSchemas, &$registered, $requireReverseRelationships) {
             /** @var ModelInterface $modelClass */
             $modelSchemas->registerClass(
-                $modelClass,
+                (string)$modelClass,
                 $modelClass::getTableName(),
                 $modelClass::getPrimaryKeyName(),
                 $modelClass::getAttributeTypes(),

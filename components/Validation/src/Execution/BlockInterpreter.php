@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Validation\Execution;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Validation\Execution;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +24,14 @@ use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Errors\Error;
 use Limoncello\Validation\Rules\BaseRule;
+use function array_key_exists;
+use function assert;
+use function call_user_func;
+use function is_array;
+use function is_bool;
+use function is_callable;
+use function is_int;
+use function is_iterable;
 
 /**
  * @package Limoncello\Validation
@@ -501,16 +511,16 @@ final class BlockInterpreter
      */
     private static function debugCheckLooksLikeBlocksArray(iterable $blocks): bool
     {
+        $result = true;
+
         foreach ($blocks as $index => $block) {
-            if (is_int($index) === false ||
-                is_array($block) === false ||
-                static::debugHasKnownBlockType($block) === false
-            ) {
-                return false;
-            }
+            $result = $result &&
+                is_int($index) === true &&
+                is_array($block) === true &&
+                static::debugHasKnownBlockType($block) === true;
         }
 
-        return true;
+        return $result;
     }
 
     /**
@@ -524,15 +534,15 @@ final class BlockInterpreter
      */
     private static function debugCheckBlocksExist(iterable $blockIndexes, array $blockList, int $blockType): bool
     {
+        $result = true;
+
         foreach ($blockIndexes as $index) {
-            if (array_key_exists($index, $blockList) === false ||
-                static::getBlockType($blockList[$index]) !== $blockType
-            ) {
-                return false;
-            }
+            $result = $result &&
+                array_key_exists($index, $blockList) === true &&
+                static::getBlockType($blockList[$index]) === $blockType;
         }
 
-        return true;
+        return $result;
     }
 
     /**

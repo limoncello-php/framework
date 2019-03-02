@@ -1,7 +1,7 @@
-<?php
+<?php declare (strict_types = 1);
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,22 @@
  * limitations under the License.
  */
 
-use Limoncello\Flute\Resources\Messages\En\Validation;
+namespace Limoncello\Tests\l10n\Messages\Resources2;
 
-return Validation::getMessages();
+use Limoncello\Contracts\L10n\MessageStorageInterface;
+
+/**
+ * @package Limoncello\Tests\l10n
+ */
+class DeMessages implements MessageStorageInterface
+{
+    /**
+     * @inheritdoc
+     */
+    public static function getMessages(): array
+    {
+        return [
+            OriginalMessages::MSG_1 => 'Hallo Welt',
+        ];
+    }
+}

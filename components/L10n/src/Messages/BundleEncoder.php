@@ -1,7 +1,9 @@
-<?php namespace Limoncello\l10n\Messages;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\l10n\Messages;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +18,11 @@
  * limitations under the License.
  */
 
+use function assert;
+use function array_intersect;
+use function array_diff;
+use function array_keys;
+use function in_array;
 use Limoncello\l10n\Contracts\Messages\BundleEncoderInterface;
 use Limoncello\l10n\Contracts\Messages\BundleStorageInterface;
 use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
@@ -96,8 +103,7 @@ class BundleEncoder implements BundleEncoderInterface
      */
     private function getBundle(string $locale, string $namespace)
     {
-        $this->assertLocale($locale);
-        $this->assertNamespace($namespace);
+        assert(empty($locale) === false && empty($namespace) === false);
 
         $bundles   = $this->getBundles();
         $hasBundle = isset($bundles[$locale][$namespace]) === true;
@@ -158,7 +164,8 @@ class BundleEncoder implements BundleEncoderInterface
      */
     private function hasLocale(string $locale): bool
     {
-        $this->assertLocale($locale);
+        assert(empty($locale) === false);
+
         $result = in_array($locale, $this->getLocales());
 
         return $result;
@@ -174,26 +181,6 @@ class BundleEncoder implements BundleEncoderInterface
         $result = $this->hasLocale($locale) === true ? array_keys($this->getBundles()[$locale]) : [];
 
         return $result;
-    }
-
-    /**
-     * @param string $locale
-     *
-     * @return void
-     */
-    private function assertLocale(string $locale)
-    {
-        assert(is_string($locale) === true && empty($locale) === false);
-    }
-
-    /**
-     * @param string $namespace
-     *
-     * @return void
-     */
-    private function assertNamespace(string $namespace)
-    {
-        assert(empty($namespace) === false);
     }
 
     /**

@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Api;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Api;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +49,6 @@ use Limoncello\Tests\Flute\Data\Models\User;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 use Limoncello\Tests\Flute\TestCase;
 use PDO;
-use stdClass;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -92,7 +93,7 @@ class CrudTest extends TestCase
         $this->assertEquals($boardId, $model->{Post::FIELD_ID_BOARD});
         $this->assertEquals($title, $model->{Post::FIELD_TITLE});
         $this->assertEquals($text, $model->{Post::FIELD_TEXT});
-        $this->assertNotEmpty($index = $model->{Post::FIELD_ID});
+        $this->assertEquals($index, $model->{Post::FIELD_ID});
 
         $this->assertNotNull($crud->read($index));
 
@@ -141,97 +142,6 @@ class CrudTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws DBALException
-     *
-     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
-     */
-    public function testInputChecksForCreate(): void
-    {
-        $invalidIndex = new stdClass();
-
-        $this->createCrud(CommentsApi::class)->create($invalidIndex, [], []);
-    }
-
-    /**
-     * @throws Exception
-     * @throws DBALException
-     *
-     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
-     */
-    public function testInputChecksForUpdate(): void
-    {
-        $invalidIndex = new stdClass();
-
-        $this->createCrud(CommentsApi::class)->update($invalidIndex, [], []);
-    }
-
-    /**
-     * @throws Exception
-     * @throws DBALException
-     *
-     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
-     */
-    public function testInputChecksForReadDelete(): void
-    {
-        $invalidIndex = new stdClass();
-
-        $this->createCrud(CommentsApi::class)->remove($invalidIndex);
-    }
-
-    /**
-     * @throws Exception
-     * @throws DBALException
-     *
-     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
-     */
-    public function testInputChecksForRead(): void
-    {
-        $invalidIndex = new stdClass();
-
-        $this->createCrud(CommentsApi::class)->read($invalidIndex)->getData();
-    }
-
-    /**
-     * @throws Exception
-     * @throws DBALException
-     *
-     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
-     */
-    public function testInputChecksForReadRow(): void
-    {
-        $invalidIndex = new stdClass();
-
-        $this->createCrud(CommentsApi::class)->read($invalidIndex)->getData();
-    }
-
-    /**
-     * @throws Exception
-     * @throws DBALException
-     *
-     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
-     */
-    public function testInputChecksForHasInRelationship1(): void
-    {
-        $invalidIndex = new stdClass();
-
-        $this->createCrud(CommentsApi::class)->hasInRelationship($invalidIndex, Comment::REL_EMOTIONS, '1');
-    }
-
-    /**
-     * @throws Exception
-     * @throws DBALException
-     *
-     * @expectedException \Limoncello\Flute\Exceptions\InvalidArgumentException
-     */
-    public function testInputChecksForHasInRelationship2(): void
-    {
-        $invalidIndex = new stdClass();
-
-        $this->createCrud(CommentsApi::class)->hasInRelationship('1', Comment::REL_EMOTIONS, $invalidIndex);
-    }
-
-    /**
      * Test create resource with to-many (belongs-to-many relationships).
      *
      * @throws Exception
@@ -261,7 +171,7 @@ class CrudTest extends TestCase
         $this->assertEquals($userId, $model->{Comment::FIELD_ID_USER});
         $this->assertEquals($postId, $model->{Comment::FIELD_ID_POST});
         $this->assertEquals($text, $model->{Comment::FIELD_TEXT});
-        $this->assertNotEmpty($index = $model->{Comment::FIELD_ID});
+        $this->assertEquals($index, $model->{Comment::FIELD_ID});
 
         // check resources is saved
         /** @noinspection SqlDialectInspection */
@@ -312,9 +222,9 @@ class CrudTest extends TestCase
      */
     public function testUpdateCommentsWithEmotions(): void
     {
-        $commentId  = 1;
-        $userId     = 1;
-        $postId     = 3;
+        $commentId  = '1';
+        $userId     = '1';
+        $postId     = '3';
         $text       = 'Some text';
         $attributes = [
             Comment::FIELD_TEXT    => $text,
@@ -371,7 +281,7 @@ class CrudTest extends TestCase
     public function testDeleteResourceWithConstraints(): void
     {
         $crud = $this->createCrud(PostsApi::class);
-        $crud->remove(1);
+        $crud->remove('1');
     }
 
     /**
@@ -384,7 +294,7 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $index        = 18;
+        $index        = '18';
         $includePaths = [
             [Post::REL_BOARD],
             [Post::REL_COMMENTS],
@@ -461,12 +371,12 @@ class CrudTest extends TestCase
         $commentsNumberSql = "SELECT COUNT(*) " .
             "FROM $commentsTable " .
             "WHERE $commentsTable.$commentsIdPost = $postsTable.$postsIdPost";
-        $noCommentsPostId  = (int)$connection->fetchColumn(
+        $noCommentsPostId  = $connection->fetchColumn(
             "SELECT $postsIdPost, ($commentsNumberSql) AS comments_number " .
             "FROM $postsTable " .
             "WHERE comments_number = 0 AND $postsIdEditor IS NULL LIMIT 1"
         );
-        assert($noCommentsPostId !== 0, 'A post without any comments is not found.');
+        assert($noCommentsPostId !== false, 'A post without any comments is not found.');
 
         $includePaths = [
             [Post::REL_EDITOR, User::REL_COMMENTS],
@@ -474,7 +384,7 @@ class CrudTest extends TestCase
             [Post::REL_COMMENTS, Comment::REL_POST, Post::REL_USER],
         ];
         $this->assertNotNull(
-            $model = $crud->withIncludes($includePaths)->read($noCommentsPostId)
+            $model = $crud->withIncludes($includePaths)->read((string)$noCommentsPostId)
         );
 
         self::assertNull($model->{Post::REL_EDITOR});
@@ -493,7 +403,7 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(PostsApi::class);
         $this->assertTrue($crud instanceof Crud);
 
-        $index        = 18;
+        $index        = '18';
         $includePaths = [
             [Post::REL_BOARD],
             [Post::REL_COMMENTS],
@@ -566,7 +476,7 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $index = 18;
+        $index = '18';
 
         // check that editor relationship for selected post is `null`
         /** @noinspection SqlDialectInspection */
@@ -924,7 +834,7 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $builder = $crud->withIndexFilter(1)->createIndexBuilder();
+        $builder = $crud->withIndexFilter('1')->createIndexBuilder();
         $row     = $crud->fetchRow($builder, Post::class);
 
         $this->assertTrue(is_int($row[Post::FIELD_ID_BOARD]));
@@ -972,7 +882,7 @@ class CrudTest extends TestCase
         $crud = $this->createCrud(PostsApi::class);
         $this->assertTrue($crud instanceof Crud);
 
-        $builder = $crud->shouldBeUntyped()->withIndexFilter(1)->createIndexBuilder();
+        $builder = $crud->shouldBeUntyped()->withIndexFilter('1')->createIndexBuilder();
         $row     = $crud->fetchRow($builder, Post::class);
 
         $this->assertTrue(is_string($row[Post::FIELD_ID_BOARD]));
@@ -1006,7 +916,7 @@ class CrudTest extends TestCase
 
                 return $columnName;
             })
-            ->read(1);
+            ->read('1');
 
         $this->assertTrue(is_string($model->{Post::FIELD_ID_BOARD}));
         $this->assertRegExp('/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/', $model->{Post::FIELD_CREATED_AT});
@@ -1120,8 +1030,8 @@ class CrudTest extends TestCase
     {
         $crud = $this->createCrud(PostsApi::class);
 
-        $this->assertFalse($crud->hasInRelationship(1, Post::REL_COMMENTS, 1));
-        $this->assertTrue($crud->hasInRelationship(1, Post::REL_COMMENTS, 9));
+        $this->assertFalse($crud->hasInRelationship('1', Post::REL_COMMENTS, '1'));
+        $this->assertTrue($crud->hasInRelationship('1', Post::REL_COMMENTS, '9'));
     }
 
     /**

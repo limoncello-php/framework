@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Data\Http;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Data\Http;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +63,7 @@ class ApiPostsController extends ApiBaseController
         ServerRequestInterface $request
     ): ResponseInterface {
         return static::readRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Model::REL_COMMENTS,
             DefaultQueryValidationRules::class,
             $container,
@@ -82,7 +84,7 @@ class ApiPostsController extends ApiBaseController
         ServerRequestInterface $request
     ): ResponseInterface {
         $response = static::replaceInRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Schema::REL_EDITOR,
             Model::REL_EDITOR,
             $container,

@@ -1,7 +1,7 @@
-<?php namespace Limoncello\Flute\Resources\Messages\En;
+<?php declare (strict_types = 1);
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,23 @@
  * limitations under the License.
  */
 
+namespace Limoncello\Tests\l10n\Messages\Resources2;
+
 use Limoncello\Contracts\L10n\MessageStorageInterface;
-use Limoncello\Flute\L10n\Messages;
 
 /**
- * @package Limoncello\Flute
+ * @package Limoncello\Tests\l10n
  */
-class Generic implements MessageStorageInterface, Messages
+class DeAtMessages implements MessageStorageInterface
 {
     /**
      * @inheritdoc
      */
     public static function getMessages(): array
     {
+        /** @noinspection SpellCheckingInspection */
         return [
-            static::MSG_ERR_INVALID_ELEMENT   => 'Invalid element.',
-            static::MSG_ERR_INVALID_PARAMETER => 'Invalid parameter.',
-            static::MSG_ERR_INVALID_OPERATION => 'Invalid operation.',
-            static::MSG_ERR_INVALID_ARGUMENT  => 'Invalid argument.',
+            OriginalMessages::MSG_1 => 'Hallo Welt aus Österreich',
         ];
     }
 }

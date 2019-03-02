@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Http\Query;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Http\Query;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +21,7 @@
 use Limoncello\Container\Container;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
-use Limoncello\Flute\Package\FluteSettings;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiQueryRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\QueryParser;
@@ -524,7 +526,7 @@ class QueryParserTest extends TestCase
             new ContextStorage($blocks, $container),
             new CaptureAggregator(),
             new ErrorAggregator(),
-            new JsonApiErrorCollection($formatterFactory->createFormatter(FluteSettings::VALIDATION_NAMESPACE)),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(Validation::NAMESPACE_NAME)),
             $formatterFactory
         );
 

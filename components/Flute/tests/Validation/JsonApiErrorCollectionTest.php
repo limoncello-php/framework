@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Validation;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Validation;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +20,7 @@
 
 use Exception;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
-use Limoncello\Flute\Package\FluteSettings;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\TestCase;
@@ -36,7 +38,7 @@ class JsonApiErrorCollectionTest extends TestCase
      */
     public function testAddIdAndTypeErrors(): void
     {
-        $formatter  = (new FormatterFactory())->createFormatter(FluteSettings::VALIDATION_NAMESPACE);
+        $formatter  = (new FormatterFactory())->createFormatter(Validation::NAMESPACE_NAME);
         $collection = new JsonApiErrorCollection($formatter);
 
         $this->assertCount(0, $collection);

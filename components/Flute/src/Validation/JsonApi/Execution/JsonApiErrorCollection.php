@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Flute\Validation\JsonApi\Execution;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Validation\JsonApi\Execution;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +21,7 @@
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Http\JsonApiResponse;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Neomerx\JsonApi\Schema\ErrorCollection;
 
@@ -49,7 +52,7 @@ class JsonApiErrorCollection extends ErrorCollection
     ): void {
         $title  = $this->getInvalidValueMessage();
         $detail = $this->getValidationMessage($error);
-        $this->addDataIdError($title, $detail, $errorStatus);
+        $this->addDataIdError($title, $detail, (string)$errorStatus);
     }
 
     /**
@@ -61,7 +64,7 @@ class JsonApiErrorCollection extends ErrorCollection
     ): void {
         $title  = $this->getInvalidValueMessage();
         $detail = $this->getValidationMessage($error);
-        $this->addDataTypeError($title, $detail, $errorStatus);
+        $this->addDataTypeError($title, $detail, (string)$errorStatus);
     }
 
     /**
@@ -73,7 +76,7 @@ class JsonApiErrorCollection extends ErrorCollection
     ): void {
         $title  = $this->getInvalidValueMessage();
         $detail = $this->getValidationMessage($error);
-        $this->addDataAttributeError($error->getParameterName(), $title, $detail, $errorStatus);
+        $this->addDataAttributeError($error->getParameterName(), $title, $detail, (string)$errorStatus);
     }
 
     /**
@@ -85,7 +88,7 @@ class JsonApiErrorCollection extends ErrorCollection
     ): void {
         $title  = $this->getInvalidValueMessage();
         $detail = $this->getValidationMessage($error);
-        $this->addRelationshipError($error->getParameterName(), $title, $detail, $errorStatus);
+        $this->addRelationshipError($error->getParameterName(), $title, $detail, (string)$errorStatus);
     }
 
     /**
@@ -98,7 +101,7 @@ class JsonApiErrorCollection extends ErrorCollection
     ): void {
         $title  = $this->getInvalidValueMessage();
         $detail = $this->getValidationMessage($error);
-        $this->addQueryParameterError($paramName, $title, $detail, $errorStatus);
+        $this->addQueryParameterError($paramName, $title, $detail, (string)$errorStatus);
     }
 
     /**
@@ -107,7 +110,8 @@ class JsonApiErrorCollection extends ErrorCollection
      */
     private function getInvalidValueMessage(): string
     {
-        $message = $this->getMessageFormatter()->formatMessage(ErrorCodes::INVALID_VALUE);
+        $defaultMessage = Validation::convertCodeToDefaultMessage(ErrorCodes::INVALID_VALUE);
+        $message        = $this->getMessageFormatter()->formatMessage($defaultMessage);
 
         return $message;
     }
@@ -119,9 +123,10 @@ class JsonApiErrorCollection extends ErrorCollection
      */
     private function getValidationMessage(ErrorInterface $error): string
     {
-        $context = $error->getMessageContext();
-        $args    = $context === null ? [] : $context;
-        $message = $this->getMessageFormatter()->formatMessage($error->getMessageCode(), $args);
+        $context        = $error->getMessageContext();
+        $args           = $context === null ? [] : $context;
+        $defaultMessage = Validation::convertCodeToDefaultMessage($error->getMessageCode());
+        $message        = $this->getMessageFormatter()->formatMessage($defaultMessage, $args);
 
         return $message;
     }

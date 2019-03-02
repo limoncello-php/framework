@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Data\Http;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Data\Http;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +72,7 @@ class ApiCommentsControllerApi extends ApiBaseController
     ): ResponseInterface {
         // Test deprecated method (coverage)
         return static::readRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Model::REL_EMOTIONS,
             ReadEmotionsFromCommentsQueryRules::class,
             $container,
@@ -94,7 +96,7 @@ class ApiCommentsControllerApi extends ApiBaseController
         ServerRequestInterface $request
     ): ResponseInterface {
         return static::readRelationshipIdentifiers(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Model::REL_EMOTIONS,
             ReadEmotionsFromCommentsQueryRules::class,
             $container,
@@ -118,7 +120,7 @@ class ApiCommentsControllerApi extends ApiBaseController
         ServerRequestInterface $request
     ): ResponseInterface {
         return static::readRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Model::REL_USER,
             DefaultQueryValidationRules::class,
             $container,
@@ -142,7 +144,7 @@ class ApiCommentsControllerApi extends ApiBaseController
         ServerRequestInterface $request
     ): ResponseInterface {
         return static::readRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Model::REL_POST,
             DefaultQueryValidationRules::class,
             $container,
@@ -163,7 +165,7 @@ class ApiCommentsControllerApi extends ApiBaseController
         ServerRequestInterface $request
     ): ResponseInterface {
         $response = static::addInRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Schema::REL_EMOTIONS,
             Model::REL_EMOTIONS,
             $container,
@@ -186,7 +188,7 @@ class ApiCommentsControllerApi extends ApiBaseController
         ServerRequestInterface $request
     ): ResponseInterface {
         $response = static::deleteInRelationship(
-            $routeParams[static::ROUTE_KEY_INDEX],
+            (string)$routeParams[static::ROUTE_KEY_INDEX],
             Schema::REL_EMOTIONS,
             Model::REL_EMOTIONS,
             $container,

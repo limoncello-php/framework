@@ -1,4 +1,6 @@
-<?php namespace Limoncello\Flute\Package;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Flute\Package;
 
 use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
@@ -7,7 +9,6 @@ use Limoncello\Flute\Contracts\Schema\SchemaInterface;
 use Limoncello\Flute\Contracts\Validation\FormRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
-use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Validation\Form\Execution\FormRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiDataRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiQueryRulesSerializer;
@@ -22,16 +23,6 @@ use ReflectionException;
 abstract class FluteSettings implements FluteSettingsInterface
 {
     use ClassIsTrait;
-
-    /**
-     * Namespace for string resources.
-     */
-    const GENERIC_NAMESPACE = Messages::RESOURCES_NAMESPACE;
-
-    /**
-     * Namespace for string resources.
-     */
-    public const VALIDATION_NAMESPACE = 'Limoncello.Flute.Validation';
 
     /**
      * Default page size.

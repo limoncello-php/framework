@@ -1,7 +1,9 @@
-<?php namespace Limoncello\l10n\Format;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\l10n\Format;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,17 +45,15 @@ class Translator implements TranslatorInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function translateMessage(string $locale, string $namespace, string $key, array $args = []): string
+    public function translateMessage(string $locale, string $namespace, string $message, array $args = []): string
     {
-        $translation = $this->getStorage()->get($locale, $namespace, $key);
+        $translation = $this->getStorage()->get($locale, $namespace, $message);
         if ($translation !== null) {
             $message = $translation[BundleStorageInterface::INDEX_PAIR_VALUE];
             $locale  = $translation[BundleStorageInterface::INDEX_PAIR_LOCALE];
-        } else {
-            $message = $key;
         }
 
-        return $this->formatMessage($locale, $message, $args);
+        return static::formatMessage($locale, $message, $args);
     }
 
     /**
@@ -67,9 +67,9 @@ class Translator implements TranslatorInterface
     /**
      * @param BundleStorageInterface $storage
      *
-     * @return Translator
+     * @return TranslatorInterface
      */
-    public function setStorage(BundleStorageInterface $storage): Translator
+    public function setStorage(BundleStorageInterface $storage): TranslatorInterface
     {
         $this->storage = $storage;
 
@@ -85,7 +85,7 @@ class Translator implements TranslatorInterface
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    protected function formatMessage(string $locale, string $message, array $args): string
+    protected static function formatMessage(string $locale, string $message, array $args): string
     {
         return MessageFormatter::formatMessage($locale, $message, $args);
     }

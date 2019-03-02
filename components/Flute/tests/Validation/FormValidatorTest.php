@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Flute\Validation;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Tests\Flute\Validation;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +28,7 @@ use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\Package\FluteSettings;
+use Limoncello\Flute\L10n\Validation;
 use Limoncello\Flute\Validation\Form\Execution\FormRulesSerializer;
 use Limoncello\Flute\Validation\Form\FormValidator;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
@@ -125,7 +127,7 @@ class FormValidatorTest extends TestCase
             FormRulesSerializer::class,
             $serializer->getData(),
             new ContextStorage($serializer->getBlocks(), $container),
-            (new FormatterFactory())->createFormatter(FluteSettings::VALIDATION_NAMESPACE)
+            (new FormatterFactory())->createFormatter(Validation::NAMESPACE_NAME)
         );
 
         return $validator;
