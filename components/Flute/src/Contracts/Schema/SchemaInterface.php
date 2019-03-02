@@ -24,10 +24,10 @@ use Neomerx\JsonApi\Contracts\Schema\SchemaInterface as BaseSchemaInterface;
  */
 interface SchemaInterface extends BaseSchemaInterface
 {
-    /** Type */
+    /**  string|null Type */
     const TYPE = null;
 
-    /** Model class name */
+    /** @var string|null Model class name */
     const MODEL = null;
 
     /** Attribute name */
