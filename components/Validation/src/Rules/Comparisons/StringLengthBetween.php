@@ -18,9 +18,9 @@ namespace Limoncello\Validation\Rules\Comparisons;
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use function assert;
 use function is_scalar;
 use function is_string;
@@ -38,11 +38,13 @@ final class StringLengthBetween extends BaseTwoValueComparision
     public function __construct($min, $max)
     {
         assert(is_scalar($min) === true && is_scalar($max) === true);
-        $errorContext = [
-            ContextKeys::STRING_LENGTH_MIN => $min,
-            ContextKeys::STRING_LENGTH_MAX => $max,
-        ];
-        parent::__construct($min, $max, ErrorCodes::STRING_LENGTH_BETWEEN, $errorContext);
+        parent::__construct(
+            $min,
+            $max,
+            ErrorCodes::STRING_LENGTH_BETWEEN,
+            Messages::STRING_LENGTH_BETWEEN,
+            [$min, $max]
+        );
     }
 
     /**

@@ -25,9 +25,9 @@ use Limoncello\Validation\Blocks\AndBlock;
 use Limoncello\Validation\Blocks\IfBlock;
 use Limoncello\Validation\Blocks\OrBlock;
 use Limoncello\Validation\Blocks\ProcedureBlock;
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\BaseRule;
 use Limoncello\Validation\Rules\Comparisons\DateTimeBetween;
 use Limoncello\Validation\Rules\Comparisons\DateTimeEquals;
@@ -93,12 +93,11 @@ class RulesToBlocksTest extends TestCase
 
         $this->assertTrue($block->getOnFalse() instanceof ProcedureBlock);
         $this->assertEquals([
-            Fail::PROPERTY_NAME               => 'name',
-            Fail::PROPERTY_IS_CAPTURE_ENABLED => false,
-            Fail::PROPERTY_ERROR_CODE         => ErrorCodes::DATE_TIME_EQUALS,
-            Fail::PROPERTY_ERROR_CONTEXT      => [
-                ContextKeys::DATE_TIME_VALUE => $date->getTimestamp(),
-            ],
+            Fail::PROPERTY_NAME                     => 'name',
+            Fail::PROPERTY_IS_CAPTURE_ENABLED       => false,
+            Fail::PROPERTY_ERROR_CODE               => ErrorCodes::DATE_TIME_EQUALS,
+            Fail::PROPERTY_ERROR_MESSAGE_TEMPLATE   => Messages::DATE_TIME_EQUALS,
+            Fail::PROPERTY_ERROR_MESSAGE_PARAMETERS => [$date->getTimestamp()],
         ], $block->getOnFalse()->getProperties());
     }
 
@@ -141,13 +140,11 @@ class RulesToBlocksTest extends TestCase
 
         $this->assertTrue($block->getOnFalse() instanceof ProcedureBlock);
         $this->assertEquals([
-            Fail::PROPERTY_NAME               => 'name',
-            Fail::PROPERTY_IS_CAPTURE_ENABLED => false,
-            Fail::PROPERTY_ERROR_CODE         => ErrorCodes::DATE_TIME_BETWEEN,
-            Fail::PROPERTY_ERROR_CONTEXT      => [
-                ContextKeys::DATE_TIME_MIN => $date1->getTimestamp(),
-                ContextKeys::DATE_TIME_MAX => $date2->getTimestamp(),
-            ],
+            Fail::PROPERTY_NAME                     => 'name',
+            Fail::PROPERTY_IS_CAPTURE_ENABLED       => false,
+            Fail::PROPERTY_ERROR_CODE               => ErrorCodes::DATE_TIME_BETWEEN,
+            Fail::PROPERTY_ERROR_MESSAGE_TEMPLATE   => Messages::DATE_TIME_BETWEEN,
+            Fail::PROPERTY_ERROR_MESSAGE_PARAMETERS => [$date1->getTimestamp(), $date2->getTimestamp()],
         ], $block->getOnFalse()->getProperties());
     }
 
@@ -356,20 +353,22 @@ class RulesToBlocksTest extends TestCase
 
         $this->assertTrue(($block = $rule->toBlock()) instanceof ProcedureBlock);
         $this->assertEquals([
-            Fail::PROPERTY_NAME               => '',
-            Fail::PROPERTY_IS_CAPTURE_ENABLED => false,
-            Fail::PROPERTY_ERROR_CODE         => ErrorCodes::INVALID_VALUE,
-            Fail::PROPERTY_ERROR_CONTEXT      => null,
+            Fail::PROPERTY_NAME                     => '',
+            Fail::PROPERTY_IS_CAPTURE_ENABLED       => false,
+            Fail::PROPERTY_ERROR_CODE               => ErrorCodes::INVALID_VALUE,
+            Fail::PROPERTY_ERROR_MESSAGE_TEMPLATE   => Messages::INVALID_VALUE,
+            Fail::PROPERTY_ERROR_MESSAGE_PARAMETERS => [],
         ], $block->getProperties());
 
         $rule->setName('name')->enableCapture();
 
         $this->assertTrue(($block = $rule->toBlock()) instanceof ProcedureBlock);
         $this->assertEquals([
-            Fail::PROPERTY_NAME               => 'name',
-            Fail::PROPERTY_IS_CAPTURE_ENABLED => true,
-            Fail::PROPERTY_ERROR_CODE         => ErrorCodes::INVALID_VALUE,
-            Fail::PROPERTY_ERROR_CONTEXT      => null,
+            Fail::PROPERTY_NAME                     => 'name',
+            Fail::PROPERTY_IS_CAPTURE_ENABLED       => true,
+            Fail::PROPERTY_ERROR_CODE               => ErrorCodes::INVALID_VALUE,
+            Fail::PROPERTY_ERROR_MESSAGE_TEMPLATE   => Messages::INVALID_VALUE,
+            Fail::PROPERTY_ERROR_MESSAGE_PARAMETERS => [],
         ], $block->getProperties());
     }
 

@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Rules\Converters;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 use function is_bool;
 use function is_string;
@@ -49,12 +50,12 @@ final class StringToBool extends ExecuteRule
             } elseif ($lcValue === 'false' || $lcValue === '0' || $lcValue === 'off' || $lcValue === 'no') {
                 $reply = static::createSuccessReply(false);
             } else {
-                $reply = static::createErrorReply($context, $value, ErrorCodes::IS_BOOL);
+                $reply = static::createErrorReply($context, $value, ErrorCodes::IS_BOOL, Messages::IS_BOOL, []);
             }
         } elseif (is_bool($value) === true) {
             $reply = static::createSuccessReply($value);
         } else {
-            $reply = static::createErrorReply($context, $value, ErrorCodes::IS_BOOL);
+            $reply = static::createErrorReply($context, $value, ErrorCodes::IS_BOOL, Messages::IS_BOOL, []);
         }
 
         return $reply;

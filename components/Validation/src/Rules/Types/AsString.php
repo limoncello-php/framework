@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Rules\Types;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 use function is_string;
 
@@ -40,6 +41,6 @@ final class AsString extends ExecuteRule
     {
         return is_string($value) === true ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, ErrorCodes::IS_STRING);
+            static::createErrorReply($context, $value, ErrorCodes::IS_STRING, Messages::IS_STRING, []);
     }
 }

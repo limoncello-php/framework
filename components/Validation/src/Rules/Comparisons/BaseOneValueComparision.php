@@ -25,6 +25,7 @@ use Limoncello\Validation\Rules\BaseRule;
 use Limoncello\Validation\Rules\Generic\Fail;
 use Limoncello\Validation\Rules\Generic\IfOperator;
 use Limoncello\Validation\Rules\Generic\Success;
+use function assert;
 
 /**
  * @package Limoncello\Validation
@@ -54,20 +55,29 @@ abstract class BaseOneValueComparision extends BaseRule implements ComparisionIn
     private $errorCode;
 
     /**
-     * @var mixed
+     * @var string
      */
-    private $errorContext;
+    private $messageTemplate;
 
     /**
-     * @param mixed $value
-     * @param int   $errorCode
-     * @param mixed $errorContext
+     * @var array
      */
-    public function __construct($value, int $errorCode, $errorContext = null)
+    private $messageParams;
+
+    /**
+     * @param mixed  $value
+     * @param int    $errorCode
+     * @param string $messageTemplate
+     * @param array  $messageParams
+     */
+    public function __construct($value, int $errorCode, string $messageTemplate, array $messageParams)
     {
-        $this->value        = $value;
-        $this->errorCode    = $errorCode;
-        $this->errorContext = $errorContext;
+        assert($this->checkEachValueConvertibleToString($messageParams));
+
+        $this->value           = $value;
+        $this->errorCode       = $errorCode;
+        $this->messageTemplate = $messageTemplate;
+        $this->messageParams   = $messageParams;
     }
 
     /**
@@ -78,7 +88,7 @@ abstract class BaseOneValueComparision extends BaseRule implements ComparisionIn
         $operator = new IfOperator(
             [static::class, 'compare'],
             new Success(),
-            new Fail($this->getErrorCode(), $this->getErrorContext()),
+            new Fail($this->getErrorCode(), $this->getMessageTemplate(), $this->getMessageParameters()),
             [static::PROPERTY_VALUE => $this->getValue()]
         );
 
@@ -107,11 +117,19 @@ abstract class BaseOneValueComparision extends BaseRule implements ComparisionIn
     }
 
     /**
+     * @return string
+     */
+    protected function getMessageTemplate(): string
+    {
+        return $this->messageTemplate;
+    }
+
+    /**
      * @return mixed
      */
-    public function getErrorContext()
+    public function getMessageParameters(): array
     {
-        return $this->errorContext;
+        return $this->messageParams;
     }
 
     /**

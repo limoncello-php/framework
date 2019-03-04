@@ -21,6 +21,7 @@ namespace Limoncello\Validation\Rules\Types;
 use DateTimeInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 
 /**
@@ -40,6 +41,6 @@ final class AsDateTime extends ExecuteRule
     {
         return $value instanceof DateTimeInterface ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, ErrorCodes::IS_DATE_TIME);
+            static::createErrorReply($context, $value, ErrorCodes::IS_DATE_TIME, Messages::IS_DATE_TIME, []);
     }
 }

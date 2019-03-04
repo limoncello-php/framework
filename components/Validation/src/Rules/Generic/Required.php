@@ -25,6 +25,7 @@ use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Execution\BlockReplies;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\BaseRule;
 
 /**
@@ -93,8 +94,8 @@ final class Required extends BaseRule
     {
         $isOk = $context->getStates()->getState(static::STATE_HAS_BEEN_CALLED, false);
 
-        return $isOk === true ?
-            BlockReplies::createEndSuccessReply() : BlockReplies::createEndErrorReply($context, ErrorCodes::REQUIRED);
+        return $isOk === true ? BlockReplies::createEndSuccessReply() :
+            BlockReplies::createEndErrorReply($context, ErrorCodes::REQUIRED, Messages::REQUIRED, []);
     }
 
     /**

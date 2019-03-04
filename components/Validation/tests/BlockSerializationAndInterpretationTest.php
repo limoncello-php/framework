@@ -33,6 +33,7 @@ use Limoncello\Validation\Execution\BlockInterpreter;
 use Limoncello\Validation\Execution\BlockReplies;
 use Limoncello\Validation\Execution\BlockSerializer;
 use Limoncello\Validation\Execution\ContextStorage;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\BaseRule;
 use Limoncello\Validation\Rules\Generic\Fail;
 use Limoncello\Validation\Rules\Generic\Success;
@@ -265,7 +266,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
         $error = $errors->get()[0];
         $this->assertEquals('name', $error->getParameterName());
         $this->assertEquals('whatever', $error->getParameterValue());
-        $this->assertEquals(['some_value__exec'], $error->getMessageContext());
+        $this->assertEquals('Some error message template', $error->getMessageTemplate());
+        $this->assertEquals(['some_value__exec'], $error->getMessageParameters());
     }
 
     /**
@@ -299,7 +301,7 @@ class BlockSerializationAndInterpretationTest extends TestCase
         $error = $errors->get()[0];
         $this->assertEquals('name', $error->getParameterName());
         $this->assertEquals(null, $error->getParameterValue());
-        $this->assertEquals(['some_value__start'], $error->getMessageContext());
+        $this->assertEquals(['some_value__start'], $error->getMessageParameters());
     }
 
     /**
@@ -333,7 +335,7 @@ class BlockSerializationAndInterpretationTest extends TestCase
         $error = $errors->get()[0];
         $this->assertEquals('name', $error->getParameterName());
         $this->assertEquals(null, $error->getParameterValue());
-        $this->assertEquals(['some_value__end'], $error->getMessageContext());
+        $this->assertEquals(['some_value__end'], $error->getMessageParameters());
     }
 
     /**
@@ -368,17 +370,17 @@ class BlockSerializationAndInterpretationTest extends TestCase
         $error = $errors->get()[0];
         $this->assertEquals('name', $error->getParameterName());
         $this->assertEquals(null, $error->getParameterValue());
-        $this->assertEquals(['some_value__start'], $error->getMessageContext());
+        $this->assertEquals(['some_value__start'], $error->getMessageParameters());
         $error = $errors->get()[1];
         $this->assertEquals('name', $error->getParameterName());
         $this->assertEquals('whatever', $error->getParameterValue());
-        $this->assertEquals(['some_value__exec'], $error->getMessageContext());
+        $this->assertEquals(['some_value__exec'], $error->getMessageParameters());
         $error = $errors->get()[2];
         $this->assertEquals('name', $error->getParameterName());
         // if we check parameter name it would be same as in exec because getErrorInfo in this class
         // just reads it from state. Which in its turn is set by exec. As it's a specific for this particular
         // test implementation we do not check parameter value for the error.
-        $this->assertEquals(['some_value__end'], $error->getMessageContext());
+        $this->assertEquals(['some_value__end'], $error->getMessageParameters());
 
         // add here some testing coverage for context's cleaning
         $context->clear();
@@ -426,7 +428,13 @@ class BlockSerializationAndInterpretationTest extends TestCase
      */
     public static function procedureExecuteError($input, ContextInterface $context): array
     {
-        return BlockReplies::createErrorReply($context, $input, ErrorCodes::INVALID_VALUE, ['some_value__exec']);
+        return BlockReplies::createErrorReply(
+            $context,
+            $input,
+            ErrorCodes::INVALID_VALUE,
+            'Some error message template',
+            ['some_value__exec']
+        );
     }
 
     /**
@@ -448,7 +456,12 @@ class BlockSerializationAndInterpretationTest extends TestCase
      */
     public static function procedureStartError(ContextInterface $context): array
     {
-        return BlockReplies::createStartErrorReply($context, ErrorCodes::INVALID_VALUE, ['some_value__start']);
+        return BlockReplies::createStartErrorReply(
+            $context,
+            ErrorCodes::INVALID_VALUE,
+            'Some error message template',
+            ['some_value__start']
+        );
     }
 
     /**
@@ -470,7 +483,12 @@ class BlockSerializationAndInterpretationTest extends TestCase
      */
     public static function procedureEndError(ContextInterface $context): array
     {
-        return BlockReplies::createEndErrorReply($context, ErrorCodes::INVALID_VALUE, ['some_value__end']);
+        return BlockReplies::createEndErrorReply(
+            $context,
+            ErrorCodes::INVALID_VALUE,
+            'Some error message template',
+            ['some_value__end']
+        );
     }
 
     /**
@@ -510,10 +528,11 @@ class BlockSerializationAndInterpretationTest extends TestCase
         return [
             BlockSerializer::TYPE                       => BlockSerializer::TYPE__PROCEDURE,
             BlockSerializer::PROPERTIES                 => [
-                Fail::PROPERTY_NAME               => '',
-                Fail::PROPERTY_IS_CAPTURE_ENABLED => false,
-                Fail::PROPERTY_ERROR_CODE         => ErrorCodes::INVALID_VALUE,
-                Fail::PROPERTY_ERROR_CONTEXT      => null,
+                Fail::PROPERTY_NAME                     => '',
+                Fail::PROPERTY_IS_CAPTURE_ENABLED       => false,
+                Fail::PROPERTY_ERROR_CODE               => ErrorCodes::INVALID_VALUE,
+                Fail::PROPERTY_ERROR_MESSAGE_TEMPLATE   => Messages::INVALID_VALUE,
+                Fail::PROPERTY_ERROR_MESSAGE_PARAMETERS => [],
             ],
             BlockSerializer::PROCEDURE_EXECUTE_CALLABLE => [Fail::class, 'execute'],
         ];

@@ -22,6 +22,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 use function assert;
 use function is_string;
@@ -69,7 +70,8 @@ final class StringToDateTime extends ExecuteRule
             $context,
             $value,
             ErrorCodes::IS_DATE_TIME,
-            [self::PROPERTY_FORMAT => $format]
+            Messages::IS_DATE_TIME,
+            [$format]
         );
     }
 

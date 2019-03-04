@@ -180,6 +180,26 @@ abstract class BaseRule implements RuleInterface
     }
 
     /**
+     * @param iterable $messageParams
+     *
+     * @return bool
+     */
+    protected function checkEachValueConvertibleToString(iterable $messageParams): bool
+    {
+        $result = true;
+
+        foreach ($messageParams as $param) {
+            $result = $result && (
+                    is_scalar($param) === true ||
+                    $param === null ||
+                    (is_object($param) === true && method_exists($param, '__toString'))
+                );
+        }
+
+        return true;
+    }
+
+    /**
      * @param mixed $result
      *
      * @return array
@@ -195,7 +215,8 @@ abstract class BaseRule implements RuleInterface
      * @param ContextInterface $context
      * @param mixed            $errorValue
      * @param int              $errorCode
-     * @param mixed|null       $errorContext
+     * @param string           $messageTemplate
+     * @param array            $messageParams
      *
      * @return array
      *
@@ -205,8 +226,9 @@ abstract class BaseRule implements RuleInterface
         ContextInterface $context,
         $errorValue,
         int $errorCode,
-        $errorContext = null
+        string $messageTemplate,
+        array $messageParams
     ): array {
-        return BlockReplies::createErrorReply($context, $errorValue, $errorCode, $errorContext);
+        return BlockReplies::createErrorReply($context, $errorValue, $errorCode, $messageTemplate, $messageParams);
     }
 }

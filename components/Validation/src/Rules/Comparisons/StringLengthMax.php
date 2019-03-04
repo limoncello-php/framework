@@ -18,9 +18,9 @@ namespace Limoncello\Validation\Rules\Comparisons;
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use function assert;
 use function is_string;
 use function strlen;
@@ -35,7 +35,12 @@ final class StringLengthMax extends BaseOneValueComparision
      */
     public function __construct(int $max)
     {
-        parent::__construct($max, ErrorCodes::STRING_LENGTH_MAX, [ContextKeys::SCALAR_VALUE => $max]);
+        parent::__construct(
+            $max,
+            ErrorCodes::STRING_LENGTH_MAX,
+            Messages::STRING_LENGTH_MAX,
+            [$max]
+        );
     }
 
     /**

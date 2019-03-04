@@ -20,12 +20,16 @@ namespace Sample\Validation;
 
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Rules\ExecuteRule;
+use function is_int;
 
 /**
  * @package Sample
  */
 class IsSkuRule extends ExecuteRule
 {
+    /** @var string Message Template */
+    const MESSAGE_TEMPLATE = 'The value should be a valid SKU.';
+
     /**
      * @param mixed            $value
      * @param ContextInterface $context
@@ -38,6 +42,12 @@ class IsSkuRule extends ExecuteRule
 
         return $idExists === true ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, Errors::IS_VALID_SKU);
+            static::createErrorReply(
+                $context,
+                $value,
+                Errors::IS_VALID_SKU,
+                static::MESSAGE_TEMPLATE,
+                []
+            );
     }
 }

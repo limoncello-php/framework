@@ -19,9 +19,9 @@ namespace Limoncello\Validation\Rules\Comparisons;
  */
 
 use DateTimeInterface;
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use function assert;
 
 /**
@@ -37,7 +37,8 @@ final class DateTimeMoreOrEquals extends BaseOneValueComparision
         parent::__construct(
             $value->getTimestamp(),
             ErrorCodes::DATE_TIME_MORE_OR_EQUALS,
-            [ContextKeys::DATE_TIME_VALUE => $value->getTimestamp()]
+            Messages::DATE_TIME_MORE_OR_EQUALS,
+            [$value->getTimestamp()]
         );
     }
 

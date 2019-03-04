@@ -56,7 +56,12 @@ final class BlockReplies
     /**
      * Error info key.
      */
-    const ERROR_INFO_CONTEXT = self::ERROR_INFO_CODE + 1;
+    const ERROR_INFO_MESSAGE_TEMPLATE = self::ERROR_INFO_CODE + 1;
+
+    /**
+     * Error info key.
+     */
+    const ERROR_INFO_MESSAGE_PARAMETERS = self::ERROR_INFO_MESSAGE_TEMPLATE + 1;
 
     /**
      * @param mixed $result
@@ -91,7 +96,8 @@ final class BlockReplies
      * @param ContextInterface $context
      * @param mixed            $errorValue
      * @param int              $errorCode
-     * @param mixed|null       $errorContext
+     * @param string           $messageTemplate
+     * @param array            $messageParams
      *
      * @return array
      */
@@ -99,7 +105,8 @@ final class BlockReplies
         ContextInterface $context,
         $errorValue,
         int $errorCode,
-        $errorContext = null
+        string $messageTemplate,
+        array $messageParams
     ): array {
         return [
             static::REPLY_SUCCESS_VALUE => null,
@@ -108,7 +115,8 @@ final class BlockReplies
                     $context->getCurrentBlockId(),
                     $errorValue,
                     $errorCode,
-                    $errorContext
+                    $messageTemplate,
+                    $messageParams
                 ),
             ],
         ];
@@ -117,12 +125,17 @@ final class BlockReplies
     /**
      * @param ContextInterface $context
      * @param int              $errorCode
-     * @param mixed|null       $errorContext
+     * @param string           $messageTemplate
+     * @param array            $messageParams
      *
      * @return array
      */
-    public static function createStartErrorReply(ContextInterface $context, int $errorCode, $errorContext = null): array
-    {
+    public static function createStartErrorReply(
+        ContextInterface $context,
+        int $errorCode,
+        string $messageTemplate,
+        array $messageParams
+    ): array {
         $value = null;
 
         return [
@@ -130,7 +143,8 @@ final class BlockReplies
                 $context->getCurrentBlockId(),
                 $value,
                 $errorCode,
-                $errorContext
+                $messageTemplate,
+                $messageParams
             ),
         ];
     }
@@ -138,12 +152,17 @@ final class BlockReplies
     /**
      * @param ContextInterface $context
      * @param int              $errorCode
-     * @param mixed|null       $errorContext
+     * @param string           $messageTemplate
+     * @param array            $messageParams
      *
      * @return array
      */
-    public static function createEndErrorReply(ContextInterface $context, int $errorCode, $errorContext = null): array
-    {
+    public static function createEndErrorReply(
+        ContextInterface $context,
+        int $errorCode,
+        string $messageTemplate,
+        array $messageParams
+    ): array {
         $value = null;
 
         return [
@@ -151,26 +170,34 @@ final class BlockReplies
                 $context->getCurrentBlockId(),
                 $value,
                 $errorCode,
-                $errorContext
+                $messageTemplate,
+                $messageParams
             ),
         ];
     }
 
     /**
-     * @param int        $blockId
-     * @param mixed      $value
-     * @param int        $code
-     * @param null|mixed $context
+     * @param int    $blockId
+     * @param mixed  $value
+     * @param int    $code
+     * @param string $messageTemplate
+     * @param array  $messageParams
      *
      * @return array
      */
-    protected static function createErrorInfoEntry(int $blockId, $value, int $code, $context = null): array
-    {
+    protected static function createErrorInfoEntry(
+        int $blockId,
+        $value,
+        int $code,
+        string $messageTemplate,
+        array $messageParams
+    ): array {
         return [
-            static::ERROR_INFO_BLOCK_INDEX => $blockId,
-            static::ERROR_INFO_VALUE       => $value,
-            static::ERROR_INFO_CODE        => $code,
-            static::ERROR_INFO_CONTEXT     => $context,
+            static::ERROR_INFO_BLOCK_INDEX        => $blockId,
+            static::ERROR_INFO_VALUE              => $value,
+            static::ERROR_INFO_CODE               => $code,
+            static::ERROR_INFO_MESSAGE_TEMPLATE   => $messageTemplate,
+            static::ERROR_INFO_MESSAGE_PARAMETERS => $messageParams,
         ];
     }
 

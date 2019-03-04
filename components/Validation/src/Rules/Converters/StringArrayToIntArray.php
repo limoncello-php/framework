@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Rules\Converters;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 use function is_array;
 use function is_numeric;
@@ -49,12 +50,18 @@ final class StringArrayToIntArray extends ExecuteRule
                 if (is_string($mightBeString) === true || is_numeric($mightBeString) === true) {
                     $result[$key] = (int)$mightBeString;
                 } else {
-                    $reply = static::createErrorReply($context, $mightBeString, ErrorCodes::IS_STRING);
+                    $reply = static::createErrorReply(
+                        $context,
+                        $mightBeString,
+                        ErrorCodes::IS_STRING,
+                        Messages::IS_STRING,
+                        []
+                    );
                     break;
                 }
             }
         } else {
-            $reply = static::createErrorReply($context, $value, ErrorCodes::IS_ARRAY);
+            $reply = static::createErrorReply($context, $value, ErrorCodes::IS_ARRAY, Messages::IS_ARRAY, []);
         }
 
         return $reply !== null ? $reply : static::createSuccessReply($result);

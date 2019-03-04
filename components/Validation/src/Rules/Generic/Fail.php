@@ -20,7 +20,9 @@ namespace Limoncello\Validation\Rules\Generic;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
+use function assert;
 
 /**
  * @package Limoncello\Validation
@@ -35,17 +37,29 @@ final class Fail extends ExecuteRule
     /**
      * Property key.
      */
-    const PROPERTY_ERROR_CONTEXT = self::PROPERTY_ERROR_CODE + 1;
+    const PROPERTY_ERROR_MESSAGE_TEMPLATE = self::PROPERTY_ERROR_CODE + 1;
 
     /**
-     * @param int   $errorCode
-     * @param mixed $errorContext
+     * Property key.
      */
-    public function __construct(int $errorCode = ErrorCodes::INVALID_VALUE, $errorContext = null)
-    {
+    const PROPERTY_ERROR_MESSAGE_PARAMETERS = self::PROPERTY_ERROR_MESSAGE_TEMPLATE + 1;
+
+    /**
+     * @param int    $errorCode
+     * @param string $messageTemplate
+     * @param array  $messageParams
+     */
+    public function __construct(
+        int $errorCode = ErrorCodes::INVALID_VALUE,
+        string $messageTemplate = Messages::INVALID_VALUE,
+        array $messageParams = []
+    ) {
+        assert($this->checkEachValueConvertibleToString($messageParams));
+
         parent::__construct([
-            self::PROPERTY_ERROR_CODE    => $errorCode,
-            self::PROPERTY_ERROR_CONTEXT => $errorContext,
+            self::PROPERTY_ERROR_CODE               => $errorCode,
+            self::PROPERTY_ERROR_MESSAGE_TEMPLATE   => $messageTemplate,
+            self::PROPERTY_ERROR_MESSAGE_PARAMETERS => $messageParams,
         ]);
     }
 
@@ -65,7 +79,8 @@ final class Fail extends ExecuteRule
             $context,
             $value,
             $properties->getProperty(self::PROPERTY_ERROR_CODE),
-            $properties->getProperty(self::PROPERTY_ERROR_CONTEXT)
+            $properties->getProperty(self::PROPERTY_ERROR_MESSAGE_TEMPLATE),
+            $properties->getProperty(self::PROPERTY_ERROR_MESSAGE_PARAMETERS)
         );
     }
 }

@@ -28,6 +28,9 @@ use Limoncello\Validation\Rules\ExecuteRule;
  */
 class IsDeliveryDateRule extends ExecuteRule
 {
+    /** @var string Message Template */
+    const MESSAGE_TEMPLATE = 'The value should be a valid delivery date.';
+
     /**
      * @param mixed            $value
      * @param ContextInterface $context
@@ -36,13 +39,19 @@ class IsDeliveryDateRule extends ExecuteRule
      */
     public static function execute($value, ContextInterface $context): array
     {
-        $isValidDeliveryDate =
-            $value instanceof DateTimeInterface === true &&
-            $value >= new DateTime('tomorrow') &&
-            $value <= new DateTime('+5 days');
+        $from = new DateTime('tomorrow');
+        $to   = new DateTime('+5 days');
+
+        $isValidDeliveryDate = $value instanceof DateTimeInterface === true && $value >= $from && $value <= $to;
 
         return $isValidDeliveryDate === true ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, Errors::IS_DELIVERY_DATE);
+            static::createErrorReply(
+                $context,
+                $value,
+                Errors::IS_DELIVERY_DATE,
+                static::MESSAGE_TEMPLATE,
+                [$from->getTimestamp(), $to->getTimestamp()]
+            );
     }
 }

@@ -62,22 +62,31 @@ abstract class BaseTwoValueComparision extends BaseRule implements ComparisionIn
     private $errorCode;
 
     /**
-     * @var mixed
+     * @var string
      */
-    private $errorContext;
+    private $messageTemplate;
 
     /**
-     * @param mixed $lowerValue
-     * @param mixed $upperValue
-     * @param int   $errorCode
-     * @param mixed $errorContext
+     * @var array
      */
-    public function __construct($lowerValue, $upperValue, int $errorCode, $errorContext = null)
+    private $messageParams;
+
+    /**
+     * @param mixed  $lowerValue
+     * @param mixed  $upperValue
+     * @param int    $errorCode
+     * @param string $messageTemplate
+     * @param array  $messageParams
+     */
+    public function __construct($lowerValue, $upperValue, int $errorCode, string $messageTemplate, array $messageParams)
     {
-        $this->lowerValue   = $lowerValue;
-        $this->upperValue   = $upperValue;
-        $this->errorCode    = $errorCode;
-        $this->errorContext = $errorContext;
+        assert($this->checkEachValueConvertibleToString($messageParams));
+
+        $this->lowerValue      = $lowerValue;
+        $this->upperValue      = $upperValue;
+        $this->errorCode       = $errorCode;
+        $this->messageTemplate = $messageTemplate;
+        $this->messageParams   = $messageParams;
     }
 
     /**
@@ -88,7 +97,7 @@ abstract class BaseTwoValueComparision extends BaseRule implements ComparisionIn
         $operator = new IfOperator(
             [static::class, 'compare'],
             new Success(),
-            new Fail($this->getErrorCode(), $this->getErrorContext()),
+            new Fail($this->getErrorCode(), $this->getMessageTemplate(), $this->getMessageParameters()),
             [
                 static::PROPERTY_LOWER_VALUE => $this->getLowerValue(),
                 static::PROPERTY_UPPER_VALUE => $this->getUpperValue(),
@@ -128,11 +137,19 @@ abstract class BaseTwoValueComparision extends BaseRule implements ComparisionIn
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getErrorContext()
+    protected function getMessageTemplate(): string
     {
-        return $this->errorContext;
+        return $this->messageTemplate;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessageParameters(): array
+    {
+        return $this->messageParams;
     }
 
     /**

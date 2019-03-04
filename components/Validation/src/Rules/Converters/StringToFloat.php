@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Rules\Converters;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 use function is_numeric;
 use function is_string;
@@ -43,6 +44,6 @@ final class StringToFloat extends ExecuteRule
             return static::createSuccessReply((float)$value);
         }
 
-        return static::createErrorReply($context, $value, ErrorCodes::IS_FLOAT);
+        return static::createErrorReply($context, $value, ErrorCodes::IS_FLOAT, Messages::IS_FLOAT, []);
     }
 }

@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Rules\Types;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 use function is_numeric;
 
@@ -40,6 +41,6 @@ final class AsNumeric extends ExecuteRule
     {
         return is_numeric($value) === true ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, ErrorCodes::IS_NUMERIC);
+            static::createErrorReply($context, $value, ErrorCodes::IS_NUMERIC, Messages::IS_NUMERIC, []);
     }
 }

@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Rules\Types;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 use function is_int;
 
@@ -40,6 +41,6 @@ final class AsInt extends ExecuteRule
     {
         return is_int($value) === true ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, ErrorCodes::IS_INT);
+            static::createErrorReply($context, $value, ErrorCodes::IS_INT, Messages::IS_INT, []);
     }
 }

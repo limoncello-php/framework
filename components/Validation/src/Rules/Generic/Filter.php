@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Rules\Generic;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
 use function filter_var;
 
@@ -44,18 +45,29 @@ final class Filter extends ExecuteRule
     const PROPERTY_FILTER_ERROR_CODE = self::PROPERTY_FILTER_OPTIONS + 1;
 
     /**
+     * Property key.
+     */
+    const PROPERTY_MESSAGE_TEMPLATE = self::PROPERTY_FILTER_ERROR_CODE + 1;
+
+    /**
      * For filter ID and options see @link http://php.net/manual/en/filter.filters.php
      *
-     * @param int   $filterId
-     * @param mixed $options
-     * @param int   $errorCode
+     * @param int    $filterId
+     * @param mixed  $options
+     * @param int    $errorCode
+     * @param string $messageTemplate
      */
-    public function __construct(int $filterId, $options = null, int $errorCode = ErrorCodes::INVALID_VALUE)
-    {
+    public function __construct(
+        int $filterId,
+        $options = null,
+        int $errorCode = ErrorCodes::INVALID_VALUE,
+        string $messageTemplate = Messages::INVALID_VALUE
+    ) {
         parent::__construct([
             static::PROPERTY_FILTER_ID         => $filterId,
             static::PROPERTY_FILTER_OPTIONS    => $options,
             static::PROPERTY_FILTER_ERROR_CODE => $errorCode,
+            static::PROPERTY_MESSAGE_TEMPLATE  => $messageTemplate,
         ]);
     }
 
@@ -69,14 +81,16 @@ final class Filter extends ExecuteRule
      */
     public static function execute($value, ContextInterface $context): array
     {
-        $filterId      = $context->getProperties()->getProperty(static::PROPERTY_FILTER_ID);
-        $filterOptions = $context->getProperties()->getProperty(static::PROPERTY_FILTER_OPTIONS);
-        $errorCode     = $context->getProperties()->getProperty(static::PROPERTY_FILTER_ERROR_CODE);
+        $properties      = $context->getProperties();
+        $filterId        = $properties->getProperty(static::PROPERTY_FILTER_ID);
+        $filterOptions   = $properties->getProperty(static::PROPERTY_FILTER_OPTIONS);
+        $errorCode       = $properties->getProperty(static::PROPERTY_FILTER_ERROR_CODE);
+        $messageTemplate = $properties->getProperty(static::PROPERTY_MESSAGE_TEMPLATE);
 
         $output = filter_var($value, $filterId, $filterOptions);
 
         return $output !== false ?
             static::createSuccessReply($output) :
-            static::createErrorReply($context, $value, $errorCode, [$filterId, $filterOptions]);
+            static::createErrorReply($context, $value, $errorCode, $messageTemplate, [$filterId, $filterOptions]);
     }
 }

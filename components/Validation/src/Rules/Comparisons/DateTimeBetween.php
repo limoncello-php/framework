@@ -19,9 +19,9 @@ namespace Limoncello\Validation\Rules\Comparisons;
  */
 
 use DateTimeInterface;
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use function assert;
 
 /**
@@ -41,10 +41,8 @@ final class DateTimeBetween extends BaseTwoValueComparision
             $lowerValue->getTimestamp(),
             $upperValue->getTimestamp(),
             ErrorCodes::DATE_TIME_BETWEEN,
-            [
-                ContextKeys::DATE_TIME_MIN => $lowerValue->getTimestamp(),
-                ContextKeys::DATE_TIME_MAX => $upperValue->getTimestamp(),
-            ]
+            Messages::DATE_TIME_BETWEEN,
+            [$lowerValue->getTimestamp(), $upperValue->getTimestamp()]
         );
     }
 

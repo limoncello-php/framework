@@ -39,7 +39,12 @@ interface ErrorInterface
     public function getMessageCode(): int;
 
     /**
+     * @return string
+     */
+    public function getMessageTemplate(): string;
+
+    /**
      * @return array|null
      */
-    public function getMessageContext(): ?array;
+    public function getMessageParameters(): array;
 }

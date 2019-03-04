@@ -18,10 +18,11 @@ namespace Limoncello\Validation\Rules\Comparisons;
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use function assert;
+use function is_numeric;
 
 /**
  * @package Limoncello\Validation
@@ -35,11 +36,13 @@ final class NumericBetween extends BaseTwoValueComparision
     public function __construct($lowerValue, $upperValue)
     {
         assert(is_numeric($lowerValue) === true && is_numeric($upperValue) === true && $lowerValue <= $upperValue);
-        $errorContext = [
-            ContextKeys::SCALAR_MIN => $lowerValue,
-            ContextKeys::SCALAR_MAX => $upperValue,
-        ];
-        parent::__construct($lowerValue, $upperValue, ErrorCodes::NUMERIC_BETWEEN, $errorContext);
+        parent::__construct(
+            $lowerValue,
+            $upperValue,
+            ErrorCodes::NUMERIC_BETWEEN,
+            Messages::NUMERIC_BETWEEN,
+            [$lowerValue, $upperValue]
+        );
     }
 
     /**

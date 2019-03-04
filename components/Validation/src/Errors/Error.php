@@ -41,22 +41,31 @@ class Error implements ErrorInterface
     private $code;
 
     /**
+     * @var string
+     */
+    private $messageTemplate;
+
+    /**
      * @var array|null
      */
-    private $context;
+    private $messageParams;
 
     /**
      * @param null|string $name
      * @param mixed       $value
      * @param int         $code
-     * @param array|null  $context
+     * @param string      $messageTemplate
+     * @param array       $messageParams
      */
-    public function __construct(?string $name, $value, int $code, ?array $context)
+    public function __construct(?string $name, $value, int $code, string $messageTemplate, array $messageParams)
     {
-        $this->name    = $name;
-        $this->value   = $value;
-        $this->code    = $code;
-        $this->context = $context;
+        assert($this->checkEachValueConvertibleToString($messageParams));
+
+        $this->name            = $name;
+        $this->value           = $value;
+        $this->code            = $code;
+        $this->messageTemplate = $messageTemplate;
+        $this->messageParams   = $messageParams;
     }
 
     /**
@@ -86,8 +95,36 @@ class Error implements ErrorInterface
     /**
      * @inheritdoc
      */
-    public function getMessageContext(): ?array
+    public function getMessageTemplate(): string
     {
-        return $this->context;
+        return $this->messageTemplate;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMessageParameters(): array
+    {
+        return $this->messageParams;
+    }
+
+    /**
+     * @param iterable $messageParams
+     *
+     * @return bool
+     */
+    protected function checkEachValueConvertibleToString(iterable $messageParams): bool
+    {
+        $result = true;
+
+        foreach ($messageParams as $param) {
+            $result = $result && (
+                    is_scalar($param) === true ||
+                    $param === null ||
+                    (is_object($param) === true && method_exists($param, '__toString'))
+                );
+        }
+
+        return true;
     }
 }

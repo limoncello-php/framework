@@ -18,9 +18,9 @@ namespace Limoncello\Validation\Rules\Comparisons;
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use function assert;
 use function call_user_func;
 use function in_array;
@@ -44,7 +44,12 @@ final class ScalarInValues extends BaseOneValueComparision
             return true;
         }));
 
-        parent::__construct($scalars, ErrorCodes::SCALAR_IN_VALUES, [ContextKeys::SCALAR_VALUES => $scalars]);
+        parent::__construct(
+            $scalars,
+            ErrorCodes::SCALAR_IN_VALUES,
+            Messages::SCALAR_IN_VALUES,
+            $scalars
+        );
     }
 
     /**

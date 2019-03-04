@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Validator;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\Generic\AndOperator;
 use Limoncello\Validation\Rules\Generic\Enum;
 use Limoncello\Validation\Rules\Generic\Fail;
@@ -85,14 +86,18 @@ trait Generics
     }
 
     /**
-     * @param int        $errorCode
-     * @param null|mixed $errorContext
+     * @param int    $errorCode
+     * @param string $messageTemplate
+     * @param array  $messageParams
      *
      * @return RuleInterface
      */
-    protected static function fail(int $errorCode = ErrorCodes::INVALID_VALUE, $errorContext = null): RuleInterface
-    {
-        return new Fail($errorCode, $errorContext);
+    protected static function fail(
+        int $errorCode = ErrorCodes::INVALID_VALUE,
+        string $messageTemplate = Messages::INVALID_VALUE,
+        array $messageParams = []
+    ): RuleInterface {
+        return new Fail($errorCode, $messageTemplate, $messageParams);
     }
 
     /**
@@ -123,6 +128,7 @@ trait Generics
      * @param int                $filterId
      * @param mixed              $options
      * @param int                $errorCode
+     * @param string             $messageTemplate
      * @param RuleInterface|null $next
      *
      * @return RuleInterface
@@ -131,9 +137,10 @@ trait Generics
         int $filterId,
         $options = null,
         int $errorCode = ErrorCodes::INVALID_VALUE,
+        string $messageTemplate = Messages::INVALID_VALUE,
         RuleInterface $next = null
     ): RuleInterface {
-        $filterRule = new Filter($filterId, $options, $errorCode);
+        $filterRule = new Filter($filterId, $options, $errorCode, $messageTemplate);
 
         return $next === null ? $filterRule : new AndOperator($filterRule, $next);
     }

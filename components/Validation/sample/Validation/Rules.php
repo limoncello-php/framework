@@ -26,6 +26,9 @@ use Limoncello\Validation\Contracts\Rules\RuleInterface;
  */
 class Rules extends \Limoncello\Validation\Rules
 {
+    /** @var string Message Template */
+    const MESSAGE_TEMPLATE_EMAIL = 'The value should be a valid email address.';
+
     /**
      * @return RuleInterface
      */
@@ -60,7 +63,13 @@ class Rules extends \Limoncello\Validation\Rules
     public static function email(): RuleInterface
     {
         return static::isString(
-            static::filter(FILTER_VALIDATE_EMAIL, null, Errors::IS_EMAIL, static::stringLengthMax(255))
+            static::filter(
+                FILTER_VALIDATE_EMAIL,
+                null,
+                Errors::IS_EMAIL,
+                static::MESSAGE_TEMPLATE_EMAIL,
+                static::stringLengthMax(255)
+            )
         );
     }
 

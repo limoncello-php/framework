@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Rules\Comparisons;
 
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 
 /**
  * @package Limoncello\Validation
@@ -31,7 +32,7 @@ final class IsNotNull extends BaseOneValueComparision
      */
     public function __construct()
     {
-        parent::__construct(null, ErrorCodes::IS_NOT_NULL);
+        parent::__construct(null, ErrorCodes::IS_NOT_NULL, Messages::IS_NOT_NULL, []);
     }
 
     /**

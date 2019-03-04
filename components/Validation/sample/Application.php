@@ -23,7 +23,6 @@ use DateTimeInterface;
 use Limoncello\Validation\ArrayValidator as v;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use MessageFormatter;
-use Sample\Validation\Errors;
 use Sample\Validation\Rules as r;
 
 /**
@@ -131,8 +130,8 @@ class Application
             $paramName  = $error->getParameterName();
             $entry      = empty($paramName) ? 'Validation' : "Param `$paramName`";
             $paramValue = $error->getParameterValue();
-            $errorMsg   = Errors::MESSAGES[$error->getMessageCode()];
-            $context    = $error->getMessageContext();
+            $errorMsg   = $error->getMessageTemplate();
+            $context    = $error->getMessageParameters();
             $errorMsg   = MessageFormatter::formatMessage('en', $errorMsg, $context !== null ? $context : []);
 
             $this->console("$entry failed for `$paramValue` with: $errorMsg" . PHP_EOL);

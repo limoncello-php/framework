@@ -18,9 +18,9 @@ namespace Limoncello\Validation\Rules\Comparisons;
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use function assert;
 use function is_numeric;
 
@@ -35,7 +35,12 @@ final class NumericMoreOrEqualsThan extends BaseOneValueComparision
     public function __construct($value)
     {
         assert(is_numeric($value) === true);
-        parent::__construct($value, ErrorCodes::NUMERIC_MORE_OR_EQUALS, [ContextKeys::SCALAR_VALUE => $value]);
+        parent::__construct(
+            $value,
+            ErrorCodes::NUMERIC_MORE_OR_EQUALS,
+            Messages::NUMERIC_MORE_OR_EQUALS,
+            [$value]
+        );
     }
 
     /**

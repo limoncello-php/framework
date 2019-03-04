@@ -491,14 +491,15 @@ final class BlockInterpreter
         ErrorAggregatorInterface $errors
     ): void {
         foreach ($errorsInfo as $errorInfo) {
-            $index        = $errorInfo[BlockReplies::ERROR_INFO_BLOCK_INDEX];
-            $value        = $errorInfo[BlockReplies::ERROR_INFO_VALUE];
-            $errorCode    = $errorInfo[BlockReplies::ERROR_INFO_CODE];
-            $errorContext = $errorInfo[BlockReplies::ERROR_INFO_CONTEXT];
+            $index           = $errorInfo[BlockReplies::ERROR_INFO_BLOCK_INDEX];
+            $value           = $errorInfo[BlockReplies::ERROR_INFO_VALUE];
+            $errorCode       = $errorInfo[BlockReplies::ERROR_INFO_CODE];
+            $messageTemplate = $errorInfo[BlockReplies::ERROR_INFO_MESSAGE_TEMPLATE];
+            $messageParams   = $errorInfo[BlockReplies::ERROR_INFO_MESSAGE_PARAMETERS];
 
             $name = $context->setCurrentBlockId($index)->getProperties()->getProperty(BaseRule::PROPERTY_NAME);
 
-            $errors->add(new Error($name, $value, $errorCode, $errorContext));
+            $errors->add(new Error($name, $value, $errorCode, $messageTemplate, $messageParams));
         }
     }
 

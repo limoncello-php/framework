@@ -18,9 +18,9 @@ namespace Limoncello\Validation\Rules\Comparisons;
  * limitations under the License.
  */
 
-use Limoncello\Validation\Contracts\Errors\ContextKeys;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use Limoncello\Validation\I18n\Messages;
 use function assert;
 use function is_string;
 use function preg_match;
@@ -36,7 +36,12 @@ final class StringRegExp extends BaseOneValueComparision
     public function __construct($pattern)
     {
         assert(is_string($pattern) === true);
-        parent::__construct($pattern, ErrorCodes::STRING_REG_EXP, [ContextKeys::SCALAR_VALUE => $pattern]);
+        parent::__construct(
+            $pattern,
+            ErrorCodes::STRING_REG_EXP,
+            Messages::STRING_REG_EXP,
+            [$pattern]
+        );
     }
 
     /**
