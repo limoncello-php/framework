@@ -110,7 +110,7 @@ trait DefaultControllerMethodsTrait
         EncoderInterface $encoder
     ): ResponseInterface {
         $queryParser->parse($index, $queryParams);
-        $validatedIndex = $queryParser->getIdentity();
+        $validatedIndex = (string)$queryParser->getIdentity();
 
         $model = $mapper->applyQueryParameters($queryParser, $crud)->read($validatedIndex);
         assert(!($model instanceof PaginatedDataInterface));
@@ -470,7 +470,7 @@ trait DefaultControllerMethodsTrait
         CrudInterface $crud,
         EncoderInterface $encoder
     ): ResponseInterface {
-        $validatedIndex = $queryParser->parse($index)->getIdentity();
+        $validatedIndex = (string)$queryParser->parse($index)->getIdentity();
         $crud->remove($validatedIndex);
 
         $responses = static::defaultCreateResponses($requestUri, $encoder);
@@ -523,7 +523,7 @@ trait DefaultControllerMethodsTrait
         $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getCaptures();
         $relIds   = $captures[$jsonRelName];
 
-        $validatedIndex = $queryParser->parse($index)->getIdentity();
+        $validatedIndex = (string)$queryParser->parse($index)->getIdentity();
         $parentCrud->createInBelongsToManyRelationship($validatedIndex, $modelRelName, $relIds);
 
         $responses = static::defaultCreateResponses($requestUri, $encoder);
@@ -576,7 +576,7 @@ trait DefaultControllerMethodsTrait
         $captures = $dataValidator->assertRelationship($index, $jsonRelName, $jsonData)->getCaptures();
         $relIds   = $captures[$jsonRelName];
 
-        $validatedIndex = $queryParser->parse($index)->getIdentity();
+        $validatedIndex = (string)$queryParser->parse($index)->getIdentity();
         $parentCrud->removeInBelongsToManyRelationship($validatedIndex, $modelRelName, $relIds);
 
         $responses = static::defaultCreateResponses($requestUri, $encoder);
@@ -633,7 +633,7 @@ trait DefaultControllerMethodsTrait
 
         // If we are here then we have something in 'data' section.
 
-        $validatedIndex = $queryParser->parse($index)->getIdentity();
+        $validatedIndex = (string)$queryParser->parse($index)->getIdentity();
         list (, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
         $updated = $crud->update($validatedIndex, $attributes, $toMany);
