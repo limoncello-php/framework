@@ -44,7 +44,7 @@ interface ErrorInterface
     public function getMessageTemplate(): string;
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getMessageParameters(): array;
 }
