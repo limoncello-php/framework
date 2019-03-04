@@ -18,12 +18,13 @@ namespace Limoncello\l10n\Messages;
  * limitations under the License.
  */
 
-use function assert;
-use function array_keys;
-use function count;
-use function locale_lookup;
-use function is_array;
 use Limoncello\l10n\Contracts\Messages\BundleStorageInterface;
+use function array_keys;
+use function assert;
+use function count;
+use function is_array;
+use function locale_lookup;
+use function strlen;
 
 /**
  * @package Limoncello\l10n
@@ -64,7 +65,7 @@ class BundleStorage implements BundleStorageInterface
      */
     public function has(string $locale, string $namespace, string $key): bool
     {
-        assert(empty($locale) === false && empty($namespace) === false && empty($key) === false);
+        assert(empty($locale) === false && empty($namespace) === false && strlen($key) > 0);
 
         $has = isset($this->getEncodedStorage()[$locale][$namespace][$key]);
 
@@ -214,7 +215,7 @@ class BundleStorage implements BundleStorageInterface
     {
         $isValid = true;
         foreach ($resources as $key => $valueAndLocale) {
-            $isValid = $isValid === true && $this->checkPair($key, $valueAndLocale);
+            $isValid = $isValid === true && $this->checkPair((string)$key, $valueAndLocale);
         }
 
         return $isValid;
@@ -228,7 +229,7 @@ class BundleStorage implements BundleStorageInterface
      */
     private function checkPair(string $key, array $valueAndLocale): bool
     {
-        $result = empty($key) === false && $this->checkValueWithLocale($valueAndLocale) === true;
+        $result = strlen($key) > 0 && $this->checkValueWithLocale($valueAndLocale) === true;
 
         return $result;
     }

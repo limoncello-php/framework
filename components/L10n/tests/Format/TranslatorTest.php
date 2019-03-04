@@ -87,5 +87,8 @@ class TranslatorTest extends TestCase
             'Hallo Welt aus Österreich',
             $translator->translateMessage('de_AT', 'Messages', 'Hello World')
         );
+
+        // and one more with message params (though unused)
+        $this->assertEquals('Hallo Welt', $translator->translateMessage('en_US', 'Messages', 'Hello World', ['p']));
     }
 }

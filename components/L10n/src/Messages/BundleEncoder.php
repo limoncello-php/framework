@@ -18,14 +18,14 @@ namespace Limoncello\l10n\Messages;
  * limitations under the License.
  */
 
-use function assert;
-use function array_intersect;
-use function array_diff;
-use function array_keys;
-use function in_array;
 use Limoncello\l10n\Contracts\Messages\BundleEncoderInterface;
 use Limoncello\l10n\Contracts\Messages\BundleStorageInterface;
 use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
+use function array_diff;
+use function array_intersect;
+use function array_keys;
+use function assert;
+use function in_array;
 
 /**
  * @package Limoncello\l10n
@@ -89,7 +89,7 @@ class BundleEncoder implements BundleEncoderInterface
     {
         $encodedBundle = [];
         foreach ($bundle->getKeys() as $key) {
-            $encodedBundle[$key] = $this->getBundleValue($bundle, $key);
+            $encodedBundle[$key] = $this->getBundleValue($bundle, (string)$key);
         }
 
         return $encodedBundle;
@@ -137,13 +137,13 @@ class BundleEncoder implements BundleEncoderInterface
         $encodedBundle = [];
 
         foreach ($commonKeys as $key) {
-            $encodedBundle[$key] = $this->getBundleValue($localizedBundle, $key);
+            $encodedBundle[$key] = $this->getBundleValue($localizedBundle, (string)$key);
         }
         foreach ($localizedOnlyKeys as $key) {
-            $encodedBundle[$key] = $this->getBundleValue($localizedBundle, $key);
+            $encodedBundle[$key] = $this->getBundleValue($localizedBundle, (string)$key);
         }
         foreach ($defaultOnlyKeys as $key) {
-            $encodedBundle[$key] = $this->getBundleValue($defaultBundle, $key);
+            $encodedBundle[$key] = $this->getBundleValue($defaultBundle, (string)$key);
         }
 
         return $encodedBundle;
@@ -189,7 +189,7 @@ class BundleEncoder implements BundleEncoderInterface
      *
      * @return string[]
      */
-    private function getBundleValue(ResourceBundleInterface $bundle, $key): array
+    private function getBundleValue(ResourceBundleInterface $bundle, string $key): array
     {
         return [
             BundleStorageInterface::INDEX_PAIR_VALUE  => $bundle->getValue($key),

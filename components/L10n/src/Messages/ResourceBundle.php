@@ -18,13 +18,13 @@ namespace Limoncello\l10n\Messages;
  * limitations under the License.
  */
 
-use function assert;
+use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
 use function array_keys;
+use function assert;
 use function is_scalar;
 use function is_string;
 use function locale_canonicalize;
 use function strlen;
-use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
 
 /**
  * @package Limoncello\l10n

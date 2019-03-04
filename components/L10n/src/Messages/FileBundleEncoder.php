@@ -18,6 +18,8 @@ namespace Limoncello\l10n\Messages;
  * limitations under the License.
  */
 
+use Limoncello\Contracts\L10n\MessageStorageInterface;
+use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
 use function assert;
 use function class_exists;
 use function class_implements;
@@ -28,8 +30,6 @@ use function is_string;
 use function pathinfo;
 use function realpath;
 use function scandir;
-use Limoncello\Contracts\L10n\MessageStorageInterface;
-use Limoncello\l10n\Contracts\Messages\ResourceBundleInterface;
 
 /**
  * @package Limoncello\l10n

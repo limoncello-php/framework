@@ -21,6 +21,10 @@ namespace Limoncello\l10n\Format;
 use Limoncello\l10n\Contracts\Format\TranslatorInterface;
 use Limoncello\l10n\Contracts\Messages\BundleStorageInterface;
 use MessageFormatter;
+use function assert;
+use function is_object;
+use function is_scalar;
+use function method_exists;
 
 /**
  * @package Limoncello\l10n
@@ -87,6 +91,24 @@ class Translator implements TranslatorInterface
      */
     protected static function formatMessage(string $locale, string $message, array $args): string
     {
-        return MessageFormatter::formatMessage($locale, $message, $args);
+        // underlying `format` method cannot work with arguments that are not convertible to string
+        // therefore we have to check that only those that actually can be used
+        assert(call_user_func(function () use ($args) : bool {
+            $result = true;
+            foreach ($args as $arg) {
+                $result = $result &&
+                    is_scalar($arg) === true ||
+                    $arg === null ||
+                    (is_object($arg) === true && method_exists($arg, '__toString') === true);
+            }
+
+            return $result;
+        }));
+
+        $formatter = MessageFormatter::create($locale, $message);
+        $message   = $formatter->format($args);
+        assert($message !== false, $formatter->getErrorMessage());
+
+        return $message;
     }
 }
