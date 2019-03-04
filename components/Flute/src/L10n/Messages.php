@@ -26,20 +26,18 @@ interface Messages extends \Limoncello\Validation\I18n\Messages
     /** @var string Namespace name for message keys. */
     const NAMESPACE_NAME = 'Limoncello.Flute';
 
-    /** Message id */
+    /** @var string Validation Message Template */
     const MSG_ERR_INVALID_ARGUMENT = 'Invalid argument.';
 
-    /** Message id */
+    /** @var string Validation Message Template */
     const MSG_ERR_INVALID_JSON_DATA_IN_REQUEST = 'Invalid JSON data in request.';
 
-    /** Message id */
+    /** @var string Validation Message Template */
     const MSG_ERR_CANNOT_CREATE_NON_UNIQUE_RESOURCE = 'Cannot create non unique resource.';
 
-    /** Message id */
+    /** @var string Validation Message Template */
     const MSG_ERR_CANNOT_UPDATE_WITH_UNIQUE_CONSTRAINT_VIOLATION =
         'Cannot update resource because unique constraint violated.';
-
-    /** @var string Validation Message Template */
 
     /** @var string Validation Message Template */
     const TYPE_MISSING = 'JSON API type should be specified.';
