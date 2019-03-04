@@ -23,7 +23,7 @@ use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Package\FluteSettings as S;
 use Limoncello\Flute\Validation\Form\FormValidator;
 use Limoncello\Validation\Execution\ContextStorage;
@@ -57,7 +57,7 @@ class FormValidatorFactory implements FormValidatorFactoryInterface
 
         /** @var FormatterFactoryInterface $factory */
         $factory   = $this->getContainer()->get(FormatterFactoryInterface::class);
-        $formatter = $factory->createFormatter(Validation::NAMESPACE_NAME);
+        $formatter = $factory->createFormatter(Messages::NAMESPACE_NAME);
 
         $validator = new FormValidator(
             $rulesClass,

@@ -20,11 +20,10 @@ namespace Limoncello\Flute\Validation\JsonApi;
 
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
-use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesSerializerInterface;
 use Limoncello\Flute\Http\JsonApiResponse;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Flute\Validation\Rules\RelationshipRulesTrait;
 use Limoncello\Validation\Captures\CaptureAggregator;
@@ -228,8 +227,8 @@ class DataParser implements JsonApiDataParserInterface
             array_key_exists($name, $this->getSerializer()::readRulesIndexes($this->getToManyRules()));
 
         if ($isFoundInToOne === false && $isFoundInToMany === false) {
-            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-            $details = $this->formatMessage(ErrorCodes::UNKNOWN_RELATIONSHIP);
+            $title   = $this->formatMessage(Messages::INVALID_VALUE);
+            $details = $this->formatMessage(Messages::UNKNOWN_RELATIONSHIP);
             $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
             $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, (string)$status);
             $this->addErrorStatus($status);
@@ -352,8 +351,8 @@ class DataParser implements JsonApiDataParserInterface
             $index = $this->getSerializer()::readRuleIndex($this->getTypeRule());
             $this->executeBlock($data[DI::KEYWORD_TYPE], $index);
         } else {
-            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-            $details = $this->formatMessage(ErrorCodes::TYPE_MISSING);
+            $title   = $this->formatMessage(Messages::INVALID_VALUE);
+            $details = $this->formatMessage(Messages::TYPE_MISSING);
             $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
             $this->getJsonApiErrorCollection()->addDataTypeError($title, $details, (string)$status);
             $this->addErrorStatus($status);
@@ -363,7 +362,7 @@ class DataParser implements JsonApiDataParserInterface
         $this->executeEnds($this->getSerializer()::readRuleEndIndexes($this->getTypeRule()));
 
         if (count($this->getErrorAggregator()) > 0) {
-            $title  = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $title  = $this->formatMessage(Messages::INVALID_VALUE);
             $status = JsonApiResponse::HTTP_CONFLICT;
             foreach ($this->getErrorAggregator()->get() as $error) {
                 $details = $this->getMessage($error);
@@ -400,7 +399,7 @@ class DataParser implements JsonApiDataParserInterface
         $this->executeEnds($this->getSerializer()::readRuleEndIndexes($this->getIdRule()));
 
         if (count($this->getErrorAggregator()) > 0) {
-            $title  = $this->formatMessage(ErrorCodes::INVALID_VALUE);
+            $title  = $this->formatMessage(Messages::INVALID_VALUE);
             $status = JsonApiResponse::HTTP_CONFLICT;
             foreach ($this->getErrorAggregator()->get() as $error) {
                 $details = $this->getMessage($error);
@@ -430,8 +429,8 @@ class DataParser implements JsonApiDataParserInterface
             array_key_exists(DI::KEYWORD_ATTRIBUTES, $data = $jsonData[DI::KEYWORD_DATA]) === true
         ) {
             if (is_array($attributes = $data[DI::KEYWORD_ATTRIBUTES]) === false) {
-                $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-                $details = $this->formatMessage(ErrorCodes::INVALID_ATTRIBUTES);
+                $title   = $this->formatMessage(Messages::INVALID_VALUE);
+                $details = $this->formatMessage(Messages::INVALID_ATTRIBUTES);
                 $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
                 $this->getJsonApiErrorCollection()->addAttributesError($title, $details, (string)$status);
                 $this->addErrorStatus($status);
@@ -441,8 +440,8 @@ class DataParser implements JsonApiDataParserInterface
                     if (($index = $this->getAttributeIndex($name)) !== null) {
                         $this->executeBlock($value, $index);
                     } elseif ($this->isIgnoreUnknowns() === false) {
-                        $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-                        $details = $this->formatMessage(ErrorCodes::UNKNOWN_ATTRIBUTE);
+                        $title   = $this->formatMessage(Messages::INVALID_VALUE);
+                        $details = $this->formatMessage(Messages::UNKNOWN_ATTRIBUTE);
                         $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
                         $this->getJsonApiErrorCollection()
                             ->addDataAttributeError($name, $title, $details, (string)$status);
@@ -487,8 +486,8 @@ class DataParser implements JsonApiDataParserInterface
             array_key_exists(DI::KEYWORD_RELATIONSHIPS, $data = $jsonData[DI::KEYWORD_DATA]) === true
         ) {
             if (is_array($relationships = $data[DI::KEYWORD_RELATIONSHIPS]) === false) {
-                $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-                $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP_TYPE);
+                $title   = $this->formatMessage(Messages::INVALID_VALUE);
+                $details = $this->formatMessage(Messages::INVALID_RELATIONSHIP_TYPE);
                 $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
                 $this->getJsonApiErrorCollection()->addRelationshipsError($title, $details, (string)$status);
                 $this->addErrorStatus($status);
@@ -506,8 +505,8 @@ class DataParser implements JsonApiDataParserInterface
                         $this->validateAsToManyRelationship($toManyIndexes[$name], $name, $relationship);
                     } else {
                         // unknown relationship
-                        $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-                        $details = $this->formatMessage(ErrorCodes::UNKNOWN_RELATIONSHIP);
+                        $title   = $this->formatMessage(Messages::INVALID_VALUE);
+                        $details = $this->formatMessage(Messages::UNKNOWN_RELATIONSHIP);
                         $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
                         $this->getJsonApiErrorCollection()
                             ->addRelationshipError($name, $title, $details, (string)$status);
@@ -553,8 +552,8 @@ class DataParser implements JsonApiDataParserInterface
             // All right we got something. Now pass it to a validation rule.
             $this->executeBlock($parsed, $index);
         } else {
-            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-            $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP);
+            $title   = $this->formatMessage(Messages::INVALID_VALUE);
+            $details = $this->formatMessage(Messages::INVALID_RELATIONSHIP);
             $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
             $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, (string)$status);
             $this->addErrorStatus($status);
@@ -595,8 +594,8 @@ class DataParser implements JsonApiDataParserInterface
             // All right we got something. Now pass it to a validation rule.
             $this->executeBlock($collectedPairs, $index);
         } else {
-            $title   = $this->formatMessage(ErrorCodes::INVALID_VALUE);
-            $details = $this->formatMessage(ErrorCodes::INVALID_RELATIONSHIP);
+            $title   = $this->formatMessage(Messages::INVALID_VALUE);
+            $details = $this->formatMessage(Messages::INVALID_RELATIONSHIP);
             $status  = JsonApiResponse::HTTP_UNPROCESSABLE_ENTITY;
             $this->getJsonApiErrorCollection()->addRelationshipError($name, $title, $details, (string)$status);
             $this->addErrorStatus($status);
@@ -693,9 +692,7 @@ class DataParser implements JsonApiDataParserInterface
      */
     private function getMessage(ErrorInterface $error): string
     {
-        $context = $error->getMessageContext();
-        $args    = $context === null ? [] : $context;
-        $message = $this->formatMessage($error->getMessageCode(), $args);
+        $message = $this->formatMessage($error->getMessageTemplate(), $error->getMessageParameters());
 
         return $message;
     }
@@ -900,7 +897,7 @@ class DataParser implements JsonApiDataParserInterface
     protected function getFormatter(): FormatterInterface
     {
         if ($this->formatter === null) {
-            $this->formatter = $this->formatterFactory->createFormatter(Validation::NAMESPACE_NAME);
+            $this->formatter = $this->formatterFactory->createFormatter(Messages::NAMESPACE_NAME);
         }
 
         return $this->formatter;
@@ -934,15 +931,14 @@ class DataParser implements JsonApiDataParserInterface
     }
 
     /**
-     * @param int   $messageId
-     * @param array $args
+     * @param string $defaultMessage
+     * @param array  $args
      *
      * @return string
      */
-    private function formatMessage(int $messageId, array $args = []): string
+    private function formatMessage(string $defaultMessage, array $args = []): string
     {
-        $defaultMessage = Validation::convertCodeToDefaultMessage($messageId);
-        $message        = $this->getFormatter()->formatMessage($defaultMessage, $args);
+        $message = $this->getFormatter()->formatMessage($defaultMessage, $args);
 
         return $message;
     }

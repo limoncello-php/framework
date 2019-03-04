@@ -28,7 +28,7 @@ use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Validation\Form\Execution\FormRulesSerializer;
 use Limoncello\Flute\Validation\Form\FormValidator;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
@@ -127,7 +127,7 @@ class FormValidatorTest extends TestCase
             FormRulesSerializer::class,
             $serializer->getData(),
             new ContextStorage($serializer->getBlocks(), $container),
-            (new FormatterFactory())->createFormatter(Validation::NAMESPACE_NAME)
+            (new FormatterFactory())->createFormatter(Messages::NAMESPACE_NAME)
         );
 
         return $validator;

@@ -20,7 +20,7 @@ namespace Limoncello\Tests\Flute\Validation;
 
 use Exception;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Tests\Flute\Data\L10n\FormatterFactory;
 use Limoncello\Tests\Flute\TestCase;
@@ -38,13 +38,17 @@ class JsonApiErrorCollectionTest extends TestCase
      */
     public function testAddIdAndTypeErrors(): void
     {
-        $formatter  = (new FormatterFactory())->createFormatter(Validation::NAMESPACE_NAME);
+        $formatter  = (new FormatterFactory())->createFormatter(Messages::NAMESPACE_NAME);
         $collection = new JsonApiErrorCollection($formatter);
 
         $this->assertCount(0, $collection);
 
-        $collection->addValidationIdError(new Error('id', 'whatever', ErrorCodes::INVALID_VALUE, null));
-        $collection->addValidationTypeError(new Error('id', 'whatever', ErrorCodes::TYPE_MISSING, null));
+        $collection->addValidationIdError(
+            new Error('id', 'whatever', ErrorCodes::INVALID_VALUE, Messages::INVALID_VALUE, [])
+        );
+        $collection->addValidationTypeError(
+            new Error('id', 'whatever', ErrorCodes::TYPE_MISSING, Messages::TYPE_MISSING, [])
+        );
 
         $this->assertCount(2, $collection);
         $errors = $collection->getArrayCopy();

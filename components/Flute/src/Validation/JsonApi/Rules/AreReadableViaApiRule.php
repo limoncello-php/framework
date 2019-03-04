@@ -21,6 +21,7 @@ namespace Limoncello\Flute\Validation\JsonApi\Rules;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Rules\ExecuteRule;
 use Psr\Container\ContainerExceptionInterface;
@@ -85,6 +86,12 @@ final class AreReadableViaApiRule extends ExecuteRule
 
         return $result === true ?
             static::createSuccessReply($values) :
-            static::createErrorReply($context, $values, ErrorCodes::EXIST_IN_DATABASE_MULTIPLE);
+            static::createErrorReply(
+                $context,
+                $values,
+                ErrorCodes::EXIST_IN_DATABASE_MULTIPLE,
+                Messages::EXIST_IN_DATABASE_MULTIPLE,
+                []
+            );
     }
 }

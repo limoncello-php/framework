@@ -19,6 +19,7 @@ namespace Limoncello\Flute\Validation\JsonApi\Rules;
  */
 
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Rules\ExecuteRule;
 
@@ -74,7 +75,13 @@ final class ToManyRelationshipTypeCheckerRule extends ExecuteRule
 
         $reply = $foundInvalidType === null ?
             static::createSuccessReply($indexes) :
-            static::createErrorReply($context, $foundInvalidType, ErrorCodes::INVALID_RELATIONSHIP_TYPE);
+            static::createErrorReply(
+                $context,
+                $foundInvalidType,
+                ErrorCodes::INVALID_RELATIONSHIP_TYPE,
+                Messages::INVALID_RELATIONSHIP_TYPE,
+                []
+            );
 
         return $reply;
     }

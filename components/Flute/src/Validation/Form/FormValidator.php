@@ -23,7 +23,7 @@ use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\FormRulesSerializerInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
@@ -127,8 +127,7 @@ class FormValidator extends BaseValidator implements FormValidatorInterface
         $formatter = $this->getMessageFormatter();
         foreach ($this->getErrors() as $error) {
             /** @var ErrorInterface $error */
-            $defMsg  = Validation::convertCodeToDefaultMessage($error->getMessageCode());
-            $message = $formatter->formatMessage($defMsg, $error->getMessageContext() ?? []);
+            $message = $formatter->formatMessage($error->getMessageTemplate(), $error->getMessageParameters());
 
             yield $error->getParameterName() => $message;
         }
@@ -224,7 +223,9 @@ class FormValidator extends BaseValidator implements FormValidatorInterface
             if (($index = $this->getAttributeIndex($name)) !== null) {
                 $this->executeBlock($value, $index);
             } else {
-                $this->getErrorAggregator()->add(new Error($name, $value, ErrorCodes::INVALID_VALUE, null));
+                $this->getErrorAggregator()->add(
+                    new Error($name, $value, ErrorCodes::INVALID_VALUE, Messages::INVALID_VALUE, [])
+                );
             }
         }
 

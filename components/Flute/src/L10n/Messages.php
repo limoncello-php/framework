@@ -21,10 +21,10 @@ namespace Limoncello\Flute\L10n;
 /**
  * @package Limoncello\Flute
  */
-interface Messages
+interface Messages extends \Limoncello\Validation\I18n\Messages
 {
     /** @var string Namespace name for message keys. */
-    const NAMESPACE_NAME = 'Limoncello.Flute.Messages';
+    const NAMESPACE_NAME = 'Limoncello.Flute';
 
     /** Message id */
     const MSG_ERR_INVALID_ARGUMENT = 'Invalid argument.';
@@ -38,4 +38,36 @@ interface Messages
     /** Message id */
     const MSG_ERR_CANNOT_UPDATE_WITH_UNIQUE_CONSTRAINT_VIOLATION =
         'Cannot update resource because unique constraint violated.';
+
+    /** @var string Validation Message Template */
+
+    /** @var string Validation Message Template */
+    const TYPE_MISSING = 'JSON API type should be specified.';
+
+    /** @var string Validation Message Template */
+    const INVALID_ATTRIBUTES = 'JSON API attributes are invalid.';
+
+    /** @var string Validation Message Template */
+    const UNKNOWN_ATTRIBUTE = 'Unknown JSON API attribute.';
+
+    /** @var string Validation Message Template */
+    const INVALID_RELATIONSHIP_TYPE = 'The value should be a valid JSON API relationship type.';
+
+    /** @var string Validation Message Template */
+    const INVALID_RELATIONSHIP = 'Invalid JSON API relationship.';
+
+    /** @var string Validation Message Template */
+    const UNKNOWN_RELATIONSHIP = 'Unknown JSON API relationship.';
+
+    /** @var string Validation Message Template */
+    const EXIST_IN_DATABASE_SINGLE = 'The value should be a valid identifier.';
+
+    /** @var string Validation Message Template */
+    const EXIST_IN_DATABASE_MULTIPLE = 'The value should be valid identifiers.';
+
+    /** @var string Validation Message Template */
+    const UNIQUE_IN_DATABASE_SINGLE = 'The value should be a unique identifier.';
+
+    /** @var string Validation Message Template */
+    const INVALID_OPERATION_ARGUMENTS = 'Invalid Operation Arguments.';
 }

@@ -21,7 +21,7 @@ namespace Limoncello\Tests\Flute\Http\Query;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiQueryRulesSerializer;
 use Limoncello\Flute\Validation\JsonApi\QueryParser;
@@ -526,7 +526,7 @@ class QueryParserTest extends TestCase
             new ContextStorage($blocks, $container),
             new CaptureAggregator(),
             new ErrorAggregator(),
-            new JsonApiErrorCollection($formatterFactory->createFormatter(Validation::NAMESPACE_NAME)),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(Messages::NAMESPACE_NAME)),
             $formatterFactory
         );
 

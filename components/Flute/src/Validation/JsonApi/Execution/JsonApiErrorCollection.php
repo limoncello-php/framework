@@ -19,9 +19,8 @@ namespace Limoncello\Flute\Validation\JsonApi\Execution;
  */
 
 use Limoncello\Contracts\L10n\FormatterInterface;
-use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Http\JsonApiResponse;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Neomerx\JsonApi\Schema\ErrorCollection;
 
@@ -110,8 +109,7 @@ class JsonApiErrorCollection extends ErrorCollection
      */
     private function getInvalidValueMessage(): string
     {
-        $defaultMessage = Validation::convertCodeToDefaultMessage(ErrorCodes::INVALID_VALUE);
-        $message        = $this->getMessageFormatter()->formatMessage($defaultMessage);
+        $message = $this->getMessageFormatter()->formatMessage(Messages::INVALID_VALUE);
 
         return $message;
     }
@@ -123,10 +121,8 @@ class JsonApiErrorCollection extends ErrorCollection
      */
     private function getValidationMessage(ErrorInterface $error): string
     {
-        $context        = $error->getMessageContext();
-        $args           = $context === null ? [] : $context;
-        $defaultMessage = Validation::convertCodeToDefaultMessage($error->getMessageCode());
-        $message        = $this->getMessageFormatter()->formatMessage($defaultMessage, $args);
+        $message = $this->getMessageFormatter()
+            ->formatMessage($error->getMessageTemplate(), $error->getMessageParameters());
 
         return $message;
     }

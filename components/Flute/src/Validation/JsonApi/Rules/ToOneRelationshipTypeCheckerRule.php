@@ -19,6 +19,7 @@ namespace Limoncello\Flute\Validation\JsonApi\Rules;
  */
 
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Rules\ExecuteRule;
 
@@ -65,7 +66,13 @@ final class ToOneRelationshipTypeCheckerRule extends ExecuteRule
         $expectedType = $context->getProperties()->getProperty(static::PROPERTY_RESOURCE_TYPE);
         $reply        = $type === $expectedType ?
             static::createSuccessReply($index) :
-            static::createErrorReply($context, $type, ErrorCodes::INVALID_RELATIONSHIP_TYPE);
+            static::createErrorReply(
+                $context,
+                $type,
+                ErrorCodes::INVALID_RELATIONSHIP_TYPE,
+                Messages::INVALID_RELATIONSHIP_TYPE,
+                []
+            );
 
         return $reply;
     }

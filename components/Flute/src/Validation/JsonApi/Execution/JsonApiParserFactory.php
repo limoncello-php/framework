@@ -24,7 +24,7 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiParserFactoryInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Flute\Validation\JsonApi\DataParser;
 use Limoncello\Flute\Validation\JsonApi\QueryParser;
@@ -68,7 +68,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
             JsonApiDataRulesSerializer::class,
             $serializedData,
             new ContextStorage(JsonApiQueryRulesSerializer::readBlocks($serializedData), $this->getContainer()),
-            new JsonApiErrorCollection($formatterFactory->createFormatter(Validation::NAMESPACE_NAME)),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(Messages::NAMESPACE_NAME)),
             $this->getContainer()->get(FormatterFactoryInterface::class)
         );
 
@@ -93,7 +93,7 @@ class JsonApiParserFactory implements JsonApiParserFactoryInterface
             new ContextStorage(JsonApiQueryRulesSerializer::readBlocks($serializedData), $this->getContainer()),
             new CaptureAggregator(),
             new ErrorAggregator(),
-            new JsonApiErrorCollection($formatterFactory->createFormatter(Validation::NAMESPACE_NAME)),
+            new JsonApiErrorCollection($formatterFactory->createFormatter(Messages::NAMESPACE_NAME)),
             $this->getContainer()->get(FormatterFactoryInterface::class)
         );
 

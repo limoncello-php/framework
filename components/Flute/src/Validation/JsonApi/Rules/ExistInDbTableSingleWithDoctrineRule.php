@@ -20,6 +20,7 @@ namespace Limoncello\Flute\Validation\JsonApi\Rules;
 
 use Doctrine\DBAL\Connection;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Rules\ExecuteRule;
 use Psr\Container\ContainerExceptionInterface;
@@ -85,7 +86,13 @@ final class ExistInDbTableSingleWithDoctrineRule extends ExecuteRule
 
         $reply = $count > 0 ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, ErrorCodes::EXIST_IN_DATABASE_SINGLE);
+            static::createErrorReply(
+                $context,
+                $value,
+                ErrorCodes::EXIST_IN_DATABASE_SINGLE,
+                Messages::EXIST_IN_DATABASE_SINGLE,
+                []
+            );
 
         return $reply;
     }

@@ -29,7 +29,7 @@ use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Flute\Contracts\Schema\JsonSchemasInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
 use Limoncello\Flute\Factory;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Types\DateTime;
 use Limoncello\Flute\Validation\JsonApi\DataParser;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiDataRulesSerializer;
@@ -959,7 +959,7 @@ EOT;
                 JsonApiDataRulesSerializer::class,
                 $serializedData,
                 new ContextStorage($blocks, $container),
-                new JsonApiErrorCollection($formatterFactory->createFormatter(Validation::NAMESPACE_NAME)),
+                new JsonApiErrorCollection($formatterFactory->createFormatter(Messages::NAMESPACE_NAME)),
                 $container->get(FormatterFactoryInterface::class)
             );
         } catch (Exception | NotFoundExceptionInterface | ContainerExceptionInterface $exception) {

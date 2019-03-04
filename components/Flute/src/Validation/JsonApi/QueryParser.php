@@ -25,7 +25,7 @@ use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesSerializerInterface;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
-use Limoncello\Flute\L10n\Validation;
+use Limoncello\Flute\L10n\Messages;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiErrorCollection;
 use Limoncello\Validation\Contracts\Captures\CaptureAggregatorInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorAggregatorInterface;
@@ -455,7 +455,7 @@ class QueryParser implements JsonApiQueryParserInterface
     protected function getFormatter(): FormatterInterface
     {
         if ($this->formatter === null) {
-            $this->formatter = $this->getFormatterFactory()->createFormatter(Validation::NAMESPACE_NAME);
+            $this->formatter = $this->getFormatterFactory()->createFormatter(Messages::NAMESPACE_NAME);
         }
 
         return $this->formatter;
@@ -526,7 +526,13 @@ class QueryParser implements JsonApiQueryParserInterface
                 if (array_key_exists($field, $mainIndexes) === false) {
                     // unknown field set type
                     $this->getValidationErrors()->add(
-                        new ValidationError(static::PARAM_FILTER, $field, ErrorCodes::INVALID_VALUE, null)
+                        new ValidationError(
+                            static::PARAM_FILTER,
+                            $field,
+                            ErrorCodes::INVALID_VALUE,
+                            Messages::INVALID_VALUE,
+                            []
+                        )
                     );
                 } else {
                     // for field a validation rule is defined so input value will be validated
@@ -567,7 +573,13 @@ class QueryParser implements JsonApiQueryParserInterface
                 } else {
                     // unknown field set type
                     $this->getValidationErrors()->add(
-                        new ValidationError(static::PARAM_FIELDS, $type, ErrorCodes::INVALID_VALUE, null)
+                        new ValidationError(
+                            static::PARAM_FIELDS,
+                            $type,
+                            ErrorCodes::INVALID_VALUE,
+                            Messages::INVALID_VALUE,
+                            []
+                        )
                     );
                 }
             }
@@ -1017,8 +1029,7 @@ class QueryParser implements JsonApiQueryParserInterface
             if (is_string($operationName) === false || empty($operationName) === true ||
                 is_string($arguments) === false
             ) {
-                $defMsg = Validation::convertCodeToDefaultMessage(ErrorCodes::INVALID_OPERATION_ARGUMENTS);
-                $title  = $this->getFormatter()->formatMessage($defMsg);
+                $title  = $this->getFormatter()->formatMessage(Messages::INVALID_OPERATION_ARGUMENTS);
                 $error  = $this->createQueryError($parameterName, $title);
                 throw new InvalidQueryParametersException($error);
             }
