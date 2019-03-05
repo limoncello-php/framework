@@ -1198,6 +1198,62 @@ EOT;
      * @throws NotFoundExceptionInterface
      * @throws DBALException
      */
+    public function testAddInRelationshipInvalidId(): void
+    {
+        $intTable     = CommentEmotion::TABLE_NAME;
+        $intCommentFk = CommentEmotion::FIELD_ID_COMMENT;
+        $intEmotionFk = CommentEmotion::FIELD_ID_EMOTION;
+
+        $container = $this->createContainer();
+        /** @var Connection $connection */
+        $connection = $container->get(Connection::class);
+
+        $commentId = 1;
+        $emotionId = 123456;
+        // check the item is in the database
+        $this->assertEmpty($connection->executeQuery(
+            "SELECT * FROM $intTable WHERE $intCommentFk = $commentId AND $intEmotionFk = $emotionId"
+        )->fetchAll());
+
+        $routeParams = [
+            ApiCommentsControllerApi::ROUTE_KEY_INDEX => $commentId,
+        ];
+
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        $uri     = "http://localhost.local/posts/$commentId/relationships/emotions";
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri($uri));
+
+        $requestBody = <<<EOT
+        {
+            "data": [
+                { "type": "emotions", "id": "$emotionId" }
+            ]
+        }
+EOT;
+        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($requestBody);
+
+        /** @var ServerRequestInterface $request */
+
+        $exception = null;
+        try {
+            $this->assertNotNull(ApiCommentsControllerApi::addEmotions($routeParams, $container, $request));
+        } catch (JsonApiException $exception) {
+        }
+        $this->assertNotNull($exception);
+        $this->assertCount(1, $exception->getErrors());
+        $error = $exception->getErrors()->getArrayCopy()[0];
+        $this->assertEquals(['pointer' => '/data/relationships/emotions-relationship'], $error->getSource());
+    }
+
+    /**
+     * Controller test.
+     *
+     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws DBALException
+     */
     public function testDeleteInRelationship(): void
     {
         $intTable     = CommentEmotion::TABLE_NAME;
@@ -1301,6 +1357,63 @@ EOT;
             $post = $connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $postId")->fetch()
         );
         $this->assertEquals($newEditorId, $post[Post::FIELD_ID_EDITOR]);
+    }
+
+    /**
+     * Controller test.
+     *
+     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws DBALException
+     */
+    public function testReplaceInRelationshipInvalidId(): void
+    {
+        $tableName = Post::TABLE_NAME;
+        $idColumn  = Post::FIELD_ID;
+
+        $container = $this->createContainer();
+        /** @var Connection $connection */
+        $connection = $container->get(Connection::class);
+
+        // add comment to update
+        $postId      = 2;
+        $newEditorId = 1;
+
+        // check old editor value do not match the new one
+        $this->assertNotEmpty(
+            $post = $connection->executeQuery("SELECT * FROM $tableName WHERE $idColumn = $postId")->fetch()
+        );
+        $this->assertNotEquals($newEditorId, $post[Post::FIELD_ID_EDITOR]);
+
+        $routeParams = [
+            ApiCommentsControllerApi::ROUTE_KEY_INDEX => $postId,
+        ];
+
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        $uri     = "http://localhost.local/posts/$postId/relationships/editor";
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn(new Uri($uri));
+
+        $requestBody = <<<EOT
+        {
+            "data": { "type": "users-XYZ", "id": "1" }
+        }
+EOT;
+        $request->shouldReceive('getBody')->once()->withNoArgs()->andReturn($requestBody);
+
+        /** @var ServerRequestInterface $request */
+
+        $exception = null;
+        try {
+            $this->assertNotNull(ApiPostsController::replaceEditor($routeParams, $container, $request));
+        } catch (JsonApiException $exception) {
+        }
+        $this->assertNotNull($exception);
+        $this->assertCount(1, $exception->getErrors());
+        $error = $exception->getErrors()->getArrayCopy()[0];
+        $this->assertEquals('The value should be a valid JSON API relationship type.', $error->getDetail());
+        $this->assertEquals(['pointer' => '/data/relationships/editor-relationship'], $error->getSource());
     }
 
     /**
