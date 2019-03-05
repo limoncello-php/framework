@@ -375,6 +375,7 @@ class RulesTest extends TestCase
             'string3'    => v::stringToDateTime(DATE_ATOM),
             'string4'    => v::stringToFloat(),
             'string5'    => v::stringToInt(),
+            'stringCsv'  => v::stringToArray(','),
             'stringArr1' => v::stringArrayToIntArray(),
             'stringArr2' => v::stringArrayToIntArray(),
         ];
@@ -388,6 +389,7 @@ class RulesTest extends TestCase
             'string3'    => $now,
             'string4'    => 5.5,
             'string5'    => 5,
+            'stringCsv'  => '1, 2',
             'stringArr1' => ['1', '2',],
             'stringArr2' => ['3tree',],
         ];
@@ -401,6 +403,7 @@ class RulesTest extends TestCase
             'string3'    => $now,
             'string4'    => 5.5,
             'string5'    => 5,
+            'stringCsv'  => ['1', ' 2'],
             'stringArr1' => [1, 2],
             'stringArr2' => [3],
         ], $captures);
@@ -413,6 +416,7 @@ class RulesTest extends TestCase
             'string3'    => 'not date or date in wrong format',
             'string4'    => [],
             'string5'    => [],
+            'stringCsv'  => 123,
             'stringArr1' => 123,
             'stringArr2' => [new stdClass(),],
         ];
@@ -420,7 +424,7 @@ class RulesTest extends TestCase
         list($captures, $errors) = $this->validateArray($input, $rules);
 
         $this->assertEmpty($captures);
-        $this->assertCount(7, $errors);
+        $this->assertCount(8, $errors);
 
         $this->assertEquals(
             ErrorCodes::IS_BOOL,
@@ -441,6 +445,10 @@ class RulesTest extends TestCase
         $this->assertEquals(
             ErrorCodes::IS_INT,
             $this->findErrorByParamName('string5', $errors)->getMessageCode()
+        );
+        $this->assertEquals(
+            ErrorCodes::IS_STRING,
+            $this->findErrorByParamName('stringCsv', $errors)->getMessageCode()
         );
         $this->assertEquals(
             ErrorCodes::IS_ARRAY,

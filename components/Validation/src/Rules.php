@@ -61,6 +61,7 @@ class Rules
         stringToDateTime as public;
         stringToFloat as public;
         stringToInt as public;
+        stringToArray as public;
         stringArrayToIntArray as public;
     }
 

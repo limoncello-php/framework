@@ -20,6 +20,7 @@ namespace Limoncello\Validation\Validator;
 
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Rules\Converters\StringArrayToIntArray;
+use Limoncello\Validation\Rules\Converters\StringToArray;
 use Limoncello\Validation\Rules\Converters\StringToBool;
 use Limoncello\Validation\Rules\Converters\StringToDateTime;
 use Limoncello\Validation\Rules\Converters\StringToFloat;
@@ -80,5 +81,21 @@ trait Converters
     protected static function stringArrayToIntArray(RuleInterface $next = null): RuleInterface
     {
         return $next === null ? new StringArrayToIntArray() : new AndOperator(new StringArrayToIntArray(), $next);
+    }
+
+    /**
+     * @param string             $delimiter
+     * @param int                $limit
+     * @param RuleInterface|null $next
+     *
+     * @return RuleInterface
+     */
+    protected static function stringToArray(
+        string $delimiter,
+        int $limit = PHP_INT_MAX,
+        RuleInterface $next = null
+    ): RuleInterface {
+        return $next === null ?
+            new StringToArray($delimiter, $limit) : new AndOperator(new StringToArray($delimiter, $limit), $next);
     }
 }
