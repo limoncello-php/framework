@@ -24,25 +24,25 @@ use Limoncello\Contracts\Exceptions\AuthorizationExceptionInterface;
 interface AuthorizationManagerInterface
 {
     /**
-     * @param string          $action
-     * @param string|null     $resourceType
-     * @param string|int|null $resourceIdentity
-     * @param array           $extraParams
+     * @param string      $action
+     * @param string|null $resourceType
+     * @param string|null $resourceIdentity
+     * @param array       $extraParams
      *
      * @return bool
      */
     public function isAllowed(
         string $action,
         string $resourceType = null,
-        $resourceIdentity = null,
+        string $resourceIdentity = null,
         array $extraParams = []
     ): bool;
 
     /**
-     * @param string          $action
-     * @param string|null     $resourceType
-     * @param string|int|null $resourceIdentity
-     * @param array           $extraParams
+     * @param string      $action
+     * @param string|null $resourceType
+     * @param string|null $resourceIdentity
+     * @param array       $extraParams
      *
      * @return void
      *
@@ -51,7 +51,7 @@ interface AuthorizationManagerInterface
     public function authorize(
         string $action,
         string $resourceType = null,
-        $resourceIdentity = null,
+        string $resourceIdentity = null,
         array $extraParams = []
     ): void;
 }

@@ -60,7 +60,7 @@ class AuthorizationManagerTest extends TestCase
     {
         $actionName       = 'some_action';
         $resType          = 'some_type';
-        $resIdentity      = ['some_identity'];
+        $resIdentity      = 'some_identity';
         $resAttributes    = ['attribute_name' => 'value'];
         $resRelationships = ['relationships_name1' => 'value1', 'relationships_name2' => ['value2', 'value3']];
         $container        = new Container();

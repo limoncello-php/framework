@@ -59,7 +59,7 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
     public function isAllowed(
         string $action,
         string $resourceType = null,
-        $resourceIdentity = null,
+        string $resourceIdentity = null,
         array $extraParams = []
     ): bool {
         $request = $this->createRequest($action, $resourceType, $resourceIdentity, $extraParams);
@@ -74,7 +74,7 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
     public function authorize(
         string $action,
         string $resourceType = null,
-        $resourceIdentity = null,
+        string $resourceIdentity = null,
         array $extraParams = []
     ): void {
         if ($this->isAllowed($action, $resourceType, $resourceIdentity, $extraParams) !== true) {
@@ -147,17 +147,17 @@ class AuthorizationManager implements AuthorizationManagerInterface, LoggerAware
     }
 
     /**
-     * @param string                $action
-     * @param string|null           $type
-     * @param string|int|array|null $identity
-     * @param array                 $extraParams
+     * @param string      $action
+     * @param string|null $type
+     * @param string|null $identity
+     * @param array       $extraParams
      *
      * @return RequestInterface
      */
     private function createRequest(
         string $action,
         string $type = null,
-        $identity = null,
+        string $identity = null,
         array $extraParams = []
     ): RequestInterface {
         assert($identity === null || is_string($identity) || is_array($identity) || is_int($identity));
