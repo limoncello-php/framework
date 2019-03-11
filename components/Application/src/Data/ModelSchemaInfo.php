@@ -216,7 +216,10 @@ class ModelSchemaInfo implements ModelSchemaInfoInterface
      */
     public function getAttributeType(string $class, string $name): string
     {
-        assert($this->hasClass($class));
+        assert(
+            $this->hasAttributeType($class, $name),
+            "Type is not defined for attribute `$name` in class `$class`."
+        );
 
         $result = $this->attributeTypes[$class][$name];
 
