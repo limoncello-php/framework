@@ -1,4 +1,6 @@
-<?php namespace App\Data\Migrations;
+<?php declare (strict_types = 1);
+
+namespace App\Data\Migrations;
 
 use App\Data\Models\{%SINGULAR_CC%} as Model;
 use Doctrine\DBAL\DBALException;
@@ -8,7 +10,7 @@ use Limoncello\Data\Migrations\MigrationTrait;
 /**
  * @package App
  */
-class {%PLURAL_CC%}Migration implements MigrationInterface
+final class {%PLURAL_CC%}Migration implements MigrationInterface
 {
     use MigrationTrait;
 

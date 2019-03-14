@@ -1,4 +1,6 @@
-<?php namespace App\Authorization;
+<?php declare (strict_types = 1);
+
+namespace App\Authorization;
 
 //use App\Api\{%PLURAL_CC%}Api;
 //use App\Data\Models\{%SINGULAR_CC%};
@@ -12,7 +14,7 @@ use Psr\Container\NotFoundExceptionInterface;
 /**
  * @package App
  */
-class {%SINGULAR_CC%}Rules implements ResourceAuthorizationRulesInterface
+final class {%SINGULAR_CC%}Rules implements ResourceAuthorizationRulesInterface
 {
     use RulesTrait;
 

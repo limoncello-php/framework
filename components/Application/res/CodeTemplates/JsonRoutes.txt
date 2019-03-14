@@ -1,4 +1,6 @@
-<?php namespace App\Routes;
+<?php declare (strict_types = 1);
+
+namespace App\Routes;
 
 use App\Json\Controllers\{%PLURAL_CC%}Controller;
 use App\Json\Schemas\{%SINGULAR_CC%}Schema;
@@ -12,7 +14,7 @@ use Limoncello\Flute\Package\FluteContainerConfigurator;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class {%SINGULAR_CC%}ApiRoutes implements RoutesConfiguratorInterface
+final class {%SINGULAR_CC%}ApiRoutes implements RoutesConfiguratorInterface
 {
     use FluteRoutesTrait;
 

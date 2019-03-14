@@ -1,4 +1,6 @@
-<?php namespace App\Api;
+<?php declare (strict_types = 1);
+
+namespace App\Api;
 
 use App\Authorization\{%SINGULAR_CC%}Rules;
 use App\Data\Models\{%SINGULAR_CC%} as Model;
@@ -37,7 +39,9 @@ class {%PLURAL_CC%}Api extends BaseApi
 
 //        $attributes = $this->addIterable($attributes, [Model::FIELD_ID_USER => $this->getCurrentUserIdentity()]);
 
-        return parent::create($index, $attributes, $toMany);
+        $index = parent::create($index, $attributes, $toMany);
+
+        return $index;
     }
 
     /**
@@ -49,7 +53,9 @@ class {%PLURAL_CC%}Api extends BaseApi
     {
         $this->authorize({%SINGULAR_CC%}Rules::ACTION_EDIT_{%SINGULAR_UC%}, Schema::TYPE, $index);
 
-        return parent::update($index, $attributes, $toMany);
+        $updated = parent::update($index, $attributes, $toMany);
+
+        return $updated;
     }
 
     /**
@@ -61,7 +67,9 @@ class {%PLURAL_CC%}Api extends BaseApi
     {
         $this->authorize({%SINGULAR_CC%}Rules::ACTION_EDIT_{%SINGULAR_UC%}, Schema::TYPE, $index);
 
-        return parent::remove($index);
+        $removed = parent::remove($index);
+
+        return $removed;
     }
 
     /**

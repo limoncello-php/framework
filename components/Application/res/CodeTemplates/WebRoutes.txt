@@ -1,4 +1,6 @@
-<?php namespace App\Routes;
+<?php declare (strict_types = 1);
+
+namespace App\Routes;
 
 use App\Web\Controllers\{%PLURAL_CC%}Controller;
 use Limoncello\Application\Packages\Application\WhoopsContainerConfigurator;
@@ -11,7 +13,7 @@ use Limoncello\Flute\Http\Traits\FluteRoutesTrait;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class {%SINGULAR_CC%}WebRoutes implements RoutesConfiguratorInterface
+final class {%SINGULAR_CC%}WebRoutes implements RoutesConfiguratorInterface
 {
     use FluteRoutesTrait;
 

@@ -1,4 +1,6 @@
-<?php namespace App\Data\Seeds;
+<?php declare (strict_types = 1);
+
+namespace App\Data\Seeds;
 
 use App\Data\Models\{%SINGULAR_CC%} as Model;
 //use App\Data\Models\User;
@@ -11,10 +13,11 @@ use Psr\Container\ContainerInterface;
 /**
  * @package App
  */
-class {%PLURAL_CC%}Seed implements SeedInterface
+final class {%PLURAL_CC%}Seed implements SeedInterface
 {
     use SeedTrait;
 
+    /** @var int Records to create */
     const NUMBER_OF_RECORDS = 100;
 
     /**
