@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Data\Migrations;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Data\Migrations;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +20,8 @@
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use function array_key_exists;
+use function assert;
 
 /**
  * The type could be used for referring custom database types in table columns.

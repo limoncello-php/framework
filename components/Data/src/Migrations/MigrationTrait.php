@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Data\Migrations;
+<?php declare (strict_types = 1);
+
+namespace Limoncello\Data\Migrations;
 
 /**
- * Copyright 2015-2017 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +30,11 @@ use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\Data\TimestampFields;
 use Limoncello\Data\Contracts\MigrationContextInterface;
 use Psr\Container\ContainerInterface;
+use function array_key_exists;
+use function assert;
+use function call_user_func;
+use function implode;
+use function is_string;
 
 /**
  * @package Limoncello\Data
@@ -374,11 +381,11 @@ trait MigrationTrait
      *
      * @return Closure
      */
-    protected function bool(string $name, $default = null): Closure
+    protected function bool(string $name, bool $default = null): Closure
     {
         return function (Table $table) use ($name, $default) {
             $column = $table->addColumn($name, Type::BOOLEAN)->setNotnull(true);
-            if ($default !== null && is_bool($default) === true) {
+            if ($default !== null) {
                 $column->setDefault($default);
             }
         };
@@ -531,7 +538,7 @@ trait MigrationTrait
     /**
      * @param string $column
      * @param string $referredClass
-     * @param bool   $cascadeDelete
+     * @param string $onDeleteRestriction
      *
      * @return Closure
      *
@@ -540,7 +547,7 @@ trait MigrationTrait
     protected function foreignRelationship(
         string $column,
         string $referredClass,
-        bool $cascadeDelete = false
+        string $onDeleteRestriction = RelationshipRestrictions::RESTRICT
     ): Closure {
         return function (
             Table $table,
@@ -548,7 +555,7 @@ trait MigrationTrait
         ) use (
             $column,
             $referredClass,
-            $cascadeDelete
+            $onDeleteRestriction
         ) {
             $tableName    = $this->getTableNameForClass($referredClass);
             $pkName       = $this->getModelSchemas()->getPrimaryKey($referredClass);
@@ -556,7 +563,14 @@ trait MigrationTrait
             $columnLength = $columnType === Type::STRING ?
                 $this->getModelSchemas()->getAttributeLength($context->getModelClass(), $column) : null;
 
-            $closure = $this->foreignColumn($column, $tableName, $pkName, $columnType, $columnLength, $cascadeDelete);
+            $closure = $this->foreignColumn(
+                $column,
+                $tableName,
+                $pkName,
+                $columnType,
+                $columnLength,
+                $onDeleteRestriction
+            );
 
             return $closure($table, $context);
         };
@@ -565,7 +579,7 @@ trait MigrationTrait
     /**
      * @param string $column
      * @param string $referredClass
-     * @param bool   $cascadeDelete
+     * @param string $onDeleteRestriction
      *
      * @return Closure
      *
@@ -574,7 +588,7 @@ trait MigrationTrait
     protected function nullableForeignRelationship(
         string $column,
         string $referredClass,
-        bool $cascadeDelete = false
+        string $onDeleteRestriction = RelationshipRestrictions::RESTRICT
     ): Closure {
         return function (
             Table $table,
@@ -582,7 +596,7 @@ trait MigrationTrait
         ) use (
             $column,
             $referredClass,
-            $cascadeDelete
+            $onDeleteRestriction
         ) {
             $tableName    = $this->getTableNameForClass($referredClass);
             $pkName       = $this->getModelSchemas()->getPrimaryKey($referredClass);
@@ -591,7 +605,7 @@ trait MigrationTrait
                 $this->getModelSchemas()->getAttributeLength($context->getModelClass(), $column) : null;
 
             $closure = $this
-                ->nullableForeignColumn($column, $tableName, $pkName, $columnType, $columnLength, $cascadeDelete);
+                ->nullableForeignColumn($column, $tableName, $pkName, $columnType, $columnLength, $onDeleteRestriction);
 
             return $closure($table, $context);
         };
@@ -603,7 +617,7 @@ trait MigrationTrait
      * @param string   $foreignKey
      * @param string   $type
      * @param int|null $length
-     * @param bool     $cascadeDelete
+     * @param string   $onDeleteRestriction
      *
      * @return Closure
      *
@@ -615,9 +629,17 @@ trait MigrationTrait
         string $foreignKey,
         string $type,
         ?int $length = null,
-        bool $cascadeDelete = false
+        string $onDeleteRestriction = RelationshipRestrictions::RESTRICT
     ): Closure {
-        return $this->foreignColumnImpl($localKey, $foreignTable, $foreignKey, $type, $length, true, $cascadeDelete);
+        return $this->foreignColumnImpl(
+            $localKey,
+            $foreignTable,
+            $foreignKey,
+            $type,
+            $length,
+            true,
+            $onDeleteRestriction
+        );
     }
 
     /** @noinspection PhpTooManyParametersInspection
@@ -626,7 +648,7 @@ trait MigrationTrait
      * @param string   $foreignKey
      * @param string   $type
      * @param int|null $length
-     * @param bool     $cascadeDelete
+     * @param string   $onDeleteRestriction
      *
      * @return Closure
      *
@@ -638,35 +660,47 @@ trait MigrationTrait
         string $foreignKey,
         string $type,
         ?int $length = null,
-        bool $cascadeDelete = false
+        string $onDeleteRestriction = RelationshipRestrictions::RESTRICT
     ): Closure {
-        return $this->foreignColumnImpl($localKey, $foreignTable, $foreignKey, $type, $length, false, $cascadeDelete);
+        return $this->foreignColumnImpl(
+            $localKey,
+            $foreignTable,
+            $foreignKey,
+            $type,
+            $length,
+            false,
+            $onDeleteRestriction
+        );
     }
 
     /**
      * @param string $name
-     * @param bool   $cascadeDelete
+     * @param string $onDeleteRestriction
      *
      * @return Closure
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected function nullableRelationship(string $name, bool $cascadeDelete = false): Closure
-    {
-        return $this->relationshipImpl($name, false, $cascadeDelete);
+    protected function nullableRelationship(
+        string $name,
+        string $onDeleteRestriction = RelationshipRestrictions::RESTRICT
+    ): Closure {
+        return $this->relationshipImpl($name, false, $onDeleteRestriction);
     }
 
     /**
      * @param string $name
-     * @param bool   $cascadeDelete
+     * @param string $onDeleteRestriction
      *
      * @return Closure
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected function relationship(string $name, bool $cascadeDelete = false): Closure
-    {
-        return $this->relationshipImpl($name, true, $cascadeDelete);
+    protected function relationship(
+        string $name,
+        string $onDeleteRestriction = RelationshipRestrictions::RESTRICT
+    ): Closure {
+        return $this->relationshipImpl($name, true, $onDeleteRestriction);
     }
 
     /**
@@ -748,7 +782,7 @@ trait MigrationTrait
      * @param string   $type
      * @param int|null $length
      * @param bool     $notNullable
-     * @param bool     $cascadeDelete
+     * @param string   $onDeleteRestriction
      *
      * @return Closure
      */
@@ -759,32 +793,36 @@ trait MigrationTrait
         string $type,
         ?int $length,
         bool $notNullable,
-        bool $cascadeDelete
+        string $onDeleteRestriction
     ): Closure {
         return function (Table $table) use (
             $localKey,
             $foreignTable,
             $foreignKey,
             $notNullable,
-            $cascadeDelete,
+            $onDeleteRestriction,
             $type,
             $length
         ) {
-            $options = $cascadeDelete === true ? ['onDelete' => 'CASCADE'] : [];
-            $column  = $table->addColumn($localKey, $type)->setNotnull($notNullable);
+            $column = $table->addColumn($localKey, $type)->setNotnull($notNullable);
             $length === null ? $column->setUnsigned(true) : $column->setLength($length);
-            $table->addForeignKeyConstraint($foreignTable, [$localKey], [$foreignKey], $options);
+            $table->addForeignKeyConstraint(
+                $foreignTable,
+                [$localKey],
+                [$foreignKey],
+                ['onDelete' => $onDeleteRestriction]
+            );
         };
     }
 
     /**
      * @param string $name
      * @param bool   $notNullable
-     * @param bool   $cascadeDelete
+     * @param string $onDeleteRestriction
      *
      * @return Closure
      */
-    private function relationshipImpl(string $name, bool $notNullable, bool $cascadeDelete): Closure
+    private function relationshipImpl(string $name, bool $notNullable, string $onDeleteRestriction): Closure
     {
         return function (
             Table $table,
@@ -792,7 +830,7 @@ trait MigrationTrait
         ) use (
             $name,
             $notNullable,
-            $cascadeDelete
+            $onDeleteRestriction
         ) {
             $modelClass = $context->getModelClass();
 
@@ -825,7 +863,7 @@ trait MigrationTrait
                 $columnType,
                 $columnLength,
                 $notNullable,
-                $cascadeDelete
+                $onDeleteRestriction
             );
 
             return $fkClosure($table);

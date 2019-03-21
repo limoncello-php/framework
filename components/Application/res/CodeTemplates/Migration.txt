@@ -6,6 +6,7 @@ use App\Data\Models\{%SINGULAR_CC%} as Model;
 use Doctrine\DBAL\DBALException;
 use Limoncello\Contracts\Data\MigrationInterface;
 use Limoncello\Data\Migrations\MigrationTrait;
+//use Limoncello\Data\Migrations\RelationshipRestrictions;
 
 /**
  * @package App
@@ -21,11 +22,11 @@ final class {%PLURAL_CC%}Migration implements MigrationInterface
      */
     public function migrate(): void
     {
-//        $isCascadeDelete = true;
+//        $onDeleteRestriction = RelationshipRestrictions::CASCADE;
 
         $this->createTable(Model::class, [
             $this->primaryInt(Model::FIELD_ID),
-//            $this->relationship(Model::REL_OTHER, $isCascadeDelete),
+//            $this->relationship(Model::REL_OTHER, $onDeleteRestriction),
             $this->string(Model::FIELD_TITLE),
             $this->text(Model::FIELD_TEXT),
             $this->timestamps(),

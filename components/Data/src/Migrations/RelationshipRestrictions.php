@@ -1,6 +1,6 @@
 <?php declare (strict_types = 1);
 
-namespace Limoncello\Data\Contracts;
+namespace Limoncello\Data\Migrations;
 
 /**
  * Copyright 2015-2019 info@neomerx.com
@@ -18,20 +18,20 @@ namespace Limoncello\Data\Contracts;
  * limitations under the License.
  */
 
-use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
-
 /**
  * @package Limoncello\Data
  */
-interface MigrationContextInterface
+final class RelationshipRestrictions
 {
-    /**
-     * @return string
-     */
-    public function getModelClass(): string;
+    /** @var string Prevents deletion of a referenced row */
+    public const RESTRICT = 'RESTRICT';
 
-    /**
-     * @return ModelSchemaInfoInterface
-     */
-    public function getModelSchemas(): ModelSchemaInfoInterface;
+    /** @var string Automatically deletes when a referenced row is deleted. */
+    public const CASCADE = 'CASCADE';
+
+    /** @var string Automatically sets to NULL when a referenced row is deleted. */
+    public const SET_NULL = 'SET NULL';
+
+    /** @var string Automatically sets a default value when a referenced row is deleted. */
+    public const SET_DEFAULT = 'SET DEFAULT';
 }
