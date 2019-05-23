@@ -29,6 +29,7 @@ use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Errors\ErrorInterface;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Errors\ErrorAggregator;
+use Limoncello\Validation\Exceptions\UnknownExecutionBlockType;
 use Limoncello\Validation\Execution\BlockInterpreter;
 use Limoncello\Validation\Execution\BlockReplies;
 use Limoncello\Validation\Execution\BlockSerializer;
@@ -388,8 +389,6 @@ class BlockSerializationAndInterpretationTest extends TestCase
 
     /**
      * Test block serializer.
-     *
-     * @expectedException \Limoncello\Validation\Exceptions\UnknownExecutionBlockType
      */
     public function testSerializeUnknownBlockType(): void
     {
@@ -403,6 +402,8 @@ class BlockSerializationAndInterpretationTest extends TestCase
                 return ['whatever'];
             }
         };
+
+        $this->expectException(UnknownExecutionBlockType::class);
 
         (new BlockSerializer())->addBlock($unknownTypeBlock);
     }
