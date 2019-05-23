@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Templates\Package;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Templates\Package;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +23,14 @@ use Limoncello\Contracts\Settings\Packages\TemplatesSettingsInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
+use function assert;
+use function call_user_func;
+use function fnmatch;
+use function glob;
+use function is_string;
+use function iterator_to_array;
+use function realpath;
+use function str_replace;
 
 /**
  * @package Limoncello\Templates
@@ -67,6 +77,8 @@ class TemplatesSettings implements TemplatesSettingsInterface
         $defaults[static::KEY_TEMPLATES_FOLDER] = $realTemplatesFolder;
         $defaults[static::KEY_CACHE_FOLDER]     = $realCacheFolder;
         $defaults[static::KEY_APP_ROOT_FOLDER]  = $realAppRootFolder;
+
+        assert(is_string($templatesFileMask));
 
         return $defaults + [
                 static::KEY_TEMPLATES_LIST => $this->getTemplateNames($realTemplatesFolder, $templatesFileMask),

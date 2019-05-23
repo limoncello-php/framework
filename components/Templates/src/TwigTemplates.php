@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Templates;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Templates;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +20,11 @@
 
 use Limoncello\Contracts\Templates\TemplatesInterface;
 use Limoncello\Templates\Contracts\TemplatesCacheInterface;
-use Twig_Environment;
-use Twig_Error_Loader;
-use Twig_Error_Runtime;
-use Twig_Error_Syntax;
-use Twig_Loader_Filesystem;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Loader\FilesystemLoader;
 
 /**
  * @package Limoncello\Templates
@@ -30,7 +32,7 @@ use Twig_Loader_Filesystem;
 class TwigTemplates implements TemplatesInterface, TemplatesCacheInterface
 {
     /**
-     * @var Twig_Environment
+     * @var Environment
      */
     private $twig;
 
@@ -55,13 +57,13 @@ class TwigTemplates implements TemplatesInterface, TemplatesCacheInterface
             'auto_reload' => $isAutoReload,
         ];
 
-        $this->twig = new Twig_Environment(new Twig_Loader_Filesystem($templatesFolder, $appRootFolder), $options);
+        $this->twig = new Environment(new FilesystemLoader($templatesFolder, $appRootFolder), $options);
     }
 
     /**
-     * @return Twig_Environment
+     * @return Environment
      */
-    public function getTwig(): Twig_Environment
+    public function getTwig(): Environment
     {
         return $this->twig;
     }
@@ -72,9 +74,9 @@ class TwigTemplates implements TemplatesInterface, TemplatesCacheInterface
      *
      * @return string
      *
-     * @throws Twig_Error_Loader
-     * @throws Twig_Error_Syntax
-     * @throws Twig_Error_Runtime
+     * @throws LoaderError
+     * @throws SyntaxError
+     * @throws RuntimeError
      */
     public function render(string $name, array $context = []): string
     {
@@ -84,8 +86,8 @@ class TwigTemplates implements TemplatesInterface, TemplatesCacheInterface
     /**
      * @param string $name
      *
-     * @throws Twig_Error_Loader
-     * @throws Twig_Error_Syntax
+     * @throws LoaderError
+     * @throws SyntaxError
      */
     public function cache(string $name): void
     {
