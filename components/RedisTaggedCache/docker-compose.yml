@@ -1,0 +1,47 @@
+# Usefull links
+# =============
+# https://hub.docker.com/_/php/
+# https://docs.docker.com/compose/overview/
+# https://docs.docker.com/compose/compose-file/
+
+version: '3.7'
+
+services:
+  cli_7_1_php:
+    build: ./../../docker/7_1_cli
+    container_name: cli_7_1_php_limoncello
+    volumes:
+      - .:/app
+    working_dir: /app
+    tty: true
+
+  cli_7_2_php:
+    build: ./../../docker/7_2_cli
+    container_name: cli_7_2_php_limoncello
+    volumes:
+      - .:/app
+    working_dir: /app
+    tty: true
+
+  cli_7_3_php:
+    build: ./../../docker/7_3_cli
+    container_name: cli_7_3_php_limoncello
+    volumes:
+      - .:/app
+    working_dir: /app
+    tty: true
+
+  cli_hhvm:
+    image: hhvm/hhvm
+    container_name: cli_hhvm_limoncello
+    volumes:
+      - .:/app
+    working_dir: /app
+    tty: true
+
+  redis:
+    image: redis:alpine
+    container_name: redis_limoncello_tagged_cache
+    ports:
+      - target: 6379
+        published: 6379
