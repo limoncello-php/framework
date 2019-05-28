@@ -9,3 +9,19 @@ Splitting out the project components is done with [git split](https://github.com
 - Run one of the split scripts.
 - Submit the component to [packagist.org](https://packagist.org/).
 - Add a hook on github to packagist.org, set up github wiki, issues, and etc.
+
+#### How to publish new rolling release
+
+Remove a tag for the rolling release
+
+```bash
+$ git push origin :refs/tags/0.10.0
+```
+
+Go to project releases page on github and start editing the release. When done click "Publish release" button. 
+
+Run publish script "with-tags"
+
+```bash
+$ ./split-with-tags.sh
+```
