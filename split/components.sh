@@ -17,6 +17,7 @@ COMPONENTS=(
     'components/L10n/:git@github.com:limoncello-php-dist/l10n.git'
     'components/OAuthServer/:git@github.com:limoncello-php-dist/oauth-server.git'
     'components/Passport/:git@github.com:limoncello-php-dist/passport.git'
+    'components/RedisTaggedCache/:git@github.com:limoncello-php-dist/redis-tagged-cache.git'
     'components/Templates/:git@github.com:limoncello-php-dist/templates.git'
     'components/Testing/:git@github.com:limoncello-php-dist/testing.git'
     'components/Validation/:git@github.com:limoncello-php-dist/validation.git'
