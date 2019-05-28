@@ -22,6 +22,7 @@ use Limoncello\RedisTaggedCache\Exceptions\RedisTaggedCacheException;
 use Limoncello\RedisTaggedCache\Scripts\RedisTaggedScripts;
 use Redis;
 use RuntimeException;
+use function array_values;
 use function assert;
 use function json_encode;
 
@@ -74,7 +75,9 @@ trait RedisTaggedCacheTrait
      */
     public function addTaggedValue(string $key, string $value, array $tags, $ttl = 0): void
     {
-        $jsonTags = json_encode($tags);
+        // if array keys are non-consecutive it will be encoded to object instead of an array.
+        // to be on a safe side we gonna use `array_values`
+        $jsonTags = json_encode(array_values($tags));
         $isOk     = $this->evalScript(
             RedisTaggedScripts::ADD_VALUE_SCRIPT_INDEX,
             [$key, $value, $jsonTags, $this->getInternalKeysPrefix(), $this->getInternalTagsPrefix(), $ttl],
