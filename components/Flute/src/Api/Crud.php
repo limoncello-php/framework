@@ -1825,6 +1825,9 @@ class Crud implements CrudInterface
                     list ($queryOffset, $queryLimit) = $this->getRelationshipPagingStrategy()
                         ->getParameters($rootClass, $parentClass, $parentsPath, $name);
                     $builder->setFirstResult($queryOffset)->setMaxResults($queryLimit + 1);
+                    // pagination requires predictable data order from the database so we are adding sorting by PK asc
+                    $targetPkName = $this->getModelSchemas()->getPrimaryKey($targetModelClass);
+                    $builder->addSorts([$targetPkName => true]);
                     foreach ($parents as $parent) {
                         $clonedBuilder = (clone $builder)->addRelationshipFiltersAndSorts(
                             $reverseRelName,

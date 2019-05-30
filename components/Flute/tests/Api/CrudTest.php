@@ -537,11 +537,22 @@ class CrudTest extends TestCase
 
         $this->assertNotEmpty($data->getData());
         $this->assertCount($pagingSize, $data->getData());
-        $this->assertEquals(20, $data->getData()[0]->{Post::FIELD_ID});
+        $this->assertTrue(($firstPost = $data->getData()[0]) instanceof Post);
+        $this->assertEquals(20, $firstPost->{Post::FIELD_ID});
         $this->assertEquals(9, $data->getData()[1]->{Post::FIELD_ID});
         $this->assertTrue($data->isCollection());
         $this->assertEquals($pagingOffset, $data->getOffset());
         $this->assertEquals($pagingSize, $data->getLimit());
+
+        // make sure that `comments` and `comments -> emotions` are sorted.
+        $this->assertCount(3, $comments = $firstPost->{Post::REL_COMMENTS}->getData());
+        $this->assertEquals(27, $comments[0]->{Comment::FIELD_ID});
+        $this->assertEquals(39, $comments[1]->{Comment::FIELD_ID});
+        $this->assertEquals(49, $comments[2]->{Comment::FIELD_ID});
+        $this->assertCount(3, $emotions = $comments[1]->{Comment::REL_EMOTIONS}->getData());
+        $this->assertEquals(3, $emotions[0]->{Emotion::FIELD_ID});
+        $this->assertEquals(4, $emotions[1]->{Emotion::FIELD_ID});
+        $this->assertEquals(5, $emotions[2]->{Emotion::FIELD_ID});
     }
 
     /**
