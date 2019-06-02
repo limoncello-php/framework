@@ -31,6 +31,14 @@ use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Flute\Contracts\Http\Query\FilterParameterInterface;
 use Limoncello\Flute\Exceptions\InvalidArgumentException;
 use PDO;
+use function assert;
+use function call_user_func;
+use function is_array;
+use function is_bool;
+use function is_callable;
+use function is_int;
+use function is_iterable;
+use function is_string;
 
 /**
  * @package Limoncello\Flute
@@ -127,6 +135,8 @@ class ModelQueryBuilder extends QueryBuilder
      * @param string|null $modelClass
      *
      * @return array
+     *
+     * @throws DBALException
      */
     public function getModelColumns(string $tableAlias = null, string $modelClass = null): array
     {
@@ -142,9 +152,13 @@ class ModelQueryBuilder extends QueryBuilder
         }
 
         $rawColumns = $this->getModelSchemas()->getRawAttributes($modelClass);
-        foreach ($rawColumns as $columnOrCallable) {
-            $quotedColumns[] = is_callable($columnOrCallable) === true ?
-                call_user_func($columnOrCallable, $tableAlias, $this) : $columnOrCallable;
+        if (empty($rawColumns) === false) {
+            $platform = $this->getConnection()->getDatabasePlatform();
+            foreach ($rawColumns as $columnOrCallable) {
+                assert(is_string($columnOrCallable) === true || is_callable($columnOrCallable) === true);
+                $quotedColumns[] = is_callable($columnOrCallable) === true ?
+                    call_user_func($columnOrCallable, $tableAlias, $platform) : $columnOrCallable;
+            }
         }
 
         return $quotedColumns;

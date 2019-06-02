@@ -18,8 +18,8 @@ namespace Limoncello\Tests\Flute\Data\Models;
  * limitations under the License.
  */
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use Limoncello\Flute\Adapters\ModelQueryBuilder;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
 
 /**
@@ -106,11 +106,12 @@ class PostExtended extends Model
     {
         return [
 
-            function (string $tableAlias, ModelQueryBuilder $builder): string {
+            function (string $tableAlias, AbstractPlatform $platform): string {
                 $usersTable = User::TABLE_NAME;
                 $userId     = User::FIELD_ID;
                 $userName   = User::FIELD_FIRST_NAME;
-                $authorId = $builder->quoteDoubleIdentifier($tableAlias, self::FIELD_ID_USER);
+                $authorId   = $platform->quoteSingleIdentifier($tableAlias) . '.' .
+                    $platform->quoteSingleIdentifier(self::FIELD_ID_USER);
 
                 return "(SELECT $userName FROM $usersTable WHERE $userId = $authorId) AS user_name";
             },
