@@ -284,7 +284,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
      */
     protected function hasProperty(ModelInterface $model, string $name): bool
     {
-        $hasRelationship = property_exists($model, $name);
+        $hasRelationship = property_exists($model, $name) || isset($model->{$name});
 
         return $hasRelationship;
     }

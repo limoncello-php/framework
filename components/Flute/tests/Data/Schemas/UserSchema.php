@@ -49,6 +49,9 @@ class UserSchema extends BaseSchema
     /** Attribute name */
     const ATTR_IS_ACTIVE = 'is-active-attribute';
 
+    /** Attribute name */
+    const D_ATTR_FULL_NAME = 'd-full-name-attribute';
+
     /** Relationship name */
     const REL_ROLE = 'role-relationship';
 
@@ -65,15 +68,17 @@ class UserSchema extends BaseSchema
     {
         return [
             self::SCHEMA_ATTRIBUTES => [
-                self::RESOURCE_ID     => Model::FIELD_ID,
-                self::ATTR_TITLE      => Model::FIELD_TITLE,
-                self::ATTR_FIRST_NAME => Model::FIELD_FIRST_NAME,
-                self::ATTR_LAST_NAME  => Model::FIELD_LAST_NAME,
-                self::ATTR_EMAIL      => Model::FIELD_EMAIL,
-                self::ATTR_LANGUAGE   => Model::FIELD_LANGUAGE,
-                self::ATTR_IS_ACTIVE  => Model::FIELD_IS_ACTIVE,
-                self::ATTR_CREATED_AT => Model::FIELD_CREATED_AT,
-                self::ATTR_UPDATED_AT => Model::FIELD_UPDATED_AT,
+                self::RESOURCE_ID      => Model::FIELD_ID,
+                self::ATTR_TITLE       => Model::FIELD_TITLE,
+                self::ATTR_FIRST_NAME  => Model::FIELD_FIRST_NAME,
+                self::ATTR_LAST_NAME   => Model::FIELD_LAST_NAME,
+                self::ATTR_EMAIL       => Model::FIELD_EMAIL,
+                self::ATTR_LANGUAGE    => Model::FIELD_LANGUAGE,
+                self::ATTR_IS_ACTIVE   => Model::FIELD_IS_ACTIVE,
+                self::ATTR_CREATED_AT  => Model::FIELD_CREATED_AT,
+                self::ATTR_UPDATED_AT  => Model::FIELD_UPDATED_AT,
+
+                self::D_ATTR_FULL_NAME => Model::D_FIELD_FULL_NAME,
             ],
             self::SCHEMA_RELATIONSHIPS => [
                 self::REL_ROLE     => Model::REL_ROLE,

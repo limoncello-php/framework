@@ -21,6 +21,7 @@ namespace Limoncello\Tests\Flute\Data\Models;
 use Doctrine\DBAL\Types\Type;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Tests\Flute\Data\Types\SystemDateTimeType;
+use LogicException;
 
 /**
  * @package Limoncello\Tests\Flute
@@ -71,6 +72,9 @@ class User extends Model
 
     /** Field name */
     const FIELD_API_TOKEN = 'api_token';
+
+    /** Field name */
+    const D_FIELD_FULL_NAME = 'd_full_name';
 
     /**
      * @inheritdoc
@@ -125,5 +129,35 @@ class User extends Model
                 self::REL_COMMENTS       => [Comment::class, Comment::FIELD_ID_USER, Comment::REL_USER],
             ],
         ];
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        switch ($name) {
+            case static::D_FIELD_FULL_NAME:
+                return $this->{static::FIELD_FIRST_NAME} . ' ' . $this->{static::FIELD_LAST_NAME};
+            default:
+                throw new LogicException();
+        }
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        switch ($name) {
+            case static::D_FIELD_FULL_NAME:
+                return true;
+            default:
+                return false;
+        }
     }
 }

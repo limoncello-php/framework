@@ -217,6 +217,12 @@ class ControllerTest extends TestCase
 
         // check some fields were filtered out
         $this->assertFalse(isset($resource['data'][0]['relationships'][CommentSchema::REL_EMOTIONS]));
+
+        // check dynamic attribute is present in User
+        $this->assertTrue(isset(
+            $resource[DocumentInterface::KEYWORD_INCLUDED][0]
+                [DocumentInterface::KEYWORD_ATTRIBUTES][UserSchema::D_ATTR_FULL_NAME]
+        ));
     }
 
     /**
