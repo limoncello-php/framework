@@ -30,6 +30,9 @@ use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Schema\BaseSchema;
 use Neomerx\JsonApi\Schema\Identifier;
+use function array_key_exists;
+use function assert;
+use function property_exists;
 
 /**
  * @package Limoncello\Flute
@@ -133,7 +136,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     {
         foreach ($this->getAttributesMapping() as $jsonAttrName => $modelAttrName) {
             if ($this->hasProperty($model, $modelAttrName) === true) {
-                yield $jsonAttrName => $model->{$modelAttrName};
+                yield $jsonAttrName => $this->getProperty($model, $modelAttrName);
             }
         }
     }
@@ -160,7 +163,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
 
             // if relationship is `belongs-to` and has that ID we can add relationship as identifier
             if ($belongsToFkName !== null && $this->hasProperty($model, $belongsToFkName) === true) {
-                $reverseIndex = $model->{$belongsToFkName};
+                $reverseIndex = $this->getProperty($model, $belongsToFkName);
                 $identifier   = $reverseIndex === null ?
                     null : new Identifier((string)$reverseIndex, $reverseType, false, null);
 
@@ -215,7 +218,7 @@ abstract class Schema extends BaseSchema implements SchemaInterface
         string $jsonRelName
     ): array {
         assert($this->hasProperty($model, $modelRelName) === true);
-        $relationshipData = $model->{$modelRelName};
+        $relationshipData = $this->getProperty($model, $modelRelName);
         $isPaginatedData  = $relationshipData instanceof PaginatedDataInterface;
 
         $description = [static::RELATIONSHIP_LINKS_SELF => $this->isAddSelfLinkInRelationshipWithData($jsonRelName)];
@@ -274,6 +277,32 @@ abstract class Schema extends BaseSchema implements SchemaInterface
     }
 
     /**
+     * @param ModelInterface $model
+     * @param string         $name
+     *
+     * @return bool
+     */
+    protected function hasProperty(ModelInterface $model, string $name): bool
+    {
+        $hasRelationship = property_exists($model, $name);
+
+        return $hasRelationship;
+    }
+
+    /**
+     * @param ModelInterface $model
+     * @param string         $name
+     *
+     * @return mixed
+     */
+    protected function getProperty(ModelInterface $model, string $name)
+    {
+        assert($this->hasProperty($model, $name));
+
+        return $model->{$name};
+    }
+
+    /**
      * @return array
      */
     private function getAttributesMapping(): array
@@ -324,25 +353,12 @@ abstract class Schema extends BaseSchema implements SchemaInterface
 
     /**
      * @param ModelInterface $model
-     * @param string         $name
-     *
-     * @return bool
-     */
-    private function hasProperty(ModelInterface $model, string $name): bool
-    {
-        $hasRelationship = property_exists($model, $name);
-
-        return $hasRelationship;
-    }
-
-    /**
-     * @param ModelInterface $model
      * @param string         $jsonRelName
      *
      * @return string
      */
     private function getRelationshipSelfSubUrl(ModelInterface $model, string $jsonRelName): string
     {
-        return $this->getSelfSubUrl($model) . '/relationships/' . $jsonRelName;
+        return $this->getSelfSubUrl($model) . '/' . DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $jsonRelName;
     }
 }
