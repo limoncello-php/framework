@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\ExceptionHandlers;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\ExceptionHandlers;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +33,7 @@ use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\TextResponse;
+use function call_user_func;
 
 /**
  * @package Limoncello\Application

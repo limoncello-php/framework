@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\CoreSettings;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\CoreSettings;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +36,8 @@ use Limoncello\Core\Routing\Dispatcher\GroupCountBased as GroupCountBasedDispatc
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;
 use ReflectionException;
+use function assert;
+use function iterator_to_array;
 
 /**
  * @package Limoncello\Application

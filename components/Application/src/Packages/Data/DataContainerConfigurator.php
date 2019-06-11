@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Packages\Data;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Packages\Data;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +26,9 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use function array_filter;
+use function array_key_exists;
+use function is_array;
 
 /**
  * @package Limoncello\Application

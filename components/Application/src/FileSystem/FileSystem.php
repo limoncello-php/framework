@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\FileSystem;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\FileSystem;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +21,17 @@
 use DirectoryIterator;
 use Limoncello\Application\Exceptions\FileSystemException;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
+use function call_user_func;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function is_dir;
+use function is_writable;
+use function iterator_to_array;
+use function mkdir;
+use function rmdir;
+use function symlink;
+use function unlink;
 
 /**
  * @package Limoncello\Application

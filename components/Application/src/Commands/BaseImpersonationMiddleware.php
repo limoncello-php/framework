@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Commands;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Commands;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +26,11 @@ use Limoncello\Contracts\Passport\PassportAccountInterface;
 use Limoncello\Contracts\Settings\Packages\CommandSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
+use function array_key_exists;
+use function assert;
+use function call_user_func;
+use function is_int;
+use function is_string;
 
 /**
  * @package Limoncello\Application

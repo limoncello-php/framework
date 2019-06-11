@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Authorization;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Authorization;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +24,9 @@ use Limoncello\Contracts\Authentication\AccountManagerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use function assert;
+use function is_array;
+use function is_string;
 
 /**
  * @package Limoncello\Application

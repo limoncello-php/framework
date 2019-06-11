@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Settings;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Settings;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +23,13 @@ use Limoncello\Application\Exceptions\AmbiguousSettingsException;
 use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Contracts\Settings\SettingsProviderInterface;
+use function array_key_exists;
+use function assert;
+use function class_implements;
+use function class_parents;
+use function count;
+use function get_class;
+use function is_subclass_of;
 
 /**
  * @package Limoncello\Application

@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Commands;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Commands;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +29,12 @@ use Limoncello\Contracts\Settings\SettingsProviderInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use function array_merge;
+use function implode;
+use function preg_match;
+use function str_replace;
+use function strtolower;
+use function strtoupper;
 
 /**
  * @package Limoncello\Application

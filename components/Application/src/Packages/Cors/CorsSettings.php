@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Packages\Cors;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Packages\Cors;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +74,7 @@ class CorsSettings implements SettingsInterface
 
         $serverOriginScheme = $appConfig[A::KEY_APP_ORIGIN_SCHEMA];
         $serverOriginHost   = $appConfig[A::KEY_APP_ORIGIN_HOST];
-        $serverOriginPort   = $appConfig[A::KEY_APP_ORIGIN_PORT] ?? null;
+        $serverOriginPort   = $appConfig[A::KEY_APP_ORIGIN_PORT] ? (int)$appConfig[A::KEY_APP_ORIGIN_PORT] : null;
 
         $corsSettings = (new Settings())->init($serverOriginScheme, $serverOriginHost, $serverOriginPort);
 

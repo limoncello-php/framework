@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Settings;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Settings;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +24,7 @@ use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
 use ReflectionException;
+use function array_key_exists;
 
 /**
  * @package Limoncello\Application

@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Packages\Data;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Packages\Data;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +27,12 @@ use Limoncello\Contracts\Settings\Packages\DataSettingsInterface;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionException;
+use function array_key_exists;
+use function array_map;
+use function assert;
+use function file_exists;
+use function glob;
+use function iterator_to_array;
 
 /**
  * @package Limoncello\Application
@@ -108,10 +116,10 @@ abstract class DataSettings implements SettingsInterface, DataSettingsInterface
 
         $registered    = [];
         $modelSchemas  = new ModelSchemaInfo();
-        $registerModel = function ($modelClass) use ($modelSchemas, &$registered, $requireReverseRel) {
+        $registerModel = function (string $modelClass) use ($modelSchemas, &$registered, $requireReverseRel) {
             /** @var ModelInterface $modelClass */
             $modelSchemas->registerClass(
-                $modelClass,
+                (string)$modelClass,
                 $modelClass::getTableName(),
                 $modelClass::getPrimaryKeyName(),
                 $modelClass::getAttributeTypes(),
@@ -124,7 +132,13 @@ abstract class DataSettings implements SettingsInterface, DataSettingsInterface
             if (array_key_exists(RelationshipTypes::BELONGS_TO, $relationships) === true) {
                 foreach ($relationships[RelationshipTypes::BELONGS_TO] as $relName => list($rClass, $fKey, $rRel)) {
                     /** @var string $rClass */
-                    $modelSchemas->registerBelongsToOneRelationship($modelClass, $relName, $fKey, $rClass, $rRel);
+                    $modelSchemas->registerBelongsToOneRelationship(
+                        (string)$modelClass,
+                        $relName,
+                        $fKey,
+                        $rClass,
+                        $rRel
+                    );
                     $registered[(string)$modelClass][$relName] = true;
                     $registered[$rClass][$rRel]                = true;
 

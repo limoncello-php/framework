@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Packages\Csrf;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Packages\Csrf;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +24,11 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionException;
+use function assert;
+use function is_int;
+use function is_null;
+use function is_string;
+use function strtoupper;
 
 /**
  * @package Limoncello\Application

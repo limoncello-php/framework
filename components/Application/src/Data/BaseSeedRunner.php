@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Data;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Data;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +31,9 @@ use Limoncello\Contracts\Data\SeedInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use function array_diff;
+use function assert;
+use function call_user_func;
 
 /**
  * @package Limoncello\Application

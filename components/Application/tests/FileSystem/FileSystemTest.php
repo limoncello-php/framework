@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Application\FileSystem;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Tests\Application\FileSystem;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +83,7 @@ class FileSystemTest extends TestCase
      */
     public function testFileCreateAndDelete(): void
     {
-        $tmpFileName = tempnam(null, null);
+        $tmpFileName = tempnam('', '');
 
         $this->assertTrue($this->fileSystem->exists($tmpFileName));
         $this->fileSystem->delete($tmpFileName);
@@ -100,7 +102,7 @@ class FileSystemTest extends TestCase
      */
     public function testFileDelete(): void
     {
-        $tmpFileName = tempnam(null, null);
+        $tmpFileName = tempnam('', '');
 
         $this->assertTrue($this->fileSystem->exists($tmpFileName));
         $this->fileSystem->delete($tmpFileName);
@@ -158,7 +160,7 @@ class FileSystemTest extends TestCase
     public function testFolderCreateAndDelete(): void
     {
         // we create tmp file, remove it and reuse its name as folder name.
-        $tmpFolderName = tempnam(null, null);
+        $tmpFolderName = tempnam('', '');
         $this->fileSystem->delete($tmpFolderName);
 
         $this->assertFalse($this->fileSystem->exists($tmpFolderName));
@@ -282,11 +284,11 @@ class FileSystemTest extends TestCase
         $contents = 'some content';
 
         // create tmp file with content
-        $tmpFileName = tempnam(null, null);
+        $tmpFileName = tempnam('', '');
         $this->fileSystem->write($tmpFileName, $contents);
 
         // tmp name for symlink
-        $tmpSymlinkName = tempnam(null, null);
+        $tmpSymlinkName = tempnam('', '');
         $this->fileSystem->delete($tmpSymlinkName);
 
         // create symlink and read content

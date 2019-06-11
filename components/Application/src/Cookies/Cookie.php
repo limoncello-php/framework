@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Cookies;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Cookies;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +139,7 @@ class Cookie implements CookieInterface
     public function setExpiresAtUnixTime(int $unixTimestamp): CookieInterface
     {
         if ($unixTimestamp < 0) {
-            throw new InvalidArgumentException($unixTimestamp);
+            throw new InvalidArgumentException('Timestamp cannot be negative.');
         }
 
         $this->expire = $unixTimestamp;

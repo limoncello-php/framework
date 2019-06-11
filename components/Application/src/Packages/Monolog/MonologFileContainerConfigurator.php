@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Packages\Monolog;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Packages\Monolog;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +33,8 @@ use Monolog\Processor\UidProcessor;
 use Monolog\Processor\WebProcessor;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Log\LoggerInterface;
+use function array_key_exists;
+use function assert;
 
 /**
  * @package Limoncello\Application

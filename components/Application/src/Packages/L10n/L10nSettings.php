@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Application\Packages\L10n;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Application\Packages\L10n;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +22,11 @@ use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
 use Limoncello\Contracts\Provider\ProvidesMessageResourcesInterface;
 use Limoncello\Contracts\Settings\Packages\L10nSettingsInterface;
 use Limoncello\l10n\Messages\FileBundleEncoder;
+use function assert;
+use function class_implements;
+use function glob;
+use function in_array;
+use function is_string;
 
 /**
  * @package Limoncello\Application
@@ -41,7 +48,10 @@ abstract class L10nSettings implements L10nSettingsInterface
         $defaults = $this->getSettings();
 
         $defaultLocale = $defaults[static::KEY_DEFAULT_LOCALE] ?? null;
-        assert(empty($defaultLocale) === false, "Invalid default locale `$defaultLocale`.");
+        assert(
+            is_string($defaultLocale) === true && empty($defaultLocale) === false,
+            "Invalid default locale `$defaultLocale`."
+        );
 
         $localesFolder = $defaults[static::KEY_LOCALES_FOLDER] ?? null;
         assert(
@@ -49,10 +59,10 @@ abstract class L10nSettings implements L10nSettingsInterface
             "Invalid Locales folder `$localesFolder`."
         );
 
-        $bundleEncoder = new FileBundleEncoder($this->getMessageDescriptionsFromProviders(), $localesFolder);
+        $bundleEncoder = new FileBundleEncoder($this->getMessageDescriptionsFromProviders(), (string)$localesFolder);
 
         return $defaults + [
-                static::KEY_LOCALES_DATA => $bundleEncoder->getStorageData($defaultLocale),
+                static::KEY_LOCALES_DATA => $bundleEncoder->getStorageData((string)$defaultLocale),
             ];
     }
 
