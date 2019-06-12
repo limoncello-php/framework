@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Common\Reflection;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Tests\Common\Reflection;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +25,7 @@ use Limoncello\Contracts\Routing\RouterInterface;
 use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Tests\Common\TestCase;
 use PHPUnit\Framework\Test;
+use Traversable;
 
 /**
  * @package Limoncello\Tests\Common
@@ -52,63 +55,75 @@ class ClassIsTraitTest extends TestCase
         // test `selectClassImplements` (interface yes/no)
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClassImplements([self::class], Test::class))
+            $this->iterableToArray($this->selectClassImplements([self::class], Test::class))
         );
         $this->assertEquals(
             [],
-            iterator_to_array($this->selectClassImplements([self::class], DateTimeInterface::class))
+            $this->iterableToArray($this->selectClassImplements([self::class], DateTimeInterface::class))
         );
 
         // test `selectClassExtends` (class yes/no)
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClassExtends([self::class], TestCase::class))
+            $this->iterableToArray($this->selectClassExtends([self::class], TestCase::class))
         );
         $this->assertEquals(
             [],
-            iterator_to_array($this->selectClassExtends([self::class], DateTime::class))
+            $this->iterableToArray($this->selectClassExtends([self::class], DateTime::class))
         );
 
         // test `selectClassInherits` (interface yes/no, class yes/no)
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClassInherits([self::class], Test::class))
+            $this->iterableToArray($this->selectClassInherits([self::class], Test::class))
         );
         $this->assertEquals(
             [],
-            iterator_to_array($this->selectClassInherits([self::class], DateTimeInterface::class))
+            $this->iterableToArray($this->selectClassInherits([self::class], DateTimeInterface::class))
         );
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClassInherits([self::class], TestCase::class))
+            $this->iterableToArray($this->selectClassInherits([self::class], TestCase::class))
         );
         $this->assertEquals(
             [],
-            iterator_to_array($this->selectClassInherits([self::class], DateTime::class))
+            $this->iterableToArray($this->selectClassInherits([self::class], DateTime::class))
         );
 
         // test `selectClasses` (interface yes/no, class yes/no)
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClasses(__FILE__, Test::class))
+            $this->iterableToArray($this->selectClasses(__FILE__, Test::class))
         );
         $this->assertEquals(
             [],
-            iterator_to_array($this->selectClasses(__FILE__, DateTimeInterface::class))
+            $this->iterableToArray($this->selectClasses(__FILE__, DateTimeInterface::class))
         );
         $this->assertEquals(
             [self::class],
-            iterator_to_array($this->selectClasses(__FILE__, TestCase::class))
+            $this->iterableToArray($this->selectClasses(__FILE__, TestCase::class))
         );
         $this->assertEquals(
             [],
-            iterator_to_array($this->selectClasses(__FILE__, DateTime::class))
+            $this->iterableToArray($this->selectClasses(__FILE__, DateTime::class))
         );
         $this->assertEquals(
             [],
-            iterator_to_array(
+            $this->iterableToArray(
                 $this->selectClasses(__DIR__ . DIRECTORY_SEPARATOR . 'InvalidInclude.php', DateTime::class)
             )
         );
+    }
+
+    /**
+     * @param iterable $values
+     *
+     * @return array
+     */
+    private function iterableToArray(iterable $values): array
+    {
+        assert($values instanceof Traversable);
+
+        return iterator_to_array($values);
     }
 }
