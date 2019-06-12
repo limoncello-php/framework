@@ -22,6 +22,7 @@ use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\Package\FluteSettings;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Rules as r;
+use function assert;
 
 /**
  * @package Limoncello\Flute

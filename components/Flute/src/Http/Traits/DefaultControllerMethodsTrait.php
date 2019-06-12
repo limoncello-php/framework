@@ -53,6 +53,11 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use function array_key_exists;
+use function assert;
+use function call_user_func;
+use function class_implements;
+use function is_string;
 
 /**
  * @package Limoncello\Flute

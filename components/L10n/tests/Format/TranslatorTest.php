@@ -1,4 +1,6 @@
-<?php namespace Limoncello\Tests\l10n\Format;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Tests\l10n\Format;
 
 /**
  * Copyright 2015-2019 info@neomerx.com

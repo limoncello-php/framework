@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Crypt;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Crypt;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +19,8 @@
  */
 
 use Limoncello\Crypt\Exceptions\CryptException;
+use function assert;
+use function openssl_pkey_get_private;
 
 /**
  * @package Limoncello\Crypt

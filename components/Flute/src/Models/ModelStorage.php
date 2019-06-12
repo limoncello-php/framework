@@ -20,6 +20,7 @@ namespace Limoncello\Flute\Models;
 
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Flute\Contracts\Models\ModelStorageInterface;
+use function get_class;
 
 /**
  * @package Limoncello\Flute

@@ -32,6 +32,7 @@ use Neomerx\JsonApi\Schema\BaseSchema;
 use Neomerx\JsonApi\Schema\Identifier;
 use function array_key_exists;
 use function assert;
+use function http_build_query;
 use function property_exists;
 
 /**

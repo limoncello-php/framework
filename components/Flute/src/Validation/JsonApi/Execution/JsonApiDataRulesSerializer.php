@@ -18,11 +18,15 @@ namespace Limoncello\Flute\Validation\JsonApi\Execution;
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesSerializerInterface;
 use Limoncello\Flute\Validation\Serialize\RulesSerializer;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
+use function array_key_exists;
+use function assert;
+use function is_array;
 
 /**
  * @package Limoncello\Flute
@@ -31,6 +35,8 @@ use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
  */
 class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataRulesSerializerInterface
 {
+    use ClassIsTrait;
+
     /** Serialized indexes key */
     protected const SERIALIZED_RULES = 0;
 
@@ -62,7 +68,7 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
      */
     public function addRulesFromClass(string $rulesClass): JsonApiDataRulesSerializerInterface
     {
-        assert(static::isRulesClass($rulesClass));
+        assert(static::classImplements($rulesClass, JsonApiDataRulesInterface::class));
 
         $name = $rulesClass;
 
@@ -279,17 +285,5 @@ class JsonApiDataRulesSerializer extends RulesSerializer implements JsonApiDataR
         $result = array_key_exists($index, $blocks);
 
         return $result;
-    }
-
-    /**
-     * @param string $rulesClass
-     *
-     * @return bool
-     */
-    private static function isRulesClass(string $rulesClass): bool
-    {
-        return
-            class_exists($rulesClass) === true &&
-            in_array(JsonApiDataRulesInterface::class, class_implements($rulesClass)) === true;
     }
 }

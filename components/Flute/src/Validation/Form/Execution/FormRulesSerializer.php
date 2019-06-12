@@ -18,9 +18,12 @@ namespace Limoncello\Flute\Validation\Form\Execution;
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Flute\Contracts\Validation\FormRulesInterface;
 use Limoncello\Flute\Contracts\Validation\FormRulesSerializerInterface;
 use Limoncello\Flute\Validation\Serialize\RulesSerializer;
+use function array_key_exists;
+use function assert;
 
 /**
  * @package Limoncello\Flute
@@ -29,6 +32,8 @@ use Limoncello\Flute\Validation\Serialize\RulesSerializer;
  */
 class FormRulesSerializer extends RulesSerializer implements FormRulesSerializerInterface
 {
+    use ClassIsTrait;
+
     /**
      * @var array
      */
@@ -45,7 +50,7 @@ class FormRulesSerializer extends RulesSerializer implements FormRulesSerializer
      */
     public function addRulesFromClass(string $rulesClass): FormRulesSerializerInterface
     {
-        assert(static::isRulesClass($rulesClass));
+        assert(static::classImplements($rulesClass, FormRulesInterface::class));
 
         $name = $rulesClass;
 
@@ -129,17 +134,5 @@ class FormRulesSerializer extends RulesSerializer implements FormRulesSerializer
     public static function readRuleEndIndexes(array $ruleIndexes): array
     {
         return parent::getRulesEndIndexes($ruleIndexes);
-    }
-
-    /**
-     * @param string $rulesClass
-     *
-     * @return bool
-     */
-    private static function isRulesClass(string $rulesClass): bool
-    {
-        return
-            class_exists($rulesClass) === true &&
-            in_array(FormRulesInterface::class, class_implements($rulesClass)) === true;
     }
 }

@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Events\Data\Subscribers;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Tests\Events\Data\Subscribers;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +23,7 @@ use Limoncello\Tests\Events\Data\Events\BaseOrderEvent;
 use Limoncello\Tests\Events\Data\Events\OrderCreatedEvent;
 use Limoncello\Tests\Events\Data\Events\OrderEvent;
 use Limoncello\Tests\Events\Data\Events\OrderUpdatedEvent;
+use function assert;
 
 /**
  * @package Limoncello\Tests\Events

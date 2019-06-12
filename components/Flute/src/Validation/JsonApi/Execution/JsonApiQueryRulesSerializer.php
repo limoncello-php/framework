@@ -18,11 +18,15 @@ namespace Limoncello\Flute\Validation\JsonApi\Execution;
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesSerializerInterface;
 use Limoncello\Flute\Validation\Serialize\RulesSerializer;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use function array_key_exists;
+use function assert;
+use function count;
 
 /**
  * @package Limoncello\Flute
@@ -31,6 +35,8 @@ use Limoncello\Validation\Contracts\Rules\RuleInterface;
  */
 class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQueryRulesSerializerInterface
 {
+    use ClassIsTrait;
+
     /**
      * @var array
      */
@@ -71,7 +77,7 @@ class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQuer
      */
     public function addRulesFromClass(string $rulesClass): JsonApiQueryRulesSerializerInterface
     {
-        assert(static::isRulesClass($rulesClass));
+        assert(static::classImplements($rulesClass, JsonApiQueryRulesInterface::class));
 
         $name = $rulesClass;
 
@@ -263,17 +269,5 @@ class JsonApiQueryRulesSerializer extends RulesSerializer implements JsonApiQuer
     public static function readRuleEndIndexes(array $ruleIndexes): array
     {
         return parent::getRulesEndIndexes($ruleIndexes);
-    }
-
-    /**
-     * @param string $rulesClass
-     *
-     * @return bool
-     */
-    private static function isRulesClass(string $rulesClass): bool
-    {
-        return
-            class_exists($rulesClass) === true &&
-            in_array(JsonApiQueryRulesInterface::class, class_implements($rulesClass)) === true;
     }
 }

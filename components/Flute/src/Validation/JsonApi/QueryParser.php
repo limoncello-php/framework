@@ -19,10 +19,12 @@ namespace Limoncello\Flute\Validation\JsonApi;
  */
 
 use Generator;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
+use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesSerializerInterface;
 use Limoncello\Flute\Exceptions\InvalidQueryParametersException;
 use Limoncello\Flute\L10n\Messages;
@@ -36,6 +38,16 @@ use Neomerx\JsonApi\Contracts\Schema\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Http\Query\BaseQueryParserTrait;
 use Neomerx\JsonApi\Schema\Error as JsonApiError;
+use function array_key_exists;
+use function assert;
+use function count;
+use function is_array;
+use function is_int;
+use function is_string;
+use function key;
+use function reset;
+use function strtolower;
+use function trim;
 
 /**
  * @package Limoncello\Flute
@@ -54,6 +66,7 @@ class QueryParser implements JsonApiQueryParserInterface
         BaseQueryParserTrait::getIncludes as getIncludesImpl;
         BaseQueryParserTrait::getSorts as getSortsImpl;
     }
+    use ClassIsTrait;
 
     /** Message */
     public const MSG_ERR_INVALID_PARAMETER = 'Invalid Parameter.';
@@ -187,10 +200,8 @@ class QueryParser implements JsonApiQueryParserInterface
         FormatterFactoryInterface $formatterFactory,
         array $messages = null
     ) {
-        assert(
-            in_array(JsonApiQueryRulesSerializerInterface::class, class_implements($serializerClass)),
-            "`$serializerClass` should implement interface `" . JsonApiQueryRulesSerializerInterface::class . '`.'
-        );
+        assert(static::classImplements($rulesClass, JsonApiQueryRulesInterface::class));
+        assert(static::classImplements($serializerClass, JsonApiQueryRulesSerializerInterface::class));
 
         $parameters = [];
         $this->setParameters($parameters)->setMessages($messages);

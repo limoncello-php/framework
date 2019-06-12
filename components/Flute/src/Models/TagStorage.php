@@ -19,6 +19,8 @@ namespace Limoncello\Flute\Models;
  */
 
 use Limoncello\Flute\Contracts\Models\TagStorageInterface;
+use function array_key_exists;
+use function spl_object_hash;
 
 /**
  * @package Limoncello\Flute

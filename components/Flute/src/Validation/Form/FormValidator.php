@@ -19,6 +19,7 @@ namespace Limoncello\Flute\Validation\Form;
  */
 
 use Generator;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\FormRulesSerializerInterface;
 use Limoncello\Flute\Contracts\Validation\FormValidatorInterface;
@@ -30,6 +31,11 @@ use Limoncello\Validation\Contracts\Execution\ContextStorageInterface;
 use Limoncello\Validation\Errors\Error;
 use Limoncello\Validation\Execution\BlockInterpreter;
 use Limoncello\Validation\Validator\BaseValidator;
+use function array_key_exists;
+use function array_merge;
+use function assert;
+use function is_array;
+use function is_int;
 
 /**
  * @package Limoncello\Flute
@@ -39,6 +45,8 @@ use Limoncello\Validation\Validator\BaseValidator;
  */
 class FormValidator extends BaseValidator implements FormValidatorInterface
 {
+    use ClassIsTrait;
+
     /**
      * It is string though it can be used to access static methods of the interface.
      *
@@ -160,7 +168,7 @@ class FormValidator extends BaseValidator implements FormValidatorInterface
      */
     protected function setSerializer(string $serializerClass): self
     {
-        assert(in_array(FormRulesSerializerInterface::class, class_implements($serializerClass)));
+        assert(static::classImplements($serializerClass, FormRulesSerializerInterface::class));
 
         $this->serializerClass = $serializerClass;
 

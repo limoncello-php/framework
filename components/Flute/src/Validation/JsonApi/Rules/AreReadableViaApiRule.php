@@ -18,6 +18,7 @@ namespace Limoncello\Flute\Validation\JsonApi\Rules;
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Flute\Contracts\Api\CrudInterface;
 use Limoncello\Flute\Contracts\FactoryInterface;
 use Limoncello\Flute\Contracts\Validation\ErrorCodes;
@@ -26,12 +27,17 @@ use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\Rules\ExecuteRule;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use function assert;
+use function count;
+use function is_array;
 
 /**
  * @package Limoncello\Flute
  */
 final class AreReadableViaApiRule extends ExecuteRule
 {
+    use ClassIsTrait;
+
     /**
      * Property key.
      */
@@ -42,10 +48,7 @@ final class AreReadableViaApiRule extends ExecuteRule
      */
     public function __construct(string $apiClass)
     {
-        assert(
-            class_exists($apiClass) === true &&
-            array_key_exists(CrudInterface::class, class_implements($apiClass)) === true
-        );
+        assert(static::classImplements($apiClass, CrudInterface::class));
 
         parent::__construct([
             static::PROPERTY_API_CLASS => $apiClass,

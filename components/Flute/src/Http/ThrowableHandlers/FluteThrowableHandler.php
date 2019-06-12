@@ -19,6 +19,7 @@ namespace Limoncello\Flute\Http\ThrowableHandlers;
  */
 
 use Exception;
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Limoncello\Flute\Contracts\Encoder\EncoderInterface;
@@ -30,6 +31,9 @@ use Neomerx\JsonApi\Schema\ErrorCollection;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Throwable;
+use function array_key_exists;
+use function assert;
+use function get_class;
 
 /**
  * @package Limoncello\Flute
@@ -38,7 +42,7 @@ use Throwable;
  */
 class FluteThrowableHandler implements ThrowableHandlerInterface
 {
-    use LoggerAwareTrait;
+    use LoggerAwareTrait, ClassIsTrait;
 
     /**
      * Those classes will not be logged. Note that classes are expected to be keys but not values.
@@ -83,7 +87,7 @@ class FluteThrowableHandler implements ThrowableHandlerInterface
     ) {
         assert(
             $converterClass === null ||
-            array_key_exists(ConverterInterface::class, class_implements($converterClass)) === true
+            static::classImplements($converterClass, ConverterInterface::class)
         );
 
         $this->doNotLogClassesAsKeys = $noLogClassesAsKeys;

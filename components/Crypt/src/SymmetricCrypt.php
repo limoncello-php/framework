@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Crypt;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Crypt;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +21,15 @@
 use Limoncello\Crypt\Contracts\DecryptInterface;
 use Limoncello\Crypt\Contracts\EncryptInterface;
 use Limoncello\Crypt\Exceptions\CryptException;
+use function assert;
+use function in_array;
+use function openssl_cipher_iv_length;
+use function openssl_decrypt;
+use function openssl_encrypt;
+use function openssl_get_cipher_methods;
+use function openssl_random_pseudo_bytes;
+use function strlen;
+use function substr;
 
 /**
  * @package Limoncello\Crypt

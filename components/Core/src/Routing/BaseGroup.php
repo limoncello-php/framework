@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Core\Routing;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Core\Routing;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +28,8 @@ use Limoncello\Core\Routing\Traits\HasMiddlewareTrait;
 use Limoncello\Core\Routing\Traits\HasRequestFactoryTrait;
 use Limoncello\Core\Routing\Traits\UriTrait;
 use ReflectionException;
+use function array_key_exists;
+use function array_merge;
 
 /**
  * @package Limoncello\Core

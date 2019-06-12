@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Testing;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Testing;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +26,7 @@ use Zend\Diactoros\Stream;
  * @package Limoncello\Testing
  *
  * @@codingStandardsIgnoreLine
- * @method ResponseInterface call(string $method, string $uri, array $queryParams = [], array $parsedBody = [], array $headers = [], array $cookies = [], array $files = [], array $server = [], string $messageBody = 'php://input')
+ * @method ResponseInterface call(string $method, string $uri, array $queryParams = [], array $parsedBody = [], array $headers = [], array $cookies = [], array $files = [], array $server = [], string|StreamInterface $messageBody = 'php://input')
  */
 trait JsonApiCallsTrait
 {

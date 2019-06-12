@@ -47,6 +47,15 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Traversable;
+use function array_key_exists;
+use function asort;
+use function assert;
+use function call_user_func;
+use function get_class;
+use function is_array;
+use function is_int;
+use function is_string;
+use function iterator_to_array;
 
 /**
  * @package Limoncello\Flute

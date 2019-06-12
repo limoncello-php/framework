@@ -23,6 +23,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType as BaseDateTimeType;
 use Exception;
+use function assert;
 
 /**
  * @package Limoncello\Flute

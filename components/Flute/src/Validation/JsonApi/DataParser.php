@@ -18,6 +18,7 @@ namespace Limoncello\Flute\Validation\JsonApi;
  * limitations under the License.
  */
 
+use Limoncello\Common\Reflection\ClassIsTrait;
 use Limoncello\Contracts\L10n\FormatterFactoryInterface;
 use Limoncello\Contracts\L10n\FormatterInterface;
 use Limoncello\Flute\Contracts\Validation\JsonApiDataParserInterface;
@@ -35,6 +36,13 @@ use Limoncello\Validation\Errors\ErrorAggregator;
 use Limoncello\Validation\Execution\BlockInterpreter;
 use Neomerx\JsonApi\Contracts\Schema\DocumentInterface as DI;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use function array_key_exists;
+use function array_merge;
+use function assert;
+use function count;
+use function is_array;
+use function is_int;
+use function is_scalar;
 
 /**
  * @package Limoncello\Flute
@@ -44,7 +52,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
  */
 class DataParser implements JsonApiDataParserInterface
 {
-    use RelationshipRulesTrait;
+    use RelationshipRulesTrait, ClassIsTrait;
 
     /** Rule description index */
     const RULE_INDEX = 0;
@@ -313,10 +321,7 @@ class DataParser implements JsonApiDataParserInterface
      */
     protected function setSerializerClass(string $serializerClass): self
     {
-        assert(
-            class_exists($serializerClass) === true &&
-            in_array(JsonApiDataRulesSerializerInterface::class, class_implements($serializerClass)) === true
-        );
+        assert(static::classImplements($serializerClass, JsonApiDataRulesSerializerInterface::class));
 
         $this->serializerClass = $serializerClass;
 

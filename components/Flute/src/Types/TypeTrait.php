@@ -20,6 +20,7 @@ namespace Limoncello\Flute\Types;
 
 use DateTimeInterface;
 use Doctrine\DBAL\Types\ConversionException;
+use function is_string;
 
 /**
  * @package Limoncello\Flute

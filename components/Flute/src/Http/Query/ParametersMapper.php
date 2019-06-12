@@ -32,6 +32,14 @@ use Limoncello\Flute\Exceptions\LogicException;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\ErrorInterface;
 use Neomerx\JsonApi\Schema\Error;
+use function array_key_exists;
+use function assert;
+use function count;
+use function explode;
+use function get_class;
+use function is_array;
+use function is_bool;
+use function is_string;
 
 /**
  * @package Limoncello\Flute

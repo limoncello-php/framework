@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Core\Routing;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Core\Routing;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +29,10 @@ use Limoncello\Contracts\Routing\RouteInterface;
 use Limoncello\Contracts\Routing\RouterInterface;
 use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
+use function assert;
+use function array_key_exists;
+use function array_merge;
+use function strlen;
 
 /**
  * @package Limoncello\Core

@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\OAuthServer\Data;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Tests\OAuthServer\Data;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +32,14 @@ use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
+use function assert;
+use function array_filter;
+use function array_key_exists;
+use function count;
+use function explode;
+use function implode;
+use function is_string;
+use function substr;
 
 /**
  * @package Limoncello\Tests\OAuthServer
@@ -457,6 +467,7 @@ class SampleServer extends BaseAuthorizationServer
         $client = null;
         if ($clientId !== null) {
             $errorCode = OAuthTokenBodyException::ERROR_INVALID_CLIENT;
+            assert(is_string($clientId));
             if (($client = $this->getRepository()->readClient($clientId)) === null) {
                 throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
             }

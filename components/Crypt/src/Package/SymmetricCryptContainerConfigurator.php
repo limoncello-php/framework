@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Crypt\Package;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Crypt\Package;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +26,7 @@ use Limoncello\Crypt\Contracts\EncryptInterface;
 use Limoncello\Crypt\SymmetricCrypt;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Limoncello\Crypt\Package\SymmetricCryptSettings as C;
+use function array_key_exists;
 
 /**
  * @package Limoncello\Crypt
@@ -45,7 +48,7 @@ class SymmetricCryptContainerConfigurator implements ContainerConfiguratorInterf
                 $settings = $container->get(SettingsProviderInterface::class)->get(C::class);
                 $crypt    = new SymmetricCrypt($settings[C::KEY_METHOD], $settings[C::KEY_PASSWORD]);
 
-                $vector = $settings[C::KEY_IV] ?? null;
+                $vector = $settings[C::KEY_IV] ?? '';
                 empty($vector) === true ?: $crypt->setIV($vector);
 
                 $usePadding = $settings[C::KEY_USE_ZERO_PADDING] ?? false;

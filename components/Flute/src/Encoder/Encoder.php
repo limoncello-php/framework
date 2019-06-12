@@ -25,6 +25,10 @@ use Limoncello\Flute\Contracts\Validation\JsonApiQueryParserInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 use Psr\Http\Message\UriInterface;
+use function array_merge;
+use function assert;
+use function http_build_query;
+use function parse_str;
 
 /**
  * @package Limoncello\Flute

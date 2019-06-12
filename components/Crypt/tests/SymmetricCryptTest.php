@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Crypt;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Tests\Crypt;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,7 +180,8 @@ class SymmetricCryptTest extends TestCase
         $hexVector = 'c3a9bb998b50f41caebf8385fb50869e';
 
         $hexPassword = bin2hex($password);
-        $exec = "openssl enc -$method -d -in $fileName -K $hexPassword -iv $hexVector";
+        $passPadding = str_repeat('0', strlen($hexVector) - strlen($hexPassword));
+        $exec        = "openssl enc -$method -d -in $fileName -K $hexPassword$passPadding -iv $hexVector";
 
         $encoded = exec($exec, $output, $retVal);
 

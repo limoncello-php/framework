@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Container;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Tests\Container;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +19,7 @@
  */
 
 use Limoncello\Container\Container;
+use Limoncello\Container\Exceptions\NotFoundException;
 use Limoncello\Container\Traits\HasContainerTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -41,10 +44,12 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @expectedException \Limoncello\Container\Exceptions\NotFoundException
+     * Test not found.
      */
     public function testNotFound(): void
     {
+        $this->expectException(NotFoundException::class);
+        
         (new Container())->get('non-existing');
     }
 

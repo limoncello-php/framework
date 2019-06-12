@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Events\Package;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Events\Package;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +26,14 @@ use Limoncello\Events\SimpleEventEmitter;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use function assert;
+use function class_exists;
+use function class_implements;
+use function count;
+use function glob;
+use function in_array;
+use function interface_exists;
+use function iterator_to_array;
 
 /**
  * @package Limoncello\Events

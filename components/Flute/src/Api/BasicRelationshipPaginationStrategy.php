@@ -19,6 +19,7 @@ namespace Limoncello\Flute\Api;
  */
 
 use Limoncello\Flute\Contracts\Api\RelationshipPaginationStrategyInterface;
+use function assert;
 
 /**
  * @package Limoncello\Flute

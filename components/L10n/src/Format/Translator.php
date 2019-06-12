@@ -22,6 +22,7 @@ use Limoncello\l10n\Contracts\Format\TranslatorInterface;
 use Limoncello\l10n\Contracts\Messages\BundleStorageInterface;
 use MessageFormatter;
 use function assert;
+use function call_user_func;
 use function is_object;
 use function is_scalar;
 use function method_exists;

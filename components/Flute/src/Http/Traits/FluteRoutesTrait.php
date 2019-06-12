@@ -29,6 +29,11 @@ use Limoncello\Flute\Contracts\Http\Controller\ControllerUpdateInterface;
 use Limoncello\Flute\Contracts\Http\JsonApiControllerInterface as JCI;
 use Limoncello\Flute\Contracts\Http\WebControllerInterface as FCI;
 use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
+use function assert;
+use function class_exists;
+use function class_implements;
+use function in_array;
+use function substr;
 
 /**
  * @package Limoncello\Flute
