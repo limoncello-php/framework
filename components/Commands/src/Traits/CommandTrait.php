@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Commands\Traits;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Commands\Traits;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +29,7 @@ use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function file_exists;
 
 /**
  * @package Limoncello\Commands

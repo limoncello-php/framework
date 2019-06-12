@@ -1,4 +1,6 @@
-<?php namespace App\Commands;
+<?php declare(strict_types=1);
+
+namespace App\Commands;
 
 use Limoncello\Contracts\Commands\CommandInterface;
 use Limoncello\Contracts\Commands\IoInterface;

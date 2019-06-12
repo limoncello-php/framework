@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Commands\Wrappers;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Commands\Wrappers;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +20,8 @@
 
 use Limoncello\Contracts\Commands\CommandInterface;
 use Symfony\Component\Console\Input\InputOption;
+use function assert;
+use function is_string;
 
 /**
  * @package Limoncello\Commands
@@ -84,7 +88,7 @@ class DataOptionWrapper
      */
     public function isNone(): bool
     {
-        return $this->getModeValue() & CommandInterface::OPTION_MODE__NONE > 0;
+        return ($this->getModeValue() & CommandInterface::OPTION_MODE__NONE) > 0;
     }
 
     /**
@@ -92,7 +96,7 @@ class DataOptionWrapper
      */
     public function isRequired(): bool
     {
-        return $this->getModeValue() & CommandInterface::OPTION_MODE__REQUIRED > 0;
+        return ($this->getModeValue() & CommandInterface::OPTION_MODE__REQUIRED) > 0;
     }
 
     /**
@@ -100,7 +104,7 @@ class DataOptionWrapper
      */
     public function isOptional(): bool
     {
-        return $this->getModeValue() & CommandInterface::OPTION_MODE__OPTIONAL > 0;
+        return ($this->getModeValue() & CommandInterface::OPTION_MODE__OPTIONAL) > 0;
     }
 
     /**
@@ -108,7 +112,7 @@ class DataOptionWrapper
      */
     public function isArray(): bool
     {
-        return $this->getModeValue() & CommandInterface::OPTION_MODE__IS_ARRAY > 0;
+        return ($this->getModeValue() & CommandInterface::OPTION_MODE__IS_ARRAY) > 0;
     }
 
     /**

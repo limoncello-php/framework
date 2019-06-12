@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Commands;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Commands;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +35,8 @@ use ReflectionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function assert;
+use function array_key_exists;
 
 /**
  * This is a special command which is immediately available from composer. The main purpose of it is to

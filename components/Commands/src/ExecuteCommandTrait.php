@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Commands;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Commands;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +30,10 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use ReflectionException;
+use function assert;
+use function array_merge;
+use function call_user_func;
+use function count;
 
 /**
  * Code for command execution is separated from the main code to get rid of a dependency from Composer.
