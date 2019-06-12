@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Auth\Authorization\PolicyDecision\Algorithms;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Auth\Authorization\PolicyDecision\Algorithms;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +21,9 @@
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\EvaluationEnum;
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
 use Psr\Log\LoggerInterface;
+use function array_key_exists;
+use function array_merge;
+use function call_user_func;
 
 /**
  * @package Limoncello\Auth

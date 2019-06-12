@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Auth\Authorization\PolicyEnforcement;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Auth\Authorization\PolicyEnforcement;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +25,7 @@ use Limoncello\Auth\Contracts\Authorization\PolicyEnforcement\RequestInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\PolicyInformationPointInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use function call_user_func;
 
 /**
  * @package Limoncello\Auth

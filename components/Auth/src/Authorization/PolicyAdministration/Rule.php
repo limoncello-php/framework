@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Auth\Authorization\PolicyAdministration;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Auth\Authorization\PolicyAdministration;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +23,8 @@ use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\MethodInterface
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\ObligationInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\RuleInterface;
 use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetInterface;
+use function assert;
+use function call_user_func;
 
 /**
  * @package Limoncello\Auth

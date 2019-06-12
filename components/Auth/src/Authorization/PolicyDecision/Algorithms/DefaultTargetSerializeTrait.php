@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Auth\Authorization\PolicyDecision\Algorithms;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Auth\Authorization\PolicyDecision\Algorithms;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +24,11 @@ use Limoncello\Auth\Contracts\Authorization\PolicyAdministration\TargetMatchEnum
 use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use function assert;
+use function array_key_exists;
+use function count;
+use function key;
+use function reset;
 
 /**
  * @package Limoncello\Auth
