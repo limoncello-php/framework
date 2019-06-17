@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Passport\Adaptors\Generic;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Passport\Adaptors\Generic;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +25,8 @@ use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Exceptions\RepositoryException;
 use PDO;
+use function assert;
+use function is_numeric;
 
 /**
  * @package Limoncello\Passport
@@ -174,9 +178,11 @@ class TokenRepository extends \Limoncello\Passport\Repositories\TokenRepository
             $data   = $statement->fetch();
             $result = null;
             if ($data !== false) {
-                $schema                                     = $this->getDatabaseSchema();
-                $tokenId                                    = $data[$schema->getTokensIdentityColumn()];
-                $scopes                                     = $this->readScopeIdentifiers($tokenId);
+                $schema  = $this->getDatabaseSchema();
+                $tokenId = $data[$schema->getTokensIdentityColumn()];
+                assert(is_numeric($tokenId));
+
+                $scopes                                     = $this->readScopeIdentifiers((int)$tokenId);
                 $data[$schema->getTokensViewScopesColumn()] = $scopes;
                 $result                                     = $data;
             }

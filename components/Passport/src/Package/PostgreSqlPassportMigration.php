@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Passport\Package;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Passport\Package;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +24,7 @@ use Limoncello\Contracts\Data\MigrationInterface;
 use Limoncello\Passport\Adaptors\PostgreSql\DatabaseSchemaMigrationTrait;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Psr\Container\ContainerInterface;
+use function assert;
 
 /**
  * @package Limoncello\Passport

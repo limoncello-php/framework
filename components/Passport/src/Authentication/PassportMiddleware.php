@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Passport\Authentication;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Passport\Authentication;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +29,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Zend\Diactoros\Response\EmptyResponse;
+use function assert;
+use function call_user_func;
+use function is_callable;
+use function is_string;
+use function substr;
 
 /**
  * @package Limoncello\Passport

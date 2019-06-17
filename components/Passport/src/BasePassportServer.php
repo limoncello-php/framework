@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Passport;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Passport;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +37,11 @@ use Psr\Log\LoggerAwareTrait;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
+use function array_filter;
+use function assert;
+use function in_array;
+use function is_int;
+use function is_string;
 
 /**
  * @package Limoncello\Passport

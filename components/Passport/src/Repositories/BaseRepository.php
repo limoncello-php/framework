@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Passport\Repositories;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Passport\Repositories;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +29,12 @@ use Exception;
 use Limoncello\Passport\Contracts\Entities\DatabaseSchemaInterface;
 use Limoncello\Passport\Exceptions\RepositoryException;
 use PDO;
+use function assert;
+use function call_user_func;
+use function is_bool;
+use function is_int;
+use function is_numeric;
+use function is_string;
 
 /**
  * @package Limoncello\Passport
@@ -165,13 +173,15 @@ abstract class BaseRepository
     }
 
     /**
-     * @return string
+     * @return int
      */
-    protected function getLastInsertId(): string
+    protected function getLastInsertId(): int
     {
         $lastInsertId = $this->getConnection()->lastInsertId();
 
-        return $lastInsertId;
+        assert(is_numeric($lastInsertId));
+
+        return (int)$lastInsertId;
     }
 
     /**

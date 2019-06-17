@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Passport\Traits;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Passport\Traits;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +22,13 @@ use Limoncello\OAuthServer\Contracts\ClientInterface;
 use Limoncello\OAuthServer\Exceptions\OAuthTokenBodyException;
 use Limoncello\Passport\Contracts\PassportServerIntegrationInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use function array_key_exists;
+use function assert;
+use function base64_decode;
+use function count;
+use function explode;
+use function is_string;
+use function substr;
 
 /**
  * @package Limoncello\Passport
@@ -100,6 +109,7 @@ trait BasicClientAuthenticationTrait
 
         $client = null;
         if ($clientId !== null) {
+            assert(is_string($clientId));
             $errorCode = OAuthTokenBodyException::ERROR_INVALID_CLIENT;
             if (($client = $integration->getClientRepository()->read($clientId)) === null) {
                 throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);
@@ -107,6 +117,7 @@ trait BasicClientAuthenticationTrait
 
             // check credentials
             if ($clientCredentials !== null) {
+                assert(is_string($clientCredentials));
                 // we got the password
                 if ($integration->verifyClientCredentials($client, $clientCredentials) === false) {
                     throw new OAuthTokenBodyException($errorCode, null, 401, $errorHeaders);

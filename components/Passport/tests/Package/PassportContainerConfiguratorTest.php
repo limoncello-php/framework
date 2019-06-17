@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Tests\Passport\Package;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Tests\Passport\Package;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,13 +96,11 @@ class PassportContainerConfiguratorTest extends TestCase
         $this->assertNotNull($container->get(TokenRepositoryInterface::class));
         /** @var PassportServerIntegrationInterface $integration */
         $this->assertNotNull($integration = $container->get(PassportServerIntegrationInterface::class));
-        $this->assertInternalType(
-            'int',
-            $userId = $integration->validateUserId(
-                PassportServerTest::TEST_USER_NAME,
-                PassportServerTest::TEST_USER_PASSWORD
-            )
+        $userId = $integration->validateUserId(
+            PassportServerTest::TEST_USER_NAME,
+            PassportServerTest::TEST_USER_PASSWORD
         );
+        $this->assertTrue(is_int($userId));
         $integration->verifyAllowedUserScope($userId, []);
     }
 
@@ -121,13 +121,11 @@ class PassportContainerConfiguratorTest extends TestCase
         $this->assertNotNull($container->get(TokenRepositoryInterface::class));
         /** @var PassportServerIntegrationInterface $integration */
         $this->assertNotNull($integration = $container->get(PassportServerIntegrationInterface::class));
-        $this->assertInternalType(
-            'int',
-            $userId = $integration->validateUserId(
-                PassportServerTest::TEST_USER_NAME,
-                PassportServerTest::TEST_USER_PASSWORD
-            )
+        $userId = $integration->validateUserId(
+            PassportServerTest::TEST_USER_NAME,
+            PassportServerTest::TEST_USER_PASSWORD
         );
+        $this->assertTrue(is_int($userId));
         $integration->verifyAllowedUserScope($userId, []);
     }
 

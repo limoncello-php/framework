@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Passport\Repositories;
+<?php declare(strict_types=1);
+
+namespace Limoncello\Passport\Repositories;
 
 /**
- * Copyright 2015-2018 info@neomerx.com
+ * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +27,8 @@ use Limoncello\Passport\Contracts\Entities\TokenInterface;
 use Limoncello\Passport\Contracts\Repositories\TokenRepositoryInterface;
 use Limoncello\Passport\Exceptions\RepositoryException;
 use PDO;
+use function assert;
+use function is_int;
 
 /**
  * @package Limoncello\Passport
@@ -316,7 +320,7 @@ abstract class TokenRepository extends BaseRepository implements TokenRepository
         $schema = $this->getDatabaseSchema();
         /** @var TokenInterface[] $tokens */
         $tokens = $this->readEnabledTokensByColumnWithExpirationCheck(
-            $userId,
+            (string)$userId,
             $schema->getTokensUserIdentityColumn(),
             $expirationInSeconds,
             $schema->getTokensValueCreatedAtColumn(),
