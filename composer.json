@@ -29,7 +29,7 @@
         "limoncello-php/l10n": "self.version",
         "limoncello-php/oauth-server": "self.version",
         "limoncello-php/passport": "self.version",
-        "limoncello-php/redis-tagged-cache": "self.version",
+
         "limoncello-php/templates": "self.version",
         "limoncello-php/validation": "self.version"
     },
