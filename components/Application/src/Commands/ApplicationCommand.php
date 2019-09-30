@@ -217,6 +217,7 @@ class ApplicationCommand implements CommandInterface
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.IfStatementAssignment)
      */
     protected function parseCacheCallable($mightBeCallable): array
     {

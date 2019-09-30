@@ -42,6 +42,7 @@ class DataContainerConfigurator implements ContainerConfiguratorInterface
      * @inheritdoc
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.IfStatementAssignment)
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {

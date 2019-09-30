@@ -55,6 +55,8 @@ class FileSettingsProvider extends InstanceSettingsProvider
      * @param string $className
      *
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.IfStatementAssignment)
      */
     private function checkDoNotHaveRequiredParametersOnCreate(string $className): bool
     {

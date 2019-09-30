@@ -31,6 +31,8 @@ use function strtolower;
 
 /**
  * @package Limoncello\Application
+ *
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 class ModelSchemaInfo implements ModelSchemaInfoInterface
 {

@@ -48,6 +48,7 @@ use function reset;
  * @package Limoncello\Application
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 class Application extends \Limoncello\Core\Application\Application
 {
@@ -163,9 +164,10 @@ class Application extends \Limoncello\Core\Application\Application
     /**
      * @return CacheSettingsProviderInterface
      *
-     * @SuppressWarnings(PHPMD.ElseExpression)
-     *
      * @throws ReflectionException
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.IfStatementAssignment)
      */
     private function getCacheSettingsProvider(): CacheSettingsProviderInterface
     {

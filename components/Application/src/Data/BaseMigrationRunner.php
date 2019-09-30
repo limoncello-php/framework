@@ -86,6 +86,8 @@ abstract class BaseMigrationRunner
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.IfStatementAssignment)
      */
     public function migrate(ContainerInterface $container): void
     {
@@ -108,6 +110,8 @@ abstract class BaseMigrationRunner
      * @throws InvalidArgumentException
      * @throws NotFoundExceptionInterface
      * @throws DBALException
+     *
+     * @SuppressWarnings(PHPMD.IfStatementAssignment)
      */
     public function rollback(ContainerInterface $container): void
     {

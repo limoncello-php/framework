@@ -28,6 +28,7 @@ use function session_status;
  * @package Limoncello\Application
  *
  * @SuppressWarnings(PHPMD.Superglobals)
+ * @SuppressWarnings(PHPMD.LongVariable)
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
