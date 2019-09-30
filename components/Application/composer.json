@@ -17,7 +17,7 @@
         "php": ">=7.1.0",
         "filp/whoops": "^2.1",
         "doctrine/dbal": "^2.6.3",
-        "monolog/monolog": "^1.22",
+        "monolog/monolog": "^2.0",
         "neomerx/cors-psr7": "^2.0.0",
         "limoncello-php/contracts": "^0.10.0",
         "limoncello-php/core": "^0.10.0",
