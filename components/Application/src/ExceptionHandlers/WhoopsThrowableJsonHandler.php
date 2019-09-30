@@ -38,7 +38,7 @@ class WhoopsThrowableJsonHandler extends BaseThrowableHandler
      */
     public function createResponse(Throwable $throwable, ContainerInterface $container): ThrowableResponseInterface
     {
-        $message = 'Internal Server Error';
+        $message = '{"error":{"message":"Internal Server Error."}}';
 
         $this->logException($throwable, $container, $message);
 
