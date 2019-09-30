@@ -18,21 +18,11 @@ namespace Limoncello\Application\ExceptionHandlers;
  * limitations under the License.
  */
 
-use Exception;
-use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
-use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
-use Limoncello\Contracts\Exceptions\ThrowableHandlerInterface;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
-use Limoncello\Core\Application\ThrowableResponseTrait;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Psr\Log\LoggerInterface;
 use Throwable;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
-use Zend\Diactoros\Response\HtmlResponse;
-use Zend\Diactoros\Response\TextResponse;
 use function call_user_func;
 
 /**
@@ -40,11 +30,8 @@ use function call_user_func;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class WhoopsThrowableHtmlHandler implements ThrowableHandlerInterface
+class WhoopsThrowableHtmlHandler extends BaseThrowableHandler
 {
-    /** Default HTTP code. */
-    protected const DEFAULT_HTTP_ERROR_CODE = 500;
-
     /**
      * @inheritdoc
      *
@@ -81,7 +68,7 @@ class WhoopsThrowableHtmlHandler implements ThrowableHandlerInterface
             }
 
             $handler->setPageTitle("Whoops! There was a problem with '$appName'.");
-            $run->pushHandler($handler);
+            $run->appendHandler($handler);
 
             $html     = $run->handleException($throwable);
             $response = $this->createThrowableHtmlResponse($throwable, $html, static::DEFAULT_HTTP_ERROR_CODE);
@@ -90,115 +77,5 @@ class WhoopsThrowableHtmlHandler implements ThrowableHandlerInterface
         }
 
         return $response;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return array
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function getSettings(ContainerInterface $container): array
-    {
-        $appConfig = null;
-
-        /** @var CacheSettingsProviderInterface $settingsProvider */
-        if ($container->has(CacheSettingsProviderInterface::class) === true &&
-            ($settingsProvider = $container->get(CacheSettingsProviderInterface::class)) !== null
-        ) {
-            $appConfig = $settingsProvider->getApplicationConfiguration();
-        }
-
-        return [
-            $appConfig[A::KEY_IS_DEBUG] ?? false,
-            $appConfig[A::KEY_APP_NAME] ?? null,
-            $appConfig[A::KEY_EXCEPTION_DUMPER] ?? null,
-        ];
-    }
-
-    /**
-     * @param Throwable          $exception
-     * @param ContainerInterface $container
-     * @param string             $message
-     *
-     * @return void
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function logException(Throwable $exception, ContainerInterface $container, string $message): void
-    {
-        if ($container->has(LoggerInterface::class) === true) {
-            /** @var LoggerInterface $logger */
-            $logger = $container->get(LoggerInterface::class);
-
-            // The sad truth is that when you have a problem logging might not be available (e.g. no permissions
-            // to write on a disk). We can't do much with it and can only hope that the error information will be
-            // delivered to the user other way.
-            try {
-                $logger->critical($message, ['exception' => $exception]);
-            } catch (Exception $secondException) {
-            }
-        }
-    }
-
-    /**
-     * @param Throwable $throwable
-     * @param string    $text
-     * @param int       $status
-     *
-     * @return ThrowableResponseInterface
-     */
-    private function createThrowableTextResponse(
-        Throwable $throwable,
-        string $text,
-        int $status
-    ): ThrowableResponseInterface {
-        return new class ($throwable, $text, $status) extends TextResponse implements ThrowableResponseInterface
-        {
-            use ThrowableResponseTrait;
-
-            /**
-             * @param Throwable $throwable
-             * @param string    $text
-             * @param int       $status
-             */
-            public function __construct(Throwable $throwable, string $text, int $status)
-            {
-                parent::__construct($text, $status);
-                $this->setThrowable($throwable);
-            }
-        };
-    }
-
-    /**
-     * @param Throwable $throwable
-     * @param string    $text
-     * @param int       $status
-     *
-     * @return ThrowableResponseInterface
-     */
-    private function createThrowableHtmlResponse(
-        Throwable $throwable,
-        string $text,
-        int $status
-    ): ThrowableResponseInterface {
-        return new class ($throwable, $text, $status) extends HtmlResponse implements ThrowableResponseInterface
-        {
-            use ThrowableResponseTrait;
-
-            /**
-             * @param Throwable $throwable
-             * @param string    $text
-             * @param int       $status
-             */
-            public function __construct(Throwable $throwable, string $text, int $status)
-            {
-                parent::__construct($text, $status);
-                $this->setThrowable($throwable);
-            }
-        };
     }
 }

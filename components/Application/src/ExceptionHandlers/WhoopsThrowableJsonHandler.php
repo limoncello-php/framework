@@ -21,7 +21,7 @@ namespace Limoncello\Application\ExceptionHandlers;
 use Limoncello\Contracts\Http\ThrowableResponseInterface;
 use Psr\Container\ContainerInterface;
 use Throwable;
-use Whoops\Handler\PlainTextHandler;
+use Whoops\Handler\JsonResponseHandler;
 use Whoops\Run;
 
 /**
@@ -29,7 +29,7 @@ use Whoops\Run;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class WhoopsThrowableTextHandler extends BaseThrowableHandler
+class WhoopsThrowableJsonHandler extends BaseThrowableHandler
 {
     /**
      * @inheritdoc
@@ -57,14 +57,14 @@ class WhoopsThrowableTextHandler extends BaseThrowableHandler
             // as we want just generated output `string` we instruct not to halt
             $run->allowQuit(false);
 
-            $handler = new PlainTextHandler();
+            $handler = new JsonResponseHandler();
             $handler->setException($throwable);
             $run->appendHandler($handler);
 
             $message = $run->handleException($throwable);
         }
 
-        $response = $this->createThrowableTextResponse($throwable, $message, static::DEFAULT_HTTP_ERROR_CODE);
+        $response = $this->createThrowableJsonResponse($throwable, $message, static::DEFAULT_HTTP_ERROR_CODE);
 
         return $response;
     }

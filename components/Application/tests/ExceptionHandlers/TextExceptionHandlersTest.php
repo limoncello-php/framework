@@ -19,6 +19,7 @@ namespace Limoncello\Tests\Application\ExceptionHandlers;
  */
 
 use Exception;
+use Limoncello\Application\ExceptionHandlers\WhoopsThrowableJsonHandler;
 use Limoncello\Application\ExceptionHandlers\WhoopsThrowableTextHandler;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface as A;
@@ -74,6 +75,22 @@ class TextExceptionHandlersTest extends TestCase
         $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
         $this->assertEquals(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
         $this->assertStringStartsWith('Exception:  in file', (string)$response->getBody());
+    }
+
+    /**
+     * Test handler.
+     */
+    public function testDefaultJsonExceptionHandler(): void
+    {
+        $handler = new WhoopsThrowableJsonHandler();
+
+        $response = $handler->createResponse(new Exception('Error for JSON handler'), $this->createContainer(true));
+        $this->assertInstanceOf(ThrowableResponseInterface::class, $response);
+        $this->assertEquals(['application/json'], $response->getHeader('Content-Type'));
+        $this->assertStringStartsWith(
+            '"{\"error\":{\"type\":\"Exception\",\"message\":\"Error for JSON handler\"',
+            json_encode(json_decode((string)$response->getBody()))
+        );
     }
 
     /**
