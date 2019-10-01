@@ -64,7 +64,8 @@ class WhoopsThrowableJsonHandler extends BaseThrowableHandler
             $message = $run->handleException($throwable);
         }
 
-        $response = $this->createThrowableJsonResponse($throwable, $message, static::DEFAULT_HTTP_ERROR_CODE);
+        $status   = $throwable->getCode() > 0 ? $throwable->getCode() : static::DEFAULT_HTTP_ERROR_CODE;
+        $response = $this->createThrowableJsonResponse($throwable, $message, $status);
 
         return $response;
     }

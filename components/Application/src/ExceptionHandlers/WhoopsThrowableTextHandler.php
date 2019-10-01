@@ -64,7 +64,8 @@ class WhoopsThrowableTextHandler extends BaseThrowableHandler
             $message = $run->handleException($throwable);
         }
 
-        $response = $this->createThrowableTextResponse($throwable, $message, static::DEFAULT_HTTP_ERROR_CODE);
+        $status   = $throwable->getCode() > 0 ? $throwable->getCode() : static::DEFAULT_HTTP_ERROR_CODE;
+        $response = $this->createThrowableTextResponse($throwable, $message, $status);
 
         return $response;
     }

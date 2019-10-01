@@ -45,6 +45,8 @@ class WhoopsThrowableHtmlHandler extends BaseThrowableHandler
 
         list($isDebug, $appName, $exceptionDumper) = $this->getSettings($container);
 
+        $status = $throwable->getCode() > 0 ? $throwable->getCode() : static::DEFAULT_HTTP_ERROR_CODE;
+
         if ($isDebug === true) {
             $run = new Run();
 
@@ -71,9 +73,9 @@ class WhoopsThrowableHtmlHandler extends BaseThrowableHandler
             $run->appendHandler($handler);
 
             $html     = $run->handleException($throwable);
-            $response = $this->createThrowableHtmlResponse($throwable, $html, static::DEFAULT_HTTP_ERROR_CODE);
+            $response = $this->createThrowableHtmlResponse($throwable, $html, $status);
         } else {
-            $response = $this->createThrowableTextResponse($throwable, $message, static::DEFAULT_HTTP_ERROR_CODE);
+            $response = $this->createThrowableTextResponse($throwable, $message, $status);
         }
 
         return $response;
