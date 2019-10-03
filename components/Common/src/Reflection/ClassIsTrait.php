@@ -29,6 +29,8 @@ use function get_declared_classes;
 use function interface_exists;
 use function is_file;
 use function is_subclass_of;
+use function ob_get_length;
+use function ob_get_level;
 use function realpath;
 
 /**
@@ -149,14 +151,27 @@ trait ClassIsTrait
         foreach (new GlobIterator($path, $flags) as $filePath) {
             if (is_file($filePath) === true) {
                 $filePath = realpath($filePath);
+
+                $obLevel  = ob_get_level();
+                $obLength = ob_get_length();
+
                 try {
                     /** @noinspection PhpIncludeInspection */
                     require_once $filePath;
+
                 } catch (Exception $ex) {
                     // Files might have syntax errors and etc.
                     // For the purposes of this method it doesn't matter so just skip it.
                     continue;
                 }
+
+                assert(
+                    ob_get_level() === $obLevel && ob_get_length() === $obLength,
+                    "File `$filePath` sends data to output buffer. " .
+                    "This function should not be used with such files. " .
+                    "Please correct input path `$path`."
+                );
+
                 $selectedFiles[$filePath] = true;
             }
         }
