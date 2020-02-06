@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Rules\Types;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
-use function is_string;
+use function is_numeric;
 
 /**
  * @package Limoncello\Validation
  */
-final class AsString extends ExecuteRule
+final class IsNumeric extends ExecuteRule
 {
     /**
      * @param mixed            $value
@@ -39,8 +39,8 @@ final class AsString extends ExecuteRule
      */
     public static function execute($value, ContextInterface $context): array
     {
-        return is_string($value) === true ?
+        return is_numeric($value) === true ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, ErrorCodes::IS_STRING, Messages::IS_STRING, []);
+            static::createErrorReply($context, $value, ErrorCodes::IS_NUMERIC, Messages::IS_NUMERIC, []);
     }
 }

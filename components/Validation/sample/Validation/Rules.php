@@ -3,7 +3,7 @@
 namespace Sample\Validation;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Sample\Validation;
 
 use DateTime;
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use function assert;
 
 /**
  * @package Sample
@@ -44,7 +45,7 @@ class Rules extends \Limoncello\Validation\Rules
      */
     public static function amount(int $max): RuleInterface
     {
-        assert ($max > 0);
+        assert($max > 0);
 
         return static::stringToInt(static::between(1, $max));
     }

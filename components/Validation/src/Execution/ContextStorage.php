@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Execution;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ class ContextStorage implements ContextStorageInterface, BlockStateInterface, Bl
      */
     public function __construct(array $blocks, ContainerInterface $container = null)
     {
-        $this->blocks = $blocks;
+        $this->blocks    = $blocks;
         $this->container = $container;
     }
 

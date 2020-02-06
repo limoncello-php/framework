@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Rules\Converters;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
-use function is_array;
+use function is_iterable;
 use function is_numeric;
 use function is_string;
 
@@ -45,7 +45,7 @@ final class StringArrayToIntArray extends ExecuteRule
         $reply = null;
 
         $result = [];
-        if (is_array($value) === true) {
+        if (is_iterable($value) === true) {
             foreach ($value as $key => $mightBeString) {
                 if (is_string($mightBeString) === true || is_numeric($mightBeString) === true) {
                     $result[$key] = (int)$mightBeString;

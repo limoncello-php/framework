@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Rules\Generic;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ final class Required extends BaseRule
     /**
      * State key.
      */
-    const STATE_HAS_BEEN_CALLED = self::STATE_LAST + 1;
+    private const STATE_HAS_BEEN_CALLED = self::STATE_LAST + 1;
 
     /**
      * @var RuleInterface

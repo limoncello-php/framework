@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Validator;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,11 +58,11 @@ trait ArrayValidation
     }
 
     /**
-     * @param RuleInterface[] $rules
+     * @param RuleInterface[]|iterable $rules
      *
      * @return self
      */
-    private function setRules(array $rules): self
+    private function setRules(iterable $rules): self
     {
         return $this->setSerializedRules($this->serializeRules($rules));
     }
@@ -107,11 +107,11 @@ trait ArrayValidation
     }
 
     /**
-     * @var RuleInterface[] $rules
+     * @var RuleInterface[]|iterable $rules
      *
      * @return array
      */
-    private function serializeRules(array $rules): array
+    private function serializeRules(iterable $rules): array
     {
         $serializer = new BlockSerializer();
 

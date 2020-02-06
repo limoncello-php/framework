@@ -3,7 +3,7 @@
 namespace Limoncello\Validation;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,10 @@ class ArrayValidator extends BaseValidator
     private $container;
 
     /**
-     * @param RuleInterface[]         $rules
-     * @param ContainerInterface|null $container
+     * @param RuleInterface[]|iterable $rules
+     * @param ContainerInterface|null  $container
      */
-    public function __construct(array $rules, ContainerInterface $container = null)
+    public function __construct(iterable $rules, ContainerInterface $container = null)
     {
         parent::__construct();
 
@@ -53,12 +53,12 @@ class ArrayValidator extends BaseValidator
     }
 
     /**
-     * @param RuleInterface[]    $rules
-     * @param ContainerInterface $container
+     * @param RuleInterface[]|iterable $rules
+     * @param ContainerInterface|null  $container
      *
      * @return self
      */
-    public static function validator(array $rules = [], ContainerInterface $container = null): self
+    public static function validator(iterable $rules = [], ContainerInterface $container = null): self
     {
         $validator = new static($rules, $container);
 

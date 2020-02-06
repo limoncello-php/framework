@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Rules\Types;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ namespace Limoncello\Validation\Rules\Types;
  * limitations under the License.
  */
 
+use DateTimeInterface;
 use Limoncello\Validation\Contracts\Errors\ErrorCodes;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
 use Limoncello\Validation\I18n\Messages;
 use Limoncello\Validation\Rules\ExecuteRule;
-use function is_int;
 
 /**
  * @package Limoncello\Validation
  */
-final class AsInt extends ExecuteRule
+final class IsDateTime extends ExecuteRule
 {
     /**
      * @param mixed            $value
@@ -39,8 +39,8 @@ final class AsInt extends ExecuteRule
      */
     public static function execute($value, ContextInterface $context): array
     {
-        return is_int($value) === true ?
+        return $value instanceof DateTimeInterface ?
             static::createSuccessReply($value) :
-            static::createErrorReply($context, $value, ErrorCodes::IS_INT, Messages::IS_INT, []);
+            static::createErrorReply($context, $value, ErrorCodes::IS_DATE_TIME, Messages::IS_DATE_TIME, []);
     }
 }

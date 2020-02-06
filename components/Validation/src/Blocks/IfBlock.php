@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Blocks;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Validation\Contracts\Blocks\ExecutionBlockInterface;
 use Limoncello\Validation\Contracts\Blocks\IfExpressionInterface;
 use Limoncello\Validation\Contracts\Execution\ContextInterface;
+use function assert;
 
 /**
  * @package Limoncello\Validation

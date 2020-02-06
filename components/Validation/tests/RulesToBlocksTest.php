@@ -3,7 +3,7 @@
 namespace Limoncello\Tests\Validation;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,13 @@ use Limoncello\Validation\Rules\Generic\IfOperator;
 use Limoncello\Validation\Rules\Generic\OrOperator;
 use Limoncello\Validation\Rules\Generic\Required;
 use Limoncello\Validation\Rules\Generic\Success;
-use Limoncello\Validation\Rules\Types\AsArray;
-use Limoncello\Validation\Rules\Types\AsBool;
-use Limoncello\Validation\Rules\Types\AsDateTime;
-use Limoncello\Validation\Rules\Types\AsFloat;
-use Limoncello\Validation\Rules\Types\AsInt;
-use Limoncello\Validation\Rules\Types\AsNumeric;
-use Limoncello\Validation\Rules\Types\AsString;
+use Limoncello\Validation\Rules\Types\IsArray;
+use Limoncello\Validation\Rules\Types\IsBool;
+use Limoncello\Validation\Rules\Types\IsDateTime;
+use Limoncello\Validation\Rules\Types\IsFloat;
+use Limoncello\Validation\Rules\Types\IsInt;
+use Limoncello\Validation\Rules\Types\IsNumeric;
+use Limoncello\Validation\Rules\Types\IsString;
 use PHPUnit\Framework\TestCase;
 use function assert;
 use function is_callable;
@@ -404,13 +404,13 @@ class RulesToBlocksTest extends TestCase
     public function testTypes(): void
     {
         $classes = [
-            AsArray::class,
-            AsBool::class,
-            AsDateTime::class,
-            AsFloat::class,
-            AsInt::class,
-            AsNumeric::class,
-            AsString::class,
+            IsArray::class,
+            IsBool::class,
+            IsDateTime::class,
+            IsFloat::class,
+            IsInt::class,
+            IsNumeric::class,
+            IsString::class,
         ];
         foreach ($classes as $className) {
             /** @var BaseRule $rule */
@@ -418,16 +418,16 @@ class RulesToBlocksTest extends TestCase
 
             $this->assertTrue(($block = $rule->toBlock()) instanceof ProcedureBlock);
             $this->assertEquals([
-                AsArray::PROPERTY_NAME               => '',
-                AsArray::PROPERTY_IS_CAPTURE_ENABLED => false,
+                IsArray::PROPERTY_NAME               => '',
+                IsArray::PROPERTY_IS_CAPTURE_ENABLED => false,
             ], $block->getProperties());
 
             $rule->setName('name')->enableCapture();
 
             $this->assertTrue(($block = $rule->toBlock()) instanceof ProcedureBlock);
             $this->assertEquals([
-                AsArray::PROPERTY_NAME               => 'name',
-                AsArray::PROPERTY_IS_CAPTURE_ENABLED => true,
+                IsArray::PROPERTY_NAME               => 'name',
+                IsArray::PROPERTY_IS_CAPTURE_ENABLED => true,
             ], $block->getProperties());
         }
     }

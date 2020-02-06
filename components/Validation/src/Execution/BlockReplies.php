@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Execution;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,37 +31,37 @@ final class BlockReplies
     /**
      * Rule reply key.
      */
-    const REPLY_SUCCESS_VALUE = 0;
+    private const REPLY_SUCCESS_VALUE = 0;
 
     /**
      * Rule reply key.
      */
-    const REPLY_ERRORS_INFO = self::REPLY_SUCCESS_VALUE + 1;
+    private const REPLY_ERRORS_INFO = self::REPLY_SUCCESS_VALUE + 1;
 
     /**
      * Error info key.
      */
-    const ERROR_INFO_BLOCK_INDEX = 0;
+    public const ERROR_INFO_BLOCK_INDEX = 0;
 
     /**
      * Error info key.
      */
-    const ERROR_INFO_VALUE = self::ERROR_INFO_BLOCK_INDEX + 1;
+    public const ERROR_INFO_VALUE = self::ERROR_INFO_BLOCK_INDEX + 1;
 
     /**
      * Error info key.
      */
-    const ERROR_INFO_CODE = self::ERROR_INFO_VALUE + 1;
+    public const ERROR_INFO_CODE = self::ERROR_INFO_VALUE + 1;
 
     /**
      * Error info key.
      */
-    const ERROR_INFO_MESSAGE_TEMPLATE = self::ERROR_INFO_CODE + 1;
+    public const ERROR_INFO_MESSAGE_TEMPLATE = self::ERROR_INFO_CODE + 1;
 
     /**
      * Error info key.
      */
-    const ERROR_INFO_MESSAGE_PARAMETERS = self::ERROR_INFO_MESSAGE_TEMPLATE + 1;
+    public const ERROR_INFO_MESSAGE_PARAMETERS = self::ERROR_INFO_MESSAGE_TEMPLATE + 1;
 
     /**
      * @param mixed $result

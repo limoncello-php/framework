@@ -3,7 +3,7 @@
 namespace Limoncello\Validation\Validator;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ namespace Limoncello\Validation\Validator;
 
 use Limoncello\Validation\Contracts\Rules\RuleInterface;
 use Limoncello\Validation\Rules\Generic\AndOperator;
-use Limoncello\Validation\Rules\Types\AsArray;
-use Limoncello\Validation\Rules\Types\AsBool;
-use Limoncello\Validation\Rules\Types\AsDateTime;
-use Limoncello\Validation\Rules\Types\AsFloat;
-use Limoncello\Validation\Rules\Types\AsInt;
-use Limoncello\Validation\Rules\Types\AsNumeric;
-use Limoncello\Validation\Rules\Types\AsString;
+use Limoncello\Validation\Rules\Types\IsArray;
+use Limoncello\Validation\Rules\Types\IsBool;
+use Limoncello\Validation\Rules\Types\IsDateTime;
+use Limoncello\Validation\Rules\Types\IsFloat;
+use Limoncello\Validation\Rules\Types\IsInt;
+use Limoncello\Validation\Rules\Types\IsNumeric;
+use Limoncello\Validation\Rules\Types\IsString;
 
 /**
  * @package Limoncello\Validation
@@ -40,7 +40,7 @@ trait Types
      */
     protected static function isArray(RuleInterface $next = null): RuleInterface
     {
-        return $next === null ? new AsArray() : new AndOperator(new AsArray(), $next);
+        return $next === null ? new IsArray() : new AndOperator(new IsArray(), $next);
     }
 
     /**
@@ -50,7 +50,7 @@ trait Types
      */
     protected static function isString(RuleInterface $next = null): RuleInterface
     {
-        return $next === null ? new AsString() : new AndOperator(new AsString(), $next);
+        return $next === null ? new IsString() : new AndOperator(new IsString(), $next);
     }
 
     /**
@@ -60,7 +60,7 @@ trait Types
      */
     protected static function isBool(RuleInterface $next = null): RuleInterface
     {
-        return $next === null ? new AsBool() : new AndOperator(new AsBool(), $next);
+        return $next === null ? new IsBool() : new AndOperator(new IsBool(), $next);
     }
 
     /**
@@ -70,7 +70,7 @@ trait Types
      */
     protected static function isInt(RuleInterface $next = null): RuleInterface
     {
-        return $next === null ? new AsInt() : new AndOperator(new AsInt(), $next);
+        return $next === null ? new IsInt() : new AndOperator(new IsInt(), $next);
     }
 
     /**
@@ -80,7 +80,7 @@ trait Types
      */
     protected static function isFloat(RuleInterface $next = null): RuleInterface
     {
-        return $next === null ? new AsFloat() : new AndOperator(new AsFloat(), $next);
+        return $next === null ? new IsFloat() : new AndOperator(new IsFloat(), $next);
     }
 
     /**
@@ -90,7 +90,7 @@ trait Types
      */
     protected static function isNumeric(RuleInterface $next = null): RuleInterface
     {
-        return $next === null ? new AsNumeric() : new AndOperator(new AsNumeric(), $next);
+        return $next === null ? new IsNumeric() : new AndOperator(new IsNumeric(), $next);
     }
 
     /**
@@ -100,6 +100,6 @@ trait Types
      */
     protected static function isDateTime(RuleInterface $next = null): RuleInterface
     {
-        return $next === null ? new AsDateTime() : new AndOperator(new AsDateTime(), $next);
+        return $next === null ? new IsDateTime() : new AndOperator(new IsDateTime(), $next);
     }
 }
