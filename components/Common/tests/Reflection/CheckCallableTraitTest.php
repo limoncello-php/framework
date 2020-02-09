@@ -43,7 +43,7 @@ class CheckCallableTraitTest extends TestCase
         $isNullableInt = function (ReflectionParameter $parameter): bool {
             $type = $parameter->getType();
 
-            return $parameter->allowsNull() === true && $type !== null && (string)$type === 'int';
+            return $parameter->allowsNull() === true && $type !== null && $type->getName() === 'int';
         };
         $parameters    = [
             'string',
