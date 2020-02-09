@@ -3,7 +3,7 @@
 namespace Limoncello\Testing;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use function array_merge;
+use function assert;
+use function call_user_func_array;
+use function in_array;
 
 /**
  * @package Limoncello\Testing
