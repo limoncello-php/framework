@@ -39,6 +39,8 @@ class L10nContainerConfigurator implements ContainerConfiguratorInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.UndefinedVariable)
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {

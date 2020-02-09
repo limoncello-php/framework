@@ -18,6 +18,7 @@ namespace Limoncello\Tests\Application\FileSystem;
  * limitations under the License.
  */
 
+use Limoncello\Application\Exceptions\FileSystemException;
 use Limoncello\Application\FileSystem\FileSystem;
 use Limoncello\Tests\Application\TestCase;
 use Mockery;
@@ -75,7 +76,7 @@ class FileSystemTest extends TestCase
      */
     public function testRead(): void
     {
-        $this->assertContains('class FileSystemTest', $this->fileSystem->read(__FILE__));
+        $this->assertStringContainsString('class FileSystemTest', $this->fileSystem->read(__FILE__));
     }
 
     /**
@@ -211,8 +212,6 @@ class FileSystemTest extends TestCase
 
     /**
      * Test recursive delete.
-     *
-     * @expectedException \Limoncello\Application\Exceptions\FileSystemException
      */
     public function testRecursiveDeleteFailedOnFile(): void
     {
@@ -239,13 +238,13 @@ class FileSystemTest extends TestCase
         $this->mock->shouldReceive('deleteFolder')->withArgs(['root/folder1/subFolder1'])->once()->andReturn(true);
         $this->mock->shouldReceive('delete')->withArgs(['root/folder1/file11'])->once()->andReturn(false);
 
+        $this->expectException(FileSystemException::class);
+
         $this->fileSystem->deleteFolderRecursive($rootPath);
     }
 
     /**
      * Test recursive delete.
-     *
-     * @expectedException \Limoncello\Application\Exceptions\FileSystemException
      */
     public function testRecursiveDeleteFailedOnFolder(): void
     {
@@ -272,6 +271,8 @@ class FileSystemTest extends TestCase
         $this->mock->shouldReceive('deleteFolder')->withArgs(['root/folder1/subFolder1'])->once()->andReturn(true);
         $this->mock->shouldReceive('delete')->withArgs(['root/folder1/file11'])->once()->andReturn(true);
         $this->mock->shouldReceive('deleteFolder')->withArgs(['root/folder1'])->once()->andReturn(false);
+
+        $this->expectException(FileSystemException::class);
 
         $this->fileSystem->deleteFolderRecursive($rootPath);
     }

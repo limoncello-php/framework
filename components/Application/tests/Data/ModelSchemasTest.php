@@ -18,7 +18,8 @@ namespace Limoncello\Tests\Application\Data;
  * limitations under the License.
  */
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use InvalidArgumentException;
 use Limoncello\Application\Data\ModelSchemaInfo;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
@@ -78,9 +79,9 @@ class ModelSchemasTest extends TestCase
         $this->assertFalse($this->schemas->hasAttributeType(Comment::class, 'non-existing-field'));
         $this->assertTrue($this->schemas->hasAttributeLength(Comment::class, Comment::FIELD_TEXT));
         $this->assertFalse($this->schemas->hasAttributeLength(Comment::class, Comment::FIELD_CREATED_AT));
-        $this->assertEquals(Type::STRING, $this->schemas->getAttributeType(Comment::class, Comment::FIELD_TEXT));
+        $this->assertEquals(Types::STRING, $this->schemas->getAttributeType(Comment::class, Comment::FIELD_TEXT));
         $this->assertEquals(
-            Type::DATE,
+            Types::DATE_MUTABLE,
             $this->schemas->getAttributeType(Comment::class, Comment::FIELD_CREATED_AT)
         );
         $this->assertEquals(
@@ -161,57 +162,63 @@ class ModelSchemasTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * Test invalid arguments.
      */
     public function testCannotRegisterWithEmptyClass(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->schemas->registerClass(
             '',
             Comment::TABLE_NAME,
             Comment::FIELD_ID,
             [
-                Comment::FIELD_ID         => Type::INTEGER,
-                Comment::FIELD_ID_USER    => Type::INTEGER,
-                Comment::FIELD_TEXT       => Type::STRING,
-                Comment::FIELD_CREATED_AT => Type::DATE
+                Comment::FIELD_ID         => Types::INTEGER,
+                Comment::FIELD_ID_USER    => Types::INTEGER,
+                Comment::FIELD_TEXT       => Types::STRING,
+                Comment::FIELD_CREATED_AT => Types::DATE_MUTABLE,
             ],
             [Comment::FIELD_TEXT => Comment::LENGTH_TEXT]
         );
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * Test invalid arguments.
      */
     public function testCannotRegisterWithEmptyTableName(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->schemas->registerClass(
             Comment::class,
             '',
             Comment::FIELD_ID,
             [
-                Comment::FIELD_ID         => Type::INTEGER,
-                Comment::FIELD_ID_USER    => Type::INTEGER,
-                Comment::FIELD_TEXT       => Type::STRING,
-                Comment::FIELD_CREATED_AT => Type::DATE
+                Comment::FIELD_ID         => Types::INTEGER,
+                Comment::FIELD_ID_USER    => Types::INTEGER,
+                Comment::FIELD_TEXT       => Types::STRING,
+                Comment::FIELD_CREATED_AT => Types::DATE_MUTABLE,
             ],
             [Comment::FIELD_TEXT => Comment::LENGTH_TEXT]
         );
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * Test invalid arguments.
      */
     public function testCannotRegisterWithEmptyPrimaryKey(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->schemas->registerClass(
             Comment::class,
             Comment::TABLE_NAME,
             '',
             [
-                Comment::FIELD_ID         => Type::INTEGER,
-                Comment::FIELD_ID_USER    => Type::INTEGER,
-                Comment::FIELD_TEXT       => Type::STRING,
-                Comment::FIELD_CREATED_AT => Type::DATE
+                Comment::FIELD_ID         => Types::INTEGER,
+                Comment::FIELD_ID_USER    => Types::INTEGER,
+                Comment::FIELD_TEXT       => Types::STRING,
+                Comment::FIELD_CREATED_AT => Types::DATE_MUTABLE,
             ],
             [Comment::FIELD_TEXT => Comment::LENGTH_TEXT]
         );
@@ -227,10 +234,10 @@ class ModelSchemasTest extends TestCase
             Comment::TABLE_NAME,
             Comment::FIELD_ID,
             [
-                Comment::FIELD_ID         => Type::INTEGER,
-                Comment::FIELD_ID_USER    => Type::INTEGER,
-                Comment::FIELD_TEXT       => Type::STRING,
-                Comment::FIELD_CREATED_AT => Type::DATE
+                Comment::FIELD_ID         => Types::INTEGER,
+                Comment::FIELD_ID_USER    => Types::INTEGER,
+                Comment::FIELD_TEXT       => Types::STRING,
+                Comment::FIELD_CREATED_AT => Types::DATE_MUTABLE,
             ],
             [Comment::FIELD_TEXT => Comment::LENGTH_TEXT]
         );

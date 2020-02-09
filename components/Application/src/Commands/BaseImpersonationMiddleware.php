@@ -75,6 +75,7 @@ abstract class BaseImpersonationMiddleware implements MiddlewareInterface
      * @return PassportAccountInterface
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.UndefinedVariable)
      */
     protected static function createCliPassport(
         $userIdentity,

@@ -168,12 +168,12 @@ class CacheSettingsProvider implements CacheSettingsProviderInterface
      */
     public function unserialize(array $serialized): void
     {
-        list (
+        [
             static::KEY_APPLICATION_CONFIGURATION => $this->appConfig,
-            static::KEY_CORE_DATA => $this->coreData,
-            static::KEY_SETTINGS_MAP => $this->settingsMap,
-            static::KEY_SETTINGS_DATA => $this->settingsData,
-            static::KEY_AMBIGUOUS_MAP => $this->ambiguousMap,
-            ) = $serialized;
+            static::KEY_CORE_DATA                 => $this->coreData,
+            static::KEY_SETTINGS_MAP              => $this->settingsMap,
+            static::KEY_SETTINGS_DATA             => $this->settingsData,
+            static::KEY_AMBIGUOUS_MAP             => $this->ambiguousMap,
+         ] = $serialized;
     }
 }

@@ -39,6 +39,8 @@ class ApplicationContainerConfigurator implements ContainerConfiguratorInterface
 
     /**
      * @inheritdoc
+     *
+     * @SuppressWarnings(PHPMD.UndefinedVariable)
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {

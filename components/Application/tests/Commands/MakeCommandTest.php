@@ -19,6 +19,7 @@ namespace Limoncello\Tests\Application\Commands;
  */
 
 use Limoncello\Application\Commands\MakeCommand;
+use Limoncello\Application\Exceptions\InvalidArgumentException;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Commands\IoInterface;
 use Limoncello\Contracts\FileSystem\FileSystemInterface;
@@ -45,7 +46,7 @@ class MakeCommandTest extends TestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -277,8 +278,6 @@ class MakeCommandTest extends TestCase
 
     /**
      * Test invalid class name.
-     *
-     * @expectedException \Limoncello\Application\Exceptions\InvalidArgumentException
      */
     public function testInvalidClassName1(): void
     {
@@ -288,13 +287,13 @@ class MakeCommandTest extends TestCase
             MakeCommand::ARG_PLURAL   => 'Boards',
         ]);
 
+        $this->expectException(InvalidArgumentException::class);
+
         MakeCommand::execute($this->createContainerWithSettings(), $inOut);
     }
 
     /**
      * Test invalid class name.
-     *
-     * @expectedException \Limoncello\Application\Exceptions\InvalidArgumentException
      */
     public function testInvalidClassName2(): void
     {
@@ -304,6 +303,8 @@ class MakeCommandTest extends TestCase
             MakeCommand::ARG_PLURAL   => 'Invalid Class Name',
         ]);
 
+
+        $this->expectException(InvalidArgumentException::class);
         MakeCommand::execute($this->createContainerWithSettings(), $inOut);
     }
 
@@ -329,8 +330,6 @@ class MakeCommandTest extends TestCase
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\InvalidArgumentException
-     *
      * @return void
      */
     public function testItShouldFailIfRootDirectoryDoNotExist(): void
@@ -341,12 +340,12 @@ class MakeCommandTest extends TestCase
         // this one will trigger the error
         $this->fileSystemMock->shouldReceive('exists')->zeroOrMoreTimes()->with('/seeds')->andReturnFalse();
 
+        $this->expectException(InvalidArgumentException::class);
+
         $this->prepareDataForDataResourceToEmulateFileSystemIssuesAndRunTheCommand();
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\InvalidArgumentException
-     *
      * @return void
      */
     public function testItShouldFailIfOneOfTheFilesAlreadyExists(): void
@@ -359,12 +358,12 @@ class MakeCommandTest extends TestCase
         $this->fileSystemMock->shouldReceive('exists')
             ->once()->with('/seeds/BoardsSeed.php')->andReturnTrue();
 
+        $this->expectException(InvalidArgumentException::class);
+
         $this->prepareDataForDataResourceToEmulateFileSystemIssuesAndRunTheCommand();
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\InvalidArgumentException
-     *
      * @return void
      */
     public function testItShouldFailIfOutputFolderIsNotWritable(): void
@@ -376,12 +375,12 @@ class MakeCommandTest extends TestCase
         // this one will trigger the error
         $this->fileSystemMock->shouldReceive('isWritable')->once()->with('/seeds')->andReturnFalse();
 
+        $this->expectException(InvalidArgumentException::class);
+
         $this->prepareDataForDataResourceToEmulateFileSystemIssuesAndRunTheCommand();
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\InvalidArgumentException
-     *
      * @return void
      */
     public function testItShouldFailIfRootFolderIsNotWritable(): void
@@ -390,6 +389,8 @@ class MakeCommandTest extends TestCase
 
         // this one will trigger the error
         $this->fileSystemMock->shouldReceive('isWritable')->once()->with('/migrations')->andReturnFalse();
+
+        $this->expectException(InvalidArgumentException::class);
 
         $this->prepareDataForDataResourceToEmulateFileSystemIssuesAndRunTheCommand();
     }

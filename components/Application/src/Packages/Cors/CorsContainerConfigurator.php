@@ -40,6 +40,7 @@ class CorsContainerConfigurator implements ContainerConfiguratorInterface
      * @inheritdoc
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.UndefinedVariable)
      */
     public static function configureContainer(LimoncelloContainerInterface $container): void
     {

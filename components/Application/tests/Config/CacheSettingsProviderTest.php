@@ -18,6 +18,8 @@ namespace Limoncello\Tests\Application\Config;
  * limitations under the License.
  */
 
+use Limoncello\Application\Exceptions\AmbiguousSettingsException;
+use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
 use Limoncello\Application\Settings\CacheSettingsProvider;
 use Limoncello\Application\Settings\FileSettingsProvider;
 use Limoncello\Tests\Application\CoreData\CoreDataTest;
@@ -75,22 +77,22 @@ class CacheSettingsProviderTest extends TestCase
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\NotRegisteredSettingsException
-     *
      * @throws ReflectionException
      */
     public function testGetNotRegistered(): void
     {
+        $this->expectException(NotRegisteredSettingsException::class);
+
         $this->createProvider()->get(static::class);
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\AmbiguousSettingsException
-     *
      * @throws ReflectionException
      */
     public function testGetAmbiguous(): void
     {
+        $this->expectException(AmbiguousSettingsException::class);
+
         $this->createProvider()->get(MarkerInterfaceTop::class);
     }
 

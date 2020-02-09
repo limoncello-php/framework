@@ -18,6 +18,10 @@ namespace Limoncello\Tests\Application\Config;
  * limitations under the License.
  */
 
+use Limoncello\Application\Exceptions\AlreadyRegisteredSettingsException;
+use Limoncello\Application\Exceptions\AmbiguousSettingsException;
+use Limoncello\Application\Exceptions\InvalidSettingsClassException;
+use Limoncello\Application\Exceptions\NotRegisteredSettingsException;
 use Limoncello\Application\Settings\FileSettingsProvider;
 use Limoncello\Contracts\Settings\SettingsInterface;
 use Limoncello\Tests\Application\Data\Config\MarkerInterfaceChild1;
@@ -124,62 +128,62 @@ class FileSettingsProviderTest extends TestCase
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\NotRegisteredSettingsException
-     *
      * @throws ReflectionException
      */
     public function testGetNotRegistered(): void
     {
+        $this->expectException(NotRegisteredSettingsException::class);
+
         $this->createProvider()->get(static::class);
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\AmbiguousSettingsException
-     *
      * @throws ReflectionException
      */
     public function testGetAmbiguous(): void
     {
+        $this->expectException(AmbiguousSettingsException::class);
+
         $this->createProvider()->get(MarkerInterfaceTop::class);
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\AlreadyRegisteredSettingsException
-     *
      * @throws ReflectionException
      */
     public function testRegisterTwice(): void
     {
+        $this->expectException(AlreadyRegisteredSettingsException::class);
+
         $this->createProvider()->register(new SampleSettingsA());
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
-     *
      * @throws ReflectionException
      */
     public function testCheckClassWithPrivateConstructor(): void
     {
+        $this->expectException(InvalidSettingsClassException::class);
+
         $this->invokeCheckMethod(PrivateConstructorClass::class);
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
-     *
      * @throws ReflectionException
      */
     public function testCheckClassWithNonDefaultConstructor(): void
     {
+        $this->expectException(InvalidSettingsClassException::class);
+
         $this->invokeCheckMethod(NoDefaultConstructorClass::class);
     }
 
     /**
-     * @expectedException \Limoncello\Application\Exceptions\InvalidSettingsClassException
-     *
      * @throws ReflectionException
      */
     public function testCheckNotAClass(): void
     {
+        $this->expectException(InvalidSettingsClassException::class);
+
         $this->invokeCheckMethod(__FILE__);
     }
 

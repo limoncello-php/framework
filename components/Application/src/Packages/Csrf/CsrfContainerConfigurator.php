@@ -60,6 +60,8 @@ class CsrfContainerConfigurator implements ContainerConfiguratorInterface
      * @param PsrContainerInterface $container
      *
      * @return CsrfTokenStorageInterface
+     *
+     * @SuppressWarnings(PHPMD.UndefinedVariable)
      */
     private static function createStorage(PsrContainerInterface $container): CsrfTokenStorageInterface
     {

@@ -18,6 +18,8 @@ namespace Limoncello\Tests\Application\Packages\Csrf;
  * limitations under the License.
  */
 
+use Laminas\Diactoros\Response\EmptyResponse;
+use Laminas\Diactoros\ServerRequest;
 use Limoncello\Application\Contracts\Csrf\CsrfTokenStorageInterface;
 use Limoncello\Application\Packages\Csrf\CsrfMiddleware;
 use Limoncello\Application\Packages\Csrf\CsrfSettings as C;
@@ -28,8 +30,6 @@ use Mockery;
 use Mockery\Mock;
 use Psr\Http\Message\ResponseInterface;
 use ReflectionException;
-use Zend\Diactoros\Response\EmptyResponse;
-use Zend\Diactoros\ServerRequest;
 
 /**
  * @package Limoncello\Tests\Application
@@ -44,7 +44,7 @@ class CsrfMiddlewareTest extends TestCase
      *
      * @throws ReflectionException
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

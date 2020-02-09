@@ -19,6 +19,7 @@ namespace Limoncello\Tests\Application\Commands;
  */
 
 use Limoncello\Application\Commands\ApplicationCommand;
+use Limoncello\Application\Exceptions\ConfigurationException;
 use Limoncello\Container\Container;
 use Limoncello\Contracts\Application\ApplicationConfigurationInterface;
 use Limoncello\Contracts\Application\CacheSettingsProviderInterface;
@@ -103,12 +104,12 @@ class ApplicationCommandTest extends TestCase
     /**
      * Test action.
      *
-     * @expectedException \Limoncello\Application\Exceptions\ConfigurationException
-     *
      * @throws ReflectionException
      */
     public function testCacheInvalidCallable(): void
     {
+        $this->expectException(ConfigurationException::class);
+
         $container = new Container();
 
         /** @var Mock $providerMock */
