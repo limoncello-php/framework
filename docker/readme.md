@@ -10,9 +10,8 @@ $ docker-compose
 When you have `docker-compose` installed on your machine you can execute in each component's root (`./components/<Component Name>`) the following commands
 
 ```bash
-$ composer test-unit-php-7-1
-$ composer test-unit-php-7-2
 $ composer test-unit-php-7-3
+$ composer test-unit-php-7-4
 ```
 
 First run will download docker image and install necessary PHP extensions (it will take some time and produce rather scary output) however further runs will be very fast and produce something like
