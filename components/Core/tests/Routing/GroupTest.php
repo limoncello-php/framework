@@ -3,7 +3,7 @@
 namespace Limoncello\Tests\Core\Routing;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ use Limoncello\Core\Application\Application;
 use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Traits\CallableTrait;
 use Limoncello\Tests\Core\TestCase;
+use LogicException;
 use Mockery;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -268,48 +269,58 @@ class GroupTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * Test invalid callable.
      */
     public function testInvalidCallable1(): void
     {
+        $this->expectException(LogicException::class);
+
         (new Group())->setMiddleware(['NonExistingClass::method']);
     }
 
     /**
-     * @expectedException \LogicException
+     * Test invalid callable.
      */
     public function testInvalidCallable2(): void
     {
+        $this->expectException(LogicException::class);
+
         (new Group())->setConfigurators(['NonExistingClass::method']);
     }
 
     /**
-     * @expectedException \LogicException
+     * Test invalid callable.
      */
     public function testInvalidCallable3(): void
     {
+        $this->expectException(LogicException::class);
+
         (new Group())->setRequestFactory(function () {
         });
     }
 
     /**
-     * @expectedException \LogicException
+     * Test invalid callable.
      *
      * @throws ReflectionException
      */
     public function testInvalidCallable4(): void
     {
+        $this->expectException(LogicException::class);
+
         (new Group())->get('/', function () {
         });
     }
 
     /**
-     * @expectedException \LogicException
+     * Test invalid callable.
      *
      * @throws ReflectionException
      */
     public function testInvalidCallable5(): void
     {
+        $this->expectException(LogicException::class);
+
         (new Group())->get(
             '/',
             self::class . '::homeIndex',
@@ -318,12 +329,14 @@ class GroupTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * Test invalid callable.
      *
      * @throws ReflectionException
      */
     public function testInvalidCallable6(): void
     {
+        $this->expectException(LogicException::class);
+
         (new Group())->get(
             '/',
             self::class . '::homeIndex',
@@ -332,12 +345,14 @@ class GroupTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * Test invalid callable.
      *
      * @throws ReflectionException
      */
     public function testInvalidCallable7(): void
     {
+        $this->expectException(LogicException::class);
+
         (new Group())->get(
             '/',
             self::class . '::homeIndex',

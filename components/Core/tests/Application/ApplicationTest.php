@@ -3,7 +3,7 @@
 namespace Limoncello\Tests\Core\Application;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ use Limoncello\Core\Routing\Group;
 use Limoncello\Core\Routing\Router;
 use Limoncello\Tests\Core\Application\Data\CoreData;
 use Limoncello\Tests\Core\TestCase;
+use LogicException;
 use Mockery;
 use Mockery\Mock;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -95,7 +96,7 @@ class ApplicationTest extends TestCase
     /**
      * Set up tests.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -205,11 +206,11 @@ class ApplicationTest extends TestCase
 
     /**
      * Test Application not configured.
-     *
-     * @expectedException \LogicException
      */
     public function testSapiNotSet(): void
     {
+        $this->expectException(LogicException::class);
+
         $app = Mockery::mock(Application::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
         /** @var Application $app */
