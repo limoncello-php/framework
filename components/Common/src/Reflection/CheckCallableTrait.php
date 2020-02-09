@@ -96,7 +96,7 @@ trait CheckCallableTrait
             $methodParam = $methodParams[$index];
             if (is_string($parameter) === true) {
                 $methodType = $methodParam->getType();
-                if ($methodType === null || (string)$methodType !== $parameter) {
+                if ($methodType === null || $methodType->getName() !== $parameter) {
                     $isParamOk = false;
                 }
             } elseif ($parameter === null) {
@@ -124,7 +124,7 @@ trait CheckCallableTrait
         $isReturnTypeOk = true;
         if ($areAllParamsOk === true && $returnType !== null) {
             $methodRetType  = $reflectionMethod->getReturnType();
-            $isReturnTypeOk = $methodRetType !== null && (string)$methodRetType === $returnType;
+            $isReturnTypeOk = ($methodRetType !== null) && ($methodRetType->getName() === $returnType);
         }
 
         $isOk = $areAllParamsOk === true && $isReturnTypeOk === true;
