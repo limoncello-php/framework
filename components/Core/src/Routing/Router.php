@@ -76,6 +76,9 @@ class Router implements RouterInterface
 
     /**
      * @inheritdoc
+     *
+     * PHPMD sees `out` parameters from functions as undefined.
+     * @SuppressWarnings(PHPMD.UndefinedVariable)
      */
     public function getCachedRoutes(GroupInterface $group): array
     {

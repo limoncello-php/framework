@@ -16,13 +16,12 @@
     "require": {
         "php": ">=7.1.0",
         "nikic/fast-route": "^1.0",
-        "zendframework/zend-diactoros": "^2.0",
-        "zendframework/zend-httphandlerrunner": "^1.0",
+        "laminas/laminas-diactoros": "^2.2",
+        "laminas/laminas-httphandlerrunner": "^1.1",
         "limoncello-php/common": "^0.10.0",
         "limoncello-php/contracts": "^0.10.0"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "^2.9",
         "phpmd/phpmd": "^2.6",
         "scrutinizer/ocular": "^1.4",
         "phpunit/phpunit": "^7.0",

@@ -35,6 +35,8 @@ use function array_merge;
 
 /**
  * @package Limoncello\Core
+ *
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 class Route implements RouteInterface
 {

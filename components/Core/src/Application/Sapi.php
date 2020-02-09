@@ -18,11 +18,11 @@ namespace Limoncello\Core\Application;
  * limitations under the License.
  */
 
+use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use Limoncello\Contracts\Core\SapiInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
-use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
 
 /**
  * @package Limoncello\Core

@@ -19,6 +19,9 @@ namespace Limoncello\Core\Application;
  */
 
 use Closure;
+use Laminas\Diactoros\Response\EmptyResponse;
+use Laminas\Diactoros\Response\TextResponse;
+use Laminas\Diactoros\ServerRequest;
 use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
 use Limoncello\Contracts\Core\ApplicationInterface;
@@ -35,9 +38,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionException;
 use Throwable;
-use Zend\Diactoros\Response\EmptyResponse;
-use Zend\Diactoros\Response\TextResponse;
-use Zend\Diactoros\ServerRequest;
 use function assert;
 use function call_user_func;
 use function count;
