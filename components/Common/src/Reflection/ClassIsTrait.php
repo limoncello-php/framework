@@ -3,7 +3,7 @@
 namespace Limoncello\Common\Reflection;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,7 @@ trait ClassIsTrait
      * @throws ReflectionException
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.IfStatementAssignment)
      */
     protected static function selectClasses(string $path, string $classOrInterface): iterable
     {
@@ -158,7 +159,6 @@ trait ClassIsTrait
                 try {
                     /** @noinspection PhpIncludeInspection */
                     require_once $filePath;
-
                 } catch (Exception $ex) {
                     // Files might have syntax errors and etc.
                     // For the purposes of this method it doesn't matter so just skip it.

@@ -3,7 +3,7 @@
 namespace Limoncello\Tests\Common\Reflection;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2015-2020 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Limoncello\Tests\Common\Reflection;
 
 use DateTimeInterface;
 use Exception;
+use InvalidArgumentException;
 use Limoncello\Common\Reflection\CheckCallableTrait;
 use Limoncello\Tests\Common\TestCase;
 use ReflectionException;
@@ -125,12 +126,12 @@ class CheckCallableTraitTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     *
      * @throws ReflectionException
      */
     public function testCheckCallableWithInvalidParameters(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+
         // parameters should be described either by strings, nulls or with Closures.
         $parameters    = [
             false,
