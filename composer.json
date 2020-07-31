@@ -1,37 +1,41 @@
 {
-    "name": "limoncello-php/framework",
+    "name": "lolltec/limoncello-php-framework",
     "description": "PHP framework framework (PSR-7)",
     "keywords": ["framework", "PSR-7", "PSR7", "limoncello"],
-    "homepage": "https://github.com/limoncello-php/framework",
+    "homepage": "https://github.com/lolltec/limoncello-php-framework",
     "support": {
-        "issues": "https://github.com/limoncello-php/framework/issues"
+        "issues": "https://github.com/lolltec/limoncello-php-framework/issues"
     },
     "license": "Apache-2.0",
     "authors": [
         {
             "name": "neomerx",
             "email": "info@neomerx.com"
+        },
+        {
+            "name": "lolltec",
+            "email": "info@lolltec.com"
         }
     ],
     "require": {
         "php": ">=7.1.0",
-        "limoncello-php/application": "self.version",
-        "limoncello-php/auth": "self.version",
-        "limoncello-php/commands": "self.version",
-        "limoncello-php/common": "self.version",
-        "limoncello-php/container": "self.version",
-        "limoncello-php/contracts": "self.version",
-        "limoncello-php/core": "self.version",
-        "limoncello-php/crypt": "self.version",
-        "limoncello-php/data": "self.version",
-        "limoncello-php/events": "self.version",
-        "limoncello-php/flute": "self.version",
-        "limoncello-php/l10n": "self.version",
-        "limoncello-php/oauth-server": "self.version",
-        "limoncello-php/passport": "self.version",
+        "lolltec/limoncello-php-component-application": "self.version",
+        "lolltec/limoncello-php-component-auth": "self.version",
+        "lolltec/limoncello-php-component-commands": "self.version",
+        "lolltec/limoncello-php-component-common": "self.version",
+        "lolltec/limoncello-php-component-container": "self.version",
+        "lolltec/limoncello-php-component-contracts": "self.version",
+        "lolltec/limoncello-php-component-core": "self.version",
+        "lolltec/limoncello-php-component-crypt": "self.version",
+        "lolltec/limoncello-php-component-data": "self.version",
+        "lolltec/limoncello-php-component-events": "self.version",
+        "lolltec/limoncello-php-component-flute": "self.version",
+        "lolltec/limoncello-php-component-l10n": "self.version",
+        "lolltec/limoncello-php-component-oauth-server": "self.version",
+        "lolltec/limoncello-php-component-passport": "self.version",
 
-        "limoncello-php/templates": "self.version",
-        "limoncello-php/validation": "self.version"
+        "lolltec/limoncello-php-component-templates": "self.version",
+        "lolltec/limoncello-php-component-validation": "self.version"
     },
     "scripts": {
         "test": ["@clean-vendor-folders", "@test-unit-with-coverage", "@test-cs", "@test-md"],
@@ -226,9 +230,7 @@
         "test-md-component-Testing":          "@composer test-md --working-dir=./components/Testing/",
         "test-md-component-Validation":       "@composer test-md --working-dir=./components/Validation/"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "0.10.x-dev"
-        }
-    }
+    "extra": {},
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

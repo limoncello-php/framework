@@ -1,16 +1,20 @@
 {
-    "name": "limoncello-php/oauth-server",
+    "name": "lolltec/limoncello-php-component-oauth-server",
     "description": "Framework agnostic OAuth 2.0 Server library (PSR-7).",
     "keywords": ["PSR-7", "PSR7", "OAuth", "OAuth 2", "OAuth 2.0", "server"],
-    "homepage": "https://github.com/limoncello-php/framework/tree/master/components/OAuthServer",
+    "homepage": "https://github.com/lolltec/limoncello-php-framework/tree/master/components/OAuthServer",
     "support": {
-        "issues": "https://github.com/limoncello-php/framework/issues"
+        "issues": "https://github.com/lolltec/limoncello-php-framework/issues"
     },
     "license": "Apache-2.0",
     "authors": [
         {
             "name": "neomerx",
             "email": "info@neomerx.com"
+        },
+        {
+            "name": "lolltec",
+            "email": "info@lolltec.com"
         }
     ],
     "require": {
@@ -41,14 +45,17 @@
         "test-unit-with-coverage": "phpdbg -qrr ./vendor/bin/phpunit --coverage-text",
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
+        "test-unit-php-7-4": "docker-compose run --rm cli_7_4_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-4-win": "docker-compose run --rm cli_7_4_php ./vendor/bin/phpunit",
         "test-unit-php-7-3": "docker-compose run --rm cli_7_3_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-3-win": "docker-compose run --rm cli_7_3_php ./vendor/bin/phpunit",
         "test-unit-php-7-2": "docker-compose run --rm cli_7_2_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-2-win": "docker-compose run --rm cli_7_2_php ./vendor/bin/phpunit",
         "test-unit-php-7-1": "docker-compose run --rm cli_7_1_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-1-win": "docker-compose run --rm cli_7_1_php ./vendor/bin/phpunit",
         "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php -d hhvm.php7.all=1 ./vendor/bin/phpunit"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "0.10.x-dev"
-        }
-    }
+    "extra": {},
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
