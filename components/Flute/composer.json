@@ -27,7 +27,9 @@
         "lolltec/limoncello-php-component-common": "dev-master",
         "lolltec/limoncello-php-component-contracts": "dev-master",
         "lolltec/limoncello-php-component-l10n": "dev-master",
-        "lolltec/limoncello-php-component-validation": "dev-master"
+        "lolltec/limoncello-php-component-validation": "dev-master",
+        "brick/geo": "^0.2.0",
+        "ramsey/uuid-doctrine": "^1.6.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9",
