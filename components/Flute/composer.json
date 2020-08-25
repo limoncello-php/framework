@@ -22,7 +22,7 @@
         "ext-intl" : "*",
         "psr/log": "1.1.0",
         "zendframework/zend-diactoros": "^2.0",
-        "doctrine/dbal": "^2.6.3",
+        "doctrine/dbal": "~2.7.0",
         "neomerx/json-api": "^3.0.0",
         "lolltec/limoncello-php-component-common": "dev-master",
         "lolltec/limoncello-php-component-contracts": "dev-master",
