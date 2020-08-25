@@ -32,12 +32,13 @@ final class IsFloat extends ExecuteRule
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function execute($value, ContextInterface $context): array
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array
     {
         return is_float($value) === true ?
             static::createSuccessReply($value) :

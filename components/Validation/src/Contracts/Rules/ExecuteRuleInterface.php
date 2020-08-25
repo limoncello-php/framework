@@ -28,8 +28,9 @@ interface ExecuteRuleInterface extends RuleInterface
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      */
-    public static function execute($value, ContextInterface $context): array;
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array;
 }

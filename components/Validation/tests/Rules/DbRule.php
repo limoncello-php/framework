@@ -33,12 +33,13 @@ class DbRule extends ExecuteRule
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function execute($value, ContextInterface $context): array
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array
     {
         // it emulates it takes connection from context's container and work with database.
         $pdo = $context->getContainer()->get(PDO::class);

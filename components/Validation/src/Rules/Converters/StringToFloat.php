@@ -33,12 +33,13 @@ final class StringToFloat extends ExecuteRule
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function execute($value, ContextInterface $context): array
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array
     {
         if (is_string($value) === true || is_numeric($value) === true) {
             return static::createSuccessReply((float)$value);

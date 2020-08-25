@@ -60,13 +60,14 @@ final class StringToArray extends ExecuteRule
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public static function execute($value, ContextInterface $context): array
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array
     {
         $reply = null;
 

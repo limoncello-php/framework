@@ -52,12 +52,13 @@ final class StringToDateTime extends ExecuteRule
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function execute($value, ContextInterface $context): array
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array
     {
         $format = $context->getProperties()->getProperty(self::PROPERTY_FORMAT);
         if (is_string($value) === true && ($parsed = static::parseFromFormat($value, $format)) !== null) {
