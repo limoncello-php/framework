@@ -443,7 +443,11 @@ class DataParser implements JsonApiDataParserInterface
                 // execute main validation block(s)
                 foreach ($attributes as $name => $value) {
                     if (($index = $this->getAttributeIndex($name)) !== null) {
-                        $this->executeBlock($value, $index);
+                        if (array_key_exists(DI::KEYWORD_ID, $data = $jsonData[DI::KEYWORD_DATA]) === true) {
+                            $this->executeBlock($value, $index, (int)$data[DI::KEYWORD_ID]);
+                        } else {
+                            $this->executeBlock($value, $index);
+                        }
                     } elseif ($this->isIgnoreUnknowns() === false) {
                         $title   = $this->formatMessage(Messages::INVALID_VALUE);
                         $details = $this->formatMessage(Messages::UNKNOWN_ATTRIBUTE);
@@ -633,14 +637,15 @@ class DataParser implements JsonApiDataParserInterface
     }
 
     /**
-     * @param mixed $input
-     * @param int   $index
+     * @param mixed    $input
+     * @param int      $index
+     * @param int|null $primaryKeyValue
      *
      * @return void
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private function executeBlock($input, int $index): void
+    private function executeBlock($input, int $index, ?int $primaryKeyValue = null): void
     {
         BlockInterpreter::executeBlock(
             $input,
@@ -648,7 +653,8 @@ class DataParser implements JsonApiDataParserInterface
             $this->getBlocks(),
             $this->getContext(),
             $this->getCaptureAggregator(),
-            $this->getErrorAggregator()
+            $this->getErrorAggregator(),
+            $primaryKeyValue
         );
     }
 

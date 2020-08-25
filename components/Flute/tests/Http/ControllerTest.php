@@ -749,6 +749,7 @@ EOT;
         {
             "data" : {
                 "type"  : "comments",
+                "id" : "$index",
                 "attributes" : {
                     "text-attribute" : "$text"
                 },
