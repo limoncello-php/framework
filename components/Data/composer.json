@@ -19,7 +19,7 @@
     ],
     "require": {
         "php": ">=7.1.0",
-        "doctrine/dbal": "^2.6.3",
+        "doctrine/dbal": "~2.7.0",
         "lolltec/limoncello-php-component-contracts": "dev-master"
     },
     "require-dev": {

@@ -1,7 +1,9 @@
-<?php namespace Limoncello\Contracts\Data;
+<?php declare (strict_types=1);
+
+namespace Limoncello\Contracts\Data;
 
 /**
- * Copyright 2015-2019 info@neomerx.com
+ * Copyright 2020 info@lollte.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +21,8 @@
 /**
  * @package Limoncello\Contracts
  */
-interface TimestampFields
+interface UuidFields
 {
     /** Field name */
-    const FIELD_CREATED_AT = 'created_at';
-
-    /** Field name */
-    const FIELD_UPDATED_AT = 'updated_at';
-
-    /** Field name */
-    const FIELD_DELETED_AT = 'deleted_at';
+    const FIELD_UUID = 'uuid';
 }

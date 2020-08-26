@@ -28,7 +28,16 @@ use Limoncello\Contracts\Data\MigrationInterface;
 use Limoncello\Contracts\Data\ModelSchemaInfoInterface;
 use Limoncello\Contracts\Data\RelationshipTypes;
 use Limoncello\Contracts\Data\TimestampFields;
+use Limoncello\Contracts\Data\UuidFields;
 use Limoncello\Data\Contracts\MigrationContextInterface;
+use Limoncello\Flute\Types\GeometryCollectionType;
+use Limoncello\Flute\Types\LineStringType;
+use Limoncello\Flute\Types\MultiLineStringType;
+use Limoncello\Flute\Types\MultiPointType;
+use Limoncello\Flute\Types\MultiPolygonType;
+use Limoncello\Flute\Types\PointType;
+use Limoncello\Flute\Types\PolygonType;
+use Limoncello\Flute\Types\UuidType;
 use Psr\Container\ContainerInterface;
 use function array_key_exists;
 use function assert;
@@ -326,15 +335,53 @@ trait MigrationTrait
     }
 
     /**
-     * @param string $name
+     * @param string   $name
+     * @param int|null $default
      *
      * @return Closure
      */
-    protected function string(string $name): Closure
+    protected function nullableFloat(string $name, int $default = null): Closure
     {
-        return function (Table $table, MigrationContextInterface $context) use ($name) {
+        return function (Table $table) use ($name, $default) {
+            $table->addColumn($name, Type::FLOAT)->setUnsigned(false)->setNotnull(false)->setDefault($default);
+        };
+    }
+
+    /**
+     * @param string   $name
+     * @param int|null $default
+     *
+     * @return Closure
+     */
+    protected function unsignedFloat(string $name, int $default = null): Closure
+    {
+        return $this->unsignedFloatImpl($name, true, $default);
+    }
+
+    /**
+     * @param string   $name
+     * @param int|null $default
+     *
+     * @return Closure
+     */
+    protected function nullableUnsignedFloat(string $name, int $default = null): Closure
+    {
+        return $this->unsignedFloatImpl($name, false, $default);
+    }
+
+    /**
+     * @param string      $name
+     *
+     * @param string|null $default
+     *
+     * @return Closure
+     */
+    protected function string(string $name, string $default = null): Closure
+    {
+        return function (Table $table, MigrationContextInterface $context) use ($name, $default) {
             $length = $context->getModelSchemas()->getAttributeLength($context->getModelClass(), $name);
-            $table->addColumn($name, Type::STRING)->setLength($length)->setNotnull(true);
+            $column = $table->addColumn($name, Type::STRING)->setLength($length)->setNotnull(true);
+            $default === null ?: $column->setDefault($default);
         };
     }
 
@@ -388,6 +435,18 @@ trait MigrationTrait
             if ($default !== null) {
                 $column->setDefault($default);
             }
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableBool(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $column = $table->addColumn($name, Type::BOOLEAN)->setNotnull(false);
         };
     }
 
@@ -508,6 +567,271 @@ trait MigrationTrait
     {
         return function (Table $table) use ($name) {
             $table->addColumn($name, Type::DATE)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function time(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, Type::TIME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableTime(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, Type::TIME)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function json(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, Type::JSON)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableJson(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, Type::JSON)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function primaryUuid(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, UuidType::NAME)->setNotnull(true);
+            $table->setPrimaryKey([$name]);
+        };
+    }
+
+    /**
+     * @return Closure
+     */
+    protected function defaultUuid(): Closure
+    {
+        return function (Table $table) {
+            $uuid = UuidFields::FIELD_UUID;
+
+            $table->addColumn($uuid, UuidType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function uuid(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, UuidType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableUuid(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, UuidType::NAME)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function point(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, PointType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullablePoint(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, PointType::NAME)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function multiPoint(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, MultiPointType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableMultiPoint(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, MultiPointType::NAME)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function lineString(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, LineStringType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableLineString(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, LineStringType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function multiLineString(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, MultiLineStringType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableMultiLineString(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, MultiLineStringType::NAME)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function polygon(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, PolygonType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullablePolygon(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, PolygonType::NAME)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function multiPolygon(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, MultiPolygonType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableMultiPolygon(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, MultiPolygonType::NAME)->setNotnull(false);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function geometryCollection(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, GeometryCollectionType::NAME)->setNotnull(true);
+        };
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Closure
+     */
+    protected function nullableGeometryCollection(string $name): Closure
+    {
+        return function (Table $table) use ($name) {
+            $table->addColumn($name, GeometryCollectionType::NAME)->setNotnull(false);
         };
     }
 
@@ -771,6 +1095,21 @@ trait MigrationTrait
     {
         return function (Table $table) use ($name, $notNullable, $default) {
             $column = $table->addColumn($name, Type::INTEGER)->setUnsigned(true)->setNotnull($notNullable);
+            $default === null ?: $column->setDefault($default);
+        };
+    }
+
+    /**
+     * @param string $name
+     * @param bool   $notNullable
+     * @param null   $default
+     *
+     * @return Closure
+     */
+    private function unsignedFloatImpl(string $name, bool $notNullable, $default = null): Closure
+    {
+        return function (Table $table) use ($name, $notNullable, $default) {
+            $column = $table->addColumn($name, Type::FLOAT)->setUnsigned(true)->setNotnull($notNullable);
             $default === null ?: $column->setDefault($default);
         };
     }
