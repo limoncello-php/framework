@@ -36,6 +36,10 @@ use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiParserFactory;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactoryInterface;
+use Ramsey\Uuid\Validator\GenericValidator as UuidValidator;
+use Ramsey\Uuid\Validator\ValidatorInterface as UuidValidatorInterface;
 
 /**
  * @package Limoncello\Flute
@@ -110,6 +114,14 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             $factory = new FormValidatorFactory($container);
 
             return $factory;
+        };
+
+        $container[UuidFactoryInterface::class] = function (): UuidFactoryInterface {
+            return Uuid::getFactory();
+        };
+
+        $container[UuidValidatorInterface::class] = function (): UuidValidatorInterface {
+            return new UuidValidator();
         };
 
         // register date/date time types

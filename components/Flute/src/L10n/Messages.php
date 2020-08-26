@@ -68,4 +68,7 @@ interface Messages extends \Limoncello\Validation\I18n\Messages
 
     /** @var string Validation Message Template */
     const INVALID_OPERATION_ARGUMENTS = 'Invalid Operation Arguments.';
+
+    /** @var string Validation Message Template */
+    const INVALID_UUID = 'The value should be a valid UUID.';
 }
