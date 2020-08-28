@@ -934,6 +934,36 @@ class Crud implements CrudInterface
     }
 
     /**
+     * @param iterable|null $columns
+     *
+     * @return ModelQueryBuilder
+     *
+     * @throws DBALException
+     */
+    protected function createIndexModelBuilderWithoutPaging(iterable $columns = null): ModelQueryBuilder
+    {
+        $builder = $this->createBuilder($this->getModelClass());
+
+        $this
+            ->applyColumnMapper($builder);
+
+        $builder
+            ->selectModelColumns($columns)
+            ->fromModelTable();
+
+        $this
+            ->applyAliasFilters($builder)
+            ->applySorts($builder)
+            ->applyRelationshipFiltersAndSorts($builder);
+
+        $result = $this->builderOnIndex($builder);
+
+        $this->clearBuilderParameters();
+
+        return $result;
+    }
+
+    /**
      * @return ModelQueryBuilder
      *
      * @throws DBALException
@@ -961,6 +991,19 @@ class Crud implements CrudInterface
     public function index(): PaginatedDataInterface
     {
         $builder = $this->createIndexModelBuilder();
+        $data    = $this->fetchResources($builder, $builder->getModelClass());
+
+        return $data;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws DBALException
+     */
+    public function indexWithoutPaging(): PaginatedDataInterface
+    {
+        $builder = $this->createIndexModelBuilderWithoutPaging();
         $data    = $this->fetchResources($builder, $builder->getModelClass());
 
         return $data;
@@ -1006,6 +1049,20 @@ class Crud implements CrudInterface
     {
         $result = $this->builderOnCount(
             $this->createCountBuilderFromBuilder($this->createIndexModelBuilder())
+        )->execute()->fetchColumn();
+
+        return $result === false ? null : (int)$result;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws DBALException
+     */
+    public function countWithoutPaging(): ?int
+    {
+        $result = $this->builderOnCount(
+            $this->createCountBuilderFromBuilder($this->createIndexModelBuilderWithoutPaging())
         )->execute()->fetchColumn();
 
         return $result === false ? null : (int)$result;

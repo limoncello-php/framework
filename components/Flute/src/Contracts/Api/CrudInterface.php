@@ -152,6 +152,11 @@ interface CrudInterface
     public function index(): PaginatedDataInterface;
 
     /**
+     * @return PaginatedDataInterface
+     */
+    public function indexWithoutPaging(): PaginatedDataInterface;
+
+    /**
      * @return array
      */
     public function indexIdentities(): array;
@@ -167,6 +172,11 @@ interface CrudInterface
      * @return int|null
      */
     public function count(): ?int;
+
+    /**
+     * @return int|null
+     */
+    public function countWithoutPaging(): ?int;
 
     /**
      * @return int
