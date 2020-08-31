@@ -93,8 +93,8 @@ final class UniqueInDbTableSingleWithDoctrineRule extends ExecuteRule
 
             $fetched = $statement->execute()->fetch();
 
-            $found = isset($primaryKey) ?
-                $fetched !== false && $fetched[$primaryKey] !== $primaryKeyValue :
+            $found = isset($primaryKeyName) ?
+                $fetched !== false && (int)$fetched[$primaryKeyName] !== $primaryKeyValue :
                 $fetched !== false;
         }
 
