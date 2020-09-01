@@ -1,16 +1,20 @@
 {
-    "name": "limoncello-php/flute",
+    "name": "lolltec/limoncello-php-component-flute",
     "description": "Limoncello framework json-api support.",
     "keywords": ["limoncello", "framework", "json-api", "flute"],
-    "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Flute",
+    "homepage": "https://github.com/lolltec/limoncello-php-framework/tree/master/components/Flute",
     "support": {
-        "issues": "https://github.com/limoncello-php/framework/issues"
+        "issues": "https://github.com/lolltec/limoncello-php-framework/issues"
     },
     "license": "Apache-2.0",
     "authors": [
         {
             "name": "neomerx",
             "email": "info@neomerx.com"
+        },
+        {
+            "name": "lolltec",
+            "email": "info@lolltec.com"
         }
     ],
     "require": {
@@ -18,12 +22,14 @@
         "ext-intl" : "*",
         "psr/log": "1.1.0",
         "zendframework/zend-diactoros": "^2.0",
-        "doctrine/dbal": "^2.6.3",
+        "doctrine/dbal": "~2.7.0",
         "neomerx/json-api": "^3.0.0",
-        "limoncello-php/common": "^0.10.0",
-        "limoncello-php/contracts": "^0.10.0",
-        "limoncello-php/l10n": "^0.10.0",
-        "limoncello-php/validation": "^0.10.0"
+        "lolltec/limoncello-php-component-common": "dev-master",
+        "lolltec/limoncello-php-component-contracts": "dev-master",
+        "lolltec/limoncello-php-component-l10n": "dev-master",
+        "lolltec/limoncello-php-component-validation": "dev-master",
+        "brick/geo": "^0.2.0",
+        "ramsey/uuid-doctrine": "^1.6.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9",
@@ -31,7 +37,7 @@
         "scrutinizer/ocular": "^1.4",
         "phpunit/phpunit": "^7.0",
         "mockery/mockery": "^1.0",
-        "limoncello-php/container": "^0.10.0",
+        "lolltec/limoncello-php-component-container": "dev-master",
         "fzaninotto/faker": "^1.7"
     },
     "autoload": {
@@ -51,14 +57,17 @@
         "test-unit-with-coverage": "./vendor/bin/phpunit --coverage-text",
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
+        "test-unit-php-7-4": "docker-compose run --rm cli_7_4_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-4-win": "docker-compose run --rm cli_7_4_php ./vendor/bin/phpunit",
         "test-unit-php-7-3": "docker-compose run --rm cli_7_3_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-3-win": "docker-compose run --rm cli_7_3_php ./vendor/bin/phpunit",
         "test-unit-php-7-2": "docker-compose run --rm cli_7_2_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-2-win": "docker-compose run --rm cli_7_2_php ./vendor/bin/phpunit",
         "test-unit-php-7-1": "docker-compose run --rm cli_7_1_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-1-win": "docker-compose run --rm cli_7_1_php ./vendor/bin/phpunit",
         "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php -d hhvm.php7.all=1 ./vendor/bin/phpunit"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "0.10.x-dev"
-        }
-    }
+    "extra": {},
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

@@ -4,6 +4,22 @@
 # https://docs.docker.com/compose/overview/
 # https://docs.docker.com/compose/compose-file/
 
+cli_7_1_php:
+    build: ./../../docker/7_1_cli
+    container_name: cli_7_1_php_limoncello
+    volumes:
+        - .:/app
+    working_dir: /app
+    tty: true
+
+cli_7_2_php:
+    build: ./../../docker/7_2_cli
+    container_name: cli_7_2_php_limoncello
+    volumes:
+        - .:/app
+    working_dir: /app
+    tty: true
+
 cli_7_3_php:
   build: ./../../docker/7_3_cli
   container_name: cli_7_3_php_limoncello

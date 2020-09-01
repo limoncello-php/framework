@@ -58,15 +58,16 @@ final class AreReadableViaApiRule extends ExecuteRule
     /**
      * @param mixed            $values
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
      */
-    public static function execute($values, ContextInterface $context): array
+    public static function execute($values, ContextInterface $context, $primaryKeyValue = null): array
     {
         assert(is_array($values));
 

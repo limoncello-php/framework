@@ -43,31 +43,39 @@ final class UniqueInDbTableSingleWithDoctrineRule extends ExecuteRule
     const PROPERTY_PRIMARY_NAME = self::PROPERTY_TABLE_NAME + 1;
 
     /**
-     * @param string $tableName
-     * @param string $primaryName
+     * Property key.
      */
-    public function __construct(string $tableName, string $primaryName)
+    const PROPERTY_PRIMARY_KEY_NAME = self::PROPERTY_PRIMARY_NAME + 1;
+
+    /**
+     * @param string      $tableName
+     * @param string      $primaryName
+     * @param string|null $primaryKeyName
+     */
+    public function __construct(string $tableName, string $primaryName, ?string $primaryKeyName = null)
     {
         parent::__construct([
-            static::PROPERTY_TABLE_NAME   => $tableName,
-            static::PROPERTY_PRIMARY_NAME => $primaryName,
+            static::PROPERTY_TABLE_NAME       => $tableName,
+            static::PROPERTY_PRIMARY_NAME     => $primaryName,
+            static::PROPERTY_PRIMARY_KEY_NAME => $primaryKeyName,
         ]);
     }
 
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
      */
-    public static function execute($value, ContextInterface $context): array
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array
     {
-        $count = 0;
+        $found = false;
 
         if (is_scalar($value) === true) {
             /** @var Connection $connection */
@@ -75,16 +83,22 @@ final class UniqueInDbTableSingleWithDoctrineRule extends ExecuteRule
             $builder     = $connection->createQueryBuilder();
             $tableName   = $context->getProperties()->getProperty(static::PROPERTY_TABLE_NAME);
             $primaryName = $context->getProperties()->getProperty(static::PROPERTY_PRIMARY_NAME);
+            $primaryKeyName = $context->getProperties()->getProperty(static::PROPERTY_PRIMARY_KEY_NAME);
+            $columnsName = $primaryKeyName !== null ? "`{$primaryKeyName}`, `{$primaryName}`" : "`{$primaryName}`";
             $statement   = $builder
-                ->select('count(*)')
+                ->select($columnsName)
                 ->from($tableName)
                 ->where($builder->expr()->eq($primaryName, $builder->createPositionalParameter($value)))
-                ->execute();
+                ->setMaxResults(1);
 
-            $count = $statement->fetchColumn();
+            $fetched = $statement->execute()->fetch();
+
+            $found = isset($primaryKeyName) ?
+                $fetched !== false && (int)$fetched[$primaryKeyName] !== $primaryKeyValue :
+                $fetched !== false;
         }
 
-        $reply = $count <= 0 ?
+        $reply = $found === false ?
             static::createSuccessReply($value) :
             static::createErrorReply(
                 $context,

@@ -85,8 +85,10 @@ trait DefaultControllerMethodsTrait
         $queryParser->parse(null, $queryParams);
 
         $models = $mapper->applyQueryParameters($queryParser, $crud)->index();
+        $modelsCount = $mapper->applyQueryParameters($queryParser, $crud)->countWithoutPaging();
 
         static::defaultApplyIncludesAndFieldSetsToEncoder($queryParser, $encoder);
+        static::defaultApplyMetaToEncoder($queryParser, $encoder, $models, $modelsCount);
         $responses = static::defaultCreateResponses($requestUri, $encoder);
         $response  = ($models->getData()) === null ?
             $responses->getCodeResponse(404) : $responses->getContentResponse($models);
@@ -275,7 +277,7 @@ trait DefaultControllerMethodsTrait
 
         $captures = $parser->assert($jsonData)->getCaptures();
 
-        list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
+        [$index, $attributes, $toMany] = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
         try {
             $index = $crud->create($index, $attributes, $toMany);
@@ -411,7 +413,7 @@ trait DefaultControllerMethodsTrait
         // validate the data
         $captures = $parser->assert($jsonData)->getCaptures();
 
-        list ($index, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
+        [$index, $attributes, $toMany] = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
         try {
             $updated = $crud->update((string)$index, $attributes, $toMany);
@@ -639,7 +641,7 @@ trait DefaultControllerMethodsTrait
         // If we are here then we have something in 'data' section.
 
         $validatedIndex = (string)$queryParser->parse($index)->getIdentity();
-        list (, $attributes, $toMany) = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
+        [, $attributes, $toMany] = static::mapSchemaDataToModelData($captures, $schemaClass, $schemaInfo);
 
         $updated = $crud->update($validatedIndex, $attributes, $toMany);
 
@@ -753,6 +755,32 @@ trait DefaultControllerMethodsTrait
         }
         if ($queryParser->hasFields() === true) {
             $encoder->withFieldSets($queryParser->getFields());
+        }
+    }
+
+    /**
+     * @param JsonApiQueryParserInterface $queryParser
+     * @param EncoderInterface       $encoder
+     * @param PaginatedDataInterface $models
+     * @param int                    $modelsCount
+     *
+     * @return void
+     */
+    protected static function defaultApplyMetaToEncoder(
+        JsonApiQueryParserInterface $queryParser,
+        EncoderInterface $encoder,
+        PaginatedDataInterface $models,
+        int $modelsCount
+    ): void {
+        if ($modelsCount > 0 &&
+            ($queryParser->hasPaging() === true &&
+            $models->hasMoreItems() === true)
+        ) {
+            $encoder->withMeta([
+                'items' => [
+                    'total' => $modelsCount,
+                ],
+            ]);
         }
     }
 

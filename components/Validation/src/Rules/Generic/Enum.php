@@ -50,12 +50,13 @@ final class Enum extends ExecuteRule
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function execute($value, ContextInterface $context): array
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array
     {
         $values = $context->getProperties()->getProperty(static::PROPERTY_VALUES);
         $isOk   = in_array($value, $values);

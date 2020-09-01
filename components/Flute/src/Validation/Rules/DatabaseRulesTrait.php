@@ -60,13 +60,14 @@ trait DatabaseRulesTrait
     /**
      * @param string             $tableName
      * @param string             $primaryName
+     * @param string|null        $primaryKeyName
      * @param RuleInterface|null $next
      *
      * @return RuleInterface
      */
-    public static function unique(string $tableName, string $primaryName, RuleInterface $next = null): RuleInterface
+    public static function unique(string $tableName, string $primaryName, ?string $primaryKeyName = null, RuleInterface $next = null): RuleInterface
     {
-        $primary = new UniqueInDbTableSingleWithDoctrineRule($tableName, $primaryName);
+        $primary = new UniqueInDbTableSingleWithDoctrineRule($tableName, $primaryName, $primaryKeyName);
 
         return $next === null ? $primary : new AndOperator($primary, $next);
     }

@@ -1,6 +1,6 @@
 <?php namespace Limoncello\Contracts\Data;
 
-    /**
+/**
  * Copyright 2015-2019 info@neomerx.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

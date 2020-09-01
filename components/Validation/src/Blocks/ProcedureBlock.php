@@ -167,7 +167,7 @@ final class ProcedureBlock implements ProcedureBlockInterface
     private function checkProcedureExecuteCallableSignature(callable $procedureCallable): bool
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        return static::checkPublicStaticCallable($procedureCallable, [null, ContextInterface::class], 'array');
+        return static::checkPublicStaticCallable($procedureCallable, [null, ContextInterface::class, null], 'array');
     }
 
     /** @noinspection PhpDocMissingThrowsInspection

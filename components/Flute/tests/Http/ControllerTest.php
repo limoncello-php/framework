@@ -231,6 +231,51 @@ class ControllerTest extends TestCase
      * @throws Exception
      * @throws DBALException
      */
+    public function testIndexWithParameters1(): void
+    {
+        $routeParams = [];
+        $queryParams = [
+            'page' => [
+                'limit' => 2,
+            ],
+        ];
+        $container   = $this->createContainer();
+        $uri         = new Uri('http://localhost.local/boards?' . http_build_query($queryParams));
+        /** @var Mock $request */
+        $request = Mockery::mock(ServerRequestInterface::class);
+        $request->shouldReceive('getQueryParams')->once()->withNoArgs()->andReturn($queryParams);
+        $request->shouldReceive('getUri')->once()->withNoArgs()->andReturn($uri);
+
+        $exception = null;
+        try {
+            /** @var ServerRequestInterface $request */
+            $response = ApiBoardsController::index($routeParams, $container, $request);
+            $this->assertNotNull($response);
+            $this->assertEquals(200, $response->getStatusCode());
+
+            $body     = (string)($response->getBody());
+            $resource = json_decode($body, true);
+
+            $this->assertArrayHasKey(DocumentInterface::KEYWORD_META, $resource);
+            $this->assertArrayHasKey('items', $meta = $resource[DocumentInterface::KEYWORD_META]);
+            $this->assertArrayHasKey('total', $items = $meta['items']);
+            $this->assertEquals(5, $items['total']);
+
+            $this->assertArrayHasKey(DocumentInterface::KEYWORD_LINKS, $resource);
+            $this->assertArrayHasKey(DocumentInterface::KEYWORD_DATA, $resource);
+
+        } catch (JsonApiException $exception) {
+        }
+
+        $this->assertNull($exception);
+    }
+
+    /**
+     * Controller test.
+     *
+     * @throws Exception
+     * @throws DBALException
+     */
     public function testIndexWithParametersJoinedByOR(): void
     {
         $routeParams = [];
@@ -749,6 +794,7 @@ EOT;
         {
             "data" : {
                 "type"  : "comments",
+                "id" : "$index",
                 "attributes" : {
                     "text-attribute" : "$text"
                 },

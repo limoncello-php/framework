@@ -24,10 +24,22 @@ use Limoncello\Flute\Http\Query\ParametersMapper;
 use Limoncello\Flute\Http\ThrowableHandlers\FluteThrowableHandler;
 use Limoncello\Flute\Types\DateTimeType;
 use Limoncello\Flute\Types\DateType;
+use Limoncello\Flute\Types\GeometryCollectionType;
+use Limoncello\Flute\Types\LineStringType;
+use Limoncello\Flute\Types\MultiLineStringType;
+use Limoncello\Flute\Types\MultiPointType;
+use Limoncello\Flute\Types\MultiPolygonType;
+use Limoncello\Flute\Types\PointType;
+use Limoncello\Flute\Types\PolygonType;
+use Limoncello\Flute\Types\UuidType;
 use Limoncello\Flute\Validation\Form\Execution\FormValidatorFactory;
 use Limoncello\Flute\Validation\JsonApi\Execution\JsonApiParserFactory;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactoryInterface;
+use Ramsey\Uuid\Validator\GenericValidator as UuidValidator;
+use Ramsey\Uuid\Validator\ValidatorInterface as UuidValidatorInterface;
 
 /**
  * @package Limoncello\Flute
@@ -104,9 +116,29 @@ class FluteContainerConfigurator implements ContainerConfiguratorInterface
             return $factory;
         };
 
+        $container[UuidFactoryInterface::class] = function (): UuidFactoryInterface {
+            return Uuid::getFactory();
+        };
+
+        $container[UuidValidatorInterface::class] = function (): UuidValidatorInterface {
+            return new UuidValidator();
+        };
+
         // register date/date time types
         Type::hasType(DateTimeType::NAME) === true ?: Type::addType(DateTimeType::NAME, DateTimeType::class);
         Type::hasType(DateType::NAME) === true ?: Type::addType(DateType::NAME, DateType::class);
+
+        // register spatial types
+        Type::hasType(PointType::NAME) === true ?: Type::addType(PointType::NAME, PointType::class);
+        Type::hasType(MultiPointType::NAME) === true ?: Type::addType(MultiPointType::NAME, MultiPointType::class);
+        Type::hasType(LineStringType::NAME) === true ?: Type::addType(LineStringType::NAME, LineStringType::class);
+        Type::hasType(MultiLineStringType::NAME) === true ?: Type::addType(MultiLineStringType::NAME, MultiLineStringType::class);
+        Type::hasType(PolygonType::NAME) === true ?: Type::addType(PolygonType::NAME, PolygonType::class);
+        Type::hasType(MultiPolygonType::NAME) === true ?: Type::addType(MultiPolygonType::NAME, MultiPolygonType::class);
+        Type::hasType(GeometryCollectionType::NAME) === true ?: Type::addType(GeometryCollectionType::NAME, GeometryCollectionType::class);
+
+        // register UUID types
+        Type::hasType(UuidType::NAME) === true ?: Type::addType(UuidType::NAME, UuidType::class);
     }
 
     /**

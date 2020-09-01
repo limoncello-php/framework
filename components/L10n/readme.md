@@ -1,11 +1,11 @@
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/limoncello-php-dist/l10n/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/limoncello-php-dist/l10n/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/limoncello-php-dist/l10n/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/limoncello-php-dist/l10n/?branch=master)
-[![Build Status](https://travis-ci.org/limoncello-php-dist/l10n.svg?branch=master)](https://travis-ci.org/limoncello-php-dist/l10n)
-[![License](https://img.shields.io/github/license/limoncello-php/framework.svg)](https://packagist.org/packages/limoncello-php/framework)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/lolltec/limoncello-php-component-l10n/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lolltec/limoncello-php-component-l10n/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/lolltec/limoncello-php-component-l10n/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/lolltec/limoncello-php-component-l10n/?branch=master)
+[![Build Status](https://travis-ci.org/lolltec/limoncello-php-component-l10n.svg?branch=master)](https://travis-ci.org/lolltec/limoncello-php-component-l10n)
+[![License](https://img.shields.io/github/license/lolltec/limoncello-php-framework.svg)](https://packagist.org/packages/lolltec/limoncello-php-framework)
 
 ## Summary
 
-This is localization component for [Limoncello Framework](https://github.com/limoncello-php/framework).
+This is localization component for [Limoncello Framework](https://github.com/lolltec/limoncello-php-framework).
 
 The component helps to translate an application into different languages. In particular,  it provides an ability to manage localized files easily and extract localized strings for a given locale with a fallback to default one.
 
@@ -113,7 +113,7 @@ There is another wrapper for `Translator` called `Formatter` which hides locale 
 
 ```
 
-[More info](https://github.com/limoncello-php/framework).
+[More info](https://github.com/lolltec/limoncello-php-framework).
 
 ## Recommended Usage
 

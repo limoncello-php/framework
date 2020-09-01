@@ -1,22 +1,26 @@
 {
-    "name": "limoncello-php/events",
+    "name": "lolltec/limoncello-php-component-events",
     "description": "Events library for Limoncello PHP framework.",
     "keywords": ["limoncello", "framework", "events"],
-    "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Events",
+    "homepage": "https://github.com/lolltec/limoncello-php-framework/tree/master/components/Events",
     "support": {
-        "issues": "https://github.com/limoncello-php/framework/issues"
+        "issues": "https://github.com/lolltec/limoncello-php-framework/issues"
     },
     "license": "Apache-2.0",
     "authors": [
         {
             "name": "neomerx",
             "email": "info@neomerx.com"
+        },
+        {
+            "name": "lolltec",
+            "email": "info@lolltec.com"
         }
     ],
     "require": {
         "php": ">=7.1.0",
-        "limoncello-php/contracts": "^0.10.0",
-        "limoncello-php/core": "^0.10.0"
+        "lolltec/limoncello-php-component-contracts": "dev-master",
+        "lolltec/limoncello-php-component-core": "dev-master"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9",
@@ -41,14 +45,17 @@
         "test-unit-with-coverage": "phpdbg -qrr ./vendor/bin/phpunit --coverage-text",
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests",
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming",
+        "test-unit-php-7-4": "docker-compose run --rm cli_7_4_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-4-win": "docker-compose run --rm cli_7_4_php ./vendor/bin/phpunit",
         "test-unit-php-7-3": "docker-compose run --rm cli_7_3_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-3-win": "docker-compose run --rm cli_7_3_php ./vendor/bin/phpunit",
         "test-unit-php-7-2": "docker-compose run --rm cli_7_2_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-2-win": "docker-compose run --rm cli_7_2_php ./vendor/bin/phpunit",
         "test-unit-php-7-1": "docker-compose run --rm cli_7_1_php php ./vendor/bin/phpunit",
+        "test-unit-php-7-1-win": "docker-compose run --rm cli_7_1_php ./vendor/bin/phpunit",
         "test-unit-hhvm":    "docker-compose run --rm cli_hhvm php -d hhvm.php7.all=1 ./vendor/bin/phpunit"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "0.10.x-dev"
-        }
-    }
+    "extra": {},
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

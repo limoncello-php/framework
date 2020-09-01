@@ -56,15 +56,16 @@ final class ExistInDbTableSingleWithDoctrineRule extends ExecuteRule
     /**
      * @param mixed            $value
      * @param ContextInterface $context
+     * @param null             $primaryKeyValue
      *
      * @return array
      *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
      */
-    public static function execute($value, ContextInterface $context): array
+    public static function execute($value, ContextInterface $context, $primaryKeyValue = null): array
     {
         $count = 0;
 

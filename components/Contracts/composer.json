@@ -1,16 +1,20 @@
 {
-    "name": "limoncello-php/contracts",
+    "name": "lolltec/limoncello-php-component-contracts",
     "description": "Limoncello PHP Framework Contracts (interfaces) required for components integration.",
     "keywords": ["limoncello", "framework", "contracts", "interfaces"],
-    "homepage": "https://github.com/limoncello-php/framework/tree/master/components/Contracts",
+    "homepage": "https://github.com/lolltec/limoncello-php-framework/tree/master/components/Contracts",
     "support": {
-        "issues": "https://github.com/limoncello-php/framework/issues"
+        "issues": "https://github.com/lolltec/limoncello-php-framework/issues"
     },
     "license": "Apache-2.0",
     "authors": [
         {
             "name": "neomerx",
             "email": "info@neomerx.com"
+        },
+        {
+            "name": "lolltec",
+            "email": "info@lolltec.com"
         }
     ],
     "require": {
@@ -32,9 +36,7 @@
         "test-cs": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src",
         "test-md": "./vendor/bin/phpmd ./src text codesize,controversial,cleancode,design,unusedcode,naming"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "0.10.x-dev"
-        }
-    }
+    "extra": {},
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
